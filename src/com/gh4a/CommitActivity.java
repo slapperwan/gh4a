@@ -244,7 +244,9 @@ public class CommitActivity extends BaseActivity {
      * @param commit the commit
      */
     protected void fillData(final Commit commit) {
-        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.ll_files);
+        LinearLayout llChanged = (LinearLayout) findViewById(R.id.ll_changed);
+        LinearLayout llAdded = (LinearLayout) findViewById(R.id.ll_added);
+        LinearLayout llDeleted = (LinearLayout) findViewById(R.id.ll_deleted);
 
         ImageView ivGravatar = (ImageView) findViewById(R.id.iv_gravatar);
         ImageDownloader.getInstance().download(StringUtils.md5Hex(commit.getAuthor().getEmail()),
@@ -301,8 +303,16 @@ public class CommitActivity extends BaseActivity {
                         startActivity(intent);
                     }
                 });
-                linearLayout.addView(tvFilename);
+                llAdded.addView(tvFilename);
             }
+        }
+        
+        if (addedCount == 0) {
+            TextView tvFilename = new TextView(getApplicationContext());
+            tvFilename.setTextAppearance(getApplicationContext(),
+                    R.style.default_text_medium);
+            tvFilename.setText(R.string.commit_no_files);
+            llAdded.addView(tvFilename);
         }
 
         List<String> removedList = commit.getRemoved();
@@ -310,28 +320,21 @@ public class CommitActivity extends BaseActivity {
             removedCount = removedList.size();
             for (final String filename : removedList) {
                 TextView tvFilename = new TextView(getApplicationContext());
-                SpannableString content = new SpannableString(filename);
-                content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-                tvFilename.setText(content);
+                tvFilename.setText(filename);
                 tvFilename.setTextAppearance(getApplicationContext(),
-                        R.style.default_text_medium_url);
-                tvFilename.setBackgroundResource(R.drawable.default_link);
-                tvFilename.setOnClickListener(new OnClickListener() {
-
-                    @Override
-                    public void onClick(View arg0) {
-                        Intent intent = new Intent().setClass(CommitActivity.this,
-                                DiffViewerActivity.class);
-                        intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
-                        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                        intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
-                        startActivity(intent);
-                    }
-                });
-                linearLayout.addView(tvFilename);
+                        R.style.default_text_medium);
+                llDeleted.addView(tvFilename);
             }
         }
 
+        if (removedCount == 0) {
+            TextView tvFilename = new TextView(getApplicationContext());
+            tvFilename.setTextAppearance(getApplicationContext(),
+                    R.style.default_text_medium);
+            tvFilename.setText(R.string.commit_no_files);
+            llDeleted.addView(tvFilename);
+        }
+        
         List<Delta> modifiedList = commit.getModified();
         if (modifiedList != null) {
             for (final Delta delta : modifiedList) {
@@ -355,11 +358,19 @@ public class CommitActivity extends BaseActivity {
                         startActivity(intent);
                     }
                 });
-                linearLayout.addView(tvFilename);
+                llChanged.addView(tvFilename);
             }
             modifiedCount = modifiedList.size();
         }
 
+        if (modifiedCount == 0) {
+            TextView tvFilename = new TextView(getApplicationContext());
+            tvFilename.setTextAppearance(getApplicationContext(),
+                    R.style.default_text_medium);
+            tvFilename.setText(R.string.commit_no_files);
+            llChanged.addView(tvFilename);
+        }
+        
         tvSummary.setText(String.format(getResources().getString(R.string.commit_summary),
                 modifiedCount, addedCount, removedCount));
 

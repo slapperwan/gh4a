@@ -6,8 +6,6 @@
     <string name="record_not_found">%1$s not found</string>
     <string name="more_data">%1$s | %2$s</string>
     <string name="more_data_3">%1$s | %2$s | %3$s</string>
-    <string name="user_extra_data">%1$d followers | %2$d repos</string>
-    <string name="commit_summary">%1$d files changed | %2$d files added | %3$d files deleted</string>
     <string name="loading_msg">Loading...</string>
     <string name="search">Search</string>
     <string name="activity">Activity</string>
@@ -61,6 +59,7 @@
     <string name="user_created_at">Member since</string>
     <string name="user_pub_repos">Public Repositories</string>
     <string name="user_watched_repos">Watched Repositories</string>
+    <string name="user_extra_data">%1$d followers | %2$d repos</string>
 
     <!-- Repository -->
     <plurals name="repository">
@@ -101,6 +100,11 @@
     <string name="commit_committed_date">Committed date</string>
     <string name="commit_authored_date">Authored date</string>
     <string name="commits">Commits</string>
+    <string name="commit_changed">Files Changed</string>
+    <string name="commit_added">Files Added</string>
+    <string name="commit_deleted">Files Deleted</string>
+    <string name="commit_summary">%1$d changed | %2$d added | %3$d deleted</string>
+    <string name="commit_no_files">No files</string>
 
     <!-- Issue -->
     <plurals name="issue">

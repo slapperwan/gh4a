@@ -45,6 +45,9 @@ public class AddedFileViewerActivity extends BaseActivity {
 
     /** The tree sha. */
     private String mTreeSha;
+    
+    /** The object sha. */
+    private String mObjectSha;
 
     /** The path. */
     private String mFilePath;
@@ -67,6 +70,7 @@ public class AddedFileViewerActivity extends BaseActivity {
         mUserLogin = getIntent().getStringExtra(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getStringExtra(Constants.Repository.REPO_NAME);
         mTreeSha = getIntent().getStringExtra(Constants.Object.TREE_SHA);
+        mObjectSha = getIntent().getStringExtra(Constants.Object.OBJECT_SHA);
         mFilePath = getIntent().getStringExtra(Constants.Object.PATH);
 
         setBreadCrumb();
@@ -168,16 +172,18 @@ public class AddedFileViewerActivity extends BaseActivity {
                 mTarget.get().showError();
             }
             else {
-                if (showInBrowser) {
+                if (result.getMimeType().startsWith("text")
+                        || result.getMimeType().equals("application/xml")
+                        || result.getMimeType().equals("application/sh")) {
+                    mTarget.get().fillData(result);
+                }
+                else {
                     String url = "https://github.com/" + mTarget.get().mUserLogin + "/"
-                            + mTarget.get().mRepoName + "/blob/" + mTarget.get().mTreeSha + "/"
+                            + mTarget.get().mRepoName + "/raw/" + mTarget.get().mObjectSha + "/"
                             + mTarget.get().mFilePath;
                     mTarget.get().getApplicationContext().openBrowser(mTarget.get(), url);
                     mTarget.get().mLoadingDialog.dismiss();
-                    mTarget.get().finish();
-                }
-                else {
-                    mTarget.get().fillData(result);
+                    mTarget.get().finish();                    
                 }
             }
         }
