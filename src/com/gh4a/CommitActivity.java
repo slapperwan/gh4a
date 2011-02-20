@@ -271,7 +271,6 @@ public class CommitActivity extends BaseActivity {
         int addedCount = 0;
         int removedCount = 0;
         int modifiedCount = 0;
-        String filenames = "";
 
         List<String> addedList = commit.getAdded();
         if (addedList != null) {
@@ -293,7 +292,6 @@ public class CommitActivity extends BaseActivity {
                         intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
                         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                         intent.putExtra(Constants.Object.OBJECT_SHA, mSha);
-                        intent.putExtra("FILENAME", filename);
                         startActivity(intent);
                     }
                 });
@@ -321,7 +319,6 @@ public class CommitActivity extends BaseActivity {
                         intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
                         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                         intent.putExtra(Constants.Object.OBJECT_SHA, mSha);
-                        intent.putExtra("FILENAME", filename);
                         startActivity(intent);
                     }
                 });
@@ -349,7 +346,6 @@ public class CommitActivity extends BaseActivity {
                         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                         intent.putExtra(Constants.Object.OBJECT_SHA, mSha);
                         intent.putExtra(Constants.DIFF, delta.getDiff());
-                        intent.putExtra("FILENAME", delta.getFilename());
                         startActivity(intent);
                     }
                 });
@@ -358,8 +354,8 @@ public class CommitActivity extends BaseActivity {
             modifiedCount = modifiedList.size();
         }
 
-        tvSummary.setText(modifiedCount + " changed files with " + addedCount + " additions and "
-                + removedCount + " deletions.");
+        tvSummary.setText(String.format(getResources().getString(R.string.commit_summary),
+                modifiedCount, addedCount, removedCount));
 
         mLoadingDialog.dismiss();
     }

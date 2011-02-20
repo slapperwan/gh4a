@@ -7,6 +7,7 @@
     <string name="more_data">%1$s | %2$s</string>
     <string name="more_data_3">%1$s | %2$s | %3$s</string>
     <string name="user_extra_data">%1$d followers | %2$d repos</string>
+    <string name="commit_summary">%1$d files changed | %2$d files added | %3$d files deleted</string>
     <string name="loading_msg">Loading...</string>
     <string name="search">Search</string>
     <string name="activity">Activity</string>
