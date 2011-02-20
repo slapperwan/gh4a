@@ -9,6 +9,8 @@
     <string name="loading_msg">Loading...</string>
     <string name="search">Search</string>
     <string name="activity">Activity</string>
+    <string name="logout">Logout</string>
+    <string name="login">Login</string>
     
     <!-- Activity event -->
     <string name="event_push_title">%1$s pushed to %2$s at %3$s/%4$s</string>

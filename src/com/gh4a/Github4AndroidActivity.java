@@ -23,7 +23,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.github.api.v2.services.GitHubException;
+import com.github.api.v2.services.GitHubServiceFactory;
+import com.github.api.v2.services.UserService;
 import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 import com.markupartist.android.widget.ActionBar;
 import com.markupartist.android.widget.ActionBar.IntentAction;
@@ -60,10 +65,15 @@ public class Github4AndroidActivity extends BaseActivity {
         }
         setContentView(R.layout.main);
 
+        //setup actionbar
         ActionBar actionBar = (ActionBar) findViewById(R.id.actionbar_main);
         actionBar.addAction(new IntentAction(this, new Intent(getApplicationContext(),
-                SearchActivity.class), R.drawable.ic_menu_search));
+                SearchActivity.class), R.drawable.ic_search));
 
+        //setup title breadcrumb
+        createBreadcrumb("Login", null);
+
+        
         mEtUserLogin = (EditText) findViewById(R.id.et_username_main);
         mEtPassword = (EditText) findViewById(R.id.et_password_main);
 
@@ -74,15 +84,46 @@ public class Github4AndroidActivity extends BaseActivity {
             public void onClick(View v) {
                 LoginPasswordAuthentication auth = new LoginPasswordAuthentication(mEtUserLogin
                         .getText().toString(), mEtPassword.getText().toString());
-                SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
-                        Constants.PREF_NAME, MODE_PRIVATE);
-                Editor editor = sharedPreferences.edit();
-                editor.putString(Constants.User.USER_LOGIN, mEtUserLogin.getText().toString());
-                editor.putString(Constants.User.USER_PASSWORD, mEtPassword.getText().toString());
-                editor.commit();
+                
+                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                UserService userService = factory.createUserService();
+                userService.setAuthentication(auth);
+                LoadingDialog progressDialog = LoadingDialog.show(Github4AndroidActivity.this,
+                        "Please wait", "Authenticating...", false, false);
+                try {
+                    userService.getKeys();//test auth
+                    
+                    SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
+                            Constants.PREF_NAME, MODE_PRIVATE);
+                    Editor editor = sharedPreferences.edit();
+                    editor.putString(Constants.User.USER_LOGIN, mEtUserLogin.getText().toString());
+                    editor.putString(Constants.User.USER_PASSWORD, mEtPassword.getText().toString());
+                    editor.commit();
 
-                Intent intent = new Intent().setClass(getApplicationContext(),
-                        DashboardActivity.class);
+                    Intent intent = new Intent().setClass(getApplicationContext(),
+                            DashboardActivity.class);
+                    startActivity(intent);
+                }
+                catch (GitHubException e) {
+                    if (e.getCause() != null && e.getCause().getMessage().equalsIgnoreCase("Received authentication challenge is null")) {
+                        Toast.makeText(Github4AndroidActivity.this, "Invalid username/password", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    Github4AndroidActivity.this.showError();
+                    return;
+                }
+                finally {
+                    progressDialog.dismiss();
+                }
+            }
+        });
+        
+        TextView tvExplore = (TextView) findViewById(R.id.tv_explore);
+        tvExplore.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View arg0) {
+                Intent intent = new Intent().setClass(Github4AndroidActivity.this, SearchActivity.class);
                 startActivity(intent);
             }
         });

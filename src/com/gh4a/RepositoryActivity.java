@@ -22,16 +22,12 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.gh4a.utils.StringUtils;
 import com.github.api.v2.schema.Repository;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
@@ -351,34 +347,6 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
         Button btnForks = (Button) findViewById(R.id.btn_forks);
         btnForks.setText(String.valueOf(result));
         mForksLoaded = true;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.repository_menu, menu);
-        return true;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
-     */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent = new Intent().setClass(RepositoryActivity.this, BranchListActivity.class);
-
-        switch (item.getItemId()) {
-        case R.id.switch_branch:
-            break;
-        case R.id.switch_tag:
-            break;
-        }
-        return true;
     }
 
     /*

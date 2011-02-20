@@ -21,9 +21,14 @@ import java.util.HashMap;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.IBinder;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
@@ -76,6 +81,52 @@ public class BaseActivity extends Activity {
         imm.hideSoftInputFromWindow(binder, InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
+    /* (non-Javadoc)
+     * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (isAuthenticated()) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.authenticated_menu, menu);
+        }
+        else {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.anon_menu, menu);
+        }
+        return true;        
+    }
+    
+    /* (non-Javadoc)
+     * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+        case R.id.logout:
+            SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
+                    Constants.PREF_NAME, MODE_PRIVATE);
+            
+            if (sharedPreferences != null) {
+                if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
+                        && sharedPreferences.getString(Constants.User.USER_PASSWORD, null) != null){
+                    Editor editor = sharedPreferences.edit();
+                    editor.clear();
+                    editor.commit();
+                    Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+                    startActivity(intent);
+                    Toast.makeText(this, "Successful logout", Toast.LENGTH_SHORT).show();
+                }
+            }
+        case R.id.login:
+            Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+            startActivity(intent);
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
+    
     /**
      * Creates the breadcrumb.
      *
@@ -83,26 +134,27 @@ public class BaseActivity extends Activity {
      * @param breadCrumbHolders the bread crumb holders
      */
     public void createBreadcrumb(String subTitle, BreadCrumbHolder... breadCrumbHolders) {
-        LinearLayout llPart = (LinearLayout) this.findViewById(R.id.ll_part);
-
-        for (int i = 0; i < breadCrumbHolders.length; i++) {
-            TextView tvBreadCrumb = new TextView(getApplication());
-            SpannableString part = new SpannableString(breadCrumbHolders[i].getLabel());
-            part.setSpan(new UnderlineSpan(), 0, part.length(), 0);
-            tvBreadCrumb.append(part);
-            tvBreadCrumb.setTag(breadCrumbHolders[i]);
-            tvBreadCrumb.setBackgroundResource(R.drawable.default_link);
-            tvBreadCrumb.setTextAppearance(getApplication(), R.style.default_text_small);
-            tvBreadCrumb.setSingleLine(true);
-            tvBreadCrumb.setOnClickListener(new OnClickBreadCrumb(this));
-
-            llPart.addView(tvBreadCrumb);
-
-            if (i < breadCrumbHolders.length - 1) {
-                TextView slash = new TextView(getApplication());
-                slash.setText(" / ");
-                slash.setTextAppearance(getApplication(), R.style.default_text_small);
-                llPart.addView(slash);
+        if (breadCrumbHolders != null) {
+            LinearLayout llPart = (LinearLayout) this.findViewById(R.id.ll_part);
+            for (int i = 0; i < breadCrumbHolders.length; i++) {
+                TextView tvBreadCrumb = new TextView(getApplication());
+                SpannableString part = new SpannableString(breadCrumbHolders[i].getLabel());
+                part.setSpan(new UnderlineSpan(), 0, part.length(), 0);
+                tvBreadCrumb.append(part);
+                tvBreadCrumb.setTag(breadCrumbHolders[i]);
+                tvBreadCrumb.setBackgroundResource(R.drawable.default_link);
+                tvBreadCrumb.setTextAppearance(getApplication(), R.style.default_text_small);
+                tvBreadCrumb.setSingleLine(true);
+                tvBreadCrumb.setOnClickListener(new OnClickBreadCrumb(this));
+    
+                llPart.addView(tvBreadCrumb);
+    
+                if (i < breadCrumbHolders.length - 1) {
+                    TextView slash = new TextView(getApplication());
+                    slash.setText(" / ");
+                    slash.setTextAppearance(getApplication(), R.style.default_text_small);
+                    llPart.addView(slash);
+                }
             }
         }
 
@@ -115,12 +167,32 @@ public class BaseActivity extends Activity {
      */
     public void setUpActionBar() {
         ActionBar actionBar = (ActionBar) findViewById(R.id.actionbar);
-        actionBar.setHomeAction(new IntentAction(this, new Intent(getApplicationContext(),
-                DashboardActivity.class), R.drawable.ic_home));
+        if (isAuthenticated()) {
+            actionBar.setHomeAction(new IntentAction(this, new Intent(getApplicationContext(),
+                    DashboardActivity.class), R.drawable.ic_home));
+        }
         actionBar.addAction(new IntentAction(this, new Intent(getApplication(),
                 SearchActivity.class), R.drawable.ic_search));
     }
 
+    private boolean isAuthenticated() {
+        SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
+                Constants.PREF_NAME, MODE_PRIVATE);
+        
+        if (sharedPreferences != null) {
+            if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
+                    && sharedPreferences.getString(Constants.User.USER_PASSWORD, null) != null){
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+    }
+    
     /**
      * The Class OnClickBreadCrumb.
      */
