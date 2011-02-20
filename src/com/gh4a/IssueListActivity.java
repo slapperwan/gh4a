@@ -99,8 +99,11 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
     @Override
     public void setUpActionBar() {
         ActionBar actionBar = (ActionBar) findViewById(R.id.actionbar);
-        actionBar.setHomeAction(new IntentAction(this, new Intent(getApplicationContext(),
-                DashboardActivity.class), R.drawable.ic_home));
+        if (isAuthenticated()) {
+            Intent intent = new Intent().setClass(getApplicationContext(), UserActivity.class);
+            intent.putExtra(Constants.User.USER_LOGIN, getAuthUsername());
+            actionBar.setHomeAction(new IntentAction(this, intent, R.drawable.ic_home));
+        }
         actionBar.addAction(new IntentAction(this, new Intent(getApplicationContext(),
                 SearchActivity.class), R.drawable.ic_search));
         actionBar.addAction(new IntentAction(this, new Intent(getApplicationContext(),
