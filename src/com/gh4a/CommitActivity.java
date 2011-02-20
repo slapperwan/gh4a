@@ -354,7 +354,8 @@ public class CommitActivity extends BaseActivity {
                         intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
                         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                         intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
-                        intent.putExtra(Constants.DIFF, delta.getDiff());
+                        intent.putExtra(Constants.Commit.DIFF, delta.getDiff());
+                        intent.putExtra(Constants.Object.PATH, delta.getFilename());
                         startActivity(intent);
                     }
                 });

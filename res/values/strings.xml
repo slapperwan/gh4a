@@ -87,6 +87,8 @@
     <string name="repo_fork_action">Fork</string>
     <string name="repo_branches">Branches</string>
     <string name="repo_tags">Tags</string>
+    <string name="repo_branch">branch</string>
+    <string name="repo_tag">tag</string>
 
     <!-- Commit -->
     <plurals name="commit">
@@ -105,6 +107,7 @@
     <string name="commit_deleted">Files Deleted</string>
     <string name="commit_summary">%1$d changed | %2$d added | %3$d deleted</string>
     <string name="commit_no_files">No files</string>
+    <string name="commit_sha">Commit - %1$s</string>
 
     <!-- Issue -->
     <plurals name="issue">

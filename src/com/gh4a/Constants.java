@@ -22,7 +22,7 @@ package com.gh4a;
 public interface Constants {
 
     /** The Constant PREF_NAME. */
-    public static final String PREF_NAME = "gitgit";
+    public static final String PREF_NAME = "Gh4a-pref";
 
     /** The Constant LOG_TAG. */
     public static final String LOG_TAG = "Gh4a";
@@ -38,9 +38,6 @@ public interface Constants {
 
     /** The Constant SUBTITLE. */
     public static final String SUBTITLE = "SUBTITLE";
-
-    /** The Constant DIFF. */
-    public static final String DIFF = "DIFF";
 
     /** The Constant VIEW_ID. */
     public static final String VIEW_ID = "VIEW_ID";
@@ -181,6 +178,9 @@ public interface Constants {
 
         /** The Constant COMMIT. */
         public static final String COMMIT = "COMMIT";
+        
+        /** The Constant DIFF. */
+        public static final String DIFF = "DIFF";
     }
 
     /**

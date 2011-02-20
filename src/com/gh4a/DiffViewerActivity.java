@@ -42,7 +42,7 @@ public class DiffViewerActivity extends BaseActivity {
     protected String mDiff;
 
     /** The filename. */
-    protected String mFilename;
+    protected String mFilePath;
 
     /**
      * Called when the activity is first created.
@@ -60,8 +60,8 @@ public class DiffViewerActivity extends BaseActivity {
         mUserLogin = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
         mSha = data.getString(Constants.Object.OBJECT_SHA);
-        mDiff = data.getString(Constants.DIFF);
-        mFilename = data.getString("FILENAME");
+        mDiff = data.getString(Constants.Commit.DIFF);
+        mFilePath = data.getString(Constants.Object.PATH);
 
         setBreadCrumb();
 
@@ -105,13 +105,13 @@ public class DiffViewerActivity extends BaseActivity {
 
         // Commit
         b = new BreadCrumbHolder();
-        b.setLabel("Commit - " + mSha.substring(0, 7));
+        b.setLabel(String.format(getResources().getString(R.string.commit_sha, mSha.substring(0, 7))));
         b.setTag(Constants.Commit.COMMIT);
         data.put(Constants.Object.OBJECT_SHA, mSha);
         b.setData(data);
         breadCrumbHolders[2] = b;
 
-        createBreadcrumb(mFilename, breadCrumbHolders);
+        createBreadcrumb(mFilePath, breadCrumbHolders);
     }
 
     /**

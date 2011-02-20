@@ -118,12 +118,12 @@ public class FileManagerActivity extends BaseActivity implements OnItemClickList
         // branches/tags
         b = new BreadCrumbHolder();
         if (R.id.btn_tags == mFromBtnId) {
-            b.setLabel("tag");
+            b.setLabel(getResources().getString(R.string.repo_tag));
             b.setTag(Constants.Object.TAGS);
         }
         else {
             b.setTag(Constants.Object.BRANCHES);
-            b.setLabel("branch");
+            b.setLabel(getResources().getString(R.string.repo_branch));
         }
 
         b.setData(data);
