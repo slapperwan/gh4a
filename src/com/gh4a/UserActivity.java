@@ -320,6 +320,12 @@ public class UserActivity extends BaseActivity implements OnClickListener {
         startActivity(intent);
     }
 
+    /**
+     * Gets the your actions.
+     *
+     * @param view the view
+     * @return the your actions
+     */
     public void getYourActions(View view) {
         Intent intent = new Intent().setClass(this, UserPublicActivity.class);
         intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
@@ -327,6 +333,7 @@ public class UserActivity extends BaseActivity implements OnClickListener {
         intent.putExtra(Constants.SUBTITLE, getResources().getString(R.string.user_your_actions));
         startActivity(intent);
     }
+    
     /**
      * Gets the public repos when Public Repository button clicked.
      *
