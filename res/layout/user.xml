@@ -50,31 +50,33 @@
                         android:id="@id/separator"
                         android:layout_width="fill_parent"
                         android:layout_height="5dp" />
+                </LinearLayout>
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@id/iv_gravatar"
+                    >
                     <Button
                         android:id="@+id/btn_news"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/activity" />
+                        android:text="@string/news_feed" />
+                    <Button
+                        android:id="@+id/btn_your_actions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/your_actions" />
                 </LinearLayout>
-                <!--
-                    LinearLayout android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_below="@id/ll_user_info"
-                    android:layout_toRightOf="@id/iv_gravatar"> <Button
-                    android:id="@+id/btn_news"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/activity" /> </LinearLayout
-                -->
             </RelativeLayout>
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:orientation="vertical"
                 android:layout_margin="10dp">
-                <LinearLayout android:id="@+id/ll_user_email"
+                <LinearLayout
+                    android:id="@+id/ll_user_email"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:orientation="vertical">
@@ -96,7 +98,8 @@
                         android:layout_marginTop="5dp"
                         android:layout_marginBottom="5dp" />
                 </LinearLayout>
-                <LinearLayout android:id="@+id/ll_user_website"
+                <LinearLayout
+                    android:id="@+id/ll_user_website"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:orientation="vertical">
@@ -118,7 +121,8 @@
                         android:layout_marginTop="5dp"
                         android:layout_marginBottom="5dp" />
                 </LinearLayout>
-                <LinearLayout android:id="@+id/ll_user_location"
+                <LinearLayout
+                    android:id="@+id/ll_user_location"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:orientation="vertical">

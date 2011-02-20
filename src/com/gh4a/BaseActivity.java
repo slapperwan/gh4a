@@ -116,7 +116,7 @@ public class BaseActivity extends Activity {
                     editor.commit();
                     Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
                     startActivity(intent);
-                    Toast.makeText(this, "Successful logout", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getResources().getString(R.string.success_logout), Toast.LENGTH_SHORT).show();
                 }
             }
         case R.id.login:
@@ -168,14 +168,15 @@ public class BaseActivity extends Activity {
     public void setUpActionBar() {
         ActionBar actionBar = (ActionBar) findViewById(R.id.actionbar);
         if (isAuthenticated()) {
-            actionBar.setHomeAction(new IntentAction(this, new Intent(getApplicationContext(),
-                    DashboardActivity.class), R.drawable.ic_home));
+            Intent intent = new Intent().setClass(getApplicationContext(), UserActivity.class);
+            intent.putExtra(Constants.User.USER_LOGIN, getAuthUsername());
+            actionBar.setHomeAction(new IntentAction(this, intent, R.drawable.ic_home));
         }
         actionBar.addAction(new IntentAction(this, new Intent(getApplication(),
                 SearchActivity.class), R.drawable.ic_search));
     }
 
-    private boolean isAuthenticated() {
+    public boolean isAuthenticated() {
         SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
                 Constants.PREF_NAME, MODE_PRIVATE);
         
@@ -190,6 +191,42 @@ public class BaseActivity extends Activity {
         }
         else {
             return false;
+        }
+    }
+    
+    public String getAuthUsername() {
+        SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
+                Constants.PREF_NAME, MODE_PRIVATE);
+        
+        if (sharedPreferences != null) {
+            if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
+                    && sharedPreferences.getString(Constants.User.USER_PASSWORD, null) != null){
+                return sharedPreferences.getString(Constants.User.USER_LOGIN, null);
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            return null;
+        }
+    }
+    
+    public String getAuthPassword() {
+        SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
+                Constants.PREF_NAME, MODE_PRIVATE);
+        
+        if (sharedPreferences != null) {
+            if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
+                    && sharedPreferences.getString(Constants.User.USER_PASSWORD, null) != null){
+                return sharedPreferences.getString(Constants.User.USER_PASSWORD, null);
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            return null;
         }
     }
     

@@ -210,6 +210,15 @@ public class UserActivity extends BaseActivity implements OnClickListener {
 
         Button btnNews = (Button) findViewById(R.id.btn_news);
         btnNews.setOnClickListener(this);
+        
+        Button btnYourActions = (Button) findViewById(R.id.btn_your_actions);
+        if (mUserLogin.equals(getAuthUsername())) {
+            btnYourActions.setOnClickListener(this);
+            btnYourActions.setVisibility(View.VISIBLE);
+        }
+        else {
+            btnYourActions.setVisibility(View.GONE);
+        }
 
         Button btnPublicRepos = (Button) findViewById(R.id.btn_pub_repos);
         btnPublicRepos.setOnClickListener(this);
@@ -278,6 +287,9 @@ public class UserActivity extends BaseActivity implements OnClickListener {
         if (id == R.id.btn_news) {
             getFeeds(view);
         }
+        else if (id == R.id.btn_your_actions) {
+            getYourActions(view);
+        }
         else if (id == R.id.btn_pub_repos) {
             getPublicRepos(view);
         }
@@ -299,7 +311,7 @@ public class UserActivity extends BaseActivity implements OnClickListener {
      * @return the feeds
      */
     public void getFeeds(View view) {
-        Intent intent = new Intent().setClass(this, UserPublicActivity.class);
+        Intent intent = new Intent().setClass(this, UserPrivateActivity.class);
         intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
         intent.putExtra(Constants.ACTIONBAR_TITLE, mUserLogin
                 + (!StringUtils.isBlank(mUserName) ? " - " + mUserName : ""));
@@ -307,6 +319,13 @@ public class UserActivity extends BaseActivity implements OnClickListener {
         startActivity(intent);
     }
 
+    public void getYourActions(View view) {
+        Intent intent = new Intent().setClass(this, UserPublicActivity.class);
+        intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
+        intent.putExtra(Constants.ACTIONBAR_TITLE, mUserLogin);
+        intent.putExtra(Constants.SUBTITLE, "Your Actions");
+        startActivity(intent);
+    }
     /**
      * Gets the public repos when Public Repository button clicked.
      *

@@ -52,16 +52,9 @@ public class Github4AndroidActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
-                Constants.PREF_NAME, MODE_PRIVATE);
-        if (sharedPreferences != null) {
-            String username = sharedPreferences.getString(Constants.User.USER_LOGIN, null);
-            if (username != null) {
-                Intent intent = new Intent().setClass(getApplicationContext(),
-                        DashboardActivity.class);
-                startActivity(intent);
-                return;
-            }
+        if (isAuthenticated()) {
+            getApplicationContext().openUserInfoActivity(this, getAuthUsername(), null);
+            return;
         }
         setContentView(R.layout.main);
 
@@ -82,8 +75,10 @@ public class Github4AndroidActivity extends BaseActivity {
 
             @Override
             public void onClick(View v) {
-                LoginPasswordAuthentication auth = new LoginPasswordAuthentication(mEtUserLogin
-                        .getText().toString(), mEtPassword.getText().toString());
+                String username = mEtUserLogin.getText().toString();
+                String password = mEtPassword.getText().toString();
+                
+                LoginPasswordAuthentication auth = new LoginPasswordAuthentication(username, password);
                 
                 GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
                 UserService userService = factory.createUserService();
@@ -96,17 +91,16 @@ public class Github4AndroidActivity extends BaseActivity {
                     SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
                             Constants.PREF_NAME, MODE_PRIVATE);
                     Editor editor = sharedPreferences.edit();
-                    editor.putString(Constants.User.USER_LOGIN, mEtUserLogin.getText().toString());
-                    editor.putString(Constants.User.USER_PASSWORD, mEtPassword.getText().toString());
+                    editor.putString(Constants.User.USER_LOGIN, username);
+                    editor.putString(Constants.User.USER_PASSWORD, password);
                     editor.commit();
 
-                    Intent intent = new Intent().setClass(getApplicationContext(),
-                            DashboardActivity.class);
-                    startActivity(intent);
+                    getApplicationContext().openUserInfoActivity(Github4AndroidActivity.this, username, null);
                 }
                 catch (GitHubException e) {
                     if (e.getCause() != null && e.getCause().getMessage().equalsIgnoreCase("Received authentication challenge is null")) {
-                        Toast.makeText(Github4AndroidActivity.this, "Invalid username/password", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Github4AndroidActivity.this, getResources().getString(R.string.invalid_login),
+                                Toast.LENGTH_SHORT).show();
                         return;
                     }
                     Github4AndroidActivity.this.showError();
