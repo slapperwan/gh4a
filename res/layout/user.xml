@@ -25,8 +25,8 @@
                 android:background="?attr/info_box">
                 <ImageView
                     android:id="@+id/iv_gravatar"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:layout_marginRight="5dp"
                     android:layout_marginBottom="5dp"
                     android:layout_marginTop="5dp" />
@@ -62,12 +62,12 @@
                         android:id="@+id/btn_news"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/news_feed" />
+                        android:text="@string/user_news_feed" />
                     <Button
                         android:id="@+id/btn_your_actions"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/your_actions" />
+                        android:text="@string/user_your_actions" />
                 </LinearLayout>
             </RelativeLayout>
             <LinearLayout

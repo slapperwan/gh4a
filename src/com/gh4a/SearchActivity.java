@@ -492,14 +492,18 @@ public class SearchActivity extends BaseActivity {
         @Override
         protected void onPostExecute(List<User> result) {
             SearchActivity activity = mTarget.get();
-            activity.mLoadingDialog.dismiss();
             if (mException) {
-                activity.showError();
+                mTarget.get().showError(false);
             }
             else {
                 activity.fillUsersData(result);
-                activity.mFirstTimeSearch = false;
             }
+
+            if (activity.mLoadingDialog != null && activity.mLoadingDialog.isShowing()) {
+                activity.mLoadingDialog.dismiss();
+            }
+            
+            activity.mFirstTimeSearch = false;
         }
 
     }

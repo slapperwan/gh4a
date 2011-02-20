@@ -9,12 +9,10 @@
     <string name="loading_msg">Loading...</string>
     <string name="search">Search</string>
     <string name="activity">Activity</string>
-    <string name="news_feed">News Feed</string>
-    <string name="your_actions">Your Actions</string>
     <string name="logout">Logout</string>
     <string name="login">Login</string>
     <string name="invalid_login">Invalid username/password</string>
-    <string name="success_logout">Successfull logout</string>
+    <string name="success_logout">Successful logout</string>
     
     <!-- Activity event -->
     <string name="event_push_title">%1$s pushed to %2$s at %3$s/%4$s</string>
@@ -67,7 +65,7 @@
     <string name="user_watched_repos">Watched Repositories</string>
     <string name="user_extra_data">%1$d followers | %2$d repos</string>
     <string name="user_news_feed">News Feed</string>
-    <string name="user_your_actions">Your Actions</string>
+    <string name="user_your_actions">Public Activity</string>
     
     <!-- Repository -->
     <plurals name="repository">

@@ -210,15 +210,16 @@ public class UserActivity extends BaseActivity implements OnClickListener {
 
         Button btnNews = (Button) findViewById(R.id.btn_news);
         btnNews.setOnClickListener(this);
-        
-        Button btnYourActions = (Button) findViewById(R.id.btn_your_actions);
         if (mUserLogin.equals(getAuthUsername())) {
-            btnYourActions.setOnClickListener(this);
-            btnYourActions.setVisibility(View.VISIBLE);
+            btnNews.setOnClickListener(this);
+            btnNews.setVisibility(View.VISIBLE);
         }
         else {
-            btnYourActions.setVisibility(View.GONE);
+            btnNews.setVisibility(View.GONE);
         }
+        
+        Button btnYourActions = (Button) findViewById(R.id.btn_your_actions);
+        btnYourActions.setOnClickListener(this);
 
         Button btnPublicRepos = (Button) findViewById(R.id.btn_pub_repos);
         btnPublicRepos.setOnClickListener(this);
