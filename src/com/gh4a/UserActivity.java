@@ -315,7 +315,7 @@ public class UserActivity extends BaseActivity implements OnClickListener {
         intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
         intent.putExtra(Constants.ACTIONBAR_TITLE, mUserLogin
                 + (!StringUtils.isBlank(mUserName) ? " - " + mUserName : ""));
-        intent.putExtra(Constants.SUBTITLE, "Public Activity");
+        intent.putExtra(Constants.SUBTITLE, "News Feed");
         startActivity(intent);
     }
 
