@@ -176,6 +176,11 @@ public class BaseActivity extends Activity {
                 SearchActivity.class), R.drawable.ic_search));
     }
 
+    /**
+     * Checks if is authenticated.
+     *
+     * @return true, if is authenticated
+     */
     public boolean isAuthenticated() {
         SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
                 Constants.PREF_NAME, MODE_PRIVATE);
@@ -194,6 +199,11 @@ public class BaseActivity extends Activity {
         }
     }
     
+    /**
+     * Gets the auth username.
+     *
+     * @return the auth username
+     */
     public String getAuthUsername() {
         SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
                 Constants.PREF_NAME, MODE_PRIVATE);
@@ -212,6 +222,11 @@ public class BaseActivity extends Activity {
         }
     }
     
+    /**
+     * Gets the auth password.
+     *
+     * @return the auth password
+     */
     public String getAuthPassword() {
         SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
                 Constants.PREF_NAME, MODE_PRIVATE);
