@@ -238,8 +238,9 @@ public class UserActivity extends BaseActivity implements OnClickListener {
             tvName.append(Constants.User.USER_TYPE_ORG);
             tvName.append(")");
         }
-        tvCreated.setText(user.getCreatedAt() != null ? "Member Since "
-                + StringUtils.formatDate(user.getCreatedAt()) : "");
+        tvCreated.setText(user.getCreatedAt() != null ? 
+                getResources().getString(R.string.user_created_at,
+                        StringUtils.formatDate(user.getCreatedAt())) : "");
 
         //show email row if not blank
         if (!StringUtils.isBlank(user.getEmail())) {
@@ -315,7 +316,7 @@ public class UserActivity extends BaseActivity implements OnClickListener {
         intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
         intent.putExtra(Constants.ACTIONBAR_TITLE, mUserLogin
                 + (!StringUtils.isBlank(mUserName) ? " - " + mUserName : ""));
-        intent.putExtra(Constants.SUBTITLE, "News Feed");
+        intent.putExtra(Constants.SUBTITLE, getResources().getString(R.string.user_news_feed));
         startActivity(intent);
     }
 
@@ -323,7 +324,7 @@ public class UserActivity extends BaseActivity implements OnClickListener {
         Intent intent = new Intent().setClass(this, UserPublicActivity.class);
         intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
         intent.putExtra(Constants.ACTIONBAR_TITLE, mUserLogin);
-        intent.putExtra(Constants.SUBTITLE, "Your Actions");
+        intent.putExtra(Constants.SUBTITLE, getResources().getString(R.string.user_your_actions));
         startActivity(intent);
     }
     /**
@@ -350,7 +351,7 @@ public class UserActivity extends BaseActivity implements OnClickListener {
         intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
         intent.putExtra(Constants.ACTIONBAR_TITLE, mUserLogin
                 + (!StringUtils.isBlank(mUserName) ? " - " + mUserName : ""));
-        intent.putExtra(Constants.SUBTITLE, "Followers");
+        intent.putExtra(Constants.SUBTITLE, getResources().getString(R.string.user_followers));
         intent.putExtra(Constants.FIND_FOLLOWER, true);
         startActivity(intent);
     }
@@ -366,7 +367,7 @@ public class UserActivity extends BaseActivity implements OnClickListener {
         intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
         intent.putExtra(Constants.ACTIONBAR_TITLE, mUserLogin
                 + (!StringUtils.isBlank(mUserName) ? " - " + mUserName : ""));
-        intent.putExtra(Constants.SUBTITLE, "Following");
+        intent.putExtra(Constants.SUBTITLE, getResources().getString(R.string.user_following));
         intent.putExtra(Constants.FIND_FOLLOWER, false);
         startActivity(intent);
     }
