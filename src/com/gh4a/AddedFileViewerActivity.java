@@ -33,7 +33,7 @@ import com.github.api.v2.services.GitHubServiceFactory;
 import com.github.api.v2.services.ObjectService;
 
 /**
- * The DiffViewer activity.
+ * The AddedFileViewer activity.
  */
 public class AddedFileViewerActivity extends BaseActivity {
 
@@ -103,7 +103,7 @@ public class AddedFileViewerActivity extends BaseActivity {
     }
 
     /**
-     * An asynchronous task that runs on a background thread to load tree list.
+     * An asynchronous task that runs on a background thread to load content.
      */
     private static class LoadContentTask extends AsyncTask<Void, Integer, Blob> {
 
@@ -185,8 +185,8 @@ public class AddedFileViewerActivity extends BaseActivity {
 
     /**
      * Fill data into UI components.
-     * 
-     * @param is the is
+     *
+     * @param blob the blob
      */
     protected void fillData(Blob blob) {
         WebView webView = (WebView) findViewById(R.id.web_view);
@@ -232,6 +232,7 @@ public class AddedFileViewerActivity extends BaseActivity {
 
     }
     
+    /** The web view client. */
     private WebViewClient webViewClient = new WebViewClient() {
 
         @Override
