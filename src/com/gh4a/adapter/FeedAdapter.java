@@ -15,7 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import java.text.MessageFormat;
 import java.util.List;
 
 import android.content.Context;
@@ -32,7 +31,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.ImageDownloader;
