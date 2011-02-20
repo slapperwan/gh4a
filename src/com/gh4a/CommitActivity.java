@@ -57,8 +57,11 @@ public class CommitActivity extends BaseActivity {
     /** The repo name. */
     protected String mRepoName;
 
-    /** The sha. */
-    protected String mSha;
+    /** The object sha. */
+    protected String mObjectSha;
+    
+    /** The tree sha. */
+    private String mTreeSha;
 
     /**
      * Called when the activity is first created.
@@ -75,7 +78,8 @@ public class CommitActivity extends BaseActivity {
         Bundle data = getIntent().getExtras();
         mUserLogin = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
-        mSha = data.getString(Constants.Object.OBJECT_SHA);
+        mObjectSha = data.getString(Constants.Object.OBJECT_SHA);
+        mTreeSha = data.getString(Constants.Object.TREE_SHA);
 
         setBreadCrumb();
 
@@ -107,7 +111,7 @@ public class CommitActivity extends BaseActivity {
         b.setData(data);
         breadCrumbHolders[1] = b;
 
-        createBreadcrumb("Commit - " + mSha.substring(0, 7), breadCrumbHolders);
+        createBreadcrumb("Commit - " + mObjectSha.substring(0, 7), breadCrumbHolders);
     }
 
     /**
@@ -142,7 +146,7 @@ public class CommitActivity extends BaseActivity {
                 GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
                 CommitService commitService = factory.createCommitService();
                 return commitService.getCommit(activity.mUserLogin, activity.mRepoName,
-                        activity.mSha);
+                        activity.mObjectSha);
             }
             catch (GitHubException e) {
                 Log.e(Constants.LOG_TAG, e.getMessage(), e);
@@ -288,10 +292,12 @@ public class CommitActivity extends BaseActivity {
                     @Override
                     public void onClick(View arg0) {
                         Intent intent = new Intent().setClass(CommitActivity.this,
-                                DiffViewerActivity.class);
+                                AddedFileViewerActivity.class);
                         intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
                         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                        intent.putExtra(Constants.Object.OBJECT_SHA, mSha);
+                        intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
+                        intent.putExtra(Constants.Object.TREE_SHA, mTreeSha);
+                        intent.putExtra(Constants.Object.PATH, filename);
                         startActivity(intent);
                     }
                 });
@@ -318,7 +324,7 @@ public class CommitActivity extends BaseActivity {
                                 DiffViewerActivity.class);
                         intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
                         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                        intent.putExtra(Constants.Object.OBJECT_SHA, mSha);
+                        intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
                         startActivity(intent);
                     }
                 });
@@ -344,7 +350,7 @@ public class CommitActivity extends BaseActivity {
                                 DiffViewerActivity.class);
                         intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
                         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                        intent.putExtra(Constants.Object.OBJECT_SHA, mSha);
+                        intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
                         intent.putExtra(Constants.DIFF, delta.getDiff());
                         startActivity(intent);
                     }

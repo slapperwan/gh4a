@@ -140,12 +140,12 @@ public class CommitListActivity extends BaseActivity implements OnScrollListener
         // branches/tags
         b = new BreadCrumbHolder();
         if (R.id.btn_tags == mFromBtnId) {
-            b.setLabel("tags");
+            b.setLabel("tag");
             b.setTag(Constants.Object.TAGS);
         }
         else {
             b.setTag(Constants.Object.BRANCHES);
-            b.setLabel("branches");
+            b.setLabel("branch");
         }
 
         b.setData(data);
@@ -331,6 +331,7 @@ public class CommitListActivity extends BaseActivity implements OnScrollListener
         intent.putExtra(Constants.Repository.REPO_OWNER, urlPart[1]);
         intent.putExtra(Constants.Repository.REPO_NAME, urlPart[2]);
         intent.putExtra(Constants.Object.OBJECT_SHA, urlPart[4]);
+        intent.putExtra(Constants.Object.TREE_SHA, commit.getTree());
 
         startActivity(intent);
     }
