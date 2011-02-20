@@ -295,10 +295,8 @@ public class FileViewerActivity extends BaseActivity {
 
         StringBuilder content = new StringBuilder();
         content.append("<html><head><title></title>");
-        content
-                .append("<link href='file:///android_asset/prettify.css' rel='stylesheet' type='text/css'/>");
-        content
-                .append("<script src='file:///android_asset/prettify.js' type='text/javascript'></script>");
+        content.append("<link href='file:///android_asset/prettify.css' rel='stylesheet' type='text/css'/>");
+        content.append("<script src='file:///android_asset/prettify.js' type='text/javascript'></script>");
         content.append("</head><body onload='prettyPrint()'><pre class='prettyprint linenums'>");
         content.append(data);
         content.append("</pre></body></html>");
