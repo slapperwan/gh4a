@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="windowTitleBackgroundStyle">#507AAA</color>
+    <color name="titletextcolor">#F8F8F8</color>
+
+    <!-- For action bar -->
+    <color name="actionbar_title">#FDFDFD</color>
+    <color name="actionbar_separator">#3F596A</color>
+    <color name="actionbar_background_start">#405A6A</color>
+    <color name="actionbar_background_end">#405A6A</color>
+    <color name="actionbar_background_item_pressed_start">#405A6A</color>
+    <color name="actionbar_background_item_pressed_end">#405A6A</color>
+
+    <color name="link">@android:color/transparent</color>
+    <color name="link_active">#FD9B00</color>
+</resources>

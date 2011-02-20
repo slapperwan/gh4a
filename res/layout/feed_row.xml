@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="?attr/row_box">
+    <ImageView
+        android:id="@+id/iv_gravatar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp" />
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_toRightOf="@id/iv_gravatar" />
+    <TextView
+        android:id="@+id/tv_created_at"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_title"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_toRightOf="@id/iv_gravatar" />
+    <TextView
+        android:id="@+id/tv_desc"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_created_at"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_toRightOf="@id/iv_gravatar" />
+
+    <!-- specific only for PushEvent -->
+    <LinearLayout
+        android:id="@+id/ll_push_desc"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="gone"
+        android:layout_toRightOf="@id/iv_gravatar"
+        android:layout_below="@id/tv_created_at"
+        android:layout_marginRight="7dp" />
+</RelativeLayout>

@@ -1,0 +1,486 @@
+/*
+ * Copyright 2011 Azwan Adli Abdullah
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.gh4a;
+
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.AdapterView.OnItemClickListener;
+
+import com.gh4a.adapter.FeedAdapter;
+import com.gh4a.holder.BreadCrumbHolder;
+import com.gh4a.utils.StringUtils;
+import com.github.api.v2.schema.Payload;
+import com.github.api.v2.schema.Repository;
+import com.github.api.v2.schema.UserFeed;
+import com.github.api.v2.services.GitHubException;
+
+/**
+ * The User activity.
+ */
+public abstract class UserFeedActivity extends BaseActivity implements OnItemClickListener {
+
+    /** The user login. */
+    protected String mUserLogin;
+
+    /** The loading dialog. */
+    protected LoadingDialog mLoadingDialog;
+
+    /** The feed adapter. */
+    protected FeedAdapter mFeedAdapter;
+
+    /** The list view feeds. */
+    protected ListView mListViewFeeds;
+
+    /** The action bar title. */
+    protected String mActionBarTitle;
+
+    /** The subtitle. */
+    protected String mSubtitle;
+
+    /**
+     * Called when the activity is first created.
+     * 
+     * @param savedInstanceState the saved instance state
+     */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.generic_list);
+        setUpActionBar();
+
+        Bundle data = getIntent().getExtras();
+        mUserLogin = data.getString(Constants.User.USER_LOGIN);
+        mActionBarTitle = data.getString(Constants.ACTIONBAR_TITLE);
+        mSubtitle = data.getString(Constants.SUBTITLE);
+
+        setBreadCrumb();
+
+        mFeedAdapter = new FeedAdapter(this, new ArrayList<UserFeed>());
+        mListViewFeeds = (ListView) findViewById(R.id.list_view);
+        mListViewFeeds.setAdapter(mFeedAdapter);
+        registerForContextMenu(mListViewFeeds);
+        mListViewFeeds.setOnItemClickListener(this);
+
+        new LoadActivityListTask(this).execute();
+    }
+
+    /**
+     * Sets the bread crumb.
+     */
+    protected void setBreadCrumb() {
+        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[1];
+
+        // common data
+        HashMap<String, String> data = new HashMap<String, String>();
+        data.put(Constants.User.USER_LOGIN, mUserLogin);
+
+        // User
+        BreadCrumbHolder b = new BreadCrumbHolder();
+        b.setLabel(mUserLogin);
+        b.setTag(Constants.User.USER_LOGIN);
+        b.setData(data);
+        breadCrumbHolders[0] = b;
+
+        createBreadcrumb(mSubtitle, breadCrumbHolders);
+    }
+
+    /**
+     * Gets the feeds.
+     * 
+     * @return the feeds
+     */
+    public abstract List<UserFeed> getFeeds();
+
+    /**
+     * An asynchronous task that runs on a background thread to load activity
+     * list.
+     */
+    private static class LoadActivityListTask extends AsyncTask<Void, Integer, List<UserFeed>> {
+
+        /** The target. */
+        private WeakReference<UserFeedActivity> mTarget;
+        
+        /** The exception. */
+        private boolean mException;
+
+        /**
+         * Instantiates a new load activity list task.
+         *
+         * @param activity the activity
+         */
+        public LoadActivityListTask(UserFeedActivity activity) {
+            mTarget = new WeakReference<UserFeedActivity>(activity);
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected List<UserFeed> doInBackground(Void... params) {
+            try {
+                return mTarget.get().getFeeds();
+            }
+            catch (GitHubException e) {
+                Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                mException = true;
+                return null;
+            }
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPreExecute()
+         */
+        @Override
+        protected void onPreExecute() {
+            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(List<UserFeed> result) {
+            mTarget.get().mLoadingDialog.dismiss();
+            if (mException) {
+                mTarget.get().showError();
+            }
+            else {
+                mTarget.get().fillData(result);
+            }
+        }
+    }
+
+    /**
+     * Fill data into UI components.
+     * 
+     * @param feeds the feeds
+     */
+    protected void fillData(List<UserFeed> feeds) {
+        if (feeds != null && feeds.size() > 0) {
+            mFeedAdapter.notifyDataSetChanged();
+            for (UserFeed feed : feeds) {
+                mFeedAdapter.add(feed);
+            }
+        }
+        mFeedAdapter.notifyDataSetChanged();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see
+     * android.widget.AdapterView.OnItemClickListener#onItemClick(android.widget
+     * .AdapterView, android.view.View, int, long)
+     */
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+        UserFeed feed = (UserFeed) adapterView.getAdapter().getItem(position);
+
+        UserFeed.Type eventType = feed.getType();
+        Gh4Application context = getApplicationContext();
+        /** PushEvent */
+        if (UserFeed.Type.PUSH_EVENT.equals(eventType)) {
+            List<String[]> shas = feed.getPayload().getShas();
+            // if commit > 1, then show context menu so that user can choose
+            // which commit
+            if (shas != null && shas.size() > 1) {
+                view.showContextMenu();
+            }
+            // only 1 commit, then show the commit details
+            else {
+                context.openCommitInfoActivity(this, feed.getRepository().getOwner(), feed
+                        .getRepository().getName(), feed.getPayload().getShas().get(0)[0]);
+            }
+        }
+
+        /** IssueEvent */
+        else if (UserFeed.Type.ISSUES_EVENT.equals(eventType)) {
+            context.openIssueActivity(this, feed.getRepository().getOwner(), feed.getRepository()
+                    .getName(), feed.getPayload().getNumber());
+        }
+
+        /** WatchEvent */
+        else if (UserFeed.Type.WATCH_EVENT.equals(eventType)) {
+            context.openRepositoryInfoActivity(this, feed.getRepository());
+        }
+
+        /** CreateEvent */
+        else if (UserFeed.Type.CREATE_EVENT.equals(eventType)) {
+            context.openRepositoryInfoActivity(this, feed.getRepository());
+        }
+
+        /** PullRequestEvent */
+        else if (UserFeed.Type.PULL_REQUEST_EVENT.equals(eventType)) {
+            context.openPullRequestActivity(this, feed.getRepository().getOwner(), feed
+                    .getRepository().getName(), feed.getPayload().getNumber());
+        }
+
+        /** FollowEvent */
+        else if (UserFeed.Type.FOLLOW_EVENT.equals(eventType)) {
+            Payload payload = feed.getPayload();
+            if (payload.getTarget() != null) {
+                context.openUserInfoActivity(this, payload.getTarget().getLogin(), null);
+            }
+        }
+
+        /** CommitCommentEvent */
+        else if (UserFeed.Type.COMMIT_COMMENT_EVENT.equals(eventType)) {
+            Repository repository = feed.getRepository();
+            if (repository != null) {
+                if (!StringUtils.isBlank(feed.getUrl())) {
+                    context.openBrowser(this, feed.getUrl());
+                }
+                else {
+                    context.notFoundMessage(this, "URL");
+                }
+            }
+            else {
+                context.notFoundMessage(this, R.plurals.repository);
+            }
+        }
+
+        /** DeleteEvent */
+        else if (UserFeed.Type.DELETE_EVENT.equals(eventType)) {
+            context.openRepositoryInfoActivity(this, feed.getRepository());
+        }
+
+        /** GistEvent */
+        else if (UserFeed.Type.GIST_EVENT.equals(eventType)) {
+            context.openBrowser(this, feed.getPayload().getUrl());
+        }
+
+        /** DownloadEvent */
+        else if (UserFeed.Type.DOWNLOAD_EVENT.equals(eventType)) {
+            Repository repository = feed.getRepository();
+            if (repository != null) {
+                String url = "https://github.com/" + repository.getOwner() + "/"
+                        + repository.getName() + "/downloads#download_" + feed.getPayload().getId();
+                context.openBrowser(this, url);
+            }
+            else {
+                context.notFoundMessage(this, R.plurals.repository);
+            }
+        }
+
+        /** ForkEvent */
+        else if (UserFeed.Type.FORK_EVENT.equals(eventType)) {
+            Repository repository = feed.getRepository();
+            if (repository != null) {
+                context.openRepositoryInfoActivity(this, feed.getPayload().getActor(), repository
+                        .getName());
+            }
+            else {
+                context.notFoundMessage(this, R.plurals.repository);
+            }
+        }
+
+        /** ForkEvent */
+        else if (UserFeed.Type.FORK_APPLY_EVENT.equals(eventType)) {
+            Repository repository = feed.getRepository();
+            if (repository != null) {
+                context.openRepositoryInfoActivity(this, repository);
+            }
+            else {
+                context.notFoundMessage(this, R.plurals.repository);
+            }
+        }
+
+        /** GollumEvent */
+        else if (UserFeed.Type.GOLLUM_EVENT.equals(eventType)) {
+            context.openBrowser(this, feed.getUrl());
+        }
+
+        /** PublicEvent */
+        else if (UserFeed.Type.PUBLIC_EVENT.equals(eventType)) {
+            Repository repository = feed.getRepository();
+            if (repository != null) {
+                context.openRepositoryInfoActivity(this, repository);
+            }
+            else {
+                context.notFoundMessage(this, R.plurals.repository);
+            }
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onCreateContextMenu(android.view.ContextMenu,
+     * android.view.View, android.view.ContextMenu.ContextMenuInfo)
+     */
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if (v.getId() == R.id.list_view) {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+            UserFeed feed = (UserFeed) mFeedAdapter.getItem(info.position);
+            UserFeed.Type eventType = feed.getType();
+            menu.setHeaderTitle("Go to");
+
+            /** Common menu */
+            menu.add("User " + feed.getActor());
+            if (feed.getRepository() != null) {
+                menu.add("Repo " + feed.getRepository().getOwner() + "/"
+                        + feed.getRepository().getName());
+            }
+
+            /** PushEvent extra menu for commits */
+            if (UserFeed.Type.PUSH_EVENT.equals(eventType)) {
+                List<String[]> shas = feed.getPayload().getShas();
+                for (String[] sha : shas) {
+                    menu.add("Commit " + sha[0].substring(0, 7) + " " + sha[2]);
+                }
+            }
+
+            /** IssueEvent extra menu for commits */
+            else if (UserFeed.Type.ISSUES_EVENT.equals(eventType)) {
+                menu.add("Issue " + feed.getPayload().getNumber());
+            }
+
+            /** FollowEvent */
+            else if (UserFeed.Type.FOLLOW_EVENT.equals(eventType)) {
+                Payload payload = feed.getPayload();
+                if (payload.getTarget() != null) {
+                    menu.add("User " + payload.getTarget().getLogin());
+                }
+            }
+
+            /** CommitCommentEvent */
+            else if (UserFeed.Type.COMMIT_COMMENT_EVENT.equals(eventType)) {
+                menu.add("Commit " + feed.getPayload().getCommit().substring(0, 7));
+                menu.add("Comment in browser");
+            }
+
+            /** GistEvent */
+            else if (UserFeed.Type.GIST_EVENT.equals(eventType)) {
+                menu.add(feed.getPayload().getName() + " in browser");
+            }
+
+            /** DownloadEvent */
+            else if (UserFeed.Type.DOWNLOAD_EVENT.equals(eventType)) {
+                String filename = feed.getPayload().getUrl();
+                int index = filename.lastIndexOf("/");
+                if (index != -1) {
+                    filename = filename.substring(index + 1, filename.length());
+                }
+                else {
+                    filename = "";
+                }
+                menu.add("File " + filename + " in browser");
+            }
+
+            /** ForkEvent */
+            else if (UserFeed.Type.FORK_EVENT.equals(eventType)) {
+                Repository repository = feed.getRepository();
+                if (repository != null) {
+                    menu.add("Forked repo " + feed.getActor() + "/" + repository.getName());
+                }
+            }
+
+            /** GollumEvent */
+            else if (UserFeed.Type.GOLLUM_EVENT.equals(eventType)) {
+                menu.add("Wiki in browser");
+            }
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see android.app.Activity#onContextItemSelected(android.view.MenuItem)
+     */
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
+                .getMenuInfo();
+        UserFeed feed = (UserFeed) mFeedAdapter.getItem(info.position);
+
+        String title = item.getTitle().toString();
+        String value = title.split(" ")[1];
+
+        Gh4Application context = getApplicationContext();
+
+        /** User item */
+        if (title.startsWith("User")) {
+            context
+                    .openUserInfoActivity(this, value, feed.getActorAttributes()
+                            .getName());
+        }
+        /** Repo item */
+        else if (title.startsWith("Repo")) {
+            context.openRepositoryInfoActivity(this, feed.getRepository());
+        }
+        /** Commit item */
+        else if (title.startsWith("Commit")) {
+            if (feed.getRepository() != null) {
+                context.openCommitInfoActivity(this, feed.getRepository().getOwner(), feed
+                        .getRepository().getName(), value);
+            }
+            else {
+                context.notFoundMessage(this, R.plurals.repository);
+            }
+        }
+        /** Issue item */
+        else if (title.startsWith("Issue")) {
+            context.openIssueActivity(this, feed.getRepository().getOwner(), feed.getRepository()
+                    .getName(), feed.getPayload().getNumber());
+        }
+        /** Commit comment item */
+        else if (title.startsWith("Comment in browser")) {
+            context.openBrowser(this, feed.getUrl());
+        }
+        /** Gist item */
+        else if (title.startsWith("gist")) {
+            context.openBrowser(this, feed.getPayload().getUrl());
+        }
+        /** Download item */
+        else if (title.startsWith("File")) {
+            Repository repository = feed.getRepository();
+            if (repository != null) {
+                String url = "https://github.com/" + repository.getOwner() + "/"
+                        + repository.getName() + "/downloads#download_" + feed.getPayload().getId();
+                context.openBrowser(this, url);
+            }
+            else {
+                context.notFoundMessage(this, R.plurals.repository);
+            }
+        }
+        /** Fork item */
+        else if (title.startsWith("Forked repo")) {
+            context.openRepositoryInfoActivity(this, feed.getActor(), feed.getRepository()
+                    .getName());
+        }
+        /** Wiki item */
+        else if (title.startsWith("Wiki in browser")) {
+            context.openBrowser(this, feed.getUrl());
+        }
+
+        return true;
+    }
+}

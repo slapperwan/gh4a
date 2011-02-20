@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	package="com.gh4a" android:versionCode="1" android:versionName="1.0">
+	<application android:icon="@drawable/icon" android:label="@string/app_name"
+		android:theme="@style/DefaultTheme" android:name="com.gh4a.Gh4Application">
+		<activity android:name=".Github4AndroidActivity">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
+		<activity android:name=".SearchActivity" />
+		<activity android:name=".DashboardActivity"/>
+		<activity android:name=".RepositoryListActivity"
+			android:label="@string/app_name" />
+		<activity android:name=".RepositoryActivity"
+			android:label="@string/app_name" />
+		<activity android:name=".UserListActivity" />
+		<activity android:name=".UserActivity" />
+		<activity android:name=".UserPublicActivity" />
+		<activity android:name=".UserPrivateActivity" />
+		<activity android:name=".CommitListActivity" />
+		<activity android:name=".CommitActivity" />
+		<activity android:name=".WatcherListActivity" />
+		<activity android:name=".ForkListActivity" />
+		<activity android:name=".FollowerFollowingListActivity"
+			android:label="@string/app_name" />
+		<activity android:name=".PublicRepoListActivity"
+			android:label="@string/app_name" />
+		<activity android:name=".WatchedRepoListActivity"
+			android:label="@string/app_name" />
+		<activity android:name=".IssueListActivity" />
+		<activity android:name=".IssueActivity" />
+		<activity android:name=".DiffViewerActivity" />
+		<activity android:name=".BranchListActivity"/>
+        <activity android:name=".TagListActivity"/>
+		<activity android:name=".ChooseIssueStateDialog"
+			android:label="Choose Status" android:theme="@android:style/Theme.Dialog"/>
+		<activity android:name=".PullRequestListActivity" />
+		<activity android:name=".PullRequestActivity"
+			android:label="@string/app_name" />
+        <activity android:name=".FileManagerActivity"
+            android:label="@string/app_name" />
+        <activity android:name=".FileViewerActivity"
+            android:label="@string/app_name" />
+
+		<activity android:name="com.markupartist.android.widget.ActionBar" />
+
+	</application>
+	<uses-sdk android:minSdkVersion="1" android:targetSdkVersion="9" />
+	<uses-permission android:name="android.permission.INTERNET" />
+
+
+</manifest> 

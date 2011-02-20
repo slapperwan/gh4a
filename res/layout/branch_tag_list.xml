@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/linear_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.gh4a"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+    <com.markupartist.android.widget.ActionBar
+        android:id="@+id/actionbar"
+        app:title="@string/app_name"
+        style="@style/ActionBar" />
+    <include
+        layout="@layout/breadcrumb"
+        android:id="@+id/breadcrumb" />
+    <FrameLayout
+        android:id="@+id/main_content"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <ListView
+            android:id="@+id/list_view"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="0dp">
+        </ListView>
+    </FrameLayout>
+</LinearLayout>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.gh4a"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+    <com.markupartist.android.widget.ActionBar
+        android:id="@+id/actionbar"
+        app:title="MineDroid"
+        style="@style/ActionBar" />
+    <ScrollView
+        android:id="@+id/main_content"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical">
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="10dp" />
+            <Button
+                android:id="@+id/btn_news_feed"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="50dp"
+                android:layout_marginLeft="50dp"
+                android:gravity="center_vertical"
+                android:text="News Feed"
+                android:background="@drawable/default_button_dashboard"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="5dp" />
+            <Button
+                android:id="@+id/btn_your_actions"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="50dp"
+                android:layout_marginLeft="50dp"
+                android:gravity="center_vertical"
+                android:text="Your Actions"
+                android:background="@drawable/default_button_dashboard"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="5dp" />
+            <Button
+                android:id="@+id/btn_pull_requests"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="50dp"
+                android:layout_marginLeft="50dp"
+                android:gravity="center_vertical"
+                android:text="Pull Requests"
+                android:background="@drawable/default_button_dashboard"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="5dp" />
+            <Button
+                android:id="@+id/btn_public_repositories_info"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="50dp"
+                android:layout_marginLeft="50dp"
+                android:gravity="center_vertical"
+                android:text="Public Repositories"
+                android:background="@drawable/default_button_dashboard"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="5dp" />
+            <Button
+                android:id="@+id/btn_private_repository_info"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="50dp"
+                android:layout_marginLeft="50dp"
+                android:gravity="center_vertical"
+                android:text="Private Repositories"
+                android:background="@drawable/default_button_dashboard"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="5dp" />
+            <Button
+                android:id="@+id/btn_watched_repository_info"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="50dp"
+                android:layout_marginLeft="50dp"
+                android:gravity="center_vertical"
+                android:text="Watched Repositories"
+                android:background="@drawable/default_button_dashboard"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

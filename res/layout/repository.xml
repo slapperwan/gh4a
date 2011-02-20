@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.gh4a"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+    <com.markupartist.android.widget.ActionBar
+        android:id="@+id/actionbar"
+        app:title="@string/app_name"
+        style="@style/ActionBar" />
+    <ScrollView
+        android:id="@id/main_content"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_margin="0dp"
+        android:padding="0dp">
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical">
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:background="?attr/info_box">
+                <LinearLayout
+                    android:id="@+id/ll_repository_info"
+                    android:layout_height="fill_parent"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent">
+                    <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:id="@+id/tv_login"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?attr/textAppearanceLink"
+                            android:textAppearance="?attr/textAppearanceLargeUrl" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceLarge"
+                            android:text=" / " />
+                        <TextView
+                            android:id="@+id/tv_name"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceLarge" />
+                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/tv_parent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="?attr/textAppearanceLink"
+                        android:textAppearance="?attr/textAppearanceSmallUrl" />
+                    <View
+                        android:id="@+id/separator"
+                        android:layout_width="fill_parent"
+                        android:layout_height="10dp" />
+                    <TextView
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="@string/repo_description" />
+                    <TextView
+                        android:id="@+id/tv_desc"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                    <TextView
+                        android:id="@+id/tv_language"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_below="@id/tv_desc"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
+                </LinearLayout>
+            </RelativeLayout>
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="vertical"
+                android:layout_margin="10dp">
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="@string/repo_url" />
+                <TextView
+                    android:id="@+id/tv_url"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:autoLink="web" />
+                <View
+                    android:background="?android:attr/divider"
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp" />
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/tv_branches_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="@string/repo_branches" />
+                    <Button
+                        android:id="@+id/btn_branches"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignRight="@id/tv_branches_label"
+                        android:layout_alignParentRight="true"
+                        android:text="View" />
+                </RelativeLayout>
+                <View
+                    android:background="?android:attr/divider"
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp" />
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/tv_tags_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="@string/repo_tags" />
+                    <Button
+                        android:id="@+id/btn_tags"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignRight="@id/tv_tags_label"
+                        android:layout_alignParentRight="true"
+                        android:text="View" />
+                </RelativeLayout>
+                <View
+                    android:background="?android:attr/divider"
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp" />
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/tv_pull_requests_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="@string/pull_request_title" />
+                    <Button
+                        android:id="@+id/btn_pull_requests"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignRight="@id/tv_pull_requests_label"
+                        android:layout_alignParentRight="true"
+                        android:text="View" />
+                </RelativeLayout>
+                <View
+                    android:background="?android:attr/divider"
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp" />
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/tv_watchers_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="@string/repo_watchers" />
+                    <Button
+                        android:id="@+id/btn_watchers"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignRight="@id/tv_watchers_label"
+                        android:layout_alignParentRight="true" />
+                </RelativeLayout>
+                <View
+                    android:background="?android:attr/divider"
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp" />
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/tv_forks_label"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="@string/repo_network" />
+                    <Button
+                        android:id="@+id/btn_forks"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignRight="@id/tv_forks_label"
+                        android:layout_alignParentRight="true" />
+                </RelativeLayout>
+                <View
+                    android:background="?android:attr/divider"
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp" />
+                <RelativeLayout
+                    android:id="@+id/rl_open_issues"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/tv_open_issues_label"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="@string/repo_open_issues" />
+                    <Button
+                        android:id="@+id/btn_open_issues"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignRight="@id/tv_open_issues_label"
+                        android:layout_alignParentRight="true" />
+                </RelativeLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

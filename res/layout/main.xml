@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.gh4a"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+    <com.markupartist.android.widget.ActionBar
+        android:id="@+id/actionbar_main"
+        app:title="MineDroid"
+        style="@style/ActionBar" />
+    <LinearLayout
+        android:id="@+id/main_content"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical">
+        <EditText
+            android:id="@+id/et_username_main"
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:hint="@string/user_username" />
+        <EditText
+            android:id="@+id/et_password_main"
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:password="true"
+            android:hint="@string/user_password" />
+        <Button
+            android:text="@string/user_login"
+            android:id="@+id/btn_login"
+            android:layout_width="100dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|center_horizontal|center">
+        </Button>
+    </LinearLayout>
+</LinearLayout>

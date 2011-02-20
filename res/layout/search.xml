@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_search"
+    xmlns:app="http://schemas.android.com/apk/res/com.gh4a"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+    <com.markupartist.android.widget.ActionBar
+        android:id="@+id/actionbar"
+        app:title="@string/app_name"
+        style="@style/ActionBar" />
+    <RelativeLayout
+        android:id="@+id/rl_top"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/info_box">
+        <LinearLayout
+            android:id="@+id/ll_spinner"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Spinner
+                android:id="@+id/spinner_language"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/languages_array"
+                android:layout_gravity="center_vertical|center_horizontal"
+                android:layout_weight="1" />
+            <Spinner
+                android:id="@+id/spinner_search_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/search_types_array"
+                android:layout_gravity="center_vertical|center_horizontal"
+                android:layout_weight="1" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@id/ll_spinner">
+            <EditText
+                android:id="@+id/et_search"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center_vertical|center_horizontal"
+                android:layout_below="@id/spinner_language"
+                android:layout_weight="1"
+                android:singleLine="true"
+                android:imeOptions="actionSearch"
+                android:hint="@string/search" />
+            <ImageButton
+                android:text="@string/search"
+                android:id="@+id/btn_search"
+                android:layout_width="wrap_content"
+                android:gravity="center_vertical|center_horizontal"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|center_horizontal|center"
+                android:layout_margin="0dp"
+                android:padding="0dp"
+                android:src="@drawable/ic_menu_search">
+            </ImageButton>
+        </LinearLayout>
+    </RelativeLayout>
+    <FrameLayout
+        android:id="@id/main_content"
+        android:layout_height="match_parent"
+        android:layout_width="fill_parent"
+        android:orientation="vertical"
+        android:layout_weight="1">
+        <ListView
+            android:id="@+id/list_search"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1.0"
+            android:padding="0dp">
+        </ListView>
+    </FrameLayout>
+    <include
+        layout="@layout/loading"
+        android:id="@+id/loading" />
+</LinearLayout>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Github for Android</string>
+
+    <!-- Common -->
+    <string name="record_not_found">%1$s not found</string>
+    <string name="more_data">%1$s | %2$s</string>
+    <string name="more_data_3">%1$s | %2$s | %3$s</string>
+    <string name="user_extra_data">%1$d followers | %2$d repos</string>
+    <string name="loading_msg">Loading...</string>
+    <string name="search">Search</string>
+    <string name="activity">Activity</string>
+    
+    <!-- Activity event -->
+    <string name="event_push_title">%1$s pushed to %2$s at %3$s/%4$s</string>
+    <string name="event_watch_title">%1$s %2$s watching %3$s/%4$s</string>
+    <string name="event_gist_title">%1$s %2$s %3$s</string>
+    <string name="event_fork_title">%1$s forked %2$s/%3$s</string>
+    <string name="event_commit_comment_title">%1$s commented on %2$s/%3$s</string>
+    <string name="event_fork_apply_title">%1$s applied fork commits to %2$s/%3$s</string>
+    <string name="event_follow_title">%1$s started following %2$s</string>
+    <string name="event_create_repo_title">%1$s created repository %2$s</string>
+    <string name="event_create_branch_title">%1$s created %2$s %3$s at %4$s/%5$s</string>
+    <string name="event_issues_title">%1$s %2$s issue %3$s on %4$s/%5$s</string>
+    <string name="event_delete_repo_title">%1$s deleted repository %2$s</string>
+    <string name="event_delete_branch_title">%1$s deleted %2$s %3$s at %4$s/%5$s</string>
+    <string name="event_wiki_title">%1$s %2$s a page in the %3$s/%4$s wiki</string>
+    <string name="event_pull_request_title">%1$s %2$s pull request %3$s on %4$s/%5$s</string>
+    <string name="event_member_title">%1$s added %2$s to %3$s/%4$s</string>
+    <string name="event_download_title">%1$s uploaded a file to %2$s/%3$s</string>
+    <string name="event_gollum_title">%1$s %2$s %3$s in the %4$s wiki</string>
+    <string name="event_public_title">%1$s open sourced %2$s</string>
+    
+    <string name="event_pull_request_desc">%1$s\n%2$d commits with %3$d additions and %4$d deletions</string>
+    <string name="event_follow_desc">%1$s has %2$d repositories and %3$d followers</string>
+    <string name="event_fork_desc">Forked repository is at %1$s</string>
+    <string name="event_create_repo_desc">New repository is at %1$s/%2$s</string>
+    <string name="event_create_branch_desc">New %1$s is at %2$s/%3$s/tree/%4$s</string>
+    <string name="event_gollum_desc">View %1$s</string>
+    <string name="event_commit_comment_desc">Comment in </string>
+    <string name="event_push_desc">%1$d more commits...</string>
+    
+    <!-- User -->
+    <plurals name="user">
+        <item quantity="one">User</item>
+        <item quantity="other">Users</item>
+    </plurals>
+    <string name="user">User</string>
+    <string name="user_login">Login</string>
+    <string name="user_name">Name</string>
+    <string name="user_username">Username</string>
+    <string name="user_password">Password</string>
+    <string name="user_email">Email</string>
+    <string name="user_location">Location</string>
+    <string name="user_website">Website</string>
+    <string name="user_company">Company</string>
+    <string name="user_following">Following</string>
+    <string name="user_followers">Followers</string>
+    <string name="user_location">Location</string>
+    <string name="user_created_at">Member since</string>
+    <string name="user_pub_repos">Public Repositories</string>
+    <string name="user_watched_repos">Watched Repositories</string>
+
+    <!-- Repository -->
+    <plurals name="repository">
+        <item quantity="one">Repository</item>
+        <item quantity="other">Repositories</item>
+    </plurals>
+    <string name="repo_owner">Owner</string>
+    <string name="repo_name">Repository Name</string>
+    <string name="repo_description">Description</string>
+    <string name="repo_url">Url</string>
+    <string name="repo_open_issues">Open Issues</string>
+    <string name="repo_homepage">Homepage</string>
+    <string name="repo_forks">Forks</string>
+    <string name="repo_size">Size</string>
+    <string name="repo_language">Language</string>
+    <string name="repo_followers">Followers</string>
+    <string name="repo_created_at">Created at</string>
+    <string name="repo_pushed_at">Pushed at</string>
+    <string name="repo_source">Source</string>
+    <string name="repo_parent">Parent</string>
+    <string name="repo_organization">Organization</string>
+    <string name="repo_watchers">Watchers</string>
+    <string name="repo_network">Network</string>
+    <string name="repo_watch_action">Watch</string>
+    <string name="repo_fork_action">Fork</string>
+    <string name="repo_branches">Branches</string>
+    <string name="repo_tags">Tags</string>
+
+    <!-- Commit -->
+    <plurals name="commit">
+        <item quantity="one">Commit</item>
+        <item quantity="other">Commits</item>
+    </plurals>
+    <string name="commit_message">Message</string>
+    <string name="commit_date">Date</string>
+    <string name="commit_author">Author</string>
+    <string name="commit_committer">Committer</string>
+    <string name="commit_committed_date">Committed date</string>
+    <string name="commit_authored_date">Authored date</string>
+    <string name="commits">Commits</string>
+
+    <!-- Issue -->
+    <plurals name="issue">
+        <item quantity="one">Issue</item>
+        <item quantity="other">Issues</item>
+    </plurals>
+    <string name="Issue">Issue</string>
+    <string name="issue_user">User</string>
+    <string name="issue_updated_at">Updated at</string>
+    <string name="issue_user">User</string>
+    <string name="issue_number">Number</string>
+    <string name="issue_votes">Votes</string>
+    <string name="issue_comments">Comments</string>
+    <string name="issue_title">Title</string>
+    <string name="issue_body">Body</string>
+    <string name="issue_state">State</string>
+    <string name="issue_created_at">Created at</string>
+    <string name="issue_closed_at">Closed at</string>
+
+    <!-- Issue comment -->
+    <plurals name="issue_comment">
+        <item quantity="one">Comment</item>
+        <item quantity="other">Comments</item>
+    </plurals>
+    <string name="issue_comment_title">Comment</string>
+    <string name="issue_comment_created_at">Created at</string>
+    <string name="issue_comment_body">Body</string>
+    <string name="issue_comment_updated_at">Updated at</string>
+    <string name="issue_comment_user">User</string>
+    
+    <!-- Pull Request -->
+    <string name="pull_request_title">Pull Request</string>
+    <string name="pull_request_comments">Comments</string>
+    
+    <!-- Object -->
+    <string name="object_tree">Tree</string>
+</resources>
