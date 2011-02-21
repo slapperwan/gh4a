@@ -139,7 +139,7 @@ public class AddedFileViewerActivity extends BaseActivity {
                 AddedFileViewerActivity activity = mTarget.get();
                 GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
                 ObjectService objectService = factory.createObjectService();
-
+                
                 return objectService.getBlob(activity.mUserLogin,
                             activity.mRepoName,
                             activity.mTreeSha, 

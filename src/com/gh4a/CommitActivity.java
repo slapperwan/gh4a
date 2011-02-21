@@ -298,7 +298,7 @@ public class CommitActivity extends BaseActivity {
                         intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
                         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                         intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
-                        intent.putExtra(Constants.Object.TREE_SHA, mTreeSha);
+                        intent.putExtra(Constants.Object.TREE_SHA, commit.getTree());
                         intent.putExtra(Constants.Object.PATH, filename);
                         startActivity(intent);
                     }
