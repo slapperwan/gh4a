@@ -121,7 +121,7 @@ public class PullRequestActivity extends BaseActivity {
         b.setData(data);
         breadCrumbHolders[2] = b;
 
-        createBreadcrumb("Pull Request", breadCrumbHolders);
+        createBreadcrumb("Pull Request #" + mPullRequestNumber, breadCrumbHolders);
     }
 
     /**
