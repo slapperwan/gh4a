@@ -8,6 +8,7 @@
         <item name="android:textAppearanceMedium">@style/default_text_medium</item>
         <item name="textAppearanceMedium">@style/default_text_medium</item>
         <item name="android:textAppearanceSmall">@style/default_text_small</item>
+        <item name="textAppearanceWhiteSmall">@style/default_text_white_small</item>
         <item name="textAppearanceCode">@style/default_text_code</item>
         <item name="textAppearanceUrl">@style/default_text_medium_url</item>
         <item name="textAppearanceLargeUrl">@style/default_text_large_url</item>
@@ -17,6 +18,8 @@
         <item name="android:divider">@drawable/default_divider</item>
         <item name="info_box">@drawable/default_info_box</item>
         <item name="row_box">@drawable/default_row_box</item>
+        <item name="red_box">@drawable/default_red_box</item>
+        <item name="green_box">@drawable/default_green_box</item>
         <item name="android:buttonStyle">@style/default_button</item>
         <!-- item name="android:spinnerStyle">@style/default_spinner</item-->
         <!--

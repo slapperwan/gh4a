@@ -16,6 +16,11 @@
         <item name="android:textSize">13sp</item>
         <item name="android:textColor">#333333</item>
     </style>
+    
+    <style name="default_text_white_small" parent="@android:style/TextAppearance.Small">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
 
     <style name="default_text_code" parent="@style/default_text_small">
         <item name="android:textSize">13sp</item>

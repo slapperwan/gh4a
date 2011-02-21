@@ -41,6 +41,13 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:layout_below="@id/ll_top"
             android:layout_toRightOf="@id/iv_gravatar" />
+        <TextView
+            android:id="@+id/tv_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_title"
+            android:layout_toRightOf="@id/iv_gravatar"
+            android:textAppearance="?attr/textAppearanceWhiteSmall" />
     </RelativeLayout>
     <LinearLayout
         android:layout_width="fill_parent"

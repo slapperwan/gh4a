@@ -2,6 +2,8 @@
 <resources>
     <attr name="info_box" format="reference" />
     <attr name="row_box" format="reference" />
+    <attr name="red_box" format="reference" />
+    <attr name="green_box" format="reference" />
     <attr name="textAppearanceCode" format="reference" />
     <attr name="textAppearanceUrl" format="reference" />
     <attr name="textAppearanceLargeUrl" format="reference" />
@@ -12,4 +14,5 @@
     <attr name="button_dashboard" format="reference" />
     <attr name="comment_box" format="reference" />
     <attr name="textAppearanceSubtitle" format="reference" />
+    <attr name="textAppearanceWhiteSmall" format="reference" />
 </resources>

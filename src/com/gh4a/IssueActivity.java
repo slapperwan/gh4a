@@ -26,9 +26,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -142,7 +140,7 @@ public class IssueActivity extends BaseActivity {
         b.setData(data);
         breadCrumbHolders[2] = b;
 
-        createBreadcrumb("Issue", breadCrumbHolders);
+        createBreadcrumb("Issue #" + mIssueNumber, breadCrumbHolders);
     }
 
     /**
@@ -200,12 +198,20 @@ public class IssueActivity extends BaseActivity {
 
         TextView tvLogin = (TextView) mHeader.findViewById(R.id.tv_login);
         TextView tvCreateAt = (TextView) mHeader.findViewById(R.id.tv_created_at);
+        TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
         TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
         TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
         Button btnComments = (Button) mHeader.findViewById(R.id.btn_comments);
 
         tvLogin.setText(mBundle.getString(Constants.Issue.ISSUE_CREATED_BY));
         tvCreateAt.setText(mBundle.getString(Constants.Issue.ISSUE_CREATED_AT));
+        tvState.setText(mBundle.getString(Constants.Issue.ISSUE_STATE));
+        if ("closed".equals(mBundle.getString(Constants.Issue.ISSUE_STATE))) {
+            tvState.setBackgroundResource(R.drawable.default_red_box);
+        }
+        else {
+            tvState.setBackgroundResource(R.drawable.default_green_box);
+        }
         tvTitle.setText(mBundle.getString(Constants.Issue.ISSUE_TITLE));
         tvDesc.setText(mBundle.getString(Constants.Issue.ISSUE_BODY));
         btnComments.setText(String.valueOf(mBundle.getInt(Constants.Issue.ISSUE_COMMENTS)));
