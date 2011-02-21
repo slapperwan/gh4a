@@ -294,7 +294,7 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         else if (UserFeed.Type.FORK_EVENT.equals(eventType)) {
             Repository repository = feed.getRepository();
             if (repository != null) {
-                context.openRepositoryInfoActivity(this, feed.getPayload().getActor(), repository
+                context.openRepositoryInfoActivity(this, feed.getActor(), repository
                         .getName());
             }
             else {
