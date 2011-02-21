@@ -114,6 +114,7 @@
     <string name="commit_summary">%1$d changed | %2$d added | %3$d deleted</string>
     <string name="commit_no_files">No files</string>
     <string name="commit_sha">Commit - %1$s</string>
+    <string name="commit_comment">Commented on %1$s</string>
 
     <!-- Issue -->
     <plurals name="issue">

@@ -99,6 +99,10 @@ public class PullRequestDiscussionAdapter extends RootAdapter<Discussion> {
                 imageDownloader.download(StringUtils.md5Hex(discussion.getUser().getEmail()),
                         viewHolder.ivGravatar);
             }
+            else if (Discussion.Type.COMMIT_COMMENT.equals(discussion.getType())) {
+                imageDownloader.download(discussion.getUser().getGravatarId(),
+                        viewHolder.ivGravatar);
+            }
 
             viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
 
@@ -125,7 +129,11 @@ public class PullRequestDiscussionAdapter extends RootAdapter<Discussion> {
                         context.openUserInfoActivity(v.getContext(), discussion.getUser()
                                 .getLogin(), null);
                     }
-
+                    else if (Discussion.Type.COMMIT_COMMENT.equals(discussion
+                            .getType())) {
+                        context.openUserInfoActivity(v.getContext(), discussion.getUser()
+                                .getLogin(), null);
+                    }
                 }
             });
 
@@ -135,6 +143,7 @@ public class PullRequestDiscussionAdapter extends RootAdapter<Discussion> {
                         .getLogin(), discussion.getAuthor().getName()));
                 viewHolder.tvDate.setText(pt.format(discussion.getCommittedDate()));
                 viewHolder.tvSha.setVisibility(View.VISIBLE);
+                
                 SpannableString content = new SpannableString("Commit "
                         + discussion.getId().substring(0, 7));
                 content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
@@ -149,6 +158,7 @@ public class PullRequestDiscussionAdapter extends RootAdapter<Discussion> {
                                 discussion.getId());
                     }
                 });
+                
                 viewHolder.tvBody.setText(discussion.getMessage());
             }
             else if (Discussion.Type.ISSUE_COMMENT.equals(discussion.getType())) {
@@ -162,6 +172,14 @@ public class PullRequestDiscussionAdapter extends RootAdapter<Discussion> {
                 viewHolder.tvDate.setText(pt.format(discussion.getCreatedAt()));
                 viewHolder.tvBody.setText(discussion.getBody());
                 viewHolder.tvSha.setVisibility(View.GONE);
+            }
+            else if (Discussion.Type.COMMIT_COMMENT.equals(discussion.getType())) {
+                viewHolder.tvUser.setText(discussion.getUser().getLogin());
+                viewHolder.tvDate.setText(pt.format(discussion.getCreatedAt()));
+                viewHolder.tvSha.setVisibility(View.VISIBLE);
+                viewHolder.tvSha.setText(v.getResources().getString(R.string.commit_comment,
+                        discussion.getCommitId().substring(0, 7)));
+                viewHolder.tvBody.setText(discussion.getBody());
             }
         }
         return v;
