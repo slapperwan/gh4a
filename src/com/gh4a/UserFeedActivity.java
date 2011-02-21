@@ -292,10 +292,10 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
 
         /** ForkEvent */
         else if (UserFeed.Type.FORK_EVENT.equals(eventType)) {
-            Repository repository = feed.getRepository();
-            if (repository != null) {
-                context.openRepositoryInfoActivity(this, feed.getActor(), repository
-                        .getName());
+            if (getToRepoName(feed) != null
+                    && getToRepoOwner(feed) != null) {
+                context.openRepositoryInfoActivity(this, getToRepoOwner(feed),
+                        getToRepoName(feed));
             }
             else {
                 context.notFoundMessage(this, R.plurals.repository);
@@ -398,9 +398,9 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
 
             /** ForkEvent */
             else if (UserFeed.Type.FORK_EVENT.equals(eventType)) {
-                Repository repository = feed.getRepository();
-                if (repository != null) {
-                    menu.add("Forked repo " + feed.getActor() + "/" + repository.getName());
+                if (getToRepoName(feed) != null
+                        && getToRepoOwner(feed) != null) {
+                    menu.add("Forked repo " + getToRepoOwner(feed) + "/" + getToRepoName(feed));
                 }
             }
 
@@ -473,8 +473,14 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         }
         /** Fork item */
         else if (title.startsWith("Forked repo")) {
-            context.openRepositoryInfoActivity(this, feed.getActor(), feed.getRepository()
-                    .getName());
+            if (getToRepoName(feed) != null
+                    && getToRepoOwner(feed) != null) {
+                context.openRepositoryInfoActivity(this, feed.getActor(), feed.getRepository()
+                        .getName());
+            }
+            else {
+                context.notFoundMessage(this, R.plurals.repository);
+            }
         }
         /** Wiki item */
         else if (title.startsWith("Wiki in browser")) {
@@ -482,5 +488,33 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         }
 
         return true;
+    }
+    
+    private static String getToRepoOwner(UserFeed userFeed) {
+        String url = userFeed.getUrl();
+        if (!StringUtils.isBlank(url)) {
+            String[] urlParts = url.split("/");
+            if (urlParts.length > 3) {
+                return urlParts[3];
+            }
+            else {
+                return null;
+            }
+        }
+        return null;
+    }
+    
+    private static String getToRepoName(UserFeed userFeed) {
+        String url = userFeed.getUrl();
+        if (!StringUtils.isBlank(url)) {
+            String[] urlParts = url.split("/");
+            if (urlParts.length > 3) {
+                return urlParts[4];
+            }
+            else {
+                return null;
+            }
+        }
+        return null;
     }
 }

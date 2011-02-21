@@ -22,6 +22,7 @@ import android.content.res.Resources;
 import android.text.SpannableString;
 import android.text.style.ClickableSpan;
 import android.text.style.TextAppearanceSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.ImageDownloader;
@@ -100,19 +102,18 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
                 }
             });
             viewHolder.tvTitle.setText(formatTitle(feed));
-
+            
             String content = formatDescription(feed, viewHolder, (RelativeLayout) v);
             if (content != null) {
                 viewHolder.tvDesc.setVisibility(View.VISIBLE);
                 viewHolder.tvDesc.setText(content);
             }
             else if (View.VISIBLE == viewHolder.tvDesc.getVisibility()) {
-                // do nothing
-                // the content is set at formatDescription (eg.
-                // CommitCommentEvent)
+                viewHolder.tvDesc.setText(null);
+                viewHolder.tvDesc.setVisibility(View.GONE);
             }
             else {
-                viewHolder.tvDesc.setText("");
+                viewHolder.tvDesc.setText(null);
                 viewHolder.tvDesc.setVisibility(View.GONE);
             }
 
@@ -216,16 +217,8 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
 
         /** ForkEvent */
         else if (UserFeed.Type.FORK_EVENT.equals(feed.getType())) {
-            Repository repository = feed.getRepository();
-            String repo = null;
-            if (repository != null) {
-                repo = feed.getActor() + "/" + repository.getName();
-            }
-            else {
-                repo = feed.getActor() + "/" + payload.getRepo();
-            }
             String text = String.format(res.getString(R.string.event_fork_desc),
-                    repo);
+                    formatToRepoName(feed));
             return text;
         }
 
@@ -293,7 +286,6 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
      */
     private String formatTitle(UserFeed feed) {
         Payload payload = feed.getPayload();
-        Repository repository = feed.getRepository();
         Resources res = mContext.getResources();
 
         /** PushEvent */
@@ -301,8 +293,7 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
             String text = String.format(res.getString(R.string.event_push_title),
                     feed.getActor(),
                     payload.getRef().split("/")[2],
-                    repository != null ? repository.getOwner() : payload.getRepo(),
-                            repository != null ? repository.getName() : "");
+                    formatFromRepoName(feed));
             return text;
         }
 
@@ -312,8 +303,7 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
                     feed.getActor(),
                     payload.getAction(),
                     payload.getNumber(),
-                    repository != null ? repository.getOwner() : payload.getRepo(),
-                    repository != null ? repository.getName() : ""); 
+                    formatFromRepoName(feed)); 
             return text;
         }
 
@@ -321,8 +311,7 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
         else if (UserFeed.Type.COMMIT_COMMENT_EVENT.equals(feed.getType())) {
             String text = String.format(res.getString(R.string.event_commit_comment_title),
                     feed.getActor(),
-                    repository != null ? repository.getOwner() : payload.getRepo(),
-                    repository != null ? repository.getName() : "");
+                    formatFromRepoName(feed));
             return text;
         }
 
@@ -332,8 +321,7 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
                     feed.getActor(),
                     "closed".equals(payload.getAction()) ? "merged" : payload.getAction(),
                     payload.getNumber(),
-                    repository != null ? repository.getOwner() : payload.getRepo(),
-                    repository != null ? repository.getName() : "");
+                    formatFromRepoName(feed));
             return text;
         }
 
@@ -341,8 +329,7 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
         else if (UserFeed.Type.WATCH_EVENT.equals(feed.getType())) {
             String text = String.format(res.getString(R.string.event_watch_title),
                     feed.getActor(), payload.getAction(),
-                    repository != null ? repository.getOwner() : payload.getRepo(),
-                    repository != null ? repository.getName() : "");
+                    formatFromRepoName(feed));
             return text;
         }
 
@@ -358,8 +345,7 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
         else if (UserFeed.Type.FORK_EVENT.equals(feed.getType())) {
             String text = String.format(res.getString(R.string.event_fork_title), 
                     feed.getActor(),
-                    repository != null ? repository.getOwner() : payload.getRepo(),
-                    repository != null ? repository.getName() : "");
+                    formatFromRepoName(feed));
             return text;
         }
 
@@ -367,8 +353,7 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
         else if (UserFeed.Type.FORK_APPLY_EVENT.equals(feed.getType())) {
             String text = String.format(res.getString(R.string.event_fork_apply_title),
                     feed.getActor(),
-                    repository != null ? repository.getOwner() : payload.getRepo(),
-                    repository != null ? repository.getName() : "");
+                    formatFromRepoName(feed));
             return text;
         }
 
@@ -391,8 +376,7 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
             else if ("branch".equals(payload.getObject()) || "tag".equals(payload.getObject())) {
                 String text = String.format(res.getString(R.string.event_create_branch_title),
                         feed.getActor(), payload.getObject(), payload.getObjectName(),
-                        repository != null ? repository.getOwner() : payload.getRepo(),
-                        repository != null ? repository.getName() : "");
+                        formatFromRepoName(feed));
                 return text;
             }
             else {
@@ -410,8 +394,7 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
             else {
                 String text = String.format(res.getString(R.string.event_delete_branch_title),
                         feed.getActor(), payload.getRefType(), payload.getRef(),
-                        repository != null ? repository.getOwner() : payload.getRepo(),
-                        repository != null ? repository.getName() : "");
+                        formatFromRepoName(feed));
                 return text;
             }
         }
@@ -421,8 +404,7 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
             String text = String.format(res.getString(R.string.event_wiki_title), 
                     feed.getActor(),
                     payload.getAction(),
-                    repository != null ? repository.getOwner() : payload.getRepo(),
-                    repository != null ? repository.getName() : "");
+                    formatFromRepoName(feed));
             return text;
         }
 
@@ -430,8 +412,7 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
         else if (UserFeed.Type.MEMBER_EVENT.equals(feed.getType())) {
             String text = String.format(res.getString(R.string.event_member_title),
                     feed.getActor(), payload.getMember(),
-                    repository != null ? repository.getOwner() : payload.getRepo(),
-                    repository != null ? repository.getName() : "");
+                    formatFromRepoName(feed));
             return text;
         }
 
@@ -439,44 +420,22 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
         else if (UserFeed.Type.DOWNLOAD_EVENT.equals(feed.getType())) {
             String text = String.format(res.getString(R.string.event_download_title),
                     feed.getActor(),
-                    repository != null ? repository.getOwner() : payload.getRepo(),
-                    repository != null ? repository.getName() : "");
+                    formatFromRepoName(feed));
             return text;
         }
 
         /** GollumEvent */
         else if (UserFeed.Type.GOLLUM_EVENT.equals(feed.getType())) {
-            String repo = "";
-            if (payload != null) {
-                if (!StringUtils.isBlank(payload.getRepo())) {
-                    repo = payload.getRepo();
-                }
-                else if (repository != null) {
-                    repo = repository.getOwner() + "/" + repository.getName();
-                }
-
-            }
-            else if (repository != null) {
-                repo = repository.getOwner() + "/" + repository.getName();
-            }
-
             String text = String.format(res.getString(R.string.event_gollum_title),
-                    feed.getActor(), payload.getAction(), payload.getTitle(), repo);
+                    feed.getActor(), payload.getAction(), payload.getTitle(),
+                    formatFromRepoName(feed));
             return text;
         }
 
         /** PublicEvent */
         else if (UserFeed.Type.PUBLIC_EVENT.equals(feed.getType())) {
-            String repo = "";
-            if (payload != null) {
-                repo = payload.getRepo();
-            }
-            else if (repository != null) {
-                repo = repository.getOwner() + "/" + repository.getName();
-            }
-
             String text = String.format(res.getString(R.string.event_public_title),
-                    feed.getActor(), repo);
+                    feed.getActor(), formatFromRepoName(feed));
             return text;
         }
 
@@ -511,7 +470,29 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
             mListener.onClick(widget);
         }
     }
+    
+    private static String formatFromRepoName(UserFeed userFeed) {
+        Repository repository = userFeed.getRepository();
+        if (repository != null) {
+            return repository.getOwner() + "/" + repository.getName();
+        }
+        return "(deleted)";
+    }
 
+    private static String formatToRepoName(UserFeed userFeed) {
+        String url = userFeed.getUrl();
+        if (!StringUtils.isBlank(url)) {
+            String[] urlParts = url.split("/");
+            if (urlParts.length > 3) {
+                return urlParts[3] + "/" + urlParts[4];
+            }
+            else {
+                return "(deleted)";
+            }
+        }
+        return "(deleted)";
+    }
+    
     /**
      * The Class ViewHolder.
      */
