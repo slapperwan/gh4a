@@ -37,6 +37,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
+import com.github.api.v2.schema.ObjectPayloadPullRequest;
 import com.github.api.v2.schema.Payload;
 import com.github.api.v2.schema.PayloadPullRequest;
 import com.github.api.v2.schema.PayloadTarget;
@@ -317,10 +318,14 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
 
         /** PullRequestEvent */
         else if (UserFeed.Type.PULL_REQUEST_EVENT.equals(feed.getType())) {
+            int pullRequestNumber = payload.getNumber();
+            if (payload.getPullRequest() instanceof ObjectPayloadPullRequest) {
+                pullRequestNumber = ((ObjectPayloadPullRequest) payload.getPullRequest()).getNumber();
+            }
             String text = String.format(res.getString(R.string.event_pull_request_title),
                     feed.getActor(),
                     "closed".equals(payload.getAction()) ? "merged" : payload.getAction(),
-                    payload.getNumber(),
+                    pullRequestNumber,
                     formatFromRepoName(feed));
             return text;
         }

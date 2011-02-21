@@ -32,6 +32,7 @@ import com.gh4a.R;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
 import com.github.api.v2.schema.Discussion;
+import com.github.api.v2.schema.PullRequest;
 
 /**
  * The Comment adapter.
@@ -41,9 +42,9 @@ public class PullRequestDiscussionAdapter extends RootAdapter<Discussion> {
     /** The repo name. */
     protected String mRepoName;
     
-    /** The issue user login. */
-    protected String mIssueUserLogin;
-
+    /** The pull request. */
+    protected PullRequest mPullRequest;
+    
     /**
      * Instantiates a new comment adapter.
      *
@@ -52,11 +53,10 @@ public class PullRequestDiscussionAdapter extends RootAdapter<Discussion> {
      * @param repoName the repo name
      * @param issueUserLogin the issue user login
      */
-    public PullRequestDiscussionAdapter(Context context, List<Discussion> objects, String repoName,
-            String issueUserLogin) {
+    public PullRequestDiscussionAdapter(Context context, List<Discussion> objects, String repoName, PullRequest pullRequest) {
         super(context, objects);
         mRepoName = repoName;
-        mIssueUserLogin = issueUserLogin;
+        mPullRequest = pullRequest;
     }
 
     /*
@@ -117,7 +117,7 @@ public class PullRequestDiscussionAdapter extends RootAdapter<Discussion> {
                         }
                         // else get from PullRequest issue user
                         else {
-                            context.openUserInfoActivity(v.getContext(), mIssueUserLogin, null);
+                            context.openUserInfoActivity(v.getContext(), mPullRequest.getIssueUser().getLogin(), null);
                         }
                     }
                     else if (Discussion.Type.ISSUE_COMMENT.equals(discussion.getType())) {
@@ -154,7 +154,7 @@ public class PullRequestDiscussionAdapter extends RootAdapter<Discussion> {
                     @Override
                     public void onClick(View v) {
                         context.openCommitInfoActivity(v.getContext(), StringUtils.ifNullDefaultTo(
-                                discussion.getAuthor().getLogin(), mIssueUserLogin), mRepoName,
+                                mPullRequest.getHead().getUser().getLogin(), discussion.getAuthor().getLogin()), mRepoName,
                                 discussion.getId());
                     }
                 });

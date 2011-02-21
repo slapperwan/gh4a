@@ -140,7 +140,7 @@ public class PullRequestActivity extends BaseActivity {
 
         List<Discussion> discussions = new ArrayList<Discussion>();
         mPullRequestDiscussionAdapter = new PullRequestDiscussionAdapter(PullRequestActivity.this,
-                discussions, mRepoName, pullRequest.getIssueUser().getLogin());
+                discussions, mRepoName, pullRequest);
         lvComments.setAdapter(mPullRequestDiscussionAdapter);
 
         ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);

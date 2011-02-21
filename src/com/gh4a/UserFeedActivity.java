@@ -34,6 +34,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import com.gh4a.adapter.FeedAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.StringUtils;
+import com.github.api.v2.schema.ObjectPayloadPullRequest;
 import com.github.api.v2.schema.Payload;
 import com.github.api.v2.schema.Repository;
 import com.github.api.v2.schema.UserFeed;
@@ -239,8 +240,13 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
 
         /** PullRequestEvent */
         else if (UserFeed.Type.PULL_REQUEST_EVENT.equals(eventType)) {
+            Payload payload = feed.getPayload();
+            int pullRequestNumber = payload.getNumber();
+            if (payload.getPullRequest() instanceof ObjectPayloadPullRequest) {
+                pullRequestNumber = ((ObjectPayloadPullRequest) payload.getPullRequest()).getNumber();
+            }
             context.openPullRequestActivity(this, feed.getRepository().getOwner(), feed
-                    .getRepository().getName(), feed.getPayload().getNumber());
+                    .getRepository().getName(), pullRequestNumber);
         }
 
         /** FollowEvent */
@@ -408,6 +414,16 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
             else if (UserFeed.Type.GOLLUM_EVENT.equals(eventType)) {
                 menu.add("Wiki in browser");
             }
+            
+            /** PullRequestEvent */
+            else if (UserFeed.Type.PULL_REQUEST_EVENT.equals(eventType)) {
+                Payload payload = feed.getPayload();
+                int pullRequestNumber = payload.getNumber();
+                if (payload.getPullRequest() instanceof ObjectPayloadPullRequest) {
+                    pullRequestNumber = ((ObjectPayloadPullRequest) payload.getPullRequest()).getNumber();
+                }
+                menu.add("Pull request " + pullRequestNumber);
+            }
         }
     }
 
@@ -485,6 +501,17 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         /** Wiki item */
         else if (title.startsWith("Wiki in browser")) {
             context.openBrowser(this, feed.getUrl());
+        }
+        /** Pull Request item */
+        else if (title.startsWith("Pull request")) {
+            Payload payload = feed.getPayload();
+            int pullRequestNumber = payload.getNumber();
+            if (payload.getPullRequest() instanceof ObjectPayloadPullRequest) {
+                pullRequestNumber = ((ObjectPayloadPullRequest) payload.getPullRequest()).getNumber();
+            }
+            
+            context.openPullRequestActivity(this, feed.getRepository().getOwner(), feed
+                    .getRepository().getName(), pullRequestNumber);
         }
 
         return true;
