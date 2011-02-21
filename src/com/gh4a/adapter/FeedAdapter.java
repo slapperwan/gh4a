@@ -185,12 +185,15 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
         else if (UserFeed.Type.PULL_REQUEST_EVENT.equals(feed.getType())) {
             PayloadPullRequest pullRequest = payload.getPullRequest();
             
-            String text = String.format(res.getString(R.string.event_pull_request_desc),
-                    pullRequest.getTitle(),
-                    pullRequest.getCommits(),
-                    pullRequest.getAdditions(),
-                    pullRequest.getDeletions());
-            return text;
+            if (!StringUtils.isBlank(pullRequest.getTitle())) {
+                String text = String.format(res.getString(R.string.event_pull_request_desc),
+                        pullRequest.getTitle(),
+                        pullRequest.getCommits(),
+                        pullRequest.getAdditions(),
+                        pullRequest.getDeletions());
+                return text;
+            }
+            return null;
         }
 
         /** FollowEvent */
