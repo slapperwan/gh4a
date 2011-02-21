@@ -161,7 +161,6 @@ public class PullRequestActivity extends BaseActivity {
         TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
         TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
         TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
-        //Button btnComments = (Button) mHeader.findViewById(R.id.btn_comments);
 
         tvLogin.setText(pullRequest.getIssueUser().getLogin());
         tvCreateAt.setText(pt.format(pullRequest.getIssueCreatedAt()));
@@ -176,18 +175,6 @@ public class PullRequestActivity extends BaseActivity {
         tvDesc.setText(pullRequest.getBody());
         
         fillDiscussion(pullRequest.getDiscussion());
-        
-//        btnComments.setText(String.valueOf(pullRequest.getComments()));
-//        btnComments.setOnClickListener(new OnClickListener() {
-//
-//            @Override
-//            public void onClick(View v) {
-//                if (!mDiscussionLoaded) {
-//                    fillDiscussion(pullRequest.getDiscussion());
-//                    mDiscussionLoaded = true;
-//                }
-//            }
-//        });
     }
 
     /**

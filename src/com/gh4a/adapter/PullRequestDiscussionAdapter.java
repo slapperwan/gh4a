@@ -33,6 +33,7 @@ import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
 import com.github.api.v2.schema.Discussion;
 import com.github.api.v2.schema.PullRequest;
+import com.github.api.v2.schema.Repository;
 
 /**
  * The Comment adapter.
@@ -153,9 +154,20 @@ public class PullRequestDiscussionAdapter extends RootAdapter<Discussion> {
 
                     @Override
                     public void onClick(View v) {
-                        context.openCommitInfoActivity(v.getContext(), StringUtils.ifNullDefaultTo(
-                                mPullRequest.getHead().getUser().getLogin(), discussion.getAuthor().getLogin()), mRepoName,
-                                discussion.getId());
+                        if (mPullRequest.getHead().getRepository() != null) {
+                            Repository repository = mPullRequest.getHead().getRepository();
+                            context.openCommitInfoActivity(v.getContext(), 
+                                    repository.getOwner(), 
+                                    repository.getName(),
+                                    discussion.getId());
+                        }
+                        else if (mPullRequest.getBase().getRepository() != null) {
+                            Repository repository = mPullRequest.getBase().getRepository();
+                            context.openCommitInfoActivity(v.getContext(), 
+                                    repository.getOwner(), 
+                                    repository.getName(),
+                                    discussion.getId());
+                        }
                     }
                 });
                 
