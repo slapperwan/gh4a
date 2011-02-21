@@ -147,7 +147,7 @@
     
     <!-- Pull Request -->
     <string name="pull_request_title">Pull Request</string>
-    <string name="pull_request_comments">Comments</string>
+    <string name="pull_request_comments">Discussion</string>
     
     <!-- Object -->
     <string name="object_tree">Tree</string>

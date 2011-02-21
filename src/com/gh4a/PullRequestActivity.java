@@ -160,23 +160,26 @@ public class PullRequestActivity extends BaseActivity {
         TextView tvCreateAt = (TextView) mHeader.findViewById(R.id.tv_created_at);
         TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
         TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
-        Button btnComments = (Button) mHeader.findViewById(R.id.btn_comments);
+        //Button btnComments = (Button) mHeader.findViewById(R.id.btn_comments);
 
         tvLogin.setText(pullRequest.getIssueUser().getLogin());
         tvCreateAt.setText(pt.format(pullRequest.getIssueCreatedAt()));
         tvTitle.setText(pullRequest.getTitle());
         tvDesc.setText(pullRequest.getBody());
-        btnComments.setText(String.valueOf(pullRequest.getComments()));
-        btnComments.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                if (!mDiscussionLoaded) {
-                    fillDiscussion(pullRequest.getDiscussion());
-                    mDiscussionLoaded = true;
-                }
-            }
-        });
+        
+        fillDiscussion(pullRequest.getDiscussion());
+        
+//        btnComments.setText(String.valueOf(pullRequest.getComments()));
+//        btnComments.setOnClickListener(new OnClickListener() {
+//
+//            @Override
+//            public void onClick(View v) {
+//                if (!mDiscussionLoaded) {
+//                    fillDiscussion(pullRequest.getDiscussion());
+//                    mDiscussionLoaded = true;
+//                }
+//            }
+//        });
     }
 
     /**

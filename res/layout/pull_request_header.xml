@@ -53,7 +53,6 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium" />
         <View
-            android:background="?android:attr/divider"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_marginTop="5dp"
@@ -68,12 +67,12 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:layout_centerVertical="true"
                 android:text="@string/pull_request_comments" />
-            <Button
+            <!-- Button
                 android:id="@+id/btn_comments"
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:layout_alignRight="@id/tv_comments_label"
-                android:layout_alignParentRight="true" />
+                android:layout_alignParentRight="true" /-->
         </RelativeLayout>
     </LinearLayout>
 </LinearLayout>
