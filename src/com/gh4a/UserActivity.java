@@ -283,6 +283,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         LinearLayout llEmail = (LinearLayout) findViewById(R.id.ll_user_email);
         LinearLayout llWebsite = (LinearLayout) findViewById(R.id.ll_user_website);
         LinearLayout llLocation = (LinearLayout) findViewById(R.id.ll_user_location);
+        LinearLayout llCompany = (LinearLayout) findViewById(R.id.ll_user_company);
 
         Button btnNews = (Button) findViewById(R.id.btn_news);
         btnNews.setOnClickListener(this);
@@ -365,6 +366,15 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         }
         else {
             llWebsite.setVisibility(View.GONE);
+        }
+        
+        if (!StringUtils.isBlank(user.getCompany())) {
+            TextView tvCompany = (TextView) findViewById(R.id.tv_company);
+            tvCompany.setText(user.getCompany());
+            llCompany.setVisibility(View.VISIBLE);
+        }
+        else {
+            llCompany.setVisibility(View.GONE);
         }
         
         //Show location if not blank

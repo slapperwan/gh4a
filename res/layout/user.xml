@@ -121,6 +121,28 @@
                         android:layout_marginBottom="5dp" />
                 </LinearLayout>
                 <LinearLayout
+                    android:id="@+id/ll_user_company"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="@string/user_company" />
+                    <TextView
+                        android:id="@+id/tv_company"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                    <View
+                        android:background="?android:attr/divider"
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp" />
+                </LinearLayout>
+                <LinearLayout
                     android:id="@+id/ll_user_location"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
