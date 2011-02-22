@@ -16,29 +16,42 @@
 package com.gh4a;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.AdapterView.OnItemClickListener;
 
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
+import com.github.api.v2.schema.Organization;
 import com.github.api.v2.schema.User;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
+import com.github.api.v2.services.OrganizationService;
 import com.github.api.v2.services.UserService;
+import com.github.api.v2.services.auth.Authentication;
+import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The UserInfo activity.
  */
-public class UserActivity extends BaseActivity implements OnClickListener {
+public class UserActivity extends BaseActivity implements OnClickListener, OnItemClickListener {
 
     /** The user login. */
     protected String mUserLogin;
@@ -51,7 +64,10 @@ public class UserActivity extends BaseActivity implements OnClickListener {
 
     /** The loading dialog. */
     protected LoadingDialog mLoadingDialog;
-
+    
+    /** The user. */
+    protected User mUser;
+    
     /**
      * Called when the activity is first created.
      * 
@@ -131,6 +147,9 @@ public class UserActivity extends BaseActivity implements OnClickListener {
             else {
                 mTarget.get().fillData(result);
                 new LoadWatchedReposTask(mTarget.get()).execute();
+                if (Constants.User.USER_TYPE_ORG.equals(result.getType())) { 
+                    new LoadOrganizationMembersTask(mTarget.get()).execute();
+                }
             }
         }
     }
@@ -165,9 +184,10 @@ public class UserActivity extends BaseActivity implements OnClickListener {
             try {
                 GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
                 UserService userService = factory.createUserService();
-                mTarget.get().mWatchedReposCount = userService.getWatchedRepositories(
-                        mTarget.get().mUserLogin).size();
-                return mTarget.get().mWatchedReposCount;
+//                mTarget.get().mWatchedReposCount = userService.getWatchedRepositories(
+//                        mTarget.get().mUserLogin).size();
+//                return mTarget.get().mWatchedReposCount;
+                return userService.getWatchedRepositories(mTarget.get().mUserLogin).size();
             }
             catch (GitHubException e) {
                 Log.e(Constants.LOG_TAG, e.getMessage(), e);
@@ -183,13 +203,68 @@ public class UserActivity extends BaseActivity implements OnClickListener {
         @Override
         protected void onPostExecute(Integer result) {
             if (mException) {
-                mTarget.get().showError();
+                //mTarget.get().showError();
             }
             else {
-                Button btnWatchedRepos = (Button) mTarget.get()
-                        .findViewById(R.id.btn_watched_repos);
+                Button btnWatchedRepos = (Button) mTarget.get().findViewById(R.id.btn_watched_repos);
                 btnWatchedRepos.setText(String.valueOf(result));
             }
+            ProgressBar progressBar = (ProgressBar) mTarget.get().findViewById(R.id.pb_watched_repos);
+            progressBar.setVisibility(View.GONE);
+        }
+    }
+    
+    private static class LoadOrganizationMembersTask extends AsyncTask<Void, Void, Integer> {
+
+        /** The target. */
+        private WeakReference<UserActivity> mTarget;
+        
+        /** The exception. */
+        private boolean mException;
+
+        /**
+         * Instantiates a new load watched repos task.
+         *
+         * @param activity the activity
+         */
+        public LoadOrganizationMembersTask(UserActivity activity) {
+            mTarget = new WeakReference<UserActivity>(activity);
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected Integer doInBackground(Void... arg0) {
+            try {
+                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                OrganizationService organizationService = factory.createOrganizationService();
+                return organizationService.getPublicMembers(mTarget.get().mUserLogin).size();
+            }
+            catch (GitHubException e) {
+                Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                mException = true;
+                return null;
+            }
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(Integer result) {
+            if (mException) {
+                //mTarget.get().showError();
+                
+            }
+            else {
+                Button btnFollowers = (Button) mTarget.get().findViewById(R.id.btn_followers);
+                btnFollowers.setText(String.valueOf(result));
+            }
+            ProgressBar progressBar = (ProgressBar) mTarget.get().findViewById(R.id.pb_followers);
+            progressBar.setVisibility(View.GONE);
         }
     }
 
@@ -199,6 +274,7 @@ public class UserActivity extends BaseActivity implements OnClickListener {
      * @param user the user
      */
     protected void fillData(User user) {
+        mUser = user;
         ImageView ivGravatar = (ImageView) findViewById(R.id.iv_gravatar);
         ImageDownloader.getInstance().download(user.getGravatarId(), ivGravatar, 80);
 
@@ -229,9 +305,37 @@ public class UserActivity extends BaseActivity implements OnClickListener {
 
         Button btnFollowers = (Button) findViewById(R.id.btn_followers);
         btnFollowers.setOnClickListener(this);
-
-        Button btnFollowing = (Button) findViewById(R.id.btn_following);
-        btnFollowing.setOnClickListener(this);
+        TextView tvFollowers = (TextView) findViewById(R.id.tv_followers_label);
+        if (Constants.User.USER_TYPE_USER.equals(user.getType())) {
+            tvFollowers.setText(R.string.user_followers);
+        }
+        else {
+            tvFollowers.setText(R.string.user_members);
+        }
+        
+        //hide following if organization
+        RelativeLayout rlFollowing = (RelativeLayout) findViewById(R.id.rl_following);
+        if (Constants.User.USER_TYPE_USER.equals(user.getType())) {
+            Button btnFollowing = (Button) findViewById(R.id.btn_following);
+            btnFollowing.setText(String.valueOf(user.getFollowingCount()));
+            btnFollowing.setOnClickListener(this);
+            rlFollowing.setVisibility(View.VISIBLE);
+        }
+        else {
+            rlFollowing.setVisibility(View.GONE);
+        }
+        
+        //hide organizations if organization
+        RelativeLayout rlOrganizations = (RelativeLayout) findViewById(R.id.rl_organizations);
+        if (Constants.User.USER_TYPE_USER.equals(user.getType())) {
+            ImageButton btnOrganizations = (ImageButton) findViewById(R.id.btn_organizations);
+            btnOrganizations.setOnClickListener(this);
+            registerForContextMenu(btnOrganizations);
+            rlOrganizations.setVisibility(View.VISIBLE);
+        }
+        else {
+            rlOrganizations.setVisibility(View.GONE);
+        }
 
         tvName.setText(StringUtils.formatName(user.getLogin(), user.getName()));
         if (Constants.User.USER_TYPE_ORG.equals(user.getType())) {
@@ -274,9 +378,12 @@ public class UserActivity extends BaseActivity implements OnClickListener {
         }
         
         btnPublicRepos.setText(String.valueOf(user.getPublicRepoCount()));
-        btnWatchedRepos.setText(String.valueOf(mWatchedReposCount));
-        btnFollowers.setText(String.valueOf(user.getFollowersCount()));
-        btnFollowing.setText(String.valueOf(user.getFollowingCount()));
+        
+        if (Constants.User.USER_TYPE_USER.equals(user.getType())) {
+            btnFollowers.setText(String.valueOf(user.getFollowersCount()));
+            ProgressBar progressBar = (ProgressBar) findViewById(R.id.pb_followers);
+            progressBar.setVisibility(View.GONE);
+        }
     }
 
     /*
@@ -286,23 +393,30 @@ public class UserActivity extends BaseActivity implements OnClickListener {
     public void onClick(View view) {
         int id = view.getId();
 
-        if (id == R.id.btn_news) {
+        switch (id) {
+        case R.id.btn_news:
             getFeeds(view);
-        }
-        else if (id == R.id.btn_your_actions) {
+            break;
+        case R.id.btn_your_actions:
             getYourActions(view);
-        }
-        else if (id == R.id.btn_pub_repos) {
+            break;
+        case R.id.btn_pub_repos:
             getPublicRepos(view);
-        }
-        else if (id == R.id.btn_followers) {
+            break;
+        case R.id.btn_followers:
             getFollowers(view);
-        }
-        else if (id == R.id.btn_following) {
+            break;
+        case R.id.btn_following:
             getFollowing(view);
-        }
-        else if (id == R.id.btn_watched_repos) {
+            break;
+        case R.id.btn_watched_repos:
             getWatchedRepos(view);
+            break;
+        case R.id.btn_organizations:
+            view.showContextMenu();
+            break;
+        default:
+            break;
         }
     }
 
@@ -355,13 +469,23 @@ public class UserActivity extends BaseActivity implements OnClickListener {
      * @return the followers
      */
     public void getFollowers(View view) {
-        Intent intent = new Intent().setClass(this, FollowerFollowingListActivity.class);
-        intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
-        intent.putExtra(Constants.ACTIONBAR_TITLE, mUserLogin
-                + (!StringUtils.isBlank(mUserName) ? " - " + mUserName : ""));
-        intent.putExtra(Constants.SUBTITLE, getResources().getString(R.string.user_followers));
-        intent.putExtra(Constants.FIND_FOLLOWER, true);
-        startActivity(intent);
+        if (Constants.User.USER_TYPE_ORG.equals(mUser.getType())) {
+            Intent intent = new Intent().setClass(this, OrganizationMemberListActivity.class);
+            intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+            startActivity(intent);
+        }
+        else {
+            Intent intent = new Intent().setClass(this, FollowerFollowingListActivity.class);
+            intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
+            if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
+                intent.putExtra(Constants.SUBTITLE, getResources().getString(R.string.user_followers));
+            }
+            else {
+                intent.putExtra(Constants.SUBTITLE, getResources().getString(R.string.user_members));
+            }
+            intent.putExtra(Constants.FIND_FOLLOWER, true);
+            startActivity(intent);
+        }
     }
 
     /**
@@ -391,5 +515,52 @@ public class UserActivity extends BaseActivity implements OnClickListener {
         intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
         intent.putExtra(Constants.User.USER_NAME, mUserName);
         startActivity(intent);
+    }
+    
+    /* (non-Javadoc)
+     * @see android.widget.AdapterView.OnItemClickListener#onItemClick(android.widget.AdapterView, android.view.View, int, long)
+     */
+    @Override
+    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+        // TODO Auto-generated method stub
+        
+    }
+    
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if (v.getId() == R.id.btn_organizations) {
+            menu.setHeaderTitle("Choose Organization");
+            GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+            UserService userService = factory.createUserService();
+            try {
+                Authentication auth = new LoginPasswordAuthentication(getAuthUsername(), getAuthPassword());
+                userService.setAuthentication(auth);
+                List<Organization> organizations = userService.getUserOrganizations(mUserLogin);
+                OrganizationService a;
+                if (organizations != null && !organizations.isEmpty()) {
+                    for (Organization organization : organizations) {
+                        menu.add(organization.getLogin());      
+                    }
+                }
+                else {
+                    getApplicationContext().notFoundMessage(this, "Organizations");
+                }
+            } catch (GitHubException e) {
+                Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                showError();
+            }
+            finally {
+                if (mLoadingDialog != null && mLoadingDialog.isShowing()) {
+                    mLoadingDialog.dismiss();
+                }
+            }
+        }
+    }
+    
+    public boolean onContextItemSelected(MenuItem item) {
+        String orgLogin = item.getTitle().toString();
+        getApplicationContext().openUserInfoActivity(this, orgLogin, null);
+        return true;
     }
 }

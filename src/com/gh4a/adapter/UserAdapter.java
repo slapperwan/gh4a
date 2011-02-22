@@ -83,7 +83,7 @@ public class UserAdapter extends RootAdapter<User> {
 
             viewHolder = new ViewHolder();
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-            viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
+            viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
             v.setTag(viewHolder);
         }
@@ -110,7 +110,7 @@ public class UserAdapter extends RootAdapter<User> {
                 });
             }
 
-            viewHolder.tvTitle.setText(StringUtils.formatName(user.getLogin(), user.getName()));
+            viewHolder.tvDesc.setText(StringUtils.formatName(user.getLogin(), user.getName()));
 
             if (mShowMoreData && viewHolder.tvExtra != null) {
                 Resources res = v.getResources();
@@ -131,8 +131,8 @@ public class UserAdapter extends RootAdapter<User> {
         /** The iv gravatar. */
         public ImageView ivGravatar;
         
-        /** The tv title. */
-        public TextView tvTitle;
+        /** The tv desc. */
+        public TextView tvDesc;
         
         /** The tv extra. */
         public TextView tvExtra;
