@@ -177,6 +177,12 @@ public class BranchListActivity extends BaseActivity {
 
         ArrayList<BranchTag> branchList = new ArrayList<BranchTag>();
         HashMap<String, String> branchMap = map.get("branches");
+        
+        if (branchMap.size() == 0) {
+            getApplicationContext().notFoundMessage(this, "Branches");
+            return;
+        }
+        
         Iterator<String> it = branchMap.keySet().iterator();
 
         BranchTag branchTag;

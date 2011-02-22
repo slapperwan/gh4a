@@ -47,14 +47,13 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:layout_toRightOf="@id/iv_gravatar"
                     android:layout_below="@id/tv_extra" />
-                <TextView
-                    android:id="@+id/tv_desc"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/iv_gravatar"
-                    android:layout_below="@id/tv_message"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
             </RelativeLayout>
+            <TextView
+                android:id="@+id/tv_desc"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium" 
+                android:padding="7dp"/>
             <LinearLayout
                 android:id="@+id/ll_changed"
                 android:layout_margin="10dp"

@@ -21,6 +21,7 @@
         <item name="red_box">@drawable/default_red_box</item>
         <item name="green_box">@drawable/default_green_box</item>
         <item name="android:buttonStyle">@style/default_button</item>
+        <item name="android:imageButtonStyle">@style/default_image_button</item>
         <!-- item name="android:spinnerStyle">@style/default_spinner</item-->
         <!--
             item

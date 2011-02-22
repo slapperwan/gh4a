@@ -43,9 +43,6 @@ public class FollowerFollowingListActivity extends BaseActivity implements OnIte
     /** The user login. */
     protected String mUserLogin;
 
-    /** The title bar. */
-    protected String mTitleBar;
-
     /** The sub title. */
     protected String mSubtitle;
 
@@ -75,7 +72,6 @@ public class FollowerFollowingListActivity extends BaseActivity implements OnIte
 
         Bundle data = getIntent().getExtras();
         mUserLogin = data.getString(Constants.User.USER_LOGIN);
-        mTitleBar = data.getString(Constants.ACTIONBAR_TITLE);
         mSubtitle = data.getString(Constants.SUBTITLE);
         mFindFollowers = data.getBoolean("FIND_FOLLOWER");
 

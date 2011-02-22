@@ -61,6 +61,11 @@
         <item name="android:textColor">#FFFFFF</item>
         <item name="android:padding">10dp</item>
     </style>
+    
+    <style name="default_image_button" parent="@android:style/Widget.ImageButton">
+        <item name="android:background">@drawable/default_button</item>
+        <item name="android:padding">10dp</item>
+    </style>
 
     <!--
         style name="default_spinner" parent="@android:style/Widget.Spinner">

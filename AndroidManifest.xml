@@ -23,11 +23,9 @@
         <activity
             android:name=".DashboardActivity" />
         <activity
-            android:name=".RepositoryListActivity"
-            android:label="@string/app_name" />
+            android:name=".RepositoryListActivity" />
         <activity
-            android:name=".RepositoryActivity"
-            android:label="@string/app_name" />
+            android:name=".RepositoryActivity" />
         <activity
             android:name=".UserListActivity" />
         <activity
@@ -45,14 +43,11 @@
         <activity
             android:name=".ForkListActivity" />
         <activity
-            android:name=".FollowerFollowingListActivity"
-            android:label="@string/app_name" />
+            android:name=".FollowerFollowingListActivity" />
         <activity
-            android:name=".PublicRepoListActivity"
-            android:label="@string/app_name" />
+            android:name=".PublicRepoListActivity" />
         <activity
-            android:name=".WatchedRepoListActivity"
-            android:label="@string/app_name" />
+            android:name=".WatchedRepoListActivity" />
         <activity
             android:name=".IssueListActivity" />
         <activity
@@ -70,17 +65,15 @@
         <activity
             android:name=".PullRequestListActivity" />
         <activity
-            android:name=".PullRequestActivity"
-            android:label="@string/app_name" />
+            android:name=".PullRequestActivity" />
         <activity
-            android:name=".FileManagerActivity"
-            android:label="@string/app_name" />
+            android:name=".FileManagerActivity" />
         <activity
-            android:name=".FileViewerActivity"
-            android:label="@string/app_name" />
+            android:name=".FileViewerActivity" />
         <activity
-            android:name=".AddedFileViewerActivity"
-            android:label="@string/app_name" />
+            android:name=".AddedFileViewerActivity" />
+        <activity
+            android:name=".OrganizationMemberListActivity" />
         <activity
             android:name="com.markupartist.android.widget.ActionBar" />
     </application>

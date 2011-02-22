@@ -178,7 +178,7 @@ public class TagListActivity extends BaseActivity {
         ArrayList<BranchTag> tagList = new ArrayList<BranchTag>();
         HashMap<String, String> tagMap = map.get("tags");
         if (tagMap.size() == 0) {
-            getApplicationContext().notFoundMessage(this, "Tag");
+            getApplicationContext().notFoundMessage(this, "Tags");
             return;
         }
         Iterator<String> it = tagMap.keySet().iterator();

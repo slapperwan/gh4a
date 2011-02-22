@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -107,13 +108,13 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
      * Fill data into UI components.
      */
     public void fillData() {
-        Button btnBranches = (Button) findViewById(R.id.btn_branches);
+        ImageButton btnBranches = (ImageButton) findViewById(R.id.btn_branches);
         btnBranches.setOnClickListener(this);
 
-        Button btnTags = (Button) findViewById(R.id.btn_tags);
+        ImageButton btnTags = (ImageButton) findViewById(R.id.btn_tags);
         btnTags.setOnClickListener(this);
 
-        Button btnPullRequests = (Button) findViewById(R.id.btn_pull_requests);
+        ImageButton btnPullRequests = (ImageButton) findViewById(R.id.btn_pull_requests);
         btnPullRequests.setOnClickListener(this);
 
         Button btnWatchers = (Button) findViewById(R.id.btn_watchers);
@@ -357,38 +358,40 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
     public void onClick(View view) {
         int id = view.getId();
 
-        if (id == R.id.btn_branches) {
+        switch (id) {
+        case R.id.btn_branches:
             getApplicationContext().openBranchListActivity(this,
                     mBundle.getString(Constants.Repository.REPO_OWNER),
                     mBundle.getString(Constants.Repository.REPO_NAME), R.id.btn_branches);
-        }
-        if (id == R.id.btn_tags) {
+            break;
+        case R.id.btn_tags:
             getApplicationContext().openTagListActivity(this,
                     mBundle.getString(Constants.Repository.REPO_OWNER),
                     mBundle.getString(Constants.Repository.REPO_NAME), R.id.btn_tags);
-        }
-        else if (id == R.id.btn_commits) {
+            break;
+        case R.id.btn_commits:
             getApplicationContext().openBranchListActivity(this,
                     mBundle.getString(Constants.Repository.REPO_OWNER),
                     mBundle.getString(Constants.Repository.REPO_NAME), R.id.btn_commits);
-        }
-        else if (id == R.id.btn_pull_requests) {
+            break;
+        case R.id.btn_pull_requests:
             getApplicationContext().openPullRequestListActivity(this,
                     mBundle.getString(Constants.Repository.REPO_OWNER),
                     mBundle.getString(Constants.Repository.REPO_NAME));
-        }
-        else if (id == R.id.btn_watchers) {
+            break;
+        case R.id.btn_watchers:
             getWatchers(view);
-        }
-        else if (id == R.id.btn_forks) {
+            break;
+        case R.id.btn_forks:
             getNetworks(view);
-        }
-        else if (id == R.id.btn_open_issues) {
+            break;
+        case R.id.btn_open_issues:
             getApplicationContext().openIssueListActivity(this,
                     mBundle.getString(Constants.Repository.REPO_OWNER),
                     mBundle.getString(Constants.Repository.REPO_NAME),
                     Constants.Issue.ISSUE_STATE_OPEN);
-
+        default:
+            break;
         }
     }
 

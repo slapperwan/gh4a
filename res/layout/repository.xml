@@ -109,13 +109,13 @@
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceLarge"
                         android:text="@string/repo_branches" />
-                    <Button
+                    <ImageButton
                         android:id="@+id/btn_branches"
                         android:layout_width="80dp"
                         android:layout_height="wrap_content"
                         android:layout_alignRight="@id/tv_branches_label"
                         android:layout_alignParentRight="true"
-                        android:text="View" />
+                        android:src="@drawable/ic_more" />
                 </RelativeLayout>
                 <View
                     android:background="?android:attr/divider"
@@ -132,13 +132,13 @@
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceLarge"
                         android:text="@string/repo_tags" />
-                    <Button
+                    <ImageButton
                         android:id="@+id/btn_tags"
                         android:layout_width="80dp"
                         android:layout_height="wrap_content"
                         android:layout_alignRight="@id/tv_tags_label"
                         android:layout_alignParentRight="true"
-                        android:text="View" />
+                        android:src="@drawable/ic_more" />
                 </RelativeLayout>
                 <View
                     android:background="?android:attr/divider"
@@ -155,13 +155,13 @@
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceLarge"
                         android:text="@string/pull_request_title" />
-                    <Button
+                    <ImageButton
                         android:id="@+id/btn_pull_requests"
                         android:layout_width="80dp"
                         android:layout_height="wrap_content"
                         android:layout_alignRight="@id/tv_pull_requests_label"
                         android:layout_alignParentRight="true"
-                        android:text="View" />
+                        android:src="@drawable/ic_more" />
                 </RelativeLayout>
                 <View
                     android:background="?android:attr/divider"

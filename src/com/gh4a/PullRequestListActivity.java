@@ -202,12 +202,15 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
      * @param pullRequests the pull requests
      */
     protected void fillData(List<PullRequest> pullRequests) {
-        if (pullRequests != null && pullRequests.size() > 0) {
+        if (pullRequests != null && !pullRequests.isEmpty()) {
             mPullRequestAdapter.notifyDataSetChanged();
             for (PullRequest pullRequest : pullRequests) {
                 mPullRequestAdapter.add(pullRequest);
             }
+            mPullRequestAdapter.notifyDataSetChanged();
         }
-        mPullRequestAdapter.notifyDataSetChanged();
+        else {
+            getApplicationContext().notFoundMessage(this, "Pull Requests");
+        }
     }
 }
