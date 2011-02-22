@@ -56,8 +56,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:layout_below="@id/iv_gravatar"
-                    >
+                    android:layout_below="@id/iv_gravatar">
                     <Button
                         android:id="@+id/btn_news"
                         android:layout_width="wrap_content"
@@ -140,13 +139,14 @@
                     <View
                         android:background="?android:attr/divider"
                         android:layout_width="fill_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginBottom="5dp" />
+                        android:layout_height="1dp" />
                 </LinearLayout>
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="5dp" />
                 <RelativeLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="fill_parent">
                     <TextView
                         android:id="@+id/tv_pub_repos_label"
                         android:layout_width="fill_parent"
@@ -156,63 +156,102 @@
                     <Button
                         android:id="@+id/btn_pub_repos"
                         android:layout_width="80dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="40dp"
                         android:layout_alignRight="@id/tv_pub_repos_label"
                         android:layout_alignParentRight="true" />
+                    <View
+                        android:background="?android:attr/divider"
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@id/btn_pub_repos"
+                        android:layout_marginTop="5dp" />
                 </RelativeLayout>
                 <View
-                    android:background="?android:attr/divider"
                     android:layout_width="fill_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp" />
+                    android:layout_height="5dp" />
                 <RelativeLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="fill_parent">
                     <TextView
                         android:id="@+id/tv_watched_repos_label"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceLarge"
                         android:text="@string/user_watched_repos" />
-                    <Button
-                        android:id="@+id/btn_watched_repos"
-                        android:layout_width="80dp"
-                        android:layout_height="wrap_content"
-                        android:layout_alignRight="@id/tv_watched_repos_label"
-                        android:layout_alignParentRight="true" />
+                    <RelativeLayout
+                        android:id="@+id/rl_btn_watched_repos"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_alignRight="@id/tv_watched_repos_label">
+                        <Button
+                            android:id="@+id/btn_watched_repos"
+                            android:layout_width="80dp"
+                            android:layout_height="40dp"
+                            android:layout_centerInParent="true" 
+                            />
+                        <ProgressBar
+                            android:id="@+id/pb_watched_repos"
+                            android:layout_height="20dp"
+                            android:layout_width="20dp"
+                            android:indeterminateBehavior="repeat"
+                            android:indeterminate="true"
+                            style="@android:style/Widget.ProgressBar"
+                            android:indeterminateOnly="true"
+                            android:layout_centerInParent="true" />
+                    </RelativeLayout>
+                    <View
+                        android:background="?android:attr/divider"
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@id/rl_btn_watched_repos"
+                        android:layout_marginTop="5dp" />
                 </RelativeLayout>
                 <View
-                    android:background="?android:attr/divider"
                     android:layout_width="fill_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp" />
+                    android:layout_height="5dp" />
                 <RelativeLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="fill_parent">
                     <TextView
                         android:id="@+id/tv_followers_label"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceLarge"
                         android:text="@string/user_followers" />
-                    <Button
-                        android:id="@+id/btn_followers"
-                        android:layout_width="80dp"
-                        android:layout_height="wrap_content"
-                        android:layout_alignRight="@id/tv_followers_label"
-                        android:layout_alignParentRight="true" />
+                    <RelativeLayout
+                        android:id="@+id/rl_btn_followers"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_alignRight="@id/tv_followers_label">
+                        <Button
+                            android:id="@+id/btn_followers"
+                            android:layout_width="80dp"
+                            android:layout_height="40dp"
+                            android:layout_centerInParent="true" />
+                        <ProgressBar
+                            android:id="@+id/pb_followers"
+                            android:layout_height="20dp"
+                            android:layout_width="20dp"
+                            android:indeterminateBehavior="repeat"
+                            android:indeterminate="true"
+                            style="@android:style/Widget.ProgressBar"
+                            android:indeterminateOnly="true"
+                            android:layout_centerInParent="true" />
+                    </RelativeLayout>
+                    <View
+                        android:background="?android:attr/divider"
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@id/rl_btn_followers"
+                        android:layout_marginTop="5dp" />
                 </RelativeLayout>
                 <View
-                    android:background="?android:attr/divider"
                     android:layout_width="fill_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp" />
+                    android:layout_height="5dp" />
                 <RelativeLayout
+                    android:id="@+id/rl_following"
                     android:layout_width="fill_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="fill_parent">
                     <TextView
                         android:id="@+id/tv_following_label"
                         android:layout_width="fill_parent"
@@ -222,9 +261,36 @@
                     <Button
                         android:id="@+id/btn_following"
                         android:layout_width="80dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="40dp"
                         android:layout_alignRight="@id/tv_following_label"
                         android:layout_alignParentRight="true" />
+                    <View
+                        android:background="?android:attr/divider"
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@id/btn_following"
+                        android:layout_marginTop="5dp" />
+                </RelativeLayout>
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="5dp" />
+                <RelativeLayout
+                    android:id="@+id/rl_organizations"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
+                    <TextView
+                        android:id="@+id/tv_organizations_label"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="@string/user_organizations" />
+                    <ImageButton
+                        android:id="@+id/btn_organizations"
+                        android:layout_width="80dp"
+                        android:layout_height="40dp"
+                        android:layout_alignRight="@id/tv_organizations_label"
+                        android:layout_alignParentRight="true"
+                        android:src="@drawable/ic_more" />
                 </RelativeLayout>
             </LinearLayout>
         </LinearLayout>
