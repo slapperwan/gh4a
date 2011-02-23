@@ -227,7 +227,7 @@ public class Gh4Application extends Application {
         Intent intent = new Intent().setClass(context, PullRequestActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, repoName);
-        intent.putExtra(Constants.PullRequest.PULL_REQUEST_NUMBER, pullRequestNumber);
+        intent.putExtra(Constants.PullRequest.NUMBER, pullRequestNumber);
         context.startActivity(intent);
     }
 
@@ -238,10 +238,11 @@ public class Gh4Application extends Application {
      * @param repoOwner the repo owner
      * @param repoName the repo name
      */
-    public void openPullRequestListActivity(Context context, String repoOwner, String repoName) {
+    public void openPullRequestListActivity(Context context, String repoOwner, String repoName, String state) {
         Intent intent = new Intent().setClass(context, PullRequestListActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, repoName);
+        intent.putExtra(Constants.PullRequest.STATE, state);
         context.startActivity(intent);
     }
 

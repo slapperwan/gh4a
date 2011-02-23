@@ -135,10 +135,10 @@ public interface Constants {
     public interface Issue {
 
         /** The Constant ISSUES. */
-        public static final String ISSUES = "ISSUES";
+        public static final String ISSUES = "Issue.ISSUES";
 
         /** The Constant ISSUE_STATE. */
-        public static final String ISSUE_STATE = "ISSUE_STATE";
+        public static final String ISSUE_STATE = "Issue.STATE";
 
         /** The Constant ISSUE_STATE_OPEN. */
         public static final String ISSUE_STATE_OPEN = "OPEN";
@@ -174,13 +174,13 @@ public interface Constants {
     public interface Commit {
 
         /** The Constant COMMITS. */
-        public static final String COMMITS = "COMMITS";
+        public static final String COMMITS = "Commit.COMMITS";
 
         /** The Constant COMMIT. */
-        public static final String COMMIT = "COMMIT";
+        public static final String COMMIT = "Commit.COMMIT";
         
         /** The Constant DIFF. */
-        public static final String DIFF = "DIFF";
+        public static final String DIFF = "Commit.DIFF";
     }
 
     /**
@@ -189,10 +189,13 @@ public interface Constants {
     public interface PullRequest {
 
         /** The Constant PULL_REQUESTS. */
-        public static final String PULL_REQUESTS = "PULL_REQUESTS";
+        public static final String PULL_REQUESTS = "PullRequest.PULL_REQUESTS";
 
         /** The Constant PULL_REQUEST_NUMBER. */
-        public static final String PULL_REQUEST_NUMBER = "PULL_REQUEST_NUMBER";
+        public static final String NUMBER = "PullRequest.NUMBER";
+        
+        /** The Constant STATE. */
+        public static final String STATE = "PullRequest.STATE";
     }
 
     /**

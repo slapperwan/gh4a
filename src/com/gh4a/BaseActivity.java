@@ -86,6 +86,7 @@ public class BaseActivity extends Activity {
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        menu = setupOptionMenu(menu);
         if (isAuthenticated()) {
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.authenticated_menu, menu);
@@ -95,6 +96,10 @@ public class BaseActivity extends Activity {
             inflater.inflate(R.menu.anon_menu, menu);
         }
         return true;        
+    }
+    
+    public Menu setupOptionMenu(Menu menu) {
+        return menu;
     }
     
     /* (non-Javadoc)
@@ -123,8 +128,12 @@ public class BaseActivity extends Activity {
             Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
             startActivity(intent);
         default:
-            return super.onOptionsItemSelected(item);
+            return setMenuOptionItemSelected(item);
         }
+    }
+    
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        return true;
     }
     
     /**
@@ -286,9 +295,7 @@ public class BaseActivity extends Activity {
             else if (Constants.Issue.ISSUES.equals(tag)) {
                 mTarget.get().getApplicationContext().openIssueListActivity(baseActivity,
                         data.get(Constants.User.USER_LOGIN),
-                        data.get(Constants.Repository.REPO_NAME), Constants.Issue.ISSUE_STATE_OPEN);// TODO
-                                                                                                    // remove
-                                                                                                    // hardcoded
+                        data.get(Constants.Repository.REPO_NAME), Constants.Issue.ISSUE_STATE_OPEN);
             }
             else if (Constants.Commit.COMMITS.equals(tag)) {
                 mTarget.get().getApplicationContext().openBranchListActivity(baseActivity,
@@ -298,7 +305,8 @@ public class BaseActivity extends Activity {
             else if (Constants.PullRequest.PULL_REQUESTS.equals(tag)) {
                 mTarget.get().getApplicationContext().openPullRequestListActivity(baseActivity,
                         data.get(Constants.User.USER_LOGIN),
-                        data.get(Constants.Repository.REPO_NAME));
+                        data.get(Constants.Repository.REPO_NAME),
+                        Constants.Issue.ISSUE_STATE_OPEN);
             }
             else if (Constants.Object.TREE.equals(tag)) {
                 mTarget.get().getApplicationContext().openBranchListActivity(baseActivity,
@@ -359,6 +367,15 @@ public class BaseActivity extends Activity {
     public void showError(boolean finishThisActivity) {
         Toast
                 .makeText(getApplication(), "An error occured while fetching data",
+                        Toast.LENGTH_SHORT).show();
+        if (finishThisActivity) {
+            super.finish();
+        }
+    }
+    
+    public void showMessage(String message, boolean finishThisActivity) {
+        Toast
+                .makeText(getApplication(), message,
                         Toast.LENGTH_SHORT).show();
         if (finishThisActivity) {
             super.finish();

@@ -19,10 +19,13 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 import android.content.Intent;
+import android.graphics.Path.FillType;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -538,7 +541,6 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
     
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
         if (v.getId() == R.id.btn_organizations) {
             menu.setHeaderTitle("Choose Organization");
             GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
@@ -560,11 +562,6 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
                 Log.e(Constants.LOG_TAG, e.getMessage(), e);
                 showError();
             }
-            finally {
-                if (mLoadingDialog != null && mLoadingDialog.isShowing()) {
-                    mLoadingDialog.dismiss();
-                }
-            }
         }
     }
     
@@ -572,5 +569,111 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         String orgLogin = item.getTitle().toString();
         getApplicationContext().openUserInfoActivity(this, orgLogin, null);
         return true;
+    }
+    
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (menu.size() == 1) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.user_menu, menu);
+            
+        }
+        return true;
+    }
+    
+    private boolean isFollowing() {
+        return false;
+    }
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.follow_action:
+                new FollowUnfollowTask(this).execute(true);
+                return true;
+            case R.id.unfollow_action:
+                new FollowUnfollowTask(this).execute(false);
+                return true;
+            default:
+                return true;
+        }
+    }
+    
+    private static class FollowUnfollowTask extends AsyncTask<Boolean, Void, Boolean> {
+
+        /** The target. */
+        private WeakReference<UserActivity> mTarget;
+        
+        /** The exception. */
+        private boolean mException;
+        
+        private boolean isFollowAction;
+
+        /**
+         * Instantiates a new load watched repos task.
+         *
+         * @param activity the activity
+         */
+        public FollowUnfollowTask(UserActivity activity) {
+            mTarget = new WeakReference<UserActivity>(activity);
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected Boolean doInBackground(Boolean... arg0) {
+            isFollowAction = arg0[0];
+            try {
+                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                UserService userService = factory.createUserService();
+                Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
+                        mTarget.get().getAuthPassword());
+                userService.setAuthentication(auth);
+                if (isFollowAction) {
+                    userService.followUser(mTarget.get().mUserLogin);
+                }
+                else {
+                    userService.unfollowUser(mTarget.get().mUserLogin);
+                }
+                return true;
+            }
+            catch (GitHubException e) {
+                Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                mException = true;
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, false);
+        }
+        
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(Boolean result) {
+            mTarget.get().mLoadingDialog.dismiss();
+            if (mException) {
+                if (isFollowAction) {
+                    mTarget.get().showMessage("An error occured while following user " + mTarget.get().mUserLogin, false);
+                }
+                else {
+                    mTarget.get().showMessage("An error occured while unfollow user " + mTarget.get().mUserLogin, false);
+                }
+            }
+            else {
+                if (isFollowAction) {
+                    mTarget.get().showMessage("Successful follow user " + mTarget.get().mUserLogin, false);
+                }
+                else {
+                    mTarget.get().showMessage("Successful unfollow user " + mTarget.get().mUserLogin, false);
+                }
+            }
+        }
     }
 }
