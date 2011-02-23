@@ -377,7 +377,8 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
         case R.id.btn_pull_requests:
             getApplicationContext().openPullRequestListActivity(this,
                     mBundle.getString(Constants.Repository.REPO_OWNER),
-                    mBundle.getString(Constants.Repository.REPO_NAME));
+                    mBundle.getString(Constants.Repository.REPO_NAME),
+                    Constants.Issue.ISSUE_STATE_OPEN);
             break;
         case R.id.btn_watchers:
             getWatchers(view);

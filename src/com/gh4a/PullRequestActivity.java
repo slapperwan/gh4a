@@ -81,7 +81,7 @@ public class PullRequestActivity extends BaseActivity {
         Bundle data = getIntent().getExtras();
         mUserLogin = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
-        mPullRequestNumber = data.getInt(Constants.PullRequest.PULL_REQUEST_NUMBER);
+        mPullRequestNumber = data.getInt(Constants.PullRequest.NUMBER);
 
         setBreadCrumb();
 

@@ -24,6 +24,9 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -135,7 +138,7 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
         b.setData(data);
         breadCrumbHolders[1] = b;
 
-        createBreadcrumb("Issues", breadCrumbHolders);
+        createBreadcrumb(State.valueOf(mState).name() + " Issues", breadCrumbHolders);
     }
 
     /**
@@ -222,11 +225,10 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
      */
     protected void fillData(List<Issue> issues) {
         if (issues != null && issues.size() > 0) {
-            mIssueAdapter.notifyDataSetChanged();
             for (Issue issue : issues) {
                 mIssueAdapter.add(issue);
             }
-            ((TextView) findViewById(R.id.tv_subtitle)).setText("Issues (" + issues.size() + ")");
+            ((TextView) findViewById(R.id.tv_subtitle)).setText(State.valueOf(mState).name() + " Issues (" + issues.size() + ")");
         }
         mIssueAdapter.notifyDataSetChanged();
     }
@@ -247,5 +249,32 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
         data.putString(Constants.Repository.REPO_NAME, mRepoName);
         intent.putExtra(Constants.DATA_BUNDLE, data);
         startActivity(intent);
+    }
+    
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (menu.size() == 1) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.issues_menu, menu);
+        }
+        return true;
+    }
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        mIssueAdapter.getObjects().clear();
+        
+        switch (item.getItemId()) {
+            case R.id.view_open_issues:
+                mState = Constants.Issue.ISSUE_STATE_OPEN;
+                new LoadIssueListTask(this).execute();
+                return true;
+            case R.id.view_closed_issues:
+                mState = Constants.Issue.ISSUE_STATE_CLOSED;
+                new LoadIssueListTask(this).execute();
+                return true;
+            default:
+                return true;
+        }
     }
 }

@@ -23,14 +23,19 @@ import java.util.List;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
 import com.gh4a.adapter.PullRequestAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.github.api.v2.schema.PullRequest;
+import com.github.api.v2.schema.Issue.State;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
 import com.github.api.v2.services.PullRequestService;
@@ -46,6 +51,9 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
     /** The repo name. */
     protected String mRepoName;
     
+    /** The state. */
+    protected String mState;
+
     /** The pull request adapter. */
     protected PullRequestAdapter mPullRequestAdapter;
     
@@ -70,6 +78,7 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
 
         mUserLogin = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
+        mState = getIntent().getExtras().getString(Constants.PullRequest.STATE);
 
         setBreadCrumb();
 
@@ -104,7 +113,7 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
         b.setData(data);
         breadCrumbHolders[1] = b;
 
-        createBreadcrumb("Pull Requests", breadCrumbHolders);
+        createBreadcrumb(State.valueOf(mState).name() + " Pull Requests", breadCrumbHolders);
     }
 
     /* (non-Javadoc)
@@ -162,7 +171,7 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
                 GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
                 PullRequestService pullRequestService = factory.createPullRequestService();
                 return pullRequestService.getPullRequests(mTarget.get().mUserLogin,
-                        mTarget.get().mRepoName);
+                        mTarget.get().mRepoName, State.valueOf(mTarget.get().mState));
             }
             catch (GitHubException e) {
                 Log.e(Constants.LOG_TAG, e.getMessage(), e);
@@ -203,14 +212,41 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
      */
     protected void fillData(List<PullRequest> pullRequests) {
         if (pullRequests != null && !pullRequests.isEmpty()) {
-            mPullRequestAdapter.notifyDataSetChanged();
             for (PullRequest pullRequest : pullRequests) {
                 mPullRequestAdapter.add(pullRequest);
             }
             mPullRequestAdapter.notifyDataSetChanged();
+            ((TextView) findViewById(R.id.tv_subtitle)).setText(State.valueOf(mState).name() + " Pull Requests (" + pullRequests.size() + ")");
         }
         else {
             getApplicationContext().notFoundMessage(this, "Pull Requests");
+        }
+    }
+    
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (menu.size() == 1) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.issues_menu, menu);
+        }
+        return true;
+    }
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        mPullRequestAdapter.getObjects().clear();
+        
+        switch (item.getItemId()) {
+            case R.id.view_open_issues:
+                mState = Constants.Issue.ISSUE_STATE_OPEN;
+                new LoadPullRequestListTask(this).execute();
+                return true;
+            case R.id.view_closed_issues:
+                mState = Constants.Issue.ISSUE_STATE_CLOSED;
+                new LoadPullRequestListTask(this).execute();
+                return true;
+            default:
+                return true;
         }
     }
 }

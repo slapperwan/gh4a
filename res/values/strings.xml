@@ -68,6 +68,8 @@
     <string name="user_news_feed">News Feed</string>
     <string name="user_your_actions">Public Activity</string>
     <string name="user_organizations">Organizations</string>
+    <string name="user_follow_action">Follow</string>
+    <string name="user_unfollow_action">Unfollow</string>
     
     <!-- Repository -->
     <plurals name="repository">
@@ -135,6 +137,8 @@
     <string name="issue_state">State</string>
     <string name="issue_created_at">Created at</string>
     <string name="issue_closed_at">Closed at</string>
+    <string name="issue_view_open_issues">View Open Issues</string>
+    <string name="issue_view_closed_issues">View Closed Issues</string>
 
     <!-- Issue comment -->
     <plurals name="issue_comment">

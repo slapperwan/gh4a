@@ -97,6 +97,10 @@ public abstract class RootAdapter<T> extends BaseAdapter {
         mObjects.add(object);
     }
 
+    public List<T> getObjects() {
+        return mObjects;
+    }
+    
     /**
      * Do get view.
      * 
