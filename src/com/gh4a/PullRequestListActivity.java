@@ -85,7 +85,7 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
         mPullRequestAdapter = new PullRequestAdapter(this, new ArrayList<PullRequest>());
         listView.setAdapter(mPullRequestAdapter);
 
-        new LoadPullRequestListTask(this).execute();
+        new LoadPullRequestListTask(this, true).execute();
     }
 
     /**
@@ -151,14 +151,18 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
         
         /** The exception. */
         private boolean mException;
+        
+        /** The hide main view. */
+        private boolean mHideMainView;
 
         /**
          * Instantiates a new load pull request list task.
          *
          * @param activity the activity
          */
-        public LoadPullRequestListTask(PullRequestListActivity activity) {
+        public LoadPullRequestListTask(PullRequestListActivity activity, boolean hideMainView) {
             mTarget = new WeakReference<PullRequestListActivity>(activity);
+            mHideMainView = hideMainView;
         }
 
         /*
@@ -186,7 +190,7 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
          */
         @Override
         protected void onPreExecute() {
-            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, mHideMainView);
         }
 
         /*
@@ -239,11 +243,11 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
         switch (item.getItemId()) {
             case R.id.view_open_issues:
                 mState = Constants.Issue.ISSUE_STATE_OPEN;
-                new LoadPullRequestListTask(this).execute();
+                new LoadPullRequestListTask(this, false).execute();
                 return true;
             case R.id.view_closed_issues:
                 mState = Constants.Issue.ISSUE_STATE_CLOSED;
-                new LoadPullRequestListTask(this).execute();
+                new LoadPullRequestListTask(this, false).execute();
                 return true;
             default:
                 return true;

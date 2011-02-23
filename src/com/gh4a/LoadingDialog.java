@@ -51,7 +51,7 @@ public class LoadingDialog extends Dialog {
      */
     public static LoadingDialog show(Context context, CharSequence title, CharSequence message,
             boolean indeterminate) {
-        return show(context, title, message, indeterminate, false, null, true);
+        return show(context, title, message, indeterminate, false, null, true, android.R.style.Theme_Dialog);
     }
 
     /**
@@ -66,7 +66,7 @@ public class LoadingDialog extends Dialog {
      */
     public static LoadingDialog show(Context context, CharSequence title, CharSequence message,
             boolean indeterminate, boolean cancelable) {
-        return show(context, title, message, indeterminate, cancelable, null, true);
+        return show(context, title, message, indeterminate, cancelable, null, false, android.R.style.Theme_Dialog);
     }
 
     /**
@@ -78,7 +78,7 @@ public class LoadingDialog extends Dialog {
      * @return the loading dialog
      */
     public static LoadingDialog show(Context context, boolean indeterminate, boolean cancelable) {
-        return show(context, null, null, indeterminate, cancelable, null, true);
+        return show(context, null, null, indeterminate, cancelable, null, true, R.style.NewDialog);
     }
 
     /**
@@ -92,7 +92,7 @@ public class LoadingDialog extends Dialog {
      */
     public static LoadingDialog show(Context context, boolean indeterminate, boolean cancelable,
             boolean hideMainView) {
-        return show(context, null, null, indeterminate, cancelable, null, hideMainView);
+        return show(context, null, null, indeterminate, cancelable, null, hideMainView, R.style.NewDialog);
     }
 
     /**
@@ -109,12 +109,12 @@ public class LoadingDialog extends Dialog {
      */
     public static LoadingDialog show(Context context, CharSequence title, CharSequence message,
             boolean indeterminate, boolean cancelable, OnCancelListener cancelListener,
-            boolean hideMainView) {
+            boolean hideMainView, int themeId) {
         if (hideMainView) {
             Activity activity = (Activity) context;
             activity.findViewById(R.id.main_content).setVisibility(View.INVISIBLE);
         }
-        LoadingDialog dialog = new LoadingDialog(context);
+        LoadingDialog dialog = new LoadingDialog(context, themeId);
         dialog.setTitle(title);
         dialog.setCancelable(cancelable);
         dialog.setOnCancelListener(cancelListener);
@@ -140,7 +140,7 @@ public class LoadingDialog extends Dialog {
      *
      * @param context the context
      */
-    public LoadingDialog(Context context) {
-        super(context, R.style.NewDialog);
+    public LoadingDialog(Context context, int themeId) {
+        super(context, themeId);
     }
 }

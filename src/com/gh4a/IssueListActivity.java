@@ -92,7 +92,7 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
         mIssueAdapter = new IssueAdapter(this, new ArrayList<Issue>());
         mListViewIssues.setAdapter(mIssueAdapter);
 
-        new LoadIssueListTask(this).execute();
+        new LoadIssueListTask(this, true).execute();
     }
 
     /*
@@ -151,14 +151,17 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
         
         /** The exception. */
         private boolean mException;
+        
+        private boolean mHideMainView;
 
         /**
          * Instantiates a new load issue list task.
          *
          * @param activity the activity
          */
-        public LoadIssueListTask(IssueListActivity activity) {
+        public LoadIssueListTask(IssueListActivity activity, boolean hideMainView) {
             mTarget = new WeakReference<IssueListActivity>(activity);
+            mHideMainView = hideMainView;
         }
 
         /*
@@ -187,7 +190,7 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
          */
         @Override
         protected void onPreExecute() {
-            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, mHideMainView);
         }
 
         /*
@@ -267,11 +270,11 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
         switch (item.getItemId()) {
             case R.id.view_open_issues:
                 mState = Constants.Issue.ISSUE_STATE_OPEN;
-                new LoadIssueListTask(this).execute();
+                new LoadIssueListTask(this, false).execute();
                 return true;
             case R.id.view_closed_issues:
                 mState = Constants.Issue.ISSUE_STATE_CLOSED;
-                new LoadIssueListTask(this).execute();
+                new LoadIssueListTask(this, false).execute();
                 return true;
             default:
                 return true;
