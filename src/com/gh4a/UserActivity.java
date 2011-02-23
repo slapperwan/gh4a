@@ -19,7 +19,6 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 import android.content.Intent;
-import android.graphics.Path.FillType;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -660,18 +659,22 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
             mTarget.get().mLoadingDialog.dismiss();
             if (mException) {
                 if (isFollowAction) {
-                    mTarget.get().showMessage("An error occured while following user " + mTarget.get().mUserLogin, false);
+                    mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.user_error_follow,
+                            mTarget.get().mUserLogin), false);
                 }
                 else {
-                    mTarget.get().showMessage("An error occured while unfollow user " + mTarget.get().mUserLogin, false);
+                    mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.user_error_unfollow,
+                            mTarget.get().mUserLogin), false);
                 }
             }
             else {
                 if (isFollowAction) {
-                    mTarget.get().showMessage("Successful follow user " + mTarget.get().mUserLogin, false);
+                    mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.user_success_follow,
+                            mTarget.get().mUserLogin), false);
                 }
                 else {
-                    mTarget.get().showMessage("Successful unfollow user " + mTarget.get().mUserLogin, false);
+                    mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.user_success_unfollow,
+                            mTarget.get().mUserLogin), false);
                 }
             }
         }

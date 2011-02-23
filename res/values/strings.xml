@@ -70,6 +70,10 @@
     <string name="user_organizations">Organizations</string>
     <string name="user_follow_action">Follow</string>
     <string name="user_unfollow_action">Unfollow</string>
+    <string name="user_success_follow">Successful follow user %1$s</string>
+    <string name="user_success_unfollow">Successful unfollow user %1$s</string>
+    <string name="user_error_follow">An error occured while following user %1$s</string>
+    <string name="user_error_unfollow">An error occured while unfollow user %1$s</string>
     
     <!-- Repository -->
     <plurals name="repository">
