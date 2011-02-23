@@ -87,8 +87,6 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
 
         final UserFeed feed = mObjects.get(position);
         if (feed != null) {
-            PrettyTime pt = new PrettyTime();
-
             ImageDownloader.getInstance().download(feed.getActorAttributes().getGravatarId(),
                     viewHolder.ivGravatar);
             viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
