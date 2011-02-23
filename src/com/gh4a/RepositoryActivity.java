@@ -22,6 +22,9 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -33,6 +36,8 @@ import com.github.api.v2.schema.Repository;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
 import com.github.api.v2.services.RepositoryService;
+import com.github.api.v2.services.auth.Authentication;
+import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The Repository activity.
@@ -526,5 +531,191 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
         Log.v(Constants.LOG_TAG, this.getLocalClassName() + " onRetain");
         mLoadNetworkTask.detach();
         return mLoadNetworkTask;
+    }
+    
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (menu.size() == 1) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.repo_menu, menu);
+            
+        }
+        return true;
+    }
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.watch_action:
+                new WatchUnwatchTask(this).execute(true);
+                return true;
+            case R.id.unwatch_action:
+                new WatchUnwatchTask(this).execute(false);
+                return true;
+            case R.id.fork_action:
+                new ForkTask(this).execute(false);
+                return true;
+            default:
+                return true;
+        }
+    }
+    
+    private static class WatchUnwatchTask extends AsyncTask<Boolean, Void, Boolean> {
+
+        /** The target. */
+        private WeakReference<RepositoryActivity> mTarget;
+        
+        /** The exception. */
+        private boolean mException;
+        
+        private boolean isWatchAction;
+
+        /**
+         * Instantiates a new load watched repos task.
+         *
+         * @param activity the activity
+         */
+        public WatchUnwatchTask(RepositoryActivity activity) {
+            mTarget = new WeakReference<RepositoryActivity>(activity);
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected Boolean doInBackground(Boolean... arg0) {
+            isWatchAction = arg0[0];
+            try {
+                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                RepositoryService repositoryService = factory.createRepositoryService();
+                Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
+                        mTarget.get().getAuthPassword());
+                repositoryService.setAuthentication(auth);
+                if (isWatchAction) {
+                    repositoryService.watchRepository(mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER),
+                            mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME));
+                }
+                else {
+                    repositoryService.unwatchRepository(mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER),
+                            mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME));
+                }
+                return true;
+            }
+            catch (GitHubException e) {
+                Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                mException = true;
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, false);
+        }
+        
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(Boolean result) {
+            mTarget.get().mLoadingDialog.dismiss();
+            if (mException) {
+                if (isWatchAction) {
+                    mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.repo_error_watch,
+                            mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER) 
+                            + "/" + mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME)),
+                            false);
+                }
+                else {
+                    mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.repo_error_unwatch,
+                            mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER)
+                            + "/" + mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME)),
+                            false);
+                }
+            }
+            else {
+                if (isWatchAction) {
+                    mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.repo_success_watch,
+                            mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER)
+                            + "/" + mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME)),
+                            false);
+                }
+                else {
+                    mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.repo_success_unwatch,
+                            mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER)
+                            + "/" + mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME)),
+                            false);
+                }
+            }
+        }
+    }
+    
+    private static class ForkTask extends AsyncTask<Boolean, Void, Boolean> {
+
+        /** The target. */
+        private WeakReference<RepositoryActivity> mTarget;
+        
+        /** The exception. */
+        private boolean mException;
+        
+        /**
+         * Instantiates a new load watched repos task.
+         *
+         * @param activity the activity
+         */
+        public ForkTask(RepositoryActivity activity) {
+            mTarget = new WeakReference<RepositoryActivity>(activity);
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected Boolean doInBackground(Boolean... arg0) {
+            try {
+                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                RepositoryService repositoryService = factory.createRepositoryService();
+                Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
+                        mTarget.get().getAuthPassword());
+                repositoryService.setAuthentication(auth);
+                repositoryService.forkRepository(mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER),
+                        mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME));
+                return true;
+            }
+            catch (GitHubException e) {
+                Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                mException = true;
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, false);
+        }
+        
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(Boolean result) {
+            mTarget.get().mLoadingDialog.dismiss();
+            if (mException) {
+                mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.repo_error_fork,
+                        mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER),
+                        mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME)),
+                        false);
+            }
+            else {
+                mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.repo_success_fork,
+                        mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER),
+                        mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME)),
+                        false);
+            }
+        }
     }
 }
