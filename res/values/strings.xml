@@ -160,10 +160,13 @@
     <string name="issue_success_create">Successful create issue</string>
     <string name="issue_edit">Edit Issue</string>
     <string name="issue_success_edit">Successful edit issue</string>
+    <string name="issue_error_edit">Cannot edit issue</string>
     <string name="issue_reopen">Reopen Issue</string>
     <string name="issue_close">Close Issue</string>
     <string name="issue_success_close">Successful close issue</string>
+    <string name="issue_error_close">Cannot close issue</string>
     <string name="issue_success_reopen">Successful reopen issue</string>
+    <string name="issue_error_reopen">Cannot reopen issue</string>
 
     <!-- Issue comment -->
     <plurals name="issue_comment">

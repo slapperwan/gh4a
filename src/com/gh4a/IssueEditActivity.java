@@ -49,6 +49,10 @@ public class IssueEditActivity extends BaseActivity implements OnClickListener {
     /** The issue number. */
     private int mIssueNumber;
     
+    private String mTitle;
+    
+    private String mBody;
+    
     /** The loading dialog. */
     protected LoadingDialog mLoadingDialog;
     
@@ -70,11 +74,19 @@ public class IssueEditActivity extends BaseActivity implements OnClickListener {
         mUserLogin = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
         mIssueNumber = getIntent().getExtras().getInt(Constants.Issue.ISSUE_NUMBER);
+        mTitle = getIntent().getExtras().getString(Constants.Issue.ISSUE_TITLE);
+        mBody = getIntent().getExtras().getString(Constants.Issue.ISSUE_BODY);
 
         setBreadCrumb();
         
         Button btnEdit = (Button) findViewById(R.id.btn_edit);
         btnEdit.setOnClickListener(this);
+        
+        EditText etTitle = (EditText) findViewById(R.id.et_title);
+        etTitle.setText(mTitle);
+        
+        EditText etDesc = (EditText) findViewById(R.id.et_desc);
+        etDesc.setText(mBody);
     }
     
     /**
@@ -219,7 +231,8 @@ public class IssueEditActivity extends BaseActivity implements OnClickListener {
                 activity.mLoadingDialog.dismiss();
     
                 if (mException) {
-                    activity.showError();
+                    activity.showMessage(activity.getResources().getString(R.string.issue_error_edit),
+                            false);
                 }
                 else {
                     activity.showMessage(activity.getResources().getString(R.string.issue_success_edit),

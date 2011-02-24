@@ -454,7 +454,9 @@ public class IssueActivity extends BaseActivity {
                 intent = new Intent().setClass(this, IssueEditActivity.class);
                 intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
                 intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                intent.putExtra(Constants.Issue.ISSUE_NUMBER, mIssueNumber);
+                intent.putExtra(Constants.Issue.ISSUE_NUMBER, mBundle.getInt(Constants.Issue.ISSUE_NUMBER));
+                intent.putExtra(Constants.Issue.ISSUE_TITLE, mBundle.getString(Constants.Issue.ISSUE_TITLE));
+                intent.putExtra(Constants.Issue.ISSUE_BODY, mBundle.getString(Constants.Issue.ISSUE_BODY));
                 startActivity(intent);
                 return true;
             case R.id.close_issue:
@@ -542,7 +544,8 @@ public class IssueActivity extends BaseActivity {
                 activity.mLoadingDialog.dismiss();
     
                 if (mException) {
-                    activity.showError();
+                    activity.showMessage(activity.getResources().getString(R.string.issue_error_close),
+                            false);
                 }
                 else {
                     activity.showMessage(activity.getResources().getString(R.string.issue_success_close),
@@ -627,7 +630,8 @@ public class IssueActivity extends BaseActivity {
                 activity.mLoadingDialog.dismiss();
     
                 if (mException) {
-                    activity.showError();
+                    activity.showMessage(activity.getResources().getString(R.string.issue_error_reopen),
+                            false);
                 }
                 else {
                     activity.showMessage(activity.getResources().getString(R.string.issue_success_reopen),
