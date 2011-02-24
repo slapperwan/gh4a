@@ -42,7 +42,7 @@ public class UserAdapter extends RootAdapter<User> {
 
     /** The show more data. */
     private boolean mShowMoreData;
-
+    
     /**
      * Instantiates a new user adapter.
      * 
@@ -66,7 +66,7 @@ public class UserAdapter extends RootAdapter<User> {
         mRowLayout = rowLayout;
         mShowMoreData = showMoreData;
     }
-
+    
     /*
      * (non-Javadoc)
      * @see com.gh4a.adapter.RootAdapter#doGetView(int, android.view.View,
@@ -115,8 +115,7 @@ public class UserAdapter extends RootAdapter<User> {
             if (mShowMoreData && viewHolder.tvExtra != null) {
                 Resources res = v.getResources();
                 String extraData = String.format(res.getString(R.string.user_extra_data), user
-                        .getFollowersCount(), user.getPublicRepoCount());
-
+                            .getFollowersCount(), user.getPublicRepoCount());
                 viewHolder.tvExtra.setText(extraData);
             }
         }

@@ -109,8 +109,6 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
         }
         actionBar.addAction(new IntentAction(this, new Intent(getApplicationContext(),
                 SearchActivity.class), R.drawable.ic_search));
-        actionBar.addAction(new IntentAction(this, new Intent(getApplicationContext(),
-                ChooseIssueStateDialog.class), R.drawable.ic_search));
     }
 
     /**

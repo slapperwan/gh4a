@@ -59,10 +59,6 @@
         <activity
             android:name=".TagListActivity" />
         <activity
-            android:name=".ChooseIssueStateDialog"
-            android:label="Choose Status"
-            android:theme="@android:style/Theme.Dialog" />
-        <activity
             android:name=".PullRequestListActivity" />
         <activity
             android:name=".PullRequestActivity" />
@@ -74,6 +70,10 @@
             android:name=".AddedFileViewerActivity" />
         <activity
             android:name=".OrganizationMemberListActivity" />
+        <activity
+            android:name=".ContributorListActivity" />
+        <activity
+            android:name=".CollaboratorListActivity" />
         <activity
             android:name="com.markupartist.android.widget.ActionBar" />
     </application>

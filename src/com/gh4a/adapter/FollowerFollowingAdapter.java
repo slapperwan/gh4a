@@ -54,7 +54,7 @@ public class FollowerFollowingAdapter extends RootAdapter<String> {
         }
         String username = mObjects.get(position);
         if (username != null) {
-            TextView tvFormattedName = (TextView) v.findViewById(R.id.tv_title);
+            TextView tvFormattedName = (TextView) v.findViewById(R.id.tv_desc);
             tvFormattedName.setText(username);
         }
         return v;

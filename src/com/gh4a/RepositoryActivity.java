@@ -130,6 +130,12 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
 
         Button btnOpenIssues = (Button) findViewById(R.id.btn_open_issues);
         btnOpenIssues.setOnClickListener(this);
+        
+        ImageButton btnCollaborators = (ImageButton) findViewById(R.id.btn_collaborators);
+        btnCollaborators.setOnClickListener(this);
+        
+        ImageButton btnContributors = (ImageButton) findViewById(R.id.btn_contributors);
+        btnContributors.setOnClickListener(this);
 
         TextView tvOwner = (TextView) findViewById(R.id.tv_login);
         tvOwner.setOnClickListener(new OnClickListener() {
@@ -391,6 +397,12 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
         case R.id.btn_forks:
             getNetworks(view);
             break;
+        case R.id.btn_contributors:
+            getContributors(view);
+            break;
+        case R.id.btn_collaborators:
+            getCollaborators(view);
+            break;
         case R.id.btn_open_issues:
             getApplicationContext().openIssueListActivity(this,
                     mBundle.getString(Constants.Repository.REPO_OWNER),
@@ -447,6 +459,36 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
         startActivity(intent);
     }
 
+    /**
+     * Gets the contributors.
+     *
+     * @param view the view
+     * @return the contributors
+     */
+    public void getContributors(View view) {
+        Intent intent = new Intent().setClass(RepositoryActivity.this, ContributorListActivity.class);
+        intent.putExtra(Constants.Repository.REPO_OWNER, mBundle
+                .getString(Constants.Repository.REPO_OWNER));
+        intent.putExtra(Constants.Repository.REPO_NAME, mBundle
+                .getString(Constants.Repository.REPO_NAME));
+        startActivity(intent);
+    }
+    
+    /**
+     * Gets the collaborators.
+     *
+     * @param view the view
+     * @return the collaborators
+     */
+    public void getCollaborators(View view) {
+        Intent intent = new Intent().setClass(RepositoryActivity.this, CollaboratorListActivity.class);
+        intent.putExtra(Constants.Repository.REPO_OWNER, mBundle
+                .getString(Constants.Repository.REPO_OWNER));
+        intent.putExtra(Constants.Repository.REPO_NAME, mBundle
+                .getString(Constants.Repository.REPO_NAME));
+        startActivity(intent);
+    }
+    
     /*
      * (non-Javadoc)
      * @see android.app.Activity#onActivityResult(int, int,
@@ -533,6 +575,9 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
         return mLoadNetworkTask;
     }
     
+    /* (non-Javadoc)
+     * @see android.app.Activity#onPrepareOptionsMenu(android.view.Menu)
+     */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         if (menu.size() == 1) {
@@ -543,6 +588,9 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
         return true;
     }
     
+    /* (non-Javadoc)
+     * @see com.gh4a.BaseActivity#setMenuOptionItemSelected(android.view.MenuItem)
+     */
     @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -560,6 +608,10 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
         }
     }
     
+    /**
+     * An asynchronous task that runs on a background thread
+     * to watch unwatch.
+     */
     private static class WatchUnwatchTask extends AsyncTask<Boolean, Void, Boolean> {
 
         /** The target. */
@@ -568,6 +620,7 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
         /** The exception. */
         private boolean mException;
         
+        /** The is watch action. */
         private boolean isWatchAction;
 
         /**
@@ -609,6 +662,9 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
             }
         }
 
+        /* (non-Javadoc)
+         * @see android.os.AsyncTask#onPreExecute()
+         */
         @Override
         protected void onPreExecute() {
             mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, false);
@@ -652,6 +708,10 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
         }
     }
     
+    /**
+     * An asynchronous task that runs on a background thread
+     * to fork.
+     */
     private static class ForkTask extends AsyncTask<Boolean, Void, Boolean> {
 
         /** The target. */
@@ -692,6 +752,9 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
             }
         }
 
+        /* (non-Javadoc)
+         * @see android.os.AsyncTask#onPreExecute()
+         */
         @Override
         protected void onPreExecute() {
             mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, false);

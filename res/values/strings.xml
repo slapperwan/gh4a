@@ -112,7 +112,10 @@
     <string name="repo_error_unwatch">An error occured while unwatch %1$s</string>
     <string name="repo_success_fork">Successful fork %1$s</string>
     <string name="repo_error_fork">An error occured while forking %1$s</string>
-
+    <string name="repo_branch">branch</string>
+    <string name="repo_contributors">Contributors</string>
+    <string name="repo_collaborators">Collaborators</string>
+    
     <!-- Commit -->
     <plurals name="commit">
         <item quantity="one">Commit</item>

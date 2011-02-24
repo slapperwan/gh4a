@@ -59,7 +59,7 @@ public class WatcherListActivity extends UserListActivity {
      * @see com.gh4a.UserListActivity#setSubtitle()
      */
     protected void setSubtitle() {
-        mSubtitle = "Watchers";
+        mSubtitle = getResources().getString(R.string.repo_watchers);
     }
 
     /*

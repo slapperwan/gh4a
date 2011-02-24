@@ -29,6 +29,7 @@ import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
 import com.gh4a.adapter.UserAdapter;
+import com.gh4a.utils.StringUtils;
 import com.github.api.v2.schema.User;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
@@ -62,7 +63,7 @@ public class UserListActivity extends BaseActivity implements OnItemClickListene
 
     /** The show more data. */
     protected boolean mShowMoreData;
-
+    
     /**
      * Called when the activity is first created.
      * 

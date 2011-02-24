@@ -173,6 +173,52 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content">
                     <TextView
+                        android:id="@+id/tv_contributors_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="@string/repo_contributors" />
+                    <ImageButton
+                        android:id="@+id/btn_contributors"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignRight="@id/tv_contributors_label"
+                        android:layout_alignParentRight="true"
+                        android:src="@drawable/ic_more" />
+                </RelativeLayout>
+                <View
+                    android:background="?android:attr/divider"
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp" />
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/tv_collaborators_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="@string/repo_collaborators" />
+                    <ImageButton
+                        android:id="@+id/btn_collaborators"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignRight="@id/tv_collaborators_label"
+                        android:layout_alignParentRight="true"
+                        android:src="@drawable/ic_more" />
+                </RelativeLayout>
+                <View
+                    android:background="?android:attr/divider"
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp" />
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
                         android:id="@+id/tv_watchers_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
