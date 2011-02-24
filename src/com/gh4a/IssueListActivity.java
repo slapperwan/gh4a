@@ -71,7 +71,7 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
 
     /** The tv subtitle. */
     protected TextView mTvSubtitle;
-
+    
     /**
      * Called when the activity is first created.
      * 
@@ -85,11 +85,12 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
         setUpActionBar();
         setRequestData();
         setBreadCrumb();
+        setRowLayout();
 
         mListViewIssues = (ListView) findViewById(R.id.list_view);
         mListViewIssues.setOnItemClickListener(this);
 
-        mIssueAdapter = new IssueAdapter(this, new ArrayList<Issue>());
+        mIssueAdapter = new IssueAdapter(this, new ArrayList<Issue>(), mRowLayout);
         mListViewIssues.setAdapter(mIssueAdapter);
 
         new LoadIssueListTask(this, true).execute();
@@ -146,6 +147,10 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
         else {
             return State.valueOf(mState).name() + " Issues";
         }
+    }
+    
+    public void setRowLayout() {
+        mRowLayout = R.layout.row_issue;
     }
     
     public List<Issue> getIssues() throws GitHubException {
@@ -288,8 +293,6 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
     
     @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
-        mIssueAdapter.getObjects().clear();
-        
         switch (item.getItemId()) {
             case R.id.view_open_issues:
                 getApplicationContext().openIssueListActivity(this, mUserLogin, mRepoName, Constants.Issue.ISSUE_STATE_OPEN);

@@ -38,6 +38,7 @@ import com.github.api.v2.schema.Issue;
  */
 public class IssueAdapter extends RootAdapter<Issue> {
 
+    private int mRowLayout;
     /**
      * Instantiates a new issue adapter.
      * 
@@ -46,6 +47,11 @@ public class IssueAdapter extends RootAdapter<Issue> {
      */
     public IssueAdapter(Context context, List<Issue> objects) {
         super(context, objects);
+    }
+    
+    public IssueAdapter(Context context, List<Issue> objects, int rowLayout) {
+        super(context, objects);
+        mRowLayout = rowLayout;
     }
 
     /*
@@ -60,12 +66,14 @@ public class IssueAdapter extends RootAdapter<Issue> {
 
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_issue, null);
+            v = vi.inflate(mRowLayout, null);
             viewHolder = new ViewHolder();
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
             viewHolder.llLabels = (LinearLayout) v.findViewById(R.id.ll_labels);
+            viewHolder.tvState = (TextView) v.findViewById(R.id.tv_state);
+            
             v.setTag(viewHolder);
         }
         else {
@@ -85,6 +93,16 @@ public class IssueAdapter extends RootAdapter<Issue> {
                     context.openUserInfoActivity(v.getContext(), issue.getUser(), null);
                 }
             });
+            
+            if (viewHolder.tvState != null) {
+                viewHolder.tvState.setText(issue.getState().value());
+                if ("closed".equals(issue.getState().value())) {
+                    viewHolder.tvState.setBackgroundResource(R.drawable.default_red_box);
+                }
+                else {
+                    viewHolder.tvState.setBackgroundResource(R.drawable.default_green_box);
+                }
+            }
             
             //show labels
             viewHolder.llLabels.removeAllViews();
@@ -142,6 +160,9 @@ public class IssueAdapter extends RootAdapter<Issue> {
         
         /** The ll labels. */
         public LinearLayout llLabels;
+        
+        /** The tv state. */
+        public TextView tvState;
 
     }
 }
