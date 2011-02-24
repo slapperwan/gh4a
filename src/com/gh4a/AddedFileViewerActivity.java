@@ -117,9 +117,6 @@ public class AddedFileViewerActivity extends BaseActivity {
         /** The exception. */
         private boolean mException;
 
-        /** The show in browser. */
-        private boolean showInBrowser;
-
         /**
          * Instantiates a new load tree list task.
          * 
@@ -135,19 +132,24 @@ public class AddedFileViewerActivity extends BaseActivity {
          */
         @Override
         protected Blob doInBackground(Void... params) {
-            try {
-                AddedFileViewerActivity activity = mTarget.get();
-                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                ObjectService objectService = factory.createObjectService();
-                
-                return objectService.getBlob(activity.mUserLogin,
-                            activity.mRepoName,
-                            activity.mTreeSha, 
-                            activity.mFilePath);
+            if (mTarget.get() != null) {
+                try {
+                    AddedFileViewerActivity activity = mTarget.get();
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    ObjectService objectService = factory.createObjectService();
+                    
+                    return objectService.getBlob(activity.mUserLogin,
+                                activity.mRepoName,
+                                activity.mTreeSha, 
+                                activity.mFilePath);
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
                 return null;
             }
         }
@@ -158,7 +160,9 @@ public class AddedFileViewerActivity extends BaseActivity {
          */
         @Override
         protected void onPreExecute() {
-            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            }
         }
 
         /*
@@ -167,22 +171,24 @@ public class AddedFileViewerActivity extends BaseActivity {
          */
         @Override
         protected void onPostExecute(Blob result) {
-            if (mException) {
-                mTarget.get().showError();
-            }
-            else {
-                if (result.getMimeType().startsWith("text")
-                        || result.getMimeType().equals("application/xml")
-                        || result.getMimeType().equals("application/sh")) {
-                    mTarget.get().fillData(result);
+            if (mTarget.get() != null) {
+                if (mException) {
+                    mTarget.get().showError();
                 }
                 else {
-                    String url = "https://github.com/" + mTarget.get().mUserLogin + "/"
-                            + mTarget.get().mRepoName + "/raw/" + mTarget.get().mObjectSha + "/"
-                            + mTarget.get().mFilePath;
-                    mTarget.get().getApplicationContext().openBrowser(mTarget.get(), url);
-                    mTarget.get().mLoadingDialog.dismiss();
-                    mTarget.get().finish();                    
+                    if (result.getMimeType().startsWith("text")
+                            || result.getMimeType().equals("application/xml")
+                            || result.getMimeType().equals("application/sh")) {
+                        mTarget.get().fillData(result);
+                    }
+                    else {
+                        String url = "https://github.com/" + mTarget.get().mUserLogin + "/"
+                                + mTarget.get().mRepoName + "/raw/" + mTarget.get().mObjectSha + "/"
+                                + mTarget.get().mFilePath;
+                        mTarget.get().getApplicationContext().openBrowser(mTarget.get(), url);
+                        mTarget.get().mLoadingDialog.dismiss();
+                        mTarget.get().finish();                    
+                    }
                 }
             }
         }

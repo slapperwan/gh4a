@@ -115,14 +115,19 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
          */
         @Override
         protected User doInBackground(Void... arg0) {
-            try {
-                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                UserService userService = factory.createUserService();
-                return userService.getUserByUsername(mTarget.get().mUserLogin);
+            if (mTarget.get() != null) {
+                try {
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    UserService userService = factory.createUserService();
+                    return userService.getUserByUsername(mTarget.get().mUserLogin);
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
                 return null;
             }
         }
@@ -133,7 +138,9 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
          */
         @Override
         protected void onPreExecute() {
-            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            }
         }
 
         /*
@@ -142,15 +149,17 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
          */
         @Override
         protected void onPostExecute(User result) {
-            mTarget.get().mLoadingDialog.dismiss();
-            if (mException) {
-                mTarget.get().showError();
-            }
-            else {
-                mTarget.get().fillData(result);
-                new LoadWatchedReposTask(mTarget.get()).execute();
-                if (Constants.User.USER_TYPE_ORG.equals(result.getType())) { 
-                    new LoadOrganizationMembersTask(mTarget.get()).execute();
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog.dismiss();
+                if (mException) {
+                    mTarget.get().showError();
+                }
+                else {
+                    mTarget.get().fillData(result);
+                    new LoadWatchedReposTask(mTarget.get()).execute();
+                    if (Constants.User.USER_TYPE_ORG.equals(result.getType())) { 
+                        new LoadOrganizationMembersTask(mTarget.get()).execute();
+                    }
                 }
             }
         }
@@ -183,17 +192,19 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
          */
         @Override
         protected Integer doInBackground(Void... arg0) {
-            try {
-                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                UserService userService = factory.createUserService();
-//                mTarget.get().mWatchedReposCount = userService.getWatchedRepositories(
-//                        mTarget.get().mUserLogin).size();
-//                return mTarget.get().mWatchedReposCount;
-                return userService.getWatchedRepositories(mTarget.get().mUserLogin).size();
+            if (mTarget.get() != null) {
+                try {
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    UserService userService = factory.createUserService();
+                    return userService.getWatchedRepositories(mTarget.get().mUserLogin).size();
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
                 return null;
             }
         }
@@ -204,15 +215,17 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
          */
         @Override
         protected void onPostExecute(Integer result) {
-            if (mException) {
-                //mTarget.get().showError();
+            if (mTarget.get() != null) {
+                if (mException) {
+                    //mTarget.get().showError();
+                }
+                else {
+                    Button btnWatchedRepos = (Button) mTarget.get().findViewById(R.id.btn_watched_repos);
+                    btnWatchedRepos.setText(String.valueOf(result));
+                }
+                ProgressBar progressBar = (ProgressBar) mTarget.get().findViewById(R.id.pb_watched_repos);
+                progressBar.setVisibility(View.GONE);
             }
-            else {
-                Button btnWatchedRepos = (Button) mTarget.get().findViewById(R.id.btn_watched_repos);
-                btnWatchedRepos.setText(String.valueOf(result));
-            }
-            ProgressBar progressBar = (ProgressBar) mTarget.get().findViewById(R.id.pb_watched_repos);
-            progressBar.setVisibility(View.GONE);
         }
     }
     
@@ -239,16 +252,19 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
          */
         @Override
         protected Integer doInBackground(Void... arg0) {
-            try {
-                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                OrganizationService organizationService = factory.createOrganizationService();
-                return organizationService.getPublicMembers(mTarget.get().mUserLogin).size();
+            if (mTarget.get() != null) {
+                try {
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    OrganizationService organizationService = factory.createOrganizationService();
+                    return organizationService.getPublicMembers(mTarget.get().mUserLogin).size();
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
-                return null;
-            }
+            return null;
         }
 
         /*
@@ -257,16 +273,17 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
          */
         @Override
         protected void onPostExecute(Integer result) {
-            if (mException) {
-                //mTarget.get().showError();
-                
+            if (mTarget.get() != null) {
+                if (mException) {
+                    //mTarget.get().showError();
+                }
+                else {
+                    Button btnFollowers = (Button) mTarget.get().findViewById(R.id.btn_followers);
+                    btnFollowers.setText(String.valueOf(result));
+                }
+                ProgressBar progressBar = (ProgressBar) mTarget.get().findViewById(R.id.pb_followers);
+                progressBar.setVisibility(View.GONE);
             }
-            else {
-                Button btnFollowers = (Button) mTarget.get().findViewById(R.id.btn_followers);
-                btnFollowers.setText(String.valueOf(result));
-            }
-            ProgressBar progressBar = (ProgressBar) mTarget.get().findViewById(R.id.pb_followers);
-            progressBar.setVisibility(View.GONE);
         }
     }
 
@@ -580,10 +597,6 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         return true;
     }
     
-    private boolean isFollowing() {
-        return false;
-    }
-    
     @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -623,31 +636,38 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
          */
         @Override
         protected Boolean doInBackground(Boolean... arg0) {
-            isFollowAction = arg0[0];
-            try {
-                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                UserService userService = factory.createUserService();
-                Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                        mTarget.get().getAuthPassword());
-                userService.setAuthentication(auth);
-                if (isFollowAction) {
-                    userService.followUser(mTarget.get().mUserLogin);
+            if (mTarget.get() != null) {
+                isFollowAction = arg0[0];
+                try {
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    UserService userService = factory.createUserService();
+                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
+                            mTarget.get().getAuthPassword());
+                    userService.setAuthentication(auth);
+                    if (isFollowAction) {
+                        userService.followUser(mTarget.get().mUserLogin);
+                    }
+                    else {
+                        userService.unfollowUser(mTarget.get().mUserLogin);
+                    }
+                    return true;
                 }
-                else {
-                    userService.unfollowUser(mTarget.get().mUserLogin);
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
                 }
-                return true;
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
                 return null;
             }
         }
 
         @Override
         protected void onPreExecute() {
-            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, false);
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, false);
+            }
         }
         
         /*
@@ -656,25 +676,27 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
          */
         @Override
         protected void onPostExecute(Boolean result) {
-            mTarget.get().mLoadingDialog.dismiss();
-            if (mException) {
-                if (isFollowAction) {
-                    mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.user_error_follow,
-                            mTarget.get().mUserLogin), false);
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog.dismiss();
+                if (mException) {
+                    if (isFollowAction) {
+                        mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.user_error_follow,
+                                mTarget.get().mUserLogin), false);
+                    }
+                    else {
+                        mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.user_error_unfollow,
+                                mTarget.get().mUserLogin), false);
+                    }
                 }
                 else {
-                    mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.user_error_unfollow,
-                            mTarget.get().mUserLogin), false);
-                }
-            }
-            else {
-                if (isFollowAction) {
-                    mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.user_success_follow,
-                            mTarget.get().mUserLogin), false);
-                }
-                else {
-                    mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.user_success_unfollow,
-                            mTarget.get().mUserLogin), false);
+                    if (isFollowAction) {
+                        mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.user_success_follow,
+                                mTarget.get().mUserLogin), false);
+                    }
+                    else {
+                        mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.user_success_unfollow,
+                                mTarget.get().mUserLogin), false);
+                    }
                 }
             }
         }

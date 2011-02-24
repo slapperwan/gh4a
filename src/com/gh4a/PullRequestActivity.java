@@ -219,16 +219,21 @@ public class PullRequestActivity extends BaseActivity {
          */
         @Override
         protected PullRequest doInBackground(Void... params) {
-            try {
-                PullRequestActivity activity = mTarget.get();
-                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                PullRequestService service = factory.createPullRequestService();
-                return service.getPullRequest(activity.mUserLogin, activity.mRepoName,
-                        activity.mPullRequestNumber);
+            if (mTarget.get() != null) {
+                try {
+                    PullRequestActivity activity = mTarget.get();
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    PullRequestService service = factory.createPullRequestService();
+                    return service.getPullRequest(activity.mUserLogin, activity.mRepoName,
+                            activity.mPullRequestNumber);
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
                 return null;
             }
         }
@@ -239,7 +244,9 @@ public class PullRequestActivity extends BaseActivity {
          */
         @Override
         protected void onPreExecute() {
-            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            }
         }
 
         /*
@@ -248,14 +255,16 @@ public class PullRequestActivity extends BaseActivity {
          */
         @Override
         protected void onPostExecute(PullRequest result) {
-            PullRequestActivity activity = mTarget.get();
-            activity.mLoadingDialog.dismiss();
-
-            if (mException) {
-                activity.showError();
-            }
-            else {
-                activity.fillData(result);
+            if (mTarget.get() != null) {
+                PullRequestActivity activity = mTarget.get();
+                activity.mLoadingDialog.dismiss();
+    
+                if (mException) {
+                    activity.showError();
+                }
+                else {
+                    activity.fillData(result);
+                }
             }
         }
     }

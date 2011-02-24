@@ -145,12 +145,17 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
          */
         @Override
         protected List<UserFeed> doInBackground(Void... params) {
-            try {
-                return mTarget.get().getFeeds();
+            if (mTarget.get() != null) {
+                try {
+                    return mTarget.get().getFeeds();
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
                 return null;
             }
         }
@@ -161,7 +166,9 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
          */
         @Override
         protected void onPreExecute() {
-            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            }
         }
 
         /*
@@ -170,12 +177,14 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
          */
         @Override
         protected void onPostExecute(List<UserFeed> result) {
-            mTarget.get().mLoadingDialog.dismiss();
-            if (mException) {
-                mTarget.get().showError();
-            }
-            else {
-                mTarget.get().fillData(result);
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog.dismiss();
+                if (mException) {
+                    mTarget.get().showError();
+                }
+                else {
+                    mTarget.get().fillData(result);
+                }
             }
         }
     }

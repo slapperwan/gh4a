@@ -29,7 +29,6 @@ import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
 import com.gh4a.adapter.UserAdapter;
-import com.gh4a.utils.StringUtils;
 import com.github.api.v2.schema.User;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
@@ -117,12 +116,17 @@ public class UserListActivity extends BaseActivity implements OnItemClickListene
          */
         @Override
         protected List<User> doInBackground(Void... params) {
-            try {
-                return mTarget.get().getUsers();
+            if (mTarget.get() != null) {
+                try {
+                    return mTarget.get().getUsers();
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
                 return null;
             }
         }
@@ -133,7 +137,9 @@ public class UserListActivity extends BaseActivity implements OnItemClickListene
          */
         @Override
         protected void onPreExecute() {
-            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            }
         }
 
         /*
@@ -142,12 +148,14 @@ public class UserListActivity extends BaseActivity implements OnItemClickListene
          */
         @Override
         protected void onPostExecute(List<User> result) {
-            mTarget.get().mLoadingDialog.dismiss();
-            if (mException) {
-                mTarget.get().showError();
-            }
-            else {
-                mTarget.get().fillData(result);
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog.dismiss();
+                if (mException) {
+                    mTarget.get().showError();
+                }
+                else {
+                    mTarget.get().fillData(result);
+                }
             }
         }
     }

@@ -123,21 +123,26 @@ public class TagListActivity extends BaseActivity {
          */
         @Override
         protected HashMap<String, HashMap<String, String>> doInBackground(Void... params) {
-            try {
-                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                RepositoryService service = factory.createRepositoryService();
-                HashMap<String, HashMap<String, String>> branchTagMap = new HashMap<String, HashMap<String, String>>();
-                TagListActivity activity = mTarget.get();
-
-                HashMap<String, String> map = (HashMap<String, String>) service.getTags(
-                        activity.mUserLogin, activity.mRepoName);
-                branchTagMap.put("tags", map);
-
-                return branchTagMap;
+            if (mTarget.get() != null) {
+                try {
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    RepositoryService service = factory.createRepositoryService();
+                    HashMap<String, HashMap<String, String>> branchTagMap = new HashMap<String, HashMap<String, String>>();
+                    TagListActivity activity = mTarget.get();
+    
+                    HashMap<String, String> map = (HashMap<String, String>) service.getTags(
+                            activity.mUserLogin, activity.mRepoName);
+                    branchTagMap.put("tags", map);
+    
+                    return branchTagMap;
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
                 return null;
             }
         }
@@ -148,7 +153,9 @@ public class TagListActivity extends BaseActivity {
          */
         @Override
         protected void onPreExecute() {
-            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            }
         }
 
         /*
@@ -157,12 +164,14 @@ public class TagListActivity extends BaseActivity {
          */
         @Override
         protected void onPostExecute(HashMap<String, HashMap<String, String>> result) {
-            if (mException) {
-                mTarget.get().showError();
-            }
-            else {
-                mTarget.get().fillData(result);
-                mTarget.get().mLoadingDialog.dismiss();
+            if (mTarget.get() != null) {
+                if (mException) {
+                    mTarget.get().showError();
+                }
+                else {
+                    mTarget.get().fillData(result);
+                    mTarget.get().mLoadingDialog.dismiss();
+                }
             }
         }
     }

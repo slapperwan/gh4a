@@ -168,16 +168,21 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
          */
         @Override
         protected List<Issue> doInBackground(Void... params) {
-            try {
-                IssueListActivity activity = mTarget.get();
-                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                IssueService service = factory.createIssueService();
-                return service.getIssues(activity.mUserLogin, activity.mRepoName, State
-                        .valueOf(activity.mState));
+            if (mTarget.get() != null) {
+                try {
+                    IssueListActivity activity = mTarget.get();
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    IssueService service = factory.createIssueService();
+                    return service.getIssues(activity.mUserLogin, activity.mRepoName, State
+                            .valueOf(activity.mState));
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
                 return null;
             }
         }
@@ -188,7 +193,9 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
          */
         @Override
         protected void onPreExecute() {
-            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, mHideMainView);
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, mHideMainView);
+            }
         }
 
         /*
@@ -197,14 +204,16 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
          */
         @Override
         protected void onPostExecute(List<Issue> result) {
-            IssueListActivity activity = mTarget.get();
-            activity.mLoadingDialog.dismiss();
-
-            if (mException) {
-                activity.showError();
-            }
-            else {
-                activity.fillData(result);
+            if (mTarget.get() != null) {
+                IssueListActivity activity = mTarget.get();
+                activity.mLoadingDialog.dismiss();
+    
+                if (mException) {
+                    activity.showError();
+                }
+                else {
+                    activity.fillData(result);
+                }
             }
         }
     }

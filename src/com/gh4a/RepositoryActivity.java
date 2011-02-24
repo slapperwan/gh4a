@@ -230,17 +230,22 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
          */
         @Override
         protected Repository doInBackground(Void... arg0) {
-            try {
-                RepositoryActivity activity = mTarget.get();
-                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                RepositoryService repositoryService = factory.createRepositoryService();
-                return repositoryService.getRepository(activity.mBundle
-                        .getString(Constants.Repository.REPO_OWNER), activity.mBundle
-                        .getString(Constants.Repository.REPO_NAME));
+            if (mTarget.get() != null) {
+                try {
+                    RepositoryActivity activity = mTarget.get();
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    RepositoryService repositoryService = factory.createRepositoryService();
+                    return repositoryService.getRepository(activity.mBundle
+                            .getString(Constants.Repository.REPO_OWNER), activity.mBundle
+                            .getString(Constants.Repository.REPO_NAME));
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
                 return null;
             }
         }
@@ -251,17 +256,19 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
          */
         @Override
         protected void onPostExecute(Repository result) {
-            RepositoryActivity activity = mTarget.get();
-            if (activity.mLoadingDialog != null && activity.mLoadingDialog.isShowing()) {
-                activity.mLoadingDialog.dismiss();
-            }
-
-            if (mException) {
-                activity.showError();
-            }
-            else {
-                activity.mBundle = activity.getApplicationContext().populateRepository(result);
-                activity.fillData();
+            if (mTarget.get() != null) {
+                RepositoryActivity activity = mTarget.get();
+                if (activity.mLoadingDialog != null && activity.mLoadingDialog.isShowing()) {
+                    activity.mLoadingDialog.dismiss();
+                }
+    
+                if (mException) {
+                    activity.showError();
+                }
+                else {
+                    activity.mBundle = activity.getApplicationContext().populateRepository(result);
+                    activity.fillData();
+                }
             }
         }
     }
@@ -292,9 +299,11 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
          */
         @Override
         protected void onPreExecute() {
-            // skip loading if this is not a forked repo
-            if (!mTarget.get().mBundle.getBoolean(Constants.Repository.REPO_IS_FORKED)) {
-                cancel(false);
+            if (mTarget.get() != null) {
+                // skip loading if this is not a forked repo
+                if (!mTarget.get().mBundle.getBoolean(Constants.Repository.REPO_IS_FORKED)) {
+                    cancel(false);
+                }
             }
         }
 
@@ -304,16 +313,21 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
          */
         @Override
         protected Integer doInBackground(Void... arg0) {
-            try {
-                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                RepositoryService repositoryService = factory.createRepositoryService();
-                return repositoryService.getForks(
-                        mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER),
-                        mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME)).size();
+            if (mTarget.get() != null) {
+                try {
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    RepositoryService repositoryService = factory.createRepositoryService();
+                    return repositoryService.getForks(
+                            mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER),
+                            mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME)).size();
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
                 return null;
             }
         }
@@ -324,11 +338,13 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
          */
         @Override
         protected void onPostExecute(Integer result) {
-            if (mException) {
-                mTarget.get().showError();
-            }
-            else {
-                mTarget.get().fillWatchers(result);
+            if (mTarget.get() != null) {
+                if (mException) {
+                    mTarget.get().showError();
+                }
+                else {
+                    mTarget.get().fillWatchers(result);
+                }
             }
         }
 
@@ -638,26 +654,31 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
          */
         @Override
         protected Boolean doInBackground(Boolean... arg0) {
-            isWatchAction = arg0[0];
-            try {
-                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                RepositoryService repositoryService = factory.createRepositoryService();
-                Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                        mTarget.get().getAuthPassword());
-                repositoryService.setAuthentication(auth);
-                if (isWatchAction) {
-                    repositoryService.watchRepository(mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER),
-                            mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME));
+            if (mTarget.get() != null) {
+                isWatchAction = arg0[0];
+                try {
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    RepositoryService repositoryService = factory.createRepositoryService();
+                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
+                            mTarget.get().getAuthPassword());
+                    repositoryService.setAuthentication(auth);
+                    if (isWatchAction) {
+                        repositoryService.watchRepository(mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER),
+                                mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME));
+                    }
+                    else {
+                        repositoryService.unwatchRepository(mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER),
+                                mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME));
+                    }
+                    return true;
                 }
-                else {
-                    repositoryService.unwatchRepository(mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER),
-                            mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME));
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
                 }
-                return true;
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
                 return null;
             }
         }
@@ -667,7 +688,9 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
          */
         @Override
         protected void onPreExecute() {
-            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, false);
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, false);
+            }
         }
         
         /*
@@ -676,33 +699,35 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
          */
         @Override
         protected void onPostExecute(Boolean result) {
-            mTarget.get().mLoadingDialog.dismiss();
-            if (mException) {
-                if (isWatchAction) {
-                    mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.repo_error_watch,
-                            mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER) 
-                            + "/" + mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME)),
-                            false);
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog.dismiss();
+                if (mException) {
+                    if (isWatchAction) {
+                        mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.repo_error_watch,
+                                mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER) 
+                                + "/" + mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME)),
+                                false);
+                    }
+                    else {
+                        mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.repo_error_unwatch,
+                                mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER)
+                                + "/" + mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME)),
+                                false);
+                    }
                 }
                 else {
-                    mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.repo_error_unwatch,
-                            mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER)
-                            + "/" + mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME)),
-                            false);
-                }
-            }
-            else {
-                if (isWatchAction) {
-                    mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.repo_success_watch,
-                            mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER)
-                            + "/" + mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME)),
-                            false);
-                }
-                else {
-                    mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.repo_success_unwatch,
-                            mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER)
-                            + "/" + mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME)),
-                            false);
+                    if (isWatchAction) {
+                        mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.repo_success_watch,
+                                mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER)
+                                + "/" + mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME)),
+                                false);
+                    }
+                    else {
+                        mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.repo_success_unwatch,
+                                mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER)
+                                + "/" + mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME)),
+                                false);
+                    }
                 }
             }
         }
@@ -735,19 +760,24 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
          */
         @Override
         protected Boolean doInBackground(Boolean... arg0) {
-            try {
-                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                RepositoryService repositoryService = factory.createRepositoryService();
-                Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                        mTarget.get().getAuthPassword());
-                repositoryService.setAuthentication(auth);
-                repositoryService.forkRepository(mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER),
-                        mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME));
-                return true;
+            if (mTarget.get() != null) {
+                try {
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    RepositoryService repositoryService = factory.createRepositoryService();
+                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
+                            mTarget.get().getAuthPassword());
+                    repositoryService.setAuthentication(auth);
+                    repositoryService.forkRepository(mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER),
+                            mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME));
+                    return true;
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
                 return null;
             }
         }
@@ -757,7 +787,9 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
          */
         @Override
         protected void onPreExecute() {
-            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, false);
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, false);
+            }
         }
         
         /*
@@ -766,18 +798,20 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
          */
         @Override
         protected void onPostExecute(Boolean result) {
-            mTarget.get().mLoadingDialog.dismiss();
-            if (mException) {
-                mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.repo_error_fork,
-                        mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER),
-                        mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME)),
-                        false);
-            }
-            else {
-                mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.repo_success_fork,
-                        mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER),
-                        mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME)),
-                        false);
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog.dismiss();
+                if (mException) {
+                    mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.repo_error_fork,
+                            mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER),
+                            mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME)),
+                            false);
+                }
+                else {
+                    mTarget.get().showMessage(mTarget.get().getResources().getString(R.string.repo_success_fork,
+                            mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER),
+                            mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME)),
+                            false);
+                }
             }
         }
     }

@@ -18,7 +18,7 @@
         android:layout_marginRight="5dp"
         android:layout_marginTop="5dp" />
     <TextView
-        android:id="@+id/tv_desc"
+        android:id="@+id/tv_title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
@@ -29,5 +29,5 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_toRightOf="@id/iv_gravatar"
-        android:layout_below="@id/tv_desc" />
+        android:layout_below="@id/tv_title" />
 </RelativeLayout>

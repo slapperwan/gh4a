@@ -234,11 +234,13 @@ public class SearchActivity extends BaseActivity {
          */
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-            User user = (User) adapterView.getAdapter().getItem(position);
-            Intent intent = new Intent().setClass(mTarget.get(), UserActivity.class);
-            intent.putExtra(Constants.User.USER_LOGIN, (String) user.getLogin());
-            intent.putExtra(Constants.User.USER_NAME, (String) user.getName());
-            mTarget.get().startActivity(intent);
+            if (mTarget.get() != null) {
+                User user = (User) adapterView.getAdapter().getItem(position);
+                Intent intent = new Intent().setClass(mTarget.get(), UserActivity.class);
+                intent.putExtra(Constants.User.USER_LOGIN, (String) user.getLogin());
+                intent.putExtra(Constants.User.USER_NAME, (String) user.getName());
+                mTarget.get().startActivity(intent);
+            }
         }
     }
 
@@ -306,10 +308,12 @@ public class SearchActivity extends BaseActivity {
          */
         @Override
         public void onScrollStateChanged(AbsListView view, int scrollState) {
-            if (mTarget.get().mReload && scrollState == SCROLL_STATE_IDLE) {
-                new LoadRepositoryTask(mTarget.get()).execute(new String[] { searchKey, language,
-                        "false" });
-                mTarget.get().mReload = false;
+            if (mTarget.get() != null) {
+                if (mTarget.get().mReload && scrollState == SCROLL_STATE_IDLE) {
+                    new LoadRepositoryTask(mTarget.get()).execute(new String[] { searchKey, language,
+                            "false" });
+                    mTarget.get().mReload = false;
+                }
             }
         }
 
@@ -322,10 +326,12 @@ public class SearchActivity extends BaseActivity {
         @Override
         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
                 int totalItemCount) {
-            if (!mTarget.get().mLoading && firstVisibleItem != 0
-                    && ((firstVisibleItem + visibleItemCount) == totalItemCount)) {
-                mTarget.get().mReload = true;
-                mTarget.get().mLoading = true;
+            if (mTarget.get() != null) {
+                if (!mTarget.get().mLoading && firstVisibleItem != 0
+                        && ((firstVisibleItem + visibleItemCount) == totalItemCount)) {
+                    mTarget.get().mReload = true;
+                    mTarget.get().mLoading = true;
+                }
             }
         }
     }
@@ -387,13 +393,18 @@ public class SearchActivity extends BaseActivity {
          */
         @Override
         protected List<Repository> doInBackground(String... params) {
-            this.mHideMainView = Boolean.valueOf(params[2]);
-            try {
-                return mTarget.get().getRepositories(params[0], params[1]);
+            if (mTarget.get() != null) {
+                this.mHideMainView = Boolean.valueOf(params[2]);
+                try {
+                    return mTarget.get().getRepositories(params[0], params[1]);
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
                 return null;
             }
         }
@@ -404,13 +415,15 @@ public class SearchActivity extends BaseActivity {
          */
         @Override
         protected void onPreExecute() {
-            if (mTarget.get().mPage == 1) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true,
-                        mHideMainView);
-            }
-            else {
-                TextView loadingView = (TextView) mTarget.get().findViewById(R.id.tv_loading);
-                loadingView.setVisibility(View.VISIBLE);
+            if (mTarget.get() != null) {
+                if (mTarget.get().mPage == 1) {
+                    mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true,
+                            mHideMainView);
+                }
+                else {
+                    TextView loadingView = (TextView) mTarget.get().findViewById(R.id.tv_loading);
+                    loadingView.setVisibility(View.VISIBLE);
+                }
             }
         }
 
@@ -420,23 +433,25 @@ public class SearchActivity extends BaseActivity {
          */
         @Override
         protected void onPostExecute(List<Repository> result) {
-            SearchActivity activity = mTarget.get();
-            if (mException) {
-                mTarget.get().showError(false);
+            if (mTarget.get() != null) {
+                SearchActivity activity = mTarget.get();
+                if (mException) {
+                    mTarget.get().showError(false);
+                }
+                else {
+                    activity.fillRepositoriesData();
+                }
+    
+                if (activity.mLoadingDialog != null && activity.mLoadingDialog.isShowing()) {
+                    activity.mLoadingDialog.dismiss();
+                }
+    
+                TextView loadingView = (TextView) mTarget.get().findViewById(R.id.tv_loading);
+                loadingView.setVisibility(View.GONE);
+    
+                activity.mFirstTimeSearch = false;
+                activity.mLoading = false;
             }
-            else {
-                activity.fillRepositoriesData();
-            }
-
-            if (activity.mLoadingDialog != null && activity.mLoadingDialog.isShowing()) {
-                activity.mLoadingDialog.dismiss();
-            }
-
-            TextView loadingView = (TextView) mTarget.get().findViewById(R.id.tv_loading);
-            loadingView.setVisibility(View.GONE);
-
-            activity.mFirstTimeSearch = false;
-            activity.mLoading = false;
         }
     }
 
@@ -466,12 +481,17 @@ public class SearchActivity extends BaseActivity {
          */
         @Override
         protected List<User> doInBackground(String... params) {
-            try {
-                return mTarget.get().getUsers(params[0]);
+            if (mTarget.get() != null) {
+                try {
+                    return mTarget.get().getUsers(params[0]);
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
                 return null;
             }
         }
@@ -482,7 +502,9 @@ public class SearchActivity extends BaseActivity {
          */
         @Override
         protected void onPreExecute() {
-            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            }
         }
 
         /*
@@ -491,21 +513,22 @@ public class SearchActivity extends BaseActivity {
          */
         @Override
         protected void onPostExecute(List<User> result) {
-            SearchActivity activity = mTarget.get();
-            if (mException) {
-                mTarget.get().showError(false);
+            if (mTarget.get() != null) {
+                SearchActivity activity = mTarget.get();
+                if (mException) {
+                    mTarget.get().showError(false);
+                }
+                else {
+                    activity.fillUsersData(result);
+                }
+    
+                if (activity.mLoadingDialog != null && activity.mLoadingDialog.isShowing()) {
+                    activity.mLoadingDialog.dismiss();
+                }
+                
+                activity.mFirstTimeSearch = false;
             }
-            else {
-                activity.fillUsersData(result);
-            }
-
-            if (activity.mLoadingDialog != null && activity.mLoadingDialog.isShowing()) {
-                activity.mLoadingDialog.dismiss();
-            }
-            
-            activity.mFirstTimeSearch = false;
         }
-
     }
 
     /**
@@ -534,13 +557,15 @@ public class SearchActivity extends BaseActivity {
          */
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-            Repository repository = (Repository) adapterView.getAdapter().getItem(position);
-            Intent intent = new Intent().setClass(mTarget.get(), RepositoryActivity.class);
-
-            Bundle data = mTarget.get().getApplicationContext().populateRepository(repository);
-
-            intent.putExtra(Constants.DATA_BUNDLE, data);
-            mTarget.get().startActivity(intent);
+            if (mTarget.get() != null) {
+                Repository repository = (Repository) adapterView.getAdapter().getItem(position);
+                Intent intent = new Intent().setClass(mTarget.get(), RepositoryActivity.class);
+    
+                Bundle data = mTarget.get().getApplicationContext().populateRepository(repository);
+    
+                intent.putExtra(Constants.DATA_BUNDLE, data);
+                mTarget.get().startActivity(intent);
+            }
         }
     }
 

@@ -166,13 +166,18 @@ public class RepositoryListActivity extends BaseActivity implements OnScrollList
          */
         @Override
         protected List<Repository> doInBackground(Boolean... params) {
-            try {
-                this.hideMainView = params[0];
-                return mTarget.get().getRepositories();
+            if (mTarget.get() != null) {
+                try {
+                    this.hideMainView = params[0];
+                    return mTarget.get().getRepositories();
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
                 return null;
             }
         }
@@ -183,8 +188,10 @@ public class RepositoryListActivity extends BaseActivity implements OnScrollList
          */
         @Override
         protected void onPreExecute() {
-            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true,
-                    hideMainView);
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true,
+                        hideMainView);
+            }
         }
 
         /*
@@ -193,15 +200,17 @@ public class RepositoryListActivity extends BaseActivity implements OnScrollList
          */
         @Override
         protected void onPostExecute(List<Repository> result) {
-            RepositoryListActivity activity = mTarget.get();
-            activity.mLoadingDialog.dismiss();
-            if (mException) {
-                activity.showError();
-            }
-            else {
-                activity.fillData(result);
-                activity.mReloading = false;
-                activity.mPage++;
+            if (mTarget.get() != null) {
+                RepositoryListActivity activity = mTarget.get();
+                activity.mLoadingDialog.dismiss();
+                if (mException) {
+                    activity.showError();
+                }
+                else {
+                    activity.fillData(result);
+                    activity.mReloading = false;
+                    activity.mPage++;
+                }
             }
         }
     }

@@ -171,15 +171,20 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
          */
         @Override
         protected List<PullRequest> doInBackground(Void... params) {
-            try {
-                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                PullRequestService pullRequestService = factory.createPullRequestService();
-                return pullRequestService.getPullRequests(mTarget.get().mUserLogin,
-                        mTarget.get().mRepoName, State.valueOf(mTarget.get().mState));
+            if (mTarget.get() != null) {
+                try {
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    PullRequestService pullRequestService = factory.createPullRequestService();
+                    return pullRequestService.getPullRequests(mTarget.get().mUserLogin,
+                            mTarget.get().mRepoName, State.valueOf(mTarget.get().mState));
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
                 return null;
             }
         }
@@ -190,7 +195,9 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
          */
         @Override
         protected void onPreExecute() {
-            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, mHideMainView);
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, mHideMainView);
+            }
         }
 
         /*
@@ -199,12 +206,14 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
          */
         @Override
         protected void onPostExecute(List<PullRequest> result) {
-            if (mException) {
-                mTarget.get().showError();
-            }
-            else {
-                mTarget.get().fillData(result);
-                mTarget.get().mLoadingDialog.dismiss();
+            if (mTarget.get() != null) {
+                if (mException) {
+                    mTarget.get().showError();
+                }
+                else {
+                    mTarget.get().fillData(result);
+                    mTarget.get().mLoadingDialog.dismiss();
+                }
             }
         }
     }

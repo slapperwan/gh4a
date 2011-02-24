@@ -37,11 +37,9 @@ import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
 import com.github.api.v2.schema.Commit;
 import com.github.api.v2.schema.Delta;
-import com.github.api.v2.schema.User;
 import com.github.api.v2.services.CommitService;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.UserService;
 
 /**
  * The Commit activity.
@@ -60,9 +58,6 @@ public class CommitActivity extends BaseActivity {
     /** The object sha. */
     protected String mObjectSha;
     
-    /** The tree sha. */
-    private String mTreeSha;
-
     /**
      * Called when the activity is first created.
      * 
@@ -79,7 +74,6 @@ public class CommitActivity extends BaseActivity {
         mUserLogin = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
         mObjectSha = data.getString(Constants.Object.OBJECT_SHA);
-        mTreeSha = data.getString(Constants.Object.TREE_SHA);
 
         setBreadCrumb();
 
@@ -141,16 +135,21 @@ public class CommitActivity extends BaseActivity {
          */
         @Override
         protected Commit doInBackground(Void... params) {
-            try {
-                CommitActivity activity = mTarget.get();
-                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                CommitService commitService = factory.createCommitService();
-                return commitService.getCommit(activity.mUserLogin, activity.mRepoName,
-                        activity.mObjectSha);
+            if (mTarget.get() != null) {
+                try {
+                    CommitActivity activity = mTarget.get();
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    CommitService commitService = factory.createCommitService();
+                    return commitService.getCommit(activity.mUserLogin, activity.mRepoName,
+                            activity.mObjectSha);
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
                 return null;
             }
         }
@@ -161,8 +160,10 @@ public class CommitActivity extends BaseActivity {
          */
         @Override
         protected void onPreExecute() {
-            CommitActivity activity = mTarget.get();
-            activity.mLoadingDialog = LoadingDialog.show(activity, true, true);
+            if (mTarget.get() != null) {
+                CommitActivity activity = mTarget.get();
+                activity.mLoadingDialog = LoadingDialog.show(activity, true, true);
+            }
         }
 
         /*
@@ -171,71 +172,17 @@ public class CommitActivity extends BaseActivity {
          */
         @Override
         protected void onPostExecute(Commit result) {
-            mTarget.get().mLoadingDialog.dismiss();
-            if (mException) {
-                mTarget.get().showError();
-            }
-            else {
-                mTarget.get().fillData(result);
-            }
-        }
-
-    }
-
-    /**
-     * An asynchronous task that runs on a background thread to load user info.
-     */
-    private static class LoadUserInfoTask extends AsyncTask<Commit, Integer, User> {
-
-        /** The target. */
-        private WeakReference<CommitActivity> mTarget;
-
-        /**
-         * Instantiates a new load user info task.
-         *
-         * @param activity the activity
-         */
-        public LoadUserInfoTask(CommitActivity activity) {
-            mTarget = new WeakReference<CommitActivity>(activity);
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
-        @Override
-        protected User doInBackground(Commit... commit) {
-            GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-            UserService userService = factory.createUserService();
-            if (!StringUtils.isBlank(commit[0].getCommitter().getLogin())) {
-                return userService.getUserByUsername(commit[0].getCommitter().getLogin());
-            }
-            return null;
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
-        @Override
-        protected void onPostExecute(final User result) {
-            final CommitActivity activity = mTarget.get();
-            if (result != null) {
-                ImageView ivGravatar = (ImageView) activity.findViewById(R.id.iv_gravatar);
-                ImageDownloader.getInstance().download(result.getGravatarId(), ivGravatar);
-                if (!StringUtils.isBlank(result.getLogin())) {
-                    ivGravatar.setOnClickListener(new OnClickListener() {
-
-                        @Override
-                        public void onClick(View v) {
-                            /** Open user activity */
-                            activity.getApplicationContext().openUserInfoActivity(activity,
-                                    result.getLogin(), result.getName());
-                        }
-                    });
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog.dismiss();
+                if (mException) {
+                    mTarget.get().showError();
+                }
+                else {
+                    mTarget.get().fillData(result);
                 }
             }
         }
+
     }
 
     /**

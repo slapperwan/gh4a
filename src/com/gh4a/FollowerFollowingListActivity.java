@@ -132,25 +132,29 @@ public class FollowerFollowingListActivity extends BaseActivity implements OnIte
          */
         @Override
         protected List<String> doInBackground(Void... params) {
-            try {
-                FollowerFollowingListActivity activity = mTarget.get();
-                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                UserService service = factory.createUserService();
-                List<String> usernames = new ArrayList<String>();
-                if (activity.mFindFollowers) {
-                    usernames = service.getUserFollowers(activity.mUserLogin);
+            if (mTarget.get() != null) {
+                try {
+                    FollowerFollowingListActivity activity = mTarget.get();
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    UserService service = factory.createUserService();
+                    List<String> usernames = new ArrayList<String>();
+                    if (activity.mFindFollowers) {
+                        usernames = service.getUserFollowers(activity.mUserLogin);
+                    }
+                    else {
+                        usernames = service.getUserFollowing(activity.mUserLogin);
+                    }
+                    return usernames;
                 }
-                else {
-                    usernames = service.getUserFollowing(activity.mUserLogin);
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
                 }
-                return usernames;
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
                 return null;
             }
-
         }
 
         /*
@@ -159,8 +163,10 @@ public class FollowerFollowingListActivity extends BaseActivity implements OnIte
          */
         @Override
         protected void onPreExecute() {
-            FollowerFollowingListActivity activity = mTarget.get();
-            activity.mLoadingDialog = LoadingDialog.show(activity, true, true);
+            if (mTarget.get() != null) {
+                FollowerFollowingListActivity activity = mTarget.get();
+                activity.mLoadingDialog = LoadingDialog.show(activity, true, true);
+            }
         }
 
         /*
@@ -169,14 +175,16 @@ public class FollowerFollowingListActivity extends BaseActivity implements OnIte
          */
         @Override
         protected void onPostExecute(List<String> result) {
-            FollowerFollowingListActivity activity = mTarget.get();
-            activity.mLoadingDialog.dismiss();
-
-            if (mException) {
-                activity.showError();
-            }
-            else {
-                activity.fillData(result);
+            if (mTarget.get() != null) {
+                FollowerFollowingListActivity activity = mTarget.get();
+                activity.mLoadingDialog.dismiss();
+    
+                if (mException) {
+                    activity.showError();
+                }
+                else {
+                    activity.fillData(result);
+                }
             }
         }
     }

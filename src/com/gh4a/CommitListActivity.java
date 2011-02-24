@@ -197,31 +197,36 @@ public class CommitListActivity extends BaseActivity implements OnScrollListener
          */
         @Override
         protected List<Commit> doInBackground(String... params) {
-            if (!mTarget.get().lastPage) {
-                this.mHideMainView = Boolean.valueOf(params[0]);
-                CommitListActivity activity = mTarget.get();
-                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                CommitService commitService = factory.createCommitService();
-                try {
-                    List<Commit> commits = commitService.getCommits(activity.mUserLogin,
-                            activity.mRepoName, activity.mBranchName, activity.mPage);
-                    activity.mPage++;
-                    return commits;
-                }
-                catch (GitHubException e) {
-                    if (!e.getMessage().contains("Not Found")) {
-                        Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                        mException = true;
-                        return null;
+            if (mTarget.get() != null) {
+                if (!mTarget.get().lastPage) {
+                    this.mHideMainView = Boolean.valueOf(params[0]);
+                    CommitListActivity activity = mTarget.get();
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    CommitService commitService = factory.createCommitService();
+                    try {
+                        List<Commit> commits = commitService.getCommits(activity.mUserLogin,
+                                activity.mRepoName, activity.mBranchName, activity.mPage);
+                        activity.mPage++;
+                        return commits;
                     }
-                    else {
-                        mException = false;
-                        activity.lastPage = true;
-                        return null;
+                    catch (GitHubException e) {
+                        if (!e.getMessage().contains("Not Found")) {
+                            Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                            mException = true;
+                            return null;
+                        }
+                        else {
+                            mException = false;
+                            activity.lastPage = true;
+                            return null;
+                        }
                     }
                 }
+                return null;
             }
-            return null;
+            else {
+                return null;
+            }
         }
 
         /*
@@ -230,17 +235,19 @@ public class CommitListActivity extends BaseActivity implements OnScrollListener
          */
         @Override
         protected void onPreExecute() {
-            if (mTarget.get().mPage == 1) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true,
-                        mHideMainView);
-            }
-            else {
-                TextView loadingView = (TextView) mTarget.get().findViewById(R.id.tv_loading);
-                if (mTarget.get().lastPage) {
-                    Toast.makeText(mTarget.get(), "No more result", Toast.LENGTH_SHORT).show();
+            if (mTarget.get() != null) {
+                if (mTarget.get().mPage == 1) {
+                    mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true,
+                            mHideMainView);
                 }
                 else {
-                    loadingView.setVisibility(View.VISIBLE);
+                    TextView loadingView = (TextView) mTarget.get().findViewById(R.id.tv_loading);
+                    if (mTarget.get().lastPage) {
+                        Toast.makeText(mTarget.get(), "No more result", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        loadingView.setVisibility(View.VISIBLE);
+                    }
                 }
             }
         }
@@ -251,23 +258,25 @@ public class CommitListActivity extends BaseActivity implements OnScrollListener
          */
         @Override
         protected void onPostExecute(List<Commit> result) {
-            CommitListActivity activity = mTarget.get();
-
-            if (activity.mLoadingDialog != null && activity.mLoadingDialog.isShowing()) {
-                activity.mLoadingDialog.dismiss();
-            }
-
-            TextView loadingView = (TextView) mTarget.get().findViewById(R.id.tv_loading);
-            loadingView.setVisibility(View.GONE);
-
-            if (mException) {
-                activity.showError();
-            }
-            else {
-                if (result != null) {
-                    activity.fillData(result);
+            if (mTarget.get() != null) {
+                CommitListActivity activity = mTarget.get();
+    
+                if (activity.mLoadingDialog != null && activity.mLoadingDialog.isShowing()) {
+                    activity.mLoadingDialog.dismiss();
                 }
-                activity.mLoading = false;
+    
+                TextView loadingView = (TextView) mTarget.get().findViewById(R.id.tv_loading);
+                loadingView.setVisibility(View.GONE);
+    
+                if (mException) {
+                    activity.showError();
+                }
+                else {
+                    if (result != null) {
+                        activity.fillData(result);
+                    }
+                    activity.mLoading = false;
+                }
             }
         }
     }

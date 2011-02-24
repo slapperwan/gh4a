@@ -24,8 +24,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -262,12 +260,17 @@ public class IssueActivity extends BaseActivity {
          */
         @Override
         protected Bundle doInBackground(Void... params) {
-            try {
-                return mTarget.get().getIssue();
+            if (mTarget.get() != null) {
+                try {
+                    return mTarget.get().getIssue();
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
                 return null;
             }
         }
@@ -278,7 +281,9 @@ public class IssueActivity extends BaseActivity {
          */
         @Override
         protected void onPreExecute() {
-            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            }
         }
 
         /*
@@ -287,14 +292,16 @@ public class IssueActivity extends BaseActivity {
          */
         @Override
         protected void onPostExecute(Bundle result) {
-            IssueActivity activity = mTarget.get();
-            activity.mLoadingDialog.dismiss();
-
-            if (mException) {
-                activity.showError();
-            }
-            else {
-                activity.fillData();
+            if (mTarget.get() != null) {
+                IssueActivity activity = mTarget.get();
+                activity.mLoadingDialog.dismiss();
+    
+                if (mException) {
+                    activity.showError();
+                }
+                else {
+                    activity.fillData();
+                }
             }
         }
     }
@@ -322,8 +329,10 @@ public class IssueActivity extends BaseActivity {
          */
         @Override
         public void onClick(View view) {
-            if (!mTarget.get().mCommentsLoaded) {
-                new LoadCommentsTask(mTarget.get()).execute(false);
+            if (mTarget.get() != null) {
+                if (!mTarget.get().mCommentsLoaded) {
+                    new LoadCommentsTask(mTarget.get()).execute(false);
+                }
             }
         }
     }
@@ -369,13 +378,18 @@ public class IssueActivity extends BaseActivity {
          */
         @Override
         protected List<Comment> doInBackground(Boolean... params) {
-            try {
-                this.hideMainView = params[0];
-                return mTarget.get().getComments();
+            if (mTarget.get() != null) {
+                try {
+                    this.hideMainView = params[0];
+                    return mTarget.get().getComments();
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
                 return null;
             }
         }
@@ -386,8 +400,10 @@ public class IssueActivity extends BaseActivity {
          */
         @Override
         protected void onPreExecute() {
-            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true,
-                    hideMainView);
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true,
+                        hideMainView);
+            }
         }
 
         /*
@@ -396,14 +412,16 @@ public class IssueActivity extends BaseActivity {
          */
         @Override
         protected void onPostExecute(List<Comment> result) {
-            IssueActivity activity = mTarget.get();
-            activity.mLoadingDialog.dismiss();
-
-            if (mException) {
-                activity.showError();
-            }
-            else {
-                activity.fillComments(result);
+            if (mTarget.get() != null) {
+                IssueActivity activity = mTarget.get();
+                activity.mLoadingDialog.dismiss();
+    
+                if (mException) {
+                    activity.showError();
+                }
+                else {
+                    activity.fillComments(result);
+                }
             }
         }
     }

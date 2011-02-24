@@ -172,16 +172,21 @@ public class FileManagerActivity extends BaseActivity implements OnItemClickList
          */
         @Override
         protected List<Tree> doInBackground(Void... params) {
-            try {
-                FileManagerActivity activity = mTarget.get();
-                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                ObjectService objectService = factory.createObjectService();
-                return objectService.getTree(activity.mUserLogin, activity.mRepoName,
-                        activity.mObjectSha);
+            if (mTarget.get() != null) {
+                try {
+                    FileManagerActivity activity = mTarget.get();
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    ObjectService objectService = factory.createObjectService();
+                    return objectService.getTree(activity.mUserLogin, activity.mRepoName,
+                            activity.mObjectSha);
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
                 return null;
             }
         }
@@ -192,7 +197,9 @@ public class FileManagerActivity extends BaseActivity implements OnItemClickList
          */
         @Override
         protected void onPreExecute() {
-            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            }
         }
 
         /*
@@ -201,12 +208,14 @@ public class FileManagerActivity extends BaseActivity implements OnItemClickList
          */
         @Override
         protected void onPostExecute(List<Tree> result) {
-            if (mException) {
-                mTarget.get().showError();
-            }
-            else {
-                mTarget.get().fillData(result);
-                mTarget.get().mLoadingDialog.dismiss();
+            if (mTarget.get() != null) {
+                if (mException) {
+                    mTarget.get().showError();
+                }
+                else {
+                    mTarget.get().fillData(result);
+                    mTarget.get().mLoadingDialog.dismiss();
+                }
             }
         }
     }

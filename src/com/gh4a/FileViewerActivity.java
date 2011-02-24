@@ -187,29 +187,34 @@ public class FileViewerActivity extends BaseActivity {
          */
         @Override
         protected InputStream doInBackground(Void... params) {
-            try {
-                FileViewerActivity activity = mTarget.get();
-                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                ObjectService objectService = factory.createObjectService();
-
-                // only show mimetype text/* and xml to WebView, else open
-                // default browser
-                if (activity.mMimeType.startsWith("text")
-                        || activity.mMimeType.equals("application/xml")
-                        || activity.mMimeType.equals("application/sh")) {
-                    showInBrowser = false;
-                    return objectService.getObjectContent(activity.mUserLogin, activity.mRepoName,
-                            activity.mObjectSha);
+            if (mTarget.get() != null) {
+                try {
+                    FileViewerActivity activity = mTarget.get();
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    ObjectService objectService = factory.createObjectService();
+    
+                    // only show mimetype text/* and xml to WebView, else open
+                    // default browser
+                    if (activity.mMimeType.startsWith("text")
+                            || activity.mMimeType.equals("application/xml")
+                            || activity.mMimeType.equals("application/sh")) {
+                        showInBrowser = false;
+                        return objectService.getObjectContent(activity.mUserLogin, activity.mRepoName,
+                                activity.mObjectSha);
+                    }
+                    else {
+                        showInBrowser = true;
+                        return null;
+                    }
+    
                 }
-                else {
-                    showInBrowser = true;
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
                     return null;
                 }
-
             }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
                 return null;
             }
         }
@@ -220,7 +225,9 @@ public class FileViewerActivity extends BaseActivity {
          */
         @Override
         protected void onPreExecute() {
-            mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            }
         }
 
         /*
@@ -229,20 +236,22 @@ public class FileViewerActivity extends BaseActivity {
          */
         @Override
         protected void onPostExecute(InputStream result) {
-            if (mException) {
-                mTarget.get().showError();
-            }
-            else {
-                if (showInBrowser) {
-                    String url = "https://github.com/" + mTarget.get().mUserLogin + "/"
-                            + mTarget.get().mRepoName + "/raw/" + mTarget.get().mBranchName + "/"
-                            + mTarget.get().mPath;
-                    mTarget.get().getApplicationContext().openBrowser(mTarget.get(), url);
-                    mTarget.get().mLoadingDialog.dismiss();
-                    mTarget.get().finish();
+            if (mTarget.get() != null) {
+                if (mException) {
+                    mTarget.get().showError();
                 }
                 else {
-                    mTarget.get().fillData(result);
+                    if (showInBrowser) {
+                        String url = "https://github.com/" + mTarget.get().mUserLogin + "/"
+                                + mTarget.get().mRepoName + "/raw/" + mTarget.get().mBranchName + "/"
+                                + mTarget.get().mPath;
+                        mTarget.get().getApplicationContext().openBrowser(mTarget.get(), url);
+                        mTarget.get().mLoadingDialog.dismiss();
+                        mTarget.get().finish();
+                    }
+                    else {
+                        mTarget.get().fillData(result);
+                    }
                 }
             }
         }
