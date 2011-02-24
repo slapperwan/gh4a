@@ -29,7 +29,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
-import com.gh4a.adapter.FollowerFollowingAdapter;
+import com.gh4a.adapter.SimpleStringAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
@@ -50,7 +50,7 @@ public class FollowerFollowingListActivity extends BaseActivity implements OnIte
     protected LoadingDialog mLoadingDialog;
 
     /** The follower following adapter. */
-    protected FollowerFollowingAdapter mFollowerFollowingAdapter;
+    protected SimpleStringAdapter mFollowerFollowingAdapter;
 
     /** The list view users. */
     protected ListView mListViewUsers;
@@ -80,7 +80,7 @@ public class FollowerFollowingListActivity extends BaseActivity implements OnIte
         mListViewUsers = (ListView) findViewById(R.id.list_view);
         mListViewUsers.setOnItemClickListener(this);
 
-        mFollowerFollowingAdapter = new FollowerFollowingAdapter(this, new ArrayList<String>());
+        mFollowerFollowingAdapter = new SimpleStringAdapter(this, new ArrayList<String>());
         mListViewUsers.setAdapter(mFollowerFollowingAdapter);
 
         new LoadListTask(this).execute();

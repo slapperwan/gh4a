@@ -222,6 +222,24 @@ public class IssueActivity extends BaseActivity {
         tvDesc.setText(mBundle.getString(Constants.Issue.ISSUE_BODY));
         btnComments.setText(String.valueOf(mBundle.getInt(Constants.Issue.ISSUE_COMMENTS)));
         btnComments.setOnClickListener(new ButtonCommentsListener(this));
+        
+        LinearLayout llLabels = (LinearLayout) findViewById(R.id.ll_labels);
+        ArrayList<CharSequence> labels = mBundle.getCharSequenceArrayList(Constants.Issue.ISSUE_LABELS);
+        if (labels != null && !labels.isEmpty()) {
+            for (CharSequence label : labels) {
+                TextView tvLabel = new TextView(getApplicationContext());
+                tvLabel.setSingleLine(true);
+                tvLabel.setText(label);
+                tvLabel.setTextAppearance(getApplicationContext(), R.style.default_text_small);
+                tvLabel.setBackgroundResource(R.drawable.default_grey_box);
+                
+                llLabels.addView(tvLabel);
+            }
+            llLabels.setVisibility(View.VISIBLE);
+        }
+        else {
+            llLabels.setVisibility(View.GONE);
+        }
     }
 
     /**

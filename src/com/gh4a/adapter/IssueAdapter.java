@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
@@ -59,11 +60,12 @@ public class IssueAdapter extends RootAdapter<Issue> {
 
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_gravatar_2, null);
+            v = vi.inflate(R.layout.row_issue, null);
             viewHolder = new ViewHolder();
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+            viewHolder.llLabels = (LinearLayout) v.findViewById(R.id.ll_labels);
             v.setTag(viewHolder);
         }
         else {
@@ -83,11 +85,30 @@ public class IssueAdapter extends RootAdapter<Issue> {
                     context.openUserInfoActivity(v.getContext(), issue.getUser(), null);
                 }
             });
-
+            
+            //show labels
+            viewHolder.llLabels.removeAllViews();
+            List<String> labels = issue.getLabels();
+            if (labels != null && !labels.isEmpty()) {
+                for (String label : labels) {
+                    TextView tvLabel = new TextView(v.getContext());
+                    tvLabel.setSingleLine(true);
+                    tvLabel.setText(label);
+                    tvLabel.setTextAppearance(v.getContext(), R.style.default_text_small);
+                    tvLabel.setBackgroundResource(R.drawable.default_grey_box);
+                    
+                    viewHolder.llLabels.addView(tvLabel);
+                }
+                viewHolder.llLabels.setVisibility(View.VISIBLE);
+            }
+            else {
+                viewHolder.llLabels.setVisibility(View.GONE);
+            }
+            
             viewHolder.tvDesc.setText(StringUtils.doTeaser(issue.getTitle()));
 
             Resources res = v.getResources();
-            String extraData = String.format(res.getString(R.string.more_data_3), issue.getUser(),
+            String extraData = res.getString(R.string.more_data_3, issue.getUser(),
                     pt.format(issue.getCreatedAt()), issue.getComments() + " "
                             + res.getQuantityString(R.plurals.issue_comment, issue.getComments()));
 
@@ -118,6 +139,9 @@ public class IssueAdapter extends RootAdapter<Issue> {
         
         /** The tv extra. */
         public TextView tvExtra;
+        
+        /** The ll labels. */
+        public LinearLayout llLabels;
 
     }
 }

@@ -139,6 +139,22 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
         createBreadcrumb(State.valueOf(mState).name() + " Issues", breadCrumbHolders);
     }
 
+    public String getSubTitleAfterLoaded(int numberOfIssues) {
+        if (numberOfIssues != -1) {
+            return State.valueOf(mState).name() + " Issues (" + numberOfIssues + ")";
+        }
+        else {
+            return State.valueOf(mState).name() + " Issues";
+        }
+    }
+    
+    public List<Issue> getIssues() throws GitHubException {
+        GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+        IssueService service = factory.createIssueService();
+        return service.getIssues(mUserLogin, mRepoName, State
+                .valueOf(mState));
+    }
+    
     /**
      * An asynchronous task that runs on a background thread to load issue list.
      */
@@ -170,11 +186,7 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
         protected List<Issue> doInBackground(Void... params) {
             if (mTarget.get() != null) {
                 try {
-                    IssueListActivity activity = mTarget.get();
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    IssueService service = factory.createIssueService();
-                    return service.getIssues(activity.mUserLogin, activity.mRepoName, State
-                            .valueOf(activity.mState));
+                    return mTarget.get().getIssues();
                 }
                 catch (GitHubException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
@@ -238,11 +250,11 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
             for (Issue issue : issues) {
                 mIssueAdapter.add(issue);
             }
-            ((TextView) findViewById(R.id.tv_subtitle)).setText(State.valueOf(mState).name() + " Issues (" + issues.size() + ")");
+            ((TextView) findViewById(R.id.tv_subtitle)).setText(getSubTitleAfterLoaded(issues.size()));
             mIssueAdapter.notifyDataSetChanged();
         }
         else {
-            ((TextView) findViewById(R.id.tv_subtitle)).setText(State.valueOf(mState).name() + " Issues");
+            ((TextView) findViewById(R.id.tv_subtitle)).setText(getSubTitleAfterLoaded(-1));
             getApplicationContext().notFoundMessage(this, R.plurals.issue);
         }
     }
@@ -280,15 +292,19 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
         
         switch (item.getItemId()) {
             case R.id.view_open_issues:
-                mState = Constants.Issue.ISSUE_STATE_OPEN;
-                new LoadIssueListTask(this, false).execute();
+                getApplicationContext().openIssueListActivity(this, mUserLogin, mRepoName, Constants.Issue.ISSUE_STATE_OPEN);
                 return true;
             case R.id.view_closed_issues:
-                mState = Constants.Issue.ISSUE_STATE_CLOSED;
-                new LoadIssueListTask(this, false).execute();
+                getApplicationContext().openIssueListActivity(this, mUserLogin, mRepoName, Constants.Issue.ISSUE_STATE_CLOSED);
                 return true;
             case R.id.create_issue:
-                Intent intent = new Intent().setClass(this, IssueCreateActivity.class);
+                Intent intent = new Intent().setClass(IssueListActivity.this, IssueCreateActivity.class);
+                intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                startActivity(intent);
+                return true;
+            case R.id.view_labels:
+                intent = new Intent().setClass(IssueListActivity.this, IssueLabelListActivity.class);
                 intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
                 intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                 startActivity(intent);

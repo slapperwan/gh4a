@@ -26,9 +26,9 @@ import android.widget.TextView;
 import com.gh4a.R;
 
 /**
- * The FollowerFollowing adapter.
+ * The SimpleString adapter.
  */
-public class FollowerFollowingAdapter extends RootAdapter<String> {
+public class SimpleStringAdapter extends RootAdapter<String> {
 
     /**
      * Instantiates a new follower following adapter.
@@ -36,7 +36,7 @@ public class FollowerFollowingAdapter extends RootAdapter<String> {
      * @param context the context
      * @param objects the objects
      */
-    public FollowerFollowingAdapter(Context context, List<String> objects) {
+    public SimpleStringAdapter(Context context, List<String> objects) {
         super(context, objects);
     }
 

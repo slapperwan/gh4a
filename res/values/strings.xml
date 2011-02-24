@@ -153,8 +153,8 @@
     <string name="issue_state">State</string>
     <string name="issue_created_at">Created at</string>
     <string name="issue_closed_at">Closed at</string>
-    <string name="issue_view_open_issues">View Open Issues</string>
-    <string name="issue_view_closed_issues">View Closed Issues</string>
+    <string name="issue_view_open_issues">View Open</string>
+    <string name="issue_view_closed_issues">View Closed</string>
     <string name="issue_create">Create Issue</string>
     <string name="issue_error_title">Please enter a title</string>
     <string name="issue_success_create">Successful create issue</string>
@@ -167,6 +167,7 @@
     <string name="issue_error_close">Cannot close issue</string>
     <string name="issue_success_reopen">Successful reopen issue</string>
     <string name="issue_error_reopen">Cannot reopen issue</string>
+    <string name="issue_view_labels">View Labels</string>
 
     <!-- Issue comment -->
     <plurals name="issue_comment">

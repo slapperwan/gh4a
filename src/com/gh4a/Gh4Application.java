@@ -16,6 +16,8 @@
 
 package com.gh4a;
 
+import java.util.ArrayList;
+
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -94,7 +96,9 @@ public class Gh4Application extends Application {
         data.putString(Constants.Issue.ISSUE_BODY, issue.getBody());
         data.putInt(Constants.Issue.ISSUE_COMMENTS, issue.getComments());
         data.putString(Constants.GRAVATAR_ID, issue.getGravatarId());
-
+        if (issue.getLabels() != null && !issue.getLabels().isEmpty()) {
+            data.putCharSequenceArrayList(Constants.Issue.ISSUE_LABELS, new ArrayList(issue.getLabels()));
+        }
         return data;
     }
 

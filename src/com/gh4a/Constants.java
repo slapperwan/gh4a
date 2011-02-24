@@ -169,6 +169,12 @@ public interface Constants {
 
         /** The Constant ISSUE_CREATED_BY. */
         public static final String ISSUE_CREATED_BY = "ISSUE_CREATED_BY";
+        
+        /** The Constant ISSUE_LABELS. */
+        public static final String ISSUE_LABELS = "ISSUE_LABELS";
+        
+        /** The Constant ISSUE_LABEL. */
+        public static final String ISSUE_LABEL = "ISSUE_LABEL";
     }
 
     /**

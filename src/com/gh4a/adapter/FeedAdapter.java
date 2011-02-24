@@ -22,7 +22,6 @@ import android.content.res.Resources;
 import android.text.SpannableString;
 import android.text.style.ClickableSpan;
 import android.text.style.TextAppearanceSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +31,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.ImageDownloader;
@@ -43,7 +41,6 @@ import com.github.api.v2.schema.PayloadPullRequest;
 import com.github.api.v2.schema.PayloadTarget;
 import com.github.api.v2.schema.Repository;
 import com.github.api.v2.schema.UserFeed;
-import com.ocpsoft.pretty.time.PrettyTime;
 
 /**
  * The Feed adapter.

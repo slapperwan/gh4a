@@ -79,6 +79,10 @@
         <activity
             android:name=".IssueEditActivity" />
         <activity
+            android:name=".IssueLabelListActivity" />
+        <activity
+            android:name=".IssueListByLabelActivity" />
+        <activity
             android:name="com.markupartist.android.widget.ActionBar" />
     </application>
     <uses-sdk
