@@ -134,6 +134,9 @@ public interface Constants {
      */
     public interface Issue {
 
+        /** The Constant ISSUE. */
+        public static final String ISSUE = "Issue.ISSUE";
+        
         /** The Constant ISSUES. */
         public static final String ISSUES = "Issue.ISSUES";
 

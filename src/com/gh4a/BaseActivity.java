@@ -297,6 +297,12 @@ public class BaseActivity extends Activity {
                         data.get(Constants.User.USER_LOGIN),
                         data.get(Constants.Repository.REPO_NAME), Constants.Issue.ISSUE_STATE_OPEN);
             }
+            else if (Constants.Issue.ISSUE.equals(tag)) {
+                mTarget.get().getApplicationContext().openIssueActivity(baseActivity,
+                        data.get(Constants.User.USER_LOGIN),
+                        data.get(Constants.Repository.REPO_NAME),
+                        Integer.parseInt(data.get(Constants.Issue.ISSUE_NUMBER)));
+            }
             else if (Constants.Commit.COMMITS.equals(tag)) {
                 mTarget.get().getApplicationContext().openBranchListActivity(baseActivity,
                         data.get(Constants.User.USER_LOGIN),

@@ -20,10 +20,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -40,6 +44,8 @@ import com.github.api.v2.schema.Issue;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
 import com.github.api.v2.services.IssueService;
+import com.github.api.v2.services.auth.Authentication;
+import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The IssueInfo activity.
@@ -421,6 +427,212 @@ public class IssueActivity extends BaseActivity {
                 }
                 else {
                     activity.fillComments(result);
+                }
+            }
+        }
+    }
+    
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (menu.size() == 1) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.issue_menu, menu);
+        }
+        return true;
+    }
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.create_issue:
+                Intent intent = new Intent().setClass(this, IssueCreateActivity.class);
+                intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                startActivity(intent);
+                return true;
+            case R.id.edit_issue:
+                intent = new Intent().setClass(this, IssueEditActivity.class);
+                intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                intent.putExtra(Constants.Issue.ISSUE_NUMBER, mIssueNumber);
+                startActivity(intent);
+                return true;
+            case R.id.close_issue:
+                new CloseIssueTask(this, false).execute();
+                return true;
+            case R.id.reopen_issue:
+                new ReopenIssueTask(this, false).execute();
+                return true;
+            default:
+                return true;
+        }
+    }
+    
+    private static class CloseIssueTask extends AsyncTask<Void, Void, Boolean> {
+
+        /** The target. */
+        private WeakReference<IssueActivity> mTarget;
+        
+        /** The exception. */
+        private boolean mException;
+        
+        /** The hide main view. */
+        private boolean mHideMainView;
+
+        /**
+         * Instantiates a new load issue list task.
+         *
+         * @param activity the activity
+         * @param hideMainView the hide main view
+         */
+        public CloseIssueTask(IssueActivity activity, boolean hideMainView) {
+            mTarget = new WeakReference<IssueActivity>(activity);
+            mHideMainView = hideMainView;
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            if (mTarget.get() != null) {
+                try {
+                    IssueActivity activity = mTarget.get();
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    IssueService service = factory.createIssueService();
+                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
+                            mTarget.get().getAuthPassword());
+                    service.setAuthentication(auth);
+                    service.closeIssue(activity.mUserLogin, 
+                            activity.mRepoName,
+                            activity.mIssueNumber);
+                    return true;
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
+            }
+            else {
+                return false;
+            }
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPreExecute()
+         */
+        @Override
+        protected void onPreExecute() {
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, mHideMainView);
+            }
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (mTarget.get() != null) {
+                IssueActivity activity = mTarget.get();
+                activity.mLoadingDialog.dismiss();
+    
+                if (mException) {
+                    activity.showError();
+                }
+                else {
+                    activity.showMessage(activity.getResources().getString(R.string.issue_success_close),
+                            false);
+                    ((TextView)activity.findViewById(R.id.tv_state)).setBackgroundResource(R.drawable.default_red_box);
+                }
+            }
+        }
+    }
+    
+    private static class ReopenIssueTask extends AsyncTask<Void, Void, Boolean> {
+
+        /** The target. */
+        private WeakReference<IssueActivity> mTarget;
+        
+        /** The exception. */
+        private boolean mException;
+        
+        /** The hide main view. */
+        private boolean mHideMainView;
+
+        /**
+         * Instantiates a new load issue list task.
+         *
+         * @param activity the activity
+         * @param hideMainView the hide main view
+         */
+        public ReopenIssueTask(IssueActivity activity, boolean hideMainView) {
+            mTarget = new WeakReference<IssueActivity>(activity);
+            mHideMainView = hideMainView;
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            if (mTarget.get() != null) {
+                try {
+                    IssueActivity activity = mTarget.get();
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    IssueService service = factory.createIssueService();
+                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
+                            mTarget.get().getAuthPassword());
+                    service.setAuthentication(auth);
+                    service.reopenIssue(activity.mUserLogin, 
+                            activity.mRepoName,
+                            activity.mIssueNumber);
+                    return true;
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
+            }
+            else {
+                return false;
+            }
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPreExecute()
+         */
+        @Override
+        protected void onPreExecute() {
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, mHideMainView);
+            }
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (mTarget.get() != null) {
+                IssueActivity activity = mTarget.get();
+                activity.mLoadingDialog.dismiss();
+    
+                if (mException) {
+                    activity.showError();
+                }
+                else {
+                    activity.showMessage(activity.getResources().getString(R.string.issue_success_reopen),
+                            false);
+                    ((TextView)activity.findViewById(R.id.tv_state)).setBackgroundResource(R.drawable.default_green_box);
                 }
             }
         }

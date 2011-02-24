@@ -155,6 +155,15 @@
     <string name="issue_closed_at">Closed at</string>
     <string name="issue_view_open_issues">View Open Issues</string>
     <string name="issue_view_closed_issues">View Closed Issues</string>
+    <string name="issue_create">Create Issue</string>
+    <string name="issue_error_title">Please enter a title</string>
+    <string name="issue_success_create">Successful create issue</string>
+    <string name="issue_edit">Edit Issue</string>
+    <string name="issue_success_edit">Successful edit issue</string>
+    <string name="issue_reopen">Reopen Issue</string>
+    <string name="issue_close">Close Issue</string>
+    <string name="issue_success_close">Successful close issue</string>
+    <string name="issue_success_reopen">Successful reopen issue</string>
 
     <!-- Issue comment -->
     <plurals name="issue_comment">

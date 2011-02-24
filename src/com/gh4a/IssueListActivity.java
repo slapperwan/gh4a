@@ -239,8 +239,12 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
                 mIssueAdapter.add(issue);
             }
             ((TextView) findViewById(R.id.tv_subtitle)).setText(State.valueOf(mState).name() + " Issues (" + issues.size() + ")");
+            mIssueAdapter.notifyDataSetChanged();
         }
-        mIssueAdapter.notifyDataSetChanged();
+        else {
+            ((TextView) findViewById(R.id.tv_subtitle)).setText(State.valueOf(mState).name() + " Issues");
+            getApplicationContext().notFoundMessage(this, R.plurals.issue);
+        }
     }
 
     /*
@@ -282,6 +286,12 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
             case R.id.view_closed_issues:
                 mState = Constants.Issue.ISSUE_STATE_CLOSED;
                 new LoadIssueListTask(this, false).execute();
+                return true;
+            case R.id.create_issue:
+                Intent intent = new Intent().setClass(this, IssueCreateActivity.class);
+                intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                startActivity(intent);
                 return true;
             default:
                 return true;

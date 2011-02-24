@@ -75,6 +75,10 @@
         <activity
             android:name=".CollaboratorListActivity" />
         <activity
+            android:name=".IssueCreateActivity" />
+        <activity
+            android:name=".IssueEditActivity" />
+        <activity
             android:name="com.markupartist.android.widget.ActionBar" />
     </application>
     <uses-sdk

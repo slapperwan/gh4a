@@ -232,6 +232,7 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
             ((TextView) findViewById(R.id.tv_subtitle)).setText(State.valueOf(mState).name() + " Pull Requests (" + pullRequests.size() + ")");
         }
         else {
+            ((TextView) findViewById(R.id.tv_subtitle)).setText(State.valueOf(mState).name() + " Pull Requests");
             getApplicationContext().notFoundMessage(this, "Pull Requests");
         }
     }
