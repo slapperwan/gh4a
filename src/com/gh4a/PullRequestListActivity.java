@@ -241,7 +241,7 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
     public boolean onPrepareOptionsMenu(Menu menu) {
         if (menu.size() == 1) {
             MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.issues_menu, menu);
+            inflater.inflate(R.menu.pull_requests_menu, menu);
         }
         return true;
     }
