@@ -141,11 +141,19 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
             generalDesc.setVisibility(View.GONE);
             ll.setVisibility(View.VISIBLE);
             List<String[]> shas = payload.getShas();
+            Repository repository = feed.getRepository();
+            boolean isRepoExists = repository != null;
             for (int i = 0; i < shas.size(); i++) {
                 String[] sha = shas.get(i);
                 SpannableString spannableSha = new SpannableString(sha[0].substring(0, 7));
-                spannableSha.setSpan(new TextAppearanceSpan(baseView.getContext(),
-                        R.style.default_text_medium_url), 0, spannableSha.length(), 0);
+                if (isRepoExists) {
+                    spannableSha.setSpan(new TextAppearanceSpan(baseView.getContext(),
+                            R.style.default_text_medium_url), 0, spannableSha.length(), 0);
+                }
+                else {
+                    spannableSha = new SpannableString("(deleted)");
+                }
+                
                 TextView tvCommitMsg = new TextView(baseView.getContext());
                 tvCommitMsg.setText(spannableSha);
                 tvCommitMsg.append(" " + sha[2]);
@@ -155,8 +163,7 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
 
                 if (i == 2 && shas.size() > 3) {// show limit 3 lines
                     TextView tvMoreMsg = new TextView(baseView.getContext());
-                    String text = String.format(res.getString(R.string.event_push_desc),
-                            shas.size() - 3);
+                    String text = res.getString(R.string.event_push_desc, shas.size() - 3);
                     tvMoreMsg.setText(text);
                     ll.addView(tvMoreMsg);
                     break;

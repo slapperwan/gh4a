@@ -226,36 +226,61 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
             }
             // only 1 commit, then show the commit details
             else {
-                context.openCommitInfoActivity(this, feed.getRepository().getOwner(), feed
-                        .getRepository().getName(), feed.getPayload().getShas().get(0)[0]);
+                if (feed.getRepository() != null) {
+                    context.openCommitInfoActivity(this, feed.getRepository().getOwner(), feed
+                            .getRepository().getName(), feed.getPayload().getShas().get(0)[0]);
+                }
+                else {
+                    context.notFoundMessage(this, R.plurals.repository);
+                }
             }
         }
 
         /** IssueEvent */
         else if (UserFeed.Type.ISSUES_EVENT.equals(eventType)) {
-            context.openIssueActivity(this, feed.getRepository().getOwner(), feed.getRepository()
-                    .getName(), feed.getPayload().getNumber());
+            if (feed.getRepository() != null) {
+                context.openIssueActivity(this, feed.getRepository().getOwner(), feed.getRepository()
+                        .getName(), feed.getPayload().getNumber());
+            }
+            else {
+                context.notFoundMessage(this, R.plurals.repository);
+            }
         }
 
         /** WatchEvent */
         else if (UserFeed.Type.WATCH_EVENT.equals(eventType)) {
-            context.openRepositoryInfoActivity(this, feed.getRepository());
+            if (feed.getRepository() != null) {
+                context.openRepositoryInfoActivity(this, feed.getRepository());
+            }
+            else {
+                context.notFoundMessage(this, R.plurals.repository);
+            }
         }
 
         /** CreateEvent */
         else if (UserFeed.Type.CREATE_EVENT.equals(eventType)) {
-            context.openRepositoryInfoActivity(this, feed.getRepository());
+            if (feed.getRepository() != null) {
+                context.openRepositoryInfoActivity(this, feed.getRepository());
+            }
+            else {
+                context.notFoundMessage(this, R.plurals.repository);
+            }
         }
 
         /** PullRequestEvent */
         else if (UserFeed.Type.PULL_REQUEST_EVENT.equals(eventType)) {
-            Payload payload = feed.getPayload();
-            int pullRequestNumber = payload.getNumber();
-            if (payload.getPullRequest() instanceof ObjectPayloadPullRequest) {
-                pullRequestNumber = ((ObjectPayloadPullRequest) payload.getPullRequest()).getNumber();
+            if (feed.getRepository() != null) {
+                Payload payload = feed.getPayload();
+                int pullRequestNumber = payload.getNumber();
+                if (payload.getPullRequest() instanceof ObjectPayloadPullRequest) {
+                    pullRequestNumber = ((ObjectPayloadPullRequest) payload.getPullRequest()).getNumber();
+                }
+                context.openPullRequestActivity(this, feed.getRepository().getOwner(), feed
+                        .getRepository().getName(), pullRequestNumber);
             }
-            context.openPullRequestActivity(this, feed.getRepository().getOwner(), feed
-                    .getRepository().getName(), pullRequestNumber);
+            else {
+                context.notFoundMessage(this, R.plurals.repository);
+            }
         }
 
         /** FollowEvent */
@@ -284,7 +309,12 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
 
         /** DeleteEvent */
         else if (UserFeed.Type.DELETE_EVENT.equals(eventType)) {
-            context.openRepositoryInfoActivity(this, feed.getRepository());
+            if (feed.getRepository() != null) {
+                context.openRepositoryInfoActivity(this, feed.getRepository());
+            }
+            else {
+                context.notFoundMessage(this, R.plurals.repository);
+            }
         }
 
         /** GistEvent */
@@ -368,9 +398,11 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
 
             /** PushEvent extra menu for commits */
             if (UserFeed.Type.PUSH_EVENT.equals(eventType)) {
-                List<String[]> shas = feed.getPayload().getShas();
-                for (String[] sha : shas) {
-                    menu.add("Commit " + sha[0].substring(0, 7) + " " + sha[2]);
+                if (feed.getRepository() != null) {
+                    List<String[]> shas = feed.getPayload().getShas();
+                    for (String[] sha : shas) {
+                        menu.add("Commit " + sha[0].substring(0, 7) + " " + sha[2]);
+                    }
                 }
             }
 
@@ -389,8 +421,10 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
 
             /** CommitCommentEvent */
             else if (UserFeed.Type.COMMIT_COMMENT_EVENT.equals(eventType)) {
-                menu.add("Commit " + feed.getPayload().getCommit().substring(0, 7));
-                menu.add("Comment in browser");
+                if (feed.getRepository() != null) {
+                    menu.add("Commit " + feed.getPayload().getCommit().substring(0, 7));
+                    menu.add("Comment in browser");
+                }
             }
 
             /** GistEvent */

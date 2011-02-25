@@ -173,6 +173,24 @@ public class PullRequestActivity extends BaseActivity {
         tvTitle.setText(pullRequest.getTitle());
         tvDesc.setText(pullRequest.getBody());
         
+        LinearLayout llLabels = (LinearLayout) findViewById(R.id.ll_labels);
+        List<String> labels = pullRequest.getLabels();
+        if (labels != null && !labels.isEmpty()) {
+            for (String label : labels) {
+                TextView tvLabel = new TextView(getApplicationContext());
+                tvLabel.setSingleLine(true);
+                tvLabel.setText(label);
+                tvLabel.setTextAppearance(getApplicationContext(), R.style.default_text_small);
+                tvLabel.setBackgroundResource(R.drawable.default_grey_box);
+                
+                llLabels.addView(tvLabel);
+            }
+            llLabels.setVisibility(View.VISIBLE);
+        }
+        else {
+            llLabels.setVisibility(View.GONE);
+        }
+        
         fillDiscussion(pullRequest.getDiscussion());
     }
 

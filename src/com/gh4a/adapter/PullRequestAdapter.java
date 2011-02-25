@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
@@ -56,12 +57,13 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> {
         ViewHolder viewHolder;
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_gravatar_3, null);
+            v = vi.inflate(R.layout.row_issue, null);
             viewHolder = new ViewHolder();
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-            viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
+            //viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+            viewHolder.llLabels = (LinearLayout) v.findViewById(R.id.ll_labels);
 
             v.setTag(viewHolder);
         }
@@ -85,8 +87,27 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> {
                 }
             });
 
-            viewHolder.tvTitle.setText(StringUtils.doTeaser(pullRequest.getTitle()));
-            viewHolder.tvDesc.setText(StringUtils.doTeaser(pullRequest.getBody()));
+            //show labels
+            viewHolder.llLabels.removeAllViews();
+            List<String> labels = pullRequest.getLabels();
+            if (labels != null && !labels.isEmpty()) {
+                for (String label : labels) {
+                    TextView tvLabel = new TextView(v.getContext());
+                    tvLabel.setSingleLine(true);
+                    tvLabel.setText(label);
+                    tvLabel.setTextAppearance(v.getContext(), R.style.default_text_small);
+                    tvLabel.setBackgroundResource(R.drawable.default_grey_box);
+                    
+                    viewHolder.llLabels.addView(tvLabel);
+                }
+                viewHolder.llLabels.setVisibility(View.VISIBLE);
+            }
+            else {
+                viewHolder.llLabels.setVisibility(View.GONE);
+            }
+            
+            viewHolder.tvDesc.setText(pullRequest.getTitle());
+            //viewHolder.tvDesc.setText(StringUtils.doTeaser(pullRequest.getBody()));
             Resources res = v.getResources();
             String extraData = String.format(res.getString(R.string.more_data_3), pullRequest
                     .getIssueUser().getLogin(), pt.format(pullRequest.getIssueCreatedAt()),
@@ -108,13 +129,16 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> {
         public ImageView ivGravatar;
         
         /** The tv title. */
-        public TextView tvTitle;
+        //public TextView tvTitle;
         
         /** The tv desc. */
         public TextView tvDesc;
         
         /** The tv extra. */
         public TextView tvExtra;
+        
+        /** The ll labels. */
+        public LinearLayout llLabels;
 
     }
 }
