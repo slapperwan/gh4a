@@ -301,13 +301,20 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
                 getApplicationContext().openIssueListActivity(this, mUserLogin, mRepoName, Constants.Issue.ISSUE_STATE_CLOSED);
                 return true;
             case R.id.create_issue:
-                Intent intent = new Intent().setClass(IssueListActivity.this, IssueCreateActivity.class);
-                intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
-                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                startActivity(intent);
+                if (isAuthenticated()) {
+                    Intent intent = new Intent().setClass(IssueListActivity.this, IssueCreateActivity.class);
+                    intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+                    intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                    startActivity(intent);
+                }
+                else {
+                    Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
                 return true;
             case R.id.view_labels:
-                intent = new Intent().setClass(IssueListActivity.this, IssueLabelListActivity.class);
+                Intent intent = new Intent().setClass(IssueListActivity.this, IssueLabelListActivity.class);
                 intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
                 intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                 startActivity(intent);

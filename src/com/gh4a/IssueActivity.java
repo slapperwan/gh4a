@@ -77,9 +77,6 @@ public class IssueActivity extends BaseActivity {
     protected boolean mCommentsLoaded;// flag to prevent more click which result
                                       // to query to the rest API
 
-    /** The header. */
-    protected LinearLayout mHeader;
-
     /**
      * Called when the activity is first created.
      * 
@@ -171,21 +168,16 @@ public class IssueActivity extends BaseActivity {
 
         // set details inside listview header
         LayoutInflater infalter = getLayoutInflater();
-        mHeader = (LinearLayout) infalter.inflate(R.layout.issue_header, lvComments, false);
+        LinearLayout mHeader = (LinearLayout) infalter.inflate(R.layout.issue_header, lvComments, false);
+        
+        // comment form at footer
+        LinearLayout mFooter = (LinearLayout) infalter.inflate(R.layout.issue_footer, lvComments, false);
 
-        // final Button btnAddComment = (Button)
-        // findViewById(R.id.btn_add_comment);
-        //        
-        // EditText etComment = (EditText) findViewById(R.id.et_comment_field);
-        // etComment.setOnFocusChangeListener(new OnFocusChangeListener() {
-        //            
-        // @Override
-        // public void onFocusChange(View v, boolean hasFocus) {
-        // btnAddComment.setVisibility(View.VISIBLE);
-        // }
-        // });
-
-        lvComments.addHeaderView(mHeader, null, true);
+        lvComments.addHeaderView(mHeader, null, false);
+        
+        if (isAuthenticated()) {
+            lvComments.addFooterView(mFooter, null, false);
+        }
 
         mCommentAdapter = new CommentAdapter(IssueActivity.this, new ArrayList<Comment>());
         lvComments.setAdapter(mCommentAdapter);
@@ -463,25 +455,53 @@ public class IssueActivity extends BaseActivity {
     public boolean setMenuOptionItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.create_issue:
-                Intent intent = new Intent().setClass(this, IssueCreateActivity.class);
-                intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
-                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                startActivity(intent);
+                if (isAuthenticated()) {
+                    Intent intent = new Intent().setClass(this, IssueCreateActivity.class);
+                    intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+                    intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                    startActivity(intent);
+                }
+                else {
+                    Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+                    startActivity(intent);
+                    finish();
+                }                
                 return true;
             case R.id.edit_issue:
-                intent = new Intent().setClass(this, IssueEditActivity.class);
-                intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
-                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                intent.putExtra(Constants.Issue.ISSUE_NUMBER, mBundle.getInt(Constants.Issue.ISSUE_NUMBER));
-                intent.putExtra(Constants.Issue.ISSUE_TITLE, mBundle.getString(Constants.Issue.ISSUE_TITLE));
-                intent.putExtra(Constants.Issue.ISSUE_BODY, mBundle.getString(Constants.Issue.ISSUE_BODY));
-                startActivity(intent);
+                if (isAuthenticated()) {
+                    Intent intent = new Intent().setClass(this, IssueEditActivity.class);
+                    intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+                    intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                    intent.putExtra(Constants.Issue.ISSUE_NUMBER, mBundle.getInt(Constants.Issue.ISSUE_NUMBER));
+                    intent.putExtra(Constants.Issue.ISSUE_TITLE, mBundle.getString(Constants.Issue.ISSUE_TITLE));
+                    intent.putExtra(Constants.Issue.ISSUE_BODY, mBundle.getString(Constants.Issue.ISSUE_BODY));
+                    startActivity(intent);
+                }
+                else {
+                    Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+                    startActivity(intent);
+                    finish();
+                }     
                 return true;
             case R.id.close_issue:
-                new CloseIssueTask(this, false).execute();
+                if (isAuthenticated()) {
+                    new CloseIssueTask(this, false).execute();
+                }
+                else {
+                    Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
                 return true;
             case R.id.reopen_issue:
-                new ReopenIssueTask(this, false).execute();
+                if (isAuthenticated()) {
+                    new ReopenIssueTask(this, false).execute();
+                }
+                else {
+                    Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
                 return true;
             default:
                 return true;
