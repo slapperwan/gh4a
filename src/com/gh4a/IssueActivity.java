@@ -224,9 +224,9 @@ public class IssueActivity extends BaseActivity {
         btnComments.setOnClickListener(new ButtonCommentsListener(this));
         
         LinearLayout llLabels = (LinearLayout) findViewById(R.id.ll_labels);
-        ArrayList<CharSequence> labels = mBundle.getCharSequenceArrayList(Constants.Issue.ISSUE_LABELS);
+        ArrayList<String> labels = mBundle.getStringArrayList(Constants.Issue.ISSUE_LABELS);
         if (labels != null && !labels.isEmpty()) {
-            for (CharSequence label : labels) {
+            for (String label : labels) {
                 TextView tvLabel = new TextView(getApplicationContext());
                 tvLabel.setSingleLine(true);
                 tvLabel.setText(label);
