@@ -13,6 +13,7 @@
     <string name="login">Login</string>
     <string name="invalid_login">Invalid username/password</string>
     <string name="success_logout">Successful logout</string>
+    <string name="sign">&lt;i>Sent from gh4a App&lt;i></string>
     
     <!-- Activity event -->
     <string name="event_push_title">%1$s pushed to %2$s at %3$s</string>
@@ -168,6 +169,9 @@
     <string name="issue_success_reopen">Successful reopen issue</string>
     <string name="issue_error_reopen">Cannot reopen issue</string>
     <string name="issue_view_labels">View Labels</string>
+    <string name="issue_success_comment">Successful create comment</string>
+    <string name="issue_error_comment">Cannot create comment</string>
+    <string name="issue_create_label">New Label</string>
 
     <!-- Issue comment -->
     <plurals name="issue_comment">

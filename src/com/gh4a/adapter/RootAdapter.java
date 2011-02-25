@@ -101,6 +101,9 @@ public abstract class RootAdapter<T> extends BaseAdapter {
         return mObjects;
     }
     
+    public void clear() {
+        mObjects.clear();
+    }
     /**
      * Do get view.
      * 

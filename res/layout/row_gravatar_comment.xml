@@ -29,5 +29,6 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_toRightOf="@id/iv_gravatar"
+        android:autoLink="web"
         android:layout_below="@id/tv_extra" />
 </RelativeLayout>

@@ -26,11 +26,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -50,7 +51,7 @@ import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 /**
  * The IssueInfo activity.
  */
-public class IssueActivity extends BaseActivity {
+public class IssueActivity extends BaseActivity implements OnClickListener {
 
     /** The issue. */
     protected Issue mIssue;
@@ -200,6 +201,7 @@ public class IssueActivity extends BaseActivity {
         TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
         TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
         Button btnComments = (Button) mHeader.findViewById(R.id.btn_comments);
+        Button btnCreateComment = (Button) mFooter.findViewById(R.id.btn_create);
 
         tvLogin.setText(mBundle.getString(Constants.Issue.ISSUE_CREATED_BY));
         tvCreateAt.setText(mBundle.getString(Constants.Issue.ISSUE_CREATED_AT));
@@ -212,8 +214,11 @@ public class IssueActivity extends BaseActivity {
         }
         tvTitle.setText(mBundle.getString(Constants.Issue.ISSUE_TITLE));
         tvDesc.setText(mBundle.getString(Constants.Issue.ISSUE_BODY));
+        
         btnComments.setText(String.valueOf(mBundle.getInt(Constants.Issue.ISSUE_COMMENTS)));
-        btnComments.setOnClickListener(new ButtonCommentsListener(this));
+        btnComments.setOnClickListener(this);
+        
+        btnCreateComment.setOnClickListener(this);
         
         LinearLayout llLabels = (LinearLayout) findViewById(R.id.ll_labels);
         ArrayList<String> labels = mBundle.getStringArrayList(Constants.Issue.ISSUE_LABELS);
@@ -240,6 +245,7 @@ public class IssueActivity extends BaseActivity {
      * @param comments the comments
      */
     protected void fillComments(List<Comment> comments) {
+        mCommentAdapter.clear();
         if (comments != null && comments.size() > 0) {
             mCommentAdapter.notifyDataSetChanged();
             for (Comment comment : comments) {
@@ -317,37 +323,6 @@ public class IssueActivity extends BaseActivity {
                 }
                 else {
                     activity.fillData();
-                }
-            }
-        }
-    }
-
-    /**
-     * Callback to be invoked when the button Comments is clicked.
-     */
-    private static class ButtonCommentsListener implements OnClickListener {
-
-        /** The target. */
-        private WeakReference<IssueActivity> mTarget;
-
-        /**
-         * Instantiates a new button comments listener.
-         *
-         * @param activity the activity
-         */
-        public ButtonCommentsListener(IssueActivity activity) {
-            mTarget = new WeakReference<IssueActivity>(activity);
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.view.View.OnClickListener#onClick(android.view.View)
-         */
-        @Override
-        public void onClick(View view) {
-            if (mTarget.get() != null) {
-                if (!mTarget.get().mCommentsLoaded) {
-                    new LoadCommentsTask(mTarget.get()).execute(false);
                 }
             }
         }
@@ -444,17 +419,22 @@ public class IssueActivity extends BaseActivity {
     
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (menu.size() == 1) {
-            MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.issue_menu, menu);
+        menu.removeGroup(Menu.FIRST);
+        if ("closed".equals(mBundle.getString(Constants.Issue.ISSUE_STATE))) {
+            menu.add(Menu.FIRST, R.string.issue_reopen, 0, R.string.issue_reopen);
         }
+        else {
+            menu.add(Menu.FIRST, R.string.issue_close, 0, R.string.issue_close);
+        }
+        menu.add(Menu.FIRST, R.string.issue_edit, 0, R.string.issue_edit);
+        menu.add(Menu.FIRST, R.string.issue_create, 0, R.string.issue_create);
         return true;
     }
     
     @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.create_issue:
+            case R.string.issue_create:
                 if (isAuthenticated()) {
                     Intent intent = new Intent().setClass(this, IssueCreateActivity.class);
                     intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
@@ -467,7 +447,7 @@ public class IssueActivity extends BaseActivity {
                     finish();
                 }                
                 return true;
-            case R.id.edit_issue:
+            case R.string.issue_edit:
                 if (isAuthenticated()) {
                     Intent intent = new Intent().setClass(this, IssueEditActivity.class);
                     intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
@@ -483,7 +463,7 @@ public class IssueActivity extends BaseActivity {
                     finish();
                 }     
                 return true;
-            case R.id.close_issue:
+            case R.string.issue_close:
                 if (isAuthenticated()) {
                     new CloseIssueTask(this, false).execute();
                 }
@@ -493,7 +473,7 @@ public class IssueActivity extends BaseActivity {
                     finish();
                 }
                 return true;
-            case R.id.reopen_issue:
+            case R.string.issue_reopen:
                 if (isAuthenticated()) {
                     new ReopenIssueTask(this, false).execute();
                 }
@@ -588,7 +568,10 @@ public class IssueActivity extends BaseActivity {
                 else {
                     activity.showMessage(activity.getResources().getString(R.string.issue_success_close),
                             false);
-                    ((TextView)activity.findViewById(R.id.tv_state)).setBackgroundResource(R.drawable.default_red_box);
+                    TextView tvState = (TextView)activity.findViewById(R.id.tv_state);
+                    tvState.setBackgroundResource(R.drawable.default_red_box);
+                    tvState.setText("closed");
+                    activity.mBundle.putString(Constants.Issue.ISSUE_STATE, Issue.State.CLOSED.value());
                 }
             }
         }
@@ -674,9 +657,130 @@ public class IssueActivity extends BaseActivity {
                 else {
                     activity.showMessage(activity.getResources().getString(R.string.issue_success_reopen),
                             false);
-                    ((TextView)activity.findViewById(R.id.tv_state)).setBackgroundResource(R.drawable.default_green_box);
+                    TextView tvState = (TextView)activity.findViewById(R.id.tv_state);
+                    tvState.setBackgroundResource(R.drawable.default_green_box);
+                    tvState.setText("open");
+                    activity.mBundle.putString(Constants.Issue.ISSUE_STATE, Issue.State.OPEN.value());
                 }
             }
+        }
+    }
+    
+    /**
+     * An asynchronous task that runs on a background thread
+     * to comment issue.
+     */
+    private static class CommentIssueTask extends AsyncTask<Void, Void, Boolean> {
+
+        /** The target. */
+        private WeakReference<IssueActivity> mTarget;
+        
+        /** The exception. */
+        private boolean mException;
+        
+        /** The hide main view. */
+        private boolean mHideMainView;
+
+        /**
+         * Instantiates a new load issue list task.
+         *
+         * @param activity the activity
+         * @param hideMainView the hide main view
+         */
+        public CommentIssueTask(IssueActivity activity, boolean hideMainView) {
+            mTarget = new WeakReference<IssueActivity>(activity);
+            mHideMainView = hideMainView;
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            if (mTarget.get() != null) {
+                try {
+                    IssueActivity activity = mTarget.get();
+                    EditText etComment = (EditText) activity.findViewById(R.id.et_desc);
+                    CheckBox cbSign = (CheckBox) activity.findViewById(R.id.cb_sign);
+                    
+                    String comment = etComment.getText().toString();
+                    if (cbSign.isChecked()) {
+                        comment = comment + "\n\n" + activity.getResources().getString(R.string.sign);
+                    }
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    IssueService service = factory.createIssueService();
+                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
+                            mTarget.get().getAuthPassword());
+                    service.setAuthentication(auth);
+                    service.addComment(activity.mUserLogin, 
+                            activity.mRepoName,
+                            activity.mIssueNumber,
+                            comment);
+                    return true;
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
+            }
+            else {
+                return false;
+            }
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPreExecute()
+         */
+        @Override
+        protected void onPreExecute() {
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, mHideMainView);
+            }
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (mTarget.get() != null) {
+                IssueActivity activity = mTarget.get();
+                activity.mLoadingDialog.dismiss();
+    
+                if (mException) {
+                    activity.showMessage(activity.getResources().getString(R.string.issue_error_comment),
+                            false);
+                }
+                else {
+                    activity.showMessage(activity.getResources().getString(R.string.issue_success_comment),
+                            false);
+                    //reload comments
+                    new LoadCommentsTask(activity).execute(false);
+                    EditText etComment = (EditText) activity.findViewById(R.id.et_desc);
+                    etComment.setText(null);
+                    etComment.clearFocus();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+        case R.id.btn_comments:
+            if (!mCommentsLoaded) {
+                new LoadCommentsTask(this).execute(false);
+            }
+            break;
+        case R.id.btn_create:
+            new CommentIssueTask(this, false).execute();
+            break;
+        default:
+            break;
         }
     }
 }

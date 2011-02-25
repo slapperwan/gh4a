@@ -16,6 +16,8 @@
 
 package com.gh4a;
 
+import android.view.Menu;
+
 /**
  * The Interface Constants.
  */
@@ -236,4 +238,5 @@ public interface Constants {
         /** The Constant TAGS. */
         public static final String TAGS = "Object.TAGS";
     }
+    
 }

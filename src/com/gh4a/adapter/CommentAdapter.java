@@ -22,6 +22,7 @@ import org.xml.sax.XMLReader;
 import android.content.Context;
 import android.content.res.Resources;
 import android.text.Editable;
+import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.Html.TagHandler;
 import android.text.style.CharacterStyle;
@@ -98,7 +99,10 @@ public class CommentAdapter extends RootAdapter<Comment> {
                     pt.format(comment.getCreatedAt()));
 
             viewHolder.tvExtra.setText(extraData);
-            viewHolder.tvDesc.setText(comment.getBody());
+            
+            String body = comment.getBody();
+            body = body.replaceAll("\n", "<br/>");
+            viewHolder.tvDesc.setText(Html.fromHtml(body));
         }
         return v;
     }

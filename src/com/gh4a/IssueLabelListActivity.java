@@ -181,6 +181,6 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
         intent.putExtra(Constants.Issue.ISSUE_LABEL, label);
         startActivity(intent);
-        
     }
+    
 }
