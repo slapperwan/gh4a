@@ -6,9 +6,9 @@
     Description (Medium)
     Extra (Small)
  -->
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="?attr/row_box">
@@ -21,13 +21,10 @@
         android:id="@+id/tv_desc"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_title"
         android:textAppearance="?android:attr/textAppearanceMedium" />
     <TextView
         android:id="@+id/tv_extra"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_below="@id/tv_desc"
         android:textAppearance="?android:attr/textAppearanceSmall" />
-</RelativeLayout>
+</LinearLayout>
