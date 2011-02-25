@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.gh4a"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+    <LinearLayout
+        android:id="@+id/main_content"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="?attr/row_box">
+        <EditText
+            android:id="@+id/et_desc"
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:gravity="top"
+            android:lines="6"
+            android:hint="@string/issue_comment_title" />
+        <CheckBox
+            android:id="@+id/cb_sign"
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:text="Help promote gh4a"
+            android:checked="true"
+            />
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:text="(When checked, the message &quot;Sent from gh4a App&quot; will appear at the bottom of the message)"
+            />
+        <Button
+            android:text="@string/issue_comment_title"
+            android:id="@+id/btn_create"
+            android:layout_width="wrap_content"
+            android:gravity="center_vertical|center_horizontal"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right">
+        </Button>
+    </LinearLayout>
+</LinearLayout>
