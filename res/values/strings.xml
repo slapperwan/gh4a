@@ -172,6 +172,10 @@
     <string name="issue_success_comment">Successful create comment</string>
     <string name="issue_error_comment">Cannot create comment</string>
     <string name="issue_create_label">New Label</string>
+    <string name="issue_label_create">Create</string>
+    <string name="issue_error_create_label">Cannot create label</string>
+    <string name="issue_error_delete_label">Cannot delete label</string>
+    <string name="issue_error_label">Please enter a label</string>
 
     <!-- Issue comment -->
     <plurals name="issue_comment">

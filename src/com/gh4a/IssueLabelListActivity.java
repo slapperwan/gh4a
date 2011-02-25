@@ -5,20 +5,34 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
 import com.gh4a.adapter.SimpleStringAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
+import com.gh4a.utils.StringUtils;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
 import com.github.api.v2.services.IssueService;
+import com.github.api.v2.services.auth.Authentication;
+import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 public class IssueLabelListActivity extends BaseActivity implements OnItemClickListener {
 
@@ -30,6 +44,8 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
     
     /** The loading dialog. */
     protected LoadingDialog mLoadingDialog;
+    
+    protected ListView mListView;
     
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -155,10 +171,11 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
     }
     
     private void fillData(List<String> result) {
-        ListView listView = (ListView) findViewById(R.id.list_view);
-        listView.setOnItemClickListener(this);
+        mListView = (ListView) findViewById(R.id.list_view);
+        mListView.setOnItemClickListener(this);
         SimpleStringAdapter adapter = new SimpleStringAdapter(this, new ArrayList<String>());
-        listView.setAdapter(adapter);
+        mListView.setAdapter(adapter);
+        registerForContextMenu(mListView);
         
         if (result != null && result.size() > 0) {
             for (String label : result) {
@@ -183,4 +200,125 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
         startActivity(intent);
     }
     
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (menu.size() == 1) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.labels_menu, menu);
+            
+        }
+        return true;
+    }
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.create_label:
+                showCreateLabelForm();
+                return true;
+            default:
+                return true;
+        }
+    }
+    
+    private void showCreateLabelForm() {
+        final Dialog dialog = new Dialog(this);
+
+        dialog.setContentView(R.layout.issue_create_label);
+        dialog.setTitle("Create Label");
+
+        final TextView tvLabel = (TextView) dialog.findViewById(R.id.et_title);
+        Button btnCreate = (Button) dialog.findViewById(R.id.btn_create);
+        btnCreate.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View arg0) {
+                String label = tvLabel.getText().toString();
+                if (!StringUtils.isBlank(label)) {
+                    try {
+                        GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                        IssueService issueService = factory.createIssueService();
+                        Authentication auth = new LoginPasswordAuthentication(getAuthUsername(), getAuthPassword());
+                        issueService.setAuthentication(auth);
+                        label = label.replaceAll(" ", "%20");
+                        issueService.addLabelWithoutIssue(mUserLogin, mRepoName, label);
+                        new LoadIssueLabelsTask(IssueLabelListActivity.this).execute();
+                    }
+                    catch (GitHubException e) {
+                        Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                        showMessage(getResources().getString(R.string.issue_error_create_label), false);
+                    }
+                    finally {
+                        dialog.dismiss();
+                    }
+                }
+                else {
+                    showMessage(getResources().getString(R.string.issue_error_label), false);
+                }
+            }
+        });
+        dialog.show();
+    }
+    
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        if (v.getId() == R.id.list_view) {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+            String label = (String) mListView.getItemAtPosition(info.position);
+            
+            menu.setHeaderTitle(label);
+            menu.add(0, Menu.FIRST + 1, 0, "Delete");
+            menu.add(0, Menu.FIRST + 2, 0, "View Issues");
+        }
+    }
+    
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+        case Menu.FIRST + 1:
+            try {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("Are you sure?")
+                       .setCancelable(false)
+                       .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                           public void onClick(DialogInterface dialog, int id) {
+                               GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                               IssueService issueService = factory.createIssueService();
+                               Authentication auth = new LoginPasswordAuthentication(getAuthUsername(), getAuthPassword());
+                               issueService.setAuthentication(auth);
+                               String label = (String) mListView.getItemAtPosition(info.position);
+                               label = label.replaceAll(" ", "%20");
+                               issueService.removeLabelWithoutIssue(mUserLogin, mRepoName, label);
+                               new LoadIssueLabelsTask(IssueLabelListActivity.this).execute();
+                           }
+                       })
+                       .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                           public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                           }
+                       });
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+            catch (GitHubException e) {
+                Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                showMessage(getResources().getString(R.string.issue_error_delete_label), false);
+            }
+            break;
+        case Menu.FIRST + 2:
+            String label = (String) mListView.getItemAtPosition(info.position);
+            label = label.replaceAll(" ", "%20");
+            Intent intent = new Intent().setClass(this, IssueListByLabelActivity.class);
+            intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+            intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+            intent.putExtra(Constants.Issue.ISSUE_LABEL, label);
+            startActivity(intent);
+            break;
+        default:
+            break;
+        }
+        
+        return true;
+    }
 }

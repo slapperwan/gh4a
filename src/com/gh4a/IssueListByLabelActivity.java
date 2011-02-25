@@ -18,6 +18,8 @@ package com.gh4a;
 import java.util.HashMap;
 import java.util.List;
 
+import android.text.TextUtils;
+
 import com.gh4a.holder.BreadCrumbHolder;
 import com.github.api.v2.schema.Issue;
 import com.github.api.v2.services.GitHubException;
@@ -62,6 +64,7 @@ public class IssueListByLabelActivity extends IssueListActivity {
         breadCrumbHolders[2] = b;
 
         String label = getIntent().getStringExtra(Constants.Issue.ISSUE_LABEL);
+        label = TextUtils.htmlEncode(label);
         createBreadcrumb("Filtered by " + label, breadCrumbHolders);
     }
     
