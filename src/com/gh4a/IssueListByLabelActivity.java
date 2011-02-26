@@ -64,7 +64,7 @@ public class IssueListByLabelActivity extends IssueListActivity {
         breadCrumbHolders[2] = b;
 
         String label = getIntent().getStringExtra(Constants.Issue.ISSUE_LABEL);
-        label = TextUtils.htmlEncode(label);
+        label = label.replaceAll("%20", " ");
         createBreadcrumb("Filtered by " + label, breadCrumbHolders);
     }
     
@@ -73,6 +73,7 @@ public class IssueListByLabelActivity extends IssueListActivity {
      */
     public String getSubTitleAfterLoaded(int numberOfIssues) {
         String label = getIntent().getStringExtra(Constants.Issue.ISSUE_LABEL);
+        label = label.replaceAll("%20", " ");
         if (numberOfIssues != -1) {
             return "Filtered by " + label + " (" + numberOfIssues + ")";
         }

@@ -14,6 +14,8 @@
     <string name="invalid_login">Invalid username/password</string>
     <string name="success_logout">Successful logout</string>
     <string name="sign">&lt;i>Sent from gh4a App&lt;i></string>
+    <string name="label_it">Label it</string>
+    <string name="cancel">Cancel</string>
     
     <!-- Activity event -->
     <string name="event_push_title">%1$s pushed to %2$s at %3$s</string>
@@ -176,6 +178,9 @@
     <string name="issue_error_create_label">Cannot create label</string>
     <string name="issue_error_delete_label">Cannot delete label</string>
     <string name="issue_error_label">Please enter a label</string>
+    <string name="issue_label_add_delete">Add/Remove labels</string>
+    <string name="issue_error_label_add_delete">Cannot add/remove label</string>
+    <string name="issue_labels">Labels</string>
 
     <!-- Issue comment -->
     <plurals name="issue_comment">

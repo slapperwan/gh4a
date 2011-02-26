@@ -20,9 +20,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -166,7 +169,6 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
      */
     protected void fillData() {
         ListView lvComments = (ListView) findViewById(R.id.lv_comments);
-
         // set details inside listview header
         LayoutInflater infalter = getLayoutInflater();
         LinearLayout mHeader = (LinearLayout) infalter.inflate(R.layout.issue_header, lvComments, false);
@@ -213,7 +215,10 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
             tvState.setBackgroundResource(R.drawable.default_green_box);
         }
         tvTitle.setText(mBundle.getString(Constants.Issue.ISSUE_TITLE));
-        tvDesc.setText(mBundle.getString(Constants.Issue.ISSUE_BODY));
+        
+        String body = mBundle.getString(Constants.Issue.ISSUE_BODY).replaceAll("\n", "<br/>");
+        
+        tvDesc.setText(Html.fromHtml(body));
         
         btnComments.setText(String.valueOf(mBundle.getInt(Constants.Issue.ISSUE_COMMENTS)));
         btnComments.setOnClickListener(this);
@@ -427,6 +432,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
             menu.add(Menu.FIRST, R.string.issue_close, 0, R.string.issue_close);
         }
         menu.add(Menu.FIRST, R.string.issue_edit, 0, R.string.issue_edit);
+        menu.add(Menu.FIRST, R.string.issue_label_add_delete, 0, R.string.issue_label_add_delete);
         menu.add(Menu.FIRST, R.string.issue_create, 0, R.string.issue_create);
         return true;
     }
@@ -476,6 +482,16 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
             case R.string.issue_reopen:
                 if (isAuthenticated()) {
                     new ReopenIssueTask(this, false).execute();
+                }
+                else {
+                    Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+                return true;
+            case R.string.issue_label_add_delete:
+                if (isAuthenticated()) {
+                    showLabelsDialog();
                 }
                 else {
                     Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
@@ -782,5 +798,76 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
         default:
             break;
         }
+    }
+    
+    private void showLabelsDialog() {
+        GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+        final IssueService issueService = factory.createIssueService();
+        Authentication auth = new LoginPasswordAuthentication(getAuthUsername(), getAuthPassword());
+        issueService.setAuthentication(auth);
+        
+        List<String> availableLabels = issueService.getIssueLabels(mUserLogin, mRepoName);
+        final boolean[] checkedItems = new boolean[availableLabels.size()];
+
+        final String[] availabelLabelArr = new String[availableLabels.size()];
+        ArrayList<String> currentLabels = mBundle.getStringArrayList(Constants.Issue.ISSUE_LABELS);
+
+        //find which labels for this issue
+        for (int i = 0; i < availableLabels.size(); i++) {
+            availabelLabelArr[i] = availableLabels.get(i);
+            if(currentLabels.contains((String) availableLabels.get(i))) {
+                checkedItems[i] = true;
+            }
+            else {
+                checkedItems[i] = false;
+            }
+        }
+        
+        //final boolean[] newCheckedItems = new boolean[availableLabels.size()];
+        
+        AlertDialog.Builder builder = new AlertDialog.Builder(IssueActivity.this);
+        builder.setCancelable(true);
+        builder.setTitle(R.string.issue_labels);
+        builder.setMultiChoiceItems(availabelLabelArr, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton, boolean isChecked) {
+                if (isChecked) {
+                    checkedItems[whichButton] = true;
+                }
+                else {
+                    checkedItems[whichButton] = false;
+                }
+            }
+        });
+        
+        builder.setPositiveButton(R.string.label_it,
+                new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                try {
+                    for (int i = 0; i < checkedItems.length; i++) {
+                        String label = availabelLabelArr[i].replaceAll(" ", "%20");
+                        if (checkedItems[i]) {
+                            issueService.addLabel(mUserLogin, mRepoName, mIssueNumber, label);
+                        }
+                        else {
+                            issueService.removeLabel(mUserLogin, mRepoName, mIssueNumber, label);
+                        }
+                    }
+                    getApplicationContext().openIssueActivity(IssueActivity.this,
+                            mUserLogin, mRepoName, mIssueNumber);
+                }
+                catch (GitHubException e) {
+                    showMessage(getResources().getString(R.string.issue_error_label_add_delete), false);
+                }
+            }
+        })
+        .setNegativeButton(R.string.cancel,
+                new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.dismiss();
+            }
+        })
+       .create();
+        
+        builder.show();
     }
 }

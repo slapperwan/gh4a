@@ -214,7 +214,14 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
     public boolean setMenuOptionItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.create_label:
-                showCreateLabelForm();
+                if (isAuthenticated()) {
+                    showCreateLabelForm();
+                }
+                else {
+                    Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
                 return true;
             default:
                 return true;
@@ -226,7 +233,8 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
 
         dialog.setContentView(R.layout.issue_create_label);
         dialog.setTitle("Create Label");
-
+        dialog.setCancelable(true);
+        
         final TextView tvLabel = (TextView) dialog.findViewById(R.id.et_title);
         Button btnCreate = (Button) dialog.findViewById(R.id.btn_create);
         btnCreate.setOnClickListener(new OnClickListener() {
@@ -257,18 +265,21 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
                 }
             }
         });
+        
         dialog.show();
     }
     
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-        if (v.getId() == R.id.list_view) {
-            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-            String label = (String) mListView.getItemAtPosition(info.position);
-            
-            menu.setHeaderTitle(label);
-            menu.add(0, Menu.FIRST + 1, 0, "Delete");
-            menu.add(0, Menu.FIRST + 2, 0, "View Issues");
+        if (isAuthenticated()) {
+            if (v.getId() == R.id.list_view) {
+                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+                String label = (String) mListView.getItemAtPosition(info.position);
+                
+                menu.setHeaderTitle(label);
+                menu.add(0, Menu.FIRST + 1, 0, "Delete");
+                menu.add(0, Menu.FIRST + 2, 0, "View Issues");
+            }
         }
     }
     
