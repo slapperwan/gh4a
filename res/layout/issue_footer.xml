@@ -28,7 +28,7 @@
         <TextView
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
-            android:text="(When checked, the message &quot;Sent from gh4a App&quot; will appear at the bottom of the message)"
+            android:text="(When checked, the signature &quot;Sent via gh4a App&quot; will appear at the bottom of the message)"
             />
         <Button
             android:text="@string/issue_comment_title"

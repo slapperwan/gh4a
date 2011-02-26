@@ -216,8 +216,8 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
         }
         tvTitle.setText(mBundle.getString(Constants.Issue.ISSUE_TITLE));
         
-        String body = mBundle.getString(Constants.Issue.ISSUE_BODY).replaceAll("\n", "<br/>");
-        
+        String body = mBundle.getString(Constants.Issue.ISSUE_BODY);
+        body = body.replaceAll("\n", "<br/>");
         tvDesc.setText(Html.fromHtml(body));
         
         btnComments.setText(String.valueOf(mBundle.getInt(Constants.Issue.ISSUE_COMMENTS)));

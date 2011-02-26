@@ -30,6 +30,18 @@
             android:gravity="top"
             android:lines="8"
             android:hint="@string/issue_body" />
+        <CheckBox
+            android:id="@+id/cb_sign"
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:text="Help promote gh4a"
+            android:checked="true"
+            />
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:text="(When checked, the signature &quot;Sent via Gh4a App&quot; will appear at the bottom of the message)"
+            />
         <Button
             android:text="@string/issue_create"
             android:id="@+id/btn_create"
