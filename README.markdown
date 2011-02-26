@@ -17,7 +17,7 @@ Main features
 * Fork/watch/unwatch repository
 * View branches/tags
 * View pull requests
-* View collaborators/contributers
+* View collaborators/contributors
 * View watchers/networks
 * View issues (view open/closed and by labels)
 
