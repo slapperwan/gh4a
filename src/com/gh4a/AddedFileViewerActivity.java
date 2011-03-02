@@ -28,7 +28,7 @@ import android.view.View.OnClickListener;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Button;
+import android.widget.TextView;
 
 import com.gh4a.holder.BreadCrumbHolder;
 import com.github.api.v2.schema.Blob;
@@ -77,17 +77,16 @@ public class AddedFileViewerActivity extends BaseActivity {
         mObjectSha = getIntent().getStringExtra(Constants.Object.OBJECT_SHA);
         mFilePath = getIntent().getStringExtra(Constants.Object.PATH);
 
-        Button btnHistoryFile = (Button) findViewById(R.id.btn_view);
-        btnHistoryFile.setText(getResources().getString(R.string.object_view_history));
-        btnHistoryFile.setOnClickListener(new OnClickListener() {
+        TextView tvHistoryFile = (TextView) findViewById(R.id.tv_view);
+        tvHistoryFile.setText(getResources().getString(R.string.object_view_history));
+        tvHistoryFile.setOnClickListener(new OnClickListener() {
             
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent().setClass(AddedFileViewerActivity.this, AddedFileViewerActivity.class);
+                Intent intent = new Intent().setClass(AddedFileViewerActivity.this, CommitHistoryActivity.class);
                 intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
                 intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                 intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
-                intent.putExtra(Constants.Object.TREE_SHA, mTreeSha);
                 intent.putExtra(Constants.Object.PATH, mFilePath);
                 
                 startActivity(intent);
@@ -103,7 +102,7 @@ public class AddedFileViewerActivity extends BaseActivity {
      * Sets the bread crumb.
      */
     protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[2];
+        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[3];
 
         // common data
         HashMap<String, String> data = new HashMap<String, String>();
@@ -124,7 +123,15 @@ public class AddedFileViewerActivity extends BaseActivity {
         b.setData(data);
         breadCrumbHolders[1] = b;
         
-        createBreadcrumb(mFilePath, breadCrumbHolders);
+        // Commit
+        b = new BreadCrumbHolder();
+        b.setLabel(String.format(getResources().getString(R.string.commit_sha, mObjectSha.substring(0, 7))));
+        b.setTag(Constants.Commit.COMMIT);
+        data.put(Constants.Object.OBJECT_SHA, mObjectSha);
+        b.setData(data);
+        breadCrumbHolders[2] = b;
+        
+        createBreadcrumb("Blob - " + mFilePath, breadCrumbHolders);
     }
 
     /**

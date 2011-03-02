@@ -85,6 +85,8 @@
         <activity
             android:name=".CompareActivity" />
         <activity
+            android:name=".CommitHistoryActivity" />
+        <activity
             android:name="com.markupartist.android.widget.ActionBar" />
     </application>
     <uses-sdk

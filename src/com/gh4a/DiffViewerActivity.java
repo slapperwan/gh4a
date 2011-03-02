@@ -24,7 +24,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.Button;
+import android.widget.TextView;
 
 import com.gh4a.holder.BreadCrumbHolder;
 
@@ -73,9 +73,9 @@ public class DiffViewerActivity extends BaseActivity {
 
         setBreadCrumb();
         
-        Button btnViewFile = (Button) findViewById(R.id.btn_view);
-        btnViewFile.setText(getResources().getString(R.string.object_view_file_at, mSha.substring(0, 7)));
-        btnViewFile.setOnClickListener(new OnClickListener() {
+        TextView tvViewFile = (TextView) findViewById(R.id.tv_view);
+        tvViewFile.setText(getResources().getString(R.string.object_view_file_at, mSha.substring(0, 7)));
+        tvViewFile.setOnClickListener(new OnClickListener() {
             
             @Override
             public void onClick(View view) {

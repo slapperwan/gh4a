@@ -10,7 +10,6 @@ Main features
 * Breadcrumbs
 * Clean and simple UI
 * Parse README (currently only support Markdown)
-* Search repository or user
 
 *Repository*
 

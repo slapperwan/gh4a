@@ -27,9 +27,13 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.StringUtils;
@@ -94,6 +98,22 @@ public class FileViewerActivity extends BaseActivity {
         mBranchName = getIntent().getStringExtra(Constants.Repository.REPO_BRANCH);
         mFromBtnId = getIntent().getExtras().getInt(Constants.VIEW_ID);
 
+        TextView tvHistoryFile = (TextView) findViewById(R.id.tv_view);
+        tvHistoryFile.setText(getResources().getString(R.string.object_view_history));
+        tvHistoryFile.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent().setClass(FileViewerActivity.this, CommitHistoryActivity.class);
+                intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                intent.putExtra(Constants.Object.OBJECT_SHA, mBranchName);
+                intent.putExtra(Constants.Object.PATH, mPath);
+                
+                startActivity(intent);
+            }
+        });
+        
         setBreadCrumb();
 
         new LoadContentTask(this).execute();
