@@ -137,11 +137,12 @@ public class AddedFileViewerActivity extends BaseActivity {
                     AddedFileViewerActivity activity = mTarget.get();
                     GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
                     ObjectService objectService = factory.createObjectService();
-                    
+                    String filepath = activity.mFilePath;
+                    filepath = filepath.replaceAll(" ", "%20");
                     return objectService.getBlob(activity.mUserLogin,
                                 activity.mRepoName,
                                 activity.mTreeSha, 
-                                activity.mFilePath);
+                                filepath);
                 }
                 catch (GitHubException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
@@ -178,7 +179,8 @@ public class AddedFileViewerActivity extends BaseActivity {
                 else {
                     if (result.getMimeType().startsWith("text")
                             || result.getMimeType().equals("application/xml")
-                            || result.getMimeType().equals("application/sh")) {
+                            || result.getMimeType().equals("application/sh")
+                            || result.getMimeType().equals("application/xhtml+xml")) {
                         mTarget.get().fillData(result);
                     }
                     else {
