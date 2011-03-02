@@ -130,7 +130,7 @@ public class StringUtils {
     public static String doTeaser(String text) {
         if (!StringUtils.isBlank(text)) {
             int indexNewLine = text.indexOf("\n");
-            int indexDot = text.indexOf(".");
+            int indexDot = text.indexOf(". ");
 
             if (indexDot != -1 && indexNewLine != -1) {
                 if (indexDot > indexNewLine) {

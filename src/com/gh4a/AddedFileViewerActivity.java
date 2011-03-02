@@ -16,9 +16,11 @@
 package com.gh4a;
 
 import java.lang.ref.WeakReference;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -31,6 +33,7 @@ import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import com.gh4a.holder.BreadCrumbHolder;
+import com.gh4a.utils.StringUtils;
 import com.github.api.v2.schema.Blob;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
@@ -259,15 +262,64 @@ public class AddedFileViewerActivity extends BaseActivity {
      * @return the string
      */
     private String highlightSyntax(String data) {
-        data = TextUtils.htmlEncode(data).replace("\n", "<br>");
-
+        String ext = StringUtils.getFileExtension(mFilePath);
+        
         StringBuilder content = new StringBuilder();
         content.append("<html><head><title></title>");
-        content.append("<link href='file:///android_asset/prettify.css' rel='stylesheet' type='text/css'/>");
-        content.append("<script src='file:///android_asset/prettify.js' type='text/javascript'></script>");
-        content.append("</head><body onload='prettyPrint()'><pre class='prettyprint linenums'>");
+        if (!Arrays.asList(Constants.SKIP_PRETTIFY_EXT).contains(ext)) {
+            data = TextUtils.htmlEncode(data).replace("\n", "<br>");
+            content.append("<link href='file:///android_asset/prettify.css' rel='stylesheet' type='text/css'/>");
+            content.append("<script src='file:///android_asset/prettify.js' type='text/javascript'></script>");
+            content.append("</head>");
+            content.append("<body onload='prettyPrint()'>");
+            content.append("<pre class='prettyprint linenums'>");
+        }
+        else if ("markdown".equals(ext) 
+                || "md".equals(ext)
+                || "mdown".equals(ext)){
+            content.append("<script src='file:///android_asset/showdown.js' type='text/javascript'></script>");
+            content.append("<style type='text/css'>");
+            content.append("html,body {");
+            content.append("margin:5px;");
+            content.append("padding:0;");
+            content.append("font-family: Helvetica, Arial, Verdana, sans-serif;");
+            content.append("}");
+            content.append("pre {");
+            content.append("display: block;");
+            content.append("background: #F0F0F0;");
+            content.append("padding:5px;");
+            content.append("}");
+            content.append("</style>");
+            content.append("</head>");
+            content.append("<body>");
+            content.append("<div id='content'>");
+        }
+        else {
+            data = TextUtils.htmlEncode(data).replace("\n", "<br>");
+            content.append("</head>");
+            content.append("<body>");
+            content.append("<pre>");
+        }
+        
         content.append(data);
-        content.append("</pre></body></html>");
+        
+        if ("markdown".equals(ext) 
+                || "md".equals(ext)
+                || "mdown".equals(ext)){
+            content.append("</div>");
+            
+            content.append("<script>");
+            content.append("var text = document.getElementById('content').innerHTML;");
+            content.append("var converter = new Showdown.converter();");
+            content.append("var html = converter.makeHtml(text);");
+            content.append("document.getElementById('content').innerHTML = html;");
+            content.append("</script>");
+        }
+        else {
+            content.append("</pre>");
+        }
+        
+        content.append("</body></html>");
 
         return content.toString();
 
@@ -281,6 +333,13 @@ public class AddedFileViewerActivity extends BaseActivity {
             if (mLoadingDialog != null && mLoadingDialog.isShowing()) {
                 mLoadingDialog.dismiss();
             }
+        }
+        
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
+            return true;
         }
     };
 

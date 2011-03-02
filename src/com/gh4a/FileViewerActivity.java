@@ -32,7 +32,6 @@ import android.view.View.OnClickListener;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.gh4a.holder.BreadCrumbHolder;
@@ -220,7 +219,8 @@ public class FileViewerActivity extends BaseActivity {
                     // default browser
                     if (activity.mMimeType.startsWith("text")
                             || activity.mMimeType.equals("application/xml")
-                            || activity.mMimeType.equals("application/sh")) {
+                            || activity.mMimeType.equals("application/sh")
+                            || activity.mMimeType.equals("application/xhtml+xml")) {
                         showInBrowser = false;
                         return objectService.getObjectContent(activity.mUserLogin, activity.mRepoName,
                                 activity.mObjectSha);
