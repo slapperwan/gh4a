@@ -239,6 +239,6 @@ public interface Constants {
     }
     
     public static String[] SKIP_PRETTIFY_EXT = {
-        "txt", "rdoc", "markdown", "md", "texttile", "org", "creole", "rst", "asciidoc", "pod"
+        "txt", "rdoc", "markdown", "md", "mdown", "texttile", "org", "creole", "rst", "asciidoc", "pod"
     };
 }
