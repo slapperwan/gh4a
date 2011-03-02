@@ -4,6 +4,7 @@
 
     <!-- Common -->
     <string name="record_not_found">%1$s not found</string>
+    <string name="more_data_1">%1$s</string>
     <string name="more_data">%1$s | %2$s</string>
     <string name="more_data_3">%1$s | %2$s | %3$s</string>
     <string name="loading_msg">Loading...</string>
