@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res/com.gh4a"
     android:layout_width="fill_parent"
@@ -14,7 +14,8 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_margin="0dp"
-        android:padding="0dp">
+        android:padding="0dp"
+        android:layout_below="@id/actionbar">
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
@@ -209,8 +210,7 @@
                             android:id="@+id/btn_watched_repos"
                             android:layout_width="80dp"
                             android:layout_height="40dp"
-                            android:layout_centerInParent="true" 
-                            />
+                            android:layout_centerInParent="true" />
                         <ProgressBar
                             android:id="@+id/pb_watched_repos"
                             android:layout_height="20dp"
@@ -317,4 +317,53 @@
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
-</LinearLayout>
+    <!-- SlidingDrawer
+        android:id="@+id/slidingDrawer"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:handle="@+id/slideHandleButton"
+        android:content="@+id/contentLayout"
+        android:orientation="vertical"
+        android:layout_below="@id/actionbar"
+        android:layout_alignParentLeft="true"
+        >
+        <LinearLayout 
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <Button
+                android:id="@id/slideHandleButton"  
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="History"
+                android:gravity="left"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="asdasd"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:id="@+id/contentLayout"
+            android:orientation="vertical"
+            android:gravity="center|top"
+            android:padding="10dip"
+            android:background="@drawable/default_comment_box"
+            android:layout_height="fill_parent"
+            android:clickable="true">
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="text drawer" />
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Submit"
+                android:gravity="left"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+        </LinearLayout>
+    </SlidingDrawer-->
+</RelativeLayout>

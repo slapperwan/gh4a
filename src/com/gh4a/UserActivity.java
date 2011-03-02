@@ -36,6 +36,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -85,7 +86,9 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         Bundle data = getIntent().getExtras();
         mUserLogin = data.getString(Constants.User.USER_LOGIN);
         mUserName = data.getString(Constants.User.USER_NAME);
-
+        
+        final ScrollView sv = (ScrollView) findViewById(R.id.main_content);
+        
         new LoadUserInfoTask(this).execute();
     }
 
@@ -589,10 +592,12 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
     
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (menu.size() == 1) {
-            MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.user_menu, menu);
-            
+        if (!mUserLogin.equals(getAuthUsername())) {
+            if (menu.size() == 1) {
+                MenuInflater inflater = getMenuInflater();
+                inflater.inflate(R.menu.user_menu, menu);
+                
+            }
         }
         return true;
     }
