@@ -22,13 +22,13 @@
             android:id="@+id/cb_sign"
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
-            android:text="Help promote gh4a"
+            android:text="@string/promote"
             android:checked="true"
             />
         <TextView
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
-            android:text="(When checked, the signature &quot;Sent via gh4a App&quot; will appear at the bottom of the message)"
+            android:text="@string/promote_desc"
             />
         <Button
             android:text="@string/issue_comment_title"

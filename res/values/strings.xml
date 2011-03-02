@@ -17,6 +17,8 @@
     <string name="sign">&lt;i>Sent via Gh4a App&lt;i></string>
     <string name="label_it">Label it</string>
     <string name="cancel">Cancel</string>
+    <string name="promote">Help Promote Gh4a</string>
+    <string name="promote_desc">(When checked, the signature \'Sent via Gh4a App\' will appear at the bottom of the message)</string>
     
     <!-- Activity event -->
     <string name="event_push_title">%1$s pushed to %2$s at %3$s</string>
