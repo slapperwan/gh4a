@@ -1,3 +1,18 @@
+/*
+ * Copyright 2011 Azwan Adli Abdullah
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.gh4a;
 
 import java.util.ArrayList;
@@ -14,6 +29,9 @@ import android.widget.AdapterView.OnItemClickListener;
 import com.gh4a.adapter.CompareAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
 
+/**
+ * The Compare activity.
+ */
 public class CompareActivity extends BaseActivity implements OnItemClickListener {
 
     /** The user login. */
@@ -22,8 +40,12 @@ public class CompareActivity extends BaseActivity implements OnItemClickListener
     /** The repo name. */
     protected String mRepoName;
     
+    /** The url. */
     protected String mUrl;
     
+    /* (non-Javadoc)
+     * @see android.app.Activity#onCreate(android.os.Bundle)
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +62,9 @@ public class CompareActivity extends BaseActivity implements OnItemClickListener
         fillData();
     }
     
+    /**
+     * Fill data into UI components.
+     */
     private void fillData() {
         ListView listView = (ListView) findViewById(R.id.list_view);
         CompareAdapter compareAdapter = new CompareAdapter(this, new ArrayList<String[]>());
@@ -67,6 +92,9 @@ public class CompareActivity extends BaseActivity implements OnItemClickListener
         compareAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Sets the bread crumb.
+     */
     protected void setBreadCrumb() {
         BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[2];
 
@@ -98,6 +126,9 @@ public class CompareActivity extends BaseActivity implements OnItemClickListener
         }
     }
     
+    /* (non-Javadoc)
+     * @see android.widget.AdapterView.OnItemClickListener#onItemClick(android.widget.AdapterView, android.view.View, int, long)
+     */
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         CompareAdapter adapter = (CompareAdapter) adapterView.getAdapter();
