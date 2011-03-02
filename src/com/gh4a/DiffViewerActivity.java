@@ -17,10 +17,14 @@ package com.gh4a;
 
 import java.util.HashMap;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.Button;
 
 import com.gh4a.holder.BreadCrumbHolder;
 
@@ -43,6 +47,9 @@ public class DiffViewerActivity extends BaseActivity {
 
     /** The filename. */
     protected String mFilePath;
+    
+    /** The tree sha. */
+    protected String mTreeSha;
 
     /**
      * Called when the activity is first created.
@@ -60,10 +67,28 @@ public class DiffViewerActivity extends BaseActivity {
         mUserLogin = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
         mSha = data.getString(Constants.Object.OBJECT_SHA);
+        mTreeSha = data.getString(Constants.Object.TREE_SHA);
         mDiff = data.getString(Constants.Commit.DIFF);
         mFilePath = data.getString(Constants.Object.PATH);
 
         setBreadCrumb();
+        
+        Button btnViewFile = (Button) findViewById(R.id.btn_view);
+        btnViewFile.setText(getResources().getString(R.string.object_view_file_at, mSha.substring(0, 7)));
+        btnViewFile.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent().setClass(DiffViewerActivity.this, AddedFileViewerActivity.class);
+                intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                intent.putExtra(Constants.Object.OBJECT_SHA, mSha);
+                intent.putExtra(Constants.Object.TREE_SHA, mTreeSha);
+                intent.putExtra(Constants.Object.PATH, mFilePath);
+                
+                startActivity(intent);
+            }
+        });
 
         WebView diffView = (WebView) findViewById(R.id.web_view);
         String formatted = highlightSyntax();

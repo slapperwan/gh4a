@@ -13,6 +13,12 @@
     <include
         layout="@layout/breadcrumb"
         android:id="@+id/breadcrumb" />
+    <Button
+        android:id="@+id/btn_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="7dp"
+    />
     <FrameLayout
         android:id="@+id/main_content"
         android:layout_width="fill_parent"

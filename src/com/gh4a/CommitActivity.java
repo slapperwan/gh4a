@@ -58,6 +58,9 @@ public class CommitActivity extends BaseActivity {
     /** The object sha. */
     protected String mObjectSha;
     
+    /** The tree sha. */
+    protected String mTreeSha;
+    
     /**
      * Called when the activity is first created.
      * 
@@ -74,6 +77,7 @@ public class CommitActivity extends BaseActivity {
         mUserLogin = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
         mObjectSha = data.getString(Constants.Object.OBJECT_SHA);
+        mTreeSha = data.getString(Constants.Object.TREE_SHA);
 
         setBreadCrumb();
 
@@ -303,6 +307,7 @@ public class CommitActivity extends BaseActivity {
                         intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
                         intent.putExtra(Constants.Commit.DIFF, delta.getDiff());
                         intent.putExtra(Constants.Object.PATH, delta.getFilename());
+                        intent.putExtra(Constants.Object.TREE_SHA, commit.getTree());
                         startActivity(intent);
                     }
                 });

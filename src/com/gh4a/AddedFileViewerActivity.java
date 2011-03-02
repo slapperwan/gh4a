@@ -18,13 +18,17 @@ package com.gh4a;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 
 import com.gh4a.holder.BreadCrumbHolder;
 import com.github.api.v2.schema.Blob;
@@ -73,6 +77,23 @@ public class AddedFileViewerActivity extends BaseActivity {
         mObjectSha = getIntent().getStringExtra(Constants.Object.OBJECT_SHA);
         mFilePath = getIntent().getStringExtra(Constants.Object.PATH);
 
+        Button btnHistoryFile = (Button) findViewById(R.id.btn_view);
+        btnHistoryFile.setText(getResources().getString(R.string.object_view_history));
+        btnHistoryFile.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent().setClass(AddedFileViewerActivity.this, AddedFileViewerActivity.class);
+                intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
+                intent.putExtra(Constants.Object.TREE_SHA, mTreeSha);
+                intent.putExtra(Constants.Object.PATH, mFilePath);
+                
+                startActivity(intent);
+            }
+        });
+        
         setBreadCrumb();
 
         new LoadContentTask(this).execute();

@@ -200,4 +200,6 @@
     
     <!-- Object -->
     <string name="object_tree">Tree</string>
+    <string name="object_view_file_at">View file @ %1$s</string>
+    <string name="object_view_history">View History</string>
 </resources>
