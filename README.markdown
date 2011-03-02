@@ -4,11 +4,12 @@ This application provides access to github.com informations and stay connected w
 
 Main features
 -------------
-*Common*
+*Key Highlights*
 
 * Easy navigation
 * Breadcrumbs
 * Clean and simple UI
+* Parse README (currently only support Markdown)
 * Search repository or user
 
 *Repository*
