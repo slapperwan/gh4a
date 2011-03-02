@@ -16,7 +16,6 @@
 
 package com.gh4a;
 
-import android.view.Menu;
 
 /**
  * The Interface Constants.
@@ -239,4 +238,7 @@ public interface Constants {
         public static final String TAGS = "Object.TAGS";
     }
     
+    public static String[] SKIP_PRETTIFY_EXT = {
+        "txt", "rdoc", "markdown", "md", "texttile", "org", "creole", "rst", "asciidoc", "pod"
+    };
 }
