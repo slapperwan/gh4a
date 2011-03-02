@@ -83,6 +83,8 @@
         <activity
             android:name=".IssueListByLabelActivity" />
         <activity
+            android:name=".CompareActivity" />
+        <activity
             android:name="com.markupartist.android.widget.ActionBar" />
     </application>
     <uses-sdk

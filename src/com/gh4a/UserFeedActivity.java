@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -218,21 +219,28 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         Gh4Application context = getApplicationContext();
         /** PushEvent */
         if (UserFeed.Type.PUSH_EVENT.equals(eventType)) {
-            List<String[]> shas = feed.getPayload().getShas();
-            // if commit > 1, then show context menu so that user can choose
-            // which commit
-            if (shas != null && shas.size() > 1) {
-                view.showContextMenu();
-            }
-            // only 1 commit, then show the commit details
-            else {
-                if (feed.getRepository() != null) {
-                    context.openCommitInfoActivity(this, feed.getRepository().getOwner(), feed
-                            .getRepository().getName(), feed.getPayload().getShas().get(0)[0]);
+            if (feed.getRepository() != null) {
+                List<String[]> shas = feed.getPayload().getShas();
+                // if commit > 1, then show compare activity
+                if (shas != null && shas.size() > 1) {
+                    Intent intent = new Intent().setClass(context, CompareActivity.class);
+                    for (String[] sha : shas) {
+                        intent.putExtra("sha" + sha[0], sha);
+                    }
+                    
+                    intent.putExtra(Constants.Repository.REPO_OWNER, feed.getRepository().getOwner());
+                    intent.putExtra(Constants.Repository.REPO_NAME, feed.getRepository().getName());
+                    intent.putExtra(Constants.Repository.REPO_URL, feed.getUrl());
+                    startActivity(intent);
                 }
+                // only 1 commit, then show the commit details
                 else {
-                    context.notFoundMessage(this, R.plurals.repository);
+                        context.openCommitInfoActivity(this, feed.getRepository().getOwner(), feed
+                                .getRepository().getName(), feed.getPayload().getShas().get(0)[0]);
                 }
+            }
+            else {
+                context.notFoundMessage(this, R.plurals.repository);
             }
         }
 
@@ -399,6 +407,14 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
             /** PushEvent extra menu for commits */
             if (UserFeed.Type.PUSH_EVENT.equals(eventType)) {
                 if (feed.getRepository() != null) {
+                    int index = feed.getUrl().lastIndexOf("/");
+                    if (index != -1) {
+                        menu.add("Compare " + feed.getUrl().substring(index + 1, feed.getUrl().length()));
+                    }
+                    else {
+                        menu.add("Compare");
+                    }
+                    
                     List<String[]> shas = feed.getPayload().getShas();
                     for (String[] sha : shas) {
                         menu.add("Commit " + sha[0].substring(0, 7) + " " + sha[2]);
@@ -555,6 +571,21 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
             
             context.openPullRequestActivity(this, feed.getRepository().getOwner(), feed
                     .getRepository().getName(), pullRequestNumber);
+        }
+        
+        else if (title.startsWith("Compare")) {
+            if (feed.getRepository() != null) {
+                List<String[]> shas = feed.getPayload().getShas();
+                Intent intent = new Intent().setClass(context, CompareActivity.class);
+                for (String[] sha : shas) {
+                    intent.putExtra("sha" + sha[0], sha);
+                }
+                
+                intent.putExtra(Constants.Repository.REPO_OWNER, feed.getRepository().getOwner());
+                intent.putExtra(Constants.Repository.REPO_NAME, feed.getRepository().getName());
+                intent.putExtra(Constants.Repository.REPO_URL, feed.getUrl());
+                startActivity(intent);
+            }
         }
 
         return true;
