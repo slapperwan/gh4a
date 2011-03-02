@@ -89,6 +89,9 @@ public class DiffViewerActivity extends BaseActivity {
                 startActivity(intent);
             }
         });
+        
+        TextView tvViewRaw = (TextView) findViewById(R.id.tv_view_raw);
+        tvViewRaw.setVisibility(View.GONE);
 
         WebView diffView = (WebView) findViewById(R.id.web_view);
         String formatted = highlightSyntax();

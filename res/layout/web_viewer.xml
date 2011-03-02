@@ -13,14 +13,31 @@
     <include
         layout="@layout/breadcrumb"
         android:id="@+id/breadcrumb" />
-    <TextView
-        android:id="@+id/tv_view"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="7dp"
-        android:textAppearance="?attr/textAppearanceUrl"
-        android:background="?attr/textAppearanceLink"
-    />
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/tv_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="7dp"
+            android:textAppearance="?attr/textAppearanceUrl"
+            android:background="?attr/textAppearanceLink"
+            android:layout_alignParentRight="true"
+        />
+        <TextView
+            android:id="@+id/tv_view_raw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:layout_margin="7dp"
+            android:text="Raw"
+            android:textAppearance="?attr/textAppearanceUrl"
+            android:background="?attr/textAppearanceLink"
+            android:layout_toLeftOf="@id/tv_view"
+        />
+    </RelativeLayout>
     <FrameLayout
         android:id="@+id/main_content"
         android:layout_width="fill_parent"

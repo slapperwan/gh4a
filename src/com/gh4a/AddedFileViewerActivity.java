@@ -96,9 +96,25 @@ public class AddedFileViewerActivity extends BaseActivity {
             }
         });
         
+        TextView tvViewRaw = (TextView) findViewById(R.id.tv_view_raw);
+        tvViewRaw.setVisibility(View.VISIBLE);
+        tvViewRaw.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View view) {
+                TextView tvViewRaw = (TextView) view;
+                if ("Raw".equals(tvViewRaw.getText())) {
+                    new LoadContentTask(AddedFileViewerActivity.this).execute(false);
+                }
+                else {
+                    new LoadContentTask(AddedFileViewerActivity.this).execute(true);
+                }
+            }
+        });
+        
         setBreadCrumb();
 
-        new LoadContentTask(this).execute();
+        new LoadContentTask(this).execute(true);
     }
 
     /**
@@ -140,13 +156,15 @@ public class AddedFileViewerActivity extends BaseActivity {
     /**
      * An asynchronous task that runs on a background thread to load content.
      */
-    private static class LoadContentTask extends AsyncTask<Void, Integer, Blob> {
+    private static class LoadContentTask extends AsyncTask<Boolean, Integer, Blob> {
 
         /** The target. */
         private WeakReference<AddedFileViewerActivity> mTarget;
 
         /** The exception. */
         private boolean mException;
+        
+        private boolean highlight;
 
         /**
          * Instantiates a new load tree list task.
@@ -162,8 +180,9 @@ public class AddedFileViewerActivity extends BaseActivity {
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
-        protected Blob doInBackground(Void... params) {
+        protected Blob doInBackground(Boolean... params) {
             if (mTarget.get() != null) {
+                highlight = params[0];
                 try {
                     AddedFileViewerActivity activity = mTarget.get();
                     GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
@@ -212,7 +231,7 @@ public class AddedFileViewerActivity extends BaseActivity {
                             || result.getMimeType().equals("application/xml")
                             || result.getMimeType().equals("application/sh")
                             || result.getMimeType().equals("application/xhtml+xml")) {
-                        mTarget.get().fillData(result);
+                        mTarget.get().fillData(result, highlight);
                     }
                     else {
                         String url = "https://github.com/" + mTarget.get().mUserLogin + "/"
@@ -232,7 +251,16 @@ public class AddedFileViewerActivity extends BaseActivity {
      *
      * @param blob the blob
      */
-    protected void fillData(Blob blob) {
+    protected void fillData(Blob blob, boolean highlight) {
+        
+        TextView tvViewRaw = (TextView) findViewById(R.id.tv_view_raw);
+        if (highlight) {
+            tvViewRaw.setText("Raw");
+        }
+        else {
+            tvViewRaw.setText("Highlight");
+        }
+        
         WebView webView = (WebView) findViewById(R.id.web_view);
 
         WebSettings s = webView.getSettings();
@@ -250,81 +278,11 @@ public class AddedFileViewerActivity extends BaseActivity {
         // webView.setWebViewClient(new WebChrome2());
         webView.getSettings().setUseWideViewPort(true);
         
-        String highlighted = highlightSyntax(blob.getData());
+        String data = StringUtils.highlightSyntax(blob.getData(), highlight, mFilePath);
         webView.setWebViewClient(webViewClient);
-        webView.loadDataWithBaseURL("file:///android_asset/", highlighted, "text/html", "", "");
+        webView.loadDataWithBaseURL("file:///android_asset/", data, "text/html", "", "");
     }
 
-    /**
-     * Highlight syntax.
-     * 
-     * @param data the data
-     * @return the string
-     */
-    private String highlightSyntax(String data) {
-        String ext = StringUtils.getFileExtension(mFilePath);
-        
-        StringBuilder content = new StringBuilder();
-        content.append("<html><head><title></title>");
-        if (!Arrays.asList(Constants.SKIP_PRETTIFY_EXT).contains(ext)) {
-            data = TextUtils.htmlEncode(data).replace("\n", "<br>");
-            content.append("<link href='file:///android_asset/prettify.css' rel='stylesheet' type='text/css'/>");
-            content.append("<script src='file:///android_asset/prettify.js' type='text/javascript'></script>");
-            content.append("</head>");
-            content.append("<body onload='prettyPrint()'>");
-            content.append("<pre class='prettyprint linenums'>");
-        }
-        else if ("markdown".equals(ext) 
-                || "md".equals(ext)
-                || "mdown".equals(ext)){
-            content.append("<script src='file:///android_asset/showdown.js' type='text/javascript'></script>");
-            content.append("<style type='text/css'>");
-            content.append("html,body {");
-            content.append("margin:5px;");
-            content.append("padding:0;");
-            content.append("font-family: Helvetica, Arial, Verdana, sans-serif;");
-            content.append("}");
-            content.append("pre {");
-            content.append("display: block;");
-            content.append("background: #F0F0F0;");
-            content.append("padding:5px;");
-            content.append("}");
-            content.append("</style>");
-            content.append("</head>");
-            content.append("<body>");
-            content.append("<div id='content'>");
-        }
-        else {
-            data = TextUtils.htmlEncode(data).replace("\n", "<br>");
-            content.append("</head>");
-            content.append("<body>");
-            content.append("<pre>");
-        }
-        
-        content.append(data);
-        
-        if ("markdown".equals(ext) 
-                || "md".equals(ext)
-                || "mdown".equals(ext)){
-            content.append("</div>");
-            
-            content.append("<script>");
-            content.append("var text = document.getElementById('content').innerHTML;");
-            content.append("var converter = new Showdown.converter();");
-            content.append("var html = converter.makeHtml(text);");
-            content.append("document.getElementById('content').innerHTML = html;");
-            content.append("</script>");
-        }
-        else {
-            content.append("</pre>");
-        }
-        
-        content.append("</body></html>");
-
-        return content.toString();
-
-    }
-    
     /** The web view client. */
     private WebViewClient webViewClient = new WebViewClient() {
 
