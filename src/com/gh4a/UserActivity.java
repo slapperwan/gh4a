@@ -18,7 +18,10 @@ package com.gh4a;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -322,8 +325,18 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
             btnNews.setVisibility(View.GONE);
         }
         
-        Button btnYourActions = (Button) findViewById(R.id.btn_your_actions);
-        btnYourActions.setOnClickListener(this);
+        Button btnPublicActivity = (Button) findViewById(R.id.btn_public_activity);
+        btnPublicActivity.setOnClickListener(this);
+        
+//        Button btnYourActions = (Button) findViewById(R.id.btn_your_actions);
+//        
+//        if (mUserLogin.equals(getAuthUsername())) {
+//            btnYourActions.setOnClickListener(this);
+//            btnYourActions.setVisibility(View.VISIBLE);
+//        }
+//        else {
+//            btnYourActions.setVisibility(View.GONE);
+//        }
 
         Button btnPublicRepos = (Button) findViewById(R.id.btn_pub_repos);
         btnPublicRepos.setOnClickListener(this);
@@ -434,6 +447,9 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         case R.id.btn_news:
             getFeeds(view);
             break;
+        case R.id.btn_public_activity:
+            getPublicActivities(view);
+            break;
         case R.id.btn_your_actions:
             getYourActions(view);
             break;
@@ -478,11 +494,17 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
      * @param view the view
      * @return the your actions
      */
-    public void getYourActions(View view) {
+    public void getPublicActivities(View view) {
         Intent intent = new Intent().setClass(this, UserPublicActivity.class);
         intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
         intent.putExtra(Constants.ACTIONBAR_TITLE, mUserLogin);
-        intent.putExtra(Constants.SUBTITLE, getResources().getString(R.string.user_your_actions));
+        intent.putExtra(Constants.SUBTITLE, getResources().getString(R.string.user_public_activity));
+        startActivity(intent);
+    }
+    
+    public void getYourActions(View view) {
+        Intent intent = new Intent().setClass(this, UserYourActionsActivity.class);
+        intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
         startActivity(intent);
     }
     
@@ -604,6 +626,10 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
                 
             }
         }
+        if (menu.size() == 1) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.about_menu, menu);
+        }
         return true;
     }
     
@@ -616,9 +642,70 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
             case R.id.unfollow_action:
                 new FollowUnfollowTask(this).execute(false);
                 return true;
+            case R.id.about:
+                openAboutDialog();
+                return true;
+            case R.id.feedback:
+                openFeedbackDialog();
+                return true;
             default:
                 return true;
         }
+    }
+    
+    private void openAboutDialog() {
+        Dialog dialog = new Dialog(this);
+
+        dialog.setContentView(R.layout.about_dialog);
+        
+        try {
+            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            String versionName = packageInfo.versionName;
+            dialog.setTitle(getResources().getString(R.string.app_name) + " V" + versionName);
+        } 
+        catch (PackageManager.NameNotFoundException e) {
+            dialog.setTitle(getResources().getString(R.string.app_name));
+        }
+        
+        dialog.show();
+    }
+    
+    private void openFeedbackDialog() {
+        Dialog dialog = new Dialog(this);
+
+        dialog.setContentView(R.layout.feedback_dialog);
+        dialog.setTitle(getResources().getString(R.string.feedback));
+        
+        Button btnByEmail = (Button) dialog.findViewById(R.id.btn_by_email);
+        btnByEmail.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View arg0) {
+                Intent sendIntent = new Intent(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{getResources().getString(R.string.my_email)});
+                sendIntent.setType("message/rfc822");
+                startActivity(Intent.createChooser(sendIntent, "Select email application."));
+            }
+        });
+        
+        Button btnByGh4a = (Button) dialog.findViewById(R.id.btn_by_gh4a);
+        btnByGh4a.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View arg0) {
+                if (isAuthenticated()) {
+                    Intent intent = new Intent().setClass(UserActivity.this, IssueCreateActivity.class);
+                    intent.putExtra(Constants.Repository.REPO_OWNER, getResources().getString(R.string.my_username));
+                    intent.putExtra(Constants.Repository.REPO_NAME, getResources().getString(R.string.my_repo));
+                    startActivity(intent);
+                }
+                else {
+                    showMessage("Please login", false);
+                }
+            }
+        });
+        
+        dialog.show();
     }
     
     private static class FollowUnfollowTask extends AsyncTask<Boolean, Void, Boolean> {
