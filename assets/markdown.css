@@ -1,0 +1,31 @@
+html,body {
+	margin:5px;
+    padding:0;
+	font-family: Helvetica, Arial, Verdana, sans-serif;
+	font-size: 12px;
+}
+
+/** From Github css */
+pre {
+	background-color: #EEEEEE;
+    border: 1px solid #DDDDDD;
+    color: #444444;
+    font-size: 12px;
+    line-height: 1.5em;
+    margin: 1em 0;
+    overflow: auto;
+    padding: 5px;
+}
+
+/** From Github css */
+pre code {
+	background-color: #EEEEEE !important;
+    border: medium none !important;
+    font-size: 12px !important;
+    padding: 0 !important;
+}
+
+/** From Github css */
+pre, code {
+    font: 12px Monaco,"Courier New","DejaVu Sans Mono","Bitstream Vera Sans Mono",monospace;
+}
