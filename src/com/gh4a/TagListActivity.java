@@ -31,6 +31,8 @@ import com.gh4a.holder.BreadCrumbHolder;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
 import com.github.api.v2.services.RepositoryService;
+import com.github.api.v2.services.auth.Authentication;
+import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The TagList activity.
@@ -129,7 +131,8 @@ public class TagListActivity extends BaseActivity {
                     RepositoryService service = factory.createRepositoryService();
                     HashMap<String, HashMap<String, String>> branchTagMap = new HashMap<String, HashMap<String, String>>();
                     TagListActivity activity = mTarget.get();
-    
+                    Authentication auth = new LoginPasswordAuthentication(activity.getAuthUsername(), activity.getAuthPassword());
+                    service.setAuthentication(auth);
                     HashMap<String, String> map = (HashMap<String, String>) service.getTags(
                             activity.mUserLogin, activity.mRepoName);
                     branchTagMap.put("tags", map);

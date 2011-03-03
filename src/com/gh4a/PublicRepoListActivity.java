@@ -79,7 +79,7 @@ public class PublicRepoListActivity extends RepositoryListActivity {
      * @see com.gh4a.RepositoryListActivity#setSubtitle()
      */
     protected void setSubtitle() {
-        mSubtitle = "Public Repositories";
+        mSubtitle = getResources().getString(R.string.user_pub_repos);
     }
 
     /*

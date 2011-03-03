@@ -25,6 +25,8 @@ import com.github.api.v2.schema.Repository;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
 import com.github.api.v2.services.RepositoryService;
+import com.github.api.v2.services.auth.Authentication;
+import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The ForkList activity.
@@ -55,6 +57,10 @@ public class ForkListActivity extends RepositoryListActivity {
     protected List<Repository> getRepositories() throws GitHubException {
         GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
         RepositoryService repositoryService = factory.createRepositoryService();
+        
+        Authentication auth = new LoginPasswordAuthentication(getAuthUsername(), getAuthPassword());
+        repositoryService.setAuthentication(auth);
+        
         return repositoryService.getForks(mUserLogin, mRepoName);
     }
 

@@ -15,8 +15,6 @@
  */
 package com.gh4a;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
@@ -38,6 +36,8 @@ import com.github.api.v2.schema.Blob;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
 import com.github.api.v2.services.ObjectService;
+import com.github.api.v2.services.auth.Authentication;
+import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The DiffViewer activity.
@@ -233,6 +233,9 @@ public class FileViewerActivity extends BaseActivity {
                     GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
                     ObjectService objectService = factory.createObjectService();
     
+                    Authentication auth = new LoginPasswordAuthentication(activity.getAuthUsername(), activity.getAuthPassword());
+                    objectService.setAuthentication(auth);
+                    
                     // only show mimetype text/* and xml to WebView, else open
                     // default browser
                     if (activity.mMimeType.startsWith("text")

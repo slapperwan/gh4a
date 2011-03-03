@@ -1,52 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="default_text_large" parent="@android:style/TextAppearance.Large">
-        <item name="android:textSize">15sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">#000000</item>
     </style>
 
     <style name="default_text_medium" parent="@android:style/TextAppearance.Medium">
-        <item name="android:textSize">15sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">#000000</item>
     </style>
 
     <style name="default_text_small" parent="@android:style/TextAppearance.Small">
-        <item name="android:textSize">13sp</item>
+        <item name="android:textSize">12sp</item>
         <item name="android:textColor">#333333</item>
     </style>
     
     <style name="default_text_white_small" parent="@android:style/TextAppearance.Small">
-        <item name="android:textSize">13sp</item>
+        <item name="android:textSize">12sp</item>
         <item name="android:textColor">#FFFFFF</item>
     </style>
 
     <style name="default_text_code" parent="@style/default_text_small">
-        <item name="android:textSize">13sp</item>
         <item name="android:textColor">#383838</item>
         <item name="android:typeface">monospace</item>
     </style>
 
-    <style name="default_text_large_url" parent="@style/default_text_medium">
-        <item name="android:textSize">15sp</item>
-        <item name="android:textStyle">bold</item>
+    <style name="default_text_large_url" parent="@style/default_text_large">
         <item name="android:textColor">#0000CC</item>
     </style>
     
     <style name="default_text_medium_url" parent="@style/default_text_medium">
-        <item name="android:textSize">15sp</item>
         <item name="android:textColor">#0000CC</item>
     </style>
     
-    <style name="default_text_small_url" parent="@style/default_text_medium">
-        <item name="android:textSize">13sp</item>
+    <style name="default_text_small_url" parent="@style/default_text_small">
         <item name="android:textColor">#0000CC</item>
     </style>
 
-    <style name="default_text_medium_subtitle" parent="@style/default_text_medium">
-        <item name="android:textSize">15sp</item>
-        <item name="android:textStyle">bold</item>
+    <style name="default_text_medium_subtitle" parent="@style/default_text_large">
         <item name="android:textColor">#23566D</item>
     </style>
 

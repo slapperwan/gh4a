@@ -40,6 +40,8 @@ import com.github.api.v2.schema.Issue.State;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
 import com.github.api.v2.services.IssueService;
+import com.github.api.v2.services.auth.Authentication;
+import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 import com.markupartist.android.widget.ActionBar;
 import com.markupartist.android.widget.ActionBar.IntentAction;
 
@@ -156,6 +158,8 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
     public List<Issue> getIssues() throws GitHubException {
         GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
         IssueService service = factory.createIssueService();
+        Authentication auth = new LoginPasswordAuthentication(getAuthUsername(), getAuthPassword());
+        service.setAuthentication(auth);
         return service.getIssues(mUserLogin, mRepoName, State
                 .valueOf(mState));
     }

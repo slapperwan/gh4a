@@ -34,6 +34,8 @@ import com.github.api.v2.schema.Tree;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
 import com.github.api.v2.services.ObjectService;
+import com.github.api.v2.services.auth.Authentication;
+import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The FileManager activity.
@@ -177,6 +179,8 @@ public class FileManagerActivity extends BaseActivity implements OnItemClickList
                     FileManagerActivity activity = mTarget.get();
                     GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
                     ObjectService objectService = factory.createObjectService();
+                    Authentication auth = new LoginPasswordAuthentication(activity.getAuthUsername(), activity.getAuthPassword());
+                    objectService.setAuthentication(auth);
                     return objectService.getTree(activity.mUserLogin, activity.mRepoName,
                             activity.mObjectSha);
                 }

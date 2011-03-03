@@ -122,6 +122,11 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
                 try {
                     GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
                     UserService userService = factory.createUserService();
+                    
+                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
+                            mTarget.get().getAuthPassword());
+                    userService.setAuthentication(auth);
+                    
                     return userService.getUserByUsername(mTarget.get().mUserLogin);
                 }
                 catch (GitHubException e) {
@@ -409,7 +414,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
             llLocation.setVisibility(View.GONE);
         }
         
-        btnPublicRepos.setText(String.valueOf(user.getPublicRepoCount()));
+        btnPublicRepos.setText(String.valueOf(user.getPublicRepoCount() + user.getTotalPrivateRepoCount()));
         
         if (Constants.User.USER_TYPE_USER.equals(user.getType())) {
             btnFollowers.setText(String.valueOf(user.getFollowersCount()));
