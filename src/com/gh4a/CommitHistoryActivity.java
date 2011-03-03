@@ -20,6 +20,8 @@ import com.github.api.v2.schema.Commit;
 import com.github.api.v2.services.CommitService;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
+import com.github.api.v2.services.auth.Authentication;
+import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 public class CommitHistoryActivity extends BaseActivity implements OnItemClickListener {
 
@@ -105,6 +107,9 @@ public class CommitHistoryActivity extends BaseActivity implements OnItemClickLi
                 CommitHistoryActivity activity = mTarget.get();
                 GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
                 CommitService commitService = factory.createCommitService();
+                Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
+                        mTarget.get().getAuthPassword());
+                commitService.setAuthentication(auth);
                 try {
                     List<Commit> commits = commitService.getCommits(activity.mUserLogin,
                             activity.mRepoName,

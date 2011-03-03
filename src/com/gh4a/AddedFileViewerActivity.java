@@ -38,6 +38,8 @@ import com.github.api.v2.schema.Blob;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
 import com.github.api.v2.services.ObjectService;
+import com.github.api.v2.services.auth.Authentication;
+import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The AddedFileViewer activity.
@@ -188,6 +190,9 @@ public class AddedFileViewerActivity extends BaseActivity {
                     GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
                     ObjectService objectService = factory.createObjectService();
                     String filepath = activity.mFilePath;
+                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
+                            mTarget.get().getAuthPassword());
+                    objectService.setAuthentication(auth);
                     filepath = filepath.replaceAll(" ", "%20");
                     return objectService.getBlob(activity.mUserLogin,
                                 activity.mRepoName,
