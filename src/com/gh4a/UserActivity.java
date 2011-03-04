@@ -36,10 +36,8 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -89,8 +87,6 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         Bundle data = getIntent().getExtras();
         mUserLogin = data.getString(Constants.User.USER_LOGIN);
         mUserName = data.getString(Constants.User.USER_NAME);
-        
-        final ScrollView sv = (ScrollView) findViewById(R.id.main_content);
         
         new LoadUserInfoTask(this).execute();
     }
@@ -310,22 +306,23 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
 
         TextView tvName = (TextView) findViewById(R.id.tv_name);
         TextView tvCreated = (TextView) findViewById(R.id.tv_created_at);
-        LinearLayout llEmail = (LinearLayout) findViewById(R.id.ll_user_email);
-        LinearLayout llWebsite = (LinearLayout) findViewById(R.id.ll_user_website);
-        LinearLayout llLocation = (LinearLayout) findViewById(R.id.ll_user_location);
-        LinearLayout llCompany = (LinearLayout) findViewById(R.id.ll_user_company);
+        //LinearLayout llEmail = (LinearLayout) findViewById(R.id.ll_user_email);
+        //LinearLayout llWebsite = (LinearLayout) findViewById(R.id.ll_user_website);
+        //LinearLayout llLocation = (LinearLayout) findViewById(R.id.ll_user_location);
+        //LinearLayout llCompany = (LinearLayout) findViewById(R.id.ll_user_company);
 
-        Button btnNews = (Button) findViewById(R.id.btn_news);
-        btnNews.setOnClickListener(this);
+        RelativeLayout rlNewsFeed = (RelativeLayout) findViewById(R.id.rl_news_feed);
         if (mUserLogin.equals(getAuthUsername())) {
+            ImageButton btnNews = (ImageButton) findViewById(R.id.btn_news);
             btnNews.setOnClickListener(this);
-            btnNews.setVisibility(View.VISIBLE);
+            btnNews.setOnClickListener(this);
+            rlNewsFeed.setVisibility(View.VISIBLE);
         }
         else {
-            btnNews.setVisibility(View.GONE);
+            rlNewsFeed.setVisibility(View.GONE);
         }
         
-        Button btnPublicActivity = (Button) findViewById(R.id.btn_public_activity);
+        ImageButton btnPublicActivity = (ImageButton) findViewById(R.id.btn_public_activity);
         btnPublicActivity.setOnClickListener(this);
         
 //        Button btnYourActions = (Button) findViewById(R.id.btn_your_actions);
@@ -389,42 +386,43 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
                         StringUtils.formatDate(user.getCreatedAt())) : "");
 
         //show email row if not blank
+        TextView tvEmail = (TextView) findViewById(R.id.tv_email);
         if (!StringUtils.isBlank(user.getEmail())) {
-            TextView tvEmail = (TextView) findViewById(R.id.tv_email);
             tvEmail.setText(user.getEmail());
-            llEmail.setVisibility(View.VISIBLE);
+            tvEmail.setVisibility(View.VISIBLE);
         }
         else {
-            llEmail.setVisibility(View.GONE);
+            tvEmail.setVisibility(View.GONE);
         }
         
         //show website if not blank
+        TextView tvWebsite = (TextView) findViewById(R.id.tv_website);
         if (!StringUtils.isBlank(user.getBlog())) {
-            TextView tvWebsite = (TextView) findViewById(R.id.tv_website);
             tvWebsite.setText(user.getBlog());
-            llWebsite.setVisibility(View.VISIBLE);
+            tvWebsite.setVisibility(View.VISIBLE);
         }
         else {
-            llWebsite.setVisibility(View.GONE);
+            tvWebsite.setVisibility(View.GONE);
         }
         
+        //show company if not blank
+        TextView tvCompany = (TextView) findViewById(R.id.tv_company);
         if (!StringUtils.isBlank(user.getCompany())) {
-            TextView tvCompany = (TextView) findViewById(R.id.tv_company);
             tvCompany.setText(user.getCompany());
-            llCompany.setVisibility(View.VISIBLE);
+            tvCompany.setVisibility(View.VISIBLE);
         }
         else {
-            llCompany.setVisibility(View.GONE);
+            tvCompany.setVisibility(View.GONE);
         }
         
         //Show location if not blank
+        TextView tvLocation = (TextView) findViewById(R.id.tv_location);
         if (!StringUtils.isBlank(user.getLocation())) {
-            TextView tvLocation = (TextView) findViewById(R.id.tv_location);
             tvLocation.setText(user.getLocation());
-            llLocation.setVisibility(View.VISIBLE);
+            tvLocation.setVisibility(View.VISIBLE);
         }
         else {
-            llLocation.setVisibility(View.GONE);
+            tvLocation.setVisibility(View.GONE);
         }
         
         btnPublicRepos.setText(String.valueOf(user.getPublicRepoCount() + user.getTotalPrivateRepoCount()));

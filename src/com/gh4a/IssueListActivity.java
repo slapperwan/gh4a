@@ -139,15 +139,15 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
         b.setData(data);
         breadCrumbHolders[1] = b;
 
-        createBreadcrumb(State.valueOf(mState).name() + " Issues", breadCrumbHolders);
+        createBreadcrumb(State.valueOf(mState).value() + " Issues", breadCrumbHolders);
     }
 
     public String getSubTitleAfterLoaded(int numberOfIssues) {
         if (numberOfIssues != -1) {
-            return State.valueOf(mState).name() + " Issues (" + numberOfIssues + ")";
+            return State.valueOf(mState).value() + " Issues (" + numberOfIssues + ")";
         }
         else {
-            return State.valueOf(mState).name() + " Issues";
+            return State.valueOf(mState).value() + " Issues";
         }
     }
     

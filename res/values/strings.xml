@@ -158,6 +158,7 @@
         <item quantity="one">Issue</item>
         <item quantity="other">Issues</item>
     </plurals>
+    <string name="issues">Issues</string>
     <string name="Issue">Issue</string>
     <string name="issue_user">User</string>
     <string name="issue_updated_at">Updated at</string>

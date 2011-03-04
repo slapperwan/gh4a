@@ -59,11 +59,12 @@ public class CommitAdapter extends RootAdapter<Commit> {
 
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_gravatar_2, null);
+            v = vi.inflate(R.layout.row_commit, null);
             viewHolder = new ViewHolder();
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
+            viewHolder.tvSha = (TextView) v.findViewById(R.id.tv_sha);
 
             v.setTag(viewHolder);
         }
@@ -89,6 +90,7 @@ public class CommitAdapter extends RootAdapter<Commit> {
                 });
             }
 
+            viewHolder.tvSha.setText(commit.getId().substring(0, 7));
             viewHolder.tvDesc.setText(commit.getMessage());
 
             Resources res = v.getResources();
@@ -114,5 +116,8 @@ public class CommitAdapter extends RootAdapter<Commit> {
         
         /** The tv extra. */
         public TextView tvExtra;
+        
+        /** The sha. */
+        public TextView tvSha;
     }
 }

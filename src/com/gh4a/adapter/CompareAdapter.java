@@ -56,11 +56,12 @@ public class CompareAdapter extends RootAdapter<String[]> {
 
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_gravatar_2, null);
+            v = vi.inflate(R.layout.row_commit, null);
             viewHolder = new ViewHolder();
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
+            viewHolder.tvSha = (TextView) v.findViewById(R.id.tv_sha);
 
             v.setTag(viewHolder);
         }
@@ -86,7 +87,8 @@ public class CompareAdapter extends RootAdapter<String[]> {
                 });
             }
 
-            viewHolder.tvDesc.setText(sha[0].substring(0, 7) + "\n" + sha[2]);
+            viewHolder.tvSha.setText(sha[0].substring(0, 7));
+            viewHolder.tvDesc.setText(sha[2]);
 
             Resources res = v.getResources();
             String extraData = String.format(res.getString(R.string.more_data_1), 
@@ -110,6 +112,9 @@ public class CompareAdapter extends RootAdapter<String[]> {
         
         /** The tv extra. */
         public TextView tvExtra;
+        
+        /** The sha. */
+        public TextView tvSha;
     }
 
 }

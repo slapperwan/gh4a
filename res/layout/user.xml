@@ -47,12 +47,35 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceSmall" />
+                    <TextView
+                        android:id="@+id/tv_email"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:autoLink="email" />
+                    <TextView
+                        android:id="@+id/tv_website"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:autoLink="web" />
+                    <TextView
+                        android:id="@+id/tv_company"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium" />
+                    <TextView
+                        android:id="@+id/tv_location"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:autoLink="map" />
                     <View
                         android:id="@id/separator"
                         android:layout_width="fill_parent"
                         android:layout_height="5dp" />
                 </LinearLayout>
-                <LinearLayout
+                <!-- LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -68,19 +91,19 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/user_public_activity" />
-                    <!-- Button
+                    <Button
                         android:id="@+id/btn_your_actions"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/user_your_actions" /-->
-                </LinearLayout>
+                        android:text="@string/user_your_actions" />
+                </LinearLayout-->
             </RelativeLayout>
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:orientation="vertical"
                 android:layout_margin="10dp">
-                <LinearLayout
+                <!-- LinearLayout
                     android:id="@+id/ll_user_email"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
@@ -102,8 +125,8 @@
                         android:layout_height="1dp"
                         android:layout_marginTop="5dp"
                         android:layout_marginBottom="5dp" />
-                </LinearLayout>
-                <LinearLayout
+                </LinearLayout-->
+                <!-- LinearLayout
                     android:id="@+id/ll_user_website"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
@@ -113,20 +136,14 @@
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceLarge"
                         android:text="@string/user_website" />
-                    <TextView
-                        android:id="@+id/tv_website"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:autoLink="web" />
                     <View
                         android:background="?android:attr/divider"
                         android:layout_width="fill_parent"
                         android:layout_height="1dp"
                         android:layout_marginTop="5dp"
                         android:layout_marginBottom="5dp" />
-                </LinearLayout>
-                <LinearLayout
+                </LinearLayout-->
+                <!-- LinearLayout
                     android:id="@+id/ll_user_company"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
@@ -147,8 +164,8 @@
                         android:layout_height="1dp"
                         android:layout_marginTop="5dp"
                         android:layout_marginBottom="5dp" />
-                </LinearLayout>
-                <LinearLayout
+                </LinearLayout-->
+                <!-- LinearLayout
                     android:id="@+id/ll_user_location"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
@@ -168,7 +185,59 @@
                         android:background="?android:attr/divider"
                         android:layout_width="fill_parent"
                         android:layout_height="1dp" />
-                </LinearLayout>
+                </LinearLayout-->
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="5dp" />
+                <RelativeLayout android:id="@+id/rl_news_feed"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
+                    <TextView
+                        android:id="@+id/tv_news_label"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="@string/user_news_feed" />
+                    <ImageButton
+                        android:id="@+id/btn_news"
+                        android:layout_width="80dp"
+                        android:layout_height="40dp"
+                        android:layout_alignRight="@id/tv_news_label"
+                        android:layout_alignParentRight="true"
+                        android:src="@drawable/ic_more" />
+                    <View
+                        android:background="?android:attr/divider"
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@id/btn_news"
+                        android:layout_marginTop="5dp" />
+                </RelativeLayout>
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="5dp" />
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
+                    <TextView
+                        android:id="@+id/tv_pub_activity_label"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="@string/user_public_activity" />
+                    <ImageButton
+                        android:id="@+id/btn_public_activity"
+                        android:layout_width="80dp"
+                        android:layout_height="40dp"
+                        android:layout_alignRight="@id/tv_pub_activity_label"
+                        android:layout_alignParentRight="true"
+                        android:src="@drawable/ic_more" />
+                    <View
+                        android:background="?android:attr/divider"
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@id/btn_public_activity"
+                        android:layout_marginTop="5dp" />
+                </RelativeLayout>
                 <View
                     android:layout_width="fill_parent"
                     android:layout_height="5dp" />

@@ -60,16 +60,22 @@
                         android:id="@+id/separator"
                         android:layout_width="fill_parent"
                         android:layout_height="10dp" />
-                    <TextView
+                    <!-- TextView
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceLarge"
-                        android:text="@string/repo_description" />
+                        android:text="@string/repo_description" /-->
                     <TextView
                         android:id="@+id/tv_desc"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceMedium" />
+                    <TextView
+                        android:id="@+id/tv_url"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:autoLink="web" />
                     <TextView
                         android:id="@+id/tv_language"
                         android:layout_width="wrap_content"
@@ -84,7 +90,7 @@
                 android:layout_height="fill_parent"
                 android:orientation="vertical"
                 android:layout_margin="10dp">
-                <TextView
+                <!-- TextView
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceLarge"
@@ -100,7 +106,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp" />
+                    android:layout_marginBottom="5dp" /-->
                 <RelativeLayout
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content">
@@ -265,16 +271,16 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content">
                     <TextView
-                        android:id="@+id/tv_open_issues_label"
+                        android:id="@+id/tv_issues_label"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceLarge"
-                        android:text="@string/repo_open_issues" />
+                        android:text="@string/issues" />
                     <Button
                         android:id="@+id/btn_open_issues"
                         android:layout_width="80dp"
                         android:layout_height="wrap_content"
-                        android:layout_alignRight="@id/tv_open_issues_label"
+                        android:layout_alignRight="@id/tv_issues_label"
                         android:layout_alignParentRight="true" />
                 </RelativeLayout>
             </LinearLayout>
