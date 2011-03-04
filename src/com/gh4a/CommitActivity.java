@@ -205,9 +205,10 @@ public class CommitActivity extends BaseActivity {
         LinearLayout llDeleted = (LinearLayout) findViewById(R.id.ll_deleted);
 
         ImageView ivGravatar = (ImageView) findViewById(R.id.iv_gravatar);
-        ImageDownloader.getInstance().download(StringUtils.md5Hex(commit.getAuthor().getEmail()),
-                ivGravatar);
+        
         if (!StringUtils.isBlank(commit.getAuthor().getLogin())) {
+            ImageDownloader.getInstance().download(StringUtils.md5Hex(commit.getAuthor().getEmail()),
+                    ivGravatar);
             ivGravatar.setOnClickListener(new OnClickListener() {
 
                 @Override
@@ -215,6 +216,19 @@ public class CommitActivity extends BaseActivity {
                     /** Open user activity */
                     getApplicationContext().openUserInfoActivity(CommitActivity.this,
                             commit.getAuthor().getLogin(), commit.getAuthor().getName());
+                }
+            });
+        }
+        else {
+            ImageDownloader.getInstance().download(StringUtils.md5Hex(commit.getCommitter().getEmail()),
+                    ivGravatar);
+            ivGravatar.setOnClickListener(new OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    /** Open user activity */
+                    getApplicationContext().openUserInfoActivity(CommitActivity.this,
+                            commit.getCommitter().getLogin(), commit.getCommitter().getName());
                 }
             });
         }

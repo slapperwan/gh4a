@@ -75,7 +75,7 @@ public class ImageDownloader {
      * @param ivImage the iv image
      */
     public void download(String gravatarId, ImageView ivImage) {
-        String url = "http://www.gravatar.com/avatar.php?gravatar_id=" + gravatarId + "&size=60";
+        String url = "http://www.gravatar.com/avatar.php?gravatar_id=" + gravatarId + "&size=60&d=https://github.com%2Fimages%2Fgravatars%2Fgravatar-140.png";
 
         resetPurgeTimer();
         Bitmap bitmap = getBitmapFromCache(url);

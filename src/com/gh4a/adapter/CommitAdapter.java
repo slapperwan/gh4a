@@ -74,9 +74,9 @@ public class CommitAdapter extends RootAdapter<Commit> {
 
         final Commit commit = mObjects.get(position);
         if (commit != null) {
-            ImageDownloader.getInstance().download(
-                    StringUtils.md5Hex(commit.getAuthor().getEmail()), viewHolder.ivGravatar);
             if (!StringUtils.isBlank(commit.getAuthor().getLogin())) {
+                ImageDownloader.getInstance().download(
+                        StringUtils.md5Hex(commit.getAuthor().getEmail()), viewHolder.ivGravatar);
                 viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
 
                     @Override
@@ -89,6 +89,21 @@ public class CommitAdapter extends RootAdapter<Commit> {
                     }
                 });
             }
+            else {
+                ImageDownloader.getInstance().download(
+                        StringUtils.md5Hex(commit.getCommitter().getEmail()), viewHolder.ivGravatar);
+                viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        /** Open user activity */
+                        Gh4Application context = (Gh4Application) v.getContext()
+                                .getApplicationContext();
+                        context.openUserInfoActivity(v.getContext(), commit.getCommitter().getLogin(),
+                                null);
+                    }
+                });
+            }
 
             viewHolder.tvSha.setText(commit.getId().substring(0, 7));
             viewHolder.tvDesc.setText(commit.getMessage());
@@ -96,7 +111,7 @@ public class CommitAdapter extends RootAdapter<Commit> {
             Resources res = v.getResources();
             String extraData = String.format(res.getString(R.string.more_data), !StringUtils
                     .isBlank(commit.getAuthor().getLogin()) ? commit.getAuthor().getLogin()
-                    : commit.getAuthor().getName(), pt.format(commit.getCommittedDate()));
+                    : commit.getCommitter().getLogin(), pt.format(commit.getCommittedDate()));
 
             viewHolder.tvExtra.setText(extraData);
         }
