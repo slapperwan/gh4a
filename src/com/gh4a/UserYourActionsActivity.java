@@ -188,7 +188,8 @@ public class UserYourActionsActivity extends BaseActivity implements OnItemClick
                 String stripAllmsg = msg.replaceAll("\n", "").replaceAll("\r\n", "");
                 String[] msgPart = msg.split(" ");
                 
-                if (!msg.substring(msg.indexOf(msgPart[1]), msg.length()).contains("more commits")) {
+                if (!msg.substring(msg.indexOf(msgPart[1]), msg.length()).contains("more commits")
+                        && msgPart[0].matches("[0-9a-zA-Z]{7}")) {
                     String[] shas = new String[4];
                     shas[0] = msgPart[0];
                     shas[1] = feed.getEmail();

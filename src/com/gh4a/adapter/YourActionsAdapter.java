@@ -92,11 +92,14 @@ public class YourActionsAdapter extends RootAdapter<YourActionFeed> {
             
             String[] commitDesc = desc.split("\n");
             for (String str : commitDesc) {
-                TextView tvCommitMsg = new TextView(baseView.getContext());
-                tvCommitMsg.setText(str.toString());
-                tvCommitMsg.setSingleLine(true);
-                tvCommitMsg.setTextAppearance(baseView.getContext(), R.style.default_text_medium);
-                ll.addView(tvCommitMsg);
+                String[] part = str.split(" ");
+                if (part[0].matches("[0-9a-zA-Z]{7}")) {//only start with sha
+                    TextView tvCommitMsg = new TextView(baseView.getContext());
+                    tvCommitMsg.setText(str.toString());
+                    tvCommitMsg.setSingleLine(true);
+                    tvCommitMsg.setTextAppearance(baseView.getContext(), R.style.default_text_medium);
+                    ll.addView(tvCommitMsg);
+                }
             }
             return null;
         }
