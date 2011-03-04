@@ -22,7 +22,11 @@ import java.util.List;
 
 import android.os.Bundle;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.HeaderViewListAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -67,6 +71,21 @@ public class CompareActivity extends BaseActivity implements OnItemClickListener
      */
     private void fillData() {
         ListView listView = (ListView) findViewById(R.id.list_view);
+        
+        LinearLayout ll = (LinearLayout) getLayoutInflater().inflate(R.layout.compare_footer, listView, false);
+        listView.addFooterView(ll);
+        Button btnAllCommits = (Button) ll.findViewById(R.id.btn_all_commits);
+        btnAllCommits.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View arg0) {
+                getApplicationContext().openBranchListActivity(CompareActivity.this,
+                        mUserLogin,
+                        mRepoName,
+                        R.id.btn_branches);
+            }
+        });
+        
         CompareAdapter compareAdapter = new CompareAdapter(this, new ArrayList<String[]>());
         listView.setAdapter(compareAdapter);
         listView.setOnItemClickListener(this);
@@ -131,7 +150,7 @@ public class CompareActivity extends BaseActivity implements OnItemClickListener
      */
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        CompareAdapter adapter = (CompareAdapter) adapterView.getAdapter();
+        HeaderViewListAdapter adapter = (HeaderViewListAdapter) adapterView.getAdapter();
         String[] sha = (String[]) adapter.getItem(position);
         
         getApplicationContext().openCommitInfoActivity(this, mUserLogin, mRepoName, 
