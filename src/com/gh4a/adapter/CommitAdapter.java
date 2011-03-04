@@ -92,9 +92,9 @@ public class CommitAdapter extends RootAdapter<Commit> {
             viewHolder.tvDesc.setText(commit.getMessage());
 
             Resources res = v.getResources();
-            String extraData = String.format(res.getString(R.string.more_data_3), !StringUtils
+            String extraData = String.format(res.getString(R.string.more_data), !StringUtils
                     .isBlank(commit.getAuthor().getLogin()) ? commit.getAuthor().getLogin()
-                    : commit.getAuthor().getName(), pt.format(commit.getCommittedDate()), commit.getId().substring(0, 7));
+                    : commit.getAuthor().getName(), pt.format(commit.getCommittedDate()));
 
             viewHolder.tvExtra.setText(extraData);
         }

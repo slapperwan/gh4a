@@ -68,11 +68,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/user_public_activity" />
-                    <Button
+                    <!-- Button
                         android:id="@+id/btn_your_actions"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/user_your_actions" />
+                        android:text="@string/user_your_actions" /-->
                 </LinearLayout>
             </RelativeLayout>
             <LinearLayout
