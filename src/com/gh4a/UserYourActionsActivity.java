@@ -29,13 +29,7 @@ import com.gh4a.adapter.YourActionsAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.holder.YourActionFeed;
 import com.gh4a.utils.RssParser;
-import com.github.api.v2.schema.Feed;
-import com.github.api.v2.schema.FeedEntry;
-import com.github.api.v2.services.FeedService;
 import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.auth.Authentication;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The UserYourActions activity.
