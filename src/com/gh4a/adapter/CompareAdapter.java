@@ -86,7 +86,7 @@ public class CompareAdapter extends RootAdapter<String[]> {
                 });
             }
 
-            viewHolder.tvDesc.setText(sha[0].substring(0, 7) + " " + sha[2]);
+            viewHolder.tvDesc.setText(sha[0].substring(0, 7) + "\n" + sha[2]);
 
             Resources res = v.getResources();
             String extraData = String.format(res.getString(R.string.more_data_1), 
