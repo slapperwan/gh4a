@@ -39,6 +39,8 @@ import com.github.api.v2.schema.PullRequest;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
 import com.github.api.v2.services.PullRequestService;
+import com.github.api.v2.services.auth.Authentication;
+import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The PullRequest activity.
@@ -242,6 +244,10 @@ public class PullRequestActivity extends BaseActivity {
                     PullRequestActivity activity = mTarget.get();
                     GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
                     PullRequestService service = factory.createPullRequestService();
+                    
+                    Authentication auth = new LoginPasswordAuthentication(activity.getAuthUsername(), activity.getAuthPassword());
+                    service.setAuthentication(auth);
+                    
                     return service.getPullRequest(activity.mUserLogin, activity.mRepoName,
                             activity.mPullRequestNumber);
                 }

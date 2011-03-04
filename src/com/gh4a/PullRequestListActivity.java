@@ -39,6 +39,8 @@ import com.github.api.v2.schema.Issue.State;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
 import com.github.api.v2.services.PullRequestService;
+import com.github.api.v2.services.auth.Authentication;
+import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The PullRequestList activity.
@@ -173,10 +175,15 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
         protected List<PullRequest> doInBackground(Void... params) {
             if (mTarget.get() != null) {
                 try {
+                    PullRequestListActivity activity = mTarget.get();
                     GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
                     PullRequestService pullRequestService = factory.createPullRequestService();
-                    return pullRequestService.getPullRequests(mTarget.get().mUserLogin,
-                            mTarget.get().mRepoName, State.valueOf(mTarget.get().mState));
+                    
+                    Authentication auth = new LoginPasswordAuthentication(activity.getAuthUsername(), activity.getAuthPassword());
+                    pullRequestService.setAuthentication(auth);
+                    
+                    return pullRequestService.getPullRequests(activity.mUserLogin,
+                            activity.mRepoName, State.valueOf(activity.mState));
                 }
                 catch (GitHubException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);

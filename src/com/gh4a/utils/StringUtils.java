@@ -359,18 +359,7 @@ public class StringUtils {
                     || "md".equals(ext)
                     || "mdown".equals(ext)){
                 content.append("<script src='file:///android_asset/showdown.js' type='text/javascript'></script>");
-                content.append("<style type='text/css'>");
-                content.append("html,body {");
-                content.append("margin:5px;");
-                content.append("padding:0;");
-                content.append("font-family: Helvetica, Arial, Verdana, sans-serif;");
-                content.append("}");
-                content.append("pre {");
-                content.append("display: block;");
-                content.append("background: #F0F0F0;");
-                content.append("padding:5px;");
-                content.append("}");
-                content.append("</style>");
+                content.append("<link href='file:///android_asset/markdown.css' rel='stylesheet' type='text/css'/>");
                 content.append("</head>");
                 content.append("<body>");
                 content.append("<div id='content'>");
@@ -400,6 +389,7 @@ public class StringUtils {
             content.append("var text = document.getElementById('content').innerHTML;");
             content.append("var converter = new Showdown.converter();");
             content.append("var html = converter.makeHtml(text);");
+            //content.append("html = html.replace(/>/g, '>\n').replace(/</g, '\n<').replace(/\n{2,}/g, '\n\n')");
             content.append("document.getElementById('content').innerHTML = html;");
             content.append("</script>");
         }

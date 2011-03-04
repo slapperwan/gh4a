@@ -15,8 +15,6 @@
  */
 package com.gh4a;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
@@ -34,9 +32,12 @@ import android.widget.TextView;
 
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.StringUtils;
+import com.github.api.v2.schema.Blob;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
 import com.github.api.v2.services.ObjectService;
+import com.github.api.v2.services.auth.Authentication;
+import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The DiffViewer activity.
@@ -197,7 +198,7 @@ public class FileViewerActivity extends BaseActivity {
     /**
      * An asynchronous task that runs on a background thread to load tree list.
      */
-    private static class LoadContentTask extends AsyncTask<Boolean, Integer, InputStream> {
+    private static class LoadContentTask extends AsyncTask<Boolean, Integer, Blob> {
 
         /** The target. */
         private WeakReference<FileViewerActivity> mTarget;
@@ -224,7 +225,7 @@ public class FileViewerActivity extends BaseActivity {
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
-        protected InputStream doInBackground(Boolean... params) {
+        protected Blob doInBackground(Boolean... params) {
             if (mTarget.get() != null) {
                 mHighlight = params[0];
                 try {
@@ -232,6 +233,9 @@ public class FileViewerActivity extends BaseActivity {
                     GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
                     ObjectService objectService = factory.createObjectService();
     
+                    Authentication auth = new LoginPasswordAuthentication(activity.getAuthUsername(), activity.getAuthPassword());
+                    objectService.setAuthentication(auth);
+                    
                     // only show mimetype text/* and xml to WebView, else open
                     // default browser
                     if (activity.mMimeType.startsWith("text")
@@ -239,8 +243,12 @@ public class FileViewerActivity extends BaseActivity {
                             || activity.mMimeType.equals("application/sh")
                             || activity.mMimeType.equals("application/xhtml+xml")) {
                         mShowInBrowser = false;
-                        return objectService.getObjectContent(activity.mUserLogin, activity.mRepoName,
-                                activity.mObjectSha);
+                        return objectService.getBlob(activity.mUserLogin,
+                                activity.mRepoName,
+                                activity.mTreeSha, 
+                                activity.mPath);
+//                        return objectService.getObjectContent(activity.mUserLogin, activity.mRepoName,
+//                                activity.mObjectSha);
                     }
                     else {
                         mShowInBrowser = true;
@@ -275,7 +283,7 @@ public class FileViewerActivity extends BaseActivity {
          * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
          */
         @Override
-        protected void onPostExecute(InputStream result) {
+        protected void onPostExecute(Blob result) {
             if (mTarget.get() != null) {
                 if (mException) {
                     mTarget.get().showError();
@@ -302,7 +310,8 @@ public class FileViewerActivity extends BaseActivity {
      * 
      * @param is the is
      */
-    protected void fillData(InputStream is, boolean highlight) {
+    protected void fillData(Blob blob, boolean highlight) {
+        String data = blob.getData();
         TextView tvViewRaw = (TextView) findViewById(R.id.tv_view_raw);
         if (highlight) {
             tvViewRaw.setText("Raw");
@@ -329,16 +338,16 @@ public class FileViewerActivity extends BaseActivity {
         webView.getSettings().setUseWideViewPort(true);
 
         String content;
-        try {
-            content = StringUtils.convertStreamToString(is);
-            String highlighted = StringUtils.highlightSyntax(content, highlight, mName);
+        //try {
+            //content = StringUtils.convertStreamToString(is);
+            String highlighted = StringUtils.highlightSyntax(data, highlight, mName);
             webView.setWebViewClient(webViewClient);
             webView.loadDataWithBaseURL("file:///android_asset/", highlighted, "text/html", "", "");
-        }
-        catch (IOException e) {
-            Log.e(Constants.LOG_TAG, e.getMessage(), e);
-            showError();
-        }
+        //}
+        //catch (IOException e) {
+        //    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+        //    showError();
+        //}
     }
 
     private WebViewClient webViewClient = new WebViewClient() {

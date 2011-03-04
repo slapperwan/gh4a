@@ -159,6 +159,8 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
     protected Bundle getIssue() throws GitHubException {
         GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
         IssueService issueService = factory.createIssueService();
+        Authentication auth = new LoginPasswordAuthentication(getAuthUsername(), getAuthPassword());
+        issueService.setAuthentication(auth);
         Issue issue = issueService.getIssue(mUserLogin, mRepoName, mIssueNumber);
         mBundle = getApplicationContext().populateIssue(issue);
         return mBundle;
@@ -342,6 +344,10 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
     protected List<Comment> getComments() throws GitHubException {
         GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
         IssueService issueService = factory.createIssueService();
+        
+        Authentication auth = new LoginPasswordAuthentication(getAuthUsername(), getAuthPassword());
+        issueService.setAuthentication(auth);
+        
         return issueService.getIssueComments(mUserLogin, mRepoName, mIssueNumber);
     }
 
@@ -852,6 +858,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                             issueService.removeLabel(mUserLogin, mRepoName, mIssueNumber, label);
                         }
                     }
+                    
                     getApplicationContext().openIssueActivity(IssueActivity.this,
                             mUserLogin, mRepoName, mIssueNumber);
                 }

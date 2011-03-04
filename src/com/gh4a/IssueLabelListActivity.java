@@ -120,6 +120,11 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
                 try {
                     GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
                     IssueService issueService = factory.createIssueService();
+                    
+                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(), 
+                            mTarget.get().getAuthPassword());
+                    issueService.setAuthentication(auth);
+                    
                     return issueService.getIssueLabels(mTarget.get().mUserLogin,
                             mTarget.get().mRepoName);
                 }
@@ -159,12 +164,7 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
                     activity.showError();
                 }
                 else {
-                    if (result != null && !result.isEmpty()) {
-                        activity.fillData(result);
-                    }
-                    else {
-                        activity.getApplicationContext().notFoundMessage(activity, "Labels");
-                    }
+                    activity.fillData(result);
                 }
             }
         }
@@ -181,11 +181,11 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
             for (String label : result) {
                 adapter.add(label);
             }
-            adapter.notifyDataSetChanged();
         }
         else {
             getApplicationContext().notFoundMessage(this, "Labels");
         }
+        adapter.notifyDataSetChanged();
     }
 
     @Override

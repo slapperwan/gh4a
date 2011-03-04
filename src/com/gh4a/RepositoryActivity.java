@@ -235,6 +235,8 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
                     RepositoryActivity activity = mTarget.get();
                     GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
                     RepositoryService repositoryService = factory.createRepositoryService();
+                    Authentication auth = new LoginPasswordAuthentication(activity.getAuthUsername(), activity.getAuthPassword());
+                    repositoryService.setAuthentication(auth);
                     return repositoryService.getRepository(activity.mBundle
                             .getString(Constants.Repository.REPO_OWNER), activity.mBundle
                             .getString(Constants.Repository.REPO_NAME));

@@ -37,6 +37,7 @@ public class UserPrivateActivity extends UserFeedActivity {
     public List<UserFeed> getFeeds() throws GitHubException {
         GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
         FeedService feedService = factory.createFeedService();
+        
         Authentication auth = new LoginPasswordAuthentication(mUserLogin, getAuthPassword());
         feedService.setAuthentication(auth);
         return feedService.getPrivateUserFeedJson(mUserLogin);

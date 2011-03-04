@@ -25,6 +25,8 @@ import com.github.api.v2.schema.Issue;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
 import com.github.api.v2.services.IssueService;
+import com.github.api.v2.services.auth.Authentication;
+import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The IssueListByLabel activity.
@@ -91,6 +93,10 @@ public class IssueListByLabelActivity extends IssueListActivity {
         GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
         IssueService service = factory.createIssueService();
         label = label.replaceAll(" ", "%20");
+        
+        Authentication auth = new LoginPasswordAuthentication(getAuthUsername(), getAuthPassword());
+        service.setAuthentication(auth);
+        
         return service.getIssues(mUserLogin, mRepoName, label);
     }
     

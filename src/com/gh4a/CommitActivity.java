@@ -40,6 +40,8 @@ import com.github.api.v2.schema.Delta;
 import com.github.api.v2.services.CommitService;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
+import com.github.api.v2.services.auth.Authentication;
+import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The Commit activity.
@@ -144,6 +146,9 @@ public class CommitActivity extends BaseActivity {
                     CommitActivity activity = mTarget.get();
                     GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
                     CommitService commitService = factory.createCommitService();
+                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
+                            mTarget.get().getAuthPassword());
+                    commitService.setAuthentication(auth);
                     return commitService.getCommit(activity.mUserLogin, activity.mRepoName,
                             activity.mObjectSha);
                 }

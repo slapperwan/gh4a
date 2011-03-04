@@ -87,10 +87,12 @@
         <activity
             android:name=".CommitHistoryActivity" />
         <activity
+            android:name=".UserYourActionsActivity" />
+        <activity
             android:name="com.markupartist.android.widget.ActionBar" />
     </application>
     <uses-sdk
-        android:targetSdkVersion="9" android:minSdkVersion="3"/>
+        android:targetSdkVersion="10" android:minSdkVersion="3"/>
     <uses-permission
         android:name="android.permission.INTERNET" />
 </manifest>
