@@ -23,39 +23,21 @@ import java.util.List;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-<<<<<<< HEAD
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
-=======
-import android.widget.ListView;
->>>>>>> upstream/master
 
 import com.gh4a.adapter.YourActionsAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.holder.YourActionFeed;
 import com.gh4a.utils.RssParser;
-<<<<<<< HEAD
 import com.github.api.v2.services.GitHubException;
-=======
-import com.github.api.v2.schema.Feed;
-import com.github.api.v2.schema.FeedEntry;
-import com.github.api.v2.services.FeedService;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.auth.Authentication;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
->>>>>>> upstream/master
 
 /**
  * The UserYourActions activity.
  */
-<<<<<<< HEAD
 public class UserYourActionsActivity extends BaseActivity implements OnItemClickListener {
-=======
-public class UserYourActionsActivity extends BaseActivity {
->>>>>>> upstream/master
 
     /** The user login. */
     protected String mUserLogin;
@@ -165,11 +147,7 @@ public class UserYourActionsActivity extends BaseActivity {
     }
     
     public List<YourActionFeed> getFeeds() throws GitHubException {
-<<<<<<< HEAD
         RssParser p = new RssParser("https://github.com/slapperwan.private.actor.atom");
-=======
-        RssParser p = new RssParser("http://github.com/slapperwan.private.atom");
->>>>>>> upstream/master
         return p.parse();
         
 //        GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
@@ -183,10 +161,7 @@ public class UserYourActionsActivity extends BaseActivity {
     protected void fillData(List<YourActionFeed> feedEntries) {
         YourActionsAdapter adapter = new YourActionsAdapter(this, new ArrayList<YourActionFeed>());
         ListView listView = (ListView) findViewById(R.id.list_view);
-<<<<<<< HEAD
         listView.setOnItemClickListener(this);
-=======
->>>>>>> upstream/master
         listView.setAdapter(adapter);
         
         if (feedEntries != null && feedEntries.size() > 0) {
@@ -196,13 +171,10 @@ public class UserYourActionsActivity extends BaseActivity {
             adapter.notifyDataSetChanged();
         }
     }
-<<<<<<< HEAD
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         YourActionFeed feed = (YourActionFeed) adapterView.getAdapter().getItem(position);
         getApplicationContext().openRepositoryInfoActivity(this, feed.getRepoOWner(), feed.getRepoName());
     }
-=======
->>>>>>> upstream/master
 }

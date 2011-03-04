@@ -68,11 +68,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/user_public_activity" />
-<<<<<<< HEAD
-                    <Button
-=======
                     <!-- Button
->>>>>>> upstream/master
                         android:id="@+id/btn_your_actions"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

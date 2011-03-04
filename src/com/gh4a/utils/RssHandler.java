@@ -7,12 +7,9 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-<<<<<<< HEAD
 import android.util.Log;
 
 import com.gh4a.Constants;
-=======
->>>>>>> upstream/master
 import com.gh4a.holder.YourActionFeed;
 
 public class RssHandler extends DefaultHandler {
@@ -43,7 +40,6 @@ public class RssHandler extends DefaultHandler {
         if (localName.equalsIgnoreCase("entry")) {
             mYourActionFeed = new YourActionFeed();
         }
-<<<<<<< HEAD
         
         if (mYourActionFeed != null) {
             if (localName.equalsIgnoreCase("thumbnail")){
@@ -72,8 +68,6 @@ public class RssHandler extends DefaultHandler {
                 }
             }
         }
-=======
->>>>>>> upstream/master
     }
 
     @Override
@@ -83,7 +77,6 @@ public class RssHandler extends DefaultHandler {
                 mYourActionFeed.setId(builder.toString());
             }
             else if (localName.equalsIgnoreCase("title")){
-<<<<<<< HEAD
                 mYourActionFeed.setTitle(builder.toString().trim());
             }
             else if (localName.equalsIgnoreCase("content")){
@@ -94,12 +87,6 @@ public class RssHandler extends DefaultHandler {
             }
             else if (localName.equalsIgnoreCase("media")){
                 mYourActionFeed.setPublished(builder.toString().trim());
-=======
-                mYourActionFeed.setTitle(builder.toString());
-            }
-            else if (localName.equalsIgnoreCase("content")){
-                mYourActionFeed.setContent(builder.toString());
->>>>>>> upstream/master
             }
             else if (localName.equalsIgnoreCase("entry")){
                 mYourActionFeeds.add(mYourActionFeed);

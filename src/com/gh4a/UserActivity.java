@@ -328,7 +328,6 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         Button btnPublicActivity = (Button) findViewById(R.id.btn_public_activity);
         btnPublicActivity.setOnClickListener(this);
         
-<<<<<<< HEAD
         Button btnYourActions = (Button) findViewById(R.id.btn_your_actions);
         
         if (mUserLogin.equals(getAuthUsername())) {
@@ -338,17 +337,6 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         else {
             btnYourActions.setVisibility(View.GONE);
         }
-=======
-//        Button btnYourActions = (Button) findViewById(R.id.btn_your_actions);
-//        
-//        if (mUserLogin.equals(getAuthUsername())) {
-//            btnYourActions.setOnClickListener(this);
-//            btnYourActions.setVisibility(View.VISIBLE);
-//        }
-//        else {
-//            btnYourActions.setVisibility(View.GONE);
-//        }
->>>>>>> upstream/master
 
         Button btnPublicRepos = (Button) findViewById(R.id.btn_pub_repos);
         btnPublicRepos.setOnClickListener(this);
