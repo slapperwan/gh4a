@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,6 +33,7 @@ import com.gh4a.adapter.YourActionsAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.holder.YourActionFeed;
 import com.gh4a.utils.RssParser;
+import com.github.api.v2.schema.UserFeed;
 import com.github.api.v2.services.GitHubException;
 
 /**
@@ -175,6 +177,34 @@ public class UserYourActionsActivity extends BaseActivity implements OnItemClick
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         YourActionFeed feed = (YourActionFeed) adapterView.getAdapter().getItem(position);
-        getApplicationContext().openRepositoryInfoActivity(this, feed.getRepoOWner(), feed.getRepoName());
+        String event = feed.getEvent();
+        Log.v(Constants.LOG_TAG, "++++++++++++ " + feed.getActionPath());
+        String actionPath = feed.getActionPath();
+        if (UserFeed.Type.PUSH_EVENT.value().equals(event)
+                && actionPath.contains("compare")) {
+            Intent intent = new Intent().setClass(this, CompareActivity.class);
+            String[] commitMsgs = feed.getContent().split("\n");
+            for (String msg : commitMsgs) {
+                String stripAllmsg = msg.replaceAll("\n", "").replaceAll("\r\n", "");
+                String[] msgPart = msg.split(" ");
+                
+                if (!msg.substring(msg.indexOf(msgPart[1]), msg.length()).contains("more commits")) {
+                    String[] shas = new String[4];
+                    shas[0] = msgPart[0];
+                    shas[1] = feed.getEmail();
+                    shas[2] = msg.substring(msg.indexOf(msgPart[1]), msg.length());
+                    shas[3] = feed.getAuthor();//TODO, get actual commit author from content
+                    intent.putExtra("sha" + shas[0], shas);
+                }
+            }
+            
+            intent.putExtra(Constants.Repository.REPO_OWNER, feed.getRepoOWner());
+            intent.putExtra(Constants.Repository.REPO_NAME, feed.getRepoName());
+            intent.putExtra(Constants.Repository.REPO_URL, feed.getLink());
+            startActivity(intent);
+        }
+        else {
+            getApplicationContext().openRepositoryInfoActivity(this, feed.getRepoOWner(), feed.getRepoName());
+        }
     }
 }

@@ -50,6 +50,9 @@ public class YourActionFeed {
     /** The action path. */
     private String actionPath;
     
+    private String event;
+    
+    private String email;
     /**
      * Gets the id.
      *
@@ -228,5 +231,21 @@ public class YourActionFeed {
      */
     public void setActionPath(String actionPath) {
         this.actionPath = actionPath;
+    }
+
+    public String getEvent() {
+        return event;
+    }
+
+    public void setEvent(String event) {
+        this.event = event;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

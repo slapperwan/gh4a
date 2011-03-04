@@ -10,12 +10,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.holder.YourActionFeed;
 import com.gh4a.utils.ImageDownloader;
+import com.github.api.v2.schema.UserFeed;
 
 public class YourActionsAdapter extends RootAdapter<YourActionFeed> {
 
@@ -51,14 +54,21 @@ public class YourActionsAdapter extends RootAdapter<YourActionFeed> {
             ImageDownloader.getInstance().download(entry.getGravatarId(), viewHolder.ivGravatar);
             
             viewHolder.tvTitle.setText(entry.getTitle());
-            String noHtmlString = entry.getContent().replaceAll("\\<.*?>","");
-            noHtmlString = noHtmlString.replaceAll("[\\n]{2,}", "")
-                    .replaceAll("[\r\n]{2,}", "")
-                    .replaceAll("[\\s]{2,}", "\n").trim()
-                    .replaceAll("[^\n][\\s]+$", "")
-                    .replaceAll("&#47;", "/")
-                    .replaceAll("&raquo;", "");
-            viewHolder.tvDesc.setText(noHtmlString);
+//            String noHtmlString = entry.getContent().replaceAll("\\<.*?>","");
+//            noHtmlString = noHtmlString.replaceAll("[\\n]{2,}", "")
+//                    .replaceAll("[\r\n]{2,}", "")
+//                    .replaceAll("[\\s]{2,}", "\n").trim()
+//                    .replaceAll("[^\n][\\s]+$", "")
+//                    .replaceAll("&#47;", "/")
+//                    .replaceAll("&raquo;", "");
+//            
+//            noHtmlString = formatDesc(entry.getEvent(), noHtmlString, (RelativeLayout) v);
+//            
+//            if (noHtmlString != null) {
+//                viewHolder.tvDesc.setText(noHtmlString);
+//            }
+            String content = formatDesc(entry.getEvent(), entry.getContent(), (RelativeLayout) v);
+            viewHolder.tvDesc.setText(content);
             try {
                 viewHolder.tvCreatedAt.setText(pt.format(sdf.parse(entry.getPublished())));
             }
@@ -69,6 +79,31 @@ public class YourActionsAdapter extends RootAdapter<YourActionFeed> {
         return v;
     }
 
+    private String formatDesc(String event, String desc, RelativeLayout baseView) {
+        LinearLayout ll = (LinearLayout) baseView.findViewById(R.id.ll_push_desc);
+        ll.removeAllViews();
+        TextView generalDesc = (TextView) baseView.findViewById(R.id.tv_desc);
+        ll.setVisibility(View.GONE);
+        generalDesc.setVisibility(View.VISIBLE);
+        
+        if (UserFeed.Type.PUSH_EVENT.value().equals(event)) {
+            generalDesc.setVisibility(View.GONE);
+            ll.setVisibility(View.VISIBLE);
+            
+            String[] commitDesc = desc.split("\n");
+            for (String str : commitDesc) {
+                TextView tvCommitMsg = new TextView(baseView.getContext());
+                tvCommitMsg.setText(str.toString());
+                tvCommitMsg.setSingleLine(true);
+                tvCommitMsg.setTextAppearance(baseView.getContext(), R.style.default_text_medium);
+                ll.addView(tvCommitMsg);
+            }
+            return null;
+        }
+        
+        return desc;
+    }
+    
     /**
      * The Class ViewHolder.
      */
