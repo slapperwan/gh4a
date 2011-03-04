@@ -93,7 +93,7 @@ public class YourActionsAdapter extends RootAdapter<YourActionFeed> {
             String[] commitDesc = desc.split("\n");
             for (String str : commitDesc) {
                 String[] part = str.split(" ");
-                if (part[0].matches("[0-9a-zA-Z]{7}")) {//only start with sha
+                if (part[0].matches("[0-9a-zA-Z]{7}") || str.contains("more commits")) {//only start with sha
                     TextView tvCommitMsg = new TextView(baseView.getContext());
                     tvCommitMsg.setText(str.toString());
                     tvCommitMsg.setSingleLine(true);
