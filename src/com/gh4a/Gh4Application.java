@@ -17,7 +17,9 @@
 package com.gh4a;
 
 import java.util.ArrayList;
-import java.util.List;
+
+import org.acra.ACRA;
+import org.acra.annotation.ReportsCrashes;
 
 import android.app.Application;
 import android.content.Context;
@@ -34,6 +36,7 @@ import com.ocpsoft.pretty.time.PrettyTime;
 /**
  * The Class Gh4Application.
  */
+@ReportsCrashes(formKey = "dGRIem9SQ2g1WU42Mk1uSTRLREQtYkE6MQ") 
 public class Gh4Application extends Application {
 
     /*
@@ -42,6 +45,7 @@ public class Gh4Application extends Application {
      */
     @Override
     public void onCreate() {
+        ACRA.init(this);
         super.onCreate();
     }
 
