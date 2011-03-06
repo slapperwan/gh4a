@@ -25,7 +25,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 
 import com.gh4a.holder.BreadCrumbHolder;
@@ -169,11 +168,11 @@ public class IssueCreateActivity extends BaseActivity implements OnClickListener
                             mTarget.get().getAuthPassword());
                     service.setAuthentication(auth);
                     
-                    CheckBox cbSign = (CheckBox) activity.findViewById(R.id.cb_sign);
+                    //CheckBox cbSign = (CheckBox) activity.findViewById(R.id.cb_sign);
                     String comment = params[1];
-                    if (cbSign.isChecked()) {
-                        comment = comment + "\n\n" + activity.getResources().getString(R.string.sign);
-                    }
+//                    if (cbSign.isChecked()) {
+//                        comment = comment + "\n\n" + activity.getResources().getString(R.string.sign);
+//                    }
                     
                     service.createIssue(activity.mUserLogin, 
                             activity.mRepoName, 

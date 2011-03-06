@@ -30,7 +30,7 @@
             android:gravity="top"
             android:lines="8"
             android:hint="@string/issue_body" />
-        <CheckBox
+        <!-- CheckBox
             android:id="@+id/cb_sign"
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
             android:text="@string/promote_desc"
-            />
+            /-->
         <Button
             android:text="@string/issue_create"
             android:id="@+id/btn_create"

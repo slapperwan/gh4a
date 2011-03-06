@@ -726,12 +726,12 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                 try {
                     IssueActivity activity = mTarget.get();
                     EditText etComment = (EditText) activity.findViewById(R.id.et_desc);
-                    CheckBox cbSign = (CheckBox) activity.findViewById(R.id.cb_sign);
+                    //CheckBox cbSign = (CheckBox) activity.findViewById(R.id.cb_sign);
                     
                     String comment = etComment.getText().toString();
-                    if (cbSign.isChecked()) {
-                        comment = comment + "\n\n" + activity.getResources().getString(R.string.sign);
-                    }
+//                    if (cbSign.isChecked()) {
+//                        comment = comment + "\n\n" + activity.getResources().getString(R.string.sign);
+//                    }
                     GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
                     IssueService service = factory.createIssueService();
                     Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
