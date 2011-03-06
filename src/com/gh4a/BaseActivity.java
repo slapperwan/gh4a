@@ -155,7 +155,7 @@ public class BaseActivity extends Activity {
         try {
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             String versionName = packageInfo.versionName;
-            dialog.setTitle(getResources().getString(R.string.app_name) + " V" + versionName);
+            dialog.setTitle(getResources().getString(R.string.app_name) + " v" + versionName);
         } 
         catch (PackageManager.NameNotFoundException e) {
             dialog.setTitle(getResources().getString(R.string.app_name));
