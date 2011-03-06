@@ -19,10 +19,13 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.IBinder;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
@@ -32,6 +35,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -87,11 +91,12 @@ public class BaseActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu = setupOptionMenu(menu);
-        if (isAuthenticated()) {
-            MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.authenticated_menu, menu);
-        }
-        else {
+//        if (isAuthenticated()
+//                && this instanceof UserActivity) {
+//            MenuInflater inflater = getMenuInflater();
+//            inflater.inflate(R.menu.authenticated_menu, menu);
+//        }
+        if (!isAuthenticated()) {
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.anon_menu, menu);
         }
@@ -127,6 +132,12 @@ public class BaseActivity extends Activity {
         case R.id.login:
             Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
             startActivity(intent);
+        case R.id.about:
+            openAboutDialog();
+            return true;
+        case R.id.feedback:
+            openFeedbackDialog();
+            return true;
         default:
             return setMenuOptionItemSelected(item);
         }
@@ -134,6 +145,61 @@ public class BaseActivity extends Activity {
     
     public boolean setMenuOptionItemSelected(MenuItem item) {
         return true;
+    }
+    
+    public void openAboutDialog() {
+        Dialog dialog = new Dialog(this);
+
+        dialog.setContentView(R.layout.about_dialog);
+        
+        try {
+            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            String versionName = packageInfo.versionName;
+            dialog.setTitle(getResources().getString(R.string.app_name) + " V" + versionName);
+        } 
+        catch (PackageManager.NameNotFoundException e) {
+            dialog.setTitle(getResources().getString(R.string.app_name));
+        }
+        
+        dialog.show();
+    }
+    
+    public void openFeedbackDialog() {
+        Dialog dialog = new Dialog(this);
+
+        dialog.setContentView(R.layout.feedback_dialog);
+        dialog.setTitle(getResources().getString(R.string.feedback));
+        
+        Button btnByEmail = (Button) dialog.findViewById(R.id.btn_by_email);
+        btnByEmail.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View arg0) {
+                Intent sendIntent = new Intent(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{getResources().getString(R.string.my_email)});
+                sendIntent.setType("message/rfc822");
+                startActivity(Intent.createChooser(sendIntent, "Select email application."));
+            }
+        });
+        
+        Button btnByGh4a = (Button) dialog.findViewById(R.id.btn_by_gh4a);
+        btnByGh4a.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View arg0) {
+                if (isAuthenticated()) {
+                    Intent intent = new Intent().setClass(BaseActivity.this, IssueCreateActivity.class);
+                    intent.putExtra(Constants.Repository.REPO_OWNER, getResources().getString(R.string.my_username));
+                    intent.putExtra(Constants.Repository.REPO_NAME, getResources().getString(R.string.my_repo));
+                    startActivity(intent);
+                }
+                else {
+                    showMessage("Please login", false);
+                }
+            }
+        });
+        
+        dialog.show();
     }
     
     /**

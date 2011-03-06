@@ -430,16 +430,18 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
     
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.removeGroup(Menu.FIRST);
-        if ("closed".equals(mBundle.getString(Constants.Issue.ISSUE_STATE))) {
-            menu.add(Menu.FIRST, R.string.issue_reopen, 0, R.string.issue_reopen);
+        if (isAuthenticated()) {
+            menu.clear();
+            if ("closed".equals(mBundle.getString(Constants.Issue.ISSUE_STATE))) {
+                menu.add(Menu.FIRST, R.string.issue_reopen, 0, R.string.issue_reopen);
+            }
+            else {
+                menu.add(Menu.FIRST, R.string.issue_close, 0, R.string.issue_close);
+            }
+            menu.add(Menu.FIRST, R.string.issue_edit, 0, R.string.issue_edit);
+            menu.add(Menu.FIRST, R.string.issue_label_add_delete, 0, R.string.issue_label_add_delete);
+            menu.add(Menu.FIRST, R.string.issue_create, 0, R.string.issue_create);
         }
-        else {
-            menu.add(Menu.FIRST, R.string.issue_close, 0, R.string.issue_close);
-        }
-        menu.add(Menu.FIRST, R.string.issue_edit, 0, R.string.issue_edit);
-        menu.add(Menu.FIRST, R.string.issue_label_add_delete, 0, R.string.issue_label_add_delete);
-        menu.add(Menu.FIRST, R.string.issue_create, 0, R.string.issue_create);
         return true;
     }
     

@@ -202,10 +202,10 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
     
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (menu.size() == 1) {
+        if (isAuthenticated()) {
+            menu.clear();
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.labels_menu, menu);
-            
         }
         return true;
     }

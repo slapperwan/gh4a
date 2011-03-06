@@ -18,10 +18,7 @@ package com.gh4a;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-import android.app.Dialog;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -618,17 +615,13 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         if (isAuthenticated()) {
-            if (!mUserLogin.equals(getAuthUsername())) {
-                if (menu.size() == 1) {
-                    MenuInflater inflater = getMenuInflater();
-                    inflater.inflate(R.menu.user_menu, menu);
-                    
-                }
-            }
-        }
-        if (menu.size() == 1) {
+            menu.clear();
             MenuInflater inflater = getMenuInflater();
+            if (!mUserLogin.equals(getAuthUsername())) {
+                inflater.inflate(R.menu.user_menu, menu);
+            }
             inflater.inflate(R.menu.about_menu, menu);
+            inflater.inflate(R.menu.authenticated_menu, menu);
         }
         return true;
     }
@@ -651,61 +644,6 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
             default:
                 return true;
         }
-    }
-    
-    private void openAboutDialog() {
-        Dialog dialog = new Dialog(this);
-
-        dialog.setContentView(R.layout.about_dialog);
-        
-        try {
-            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            String versionName = packageInfo.versionName;
-            dialog.setTitle(getResources().getString(R.string.app_name) + " V" + versionName);
-        } 
-        catch (PackageManager.NameNotFoundException e) {
-            dialog.setTitle(getResources().getString(R.string.app_name));
-        }
-        
-        dialog.show();
-    }
-    
-    private void openFeedbackDialog() {
-        Dialog dialog = new Dialog(this);
-
-        dialog.setContentView(R.layout.feedback_dialog);
-        dialog.setTitle(getResources().getString(R.string.feedback));
-        
-        Button btnByEmail = (Button) dialog.findViewById(R.id.btn_by_email);
-        btnByEmail.setOnClickListener(new OnClickListener() {
-            
-            @Override
-            public void onClick(View arg0) {
-                Intent sendIntent = new Intent(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{getResources().getString(R.string.my_email)});
-                sendIntent.setType("message/rfc822");
-                startActivity(Intent.createChooser(sendIntent, "Select email application."));
-            }
-        });
-        
-        Button btnByGh4a = (Button) dialog.findViewById(R.id.btn_by_gh4a);
-        btnByGh4a.setOnClickListener(new OnClickListener() {
-            
-            @Override
-            public void onClick(View arg0) {
-                if (isAuthenticated()) {
-                    Intent intent = new Intent().setClass(UserActivity.this, IssueCreateActivity.class);
-                    intent.putExtra(Constants.Repository.REPO_OWNER, getResources().getString(R.string.my_username));
-                    intent.putExtra(Constants.Repository.REPO_NAME, getResources().getString(R.string.my_repo));
-                    startActivity(intent);
-                }
-                else {
-                    showMessage("Please login", false);
-                }
-            }
-        });
-        
-        dialog.show();
     }
     
     private static class FollowUnfollowTask extends AsyncTask<Boolean, Void, Boolean> {

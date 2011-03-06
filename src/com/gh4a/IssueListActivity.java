@@ -288,10 +288,9 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
     
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (menu.size() == 1) {
-            MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.issues_menu, menu);
-        }
+        menu.clear();
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.issues_menu, menu);
         return true;
     }
     

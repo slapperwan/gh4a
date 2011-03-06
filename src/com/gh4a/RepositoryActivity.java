@@ -598,10 +598,10 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
      */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (menu.size() == 1) {
+        if (isAuthenticated()) {
+            menu.clear();
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.repo_menu, menu);
-            
         }
         return true;
     }
