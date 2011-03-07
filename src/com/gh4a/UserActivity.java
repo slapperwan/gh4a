@@ -430,8 +430,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         }
         
         RelativeLayout rlPrivateActivity = (RelativeLayout) findViewById(R.id.rl_private_activity);
-        if (isSettingEnabled("Private_Repo_Feed")
-                && mUserLogin.equals(getAuthUsername())) {
+        if (isSettingEnabled("Private_Repo_Feed") || (isSettingEnabled("Private_Org_Feed"))) {
             ImageButton btnPrivateActivity = (ImageButton) findViewById(R.id.btn_private_activity);
             btnPrivateActivity.setOnClickListener(this);
             rlPrivateActivity.setVisibility(View.VISIBLE);
@@ -456,7 +455,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
             getPublicActivities(view);
             break;
         case R.id.btn_private_activity:
-            getYourActions(view);
+            getPrivateActivities(view);
             break;
         case R.id.btn_pub_repos:
             getPublicRepos(view);
@@ -508,10 +507,27 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         startActivity(intent);
     }
     
-    public void getYourActions(View view) {
+    public void getPrivateActivities(View view) {
         Intent intent = new Intent().setClass(this, UserYourActionsActivity.class);
         intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
-        startActivity(intent);
+        if (isSettingEnabled("Private_Repo_Feed")
+                && mUserLogin.equals(getAuthUsername())
+                && Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
+            intent.putExtra(Constants.Repository.REPO_URL, "https://github.com/" + mUserLogin + ".private.actor.atom");
+            startActivity(intent);
+        }
+        else if (isSettingEnabled("Private_Org_Feed")
+                && Constants.User.USER_TYPE_ORG.equals(mUser.getType())) {
+            if (getSettingStringValue("Api_Token") != null) {
+                intent.putExtra(Constants.Repository.REPO_URL, "https://github.com/organizations/" + mUserLogin 
+                        + "/" + getAuthUsername() + ".private.atom?token="
+                        + getSettingStringValue("Api_Token"));
+                startActivity(intent);
+            }
+            else {
+                showMessage("No API Token found.  Please enter the value at Settings page.", false);
+            }
+        }
     }
     
     /**

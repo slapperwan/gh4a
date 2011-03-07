@@ -23,7 +23,6 @@ import java.util.List;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -34,7 +33,6 @@ import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.holder.YourActionFeed;
 import com.gh4a.utils.RssParser;
 import com.github.api.v2.schema.UserFeed;
-import com.github.api.v2.services.GitHubException;
 
 /**
  * The UserYourActions activity.
@@ -43,6 +41,8 @@ public class UserYourActionsActivity extends BaseActivity implements OnItemClick
 
     /** The user login. */
     protected String mUserLogin;
+    
+    protected String mUrl;
     
     /** The loading dialog. */
     protected LoadingDialog mLoadingDialog;
@@ -55,6 +55,7 @@ public class UserYourActionsActivity extends BaseActivity implements OnItemClick
         setUpActionBar();
         
         mUserLogin = getIntent().getExtras().getString(Constants.User.USER_LOGIN);
+        mUrl = getIntent().getExtras().getString(Constants.Repository.REPO_URL);
         
         setBreadCrumb();
         
@@ -88,6 +89,8 @@ public class UserYourActionsActivity extends BaseActivity implements OnItemClick
         
         /** The exception. */
         private boolean mException;
+        
+        private boolean isAuthError; 
 
         /**
          * Instantiates a new load activity list task.
@@ -105,12 +108,19 @@ public class UserYourActionsActivity extends BaseActivity implements OnItemClick
         @Override
         protected List<YourActionFeed> doInBackground(Void... params) {
             if (mTarget.get() != null) {
+                RssParser p = new RssParser(mTarget.get().mUrl);
                 try {
-                    return mTarget.get().getFeeds();
+                    return p.parse();
                 }
-                catch (GitHubException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
+                catch (Exception e) {
+                    if ("Received authentication challenge is null".equalsIgnoreCase(e.getMessage())) {
+                        mException = true;
+                        isAuthError = true;
+                    }
+                    else {
+                        mException = true;
+                        isAuthError = false;
+                    }
                     return null;
                 }
             }
@@ -139,25 +149,20 @@ public class UserYourActionsActivity extends BaseActivity implements OnItemClick
             if (mTarget.get() != null) {
                 mTarget.get().mLoadingDialog.dismiss();
                 if (mException) {
-                    mTarget.get().showError();
+                    if (isAuthError) {
+                        mTarget.get().showMessage("Invalid API Token.", false);
+                    }
+                    else {
+                        mTarget.get().showError();
+                    }
                 }
                 else {
-                    mTarget.get().fillData(result);
+                    if (result != null) {
+                        mTarget.get().fillData(result);
+                    }
                 }
             }
         }
-    }
-    
-    public List<YourActionFeed> getFeeds() throws GitHubException {
-        RssParser p = new RssParser("https://github.com/slapperwan.private.actor.atom");
-        return p.parse();
-        
-//        GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-//        FeedService feedService = factory.createFeedService();
-//        Authentication auth = new LoginPasswordAuthentication(getAuthUsername(), getAuthPassword());
-//        feedService.setAuthentication(auth);
-//        Feed feed = feedService.getPrivateUserFeed(getAuthUsername(), 100);
-//        return feed.getEntries();
     }
     
     protected void fillData(List<YourActionFeed> feedEntries) {
@@ -178,7 +183,6 @@ public class UserYourActionsActivity extends BaseActivity implements OnItemClick
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         YourActionFeed feed = (YourActionFeed) adapterView.getAdapter().getItem(position);
         String event = feed.getEvent();
-        Log.v(Constants.LOG_TAG, "++++++++++++ " + feed.getActionPath());
         String actionPath = feed.getActionPath();
         if (UserFeed.Type.PUSH_EVENT.value().equals(event)
                 && actionPath.contains("compare")) {
@@ -225,7 +229,14 @@ public class UserYourActionsActivity extends BaseActivity implements OnItemClick
         else {
             if (feed.getRepoOWner() != null
                     && feed.getRepoName() != null) {
-                getApplicationContext().openRepositoryInfoActivity(this, feed.getRepoOWner(), feed.getRepoName());
+                
+                //url is https://github.com/organizations/:organization/:....
+                if ("organizations".equals(feed.getRepoOWner())) {
+                    getApplicationContext().openUserInfoActivity(this, feed.getRepoName(), null);
+                }
+                else {
+                    getApplicationContext().openRepositoryInfoActivity(this, feed.getRepoOWner(), feed.getRepoName());
+                }
             }
             else {
                 getApplicationContext().notFoundMessage(this, R.plurals.repository);

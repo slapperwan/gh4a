@@ -457,6 +457,11 @@ public class BaseActivity extends Activity {
     
     public boolean isSettingEnabled(String key) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        return sp.getBoolean("Private_Repo_Feed", false);
+        return sp.getBoolean(key, false);
+    }
+    
+    public String getSettingStringValue(String key) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        return sp.getString(key, null);
     }
 }
