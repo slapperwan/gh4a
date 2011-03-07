@@ -29,6 +29,7 @@
     <string name="feedback_text">If you have any issues or suggestions, please contact me.  Any kind of feedback is greatly appreciated.</string>
     <string name="feedback_by_email">By Email</string>
     <string name="feedback_by_gh4a">By Gh4a</string>
+    <string name="settings">Settings</string>
     
     <!-- Activity event -->
     <string name="event_push_title">%1$s pushed to %2$s at %3$s</string>
@@ -84,6 +85,7 @@
     <string name="user_news_feed">News Feed</string>
     <string name="user_your_actions">Your Actions</string>
     <string name="user_public_activity">Public Activity</string>
+    <string name="user_private_activity">Private Activity</string>
     <string name="user_organizations">Organizations</string>
     <string name="user_follow_action">Follow</string>
     <string name="user_unfollow_action">Unfollow</string>

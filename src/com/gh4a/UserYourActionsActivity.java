@@ -78,7 +78,7 @@ public class UserYourActionsActivity extends BaseActivity implements OnItemClick
         b.setData(data);
         breadCrumbHolders[0] = b;
 
-        createBreadcrumb(getResources().getString(R.string.user_your_actions), breadCrumbHolders);
+        createBreadcrumb(getResources().getString(R.string.user_private_activity), breadCrumbHolders);
     }
     
     private static class LoadActivityListTask extends AsyncTask<Void, Integer, List<YourActionFeed>> {
@@ -203,6 +203,24 @@ public class UserYourActionsActivity extends BaseActivity implements OnItemClick
             intent.putExtra(Constants.Repository.REPO_NAME, feed.getRepoName());
             intent.putExtra(Constants.Repository.REPO_URL, feed.getLink());
             startActivity(intent);
+        }
+        else if (UserFeed.Type.FOLLOW_EVENT.value().equals(event)) {
+            String[] title = feed.getTitle().split(" ");
+            String username = title[3];
+            getApplicationContext().openUserInfoActivity(this, username, null);
+        }
+        else if (UserFeed.Type.ISSUES_EVENT.value().equals(event)) {
+            String[] title = feed.getTitle().split(" ");
+            String issueNumber = title[3];
+            getApplicationContext().openIssueActivity(this, feed.getRepoOWner(), feed.getRepoName(), Integer.parseInt(issueNumber));
+        }
+        else if (UserFeed.Type.GOLLUM_EVENT.value().equals(event)) {
+            getApplicationContext().openBrowser(this, feed.getLink());
+        }
+        else if (UserFeed.Type.PULL_REQUEST_EVENT.value().equals(event)) {
+            String[] title = feed.getTitle().split(" ");
+            String issueNumber = title[4];
+            getApplicationContext().openPullRequestActivity(this, feed.getRepoOWner(), feed.getRepoName(), Integer.parseInt(issueNumber));
         }
         else {
             getApplicationContext().openRepositoryInfoActivity(this, feed.getRepoOWner(), feed.getRepoName());

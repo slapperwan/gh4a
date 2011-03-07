@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="Experimental Features">
+        <CheckBoxPreference
+            android:key="Private_Repo_Feed"
+            android:title="Private Repo Feed"
+            android:defaultValue="false"
+            android:summary="Enable private repository news feed.  When enabled, this feature will appear at your profile page (Home) with label \'Private Activity\'" />
+        <CheckBoxPreference
+            android:key="Private_Org_Feed"
+            android:title="Organization Feed"
+            android:defaultValue="false"
+            android:summary="Enable organization news feed.  When enabled, this feature will appear at organization profile page." />
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -126,6 +126,9 @@ public class RssHandler extends DefaultHandler {
         if (UserFeed.Type.FOLLOW_EVENT.value().equals(event)) {
             content = content.replaceAll("\n", " ");
         }
+        if (UserFeed.Type.PULL_REQUEST_EVENT.value().equals(event)) {
+            content = content.replaceAll("\n", " ");
+        }
         else if (UserFeed.Type.PUSH_EVENT.value().equals(event)) {
             StringBuilder sb = new StringBuilder();
             

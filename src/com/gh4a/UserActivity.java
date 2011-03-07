@@ -312,7 +312,6 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         if (mUserLogin.equals(getAuthUsername())) {
             ImageButton btnNews = (ImageButton) findViewById(R.id.btn_news);
             btnNews.setOnClickListener(this);
-            btnNews.setOnClickListener(this);
             rlNewsFeed.setVisibility(View.VISIBLE);
         }
         else {
@@ -429,6 +428,17 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
             ProgressBar progressBar = (ProgressBar) findViewById(R.id.pb_followers);
             progressBar.setVisibility(View.GONE);
         }
+        
+        RelativeLayout rlPrivateActivity = (RelativeLayout) findViewById(R.id.rl_private_activity);
+        if (isSettingEnabled("Private_Repo_Feed")
+                && mUserLogin.equals(getAuthUsername())) {
+            ImageButton btnPrivateActivity = (ImageButton) findViewById(R.id.btn_private_activity);
+            btnPrivateActivity.setOnClickListener(this);
+            rlPrivateActivity.setVisibility(View.VISIBLE);
+        }
+        else {
+            rlPrivateActivity.setVisibility(View.GONE);
+        }
     }
 
     /*
@@ -445,7 +455,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         case R.id.btn_public_activity:
             getPublicActivities(view);
             break;
-        case R.id.btn_your_actions:
+        case R.id.btn_private_activity:
             getYourActions(view);
             break;
         case R.id.btn_pub_repos:
@@ -463,6 +473,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         case R.id.btn_organizations:
             view.showContextMenu();
             break;
+          
         default:
             break;
         }
@@ -640,6 +651,10 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
                 return true;
             case R.id.feedback:
                 openFeedbackDialog();
+                return true;
+            case R.id.settings:
+                Intent intent = new Intent().setClass(this, AppPreferenceActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return true;

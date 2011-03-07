@@ -27,6 +27,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.view.Menu;
@@ -452,5 +453,10 @@ public class BaseActivity extends Activity {
         if (finishThisActivity) {
             super.finish();
         }
+    }
+    
+    public boolean isSettingEnabled(String key) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        return sp.getBoolean("Private_Repo_Feed", false);
     }
 }
