@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.AbsListView;
 
 import com.gh4a.holder.BreadCrumbHolder;
@@ -62,7 +63,8 @@ public class PublicRepoListActivity extends RepositoryListActivity {
         RepositoryService repositoryService = factory.createRepositoryService();
         Authentication auth = new LoginPasswordAuthentication(getAuthUsername(), getAuthPassword());
         repositoryService.setAuthentication(auth);
-        return repositoryService.getRepositories(mUserLogin);
+        Log.v(Constants.LOG_TAG, "++++++++++ " + mPage);
+        return repositoryService.getRepositories(mUserLogin, mPage);
     }
 
     /*
@@ -87,10 +89,10 @@ public class PublicRepoListActivity extends RepositoryListActivity {
      * @seecom.gh4a.RepositoryListActivity#onScrollStateChanged(android.widget.
      * AbsListView, int)
      */
-    @Override
-    public void onScrollStateChanged(AbsListView view, int scrollState) {
-        mReload = false;
-    }
+//    @Override
+//    public void onScrollStateChanged(AbsListView view, int scrollState) {
+//        mReload = false;
+//    }
 
     /*
      * (non-Javadoc)
