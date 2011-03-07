@@ -7,10 +7,12 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.holder.YourActionFeed;
 import com.github.api.v2.schema.UserFeed;
@@ -40,6 +42,7 @@ public class RssHandler extends DefaultHandler {
     public void startElement(String uri, String localName, String qName, Attributes attributes)
             throws SAXException {
         
+        Log.v(Constants.LOG_TAG, "+++++ " + uri + " " + localName + " " + qName);
         if (localName.equalsIgnoreCase("entry")) {
             mYourActionFeed = new YourActionFeed();
         }
@@ -53,6 +56,7 @@ public class RssHandler extends DefaultHandler {
             }
             else if (localName.equalsIgnoreCase("link")){
                 String url = attributes.getValue(2);
+                Log.v(Constants.LOG_TAG, "++++++ " + url);
                 String[] urlPart = url.split("/");
                 String owner = null;
                 String repoName = null;
@@ -61,10 +65,10 @@ public class RssHandler extends DefaultHandler {
                     owner = urlPart[3];
                     repoName = urlPart[4];
                 }
-                else if (urlPart.length <= 4) {
+                else if (urlPart.length > 3) {
                     owner = urlPart[3];
                 }
-
+                
                 mYourActionFeed.setLink(url);
                 mYourActionFeed.setRepoOWner(owner);
                 mYourActionFeed.setRepoName(repoName);

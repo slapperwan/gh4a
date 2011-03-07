@@ -223,7 +223,13 @@ public class UserYourActionsActivity extends BaseActivity implements OnItemClick
             getApplicationContext().openPullRequestActivity(this, feed.getRepoOWner(), feed.getRepoName(), Integer.parseInt(issueNumber));
         }
         else {
-            getApplicationContext().openRepositoryInfoActivity(this, feed.getRepoOWner(), feed.getRepoName());
+            if (feed.getRepoOWner() != null
+                    && feed.getRepoName() != null) {
+                getApplicationContext().openRepositoryInfoActivity(this, feed.getRepoOWner(), feed.getRepoName());
+            }
+            else {
+                getApplicationContext().notFoundMessage(this, R.plurals.repository);
+            }
         }
     }
 }
