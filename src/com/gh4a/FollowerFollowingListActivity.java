@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,8 +28,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
-import com.gh4a.adapter.SimpleStringAdapter;
+import com.gh4a.adapter.UserAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
+import com.github.api.v2.schema.User;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
 import com.github.api.v2.services.UserService;
@@ -50,7 +50,7 @@ public class FollowerFollowingListActivity extends BaseActivity implements OnIte
     protected LoadingDialog mLoadingDialog;
 
     /** The follower following adapter. */
-    protected SimpleStringAdapter mFollowerFollowingAdapter;
+    protected UserAdapter mFollowerFollowingAdapter;
 
     /** The list view users. */
     protected ListView mListViewUsers;
@@ -80,7 +80,7 @@ public class FollowerFollowingListActivity extends BaseActivity implements OnIte
         mListViewUsers = (ListView) findViewById(R.id.list_view);
         mListViewUsers.setOnItemClickListener(this);
 
-        mFollowerFollowingAdapter = new SimpleStringAdapter(this, new ArrayList<String>());
+        mFollowerFollowingAdapter = new UserAdapter(this, new ArrayList<User>(), R.layout.row_gravatar_1, false);
         mListViewUsers.setAdapter(mFollowerFollowingAdapter);
 
         new LoadListTask(this).execute();
@@ -109,7 +109,7 @@ public class FollowerFollowingListActivity extends BaseActivity implements OnIte
     /**
      * An asynchronous task that runs on a background thread to load list.
      */
-    private static class LoadListTask extends AsyncTask<Void, Integer, List<String>> {
+    private static class LoadListTask extends AsyncTask<Void, Integer, List<User>> {
 
         /** The target. */
         private WeakReference<FollowerFollowingListActivity> mTarget;
@@ -131,20 +131,20 @@ public class FollowerFollowingListActivity extends BaseActivity implements OnIte
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
-        protected List<String> doInBackground(Void... params) {
+        protected List<User> doInBackground(Void... params) {
             if (mTarget.get() != null) {
                 try {
                     FollowerFollowingListActivity activity = mTarget.get();
                     GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
                     UserService service = factory.createUserService();
-                    List<String> usernames = new ArrayList<String>();
+                    List<User> users = new ArrayList<User>();
                     if (activity.mFindFollowers) {
-                        usernames = service.getUserFollowers(activity.mUserLogin);
+                        users = service.getUserFollowers(activity.mUserLogin);
                     }
                     else {
-                        usernames = service.getUserFollowing(activity.mUserLogin);
+                        users = service.getUserFollowing(activity.mUserLogin);
                     }
-                    return usernames;
+                    return users;
                 }
                 catch (GitHubException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
@@ -174,7 +174,7 @@ public class FollowerFollowingListActivity extends BaseActivity implements OnIte
          * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
          */
         @Override
-        protected void onPostExecute(List<String> result) {
+        protected void onPostExecute(List<User> result) {
             if (mTarget.get() != null) {
                 FollowerFollowingListActivity activity = mTarget.get();
                 activity.mLoadingDialog.dismiss();
@@ -194,11 +194,11 @@ public class FollowerFollowingListActivity extends BaseActivity implements OnIte
      * 
      * @param usernames the usernames
      */
-    protected void fillData(List<String> usernames) {
-        if (usernames != null && usernames.size() > 0) {
+    protected void fillData(List<User> users) {
+        if (users != null && users.size() > 0) {
             mFollowerFollowingAdapter.notifyDataSetChanged();
-            for (String username : usernames) {
-                mFollowerFollowingAdapter.add(username);
+            for (User user : users) {
+                mFollowerFollowingAdapter.add(user);
             }
         }
         mFollowerFollowingAdapter.notifyDataSetChanged();
@@ -212,10 +212,7 @@ public class FollowerFollowingListActivity extends BaseActivity implements OnIte
      */
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        String username = (String) adapterView.getAdapter().getItem(position);
-        Intent intent = new Intent().setClass(FollowerFollowingListActivity.this,
-                UserActivity.class);
-        intent.putExtra(Constants.User.USER_LOGIN, username);
-        startActivity(intent);
+        User user = (User) adapterView.getAdapter().getItem(position);
+        getApplicationContext().openUserInfoActivity(this, user.getLogin(), user.getName());
     }
 }
