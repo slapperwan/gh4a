@@ -430,10 +430,18 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         }
         
         RelativeLayout rlPrivateActivity = (RelativeLayout) findViewById(R.id.rl_private_activity);
-        if (isSettingEnabled("Private_Repo_Feed") || (isSettingEnabled("Private_Org_Feed"))) {
+        if (isSettingEnabled("Private_Repo_Feed") 
+                && mUserLogin.equals(getAuthUsername())
+                && Constants.User.USER_TYPE_USER.equals(user.getType())) {
             ImageButton btnPrivateActivity = (ImageButton) findViewById(R.id.btn_private_activity);
             btnPrivateActivity.setOnClickListener(this);
             rlPrivateActivity.setVisibility(View.VISIBLE);
+        }
+        else if (isSettingEnabled("Private_Org_Feed")
+                && Constants.User.USER_TYPE_ORG.equals(user.getType())) {
+            ImageButton btnPrivateActivity = (ImageButton) findViewById(R.id.btn_private_activity);
+            btnPrivateActivity.setOnClickListener(this);
+            rlPrivateActivity.setVisibility(View.VISIBLE);   
         }
         else {
             rlPrivateActivity.setVisibility(View.GONE);
