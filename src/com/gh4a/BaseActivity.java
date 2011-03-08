@@ -130,9 +130,11 @@ public class BaseActivity extends Activity {
                     Toast.makeText(this, getResources().getString(R.string.success_logout), Toast.LENGTH_SHORT).show();
                 }
             }
+            return true;
         case R.id.login:
             Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
             startActivity(intent);
+            return true;
         case R.id.about:
             openAboutDialog();
             return true;
