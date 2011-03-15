@@ -81,7 +81,6 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:layout_centerVertical="true"
                 android:text="@string/issue_comments" />
             <Button
                 android:id="@+id/btn_comments"
