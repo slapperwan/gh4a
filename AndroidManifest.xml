@@ -89,7 +89,8 @@
         <activity
             android:name=".UserYourActionsActivity" />
         <activity
-            android:name=".AppPreferenceActivity" />
+            android:name=".AppPreferenceActivity"
+            android:theme="@android:style/Theme"/>
         <activity
             android:name="com.markupartist.android.widget.ActionBar" />
     </application>
