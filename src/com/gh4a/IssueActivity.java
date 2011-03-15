@@ -27,13 +27,13 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -833,7 +833,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
         
         //final boolean[] newCheckedItems = new boolean[availableLabels.size()];
         
-        AlertDialog.Builder builder = new AlertDialog.Builder(IssueActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(IssueActivity.this, android.R.style.Theme));
         builder.setCancelable(true);
         builder.setTitle(R.string.issue_labels);
         builder.setMultiChoiceItems(availabelLabelArr, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
