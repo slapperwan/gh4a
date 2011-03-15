@@ -42,7 +42,6 @@ public class RssHandler extends DefaultHandler {
     public void startElement(String uri, String localName, String qName, Attributes attributes)
             throws SAXException {
         
-        Log.v(Constants.LOG_TAG, "+++++ " + uri + " " + localName + " " + qName);
         if (localName.equalsIgnoreCase("entry")) {
             mYourActionFeed = new YourActionFeed();
         }
@@ -56,7 +55,6 @@ public class RssHandler extends DefaultHandler {
             }
             else if (localName.equalsIgnoreCase("link")){
                 String url = attributes.getValue(2);
-                Log.v(Constants.LOG_TAG, "++++++ " + url);
                 String[] urlPart = url.split("/");
                 String owner = null;
                 String repoName = null;

@@ -3,11 +3,13 @@ package com.gh4a.utils;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -28,8 +30,9 @@ public class RssParser {
     }
 
     public InputStream getInputStream() throws IOException {
-        HttpURLConnection request = (HttpURLConnection) feedUrl.openConnection();
+        HttpsURLConnection request = (HttpsURLConnection) feedUrl.openConnection();
         
+        request.setHostnameVerifier(DO_NOT_VERIFY);
         request.setRequestMethod("GET");
         request.setDoOutput(true);
         
@@ -54,4 +57,10 @@ public class RssParser {
         parser.parse(this.getInputStream(), handler);
         return handler.getFeeds();
     }
+    
+    final static HostnameVerifier DO_NOT_VERIFY = new HostnameVerifier() {
+        public boolean verify(String hostname, SSLSession session) {
+                return true;
+        }
+    };
 }

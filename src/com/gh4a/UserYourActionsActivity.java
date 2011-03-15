@@ -23,6 +23,7 @@ import java.util.List;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -113,6 +114,7 @@ public class UserYourActionsActivity extends BaseActivity implements OnItemClick
                     return p.parse();
                 }
                 catch (Exception e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     if ("Received authentication challenge is null".equalsIgnoreCase(e.getMessage())) {
                         mException = true;
                         isAuthError = true;
@@ -191,15 +193,15 @@ public class UserYourActionsActivity extends BaseActivity implements OnItemClick
             for (String msg : commitMsgs) {
                 String stripAllmsg = msg.replaceAll("\n", "").replaceAll("\r\n", "");
                 String[] msgPart = msg.split(" ");
-                
-                if (!msg.substring(msg.indexOf(msgPart[1]), msg.length()).contains("more commits")
-                        && msgPart[0].matches("[0-9a-zA-Z]{7}")) {
-                    String[] shas = new String[4];
-                    shas[0] = msgPart[0];
-                    shas[1] = feed.getEmail();
-                    shas[2] = msg.substring(msg.indexOf(msgPart[1]), msg.length());
-                    shas[3] = feed.getAuthor();//TODO, get actual commit author from content
-                    intent.putExtra("sha" + shas[0], shas);
+                if (msgPart[0].matches("[0-9a-zA-Z]{7}") && msgPart.length > 1) {
+                    if (!msg.substring(msg.indexOf(msgPart[1]), msg.length()).contains("more commits")) {
+                        String[] shas = new String[4];
+                        shas[0] = msgPart[0];
+                        shas[1] = feed.getEmail();
+                        shas[2] = msg.substring(msg.indexOf(msgPart[1]), msg.length());
+                        shas[3] = feed.getAuthor();//TODO, get actual commit author from content
+                        intent.putExtra("sha" + shas[0], shas);
+                    }
                 }
             }
             
