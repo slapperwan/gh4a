@@ -51,6 +51,6 @@
             android:layout_gravity="center_vertical|center_horizontal|center"
             android:textAppearance="?attr/textAppearanceUrl"
             android:background="?attr/textAppearanceLink"
-            android:text="Explore Github" />
+            android:text="Explore Gh4a" />
     </LinearLayout>
 </LinearLayout>
