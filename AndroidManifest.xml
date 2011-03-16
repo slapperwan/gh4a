@@ -19,75 +19,75 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SearchActivity" />
+            android:name=".SearchActivity" android:configChanges="orientation"/>
         <activity
             android:name=".DashboardActivity" />
         <activity
-            android:name=".RepositoryListActivity" />
+            android:name=".RepositoryListActivity" android:configChanges="orientation" />
         <activity
-            android:name=".RepositoryActivity" />
+            android:name=".RepositoryActivity" android:configChanges="orientation" />
         <activity
-            android:name=".UserListActivity" />
+            android:name=".UserListActivity" android:configChanges="orientation" />
         <activity
-            android:name=".UserActivity" />
+            android:name=".UserActivity" android:configChanges="orientation" />
         <activity
-            android:name=".UserPublicActivity" />
+            android:name=".UserPublicActivity" android:configChanges="orientation" />
         <activity
-            android:name=".UserPrivateActivity" />
+            android:name=".UserPrivateActivity" android:configChanges="orientation" />
         <activity
-            android:name=".CommitListActivity" />
+            android:name=".CommitListActivity" android:configChanges="orientation"/>
         <activity
-            android:name=".CommitActivity" />
+            android:name=".CommitActivity" android:configChanges="orientation" />
         <activity
-            android:name=".WatcherListActivity" />
+            android:name=".WatcherListActivity" android:configChanges="orientation" />
         <activity
-            android:name=".ForkListActivity" />
+            android:name=".ForkListActivity" android:configChanges="orientation" />
         <activity
-            android:name=".FollowerFollowingListActivity" />
+            android:name=".FollowerFollowingListActivity" android:configChanges="orientation" />
         <activity
-            android:name=".PublicRepoListActivity" />
+            android:name=".PublicRepoListActivity" android:configChanges="orientation" />
         <activity
-            android:name=".WatchedRepoListActivity" />
+            android:name=".WatchedRepoListActivity" android:configChanges="orientation" />
         <activity
-            android:name=".IssueListActivity" />
+            android:name=".IssueListActivity" android:configChanges="orientation" />
         <activity
-            android:name=".IssueActivity" />
+            android:name=".IssueActivity" android:configChanges="orientation" />
         <activity
-            android:name=".DiffViewerActivity" />
+            android:name=".DiffViewerActivity" android:configChanges="orientation" />
         <activity
-            android:name=".BranchListActivity" />
+            android:name=".BranchListActivity" android:configChanges="orientation" />
         <activity
-            android:name=".TagListActivity" />
+            android:name=".TagListActivity" android:configChanges="orientation" />
         <activity
-            android:name=".PullRequestListActivity" />
+            android:name=".PullRequestListActivity" android:configChanges="orientation" />
         <activity
-            android:name=".PullRequestActivity" />
+            android:name=".PullRequestActivity" android:configChanges="orientation" />
         <activity
-            android:name=".FileManagerActivity" />
+            android:name=".FileManagerActivity" android:configChanges="orientation"/>
         <activity
-            android:name=".FileViewerActivity" />
+            android:name=".FileViewerActivity" android:configChanges="orientation" />
         <activity
-            android:name=".AddedFileViewerActivity" />
+            android:name=".AddedFileViewerActivity" android:configChanges="orientation"/>
         <activity
-            android:name=".OrganizationMemberListActivity" />
+            android:name=".OrganizationMemberListActivity" android:configChanges="orientation" />
         <activity
-            android:name=".ContributorListActivity" />
+            android:name=".ContributorListActivity" android:configChanges="orientation" />
         <activity
-            android:name=".CollaboratorListActivity" />
+            android:name=".CollaboratorListActivity" android:configChanges="orientation" />
         <activity
-            android:name=".IssueCreateActivity" />
+            android:name=".IssueCreateActivity" android:configChanges="orientation" />
         <activity
-            android:name=".IssueEditActivity" />
+            android:name=".IssueEditActivity" android:configChanges="orientation" />
         <activity
-            android:name=".IssueLabelListActivity" />
+            android:name=".IssueLabelListActivity" android:configChanges="orientation" />
         <activity
-            android:name=".IssueListByLabelActivity" />
+            android:name=".IssueListByLabelActivity" android:configChanges="orientation" />
         <activity
-            android:name=".CompareActivity" />
+            android:name=".CompareActivity" android:configChanges="orientation" />
         <activity
-            android:name=".CommitHistoryActivity" />
+            android:name=".CommitHistoryActivity" android:configChanges="orientation" />
         <activity
-            android:name=".UserYourActionsActivity" />
+            android:name=".UserYourActionsActivity" android:configChanges="orientation" />
         <activity
             android:name=".AppPreferenceActivity"
             android:theme="@android:style/Theme"/>
