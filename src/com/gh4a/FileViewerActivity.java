@@ -22,15 +22,18 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.ScaleAnimation;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import com.gh4a.holder.BreadCrumbHolder;
+import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 import com.github.api.v2.schema.Blob;
 import com.github.api.v2.services.GitHubException;
@@ -73,6 +76,8 @@ public class FileViewerActivity extends BaseActivity {
 
     /** The loading dialog. */
     protected LoadingDialog mLoadingDialog;
+    
+    private Blob mBlob;
 
     /**
      * Called when the activity is first created.
@@ -124,6 +129,28 @@ public class FileViewerActivity extends BaseActivity {
                 }
                 else {
                     new LoadContentTask(FileViewerActivity.this).execute(true);
+                }
+            }
+        });
+        
+        TextView tvDownload = (TextView) findViewById(R.id.tv_download);
+        tvDownload.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View view) {
+                String filename = mBlob.getName();
+                int idx = filename.lastIndexOf("/");
+                
+                if (idx != -1) {
+                    filename = filename.substring(filename.lastIndexOf("/") + 1, filename.length());
+                }
+
+                boolean success = FileUtils.save(filename, mBlob.getData());
+                if (success) {
+                    showMessage("File saved at " + Environment.getExternalStorageDirectory().getAbsolutePath() + "/download/" + filename, false);
+                }
+                else {
+                    showMessage("Unable to save the file", false);
                 }
             }
         });
@@ -298,6 +325,7 @@ public class FileViewerActivity extends BaseActivity {
                         mTarget.get().finish();
                     }
                     else {
+                        mTarget.get().mBlob = result;
                         mTarget.get().fillData(result, mHighlight);
                     }
                 }

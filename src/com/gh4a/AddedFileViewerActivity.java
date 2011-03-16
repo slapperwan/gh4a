@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -33,6 +34,7 @@ import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import com.gh4a.holder.BreadCrumbHolder;
+import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 import com.github.api.v2.schema.Blob;
 import com.github.api.v2.services.GitHubException;
@@ -63,6 +65,8 @@ public class AddedFileViewerActivity extends BaseActivity {
 
     /** The loading dialog. */
     protected LoadingDialog mLoadingDialog;
+    
+    private Blob mBlob;
 
     /**
      * Called when the activity is first created.
@@ -110,6 +114,29 @@ public class AddedFileViewerActivity extends BaseActivity {
                 }
                 else {
                     new LoadContentTask(AddedFileViewerActivity.this).execute(true);
+                }
+            }
+        });
+        
+        TextView tvDownload = (TextView) findViewById(R.id.tv_download);
+        tvDownload.setVisibility(View.VISIBLE);
+        tvDownload.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View view) {
+                String filename = mBlob.getName();
+                int idx = filename.lastIndexOf("/");
+                
+                if (idx != -1) {
+                    filename = filename.substring(filename.lastIndexOf("/") + 1, filename.length());
+                }
+
+                boolean success = FileUtils.save(filename, mBlob.getData());
+                if (success) {
+                    showMessage("File saved at " + Environment.getExternalStorageDirectory().getAbsolutePath() + "/download/" + filename, false);
+                }
+                else {
+                    showMessage("Unable to save the file", false);
                 }
             }
         });
@@ -236,6 +263,7 @@ public class AddedFileViewerActivity extends BaseActivity {
                             || result.getMimeType().equals("application/xml")
                             || result.getMimeType().equals("application/sh")
                             || result.getMimeType().equals("application/xhtml+xml")) {
+                        mTarget.get().mBlob = result;
                         mTarget.get().fillData(result, highlight);
                     }
                     else {

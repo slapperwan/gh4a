@@ -37,6 +37,17 @@
             android:background="?attr/textAppearanceLink"
             android:layout_toLeftOf="@id/tv_view"
         />
+        <TextView
+            android:id="@+id/tv_download"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:layout_margin="7dp"
+            android:text="Download"
+            android:textAppearance="?attr/textAppearanceUrl"
+            android:background="?attr/textAppearanceLink"
+            android:layout_toLeftOf="@id/tv_view_raw"
+        />
     </RelativeLayout>
     <FrameLayout
         android:id="@+id/main_content"
