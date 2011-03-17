@@ -243,22 +243,8 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
             public void onClick(View arg0) {
                 String label = tvLabel.getText().toString();
                 if (!StringUtils.isBlank(label)) {
-                    try {
-                        GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                        IssueService issueService = factory.createIssueService();
-                        Authentication auth = new LoginPasswordAuthentication(getAuthUsername(), getAuthPassword());
-                        issueService.setAuthentication(auth);
-                        label = label.replaceAll(" ", "%20");
-                        issueService.addLabelWithoutIssue(mUserLogin, mRepoName, label);
-                        new LoadIssueLabelsTask(IssueLabelListActivity.this).execute();
-                    }
-                    catch (GitHubException e) {
-                        Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                        showMessage(getResources().getString(R.string.issue_error_create_label), false);
-                    }
-                    finally {
-                        dialog.dismiss();
-                    }
+                    dialog.dismiss();
+                    new AddIssueLabelsTask(IssueLabelListActivity.this).execute(label);
                 }
                 else {
                     showMessage(getResources().getString(R.string.issue_error_label), false);
@@ -294,14 +280,8 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
                        .setCancelable(false)
                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                            public void onClick(DialogInterface dialog, int id) {
-                               GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                               IssueService issueService = factory.createIssueService();
-                               Authentication auth = new LoginPasswordAuthentication(getAuthUsername(), getAuthPassword());
-                               issueService.setAuthentication(auth);
-                               String label = (String) mListView.getItemAtPosition(info.position);
-                               label = label.replaceAll(" ", "%20");
-                               issueService.removeLabelWithoutIssue(mUserLogin, mRepoName, label);
-                               new LoadIssueLabelsTask(IssueLabelListActivity.this).execute();
+                               dialog.dismiss();
+                               new DeleteIssueLabelsTask(IssueLabelListActivity.this).execute(info.position);
                            }
                        })
                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -331,5 +311,161 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
         }
         
         return true;
+    }
+    
+    /**
+     * An asynchronous task that runs on a background thread
+     * to delete issue labels.
+     */
+    private static class DeleteIssueLabelsTask extends AsyncTask<Integer, Void, Void> {
+
+        /** The target. */
+        private WeakReference<IssueLabelListActivity> mTarget;
+        
+        /** The exception. */
+        private boolean mException;
+        
+        /**
+         * Instantiates a new load issue list task.
+         *
+         * @param activity the activity
+         * @param hideMainView the hide main view
+         */
+        public DeleteIssueLabelsTask(IssueLabelListActivity activity) {
+            mTarget = new WeakReference<IssueLabelListActivity>(activity);
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected Void doInBackground(Integer... params) {
+            if (mTarget.get() != null) {
+                try {
+                    IssueLabelListActivity activity = mTarget.get();
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    IssueService issueService = factory.createIssueService();
+                    Authentication auth = new LoginPasswordAuthentication(activity.getAuthUsername(), activity.getAuthPassword());
+                    issueService.setAuthentication(auth);
+                    String label = (String) activity.mListView.getItemAtPosition(params[0]);
+                    label = label.replaceAll(" ", "%20");
+                    issueService.removeLabelWithoutIssue(activity.mUserLogin, activity.mRepoName, label);
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                }
+            }
+            return null;
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPreExecute()
+         */
+        @Override
+        protected void onPreExecute() {
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, false);
+            }
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(Void result) {
+            if (mTarget.get() != null) {
+                IssueLabelListActivity activity = mTarget.get();
+                activity.mLoadingDialog.dismiss();
+    
+                if (mException) {
+                    activity.showError();
+                }
+                else {
+                    new LoadIssueLabelsTask(activity).execute();
+                }
+            }
+        }
+    }
+    
+    /**
+     * An asynchronous task that runs on a background thread
+     * to add issue labels.
+     */
+    private static class AddIssueLabelsTask extends AsyncTask<String, Void, Void> {
+
+        /** The target. */
+        private WeakReference<IssueLabelListActivity> mTarget;
+        
+        /** The exception. */
+        private boolean mException;
+        
+        /**
+         * Instantiates a new load issue list task.
+         *
+         * @param activity the activity
+         * @param hideMainView the hide main view
+         */
+        public AddIssueLabelsTask(IssueLabelListActivity activity) {
+            mTarget = new WeakReference<IssueLabelListActivity>(activity);
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected Void doInBackground(String... params) {
+            if (mTarget.get() != null) {
+                try {
+                    IssueLabelListActivity activity = mTarget.get();
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    IssueService issueService = factory.createIssueService();
+                    Authentication auth = new LoginPasswordAuthentication(activity.getAuthUsername(), activity.getAuthPassword());
+                    issueService.setAuthentication(auth);
+                    String label = params[0];
+                    label = label.replaceAll(" ", "%20");
+                    issueService.addLabelWithoutIssue(activity.mUserLogin, activity.mRepoName, label);
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                }
+            }
+            return null;
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPreExecute()
+         */
+        @Override
+        protected void onPreExecute() {
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, false);
+            }
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(Void result) {
+            if (mTarget.get() != null) {
+                IssueLabelListActivity activity = mTarget.get();
+                activity.mLoadingDialog.dismiss();
+    
+                if (mException) {
+                    activity.showMessage(activity.getResources().getString(R.string.issue_error_create_label), false);
+                }
+                else {
+                    new LoadIssueLabelsTask(activity).execute();
+                }
+            }
+        }
     }
 }
