@@ -69,6 +69,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
     /** The user. */
     protected User mUser;
     
+    protected List<Organization> mOrganizations;
     /**
      * Called when the activity is first created.
      * 
@@ -478,7 +479,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
             getWatchedRepos(view);
             break;
         case R.id.btn_organizations:
-            view.showContextMenu();
+            getOrganizations(view);
             break;
           
         default:
@@ -619,26 +620,19 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         if (v.getId() == R.id.btn_organizations) {
             menu.setHeaderTitle("Choose Organization");
-            GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-            UserService userService = factory.createUserService();
-            try {
-                Authentication auth = new LoginPasswordAuthentication(getAuthUsername(), getAuthPassword());
-                userService.setAuthentication(auth);
-                List<Organization> organizations = userService.getUserOrganizations(mUserLogin);
-                OrganizationService a;
-                if (organizations != null && !organizations.isEmpty()) {
-                    for (Organization organization : organizations) {
-                        menu.add(organization.getLogin());      
-                    }
+            if (mOrganizations != null && !mOrganizations.isEmpty()) {
+                for (Organization organization : mOrganizations) {
+                menu.add(organization.getLogin());      
                 }
-                else {
-                    getApplicationContext().notFoundMessage(this, "Organizations");
-                }
-            } catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                showError();
+            }
+            else {
+                getApplicationContext().notFoundMessage(this, "Organizations");
             }
         }
+    }
+    
+    public void getOrganizations(View view) {
+        new LoadOrganizationsTask(this).execute();
     }
     
     public boolean onContextItemSelected(MenuItem item) {
@@ -774,5 +768,86 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
                 }
             }
         }
+    }
+    
+    /**
+     * An asynchronous task that runs on a background thread to load organizations.
+     */
+    private static class LoadOrganizationsTask extends AsyncTask<Void, Integer, List<Organization>> {
+
+        /** The target. */
+        private WeakReference<UserActivity> mTarget;
+        
+        /** The exception. */
+        private boolean mException;
+
+        /**
+         * Instantiates a new load user info task.
+         *
+         * @param activity the activity
+         */
+        public LoadOrganizationsTask(UserActivity activity) {
+            mTarget = new WeakReference<UserActivity>(activity);
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected List<Organization> doInBackground(Void... arg0) {
+            if (mTarget.get() != null) {
+                try {
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    UserService userService = factory.createUserService();
+                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
+                            mTarget.get().getAuthPassword());
+                    userService.setAuthentication(auth);
+                    return userService.getUserOrganizations(mTarget.get().mUserLogin);
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
+            }
+            else {
+                return null;
+            }
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPreExecute()
+         */
+        @Override
+        protected void onPreExecute() {
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, false);
+            }
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(List<Organization> result) {
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog.dismiss();
+                if (mException) {
+                    mTarget.get().showError();
+                }
+                else {
+                    mTarget.get().showOrganizationsContextMenu(result);
+                }
+            }
+        }
+    }
+    
+    private void showOrganizationsContextMenu(List<Organization> organizations) {
+        mOrganizations = organizations;
+        View view = findViewById(R.id.btn_organizations);
+        view.showContextMenu();
     }
 }
