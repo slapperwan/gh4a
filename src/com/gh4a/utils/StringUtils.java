@@ -188,6 +188,9 @@ public class StringUtils {
      * @return the string
      */
     public static String md5Hex(String s) {
+        if (StringUtils.isBlank(s)) {
+            return null;
+        }
         String result = null;
         try {
             MessageDigest md5 = MessageDigest.getInstance("MD5");
