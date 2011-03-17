@@ -80,6 +80,8 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
     /** The comments loaded. */
     protected boolean mCommentsLoaded;// flag to prevent more click which result
                                       // to query to the rest API
+    
+    protected List<String> mLabels;
 
     /**
      * Called when the activity is first created.
@@ -499,7 +501,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                 return true;
             case R.string.issue_label_add_delete:
                 if (isAuthenticated()) {
-                    showLabelsDialog();
+                    new LoadIssueLabelsTask(this).execute();
                 }
                 else {
                     Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
@@ -809,21 +811,15 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
     }
     
     private void showLabelsDialog() {
-        GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-        final IssueService issueService = factory.createIssueService();
-        Authentication auth = new LoginPasswordAuthentication(getAuthUsername(), getAuthPassword());
-        issueService.setAuthentication(auth);
-        
-        List<String> availableLabels = issueService.getIssueLabels(mUserLogin, mRepoName);
-        final boolean[] checkedItems = new boolean[availableLabels.size()];
+        final boolean[] checkedItems = new boolean[mLabels.size()];
 
-        final String[] availabelLabelArr = new String[availableLabels.size()];
+        final String[] availabelLabelArr = new String[mLabels.size()];
         ArrayList<String> currentLabels = mBundle.getStringArrayList(Constants.Issue.ISSUE_LABELS);
 
         //find which labels for this issue
-        for (int i = 0; i < availableLabels.size(); i++) {
-            availabelLabelArr[i] = availableLabels.get(i);
-            if(currentLabels.contains((String) availableLabels.get(i))) {
+        for (int i = 0; i < mLabels.size(); i++) {
+            availabelLabelArr[i] = mLabels.get(i);
+            if(currentLabels.contains((String) mLabels.get(i))) {
                 checkedItems[i] = true;
             }
             else {
@@ -850,23 +846,8 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
         builder.setPositiveButton(R.string.label_it,
                 new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                try {
-                    for (int i = 0; i < checkedItems.length; i++) {
-                        String label = availabelLabelArr[i].replaceAll(" ", "%20");
-                        if (checkedItems[i]) {
-                            issueService.addLabel(mUserLogin, mRepoName, mIssueNumber, label);
-                        }
-                        else {
-                            issueService.removeLabel(mUserLogin, mRepoName, mIssueNumber, label);
-                        }
-                    }
-                    
-                    getApplicationContext().openIssueActivity(IssueActivity.this,
-                            mUserLogin, mRepoName, mIssueNumber);
-                }
-                catch (GitHubException e) {
-                    showMessage(getResources().getString(R.string.issue_error_label_add_delete), false);
-                }
+                dialog.dismiss();
+                new TagIssueLabelsTask(IssueActivity.this, availabelLabelArr, checkedItems).execute();
             }
         })
         .setNegativeButton(R.string.cancel,
@@ -878,5 +859,190 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
        .create();
         
         builder.show();
+    }
+    
+    /**
+     * An asynchronous task that runs on a background thread
+     * to load issue labels.
+     */
+    private static class LoadIssueLabelsTask extends AsyncTask<Void, Void, List<String>> {
+
+        /** The target. */
+        private WeakReference<IssueActivity> mTarget;
+        
+        /** The exception. */
+        private boolean mException;
+        
+        /**
+         * Instantiates a new load issue list task.
+         *
+         * @param activity the activity
+         * @param hideMainView the hide main view
+         */
+        public LoadIssueLabelsTask(IssueActivity activity) {
+            mTarget = new WeakReference<IssueActivity>(activity);
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected List<String> doInBackground(Void... params) {
+            if (mTarget.get() != null) {
+                try {
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    IssueService issueService = factory.createIssueService();
+                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
+                            mTarget.get().getAuthPassword());
+                    issueService.setAuthentication(auth);
+                    
+                    return issueService.getIssueLabels(mTarget.get().mUserLogin, mTarget.get().mRepoName);
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
+            }
+            else {
+                return null;
+            }
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPreExecute()
+         */
+        @Override
+        protected void onPreExecute() {
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, false);
+            }
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(List<String> result) {
+            if (mTarget.get() != null) {
+                IssueActivity activity = mTarget.get();
+                activity.mLoadingDialog.dismiss();
+    
+                if (mException) {
+                    activity.showError();
+                }
+                else {
+                    activity.showIssueLabelsContextMenu(result);
+                }
+            }
+        }
+    }
+    
+    /**
+     * An asynchronous task that runs on a background thread
+     * to tag issue labels.
+     */
+    private static class TagIssueLabelsTask extends AsyncTask<Void, Void, Void> {
+
+        /** The target. */
+        private WeakReference<IssueActivity> mTarget;
+        
+        /** The exception. */
+        private boolean mException;
+        
+        /** The available label arr. */
+        private String[] mAvailableLabelArr;
+        
+        /** The checked items. */
+        private boolean[] mCheckedItems;
+        
+        /**
+         * Instantiates a new load issue list task.
+         *
+         * @param activity the activity
+         * @param hideMainView the hide main view
+         */
+        public TagIssueLabelsTask(IssueActivity activity, String[] availableLabelArr, boolean[] checkedItems) {
+            mTarget = new WeakReference<IssueActivity>(activity);
+            mAvailableLabelArr = availableLabelArr;
+            mCheckedItems = checkedItems;
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected Void doInBackground(Void...params) {
+            if (mTarget.get() != null) {
+                try {
+                    IssueActivity activity = mTarget.get();
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    IssueService issueService = factory.createIssueService();
+                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
+                            mTarget.get().getAuthPassword());
+                    issueService.setAuthentication(auth);
+                    
+                    for (int i = 0; i < mCheckedItems.length; i++) {
+                        String label = mAvailableLabelArr[i].replaceAll(" ", "%20");
+                        if (mCheckedItems[i]) {
+                            issueService.addLabel(activity.mUserLogin, activity.mRepoName, activity.mIssueNumber, label);
+                        }
+                        else {
+                            issueService.removeLabel(activity.mUserLogin, activity.mRepoName, activity.mIssueNumber, label);
+                        }
+                    }
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                }
+            }
+            return null;
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPreExecute()
+         */
+        @Override
+        protected void onPreExecute() {
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, false);
+            }
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(Void result) {
+            if (mTarget.get() != null) {
+                IssueActivity activity = mTarget.get();
+                activity.mLoadingDialog.dismiss();
+    
+                if (mException) {
+                    activity.showMessage(activity.getResources().getString(R.string.issue_error_label_add_delete), false);
+                }
+                else {
+                    activity.getApplicationContext().openIssueActivity(activity,
+                            activity.mUserLogin, activity.mRepoName, activity.mIssueNumber);
+                }
+            }
+        }
+    }
+    
+    private void showIssueLabelsContextMenu(List<String> labels) {
+        if (labels != null && !labels.isEmpty()) {
+            mLabels = labels;
+            showLabelsDialog();
+        }
+        else {
+            getApplicationContext().notFoundMessage(this, getResources().getString(R.string.issue_labels));
+        }
     }
 }
