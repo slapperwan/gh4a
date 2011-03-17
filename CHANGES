@@ -1,0 +1,10 @@
+v1.1.1 (Mar 17, 2011)
+- Fixed FC in honeycomb when loading Organizations
+- Minor bug fixes
+
+v1.1 (Mar 16, 2011)
+- Handle orientation changed properly 
+- New feature to download source code at file viewer
+
+v1.0 (Mar 15, 2011)
+- Initial release

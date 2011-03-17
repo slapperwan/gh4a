@@ -1,0 +1,23 @@
+Gh4a - GitHub Clien for Android
+Copyright 2011, Azwan Adli Abdullah
+
+GiHub Java sdk provided by github-java-sdk
+https://github.com/nabeelmukhtar/github-java-sdk
+
+Android action bar provided by android-actionbar
+https://github.com/johannilsson/android-actionbar
+
+JSON (de)serialization provided by gson
+http://code.google.com/p/google-gson/
+
+Code syntax highlighting provided by google-code-prettify
+http://code.google.com/p/google-code-prettify/
+
+Some of the icons provided by Silk icon set 1.3
+http://www.famfamfam.com/lab/icons/silk/
+
+Pretty time formatting provided by PrettyTime
+http://ocpsoft.com/prettytime/
+
+ACRA - Application Crash Report for Android
+http://code.google.com/p/acra/
