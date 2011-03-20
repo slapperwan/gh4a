@@ -166,7 +166,6 @@ public class GistViewerActivity extends BaseActivity {
         protected String doInBackground(String... params) {
             if (mTarget.get() != null) {
                 try {
-                    GistViewerActivity activity = mTarget.get();
                     GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
                     GistService service = factory.createGistService();
                     Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
