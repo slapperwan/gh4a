@@ -50,6 +50,12 @@ Main features
 * Browse source codes
 * File viewer with code syntax hightlighted
 
+*Gist (note: current Github API for gist is limited and only support public gist)*
+
+* List public gists
+* View gist content
+
+
 <i>..and many more</i>
 
 Visit [Gh4a page](http://slapperwan.github.com/gh4a/) for more info and screenshots.
