@@ -414,6 +414,33 @@
                         android:layout_alignRight="@id/tv_organizations_label"
                         android:layout_alignParentRight="true"
                         android:src="@drawable/ic_more" />
+                    <View
+                        android:background="?android:attr/divider"
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dp"
+                        android:layout_below="@id/btn_organizations"
+                        android:layout_marginTop="5dp" />
+                </RelativeLayout>
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="5dp" />
+                <RelativeLayout
+                    android:id="@+id/rl_gists"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
+                    <TextView
+                        android:id="@+id/tv_gists_label"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="@string/gist_public" />
+                    <ImageButton
+                        android:id="@+id/btn_gists"
+                        android:layout_width="80dp"
+                        android:layout_height="40dp"
+                        android:layout_alignRight="@id/tv_gists_label"
+                        android:layout_alignParentRight="true"
+                        android:src="@drawable/ic_more" />
                 </RelativeLayout>
             </LinearLayout>
         </LinearLayout>

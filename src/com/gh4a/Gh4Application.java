@@ -299,6 +299,12 @@ public class Gh4Application extends Application {
         context.startActivity(browserIntent);
     }
 
+    public void openGistActivity(Context context, String gistId) {
+        Intent intent = new Intent().setClass(context, GistActivity.class);
+        intent.putExtra(Constants.Gist.ID, gistId);
+        context.startActivity(intent);
+    }
+    
     /**
      * Not found message.
      * 

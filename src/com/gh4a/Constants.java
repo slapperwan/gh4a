@@ -238,6 +238,14 @@ public interface Constants {
         public static final String TAGS = "Object.TAGS";
     }
     
+    /**
+     * The Interface Gist.
+     */
+    public interface Gist {
+        public static final String ID = "Gist.id";
+        public static final String FILENAME = "Gist.filename";
+    }
+    
     public static String[] SKIP_PRETTIFY_EXT = {
         "txt", "rdoc", "markdown", "md", "mdown", "texttile", "org", "creole", "rst", "asciidoc", "pod"
     };

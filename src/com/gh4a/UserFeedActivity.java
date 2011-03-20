@@ -326,9 +326,9 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         }
 
         /** GistEvent */
-        else if (UserFeed.Type.GIST_EVENT.equals(eventType)) {
-            context.openBrowser(this, feed.getPayload().getUrl());
-        }
+//        else if (UserFeed.Type.GIST_EVENT.equals(eventType)) {
+//            context.openBrowser(this, feed.getPayload().getUrl());
+//        }
 
         /** DownloadEvent */
         else if (UserFeed.Type.DOWNLOAD_EVENT.equals(eventType)) {
@@ -390,6 +390,15 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
             }
             else {
                 context.notFoundMessage(this, R.plurals.repository);
+            }
+        }
+        
+        else if (UserFeed.Type.GIST_EVENT.equals(eventType)) {
+            Payload payload = feed.getPayload();
+            String[] gistPart = payload.getName().split(":");
+            if (gistPart.length > 1) {
+                String gistId = gistPart[1].trim();
+                context.openGistActivity(this, gistId);
             }
         }
     }

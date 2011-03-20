@@ -371,6 +371,16 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         else {
             rlOrganizations.setVisibility(View.GONE);
         }
+        
+        RelativeLayout rlGists = (RelativeLayout) findViewById(R.id.rl_gists);
+        if (Constants.User.USER_TYPE_USER.equals(user.getType())) {
+            ImageButton btnGists = (ImageButton) findViewById(R.id.btn_gists);
+            btnGists.setOnClickListener(this);
+            btnGists.setVisibility(View.VISIBLE);
+        }
+        else {
+            rlGists.setVisibility(View.GONE);
+        }
 
         tvName.setText(StringUtils.formatName(user.getLogin(), user.getName()));
         if (Constants.User.USER_TYPE_ORG.equals(user.getType())) {
@@ -480,6 +490,9 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
             break;
         case R.id.btn_organizations:
             getOrganizations(view);
+            break;
+        case R.id.btn_gists:
+            getGists(view);
             break;
           
         default:
@@ -633,6 +646,12 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
     
     public void getOrganizations(View view) {
         new LoadOrganizationsTask(this).execute();
+    }
+    
+    public void getGists(View view) {
+        Intent intent = new Intent().setClass(this, GistListActivity.class);
+        intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
+        startActivity(intent);
     }
     
     public boolean onContextItemSelected(MenuItem item) {

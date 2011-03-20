@@ -1,3 +1,9 @@
+v1.2 (Mar 20, 2011)
+- Gist support (note: current Github API for gist is limited and only support public gist)
+- Fixed FC when add/delete label
+- When click on item MemberEvent, go to repo
+- Support move to sdcard
+
 v1.1.1 (Mar 17, 2011)
 - Fixed FC in honeycomb when loading Organizations
 - Minor bug fixes

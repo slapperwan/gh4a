@@ -127,6 +127,15 @@
             android:name=".AppPreferenceActivity"
             android:theme="@android:style/Theme" />
         <activity
+            android:name=".GistActivity"
+            android:configChanges="orientation" />
+        <activity
+            android:name=".GistListActivity"
+            android:configChanges="orientation" />
+        <activity
+            android:name=".GistViewerActivity"
+            android:configChanges="orientation" />
+        <activity
             android:name="com.markupartist.android.widget.ActionBar" />
     </application>
     <uses-sdk
