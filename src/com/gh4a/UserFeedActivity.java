@@ -381,6 +381,17 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
                 context.notFoundMessage(this, R.plurals.repository);
             }
         }
+        
+        /** MemberEvent */
+        else if (UserFeed.Type.MEMBER_EVENT.equals(eventType)) {
+            Repository repository = feed.getRepository();
+            if (repository != null) {
+                context.openRepositoryInfoActivity(this, repository);
+            }
+            else {
+                context.notFoundMessage(this, R.plurals.repository);
+            }
+        }
     }
 
     /*
