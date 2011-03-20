@@ -136,7 +136,7 @@ public class GistViewerActivity extends BaseActivity {
      * An asynchronous task that runs on a background thread
      * to load gist.
      */
-    private static class LoadGistTask extends AsyncTask<String, Void, InputStream> {
+    private static class LoadGistTask extends AsyncTask<String, Void, String> {
 
         /** The target. */
         private WeakReference<GistViewerActivity> mTarget;
@@ -163,7 +163,7 @@ public class GistViewerActivity extends BaseActivity {
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
-        protected InputStream doInBackground(String... params) {
+        protected String doInBackground(String... params) {
             if (mTarget.get() != null) {
                 try {
                     GistViewerActivity activity = mTarget.get();
@@ -172,7 +172,15 @@ public class GistViewerActivity extends BaseActivity {
                     Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
                             mTarget.get().getAuthPassword());
                     service.setAuthentication(auth);
-                    return service.getGistContent(params[0], params[1]);                    
+                    InputStream is = service.getGistContent(params[0], params[1]);
+                    try {
+                        return StringUtils.convertStreamToString(is);
+                    }
+                    catch (IOException e) {
+                        Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                        mException = true;
+                        return null;
+                    }
                 }
                 catch (GitHubException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
@@ -201,7 +209,7 @@ public class GistViewerActivity extends BaseActivity {
          * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
          */
         @Override
-        protected void onPostExecute(InputStream result) {
+        protected void onPostExecute(String result) {
             if (mTarget.get() != null) {
                 GistViewerActivity activity = mTarget.get();
 
@@ -221,7 +229,7 @@ public class GistViewerActivity extends BaseActivity {
      * @param is the is
      * @param highlight the highlight
      */
-    private void fillData(InputStream is, boolean highlight) {
+    private void fillData(String data, boolean highlight) {
         TextView tvViewRaw = (TextView) findViewById(R.id.tv_view_raw);
         if (highlight) {
             tvViewRaw.setText("Raw");
@@ -246,16 +254,10 @@ public class GistViewerActivity extends BaseActivity {
 
         webView.getSettings().setUseWideViewPort(true);
 
-        try {
-            mData = StringUtils.convertStreamToString(is);
-            String highlighted = StringUtils.highlightSyntax(mData, highlight, mFilename);
-            webView.setWebViewClient(webViewClient);
-            webView.loadDataWithBaseURL("file:///android_asset/", highlighted, "text/html", "", "");
-        }
-        catch (IOException e) {
-            Log.e(Constants.LOG_TAG, e.getMessage(), e);
-            showError();
-        }
+        mData = data;
+        String highlighted = StringUtils.highlightSyntax(mData, highlight, mFilename);
+        webView.setWebViewClient(webViewClient);
+        webView.loadDataWithBaseURL("file:///android_asset/", highlighted, "text/html", "", "");
     }
 
     /** The web view client. */
