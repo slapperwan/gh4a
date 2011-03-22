@@ -109,7 +109,7 @@ public class UserYourActionsActivity extends BaseActivity implements OnItemClick
         @Override
         protected List<YourActionFeed> doInBackground(Void... params) {
             if (mTarget.get() != null) {
-                RssParser p = new RssParser(mTarget.get().mUrl);
+                RssParser p = new RssParser(mTarget.get().mUrl, mTarget.get().getAuthUsername(), mTarget.get().getAuthPassword());
                 try {
                     return p.parse();
                 }

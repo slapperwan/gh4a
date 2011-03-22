@@ -20,10 +20,14 @@ import com.github.api.v2.services.util.Base64;
 public class RssParser {
     
     final URL feedUrl;
-
-    public RssParser(String feedUrl){
+    private String username;
+    private String password;
+    
+    public RssParser(String feedUrl, String username, String password){
         try {
             this.feedUrl = new URL(feedUrl);
+            this.username = username;
+            this.password = password;
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
@@ -43,7 +47,7 @@ public class RssParser {
         if (ApplicationConstants.READ_TIMEOUT > -1) {
             request.setReadTimeout(ApplicationConstants.READ_TIMEOUT);
         }
-        String credentials = "slapperwan:marwan-2002git";
+        String credentials = username + ":" + password;
         request.setRequestProperty("Authorization", "Basic " + Base64.encodeBytes(credentials.getBytes()));
         request.connect();
         return new BufferedInputStream(request.getInputStream());
