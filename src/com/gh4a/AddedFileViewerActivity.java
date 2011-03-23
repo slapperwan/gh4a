@@ -79,7 +79,7 @@ public class AddedFileViewerActivity extends BaseActivity {
 
         setContentView(R.layout.web_viewer);
         setUpActionBar();
-
+        
         mUserLogin = getIntent().getStringExtra(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getStringExtra(Constants.Repository.REPO_NAME);
         mTreeSha = getIntent().getStringExtra(Constants.Object.TREE_SHA);

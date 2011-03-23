@@ -17,7 +17,9 @@ package com.gh4a;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
+import java.net.URLEncoder;
 import java.util.HashMap;
 
 import android.content.Intent;
@@ -25,6 +27,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -41,6 +44,7 @@ import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
 import com.github.api.v2.services.auth.Authentication;
 import com.github.api.v2.services.auth.LoginPasswordAuthentication;
+import com.github.api.v2.services.constant.ApplicationConstants;
 
 /**
  * The GistViewer activity.
@@ -171,7 +175,7 @@ public class GistViewerActivity extends BaseActivity {
                     Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
                             mTarget.get().getAuthPassword());
                     service.setAuthentication(auth);
-                    InputStream is = service.getGistContent(params[0], params[1]);
+                    InputStream is = service.getGistContent(params[0], StringUtils.encodeUrl(params[1]));
                     try {
                         return StringUtils.convertStreamToString(is);
                     }
@@ -182,6 +186,11 @@ public class GistViewerActivity extends BaseActivity {
                     }
                 }
                 catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
+                catch (UnsupportedEncodingException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;

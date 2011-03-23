@@ -21,7 +21,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
@@ -33,6 +35,7 @@ import java.util.Date;
 import android.text.TextUtils;
 
 import com.gh4a.Constants;
+import com.github.api.v2.services.constant.ApplicationConstants;
 
 /**
  * The Class StringUtils.
@@ -403,5 +406,14 @@ public class StringUtils {
         content.append("</body></html>");
 
         return content.toString();
+    }
+    
+    public static String encodeUrl(String s) throws UnsupportedEncodingException {
+        s = s.replaceAll("%", "%25");
+        s = s.replaceAll(" ", "%20");
+        s = s.replaceAll("!", "%21");
+        s = s.replaceAll("\"", "%22");
+        s = s.replaceAll("#", "%23");
+        return s;
     }
 }
