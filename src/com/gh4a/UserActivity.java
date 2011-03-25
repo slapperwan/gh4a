@@ -41,10 +41,12 @@ import android.widget.AdapterView.OnItemClickListener;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
 import com.github.api.v2.schema.Organization;
+import com.github.api.v2.schema.Repository;
 import com.github.api.v2.schema.User;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
 import com.github.api.v2.services.OrganizationService;
+import com.github.api.v2.services.RepositoryService;
 import com.github.api.v2.services.UserService;
 import com.github.api.v2.services.auth.Authentication;
 import com.github.api.v2.services.auth.LoginPasswordAuthentication;
@@ -162,6 +164,9 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
                 else {
                     mTarget.get().fillData(result);
                     new LoadWatchedReposTask(mTarget.get()).execute();
+                    if (mTarget.get().mUserLogin.equals(mTarget.get().getAuthUsername())) {
+                        new LoadPushableReposTask(mTarget.get()).execute();
+                    }
                     if (Constants.User.USER_TYPE_ORG.equals(result.getType())) { 
                         new LoadOrganizationMembersTask(mTarget.get()).execute();
                     }
@@ -229,6 +234,75 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
                     btnWatchedRepos.setText(String.valueOf(result));
                 }
                 ProgressBar progressBar = (ProgressBar) mTarget.get().findViewById(R.id.pb_watched_repos);
+                progressBar.setVisibility(View.GONE);
+            }
+        }
+    }
+    
+    private static class LoadPushableReposTask extends AsyncTask<Void, Integer, Integer> {
+
+        /** The target. */
+        private WeakReference<UserActivity> mTarget;
+        
+        /** The exception. */
+        private boolean mException;
+
+        /**
+         * Instantiates a new load watched repos task.
+         *
+         * @param activity the activity
+         */
+        public LoadPushableReposTask(UserActivity activity) {
+            mTarget = new WeakReference<UserActivity>(activity);
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected Integer doInBackground(Void... arg0) {
+            if (mTarget.get() != null) {
+                try {
+                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+                    RepositoryService repositoryService = factory.createRepositoryService();
+                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
+                            mTarget.get().getAuthPassword());
+                    repositoryService.setAuthentication(auth);
+                    List<Repository> repos = repositoryService.getPushableRepositories();
+                    if (repos != null && !repos.isEmpty()) {
+                        return repos.size();
+                    }
+                    else {
+                        return 0;
+                    }
+                }
+                catch (GitHubException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
+            }
+            else {
+                return null;
+            }
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(Integer result) {
+            if (mTarget.get() != null) {
+                if (mException) {
+                    //mTarget.get().showError();
+                }
+                else {
+                    Button btnPushableRepos = (Button) mTarget.get().findViewById(R.id.btn_pushable_repos);
+                    btnPushableRepos.setText(String.valueOf(result));
+                }
+                ProgressBar progressBar = (ProgressBar) mTarget.get().findViewById(R.id.pb_pushable_repos);
                 progressBar.setVisibility(View.GONE);
             }
         }
@@ -335,6 +409,16 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         Button btnPublicRepos = (Button) findViewById(R.id.btn_pub_repos);
         btnPublicRepos.setOnClickListener(this);
 
+        RelativeLayout rlPushableRepos = (RelativeLayout) findViewById(R.id.rl_pushable_repos);
+        if (mUserLogin.equals(getAuthUsername())) {
+            Button btnPushableRepos = (Button) findViewById(R.id.btn_pushable_repos);
+            btnPushableRepos.setOnClickListener(this);
+            rlPushableRepos.setVisibility(View.VISIBLE);
+        }
+        else {
+            rlPushableRepos.setVisibility(View.GONE);
+        }
+        
         Button btnWatchedRepos = (Button) findViewById(R.id.btn_watched_repos);
         btnWatchedRepos.setOnClickListener(this);
 
@@ -494,6 +578,9 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         case R.id.btn_gists:
             getGists(view);
             break;
+        case R.id.btn_pushable_repos:
+            getPushableRepos(view);
+            break;
           
         default:
             break;
@@ -615,6 +702,19 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
      */
     public void getWatchedRepos(View view) {
         Intent intent = new Intent().setClass(this, WatchedRepoListActivity.class);
+        intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+        intent.putExtra(Constants.User.USER_NAME, mUserName);
+        startActivity(intent);
+    }
+    
+    /**
+     * Gets the pushable repos.
+     *
+     * @param view the view
+     * @return the pushable repos
+     */
+    public void getPushableRepos(View view) {
+        Intent intent = new Intent().setClass(this, PushableRepoListActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
         intent.putExtra(Constants.User.USER_NAME, mUserName);
         startActivity(intent);

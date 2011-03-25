@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.AbsListView;
 
 import com.gh4a.holder.BreadCrumbHolder;
@@ -32,9 +31,9 @@ import com.github.api.v2.services.auth.Authentication;
 import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
- * The PublicRepoList activity.
+ * The WatchedRepoList activity.
  */
-public class PublicRepoListActivity extends RepositoryListActivity {
+public class PushableRepoListActivity extends RepositoryListActivity {
 
     /** The user login. */
     protected String mUserLogin;
@@ -63,7 +62,7 @@ public class PublicRepoListActivity extends RepositoryListActivity {
         RepositoryService repositoryService = factory.createRepositoryService();
         Authentication auth = new LoginPasswordAuthentication(getAuthUsername(), getAuthPassword());
         repositoryService.setAuthentication(auth);
-        return repositoryService.getRepositories(mUserLogin, mPage);
+        return repositoryService.getPushableRepositories();
     }
 
     /*
@@ -80,7 +79,7 @@ public class PublicRepoListActivity extends RepositoryListActivity {
      * @see com.gh4a.RepositoryListActivity#setSubtitle()
      */
     protected void setSubtitle() {
-        mSubtitle = getResources().getString(R.string.user_pub_repos);
+        mSubtitle = getResources().getString(R.string.user_pushable_repos);
     }
 
     /*
@@ -88,10 +87,10 @@ public class PublicRepoListActivity extends RepositoryListActivity {
      * @seecom.gh4a.RepositoryListActivity#onScrollStateChanged(android.widget.
      * AbsListView, int)
      */
-//    @Override
-//    public void onScrollStateChanged(AbsListView view, int scrollState) {
-//        mReload = false;
-//    }
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+        mReload = false;
+    }
 
     /*
      * (non-Javadoc)
