@@ -1,3 +1,8 @@
+v1.2.3 (Mar 25, 2011)
+- Show pushable repos
+- Encode url for issue label and gits filename
+- More verbose message when login error
+
 v1.2.2 (Mar 23, 2011)
 - Fixed classpath problem in some HTC devices (known model is HTC Desire HD). Refer to http://code.google.com/p/google-gson/issues/detail?id=255
 
