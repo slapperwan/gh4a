@@ -43,6 +43,7 @@ import android.widget.TextView;
 import com.gh4a.adapter.CommentAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.ImageDownloader;
+import com.gh4a.utils.StringUtils;
 import com.github.api.v2.schema.Comment;
 import com.github.api.v2.schema.Issue;
 import com.github.api.v2.services.GitHubException;
@@ -987,7 +988,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                     issueService.setAuthentication(auth);
                     
                     for (int i = 0; i < mCheckedItems.length; i++) {
-                        String label = mAvailableLabelArr[i].replaceAll(" ", "%20");
+                        String label = StringUtils.encodeUrl(mAvailableLabelArr[i]);
                         if (mCheckedItems[i]) {
                             issueService.addLabel(activity.mUserLogin, activity.mRepoName, activity.mIssueNumber, label);
                         }

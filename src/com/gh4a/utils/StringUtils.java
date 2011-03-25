@@ -32,6 +32,8 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 
+import org.apache.http.client.utils.URLEncodedUtils;
+
 import android.text.TextUtils;
 
 import com.gh4a.Constants;
@@ -408,12 +410,13 @@ public class StringUtils {
         return content.toString();
     }
     
-    public static String encodeUrl(String s) throws UnsupportedEncodingException {
-        s = s.replaceAll("%", "%25");
-        s = s.replaceAll(" ", "%20");
-        s = s.replaceAll("!", "%21");
-        s = s.replaceAll("\"", "%22");
-        s = s.replaceAll("#", "%23");
+    public static String encodeUrl(String s) {
+//        s = s.replaceAll("%", "%25");
+//        s = s.replaceAll(" ", "%20");
+//        s = s.replaceAll("!", "%21");
+//        s = s.replaceAll("\"", "%22");
+//        s = s.replaceAll("#", "%23");
+        s = URLEncoder.encode(s).replaceAll("\\+", "%20");
         return s;
     }
 }

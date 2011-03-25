@@ -18,9 +18,8 @@ package com.gh4a;
 import java.util.HashMap;
 import java.util.List;
 
-import android.text.TextUtils;
-
 import com.gh4a.holder.BreadCrumbHolder;
+import com.gh4a.utils.StringUtils;
 import com.github.api.v2.schema.Issue;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
@@ -66,7 +65,6 @@ public class IssueListByLabelActivity extends IssueListActivity {
         breadCrumbHolders[2] = b;
 
         String label = getIntent().getStringExtra(Constants.Issue.ISSUE_LABEL);
-        label = label.replaceAll("%20", " ");
         createBreadcrumb("Filtered by " + label, breadCrumbHolders);
     }
     
@@ -75,7 +73,6 @@ public class IssueListByLabelActivity extends IssueListActivity {
      */
     public String getSubTitleAfterLoaded(int numberOfIssues) {
         String label = getIntent().getStringExtra(Constants.Issue.ISSUE_LABEL);
-        label = label.replaceAll("%20", " ");
         if (numberOfIssues != -1) {
             return "Filtered by " + label + " (" + numberOfIssues + ")";
         }
@@ -92,7 +89,7 @@ public class IssueListByLabelActivity extends IssueListActivity {
         String label = getIntent().getStringExtra(Constants.Issue.ISSUE_LABEL);
         GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
         IssueService service = factory.createIssueService();
-        label = label.replaceAll(" ", "%20");
+        label = StringUtils.encodeUrl(label);
         
         Authentication auth = new LoginPasswordAuthentication(getAuthUsername(), getAuthPassword());
         service.setAuthentication(auth);

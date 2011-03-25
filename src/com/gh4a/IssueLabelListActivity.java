@@ -1,3 +1,18 @@
+/*
+ * Copyright 2011 Azwan Adli Abdullah
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.gh4a;
 
 import java.lang.ref.WeakReference;
@@ -34,6 +49,9 @@ import com.github.api.v2.services.IssueService;
 import com.github.api.v2.services.auth.Authentication;
 import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
+/**
+ * The IssueLabelList activity.
+ */
 public class IssueLabelListActivity extends BaseActivity implements OnItemClickListener {
 
     /** The user login. */
@@ -45,8 +63,12 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
     /** The loading dialog. */
     protected LoadingDialog mLoadingDialog;
     
+    /** The list view. */
     protected ListView mListView;
     
+    /* (non-Javadoc)
+     * @see android.app.Activity#onCreate(android.os.Bundle)
+     */
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
@@ -61,6 +83,9 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
         new LoadIssueLabelsTask(this).execute();
     }
     
+    /**
+     * Sets the bread crumb.
+     */
     protected void setBreadCrumb() {
         BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[3];
 
@@ -93,6 +118,10 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
         createBreadcrumb("Labels", breadCrumbHolders);
     }
     
+    /**
+     * An asynchronous task that runs on a background thread
+     * to load issue labels.
+     */
     private static class LoadIssueLabelsTask extends AsyncTask<Void, Integer, List<String>> {
 
         /** The target. */
@@ -170,6 +199,11 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
         }
     }
     
+    /**
+     * Fill data into UI components.
+     *
+     * @param result the result
+     */
     private void fillData(List<String> result) {
         mListView = (ListView) findViewById(R.id.list_view);
         mListView.setOnItemClickListener(this);
@@ -188,6 +222,9 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
         adapter.notifyDataSetChanged();
     }
 
+    /* (non-Javadoc)
+     * @see android.widget.AdapterView.OnItemClickListener#onItemClick(android.widget.AdapterView, android.view.View, int, long)
+     */
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         SimpleStringAdapter adapter = (SimpleStringAdapter) adapterView.getAdapter();
@@ -200,6 +237,9 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
         startActivity(intent);
     }
     
+    /* (non-Javadoc)
+     * @see android.app.Activity#onPrepareOptionsMenu(android.view.Menu)
+     */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         if (isAuthenticated()) {
@@ -210,6 +250,9 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
         return true;
     }
     
+    /* (non-Javadoc)
+     * @see com.gh4a.BaseActivity#setMenuOptionItemSelected(android.view.MenuItem)
+     */
     @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -228,6 +271,9 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
         }
     }
     
+    /**
+     * Show create label form.
+     */
     private void showCreateLabelForm() {
         final Dialog dialog = new Dialog(this);
 
@@ -255,6 +301,9 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
         dialog.show();
     }
     
+    /* (non-Javadoc)
+     * @see android.app.Activity#onCreateContextMenu(android.view.ContextMenu, android.view.View, android.view.ContextMenu.ContextMenuInfo)
+     */
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         if (isAuthenticated()) {
@@ -269,6 +318,9 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
         }
     }
     
+    /* (non-Javadoc)
+     * @see android.app.Activity#onContextItemSelected(android.view.MenuItem)
+     */
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
@@ -299,7 +351,6 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
             break;
         case Menu.FIRST + 2:
             String label = (String) mListView.getItemAtPosition(info.position);
-            label = label.replaceAll(" ", "%20");
             Intent intent = new Intent().setClass(this, IssueListByLabelActivity.class);
             intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
             intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
@@ -329,7 +380,6 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
          * Instantiates a new load issue list task.
          *
          * @param activity the activity
-         * @param hideMainView the hide main view
          */
         public DeleteIssueLabelsTask(IssueLabelListActivity activity) {
             mTarget = new WeakReference<IssueLabelListActivity>(activity);
@@ -349,7 +399,7 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
                     Authentication auth = new LoginPasswordAuthentication(activity.getAuthUsername(), activity.getAuthPassword());
                     issueService.setAuthentication(auth);
                     String label = (String) activity.mListView.getItemAtPosition(params[0]);
-                    label = label.replaceAll(" ", "%20");
+                    label = StringUtils.encodeUrl(label);
                     issueService.removeLabelWithoutIssue(activity.mUserLogin, activity.mRepoName, label);
                 }
                 catch (GitHubException e) {
@@ -407,7 +457,6 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
          * Instantiates a new load issue list task.
          *
          * @param activity the activity
-         * @param hideMainView the hide main view
          */
         public AddIssueLabelsTask(IssueLabelListActivity activity) {
             mTarget = new WeakReference<IssueLabelListActivity>(activity);
@@ -427,7 +476,7 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
                     Authentication auth = new LoginPasswordAuthentication(activity.getAuthUsername(), activity.getAuthPassword());
                     issueService.setAuthentication(auth);
                     String label = params[0];
-                    label = label.replaceAll(" ", "%20");
+                    label = StringUtils.encodeUrl(label);
                     issueService.addLabelWithoutIssue(activity.mUserLogin, activity.mRepoName, label);
                 }
                 catch (GitHubException e) {
