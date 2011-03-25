@@ -32,6 +32,7 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.gh4a.utils.StringUtils;
 import com.github.api.v2.schema.Repository;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
@@ -174,7 +175,14 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
         else {
             tvParentRepo.setVisibility(View.GONE);
         }
-        tvDesc.setText(mBundle.getString(Constants.Repository.REPO_DESC));
+        
+        if (!StringUtils.isBlank(mBundle.getString(Constants.Repository.REPO_DESC))) {
+            tvDesc.setText(mBundle.getString(Constants.Repository.REPO_DESC));
+            tvDesc.setVisibility(View.VISIBLE);
+        }
+        else {
+            tvDesc.setVisibility(View.GONE);
+        }
         
         if (mBundle.getString(Constants.Repository.REPO_LANGUANGE) != null) {
             tvLanguage.setText(getResources().getString(R.string.repo_language) 
