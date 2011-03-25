@@ -1,17 +1,21 @@
 /*
- * Copyright 2011 Azwan Adli Abdullah Licensed under the Apache License, Version
- * 2.0 (the "License"); you may not use this file except in compliance with the
- * License. You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
- * or agreed to in writing, software distributed under the License is
- * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the specific language
- * governing permissions and limitations under the License.
+ * Copyright 2011 Azwan Adli Abdullah
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.gh4a;
 
 import java.lang.ref.WeakReference;
-import java.util.List;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -27,7 +31,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.api.v2.schema.Repository;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
 import com.github.api.v2.services.UserService;
@@ -36,7 +39,7 @@ import com.markupartist.android.widget.ActionBar;
 import com.markupartist.android.widget.ActionBar.IntentAction;
 
 /**
- * The MineDroid activity.
+ * The Github4Android activity.
  */
 public class Github4AndroidActivity extends BaseActivity {
 
@@ -79,45 +82,6 @@ public class Github4AndroidActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 new LoginTask(Github4AndroidActivity.this).execute();
-//                String username = mEtUserLogin.getText().toString();
-//                String password = mEtPassword.getText().toString();
-//
-//                LoginPasswordAuthentication auth = new LoginPasswordAuthentication(username,
-//                        password);
-//
-//                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-//                UserService userService = factory.createUserService();
-//                userService.setAuthentication(auth);
-//                progressDialog = LoadingDialog.show(Github4AndroidActivity.this, "Please wait",
-//                        "Authenticating...", false, false);
-//                try {
-//                    userService.getKeys();// test auth
-//
-//                    SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
-//                            Constants.PREF_NAME, MODE_PRIVATE);
-//                    Editor editor = sharedPreferences.edit();
-//                    editor.putString(Constants.User.USER_LOGIN, username.trim());
-//                    editor.putString(Constants.User.USER_PASSWORD, password.trim());
-//                    editor.commit();
-//
-//                    getApplicationContext().openUserInfoActivity(Github4AndroidActivity.this,
-//                            username, null);
-//                }
-//                catch (GitHubException e) {
-//                    if (e.getCause() != null
-//                            && e.getCause().getMessage().equalsIgnoreCase(
-//                                    "Received authentication challenge is null")) {
-//                        Toast.makeText(Github4AndroidActivity.this,
-//                                getResources().getString(R.string.invalid_login),
-//                                Toast.LENGTH_SHORT).show();
-//                        return;
-//                    }
-//                    Github4AndroidActivity.this.showError();
-//                    return;
-//                }
-//                finally {
-//                    progressDialog.dismiss();
-//                }
             }
         });
 
@@ -141,7 +105,11 @@ public class Github4AndroidActivity extends BaseActivity {
         /** The exception. */
         private boolean mException;
         
+        /** The is auth error. */
         private boolean isAuthError; 
+        
+        /** The exception msg. */
+        private String mExceptionMsg;
 
         /**
          * Instantiates a new load repository list task.
@@ -151,9 +119,6 @@ public class Github4AndroidActivity extends BaseActivity {
         public LoginTask(Github4AndroidActivity activity) {
             mTarget = new WeakReference<Github4AndroidActivity>(activity);
         }
-
-        /** The hide main view. */
-        private boolean hideMainView;
 
         /*
          * (non-Javadoc)
@@ -182,6 +147,10 @@ public class Github4AndroidActivity extends BaseActivity {
                         isAuthError = true;
                     }
                     mException = true;
+                    mExceptionMsg = e.getMessage();
+                    if (e.getCause() != null) {
+                        mExceptionMsg += ", " + e.getCause().getMessage();
+                    }
                 }
                 
                 return null;
@@ -212,10 +181,13 @@ public class Github4AndroidActivity extends BaseActivity {
             if (mTarget.get() != null) {
                 Github4AndroidActivity activity = mTarget.get();
                 activity.mProgressDialog.dismiss();
-                if (mException) {
+                if (mException && isAuthError) {
                     Toast.makeText(activity,
                             activity.getResources().getString(R.string.invalid_login),
                             Toast.LENGTH_SHORT).show();
+                }
+                else if (mException) {
+                    Toast.makeText(activity, mExceptionMsg, Toast.LENGTH_LONG).show();
                 }
                 else {
                     SharedPreferences sharedPreferences = activity.getSharedPreferences(
