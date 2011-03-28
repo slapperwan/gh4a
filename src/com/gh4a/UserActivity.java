@@ -969,4 +969,5 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         View view = findViewById(R.id.btn_organizations);
         view.showContextMenu();
     }
+    
 }

@@ -126,8 +126,10 @@ public class BaseActivity extends Activity {
                     editor.clear();
                     editor.commit();
                     Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                     Toast.makeText(this, getResources().getString(R.string.success_logout), Toast.LENGTH_SHORT).show();
+                    this.finish();
                 }
             }
             return true;

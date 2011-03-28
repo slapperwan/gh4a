@@ -60,7 +60,8 @@ public class Github4AndroidActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         if (isAuthenticated()) {
-            getApplicationContext().openUserInfoActivity(this, getAuthUsername(), null);
+            getApplicationContext().openUserInfoActivity(this, getAuthUsername(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            finish();
             return;
         }
         setContentView(R.layout.main);
@@ -196,9 +197,10 @@ public class Github4AndroidActivity extends BaseActivity {
                     editor.putString(Constants.User.USER_LOGIN, activity.mEtUserLogin.getText().toString().trim());
                     editor.putString(Constants.User.USER_PASSWORD, activity.mEtPassword.getText().toString().trim());
                     editor.commit();
-
                     activity.getApplicationContext().openUserInfoActivity(activity, activity.mEtUserLogin.getText().toString().trim(),
-                            null);
+                            null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    activity.finish();
+                    
                 }
             }
         }

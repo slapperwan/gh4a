@@ -183,6 +183,22 @@ public class Gh4Application extends Application {
         intent.putExtra(Constants.User.USER_NAME, name);
         context.startActivity(intent);
     }
+    
+    /**
+     * Open user info activity.
+     *
+     * @param context the context
+     * @param login the login
+     * @param name the name
+     * @param flags the flags
+     */
+    public void openUserInfoActivity(Context context, String login, String name, int flags) {
+        Intent intent = new Intent().setClass(context, UserActivity.class);
+        intent.putExtra(Constants.User.USER_LOGIN, login);
+        intent.putExtra(Constants.User.USER_NAME, name);
+        intent.setFlags(flags);
+        context.startActivity(intent);
+    }
 
     /**
      * Open commit activity.
