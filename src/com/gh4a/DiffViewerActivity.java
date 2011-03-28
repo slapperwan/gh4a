@@ -106,7 +106,7 @@ public class DiffViewerActivity extends BaseActivity {
         s.setPluginsEnabled(false);
         s.setSupportZoom(true);
         s.setUseWideViewPort(true);
-        diffView.loadDataWithBaseURL("file:///android_asset/", formatted, "text/html", "", "");
+        diffView.loadDataWithBaseURL("file:///android_asset/", formatted, "text/html", "utf-8", "");
     }
 
     /**

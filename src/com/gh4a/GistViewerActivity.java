@@ -256,7 +256,7 @@ public class GistViewerActivity extends BaseActivity {
         mData = data;
         String highlighted = StringUtils.highlightSyntax(mData, highlight, mFilename);
         webView.setWebViewClient(webViewClient);
-        webView.loadDataWithBaseURL("file:///android_asset/", highlighted, "text/html", "", "");
+        webView.loadDataWithBaseURL("file:///android_asset/", highlighted, "text/html", "utf-8", "");
     }
 
     /** The web view client. */

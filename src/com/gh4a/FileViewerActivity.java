@@ -26,7 +26,6 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.animation.ScaleAnimation;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -370,7 +369,7 @@ public class FileViewerActivity extends BaseActivity {
             //content = StringUtils.convertStreamToString(is);
             String highlighted = StringUtils.highlightSyntax(data, highlight, mName);
             webView.setWebViewClient(webViewClient);
-            webView.loadDataWithBaseURL("file:///android_asset/", highlighted, "text/html", "", "");
+            webView.loadDataWithBaseURL("file:///android_asset/", highlighted, "text/html", "utf-8", "");
         //}
         //catch (IOException e) {
         //    Log.e(Constants.LOG_TAG, e.getMessage(), e);

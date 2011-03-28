@@ -16,7 +16,6 @@
 package com.gh4a;
 
 import java.lang.ref.WeakReference;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import android.content.Intent;
@@ -24,7 +23,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -313,7 +311,7 @@ public class AddedFileViewerActivity extends BaseActivity {
         
         String data = StringUtils.highlightSyntax(blob.getData(), highlight, mFilePath);
         webView.setWebViewClient(webViewClient);
-        webView.loadDataWithBaseURL("file:///android_asset/", data, "text/html", "", "");
+        webView.loadDataWithBaseURL("file:///android_asset/", data, "text/html", "utf-8", "");
     }
 
     /** The web view client. */
