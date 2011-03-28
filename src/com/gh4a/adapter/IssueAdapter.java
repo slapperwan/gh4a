@@ -104,8 +104,18 @@ public class IssueAdapter extends RootAdapter<Issue> {
                 }
             }
             
-            //show labels
             viewHolder.llLabels.removeAllViews();
+            
+            //issue number
+            TextView tvNumber = new TextView(v.getContext());
+            tvNumber.setSingleLine(true);
+            tvNumber.setText("#" + issue.getNumber());
+            tvNumber.setTextAppearance(v.getContext(), R.style.default_text_small);
+            tvNumber.setBackgroundResource(R.drawable.default_grey_box);
+            
+            viewHolder.llLabels.addView(tvNumber);
+
+            //show labels
             List<String> labels = issue.getLabels();
             if (labels != null && !labels.isEmpty()) {
                 for (String label : labels) {
@@ -117,11 +127,12 @@ public class IssueAdapter extends RootAdapter<Issue> {
                     
                     viewHolder.llLabels.addView(tvLabel);
                 }
-                viewHolder.llLabels.setVisibility(View.VISIBLE);
+//                viewHolder.llLabels.setVisibility(View.VISIBLE);
             }
-            else {
-                viewHolder.llLabels.setVisibility(View.GONE);
-            }
+//            else {
+//                viewHolder.llLabels.setVisibility(View.GONE);
+//            }
+            viewHolder.llLabels.setVisibility(View.VISIBLE);
             
             viewHolder.tvDesc.setText(StringUtils.doTeaser(issue.getTitle()));
 
