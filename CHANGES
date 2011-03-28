@@ -1,6 +1,7 @@
 v1.2.4 (Mar 28, 2011)
 - Fixed create issue layout when in landscape mode.
 - Fixed encoding in gist, file and diff viewer.
+- Show issue number in issue and pull request listing
  
 v1.2.3 (Mar 25, 2011)
 - Show pushable repos
