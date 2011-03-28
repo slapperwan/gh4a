@@ -30,7 +30,6 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.ImageDownloader;
-import com.gh4a.utils.StringUtils;
 import com.github.api.v2.schema.PullRequest;
 
 /**
@@ -106,7 +105,7 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> {
                 viewHolder.llLabels.setVisibility(View.GONE);
             }
             
-            viewHolder.tvDesc.setText(pullRequest.getTitle());
+            viewHolder.tvDesc.setText("#" + pullRequest.getNumber() + " - " + pullRequest.getTitle());
             //viewHolder.tvDesc.setText(StringUtils.doTeaser(pullRequest.getBody()));
             Resources res = v.getResources();
             String extraData = String.format(res.getString(R.string.more_data_3), pullRequest
