@@ -139,6 +139,15 @@
             android:name=".PushableRepoListActivity"
             android:configChanges="orientation" />
         <activity
+            android:name=".ExploreActivity"
+            android:configChanges="orientation" />
+        <activity
+            android:name=".TrendActivity"
+            android:configChanges="orientation" />
+        <activity
+            android:name=".TimelineActivity"
+            android:configChanges="orientation" />
+        <activity
             android:name="com.markupartist.android.widget.ActionBar" />
     </application>
     <uses-sdk

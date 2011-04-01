@@ -253,6 +253,8 @@ public class BaseActivity extends Activity {
             actionBar.setHomeAction(new IntentAction(this, intent, R.drawable.ic_home));
         }
         actionBar.addAction(new IntentAction(this, new Intent(getApplication(),
+                ExploreActivity.class), R.drawable.ic_search));
+        actionBar.addAction(new IntentAction(this, new Intent(getApplication(),
                 SearchActivity.class), R.drawable.ic_search));
     }
 

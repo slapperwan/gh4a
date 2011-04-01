@@ -32,4 +32,9 @@
         <item>Repository</item>
         <item>User</item>
     </string-array>
+    <string-array
+        name="explore_item">
+        <item>Public Timeline</item>
+        <item>Trending Repos</item>
+    </string-array>
 </resources>
