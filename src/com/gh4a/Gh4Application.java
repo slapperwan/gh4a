@@ -45,7 +45,7 @@ public class Gh4Application extends Application {
      */
     @Override
     public void onCreate() {
-        ACRA.init(this);
+        //ACRA.init(this);
         super.onCreate();
     }
 

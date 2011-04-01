@@ -224,4 +224,14 @@
     <string name="gist">Gist</string>
     <string name="gist_public">Public Gist</string>
     <string name="gist_filename">Gist - %1$s</string>
+    
+    <!-- Explore -->
+    <string name="explore">Explore</string>
+    
+    <!-- Trending repos -->
+    <string name="trend">Trending Repos</string>
+    <string name="trend_today">Today</string>
+    <string name="trend_week">Week</string>
+    <string name="trend_month">Month</string>
+    <string name="trend_forever">Forever</string>
 </resources>

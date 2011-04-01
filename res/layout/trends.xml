@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.gh4a"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+    <com.markupartist.android.widget.ActionBar
+        android:id="@+id/actionbar"
+        app:title="@string/app_name"
+        style="@style/ActionBar" />
+    <LinearLayout
+        android:id="@+id/breadcrumb"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/actionbar"
+        android:background="?attr/info_box">
+        <HorizontalScrollView
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:scrollbars="none">
+            <LinearLayout
+                android:id="@+id/ll_part"
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content">
+            </LinearLayout>
+        </HorizontalScrollView>
+        <com.markupartist.android.widget.ScrollingTextView
+            android:id="@+id/tv_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceSubtitle"
+            android:lines="1"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            android:ellipsize="marquee" />
+    </LinearLayout>
+    <ListView
+        android:id="@+id/main_content"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/breadcrumb"
+        android:layout_above="@+id/ll_bottom" >
+    </ListView>
+    <LinearLayout
+        android:id="@id/ll_bottom"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btn_today"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="0dp"
+            android:background="@drawable/btn_bottom_bg"
+            android:textColor="#FFFFFF"
+            android:textSize="16dp"
+            android:text="@string/trend_today" >
+        </Button>
+        <Button
+            android:id="@+id/btn_week"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="0dp"
+            android:background="@drawable/btn_bottom_bg"
+            android:textColor="#FFFFFF"
+            android:textSize="16dp"
+            android:text="@string/trend_week" >
+        </Button>
+        <Button
+            android:id="@+id/btn_month"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="0dp"
+            android:background="@drawable/btn_bottom_bg"
+            android:textColor="#FFFFFF"
+            android:textSize="16dp"
+            android:text="@string/trend_month" >
+        </Button>
+        <Button
+            android:id="@+id/btn_forever"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="0dp"
+            android:background="@drawable/btn_bottom_bg"
+            android:textColor="#FFFFFF"
+            android:textSize="16dp"
+            android:text="@string/trend_forever" >
+        </Button>
+    </LinearLayout>
+</RelativeLayout>
