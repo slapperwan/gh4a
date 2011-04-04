@@ -209,6 +209,15 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
             RelativeLayout rlOpenIssues = (RelativeLayout) findViewById(R.id.rl_open_issues);
             rlOpenIssues.setVisibility(View.GONE);
         }
+        
+        if (mBundle.getBoolean(Constants.Repository.REPO_HAS_WIKI)) {
+            ImageButton btnWiki = (ImageButton) findViewById(R.id.btn_wiki);
+            btnWiki.setOnClickListener(this);
+        }
+        else {
+            RelativeLayout rlWiki = (RelativeLayout) findViewById(R.id.rl_wiki);
+            rlWiki.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -434,6 +443,13 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
                     mBundle.getString(Constants.Repository.REPO_OWNER),
                     mBundle.getString(Constants.Repository.REPO_NAME),
                     Constants.Issue.ISSUE_STATE_OPEN);
+            break;
+        case R.id.btn_wiki:
+            Intent intent = new Intent().setClass(this, WikiListActivity.class);
+            intent.putExtra(Constants.Repository.REPO_OWNER, mBundle.getString(Constants.Repository.REPO_OWNER));
+            intent.putExtra(Constants.Repository.REPO_NAME, mBundle.getString(Constants.Repository.REPO_NAME));
+            startActivity(intent);
+            break;
         default:
             break;
         }
