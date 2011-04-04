@@ -65,7 +65,8 @@ public class BlogAdapter extends RootAdapter<Blog> {
             viewHolder.tvDesc.setText(blog.getContent().replaceAll("<(.|\n)*?>",""));
             viewHolder.tvDesc.setSingleLine(true);
             
-            viewHolder.tvExtra.setText(blog.getAuthor() + " | " + sdf.format(blog.getPublished()));
+            viewHolder.tvExtra.setText(blog.getAuthor() 
+                    +  (blog.getPublished() != null ? " | " + sdf.format(blog.getPublished()) : ""));
         }
         return v;
     }
