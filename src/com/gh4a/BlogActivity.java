@@ -29,8 +29,6 @@ public class BlogActivity extends BaseActivity {
     private LoadingDialog mLoadingDialog;
     private String mTitle;
     private String mContent;
-    private String mPubDate;
-    private String mAuthor;
     
     /**
      * Called when the activity is first created.
@@ -45,9 +43,7 @@ public class BlogActivity extends BaseActivity {
         setUpActionBar();
         
         mTitle = getIntent().getStringExtra(Constants.Blog.TITLE);
-        mAuthor = getIntent().getStringExtra(Constants.Blog.AUTHOR);
         mContent = getIntent().getStringExtra(Constants.Blog.CONTENT);
-        mPubDate = getIntent().getStringExtra(Constants.Blog.PUB_DATE);
 
         TextView tvHistoryFile = (TextView) findViewById(R.id.tv_view);
         tvHistoryFile.setVisibility(View.GONE);
@@ -70,7 +66,7 @@ public class BlogActivity extends BaseActivity {
         WebView webView = (WebView) findViewById(R.id.web_view);
 
         WebSettings s = webView.getSettings();
-        s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
+        s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
         s.setUseWideViewPort(false);
         s.setAllowFileAccess(true);
         s.setBuiltInZoomControls(false);
@@ -82,7 +78,7 @@ public class BlogActivity extends BaseActivity {
         s.setJavaScriptEnabled(true);
 
         webView.setWebViewClient(webViewClient);
-        webView.loadDataWithBaseURL("https://github.com/blog", mContent, "text/html", "utf-8", null);
+        webView.loadDataWithBaseURL("https://github.com", mContent, "text/html", "utf-8", null);
     }
 
     /** The web view client. */

@@ -44,9 +44,9 @@ import android.widget.TextView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView.OnItemClickListener;
 
-import com.gh4a.adapter.BlogAdapter;
-import com.gh4a.feeds.BlogHandler;
-import com.gh4a.holder.Blog;
+import com.gh4a.adapter.CommonFeedAdapter;
+import com.gh4a.feeds.FeedHandler;
+import com.gh4a.holder.Feed;
 import com.github.api.v2.services.constant.ApplicationConstants;
 
 public class BlogListActivity extends BaseActivity {
@@ -70,12 +70,12 @@ public class BlogListActivity extends BaseActivity {
         
         mListView = (ListView) findViewById(R.id.list_view);
         mListView.setOnScrollListener(new BlogScrollListener(this));
-        BlogAdapter adapter = new BlogAdapter(this, new ArrayList<Blog>());
+        CommonFeedAdapter adapter = new CommonFeedAdapter(this, new ArrayList<Feed>());
         mListView.setAdapter(adapter);
         mListView.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Blog blog = (Blog) adapterView.getAdapter().getItem(position);
+                Feed blog = (Feed) adapterView.getAdapter().getItem(position);
                 Intent intent = new Intent().setClass(BlogListActivity.this, BlogActivity.class);
                 intent.putExtra(Constants.Blog.TITLE, blog.getTitle());
                 intent.putExtra(Constants.Blog.CONTENT, blog.getContent());
@@ -87,7 +87,7 @@ public class BlogListActivity extends BaseActivity {
     }
 
     private static class LoadBlogsTask extends
-            AsyncTask<String, Void, List<Blog>> {
+            AsyncTask<String, Void, List<Feed>> {
 
         /** The target. */
         private WeakReference<BlogListActivity> mTarget;
@@ -112,7 +112,7 @@ public class BlogListActivity extends BaseActivity {
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
-        protected List<Blog> doInBackground(String... params) {
+        protected List<Feed> doInBackground(String... params) {
             if (mTarget.get() != null) {
                 this.mHideMainView = Boolean.valueOf(params[0]);
                 BufferedInputStream bis = null;
@@ -136,9 +136,9 @@ public class BlogListActivity extends BaseActivity {
                     
                     SAXParserFactory factory = SAXParserFactory.newInstance();
                     SAXParser parser = factory.newSAXParser();
-                    BlogHandler handler = new BlogHandler();
+                    FeedHandler handler = new FeedHandler();
                     parser.parse(bis, handler);
-                    return handler.getBlogs();
+                    return handler.getFeeds();
                 }
                 catch (MalformedURLException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
@@ -199,7 +199,7 @@ public class BlogListActivity extends BaseActivity {
          * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
          */
         @Override
-        protected void onPostExecute(List<Blog> result) {
+        protected void onPostExecute(List<Feed> result) {
             if (mTarget.get() != null) {
                 if (mException) {
                     mTarget.get().showError();
@@ -219,11 +219,11 @@ public class BlogListActivity extends BaseActivity {
         }
     }
 
-    private void fillData(List<Blog> result) {
+    private void fillData(List<Feed> result) {
         if (result != null) {
-            List<Blog> blogs = ((BlogAdapter) mListView.getAdapter()).getObjects();
+            List<Feed> blogs = ((CommonFeedAdapter) mListView.getAdapter()).getObjects();
             blogs.addAll(result);
-            ((BlogAdapter) mListView.getAdapter()).notifyDataSetChanged();
+            ((CommonFeedAdapter) mListView.getAdapter()).notifyDataSetChanged();
         }
     }
     
