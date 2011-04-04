@@ -45,6 +45,8 @@ public interface Constants {
 
     /** The Constant GRAVATAR_ID. */
     public static final String GRAVATAR_ID = "GRAVATAR_ID";
+    
+    public static final String BASE_URL = "BASE_URL";
 
     /**
      * User properties.
@@ -128,6 +130,9 @@ public interface Constants {
 
         /** The Constant REPO_HAS_ISSUES. */
         public static final String REPO_HAS_ISSUES = "REPO_HAS_ISSUES";
+        
+        /** The Constant REPO_HAS_WIKI. */
+        public static final String REPO_HAS_WIKI = "REPO_HAS_WIKI";
     }
 
     /**
