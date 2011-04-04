@@ -79,6 +79,7 @@ public class Gh4Application extends Application {
         data.putString(Constants.Repository.REPO_PARENT, repository.getParent());
         data.putString(Constants.Repository.REPO_SOURCE, repository.getSource());
         data.putBoolean(Constants.Repository.REPO_HAS_ISSUES, repository.isHasIssues());
+        data.putBoolean(Constants.Repository.REPO_HAS_WIKI, repository.isHasWiki());
 
         return data;
     }
