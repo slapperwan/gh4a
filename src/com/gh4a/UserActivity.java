@@ -19,6 +19,8 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -36,6 +38,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
 import com.gh4a.utils.ImageDownloader;
@@ -101,6 +104,8 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         
         /** The exception. */
         private boolean mException;
+        
+        private boolean isAuthError; 
 
         /**
          * Instantiates a new load user info task.
@@ -125,11 +130,15 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
                     Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
                             mTarget.get().getAuthPassword());
                     userService.setAuthentication(auth);
-                    
                     return userService.getUserByUsername(mTarget.get().mUserLogin);
                 }
                 catch (GitHubException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    if (e.getCause() != null
+                            && e.getCause().getMessage().equalsIgnoreCase(
+                                    "Received authentication challenge is null")) {
+                        isAuthError = true;
+                    }
                     mException = true;
                     return null;
                 }
@@ -158,7 +167,24 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         protected void onPostExecute(User result) {
             if (mTarget.get() != null) {
                 mTarget.get().mLoadingDialog.dismiss();
-                if (mException) {
+                if (mException && isAuthError) {
+                    SharedPreferences sharedPreferences = mTarget.get().getSharedPreferences(
+                            Constants.PREF_NAME, MODE_PRIVATE);
+                    
+                    if (sharedPreferences != null) {
+                        if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
+                                && sharedPreferences.getString(Constants.User.USER_PASSWORD, null) != null){
+                            Editor editor = sharedPreferences.edit();
+                            editor.clear();
+                            editor.commit();
+                            Intent intent = new Intent().setClass(mTarget.get(), Github4AndroidActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            mTarget.get().startActivity(intent);
+                            mTarget.get().finish();
+                        }
+                    }
+                }
+                else if (mException) {
                     mTarget.get().showError();
                 }
                 else {

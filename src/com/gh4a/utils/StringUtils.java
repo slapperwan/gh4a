@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
@@ -31,13 +30,11 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-
-import org.apache.http.client.utils.URLEncodedUtils;
+import java.util.regex.Pattern;
 
 import android.text.TextUtils;
 
 import com.gh4a.Constants;
-import com.github.api.v2.services.constant.ApplicationConstants;
 
 /**
  * The Class StringUtils.
@@ -49,6 +46,16 @@ public class StringUtils {
 
     /** The Constant MEGABYTE. */
     private static final long MEGABYTE = 1024L;
+
+    public static final Pattern EMAIL_ADDRESS_PATTERN = Pattern.compile(
+            "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" +
+            "\\@" +
+            "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
+            "(" +
+            "\\." +
+            "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
+            ")+"
+        );
 
     /**
      * Checks if is blank.
@@ -419,4 +426,9 @@ public class StringUtils {
         s = URLEncoder.encode(s).replaceAll("\\+", "%20");
         return s;
     }
+    
+    public static boolean checkEmail(String email) {
+        return EMAIL_ADDRESS_PATTERN.matcher(email).matches();
+    }
+
 }

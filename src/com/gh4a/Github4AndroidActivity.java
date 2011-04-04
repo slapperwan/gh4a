@@ -23,6 +23,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -30,7 +31,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.AutoCompleteTextView.Validator;
 
+import com.gh4a.utils.StringUtils;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
 import com.github.api.v2.services.UserService;
@@ -73,16 +76,22 @@ public class Github4AndroidActivity extends BaseActivity {
 
         // setup title breadcrumb
         createBreadcrumb("Login", null);
-
+        
         mEtUserLogin = (EditText) findViewById(R.id.et_username_main);
         mEtPassword = (EditText) findViewById(R.id.et_password_main);
 
-        Button btnLogin = (Button) findViewById(R.id.btn_login);
+        final Button btnLogin = (Button) findViewById(R.id.btn_login);
         btnLogin.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                new LoginTask(Github4AndroidActivity.this).execute();
+                hideKeyboard(btnLogin.getWindowToken());
+                if (!StringUtils.checkEmail(mEtUserLogin.getText().toString())) {
+                    new LoginTask(Github4AndroidActivity.this).execute();    
+                }
+                else {
+                    Toast.makeText(Github4AndroidActivity.this, "Please enter username instead of email", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
