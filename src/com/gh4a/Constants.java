@@ -246,6 +246,13 @@ public interface Constants {
         public static final String FILENAME = "Gist.filename";
     }
     
+    public interface Blog {
+        public static final String CONTENT = "Blog.content";
+        public static final String AUTHOR = "Blog.author";
+        public static final String TITLE = "Blog.title";
+        public static final String PUB_DATE = "Blog.pubDate";
+    }
+    
     public static String[] SKIP_PRETTIFY_EXT = {
         "txt", "rdoc", "markdown", "md", "mdown", "texttile", "org", "creole", "rst", "asciidoc", "pod"
     };

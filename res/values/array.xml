@@ -36,5 +36,6 @@
         name="explore_item">
         <item>Public Timeline</item>
         <item>Trending Repos</item>
+        <item>GitHub Blog</item>
     </string-array>
 </resources>

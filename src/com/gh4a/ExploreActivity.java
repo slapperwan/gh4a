@@ -59,6 +59,10 @@ public class ExploreActivity extends BaseActivity {
                     Intent intent = new Intent().setClass(ExploreActivity.this, TrendActivity.class);
                     startActivity(intent);
                 }
+                else if (position == 2) {//GitHub Blog
+                    Intent intent = new Intent().setClass(ExploreActivity.this, BlogListActivity.class);
+                    startActivity(intent);
+                }
             }
         });
     }
