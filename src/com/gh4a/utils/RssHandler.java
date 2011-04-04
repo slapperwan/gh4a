@@ -7,13 +7,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import android.util.Log;
-import android.view.View;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-
-import com.gh4a.Constants;
-import com.gh4a.R;
 import com.gh4a.holder.YourActionFeed;
 import com.github.api.v2.schema.UserFeed;
 
