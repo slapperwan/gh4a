@@ -283,6 +283,30 @@
                         android:layout_alignRight="@id/tv_issues_label"
                         android:layout_alignParentRight="true" />
                 </RelativeLayout>
+                <View
+                    android:background="?android:attr/divider"
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp" />
+                <RelativeLayout
+                    android:id="@+id/rl_wiki"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/tv_wiki_label"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="@string/recent_wiki" />
+                    <ImageButton
+                        android:id="@+id/btn_wiki"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignRight="@id/tv_wiki_label"
+                        android:layout_alignParentRight="true"
+                        android:src="@drawable/ic_more" />
+                </RelativeLayout>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

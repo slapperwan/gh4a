@@ -237,4 +237,7 @@
     
     <!-- GitHub Blog -->
     <string name="blog">GitHub Blog</string>
+    
+    <!-- Recent Wiki Updates -->
+    <string name="recent_wiki">Recent Wiki Updates</string>
 </resources>

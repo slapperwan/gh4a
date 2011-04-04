@@ -154,6 +154,9 @@
             android:name="BlogActivity"
             android:configChanges="orientation" />
         <activity
+            android:name="WikiListActivity"
+            android:configChanges="orientation" />
+        <activity
             android:name="com.markupartist.android.widget.ActionBar" />
     </application>
     <uses-sdk
