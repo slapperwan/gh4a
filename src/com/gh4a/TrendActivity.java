@@ -31,6 +31,7 @@ import org.xml.sax.SAXException;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -144,6 +145,7 @@ public class TrendActivity extends BaseActivity {
         @Override
         protected List<Trend> doInBackground(String... params) {
             if (mTarget.get() != null) {
+                BufferedInputStream bis = null;
                 try {
                     URL url = new URL(params[0]);
                     HttpURLConnection request = (HttpURLConnection) url.openConnection();
@@ -159,7 +161,7 @@ public class TrendActivity extends BaseActivity {
                         request.setReadTimeout(ApplicationConstants.READ_TIMEOUT);
                     }
                     request.connect();
-                    BufferedInputStream bis = new BufferedInputStream(request.getInputStream());
+                    bis = new BufferedInputStream(request.getInputStream());
                     
                     SAXParserFactory factory = SAXParserFactory.newInstance();
                     SAXParser parser = factory.newSAXParser();
@@ -168,16 +170,34 @@ public class TrendActivity extends BaseActivity {
                     return handler.getTrends();
                 }
                 catch (MalformedURLException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
                     return null;
                 }
                 catch (IOException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
                     return null;
                 }
                 catch (ParserConfigurationException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
                     return null;
                 }
                 catch (SAXException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
                     return null;
+                }
+                finally {
+                    if (bis != null) {
+                        try {
+                            bis.close();
+                        }
+                        catch (IOException e) {
+                            Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                        }
+                    }
                 }
             }
             else {
