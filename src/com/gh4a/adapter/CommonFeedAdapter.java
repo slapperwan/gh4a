@@ -48,7 +48,7 @@ public class CommonFeedAdapter extends RootAdapter<Feed> {
         mShowGravatar = showGravatar;
         mShowExtra = showExtra;
     }
-
+    
     @Override
     public View doGetView(int position, View convertView, ViewGroup parent) {
         View v = convertView;

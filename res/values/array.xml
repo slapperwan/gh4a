@@ -37,5 +37,6 @@
         <item>Public Timeline</item>
         <item>Trending Repos</item>
         <item>GitHub Blog</item>
+        <item>Public Discussion</item>
     </string-array>
 </resources>

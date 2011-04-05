@@ -439,6 +439,16 @@ public class BaseActivity extends Activity {
                 intent.putExtra(Constants.Repository.REPO_NAME, data.get(Constants.Repository.REPO_NAME));
                 mTarget.get().startActivity(intent);
             }
+            else if (Constants.Discussion.CATEGORY.equals(tag)) {
+                Intent intent = new Intent().setClass(mTarget.get(), DiscussionCategoryListActivity.class);
+                mTarget.get().startActivity(intent);
+            }
+            else if (Constants.Discussion.DISCUSSIONS.equals(tag)) {
+                Intent intent = new Intent().setClass(mTarget.get(), DiscussionListActivity.class);
+                intent.putExtra(Constants.Discussion.URL, data.get(Constants.Discussion.URL));
+                intent.putExtra(Constants.Discussion.TITLE, data.get(Constants.Discussion.TITLE));
+                mTarget.get().startActivity(intent);
+            }
         }
     };
 

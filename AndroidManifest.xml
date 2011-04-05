@@ -160,6 +160,15 @@
             android:name="WikiActivity"
             android:configChanges="orientation" />
         <activity
+            android:name="DiscussionCategoryListActivity"
+            android:configChanges="orientation" />
+        <activity
+            android:name="DiscussionListActivity"
+            android:configChanges="orientation" />
+        <activity
+            android:name="DiscussionActivity"
+            android:configChanges="orientation" />
+        <activity
             android:name="com.markupartist.android.widget.ActionBar" />
     </application>
     <uses-sdk

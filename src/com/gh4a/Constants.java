@@ -265,6 +265,16 @@ public interface Constants {
         public static final String WIKI = "Wiki";
     }
     
+    public interface Discussion {
+        public static final String CATEGORY = "Discussion.category";
+        public static final String DISCUSSIONS = "Discussion.discussions";
+        public static final String TITLE = "Discussion.title";
+        public static final String URL = "Discussion.url";
+        public static final String CONTENT = "Discussion.content";
+        public static final String FROM_URL = "Discussion.fromUrl";
+        public static final String FROM_TITLE = "Discussion.fromTitle";
+    }
+    
     public static String[] SKIP_PRETTIFY_EXT = {
         "txt", "rdoc", "markdown", "md", "mdown", "texttile", "org", "creole", "rst", "asciidoc", "pod"
     };
