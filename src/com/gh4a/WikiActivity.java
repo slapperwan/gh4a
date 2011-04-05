@@ -94,6 +94,7 @@ public class WikiActivity extends BaseActivity {
         b = new BreadCrumbHolder();
         b.setLabel(getResources().getString(R.string.recent_wiki));
         b.setTag(Constants.Wiki.WIKI);
+        b.setData(data);
         breadCrumbHolders[2] = b;
         
         createBreadcrumb(mTitle, breadCrumbHolders);
