@@ -49,7 +49,6 @@ import com.gh4a.adapter.CommonFeedAdapter;
 import com.gh4a.feeds.FeedHandler;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.holder.Feed;
-import com.github.api.v2.schema.Issue.State;
 import com.github.api.v2.services.constant.ApplicationConstants;
 
 public class WikiListActivity extends BaseActivity {
@@ -78,7 +77,7 @@ public class WikiListActivity extends BaseActivity {
         
         mListView = (ListView) findViewById(R.id.list_view);
         //mListView.setOnScrollListener(new WikiScrollListener(this));
-        CommonFeedAdapter adapter = new CommonFeedAdapter(this, new ArrayList<Feed>());
+        CommonFeedAdapter adapter = new CommonFeedAdapter(this, new ArrayList<Feed>(), false, false);
         mListView.setAdapter(adapter);
         mListView.setOnItemClickListener(new OnItemClickListener() {
             @Override

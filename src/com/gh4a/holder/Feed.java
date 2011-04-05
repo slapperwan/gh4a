@@ -26,6 +26,8 @@ public class Feed {
     private String title;
     private String content;
     private String author;
+    private String gravatarId;
+    
     public String getId() {
         return id;
     }
@@ -67,5 +69,11 @@ public class Feed {
     }
     public void setAuthor(String author) {
         this.author = author;
+    }
+    public String getGravatarId() {
+        return gravatarId;
+    }
+    public void setGravatarId(String gravatarId) {
+        this.gravatarId = gravatarId;
     }
 }

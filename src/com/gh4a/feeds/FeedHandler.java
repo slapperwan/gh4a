@@ -44,6 +44,15 @@ public class FeedHandler extends DefaultHandler {
         if (localName.equalsIgnoreCase("author")){
             author = true;
         }
+        
+        if (localName.equalsIgnoreCase("thumbnail")){
+            String gravatarUrl = attributes.getValue(0);
+            String[] gravatarUrlPart = gravatarUrl.split("/");
+            if (gravatarUrlPart.length > 3) {
+                String gravatarId = gravatarUrl.substring(gravatarUrl.indexOf(gravatarUrlPart[4]), gravatarUrl.indexOf("?"));
+                mFeed.setGravatarId(gravatarId);
+            }
+        }
     }
 
     @Override

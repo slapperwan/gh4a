@@ -15,28 +15,38 @@
  */
 package com.gh4a.adapter;
 
-import java.io.InputStream;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.text.Html.ImageGetter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.holder.Feed;
+import com.gh4a.utils.ImageDownloader;
 
 public class CommonFeedAdapter extends RootAdapter<Feed> {
 
     private static final SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
+    private boolean mShowGravatar;
+    private boolean mShowExtra;
     
     public CommonFeedAdapter(Context context, List<Feed> objects) {
         super(context, objects);
+        mShowGravatar = true;//default true
+        mShowExtra = true;//default true
+    }
+    
+    public CommonFeedAdapter(Context context, List<Feed> objects, boolean showGravatar, boolean showExtra) {
+        super(context, objects);
+        mShowGravatar = showGravatar;
+        mShowExtra = showExtra;
     }
 
     @Override
@@ -46,8 +56,9 @@ public class CommonFeedAdapter extends RootAdapter<Feed> {
 
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_simple_3, null);
+            v = vi.inflate(R.layout.row_gravatar_3, null);
             viewHolder = new ViewHolder();
+            viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
             viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
@@ -58,36 +69,45 @@ public class CommonFeedAdapter extends RootAdapter<Feed> {
             viewHolder = (ViewHolder) v.getTag();
         }
 
-        final Feed blog = mObjects.get(position);
-        if (blog != null) {
-            viewHolder.tvTitle.setText(blog.getTitle());
+        final Feed feed = mObjects.get(position);
+        if (feed != null) {
+            if (mShowGravatar) {
+                ImageDownloader.getInstance().download(feed.getGravatarId(), viewHolder.ivGravatar);
+                viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
+    
+                    @Override
+                    public void onClick(View v) {
+                        /** Open user activity */
+                        Gh4Application context = (Gh4Application) v.getContext()
+                                .getApplicationContext();
+                        context.openUserInfoActivity(v.getContext(), feed.getAuthor(), null);
+                    }
+                });
+                viewHolder.ivGravatar.setVisibility(View.VISIBLE);
+            }
+            else {
+                viewHolder.ivGravatar.setVisibility(View.GONE);
+            }
+            
+            viewHolder.tvTitle.setText(feed.getTitle());
 
-            viewHolder.tvDesc.setText(blog.getContent().replaceAll("<(.|\n)*?>",""));
+            viewHolder.tvDesc.setText(feed.getContent().replaceAll("<(.|\n)*?>",""));
             viewHolder.tvDesc.setSingleLine(true);
             
-            viewHolder.tvExtra.setText(blog.getAuthor() 
-                    +  (blog.getPublished() != null ? " | " + sdf.format(blog.getPublished()) : ""));
+            if (mShowExtra) {
+                viewHolder.tvExtra.setText(feed.getAuthor() 
+                        +  (feed.getPublished() != null ? " | " + sdf.format(feed.getPublished()) : ""));
+                viewHolder.tvExtra.setVisibility(View.VISIBLE);
+            }
+            else {
+                viewHolder.tvExtra.setVisibility(View.GONE);
+            }
         }
         return v;
     }
 
-    private static class BlogImageGetter implements ImageGetter {
-        @Override
-        public Drawable getDrawable(String source) {
-            try {
-                InputStream is = (InputStream)new URL(source).getContent();
-                Drawable d = Drawable.createFromStream(is, "img");
-                return d;
-            } catch (Exception e) {
-                System.out.println("Exc=" + e);
-                return null;
-            }
-        }
-
-        
-    }
-    
     private static class ViewHolder {
+        public ImageView ivGravatar;
         public TextView tvTitle;
         public TextView tvDesc;
         public TextView tvExtra;
