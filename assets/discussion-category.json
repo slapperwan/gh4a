@@ -1,5 +1,10 @@
 [
   {
+    "title":"Recent discussions",
+    "url":"http://support.github.com/discussions.atom",
+    "desc":"Recent discussions for all categories."
+  },
+  {
     "title":"Site issues",
     "url":"http://support.github.com/discussions/site.atom",
     "desc":"Oddities in the site layout? Things not updating correctly? Post your problems here."
@@ -42,7 +47,7 @@
   {
     "title":"Pull requests",
     "url":"http://support.github.com/discussions/pull-requests.atom",
-    "desc":""
+    "desc":"Problems with the pull request."
   },
   {
     "title":"API",
