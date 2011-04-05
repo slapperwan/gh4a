@@ -208,6 +208,9 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
         else {
             RelativeLayout rlOpenIssues = (RelativeLayout) findViewById(R.id.rl_open_issues);
             rlOpenIssues.setVisibility(View.GONE);
+            
+            View divider = (View) findViewById(R.id.issues_divider);
+            divider.setVisibility(View.GONE);
         }
         
         if (mBundle.getBoolean(Constants.Repository.REPO_HAS_WIKI)) {
@@ -217,6 +220,9 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
         else {
             RelativeLayout rlWiki = (RelativeLayout) findViewById(R.id.rl_wiki);
             rlWiki.setVisibility(View.GONE);
+            
+            View divider = (View) findViewById(R.id.wiki_divider);
+            divider.setVisibility(View.GONE);
         }
     }
 

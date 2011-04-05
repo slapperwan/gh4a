@@ -261,6 +261,7 @@
                         android:layout_alignParentRight="true" />
                 </RelativeLayout>
                 <View
+                    android:id="@+id/issues_divider"
                     android:background="?android:attr/divider"
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
@@ -284,6 +285,7 @@
                         android:layout_alignParentRight="true" />
                 </RelativeLayout>
                 <View
+                    android:id="@+id/wiki_divider"
                     android:background="?android:attr/divider"
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
