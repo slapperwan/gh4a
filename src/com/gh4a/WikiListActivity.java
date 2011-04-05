@@ -83,9 +83,11 @@ public class WikiListActivity extends BaseActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Feed feed = (Feed) adapterView.getAdapter().getItem(position);
-                Intent intent = new Intent().setClass(WikiListActivity.this, BlogActivity.class);
+                Intent intent = new Intent().setClass(WikiListActivity.this, WikiActivity.class);
                 intent.putExtra(Constants.Blog.TITLE, feed.getTitle());
                 intent.putExtra(Constants.Blog.CONTENT, feed.getContent());
+                intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                 startActivity(intent);
             }
         });

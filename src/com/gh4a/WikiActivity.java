@@ -15,6 +15,8 @@
  */
 package com.gh4a;
 
+import java.util.HashMap;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,9 +28,11 @@ import android.widget.TextView;
 
 import com.gh4a.holder.BreadCrumbHolder;
 
-public class BlogActivity extends BaseActivity {
+public class WikiActivity extends BaseActivity {
 
     private LoadingDialog mLoadingDialog;
+    private String mUserLogin;
+    private String mRepoName;
     private String mTitle;
     private String mContent;
     
@@ -44,6 +48,8 @@ public class BlogActivity extends BaseActivity {
         setContentView(R.layout.web_viewer);
         setUpActionBar();
         
+        mUserLogin = getIntent().getStringExtra(Constants.Repository.REPO_OWNER);
+        mRepoName = getIntent().getStringExtra(Constants.Repository.REPO_NAME);
         mTitle = getIntent().getStringExtra(Constants.Blog.TITLE);
         mContent = getIntent().getStringExtra(Constants.Blog.CONTENT);
 
@@ -64,17 +70,31 @@ public class BlogActivity extends BaseActivity {
     }
     
     protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[2];
+        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[3];
 
+        // common data
+        HashMap<String, String> data = new HashMap<String, String>();
+        data.put(Constants.User.USER_LOGIN, mUserLogin);
+        data.put(Constants.Repository.REPO_NAME, mRepoName);
+
+        // User
         BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(getResources().getString(R.string.explore));
-        b.setTag(Constants.EXPLORE);
+        b.setLabel(mUserLogin);
+        b.setTag(Constants.User.USER_LOGIN);
+        b.setData(data);
         breadCrumbHolders[0] = b;
-        
+
+        // Repo
         b = new BreadCrumbHolder();
-        b.setLabel(getResources().getString(R.string.blog));
-        b.setTag(Constants.Blog.BLOG);
+        b.setLabel(mRepoName);
+        b.setTag(Constants.Repository.REPO_NAME);
+        b.setData(data);
         breadCrumbHolders[1] = b;
+
+        b = new BreadCrumbHolder();
+        b.setLabel(getResources().getString(R.string.recent_wiki));
+        b.setTag(Constants.Wiki.WIKI);
+        breadCrumbHolders[2] = b;
         
         createBreadcrumb(mTitle, breadCrumbHolders);
     }

@@ -433,6 +433,12 @@ public class BaseActivity extends Activity {
                 Intent intent = new Intent().setClass(mTarget.get(), BlogListActivity.class);
                 mTarget.get().startActivity(intent);
             }
+            else if (Constants.Wiki.WIKI.equals(tag)) {
+                Intent intent = new Intent().setClass(mTarget.get(), WikiListActivity.class);
+                intent.putExtra(Constants.Repository.REPO_OWNER, data.get(Constants.User.USER_LOGIN));
+                intent.putExtra(Constants.Repository.REPO_NAME, data.get(Constants.Repository.REPO_NAME));
+                mTarget.get().startActivity(intent);
+            }
         }
     };
 

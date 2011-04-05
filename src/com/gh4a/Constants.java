@@ -261,6 +261,10 @@ public interface Constants {
         public static final String PUB_DATE = "Blog.pubDate";
     }
     
+    public interface Wiki {
+        public static final String WIKI = "Wiki";
+    }
+    
     public static String[] SKIP_PRETTIFY_EXT = {
         "txt", "rdoc", "markdown", "md", "mdown", "texttile", "org", "creole", "rst", "asciidoc", "pod"
     };
