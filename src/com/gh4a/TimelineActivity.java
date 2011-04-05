@@ -19,6 +19,7 @@ import java.util.List;
 
 import android.util.Log;
 
+import com.gh4a.holder.BreadCrumbHolder;
 import com.github.api.v2.schema.UserFeed;
 import com.github.api.v2.services.FeedService;
 import com.github.api.v2.services.GitHubException;
@@ -43,6 +44,13 @@ public class TimelineActivity extends UserFeedActivity {
     
     @Override
     protected void setBreadCrumb() {
-        createBreadcrumb(getResources().getStringArray(R.array.explore_item)[0]);
+        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[1];
+
+        BreadCrumbHolder b = new BreadCrumbHolder();
+        b.setLabel(getResources().getString(R.string.explore));
+        b.setTag(Constants.EXPLORE);
+        breadCrumbHolders[0] = b;
+        
+        createBreadcrumb(getResources().getStringArray(R.array.explore_item)[0], breadCrumbHolders);
     }
 }

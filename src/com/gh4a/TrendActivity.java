@@ -41,6 +41,7 @@ import android.widget.AdapterView.OnItemClickListener;
 
 import com.gh4a.adapter.TrendAdapter;
 import com.gh4a.feeds.TrendHandler;
+import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.holder.Trend;
 import com.github.api.v2.services.constant.ApplicationConstants;
 
@@ -68,13 +69,24 @@ public class TrendActivity extends BaseActivity {
         setContentView(R.layout.trends);
         setUpActionBar();
 
-        createBreadcrumb(getResources().getString(R.string.trend));
+        setBreadCrumb();
         setUpBottomButtons();
         setEnableButtons(new boolean[] {false, true, true, true});
         
         new LoadTrendsTask(this).execute(TODAY);
     }
 
+    protected void setBreadCrumb() {
+        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[1];
+
+        BreadCrumbHolder b = new BreadCrumbHolder();
+        b.setLabel(getResources().getString(R.string.explore));
+        b.setTag(Constants.EXPLORE);
+        breadCrumbHolders[0] = b;
+        
+        createBreadcrumb(getResources().getString(R.string.trend), breadCrumbHolders);
+    }
+    
     private void setUpBottomButtons() {
         mBtnToday = (Button) findViewById(R.id.btn_today);
         mBtnToday.setOnClickListener(new OnClickListener() {

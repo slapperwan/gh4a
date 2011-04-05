@@ -48,6 +48,8 @@ public interface Constants {
     
     public static final String BASE_URL = "BASE_URL";
 
+    public static final String EXPLORE = "EXPLORE";
+    
     /**
      * User properties.
      */
@@ -252,6 +254,7 @@ public interface Constants {
     }
     
     public interface Blog {
+        public static final String BLOG = "Blog";
         public static final String CONTENT = "Blog.content";
         public static final String AUTHOR = "Blog.author";
         public static final String TITLE = "Blog.title";

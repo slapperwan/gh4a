@@ -15,6 +15,10 @@
  */
 package com.gh4a;
 
+import java.util.HashMap;
+
+import com.gh4a.holder.BreadCrumbHolder;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -54,11 +58,27 @@ public class BlogActivity extends BaseActivity {
         TextView tvDownload = (TextView) findViewById(R.id.tv_download);
         tvDownload.setVisibility(View.GONE);
         
-        createBreadcrumb(mTitle, null);
+        setBreadCrumb();
 
         mLoadingDialog = LoadingDialog.show(this, true, true);
         
         fillData();
+    }
+    
+    protected void setBreadCrumb() {
+        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[2];
+
+        BreadCrumbHolder b = new BreadCrumbHolder();
+        b.setLabel(getResources().getString(R.string.explore));
+        b.setTag(Constants.EXPLORE);
+        breadCrumbHolders[0] = b;
+        
+        b = new BreadCrumbHolder();
+        b.setLabel(getResources().getString(R.string.blog));
+        b.setTag(Constants.Blog.BLOG);
+        breadCrumbHolders[1] = b;
+        
+        createBreadcrumb(mTitle, breadCrumbHolders);
     }
 
     private void fillData() {

@@ -21,6 +21,7 @@ import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
@@ -46,6 +47,7 @@ import android.widget.AdapterView.OnItemClickListener;
 
 import com.gh4a.adapter.CommonFeedAdapter;
 import com.gh4a.feeds.FeedHandler;
+import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.holder.Feed;
 import com.github.api.v2.services.constant.ApplicationConstants;
 
@@ -66,7 +68,7 @@ public class BlogListActivity extends BaseActivity {
         setContentView(R.layout.generic_list);
         setUpActionBar();
 
-        createBreadcrumb(getResources().getString(R.string.blog));
+        setBreadCrumb();
         
         mListView = (ListView) findViewById(R.id.list_view);
         mListView.setOnScrollListener(new BlogScrollListener(this));
@@ -86,6 +88,17 @@ public class BlogListActivity extends BaseActivity {
         new LoadBlogsTask(this).execute("true");
     }
 
+    protected void setBreadCrumb() {
+        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[1];
+
+        BreadCrumbHolder b = new BreadCrumbHolder();
+        b.setLabel(getResources().getString(R.string.explore));
+        b.setTag(Constants.EXPLORE);
+        breadCrumbHolders[0] = b;
+        
+        createBreadcrumb(getResources().getString(R.string.blog), breadCrumbHolders);
+    }
+    
     private static class LoadBlogsTask extends
             AsyncTask<String, Void, List<Feed>> {
 

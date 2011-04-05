@@ -425,6 +425,14 @@ public class BaseActivity extends Activity {
                         data.get(Constants.User.USER_LOGIN),
                         data.get(Constants.Repository.REPO_NAME), R.id.btn_branches);
             }
+            else if (Constants.EXPLORE.equals(tag)) {
+                Intent intent = new Intent().setClass(mTarget.get(), ExploreActivity.class);
+                mTarget.get().startActivity(intent);
+            }
+            else if (Constants.Blog.BLOG.equals(tag)) {
+                Intent intent = new Intent().setClass(mTarget.get(), BlogListActivity.class);
+                mTarget.get().startActivity(intent);
+            }
         }
     };
 
