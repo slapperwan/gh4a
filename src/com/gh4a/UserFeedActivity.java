@@ -401,6 +401,17 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
                 context.openGistActivity(this, gistId);
             }
         }
+        
+        /** IssueCommentEvent */
+        else if (UserFeed.Type.ISSUE_COMMENT_EVENT.equals(eventType)) {
+            if (feed.getRepository() != null) {
+                context.openIssueActivity(this, feed.getRepository().getOwner(), feed.getRepository()
+                        .getName(), feed.getPayload().getIssueId());
+            }
+            else {
+                context.notFoundMessage(this, R.plurals.repository);
+            }
+        }
     }
 
     /*
@@ -502,6 +513,11 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
                     pullRequestNumber = ((ObjectPayloadPullRequest) payload.getPullRequest()).getNumber();
                 }
                 menu.add("Pull request " + pullRequestNumber);
+            }
+            
+            /** IssueCommentEvent */
+            else if (UserFeed.Type.ISSUES_EVENT.equals(eventType)) {
+                menu.add("Issue comment " + feed.getPayload().getIssueId());
             }
         }
     }
