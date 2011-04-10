@@ -1,3 +1,7 @@
+v1.3.1
+- Option to view blog and wiki in the browser
+- Indicator if issue has a pull request attached
+
 v1.3 (Apr 05, 2011)
 - More explore features:
   * Public timeline
