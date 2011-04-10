@@ -76,6 +76,9 @@ public class GistViewerActivity extends BaseActivity {
         mFilename = getIntent().getExtras().getString(Constants.Gist.FILENAME);
         mGistId = getIntent().getExtras().getString(Constants.Gist.ID);
         
+        TextView tvViewInBrowser = (TextView) findViewById(R.id.tv_in_browser);
+        tvViewInBrowser.setVisibility(View.GONE);
+        
         TextView tvViewRaw = (TextView) findViewById(R.id.tv_view_raw);
         tvViewRaw.setVisibility(View.VISIBLE);
         tvViewRaw.setOnClickListener(new OnClickListener() {
