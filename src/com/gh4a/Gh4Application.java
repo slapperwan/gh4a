@@ -102,6 +102,7 @@ public class Gh4Application extends Application {
         data.putString(Constants.Issue.ISSUE_BODY, issue.getBody());
         data.putInt(Constants.Issue.ISSUE_COMMENTS, issue.getComments());
         data.putString(Constants.GRAVATAR_ID, issue.getGravatarId());
+        data.putString(Constants.Issue.PULL_REQUEST_URL, issue.getPullRequestUrl());
         data.putStringArrayList(Constants.Issue.ISSUE_LABELS, new ArrayList(issue.getLabels()));
         return data;
     }

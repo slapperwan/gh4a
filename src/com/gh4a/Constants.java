@@ -183,6 +183,9 @@ public interface Constants {
         
         /** The Constant ISSUE_LABEL. */
         public static final String ISSUE_LABEL = "ISSUE_LABEL";
+        
+        /** The Constant PULL_REQUEST_URL */
+        public static final String PULL_REQUEST_URL = "PULL_REQUEST_URL";
     }
 
     /**
@@ -259,6 +262,7 @@ public interface Constants {
         public static final String AUTHOR = "Blog.author";
         public static final String TITLE = "Blog.title";
         public static final String PUB_DATE = "Blog.pubDate";
+        public static final String LINK = "Blog.link";
     }
     
     public interface Wiki {

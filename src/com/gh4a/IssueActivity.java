@@ -247,6 +247,12 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
         else {
             llLabels.setVisibility(View.GONE);
         }
+        
+        TextView tvPull = (TextView) mHeader.findViewById(R.id.tv_pull);
+        if (mBundle.getString(Constants.Issue.PULL_REQUEST_URL) != null) {
+            tvPull.setVisibility(View.VISIBLE);
+            tvPull.setOnClickListener(this);
+        }
     }
 
     /**
@@ -805,6 +811,10 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
             break;
         case R.id.btn_create:
             new CommentIssueTask(this, false).execute();
+            break;
+        case R.id.tv_pull:
+            getApplicationContext().openPullRequestActivity(this,
+                    mUserLogin, mRepoName, mIssueNumber);
             break;
         default:
             break;
