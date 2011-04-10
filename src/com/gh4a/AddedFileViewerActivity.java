@@ -84,6 +84,9 @@ public class AddedFileViewerActivity extends BaseActivity {
         mObjectSha = getIntent().getStringExtra(Constants.Object.OBJECT_SHA);
         mFilePath = getIntent().getStringExtra(Constants.Object.PATH);
 
+        TextView tvViewInBrowser = (TextView) findViewById(R.id.tv_in_browser);
+        tvViewInBrowser.setVisibility(View.GONE);
+        
         TextView tvHistoryFile = (TextView) findViewById(R.id.tv_view);
         tvHistoryFile.setText(getResources().getString(R.string.object_view_history));
         tvHistoryFile.setOnClickListener(new OnClickListener() {

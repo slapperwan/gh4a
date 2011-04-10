@@ -18,7 +18,9 @@ package com.gh4a;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -31,6 +33,7 @@ public class BlogActivity extends BaseActivity {
     private LoadingDialog mLoadingDialog;
     private String mTitle;
     private String mContent;
+    private String mLink;
     
     /**
      * Called when the activity is first created.
@@ -46,6 +49,7 @@ public class BlogActivity extends BaseActivity {
         
         mTitle = getIntent().getStringExtra(Constants.Blog.TITLE);
         mContent = getIntent().getStringExtra(Constants.Blog.CONTENT);
+        mLink = getIntent().getStringExtra(Constants.Blog.LINK);
 
         TextView tvHistoryFile = (TextView) findViewById(R.id.tv_view);
         tvHistoryFile.setVisibility(View.GONE);
@@ -55,6 +59,16 @@ public class BlogActivity extends BaseActivity {
 
         TextView tvDownload = (TextView) findViewById(R.id.tv_download);
         tvDownload.setVisibility(View.GONE);
+        
+        TextView tvViewInBrowser = (TextView) findViewById(R.id.tv_in_browser);
+        tvViewInBrowser.setVisibility(View.VISIBLE);
+        tvViewInBrowser.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View arg0) {
+                getApplicationContext().openBrowser(BlogActivity.this, mLink);
+            }
+        });
         
         setBreadCrumb();
 

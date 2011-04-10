@@ -95,6 +95,9 @@ public class DiffViewerActivity extends BaseActivity {
         
         TextView tvDownload = (TextView) findViewById(R.id.tv_download);
         tvDownload.setVisibility(View.GONE);
+        
+        TextView tvViewInBrowser = (TextView) findViewById(R.id.tv_in_browser);
+        tvViewInBrowser.setVisibility(View.GONE);
 
         WebView diffView = (WebView) findViewById(R.id.web_view);
         String formatted = highlightSyntax();

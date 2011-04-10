@@ -16,7 +16,8 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginBottom="5dp">
         <TextView
             android:id="@+id/tv_view"
             android:layout_width="wrap_content"
@@ -47,6 +48,17 @@
             android:textAppearance="?attr/textAppearanceUrl"
             android:background="?attr/textAppearanceLink"
             android:layout_toLeftOf="@id/tv_view_raw"
+        />
+        <TextView
+            android:id="@+id/tv_in_browser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:layout_margin="7dp"
+            android:text="View in browser"
+            android:textAppearance="?attr/textAppearanceUrl"
+            android:background="?attr/textAppearanceLink"
+            android:layout_toLeftOf="@id/tv_download"
         />
     </RelativeLayout>
     <FrameLayout

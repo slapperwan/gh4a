@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -35,6 +36,7 @@ public class WikiActivity extends BaseActivity {
     private String mRepoName;
     private String mTitle;
     private String mContent;
+    private String mLink;
     
     /**
      * Called when the activity is first created.
@@ -52,7 +54,8 @@ public class WikiActivity extends BaseActivity {
         mRepoName = getIntent().getStringExtra(Constants.Repository.REPO_NAME);
         mTitle = getIntent().getStringExtra(Constants.Blog.TITLE);
         mContent = getIntent().getStringExtra(Constants.Blog.CONTENT);
-
+        mLink = getIntent().getStringExtra(Constants.Blog.LINK);
+        
         TextView tvHistoryFile = (TextView) findViewById(R.id.tv_view);
         tvHistoryFile.setVisibility(View.GONE);
         
@@ -61,6 +64,16 @@ public class WikiActivity extends BaseActivity {
 
         TextView tvDownload = (TextView) findViewById(R.id.tv_download);
         tvDownload.setVisibility(View.GONE);
+        
+        TextView tvViewInBrowser = (TextView) findViewById(R.id.tv_in_browser);
+        tvViewInBrowser.setVisibility(View.VISIBLE);
+        tvViewInBrowser.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View arg0) {
+                getApplicationContext().openBrowser(WikiActivity.this, "http://github.com" + mLink);
+            }
+        });
         
         setBreadCrumb();
 

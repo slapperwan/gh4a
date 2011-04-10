@@ -9,6 +9,9 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import android.util.Log;
+
+import com.gh4a.Constants;
 import com.gh4a.holder.Feed;
 
 public class FeedHandler extends DefaultHandler {
@@ -41,16 +44,24 @@ public class FeedHandler extends DefaultHandler {
             mFeed = new Feed();
         }
         
-        if (localName.equalsIgnoreCase("author")){
-            author = true;
-        }
-        
-        if (localName.equalsIgnoreCase("thumbnail")){
-            String gravatarUrl = attributes.getValue(0);
-            String[] gravatarUrlPart = gravatarUrl.split("/");
-            if (gravatarUrlPart.length > 3) {
-                String gravatarId = gravatarUrl.substring(gravatarUrl.indexOf(gravatarUrlPart[4]), gravatarUrl.indexOf("?"));
-                mFeed.setGravatarId(gravatarId);
+        if (mFeed != null) {
+            if (localName.equalsIgnoreCase("author")){
+                author = true;
+            }
+            
+            if (localName.equalsIgnoreCase("thumbnail")){
+                String gravatarUrl = attributes.getValue(0);
+                String[] gravatarUrlPart = gravatarUrl.split("/");
+                if (gravatarUrlPart.length > 3) {
+                    String gravatarId = gravatarUrl.substring(gravatarUrl.indexOf(gravatarUrlPart[4]), gravatarUrl.indexOf("?"));
+                    mFeed.setGravatarId(gravatarId);
+                }
+            }
+            
+            if (localName.equalsIgnoreCase("link")){
+                String url = attributes.getValue("href");
+                Log.v(Constants.LOG_TAG, "+++++++++++ " + url);
+                mFeed.setLink(url);
             }
         }
     }
@@ -61,9 +72,6 @@ public class FeedHandler extends DefaultHandler {
             if (localName.equalsIgnoreCase("title")) {
                 String title = mBuilder.toString().trim();
                 mFeed.setTitle(title);
-            }
-            else if (localName.equalsIgnoreCase("link")) {
-                mFeed.setLink(mBuilder.toString().trim());
             }
             else if (localName.equalsIgnoreCase("content")) {
                 mFeed.setContent(mBuilder.toString().trim());

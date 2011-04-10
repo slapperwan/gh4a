@@ -88,6 +88,7 @@ public class WikiListActivity extends BaseActivity {
                 intent.putExtra(Constants.Blog.CONTENT, feed.getContent());
                 intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
                 intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                intent.putExtra(Constants.Blog.LINK, feed.getLink());
                 startActivity(intent);
             }
         });

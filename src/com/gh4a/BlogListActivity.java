@@ -21,7 +21,6 @@ import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
@@ -81,6 +80,7 @@ public class BlogListActivity extends BaseActivity {
                 Intent intent = new Intent().setClass(BlogListActivity.this, BlogActivity.class);
                 intent.putExtra(Constants.Blog.TITLE, blog.getTitle());
                 intent.putExtra(Constants.Blog.CONTENT, blog.getContent());
+                intent.putExtra(Constants.Blog.LINK, blog.getLink());
                 startActivity(intent);
             }
         });

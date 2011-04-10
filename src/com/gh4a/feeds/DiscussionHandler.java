@@ -50,7 +50,7 @@ public class DiscussionHandler extends DefaultHandler {
             }
             
             if (localName.equalsIgnoreCase("link")){
-                String url = attributes.getValue(2);
+                String url = attributes.getValue("href");
                 String[] urlPart = url.split("/");
                 if (urlPart.length > 4) {
                     String id = url.substring(url.indexOf(urlPart[5]));

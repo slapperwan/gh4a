@@ -100,6 +100,9 @@ public class FileViewerActivity extends BaseActivity {
         mBranchName = getIntent().getStringExtra(Constants.Repository.REPO_BRANCH);
         mFromBtnId = getIntent().getExtras().getInt(Constants.VIEW_ID);
 
+        TextView tvViewInBrowser = (TextView) findViewById(R.id.tv_in_browser);
+        tvViewInBrowser.setVisibility(View.GONE);
+        
         TextView tvHistoryFile = (TextView) findViewById(R.id.tv_view);
         tvHistoryFile.setText(getResources().getString(R.string.object_view_history));
         tvHistoryFile.setOnClickListener(new OnClickListener() {
@@ -115,6 +118,7 @@ public class FileViewerActivity extends BaseActivity {
                 startActivity(intent);
             }
         });
+        
         
         TextView tvViewRaw = (TextView) findViewById(R.id.tv_view_raw);
         tvViewRaw.setVisibility(View.VISIBLE);
