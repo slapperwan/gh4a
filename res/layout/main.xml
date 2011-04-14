@@ -22,13 +22,17 @@
             android:id="@+id/et_username_main"
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
-            android:hint="@string/user_username" />
+            android:hint="@string/user_username" 
+            android:singleLine="true" 
+            android:nextFocusDown="@+id/et_password_main"/>
         <EditText
-            android:id="@+id/et_password_main"
+            android:id="@id/et_password_main"
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
             android:password="true"
-            android:hint="@string/user_password" />
+            android:hint="@string/user_password"
+            android:singleLine="true"
+            android:nextFocusDown="@+id/btn_login" />
         <Button
             android:text="@string/user_login"
             android:id="@+id/btn_login"
