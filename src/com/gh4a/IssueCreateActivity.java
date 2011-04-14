@@ -213,7 +213,7 @@ public class IssueCreateActivity extends BaseActivity implements OnClickListener
                 activity.mLoadingDialog.dismiss();
     
                 if (mException) {
-                    activity.showError();
+                    activity.showError(false);
                 }
                 else {
                     activity.showMessage(activity.getResources().getString(R.string.issue_success_create),

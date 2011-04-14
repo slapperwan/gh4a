@@ -428,7 +428,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                 activity.mLoadingDialog.dismiss();
     
                 if (mException) {
-                    activity.showError();
+                    activity.showError(false);
                 }
                 else {
                     activity.fillComments(result);
@@ -943,7 +943,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                 activity.mLoadingDialog.dismiss();
     
                 if (mException) {
-                    activity.showError();
+                    activity.showError(false);
                 }
                 else {
                     activity.showIssueLabelsContextMenu(result);
