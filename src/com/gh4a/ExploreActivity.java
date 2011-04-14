@@ -67,6 +67,10 @@ public class ExploreActivity extends BaseActivity {
                     Intent intent = new Intent().setClass(ExploreActivity.this, DiscussionCategoryListActivity.class);
                     startActivity(intent);
                 }
+                else if (position == 4) {//GitHub jobs
+                    Intent intent = new Intent().setClass(ExploreActivity.this, JobListActivity.class);
+                    startActivity(intent);
+                }
             }
         });
     }

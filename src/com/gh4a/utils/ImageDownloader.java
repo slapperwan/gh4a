@@ -114,6 +114,24 @@ public class ImageDownloader {
         }
     }
 
+    public void downloadByUrl(String url, ImageView ivImage) {
+        resetPurgeTimer();
+        Bitmap bitmap = getBitmapFromCache(url);
+
+        if (bitmap == null) {
+            if (cancelPotentialDownload(url, ivImage)) {
+                BitmapDownloaderTask task = new BitmapDownloaderTask(ivImage);
+                DownloadedDrawable downloadedDrawable = new DownloadedDrawable(task);
+                ivImage.setImageDrawable(downloadedDrawable);
+                task.execute(url);
+            }
+        }
+        else {
+            cancelPotentialDownload(url, ivImage);
+            ivImage.setImageBitmap(bitmap);
+        }
+    }
+    
     /**
      * Download bitmap.
      * 

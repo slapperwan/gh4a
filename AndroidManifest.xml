@@ -169,6 +169,12 @@
             android:name="DiscussionActivity"
             android:configChanges="orientation" />
         <activity
+            android:name="JobListActivity"
+            android:configChanges="orientation" />
+        <activity
+            android:name="JobActivity"
+            android:configChanges="orientation" />
+        <activity
             android:name="com.markupartist.android.widget.ActionBar" />
     </application>
     <uses-sdk

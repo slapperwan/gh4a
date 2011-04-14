@@ -279,6 +279,21 @@ public interface Constants {
         public static final String FROM_TITLE = "Discussion.fromTitle";
     }
     
+    public interface Job {
+        public static final String JOB = "Job";
+        public static final String COMPANY = "Job.company";
+        public static final String LOCATION = "Job.location";
+        public static final String CREATED_AT = "Job.createdAt";
+        public static final String COMPANY_URL = "Job.companyUrl";
+        public static final String TITLE = "Job.title";
+        public static final String URL = "Job.url";
+        public static final String ID = "Job.id";
+        public static final String COMPANY_LOGO = "Job.companyLogo";
+        public static final String TYPE = "Job.type";
+        public static final String DESCRIPTION = "Job.description";
+        public static final String HOW_TO_APPLY = "Job.howToApply";
+    }
+    
     public static String[] SKIP_PRETTIFY_EXT = {
         "txt", "rdoc", "markdown", "md", "mdown", "mkdn", "mkd", "texttile", "org", "creole", "rst", "asciidoc", "pod", ""
     };

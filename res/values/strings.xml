@@ -241,4 +241,7 @@
     
     <!-- Recent Wiki Updates -->
     <string name="recent_wiki">Recent Wiki Updates</string>
+    
+    <!-- GitHub Jobs -->
+    <string name="jobs">GitHub Jobs</string>
 </resources>

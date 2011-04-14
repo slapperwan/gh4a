@@ -449,6 +449,10 @@ public class BaseActivity extends Activity {
                 intent.putExtra(Constants.Discussion.TITLE, data.get(Constants.Discussion.TITLE));
                 mTarget.get().startActivity(intent);
             }
+            else if (Constants.Job.JOB.equals(tag)) {
+                Intent intent = new Intent().setClass(mTarget.get(), JobListActivity.class);
+                mTarget.get().startActivity(intent);
+            }
         }
     };
 
