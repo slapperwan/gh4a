@@ -370,9 +370,7 @@ public class StringUtils {
                 content.append("<body onload='prettyPrint()'>");
                 content.append("<pre class='prettyprint linenums'>");
             }
-            else if ("markdown".equals(ext) 
-                    || "md".equals(ext)
-                    || "mdown".equals(ext)){
+            else if (Arrays.asList(Constants.MARKDOWN_EXT).contains(ext)) {
                 content.append("<script src='file:///android_asset/showdown.js' type='text/javascript'></script>");
                 content.append("<link href='file:///android_asset/markdown.css' rel='stylesheet' type='text/css'/>");
                 content.append("</head>");
@@ -395,9 +393,7 @@ public class StringUtils {
         
         content.append(data);
         
-        if ("markdown".equals(ext) 
-                || "md".equals(ext)
-                || "mdown".equals(ext)){
+        if (Arrays.asList(Constants.MARKDOWN_EXT).contains(ext)){
             content.append("</div>");
             
             content.append("<script>");
