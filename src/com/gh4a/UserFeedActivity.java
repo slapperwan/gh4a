@@ -405,8 +405,8 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         /** IssueCommentEvent */
         else if (UserFeed.Type.ISSUE_COMMENT_EVENT.equals(eventType)) {
             if (feed.getRepository() != null) {
-                context.openIssueActivity(this, feed.getRepository().getOwner(), feed.getRepository()
-                        .getName(), feed.getPayload().getIssueId());
+                context.openIssueListActivity(this, feed.getRepository().getOwner(), feed.getRepository()
+                        .getName(), Constants.Issue.ISSUE_STATE_OPEN);
             }
             else {
                 context.notFoundMessage(this, R.plurals.repository);
@@ -516,8 +516,8 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
             }
             
             /** IssueCommentEvent */
-            else if (UserFeed.Type.ISSUES_EVENT.equals(eventType)) {
-                menu.add("Issue comment " + feed.getPayload().getIssueId());
+            else if (UserFeed.Type.ISSUE_COMMENT_EVENT.equals(eventType)) {
+                menu.add("Open issues");//TODO: Open issue activity instead issue listing (waiting for github response)
             }
         }
     }
@@ -556,6 +556,11 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
             else {
                 context.notFoundMessage(this, R.plurals.repository);
             }
+        }
+        /** Issue comment item */
+        else if (title.startsWith("Open issues")) {
+            context.openIssueListActivity(this, feed.getRepository().getOwner(), feed.getRepository()
+                    .getName(), Constants.Issue.ISSUE_STATE_OPEN);
         }
         /** Issue item */
         else if (title.startsWith("Issue")) {

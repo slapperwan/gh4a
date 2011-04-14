@@ -452,7 +452,7 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
         /** IssueCommentEvent */
         else if (UserFeed.Type.ISSUE_COMMENT_EVENT.equals(feed.getType())) {
             String text = String.format(res.getString(R.string.event_issue_comment),
-                    feed.getActor(), payload.getIssueId(), formatFromRepoName(feed));
+                    feed.getActor(), formatFromRepoName(feed));
             return text;
         }
 
