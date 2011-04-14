@@ -228,6 +228,11 @@ public class UserYourActionsActivity extends BaseActivity implements OnItemClick
             String issueNumber = title[4];
             getApplicationContext().openPullRequestActivity(this, feed.getRepoOWner(), feed.getRepoName(), Integer.parseInt(issueNumber));
         }
+        else if (UserFeed.Type.ISSUE_COMMENT_EVENT.value().equals(event)) {
+            String[] title = feed.getTitle().split(" ");
+            String issueNumber = title[4];
+            getApplicationContext().openIssueActivity(this, feed.getRepoOWner(), feed.getRepoName(), Integer.parseInt(issueNumber));
+        }
         else {
             if (feed.getRepoOWner() != null
                     && feed.getRepoName() != null) {
