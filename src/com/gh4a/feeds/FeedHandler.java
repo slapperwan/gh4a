@@ -60,7 +60,6 @@ public class FeedHandler extends DefaultHandler {
             
             if (localName.equalsIgnoreCase("link")){
                 String url = attributes.getValue("href");
-                Log.v(Constants.LOG_TAG, "+++++++++++ " + url);
                 mFeed.setLink(url);
             }
         }
