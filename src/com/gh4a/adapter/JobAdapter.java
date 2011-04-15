@@ -21,14 +21,9 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.ImageDownloader;
-import com.gh4a.utils.StringUtils;
 import com.github.api.v2.schema.Job;
 
 public class JobAdapter extends RootAdapter<Job> {
@@ -44,9 +39,8 @@ public class JobAdapter extends RootAdapter<Job> {
 
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_job, null);
+            v = vi.inflate(R.layout.row_simple_3, null);
             viewHolder = new ViewHolder();
-            viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
             viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
@@ -59,25 +53,6 @@ public class JobAdapter extends RootAdapter<Job> {
 
         final Job job = mObjects.get(position);
         if (job != null) {
-            if (!StringUtils.isBlank(job.getCompanyLogo())) {
-                ImageDownloader.getInstance().downloadByUrl(job.getCompanyLogo(), viewHolder.ivGravatar);
-                if (!StringUtils.isBlank(job.getCompanyUrl())) {
-                    viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
-        
-                        @Override
-                        public void onClick(View v) {
-                            /** Open user activity */
-                            Gh4Application context = (Gh4Application) v.getContext()
-                                    .getApplicationContext();
-                            context.openBrowser(v.getContext(), job.getCompanyUrl());
-                        }
-                    });
-                }
-            }
-            else {
-                viewHolder.ivGravatar.setImageDrawable(null);
-            }
-            
             viewHolder.tvTitle.setText(job.getTitle());
             viewHolder.tvDesc.setText(job.getCompany());
             viewHolder.tvExtra.setText(job.getType().value() 
@@ -88,7 +63,6 @@ public class JobAdapter extends RootAdapter<Job> {
     }
 
     private static class ViewHolder {
-        public ImageView ivGravatar;
         public TextView tvTitle;
         public TextView tvDesc;
         public TextView tvExtra;
