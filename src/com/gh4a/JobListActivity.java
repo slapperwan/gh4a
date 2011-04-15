@@ -24,8 +24,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.AbsListView.OnScrollListener;
@@ -43,18 +47,47 @@ public class JobListActivity extends BaseActivity {
     private LoadingDialog mLoadingDialog;
     private boolean mLoading;
     private boolean mReload;
+    private boolean mPagination;
     private ListView mListView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.generic_list);
+        setContentView(R.layout.jobs);
         setUpActionBar();
 
-        setBreadCrumb();
+        final EditText etFilter = (EditText) findViewById(R.id.et_filter);
+        final EditText etLocation = (EditText) findViewById(R.id.et_location);
         
-        mListView = (ListView) findViewById(R.id.list_view);
+        Button btnAll = (Button) findViewById(R.id.btn_all);
+        btnAll.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                page = 0;
+                mPagination = true;
+                etFilter.setText(null);
+                etLocation.setText(null);
+                List<Job> jobs = ((JobAdapter) mListView.getAdapter()).getObjects();
+                jobs.clear();
+                new LoadJobsTask(JobListActivity.this, true).execute();
+            }
+        });
+        
+        ImageButton btnSearch = (ImageButton) findViewById(R.id.btn_search);
+        btnSearch.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                page = 0;
+                mPagination = false;
+                String filter = etFilter.getText() != null ? etFilter.getText().toString() : null;
+                String location = etLocation.getText() != null ? etLocation.getText().toString() : null;
+                new LoadJobsTask(JobListActivity.this, true).execute(filter, location);
+            }
+        });
+        
+        
+        mListView = (ListView) findViewById(R.id.list_search);
         mListView.setOnScrollListener(new JobScrollListener(this));
         JobAdapter adapter = new JobAdapter(this, new ArrayList<Job>());
         mListView.setAdapter(adapter);
@@ -77,7 +110,8 @@ public class JobListActivity extends BaseActivity {
             }
         });
         
-        new LoadAllJobsTask(this, true).execute();
+        mPagination = true;
+        new LoadJobsTask(this, true).execute();
     }
 
     protected void setBreadCrumb() {
@@ -91,7 +125,7 @@ public class JobListActivity extends BaseActivity {
         createBreadcrumb(getResources().getString(R.string.jobs), breadCrumbHolders);
     }
     
-    private static class LoadAllJobsTask extends
+    private static class LoadJobsTask extends
             AsyncTask<String, Void, List<Job>> {
 
         /** The target. */
@@ -108,7 +142,7 @@ public class JobListActivity extends BaseActivity {
          * 
          * @param activity the activity
          */
-        public LoadAllJobsTask(JobListActivity activity, boolean hideMainView) {
+        public LoadJobsTask(JobListActivity activity, boolean hideMainView) {
             mTarget = new WeakReference<JobListActivity>(activity);
             mHideMainView = hideMainView;
         }
@@ -121,9 +155,17 @@ public class JobListActivity extends BaseActivity {
         protected List<Job> doInBackground(String... params) {
             if (mTarget.get() != null) {
                 try {
+                    String filter = params.length > 0 ? params[0] : null;
+                    String location = params.length > 1 ? params[1] : null;
+                    
                     GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
                     JobService jobService = factory.createJobService();
-                    return jobService.searchJobs(null);//search all
+                    if (filter == null && location == null) {
+                        return jobService.getAllJobs(mTarget.get().page);
+                    }
+                    else {
+                        return jobService.searchJobs(filter, location, mTarget.get().page);
+                    }
                 }
                 catch (Exception e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
@@ -182,6 +224,9 @@ public class JobListActivity extends BaseActivity {
     private void fillData(List<Job> result) {
         if (result != null) {
             List<Job> jobs = ((JobAdapter) mListView.getAdapter()).getObjects();
+            if (!mPagination) {
+                jobs.clear();
+            }
             jobs.addAll(result);
             ((JobAdapter) mListView.getAdapter()).notifyDataSetChanged();
         }
@@ -212,9 +257,9 @@ public class JobListActivity extends BaseActivity {
          */
         @Override
         public void onScrollStateChanged(AbsListView view, int scrollState) {
-            if (mTarget.get() != null) {
+            if (mTarget.get() != null && mTarget.get().mPagination) {
                 if (mTarget.get().mReload && scrollState == SCROLL_STATE_IDLE) {
-                    new LoadAllJobsTask(mTarget.get(), false).execute();
+                    new LoadJobsTask(mTarget.get(), false).execute();
                     mTarget.get().mReload = false;
                 }
             }
@@ -229,7 +274,7 @@ public class JobListActivity extends BaseActivity {
         @Override
         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
                 int totalItemCount) {
-            if (mTarget.get() != null) {
+            if (mTarget.get() != null && mTarget.get().mPagination) {
                 if (!mTarget.get().mLoading && firstVisibleItem != 0
                         && ((firstVisibleItem + visibleItemCount) == totalItemCount)) {
                     mTarget.get().mReload = true;
