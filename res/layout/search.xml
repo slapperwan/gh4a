@@ -53,13 +53,13 @@
             <ImageButton
                 android:text="@string/search"
                 android:id="@+id/btn_search"
-                android:layout_width="wrap_content"
+                android:layout_width="60dp"
                 android:gravity="center_vertical|center_horizontal"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical|center_horizontal|center"
                 android:layout_margin="0dp"
                 android:padding="0dp"
-                android:src="@drawable/ic_menu_search">
+                android:src="@drawable/ic_search">
             </ImageButton>
         </LinearLayout>
     </RelativeLayout>
