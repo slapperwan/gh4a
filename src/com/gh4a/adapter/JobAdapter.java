@@ -18,7 +18,6 @@ package com.gh4a.adapter;
 import java.util.List;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,7 +80,9 @@ public class JobAdapter extends RootAdapter<Job> {
             
             viewHolder.tvTitle.setText(job.getTitle());
             viewHolder.tvDesc.setText(job.getCompany());
-            viewHolder.tvExtra.setText(job.getType().value() + " | " + job.getLocation());
+            viewHolder.tvExtra.setText(job.getType().value() 
+                    + " | " + job.getLocation() 
+                    + (job.getCreatedAt() != null ? " | " + pt.format(job.getCreatedAt()) : ""));
         }
         return v;
     }
