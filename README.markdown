@@ -55,6 +55,13 @@ Main features
 * List public gists
 * View gist content
 
+*Explore Github*
+
+* Public timeline
+* Trending repos (today, week, month, forever)
+* GitHub blog
+* Public discussion (view only)
+* GitHub Jobs
 
 <i>..and many more</i>
 
