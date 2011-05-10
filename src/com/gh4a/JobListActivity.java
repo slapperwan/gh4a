@@ -103,7 +103,7 @@ public class JobListActivity extends BaseActivity {
                 intent.putExtra(Constants.Job.URL, job.getUrl());
                 intent.putExtra(Constants.Job.ID, job.getId());
                 intent.putExtra(Constants.Job.COMPANY_LOGO, job.getCompanyLogo());
-                intent.putExtra(Constants.Job.TYPE, job.getType().value());
+                intent.putExtra(Constants.Job.TYPE, job.getType() != null ? job.getType().value() : "");
                 intent.putExtra(Constants.Job.DESCRIPTION, job.getDescription());
                 intent.putExtra(Constants.Job.HOW_TO_APPLY, job.getHowToApply());
                 startActivity(intent);

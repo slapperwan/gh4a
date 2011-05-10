@@ -55,8 +55,8 @@ public class JobAdapter extends RootAdapter<Job> {
         if (job != null) {
             viewHolder.tvTitle.setText(job.getTitle());
             viewHolder.tvDesc.setText(job.getCompany());
-            viewHolder.tvExtra.setText(job.getType().value() 
-                    + " | " + job.getLocation() 
+            viewHolder.tvExtra.setText((job.getType() != null ? job.getType().value() + " | " : "") 
+                    + job.getLocation() 
                     + (job.getCreatedAt() != null ? " | " + pt.format(job.getCreatedAt()) : ""));
         }
         return v;
