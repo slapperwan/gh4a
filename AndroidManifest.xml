@@ -176,6 +176,45 @@
             android:configChanges="orientation" />
         <activity
             android:name="com.markupartist.android.widget.ActionBar" />
+        <activity android:name="BrowseFilter">
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.VIEW" />
+                <category
+                    android:name="android.intent.category.DEFAULT" />
+                <category
+                    android:name="android.intent.category.BROWSABLE" />
+                <!-- Repo -->
+                <data
+                    android:scheme="https"
+                    android:host="github.com"
+                    android:pathPattern="/.*/.*" />
+                <data
+                    android:scheme="https"
+                    android:host="github.com"
+                    android:pathPattern="/.*" />
+                <!-- Repo Issues -->
+                <data
+                    android:scheme="https"
+                    android:host="github.com"
+                    android:pathPattern="/.*/.*/issues" />
+                <data
+                    android:scheme="http"
+                    android:host="jobs.github.com" />
+                    
+            </intent-filter>
+        </activity>
+        <!-- activity android:name="BrowseFilter">
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.SEND" />
+                <category
+                    android:name="android.intent.category.DEFAULT" />
+                <data
+                    android:mimeType="text/plain"
+                    android:pathPattern="slapperwan/gh4a"/>
+            </intent-filter>
+        </activity-->
     </application>
     <uses-sdk
         android:targetSdkVersion="10"
