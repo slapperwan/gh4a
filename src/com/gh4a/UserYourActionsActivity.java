@@ -231,6 +231,9 @@ public class UserYourActionsActivity extends BaseActivity implements OnItemClick
         else if (UserFeed.Type.ISSUE_COMMENT_EVENT.value().equals(event)) {
             String[] title = feed.getTitle().split(" ");
             String issueNumber = title[4];
+            if ("request".equals(issueNumber)) {//comment in pull request
+                issueNumber = title[5];
+            }
             getApplicationContext().openIssueActivity(this, feed.getRepoOWner(), feed.getRepoName(), Integer.parseInt(issueNumber));
         }
         else {
