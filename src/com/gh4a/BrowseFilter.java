@@ -12,6 +12,7 @@ public class BrowseFilter extends BaseActivity {
         String url = getIntent().getDataString();
         
         String[] urlPart = url.split("/");
+        
         String host = urlPart[2];
         
         if ("jobs.github.com".equals(host)) {
