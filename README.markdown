@@ -66,3 +66,8 @@ Main features
 <i>..and many more</i>
 
 Visit [Gh4a page](http://slapperwan.github.com/gh4a/) for more info and screenshots.
+
+Contributions
+=============
+
+* [zquestz](https://github.com/zquestz)  Thanks for the application icon.
