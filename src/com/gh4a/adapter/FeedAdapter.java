@@ -421,7 +421,7 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
         /** MemberEvent */
         else if (UserFeed.Type.MEMBER_EVENT.equals(feed.getType())) {
             String text = String.format(res.getString(R.string.event_member_title),
-                    feed.getActor(), payload.getMember(),
+                    feed.getActor(), payload.getMember().getLogin(),
                     formatFromRepoName(feed));
             return text;
         }
