@@ -348,6 +348,8 @@ public class SearchActivity extends BaseActivity {
             throws GitHubException {
         GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
         RepositoryService repositoryService = factory.createRepositoryService();
+        searchKey = StringUtils.encodeUrl(searchKey);
+        searchKey = searchKey.replaceAll("\\.", "%2e");
         if (!StringUtils.isBlank(searchKey)) {
             if ("Any Language".equals(language)) {
                 repositories = repositoryService.searchRepositories(searchKey, mPage);
