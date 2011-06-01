@@ -1,4 +1,9 @@
 v1.3.2 (May 10, 2011)
+- New JSON response format for CreateEvent
+- New JSON response format for MemberEvent
+- Revert application icon.  Need to follow guidelines https://github.com/github/media#readme
+
+v1.3.2 (May 10, 2011)
 - Option to open gh4a while browsing github.com using browser
 - New application icon
 - Minor bug fixes 
