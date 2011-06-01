@@ -378,14 +378,14 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
 
         /** CreateEvent */
         else if (UserFeed.Type.CREATE_EVENT.equals(feed.getType())) {
-            if ("repository".equals(payload.getObject())) {
+            if ("repository".equals(payload.getRefType())) {
                 String text = String.format(res.getString(R.string.event_create_repo_title),
-                        feed.getActor(), payload.getName());
+                        feed.getActor(), formatFromRepoName(feed));
                 return text;
             }
-            else if ("branch".equals(payload.getObject()) || "tag".equals(payload.getObject())) {
+            else if ("branch".equals(payload.getRefType()) || "tag".equals(payload.getRefType())) {
                 String text = String.format(res.getString(R.string.event_create_branch_title),
-                        feed.getActor(), payload.getObject(), payload.getObjectName(),
+                        feed.getActor(), payload.getRefType(), payload.getRef(),
                         formatFromRepoName(feed));
                 return text;
             }
