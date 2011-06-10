@@ -16,7 +16,6 @@
         <EditTextPreference
             android:dialogTitle="API Token"
             android:dialogMessage="Your API Token"
-            android:dependency="Private_Org_Feed"
             android:key="Api_Token"
             android:title="API Token"
             android:summary="API Token can be found at github.com under Account Settings -> Account Admin"/>

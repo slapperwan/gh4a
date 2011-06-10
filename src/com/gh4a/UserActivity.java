@@ -474,7 +474,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         if (Constants.User.USER_TYPE_USER.equals(user.getType())) {
             ImageButton btnOrganizations = (ImageButton) findViewById(R.id.btn_organizations);
             btnOrganizations.setOnClickListener(this);
-            registerForContextMenu(btnOrganizations);
+            //registerForContextMenu(btnOrganizations);
             rlOrganizations.setVisibility(View.VISIBLE);
         }
         else {
@@ -652,7 +652,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         }
         else if (isSettingEnabled("Private_Org_Feed")
                 && Constants.User.USER_TYPE_ORG.equals(mUser.getType())) {
-            if (getSettingStringValue("Api_Token") != null) {
+            if (!StringUtils.isBlank(getSettingStringValue("Api_Token"))) {
                 intent.putExtra(Constants.Repository.REPO_URL, "https://github.com/organizations/" + mUserLogin 
                         + "/" + getAuthUsername() + ".private.atom?token="
                         + getSettingStringValue("Api_Token"));
@@ -770,7 +770,9 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
     }
     
     public void getOrganizations(View view) {
-        new LoadOrganizationsTask(this).execute();
+        Intent intent = new Intent().setClass(this, OrganizationListActivity.class);
+        intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
+        startActivity(intent);
     }
     
     public void getGists(View view) {

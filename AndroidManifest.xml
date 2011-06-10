@@ -175,6 +175,9 @@
             android:name="JobActivity"
             android:configChanges="orientation" />
         <activity
+            android:name="OrganizationListActivity"
+            android:configChanges="orientation" />
+        <activity
             android:name="com.markupartist.android.widget.ActionBar" />
         <activity android:name="BrowseFilter">
             <intent-filter>
