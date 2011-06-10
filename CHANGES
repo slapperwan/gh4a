@@ -1,4 +1,7 @@
-v1.3.2 (May 10, 2011)
+v1.3.4 (Jun 11, 2011)
+- Show private organizations
+
+v1.3.3 (Jun 01, 2011)
 - New JSON response format for CreateEvent
 - New JSON response format for MemberEvent
 - Revert application icon.  Need to follow guidelines https://github.com/github/media#readme
