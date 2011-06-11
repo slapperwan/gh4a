@@ -27,6 +27,7 @@ public class DbHelper extends SQLiteOpenHelper {
         db.execSQL("create table " + TBL_BOOKMARK_PARAM + " (_id integer primary key autoincrement, "
                 + "bookmark_id integer not null, key text not null, value text not null);");
         db.execSQL("create index bookmark_id_idx on " + TBL_BOOKMARK_PARAM + "(bookmark_id)");
+        db.execSQL("create index object_type_idx on " + TBL_BOOKMARK + "(object_type)");
     }
 
     @Override
