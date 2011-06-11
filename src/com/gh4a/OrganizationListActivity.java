@@ -16,7 +16,6 @@ import android.widget.AdapterView.OnItemClickListener;
 
 import com.gh4a.adapter.SimpleStringAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
-import com.gh4a.utils.StringUtils;
 import com.github.api.v2.schema.Organization;
 import com.github.api.v2.services.GitHubException;
 import com.github.api.v2.services.GitHubServiceFactory;
@@ -24,7 +23,6 @@ import com.github.api.v2.services.OrganizationService;
 import com.github.api.v2.services.UserService;
 import com.github.api.v2.services.auth.Authentication;
 import com.github.api.v2.services.auth.LoginPasswordAuthentication;
-import com.github.api.v2.services.auth.LoginTokenAuthentication;
 
 public class OrganizationListActivity extends BaseActivity {
 
@@ -99,11 +97,20 @@ public class OrganizationListActivity extends BaseActivity {
             if (mTarget.get() != null) {
                 try {
                     GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    OrganizationService orgService = factory.createOrganizationService();
-                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                            mTarget.get().getAuthPassword());
-                    orgService.setAuthentication(auth);
-                    return orgService.getUserOrganizations();
+                    if (mTarget.get().mUserLogin.equals(mTarget.get().getAuthUsername())) {
+                        OrganizationService orgService = factory.createOrganizationService();
+                        Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
+                                mTarget.get().getAuthPassword());
+                        orgService.setAuthentication(auth);
+                        return orgService.getUserOrganizations();    
+                    }
+                    else {
+                        UserService userService = factory.createUserService();
+                        Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
+                                mTarget.get().getAuthPassword());
+                        userService.setAuthentication(auth);
+                        return userService.getUserOrganizations(mTarget.get().mUserLogin);    
+                    }
                 }
                 catch (GitHubException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
