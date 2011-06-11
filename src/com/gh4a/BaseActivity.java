@@ -17,6 +17,7 @@ package com.gh4a;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -41,6 +42,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gh4a.db.Bookmark;
+import com.gh4a.db.BookmarkParam;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.markupartist.android.widget.ActionBar;
 import com.markupartist.android.widget.ScrollingTextView;
@@ -143,9 +146,16 @@ public class BaseActivity extends Activity {
         case R.id.feedback:
             openFeedbackDialog();
             return true;
+        case R.id.bookmarks:
+            openBookmarkActivity();
+            return true;
         default:
             return setMenuOptionItemSelected(item);
         }
+    }
+
+    public void openBookmarkActivity() {
+        //should be override at sub class
     }
     
     public boolean setMenuOptionItemSelected(MenuItem item) {

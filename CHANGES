@@ -1,3 +1,13 @@
+v1.3.5
+- Simple bookmark function.  Pages available for bookmark:
+  * User
+  * Repository
+  * Repository branches
+  * Repository tags
+  * Issue listing
+  * Issue details
+  * Create issue page
+  
 v1.3.4 (Jun 11, 2011)
 - Show private organizations
 

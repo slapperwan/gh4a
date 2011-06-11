@@ -30,6 +30,7 @@ import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -41,6 +42,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.gh4a.adapter.CommentAdapter;
+import com.gh4a.db.Bookmark;
+import com.gh4a.db.BookmarkParam;
+import com.gh4a.db.DbHelper;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
@@ -440,6 +444,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         if (isAuthenticated()) {
+            MenuInflater inflater = getMenuInflater();
             menu.clear();
             if ("closed".equals(mBundle.getString(Constants.Issue.ISSUE_STATE))) {
                 menu.add(Menu.FIRST, R.string.issue_reopen, 0, R.string.issue_reopen);
@@ -450,6 +455,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
             menu.add(Menu.FIRST, R.string.issue_edit, 0, R.string.issue_edit);
             menu.add(Menu.FIRST, R.string.issue_label_add_delete, 0, R.string.issue_label_add_delete);
             menu.add(Menu.FIRST, R.string.issue_create, 0, R.string.issue_create);
+            inflater.inflate(R.menu.bookmark_menu, menu);
         }
         return true;
     }
@@ -1056,4 +1062,47 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
             getApplicationContext().notFoundMessage(this, getResources().getString(R.string.issue_labels));
         }
     }
+    
+    @Override
+    public void openBookmarkActivity() {
+        Intent intent = new Intent().setClass(this, BookmarkListActivity.class);
+        intent.putExtra(Constants.Bookmark.NAME, "Issue #" + mIssueNumber + " at " + mUserLogin + "/" + mRepoName);
+        intent.putExtra(Constants.Bookmark.OBJECT_TYPE, Constants.Bookmark.OBJECT_TYPE_ISSUE);
+        startActivityForResult(intent, 100);
+    }
+    
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 100) {
+           if (resultCode == Constants.Bookmark.ADD) {
+               DbHelper db = new DbHelper(this);
+               Bookmark b = new Bookmark();
+               b.setName("Issue #" + mIssueNumber + " at " + mUserLogin + "/" + mRepoName);
+               b.setObjectType(Constants.Bookmark.OBJECT_TYPE_ISSUE);
+               b.setObjectClass(IssueActivity.class.getName());
+               long id = db.saveBookmark(b);
+               
+               BookmarkParam[] params = new BookmarkParam[3];
+               BookmarkParam param = new BookmarkParam();
+               param.setBookmarkId(id);
+               param.setKey(Constants.Repository.REPO_OWNER);
+               param.setValue(mUserLogin);
+               params[0] = param;
+               
+               param = new BookmarkParam();
+               param.setBookmarkId(id);
+               param.setKey(Constants.Repository.REPO_NAME);
+               param.setValue(mRepoName);
+               params[1] = param;
+               
+               param = new BookmarkParam();
+               param.setBookmarkId(id);
+               param.setKey(Constants.Issue.ISSUE_NUMBER);
+               param.setValue(String.valueOf(mIssueNumber));
+               params[2] = param;
+               
+               db.saveBookmarkParam(params);
+           }
+        }
+     }
 }

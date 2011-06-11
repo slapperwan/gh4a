@@ -20,12 +20,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.widget.ListView;
 
 import com.gh4a.adapter.BranchTagAdapter;
+import com.gh4a.db.Bookmark;
+import com.gh4a.db.BookmarkParam;
+import com.gh4a.db.DbHelper;
 import com.gh4a.holder.BranchTag;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.github.api.v2.services.GitHubException;
@@ -208,5 +214,52 @@ public class TagListActivity extends BaseActivity {
         BranchTagAdapter branchAdapter = new BranchTagAdapter(this, tagList, mUserLogin, mRepoName);
         branchListView.setAdapter(branchAdapter);
     }
+    
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (isAuthenticated()) {
+            menu.clear();
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.bookmark_menu, menu);
+        }
+        return true;
+    }
+    
+    @Override
+    public void openBookmarkActivity() {
+        Intent intent = new Intent().setClass(this, BookmarkListActivity.class);
+        intent.putExtra(Constants.Bookmark.NAME, "Tags at " + mUserLogin + "/" + mRepoName);
+        intent.putExtra(Constants.Bookmark.OBJECT_TYPE, Constants.Bookmark.OBJECT_TYPE_REPO);
+        startActivityForResult(intent, 100);
+    }
+    
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 100) {
+           if (resultCode == Constants.Bookmark.ADD) {
+               DbHelper db = new DbHelper(this);
+               Bookmark b = new Bookmark();
+               b.setName("Tags at " + mUserLogin + "/" + mRepoName);
+               b.setObjectType(Constants.Bookmark.OBJECT_TYPE_REPO);
+               b.setObjectClass(TagListActivity.class.getName());
+               long id = db.saveBookmark(b);
+               
+               BookmarkParam[] params = new BookmarkParam[2];
+               BookmarkParam param = new BookmarkParam();
+               param.setBookmarkId(id);
+               param.setKey(Constants.Repository.REPO_OWNER);
+               param.setValue(mUserLogin);
+               params[0] = param;
+               
+               param = new BookmarkParam();
+               param.setBookmarkId(id);
+               param.setKey(Constants.Repository.REPO_NAME);
+               param.setValue(mRepoName);
+               params[1] = param;
+               
+               db.saveBookmarkParam(params);
+           }
+        }
+     }
 
 }

@@ -32,6 +32,9 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.gh4a.db.Bookmark;
+import com.gh4a.db.BookmarkParam;
+import com.gh4a.db.DbHelper;
 import com.gh4a.utils.StringUtils;
 import com.github.api.v2.schema.Repository;
 import com.github.api.v2.services.GitHubException;
@@ -620,6 +623,7 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
             menu.clear();
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.repo_menu, menu);
+            inflater.inflate(R.menu.bookmark_menu, menu);
         }
         return true;
     }
@@ -835,4 +839,43 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
             }
         }
     }
+    
+    @Override
+    public void openBookmarkActivity() {
+        Intent intent = new Intent().setClass(this, BookmarkListActivity.class);
+        intent.putExtra(Constants.Bookmark.NAME, mBundle.getString(Constants.Repository.REPO_OWNER)
+                + "/" + mBundle.getString(Constants.Repository.REPO_NAME));
+        intent.putExtra(Constants.Bookmark.OBJECT_TYPE, Constants.Bookmark.OBJECT_TYPE_REPO);
+        startActivityForResult(intent, 100);
+    }
+    
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 100) {
+           if (resultCode == Constants.Bookmark.ADD) {
+               DbHelper db = new DbHelper(this);
+               Bookmark b = new Bookmark();
+               b.setName(mBundle.getString(Constants.Repository.REPO_OWNER)
+                       + "/" + mBundle.getString(Constants.Repository.REPO_NAME));
+               b.setObjectType(Constants.Bookmark.OBJECT_TYPE_REPO);
+               b.setObjectClass(RepositoryActivity.class.getName());
+               long id = db.saveBookmark(b);
+               
+               BookmarkParam[] params = new BookmarkParam[2];
+               BookmarkParam param = new BookmarkParam();
+               param.setBookmarkId(id);
+               param.setKey(Constants.Repository.REPO_OWNER);
+               param.setValue(mBundle.getString(Constants.Repository.REPO_OWNER));
+               params[0] = param;
+               
+               param = new BookmarkParam();
+               param.setBookmarkId(id);
+               param.setKey(Constants.Repository.REPO_NAME);
+               param.setValue(mBundle.getString(Constants.Repository.REPO_NAME));
+               params[1] = param;
+               
+               db.saveBookmarkParam(params);
+           }
+        }
+     }
 }

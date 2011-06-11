@@ -294,6 +294,15 @@ public interface Constants {
         public static final String HOW_TO_APPLY = "Job.howToApply";
     }
     
+    public interface Bookmark {
+        public static final int ADD = 100;
+        public static final String NAME = "Bookmark.name";
+        public static final String OBJECT_TYPE = "Bookmark.objectType";
+        public static final String OBJECT_TYPE_USER = "User";
+        public static final String OBJECT_TYPE_REPO = "Repo";
+        public static final String OBJECT_TYPE_ISSUE = "Issue";
+    }
+    
     public static String[] SKIP_PRETTIFY_EXT = {
         "txt", "rdoc", "markdown", "md", "mdown", "mkdn", "mkd", "texttile", "org", "creole", "rst", "asciidoc", "pod", ""
     };

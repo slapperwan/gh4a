@@ -40,6 +40,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
+import com.gh4a.db.Bookmark;
+import com.gh4a.db.BookmarkParam;
+import com.gh4a.db.DbHelper;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
 import com.github.api.v2.schema.Organization;
@@ -795,6 +798,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
             if (!mUserLogin.equals(getAuthUsername())) {
                 inflater.inflate(R.menu.user_menu, menu);
             }
+            inflater.inflate(R.menu.bookmark_menu, menu);
             inflater.inflate(R.menu.about_menu, menu);
             inflater.inflate(R.menu.authenticated_menu, menu);
         }
@@ -997,4 +1001,40 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         view.showContextMenu();
     }
     
+    @Override
+    public void openBookmarkActivity() {
+        Intent intent = new Intent().setClass(this, BookmarkListActivity.class);
+        intent.putExtra(Constants.Bookmark.NAME, mUserLogin + (!StringUtils.isBlank(mUserName) ? " - " + mUserName : ""));
+        intent.putExtra(Constants.Bookmark.OBJECT_TYPE, Constants.Bookmark.OBJECT_TYPE_USER);
+        startActivityForResult(intent, 100);
+    }
+    
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 100) {
+           if (resultCode == Constants.Bookmark.ADD) {
+               DbHelper db = new DbHelper(this);
+               Bookmark b = new Bookmark();
+               b.setName(mUserLogin + (!StringUtils.isBlank(mUserName) ? " - " + mUserName : ""));
+               b.setObjectType(Constants.Bookmark.OBJECT_TYPE_USER);
+               b.setObjectClass(UserActivity.class.getName());
+               long id = db.saveBookmark(b);
+               
+               BookmarkParam[] params = new BookmarkParam[2];
+               BookmarkParam param = new BookmarkParam();
+               param.setBookmarkId(id);
+               param.setKey(Constants.User.USER_LOGIN);
+               param.setValue(mUserLogin);
+               params[0] = param;
+               
+               param = new BookmarkParam();
+               param.setBookmarkId(id);
+               param.setKey(Constants.User.USER_NAME);
+               param.setValue(mUserName);
+               params[1] = param;
+               
+               db.saveBookmarkParam(params);
+           }
+        }
+     }
 }
