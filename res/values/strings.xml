@@ -31,6 +31,8 @@
     <string name="feedback_by_gh4a">By Gh4a</string>
     <string name="settings">Settings</string>
     <string name="bookmarks">Bookmarks</string>
+    <string name="donate">Donate</string>
+    <string name="donate_text">Gh4a is open source and will always be available for free.  If you find it useful consider donating via Paypal (slapperwan.pp@gmail.com).  Thank you.</string>
     
     <!-- Activity event -->
     <string name="event_push_title">%1$s pushed to %2$s at %3$s</string>
