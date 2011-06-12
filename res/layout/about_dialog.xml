@@ -23,4 +23,24 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/my_web"
         android:autoLink="web" />
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FFF"
+        android:textAppearance="?android:attr/textAppearanceMedium" 
+        android:text="@string/feedback_text"/>
+    <Button
+        android:id="@+id/btn_by_email"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        android:textAppearance="?android:attr/textAppearanceMedium" 
+        android:text="@string/feedback_by_email"/>
+    <Button
+        android:id="@+id/btn_by_gh4a"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        android:textAppearance="?android:attr/textAppearanceMedium" 
+        android:text="@string/feedback_by_gh4a"/>
 </LinearLayout>

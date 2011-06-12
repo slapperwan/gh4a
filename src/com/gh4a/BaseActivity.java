@@ -17,7 +17,6 @@ package com.gh4a;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
-import java.util.List;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -27,6 +26,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.text.SpannableString;
@@ -42,8 +42,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.gh4a.db.Bookmark;
-import com.gh4a.db.BookmarkParam;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.markupartist.android.widget.ActionBar;
 import com.markupartist.android.widget.ScrollingTextView;
@@ -176,6 +174,35 @@ public class BaseActivity extends Activity {
             dialog.setTitle(getResources().getString(R.string.app_name));
         }
         
+        Button btnByEmail = (Button) dialog.findViewById(R.id.btn_by_email);
+        btnByEmail.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View arg0) {
+                Intent sendIntent = new Intent(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{getResources().getString(R.string.my_email)});
+                sendIntent.setType("message/rfc822");
+                startActivity(Intent.createChooser(sendIntent, "Select email application."));
+            }
+        });
+        
+        Button btnByGh4a = (Button) dialog.findViewById(R.id.btn_by_gh4a);
+        btnByGh4a.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View arg0) {
+                if (isAuthenticated()) {
+                    Intent intent = new Intent().setClass(BaseActivity.this, IssueCreateActivity.class);
+                    intent.putExtra(Constants.Repository.REPO_OWNER, getResources().getString(R.string.my_username));
+                    intent.putExtra(Constants.Repository.REPO_NAME, getResources().getString(R.string.my_repo));
+                    startActivity(intent);
+                }
+                else {
+                    showMessage("Please login", false);
+                }
+            }
+        });
+        
         dialog.show();
     }
     
@@ -214,6 +241,24 @@ public class BaseActivity extends Activity {
             }
         });
         
+        dialog.show();
+    }
+    
+    public void openDonateDialog() {
+        Dialog dialog = new Dialog(this);
+        dialog.setTitle(getResources().getString(R.string.donate));
+        dialog.setContentView(R.layout.donate_dialog);
+        Button btn = (Button) dialog.findViewById(R.id.btn_donate);
+        btn.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View view) {
+                String url = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=CLFEUAAXKXLLU&lc=MY&item_name=Donate%20for%20Gh4a&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted";
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);     
+            }
+        });
         dialog.show();
     }
     

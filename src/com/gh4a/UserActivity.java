@@ -817,8 +817,8 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
             case R.id.about:
                 openAboutDialog();
                 return true;
-            case R.id.feedback:
-                openFeedbackDialog();
+            case R.id.donate:
+                openDonateDialog();
                 return true;
             case R.id.settings:
                 Intent intent = new Intent().setClass(this, AppPreferenceActivity.class);

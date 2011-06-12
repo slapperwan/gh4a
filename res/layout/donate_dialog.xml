@@ -1,0 +1,21 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_root"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:padding="10dp">
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FFF"
+        android:textAppearance="?android:attr/textAppearanceMedium" 
+        android:text="@string/donate_text"/>
+    <Button
+        android:id="@+id/btn_donate"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        android:textAppearance="?android:attr/textAppearanceMedium" 
+        android:text="@string/donate"/>
+</LinearLayout>
