@@ -19,8 +19,11 @@ import com.gh4a.db.Bookmark;
 
 public class BookmarkAdapter extends RootAdapter<Bookmark> {
 
-    public BookmarkAdapter(Context context, List<Bookmark> objects) {
+    private boolean mHideAdd;
+    
+    public BookmarkAdapter(Context context, List<Bookmark> objects, boolean hideAdd) {
         super(context, objects);
+        mHideAdd = hideAdd;
     }
 
     @Override
@@ -35,14 +38,21 @@ public class BookmarkAdapter extends RootAdapter<Bookmark> {
             TextView tvFormattedName = (TextView) v.findViewById(R.id.tv_title);
             ImageView buttonAdd = (ImageView) v.findViewById(R.id.iv_add);
             if (position == 0) {
-                tvFormattedName.setText("Bookmark " + bookmark.getName());
-                tvFormattedName.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
-                tvFormattedName.setTypeface(Typeface.DEFAULT_BOLD);
-                LinearLayout.LayoutParams para = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT );
-                para.setMargins(0, 0, 0, 0); //left,top,right, bottom
-                para.gravity = Gravity.CENTER_VERTICAL;
-                tvFormattedName.setLayoutParams(para);
-                buttonAdd.setVisibility(View.VISIBLE);
+                if (!mHideAdd) {
+                    tvFormattedName.setText("Add " + bookmark.getName());
+                    tvFormattedName.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+                    tvFormattedName.setTypeface(Typeface.DEFAULT_BOLD);
+                    LinearLayout.LayoutParams para = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT );
+                    para.setMargins(0, 0, 0, 0); //left,top,right, bottom
+                    para.gravity = Gravity.CENTER_VERTICAL;
+                    tvFormattedName.setLayoutParams(para);
+                    buttonAdd.setVisibility(View.VISIBLE);
+                }
+                else {
+                    buttonAdd.setVisibility(View.GONE);
+                    tvFormattedName.setVisibility(View.GONE);
+                    v.setVisibility(View.GONE);
+                }
             }
             else {
                 tvFormattedName.setText("[" + bookmark.getObjectType() + "] " + bookmark.getName());

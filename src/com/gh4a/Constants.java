@@ -301,6 +301,7 @@ public interface Constants {
         public static final String OBJECT_TYPE_USER = "User";
         public static final String OBJECT_TYPE_REPO = "Repo";
         public static final String OBJECT_TYPE_ISSUE = "Issue";
+        public static final String HIDE_ADD = "Bookmark.hideAdd";
     }
     
     public static String[] SKIP_PRETTIFY_EXT = {

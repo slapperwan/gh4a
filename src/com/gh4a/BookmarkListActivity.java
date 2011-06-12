@@ -24,6 +24,7 @@ public class BookmarkListActivity extends BaseActivity {
 
     private String mName;
     private String mObjectType;
+    private boolean mHideAdd;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,6 +36,7 @@ public class BookmarkListActivity extends BaseActivity {
         
         mName = getIntent().getStringExtra(Constants.Bookmark.NAME);
         mObjectType = getIntent().getStringExtra(Constants.Bookmark.OBJECT_TYPE);
+        mHideAdd = getIntent().getBooleanExtra(Constants.Bookmark.HIDE_ADD, false);
         
         fillData();
     }
@@ -106,7 +108,7 @@ public class BookmarkListActivity extends BaseActivity {
             }
         });
         
-        BookmarkAdapter adapter = new BookmarkAdapter(this, new ArrayList<Bookmark>());
+        BookmarkAdapter adapter = new BookmarkAdapter(this, new ArrayList<Bookmark>(), mHideAdd);
         listView.setAdapter(adapter);
         
         List<Bookmark> list = db.findAllBookmark();

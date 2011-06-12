@@ -1006,6 +1006,12 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         Intent intent = new Intent().setClass(this, BookmarkListActivity.class);
         intent.putExtra(Constants.Bookmark.NAME, mUserLogin + (!StringUtils.isBlank(mUserName) ? " - " + mUserName : ""));
         intent.putExtra(Constants.Bookmark.OBJECT_TYPE, Constants.Bookmark.OBJECT_TYPE_USER);
+        if (getAuthUsername().equals(mUserLogin)) {
+            intent.putExtra(Constants.Bookmark.HIDE_ADD, true);
+        }
+        else {
+            intent.putExtra(Constants.Bookmark.HIDE_ADD, false);
+        }
         startActivityForResult(intent, 100);
     }
     
