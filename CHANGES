@@ -3,6 +3,7 @@ v1.3.7
 - Open Recent Wiki Updates page when event is GollumEvent in the activity feeds
 - Remove donate menu
 - Add Admob (ONLY at activity feeds, no ads at other places)
+- Remove GitHub Discussions, seems like the url http://support.github.com no longer exist
 
 v1.3.6
 - File viewer now be able to view all type of languages
