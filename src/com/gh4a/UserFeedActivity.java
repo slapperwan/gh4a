@@ -368,7 +368,10 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
 
         /** GollumEvent */
         else if (UserFeed.Type.GOLLUM_EVENT.equals(eventType)) {
-            context.openBrowser(this, feed.getUrl());
+            Intent intent = new Intent().setClass(this, WikiListActivity.class);
+            intent.putExtra(Constants.Repository.REPO_OWNER, feed.getRepository().getOwner());
+            intent.putExtra(Constants.Repository.REPO_NAME, feed.getRepository().getName());
+            startActivity(intent);
         }
 
         /** PublicEvent */
