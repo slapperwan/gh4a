@@ -454,7 +454,13 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
             String url = feed.getUrl();
             int idx1 = url.indexOf("/issues/");
             int idx2 = url.indexOf("#issuecomment");
-            String issueId = url.substring(idx1 + 8, idx2);
+            if (idx2 == -1) {//sometime it return comment only
+                idx2 = url.indexOf("#comment");
+            }
+            String issueId = "";
+            if (idx2 != -1) {
+                issueId = url.substring(idx1 + 8, idx2);
+            }
             String text = String.format(res.getString(R.string.event_issue_comment),
                     feed.getActor(), issueId, formatFromRepoName(feed));
             return text;

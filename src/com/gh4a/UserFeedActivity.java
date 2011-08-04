@@ -40,6 +40,8 @@ import com.github.api.v2.schema.Payload;
 import com.github.api.v2.schema.Repository;
 import com.github.api.v2.schema.UserFeed;
 import com.github.api.v2.services.GitHubException;
+import com.google.ads.AdRequest;
+import com.google.ads.AdView;
 
 /**
  * The User activity.
@@ -75,7 +77,13 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
 
         setContentView(R.layout.generic_list);
         setUpActionBar();
+        AdView adView = (AdView)this.findViewById(R.id.adView);
+        AdRequest request = new AdRequest();
+//        request.addTestDevice(AdRequest.TEST_EMULATOR);
+//        request.addTestDevice("DA870570FFC173C3F71D204CA2F77E67");
+        adView.loadAd(request);
 
+        
         Bundle data = getIntent().getExtras();
         mUserLogin = data.getString(Constants.User.USER_LOGIN);
         mActionBarTitle = data.getString(Constants.ACTIONBAR_TITLE);
@@ -411,11 +419,21 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
             String url = feed.getUrl();
             int idx1 = url.indexOf("/issues/");
             int idx2 = url.indexOf("#issuecomment");
-            String issueNumber = url.substring(idx1 + 8, idx2);
+            if (idx2 == -1) {//sometime it return comment only
+                idx2 = url.indexOf("#comment");
+            }
+            String issueNumber = "-1";
+            if (idx2 != -1) {
+                issueNumber = url.substring(idx1 + 8, idx2);
+            }
             if (feed.getRepository() != null) {
-                context.openIssueActivity(this, feed.getRepository().getOwner(), feed.getRepository().getName(), Integer.parseInt(issueNumber));
-//                context.openIssueListActivity(this, feed.getRepository().getOwner(), feed.getRepository()
-//                        .getName(), Constants.Issue.ISSUE_STATE_OPEN);
+                if (!"-1".equals(issueNumber)) {
+                    context.openIssueActivity(this, feed.getRepository().getOwner(), feed.getRepository().getName(), Integer.parseInt(issueNumber));
+                }
+                else {
+                    context.openIssueListActivity(this, feed.getRepository().getOwner(), feed.getRepository()
+                            .getName(), Constants.Issue.ISSUE_STATE_OPEN);
+                }
             }
             else {
                 context.notFoundMessage(this, R.plurals.repository);
