@@ -451,8 +451,12 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
         
         /** IssueCommentEvent */
         else if (UserFeed.Type.ISSUE_COMMENT_EVENT.equals(feed.getType())) {
+            String url = feed.getUrl();
+            int idx1 = url.indexOf("/issues/");
+            int idx2 = url.indexOf("#issuecomment");
+            String issueId = url.substring(idx1 + 8, idx2);
             String text = String.format(res.getString(R.string.event_issue_comment),
-                    feed.getActor(), formatFromRepoName(feed));
+                    feed.getActor(), issueId, formatFromRepoName(feed));
             return text;
         }
 

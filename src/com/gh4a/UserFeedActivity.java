@@ -404,9 +404,15 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         
         /** IssueCommentEvent */
         else if (UserFeed.Type.ISSUE_COMMENT_EVENT.equals(eventType)) {
+            //https://github.com/slapperwan/gh4a/issues/32#issuecomment-1531102
+            String url = feed.getUrl();
+            int idx1 = url.indexOf("/issues/");
+            int idx2 = url.indexOf("#issuecomment");
+            String issueNumber = url.substring(idx1 + 8, idx2);
             if (feed.getRepository() != null) {
-                context.openIssueListActivity(this, feed.getRepository().getOwner(), feed.getRepository()
-                        .getName(), Constants.Issue.ISSUE_STATE_OPEN);
+                context.openIssueActivity(this, feed.getRepository().getOwner(), feed.getRepository().getName(), Integer.parseInt(issueNumber));
+//                context.openIssueListActivity(this, feed.getRepository().getOwner(), feed.getRepository()
+//                        .getName(), Constants.Issue.ISSUE_STATE_OPEN);
             }
             else {
                 context.notFoundMessage(this, R.plurals.repository);

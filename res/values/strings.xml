@@ -53,7 +53,7 @@
     <string name="event_download_title">%1$s uploaded a file to %2$s</string>
     <string name="event_gollum_title">%1$s %2$s %3$s in the %4$s wiki</string>
     <string name="event_public_title">%1$s open sourced %2$s</string>
-    <string name="event_issue_comment">%1$s commented on pull request/issue on %2$s</string>
+    <string name="event_issue_comment">%1$s commented on pull request/issue %2$s on %3$s</string>
     
     <string name="event_pull_request_desc">%1$s\n%2$d commits with %3$d additions and %4$d deletions</string>
     <string name="event_follow_desc">%1$s has %2$d repositories and %3$d followers</string>
