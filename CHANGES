@@ -1,4 +1,4 @@
-v1.3.7
+v1.3.7 (Aug 5, 2011)
 - Open specific issue/pull request for IssueCommentEvent in activity feeds 
 - Open Recent Wiki Updates page when event is GollumEvent in the activity feeds
 - Remove donate menu
