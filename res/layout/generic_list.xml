@@ -3,6 +3,7 @@
     android:id="@+id/linear_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res/com.gh4a"
+    xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical">
@@ -28,4 +29,10 @@
     <include
         layout="@layout/loading"
         android:id="@+id/loading" />
+    <com.google.ads.AdView android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        ads:adUnitId="a14e3ace43e093f"
+        ads:adSize="BANNER"
+         />
 </LinearLayout>

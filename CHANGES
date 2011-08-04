@@ -1,3 +1,12 @@
+v1.3.7
+- Open specific issue/pull request for IssueCommentEvent in activity feeds 
+- Open Recent Wiki Updates page when event is GollumEvent in the activity feeds
+- Remove donate menu
+- Add Admob (ONLY at activity feeds, no ads at other places)
+
+v1.3.6
+- File viewer now be able to view all type of languages
+
 v1.3.5 (Jun 13, 2011)
 - Simple bookmark function.  Pages available for bookmark:
   * User
