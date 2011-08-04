@@ -260,21 +260,21 @@ public class AddedFileViewerActivity extends BaseActivity {
                     mTarget.get().showError();
                 }
                 else {
-                    if (result.getMimeType().startsWith("text")
-                            || result.getMimeType().equals("application/xml")
-                            || result.getMimeType().equals("application/sh")
-                            || result.getMimeType().equals("application/xhtml+xml")) {
+//                    if (result.getMimeType().startsWith("text")
+//                            || result.getMimeType().equals("application/xml")
+//                            || result.getMimeType().equals("application/sh")
+//                            || result.getMimeType().equals("application/xhtml+xml")) {
                         mTarget.get().mBlob = result;
                         mTarget.get().fillData(result, highlight);
-                    }
-                    else {
-                        String url = "https://github.com/" + mTarget.get().mUserLogin + "/"
-                                + mTarget.get().mRepoName + "/raw/" + mTarget.get().mObjectSha + "/"
-                                + mTarget.get().mFilePath;
-                        mTarget.get().getApplicationContext().openBrowser(mTarget.get(), url);
-                        mTarget.get().mLoadingDialog.dismiss();
-                        mTarget.get().finish();                    
-                    }
+//                    }
+//                    else {
+//                        String url = "https://github.com/" + mTarget.get().mUserLogin + "/"
+//                                + mTarget.get().mRepoName + "/raw/" + mTarget.get().mObjectSha + "/"
+//                                + mTarget.get().mFilePath;
+//                        mTarget.get().getApplicationContext().openBrowser(mTarget.get(), url);
+//                        mTarget.get().mLoadingDialog.dismiss();
+//                        mTarget.get().finish();                    
+//                    }
                 }
             }
         }

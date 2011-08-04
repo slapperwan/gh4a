@@ -268,10 +268,10 @@ public class FileViewerActivity extends BaseActivity {
                     
                     // only show mimetype text/* and xml to WebView, else open
                     // default browser
-                    if (activity.mMimeType.startsWith("text")
-                            || activity.mMimeType.equals("application/xml")
-                            || activity.mMimeType.equals("application/sh")
-                            || activity.mMimeType.equals("application/xhtml+xml")) {
+//                    if (activity.mMimeType.startsWith("text")
+//                            || activity.mMimeType.equals("application/xml")
+//                            || activity.mMimeType.equals("application/sh")
+//                            || activity.mMimeType.equals("application/xhtml+xml")) {
                         mShowInBrowser = false;
                         return objectService.getBlob(activity.mUserLogin,
                                 activity.mRepoName,
@@ -279,11 +279,11 @@ public class FileViewerActivity extends BaseActivity {
                                 activity.mPath);
 //                        return objectService.getObjectContent(activity.mUserLogin, activity.mRepoName,
 //                                activity.mObjectSha);
-                    }
-                    else {
-                        mShowInBrowser = true;
-                        return null;
-                    }
+//                    }
+//                    else {
+//                        mShowInBrowser = true;
+//                        return null;
+//                    }
     
                 }
                 catch (GitHubException e) {
