@@ -1,6 +1,6 @@
 Gh4a - GitHub Client for Android
 ================================
-This application provides access to github.com informations and stay connected with your networks.
+This application provides access to github.com information  and stay connected with your networks.
 
 Main features
 -------------
@@ -23,7 +23,7 @@ Main features
 
 *User*
 
-* View basic informations
+* View basic information 
 * Activity feeds
 * Follow/unfollow user
 * View public/watched repositories
