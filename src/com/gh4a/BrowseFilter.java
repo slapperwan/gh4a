@@ -57,6 +57,9 @@ public class BrowseFilter extends BaseActivity {
                     if ("issues".equals(action)) {
                         context.openIssueListActivity(this, user, repo, Constants.Issue.ISSUE_STATE_OPEN);
                     }
+                    else if ("pulls".equals(action)) {
+                        context.openPullRequestListActivity(this, user, repo, Constants.Issue.ISSUE_STATE_OPEN);
+                    }
                     else if ("wiki".equals(action)) {
                         Intent intent = new Intent().setClass(this, WikiListActivity.class);
                         intent.putExtra(Constants.Repository.REPO_OWNER, user);
@@ -72,7 +75,22 @@ public class BrowseFilter extends BaseActivity {
                     
                     if ("issues".equals(action)) {
                         if (!StringUtils.isBlank(id)) {
-                            context.openIssueActivity(this, user, repo, Integer.parseInt(id));
+                            try {
+                                context.openIssueActivity(this, user, repo, Integer.parseInt(id));
+                            }
+                            catch (NumberFormatException e) {
+                                // Ignore non-numeric ids
+                            }
+                        }
+                    }
+                    else if ("pull".equals(action)) {
+                        if (!StringUtils.isBlank(id)) {
+                            try {
+                                context.openPullRequestActivity(this, user, repo, Integer.parseInt(id));
+                            }
+                            catch (NumberFormatException e) {
+                                // Ignore non-numeric ids
+                            }
                         }
                     }
                 }
