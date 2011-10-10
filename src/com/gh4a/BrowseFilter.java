@@ -75,7 +75,12 @@ public class BrowseFilter extends BaseActivity {
                     
                     if ("issues".equals(action)) {
                         if (!StringUtils.isBlank(id)) {
-                            context.openIssueActivity(this, user, repo, Integer.parseInt(id));
+                            try {
+                                context.openIssueActivity(this, user, repo, Integer.parseInt(id));
+                            }
+                            catch (NumberFormatException e) {
+                                // Ignore non-numeric ids
+                            }
                         }
                     }
                     else if ("pull".equals(action)) {
