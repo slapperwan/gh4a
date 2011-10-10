@@ -71,3 +71,4 @@ Contributions
 =============
 
 * [zquestz](https://github.com/zquestz)  Thanks for the application icon.
+* [cketti](https://github.com/cketti)

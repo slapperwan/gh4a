@@ -1,3 +1,6 @@
+v1.3.8 (Oct 10, 2011)
+- Add support for pull request URL as an option to view with Gh4a.
+
 v1.3.7 (Aug 5, 2011)
 - Open specific issue/pull request for IssueCommentEvent in activity feeds 
 - Open Recent Wiki Updates page when event is GollumEvent in the activity feeds
