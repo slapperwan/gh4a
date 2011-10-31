@@ -13,7 +13,7 @@
     <string name="logout">Logout</string>
     <string name="login">Login</string>
     <string name="invalid_login">Invalid username/password</string>
-    <string name="success_logout">Successful logout</string>
+    <string name="success_logout">Successfully logged out</string>
     <string name="sign">&lt;i>Sent via Gh4a App&lt;i></string>
     <string name="label_it">Update</string>
     <string name="cancel">Cancel</string>
@@ -94,10 +94,10 @@
     <string name="user_organizations">Organizations</string>
     <string name="user_follow_action">Follow</string>
     <string name="user_unfollow_action">Unfollow</string>
-    <string name="user_success_follow">Successful follow user %1$s</string>
-    <string name="user_success_unfollow">Successful unfollow user %1$s</string>
+    <string name="user_success_follow">Successfully followed user %1$s</string>
+    <string name="user_success_unfollow">Successfully unfollowed user %1$s</string>
     <string name="user_error_follow">An error occured while following user %1$s</string>
-    <string name="user_error_unfollow">An error occured while unfollow user %1$s</string>
+    <string name="user_error_unfollow">An error occured while unfollowing user %1$s</string>
     
     <!-- Repository -->
     <plurals name="repository">
@@ -130,11 +130,11 @@
     <string name="repo_watch_action">Watch</string>
     <string name="repo_unwatch_action">Unwatch</string>
     <string name="repo_fork_action">Fork</string>
-    <string name="repo_success_watch">Successful watch %1$s</string>
-    <string name="repo_success_unwatch">Successful unwatch %1$s</string>
+    <string name="repo_success_watch">Successfully watched %1$s</string>
+    <string name="repo_success_unwatch">Successfully unwatched %1$s</string>
     <string name="repo_error_watch">An error occured while watching %1$s</string>
-    <string name="repo_error_unwatch">An error occured while unwatch %1$s</string>
-    <string name="repo_success_fork">Successful fork %1$s</string>
+    <string name="repo_error_unwatch">An error occured while unwatching %1$s</string>
+    <string name="repo_success_fork">Successfully forked %1$s</string>
     <string name="repo_error_fork">An error occured while forking %1$s</string>
     <string name="repo_branch">branch</string>
     <string name="repo_contributors">Contributors</string>
@@ -182,18 +182,18 @@
     <string name="issue_view_closed_issues">View Closed</string>
     <string name="issue_create">Create Issue</string>
     <string name="issue_error_title">Please enter a title</string>
-    <string name="issue_success_create">Successful create issue</string>
+    <string name="issue_success_create">Successfully created issue</string>
     <string name="issue_edit">Edit Issue</string>
-    <string name="issue_success_edit">Successful edit issue</string>
+    <string name="issue_success_edit">Successfully edited issue</string>
     <string name="issue_error_edit">Cannot edit issue</string>
     <string name="issue_reopen">Reopen Issue</string>
     <string name="issue_close">Close Issue</string>
-    <string name="issue_success_close">Successful close issue</string>
+    <string name="issue_success_close">Successfully closed issue</string>
     <string name="issue_error_close">Cannot close issue</string>
-    <string name="issue_success_reopen">Successful reopen issue</string>
+    <string name="issue_success_reopen">Successfully reopened issue</string>
     <string name="issue_error_reopen">Cannot reopen issue</string>
     <string name="issue_view_labels">View Labels</string>
-    <string name="issue_success_comment">Successful create comment</string>
+    <string name="issue_success_comment">Successfully created comment</string>
     <string name="issue_error_comment">Cannot create comment</string>
     <string name="issue_create_label">New Label</string>
     <string name="issue_label_create">Create</string>
