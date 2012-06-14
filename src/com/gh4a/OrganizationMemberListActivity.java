@@ -15,14 +15,15 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.OrganizationService;
+
 import com.gh4a.holder.BreadCrumbHolder;
-import com.github.api.v2.schema.User;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.OrganizationService;
 
 public class OrganizationMemberListActivity extends UserListActivity {
 
@@ -92,9 +93,10 @@ public class OrganizationMemberListActivity extends UserListActivity {
      * (non-Javadoc)
      * @see com.gh4a.UserListActivity#getUsers()
      */
-    protected List<User> getUsers() throws GitHubException {
-        GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-        OrganizationService organizationService = factory.createOrganizationService();
-        return organizationService.getPublicMembers(mUserLogin);
+    protected List<User> getUsers() throws IOException {
+        GitHubClient client = new GitHubClient();
+        client.setOAuth2Token(getAuthToken());
+        OrganizationService orgService = new OrganizationService(client);
+        return orgService.getPublicMembers(mUserLogin);
     }
 }

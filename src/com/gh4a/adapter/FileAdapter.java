@@ -17,6 +17,8 @@ package com.gh4a.adapter;
 
 import java.util.List;
 
+import org.eclipse.egit.github.core.TreeEntry;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,12 +28,11 @@ import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
-import com.github.api.v2.schema.Tree;
 
 /**
  * The FollowerFollowing adapter.
  */
-public class FileAdapter extends RootAdapter<Tree> {
+public class FileAdapter extends RootAdapter<TreeEntry> {
 
     /**
      * Instantiates a new follower following adapter.
@@ -39,7 +40,7 @@ public class FileAdapter extends RootAdapter<Tree> {
      * @param context the context
      * @param objects the objects
      */
-    public FileAdapter(Context context, List<Tree> objects) {
+    public FileAdapter(Context context, List<TreeEntry> objects) {
         super(context, objects);
     }
 
@@ -55,14 +56,14 @@ public class FileAdapter extends RootAdapter<Tree> {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
             v = vi.inflate(R.layout.row_file_manager, null);
         }
-        Tree tree = mObjects.get(position);
+        TreeEntry tree = mObjects.get(position);
         if (tree != null) {
             ImageView ivIcon = (ImageView) v.findViewById(R.id.iv_icon);
             ivIcon.setBackgroundResource(getIconId(tree.getType(), StringUtils
-                    .getFileExtension(tree.getName())));
+                    .getFileExtension(tree.getPath())));
 
             TextView tvFilename = (TextView) v.findViewById(R.id.tv_text);
-            tvFilename.setText(tree.getName());
+            tvFilename.setText(tree.getPath());
         }
         return v;
     }
@@ -74,11 +75,11 @@ public class FileAdapter extends RootAdapter<Tree> {
      * @param ext the ext
      * @return the icon id
      */
-    private int getIconId(Tree.Type type, String ext) {
-        if (Tree.Type.TREE.equals(type)) {
+    private int getIconId(String type, String ext) {
+        if ("tree".equals(type)) {
             return R.drawable.folder;
         }
-        else if (Tree.Type.BLOB.equals(type)) {
+        else if ("blob".equals(type)) {
             if ("png".equalsIgnoreCase(ext) || "ico".equalsIgnoreCase(ext)
                     || "jpg".equalsIgnoreCase(ext) || "jpeg".equalsIgnoreCase(ext)
                     || "gif".equalsIgnoreCase(ext)) {

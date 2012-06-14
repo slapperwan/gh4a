@@ -15,14 +15,19 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+
+import org.eclipse.egit.github.core.Blob;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.DataService;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,14 +37,7 @@ import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import com.gh4a.holder.BreadCrumbHolder;
-import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
-import com.github.api.v2.schema.Blob;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.ObjectService;
-import com.github.api.v2.services.auth.Authentication;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The DiffViewer activity.
@@ -137,26 +135,26 @@ public class FileViewerActivity extends BaseActivity {
         });
         
         TextView tvDownload = (TextView) findViewById(R.id.tv_download);
-        tvDownload.setOnClickListener(new OnClickListener() {
-            
-            @Override
-            public void onClick(View view) {
-                String filename = mBlob.getName();
-                int idx = filename.lastIndexOf("/");
-                
-                if (idx != -1) {
-                    filename = filename.substring(filename.lastIndexOf("/") + 1, filename.length());
-                }
-
-                boolean success = FileUtils.save(filename, mBlob.getData());
-                if (success) {
-                    showMessage("File saved at " + Environment.getExternalStorageDirectory().getAbsolutePath() + "/download/" + filename, false);
-                }
-                else {
-                    showMessage("Unable to save the file", false);
-                }
-            }
-        });
+//        tvDownload.setOnClickListener(new OnClickListener() {
+//            
+//            @Override
+//            public void onClick(View view) {
+//                String filename = mBlob.getName();
+//                int idx = filename.lastIndexOf("/");
+//                
+//                if (idx != -1) {
+//                    filename = filename.substring(filename.lastIndexOf("/") + 1, filename.length());
+//                }
+//
+//                boolean success = FileUtils.save(filename, mBlob.getData());
+//                if (success) {
+//                    showMessage("File saved at " + Environment.getExternalStorageDirectory().getAbsolutePath() + "/download/" + filename, false);
+//                }
+//                else {
+//                    showMessage("Unable to save the file", false);
+//                }
+//            }
+//        });
         
         setBreadCrumb();
 
@@ -260,11 +258,9 @@ public class FileViewerActivity extends BaseActivity {
                 mHighlight = params[0];
                 try {
                     FileViewerActivity activity = mTarget.get();
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    ObjectService objectService = factory.createObjectService();
-    
-                    Authentication auth = new LoginPasswordAuthentication(activity.getAuthUsername(), activity.getAuthPassword());
-                    objectService.setAuthentication(auth);
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    DataService dataService = new DataService(client);
                     
                     // only show mimetype text/* and xml to WebView, else open
                     // default browser
@@ -273,10 +269,12 @@ public class FileViewerActivity extends BaseActivity {
 //                            || activity.mMimeType.equals("application/sh")
 //                            || activity.mMimeType.equals("application/xhtml+xml")) {
                         mShowInBrowser = false;
-                        return objectService.getBlob(activity.mUserLogin,
-                                activity.mRepoName,
-                                activity.mTreeSha, 
-                                activity.mPath);
+                        return dataService.getBlob(new RepositoryId(activity.mUserLogin,
+                                activity.mRepoName), activity.mObjectSha);
+//                        return objectService.getBlob(activity.mUserLogin,
+//                                activity.mRepoName,
+//                                activity.mTreeSha, 
+//                                activity.mPath);
 //                        return objectService.getObjectContent(activity.mUserLogin, activity.mRepoName,
 //                                activity.mObjectSha);
 //                    }
@@ -286,7 +284,7 @@ public class FileViewerActivity extends BaseActivity {
 //                    }
     
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -342,7 +340,7 @@ public class FileViewerActivity extends BaseActivity {
      * @param is the is
      */
     protected void fillData(Blob blob, boolean highlight) {
-        String data = blob.getData();
+        String data = blob.getContent();
         TextView tvViewRaw = (TextView) findViewById(R.id.tv_view_raw);
         if (highlight) {
             tvViewRaw.setText("Raw");

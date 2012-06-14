@@ -15,42 +15,43 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.SearchRepository;
+import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.RepositoryService;
+import org.eclipse.egit.github.core.service.UserService;
 
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.AbsListView.OnScrollListener;
-import android.widget.AdapterView.OnItemClickListener;
 
-import com.gh4a.adapter.RepositoryAdapter;
+import com.gh4a.adapter.SearchRepositoryAdapter;
 import com.gh4a.adapter.UserAdapter;
 import com.gh4a.utils.StringUtils;
-import com.github.api.v2.schema.Language;
-import com.github.api.v2.schema.Repository;
-import com.github.api.v2.schema.User;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.RepositoryService;
-import com.github.api.v2.services.UserService;
 
 /**
  * The Search activity.
@@ -61,13 +62,13 @@ public class SearchActivity extends BaseActivity {
     protected LoadingDialog mLoadingDialog;
 
     /** The repositories. */
-    protected List<Repository> repositories;
+    protected List<SearchRepository> repositories;
 
     /** The user adapter. */
     protected UserAdapter userAdapter;
 
     /** The repository adapter. */
-    protected RepositoryAdapter repositoryAdapter;
+    protected SearchRepositoryAdapter repositoryAdapter;
 
     /** The list view results. */
     protected ListView mListViewResults;
@@ -164,8 +165,8 @@ public class SearchActivity extends BaseActivity {
     protected void searchRepository(final String searchKey, final String language) {
         mListViewResults.setOnItemClickListener(new OnRepositoryClickListener(this));
 
-        repositories = new ArrayList<Repository>();
-        repositoryAdapter = new RepositoryAdapter(this, repositories, R.layout.row_simple_3);
+        repositories = new ArrayList<SearchRepository>();
+        repositoryAdapter = new SearchRepositoryAdapter(this, repositories, R.layout.row_simple_3);
         mListViewResults.setAdapter(repositoryAdapter);
         mListViewResults
                 .setOnScrollListener(new RepositoryScrollListener(this, searchKey, language));
@@ -196,16 +197,18 @@ public class SearchActivity extends BaseActivity {
      * @param searchKey the search key
      * @return the users
      */
-    protected List<User> getUsers(String searchKey) {
-        GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-        UserService service = factory.createUserService();
+    protected List<User> getUsers(String searchKey) throws IOException {
+        GitHubClient client = new GitHubClient();
+        client.setOAuth2Token(getAuthToken());
+        UserService userService = new UserService();
+        
         List<User> users = new ArrayList<User>();
-        if (!StringUtils.isBlank(searchKey)) {
-            users = service.searchUsersByName(searchKey);
-        }
-        else {
-            // TODO : show dialog
-        }
+//        if (!StringUtils.isBlank(searchKey)) {
+//            users = service.searchUsersByName(searchKey);
+//        }
+//        else {
+//            // TODO : show dialog
+//        }
         return users;
     }
 
@@ -250,7 +253,7 @@ public class SearchActivity extends BaseActivity {
     protected void fillRepositoriesData() {
         if (repositories != null && repositories.size() > 0) {
             repositoryAdapter.notifyDataSetChanged();
-            for (Repository repository : repositories) {
+            for (SearchRepository repository : repositories) {
                 repositoryAdapter.add(repository);
             }
         }
@@ -344,19 +347,20 @@ public class SearchActivity extends BaseActivity {
      * @return the repositories
      * @throws GitHubException the git hub exception
      */
-    protected List<Repository> getRepositories(String searchKey, String language)
-            throws GitHubException {
-        GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-        RepositoryService repositoryService = factory.createRepositoryService();
+    protected List<SearchRepository> getRepositories(String searchKey, String language)
+            throws IOException {
+        GitHubClient client = new GitHubClient();
+        client.setOAuth2Token(getAuthToken());
+        RepositoryService repoService = new RepositoryService();
+        
         searchKey = StringUtils.encodeUrl(searchKey);
         searchKey = searchKey.replaceAll("\\.", "%2e");
         if (!StringUtils.isBlank(searchKey)) {
             if ("Any Language".equals(language)) {
-                repositories = repositoryService.searchRepositories(searchKey, mPage);
+                repositories = repoService.searchRepositories(searchKey, mPage);
             }
             else {
-                repositories = repositoryService.searchRepositories(searchKey, Language
-                        .fromValue(language), mPage);
+                repositories = repoService.searchRepositories(searchKey, language, mPage);
             }
             mPage++;
         }
@@ -369,7 +373,7 @@ public class SearchActivity extends BaseActivity {
     /**
      * An asynchronous task that runs on a background thread to load repository.
      */
-    private static class LoadRepositoryTask extends AsyncTask<String, Integer, List<Repository>> {
+    private static class LoadRepositoryTask extends AsyncTask<String, Integer, List<SearchRepository>> {
 
         /** The hide main view. */
         private boolean mHideMainView;
@@ -394,13 +398,13 @@ public class SearchActivity extends BaseActivity {
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
-        protected List<Repository> doInBackground(String... params) {
+        protected List<SearchRepository> doInBackground(String... params) {
             if (mTarget.get() != null) {
                 this.mHideMainView = Boolean.valueOf(params[2]);
                 try {
                     return mTarget.get().getRepositories(params[0], params[1]);
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -434,7 +438,7 @@ public class SearchActivity extends BaseActivity {
          * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
          */
         @Override
-        protected void onPostExecute(List<Repository> result) {
+        protected void onPostExecute(List<SearchRepository> result) {
             if (mTarget.get() != null) {
                 SearchActivity activity = mTarget.get();
                 if (mException) {
@@ -487,7 +491,7 @@ public class SearchActivity extends BaseActivity {
                 try {
                     return mTarget.get().getUsers(params[0]);
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -628,7 +632,7 @@ public class SearchActivity extends BaseActivity {
 
             String username = null;
             if (object instanceof Repository) {
-                Repository repository = (Repository) object;
+                SearchRepository repository = (SearchRepository) object;
                 username = repository.getOwner();
             }
             if (mSearchByUser) {

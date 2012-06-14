@@ -15,14 +15,13 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.util.List;
 
-import com.github.api.v2.schema.UserFeed;
-import com.github.api.v2.services.FeedService;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.auth.Authentication;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.PageIterator;
+import org.eclipse.egit.github.core.event.Event;
+import org.eclipse.egit.github.core.service.EventService;
 
 /**
  * The UserPrivate activity.
@@ -34,13 +33,13 @@ public class UserPrivateActivity extends UserFeedActivity {
      * @see com.gh4a.UserActivity#getFeeds()
      */
     @Override
-    public List<UserFeed> getFeeds() throws GitHubException {
-        GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-        FeedService feedService = factory.createFeedService();
-        
-        Authentication auth = new LoginPasswordAuthentication(mUserLogin, getAuthPassword());
-        feedService.setAuthentication(auth);
-        return feedService.getPrivateUserFeedJson(mUserLogin);
+    public List<Event> getFeeds() throws IOException {
+        GitHubClient client = new GitHubClient();
+        client.setOAuth2Token(getAuthToken());
+        EventService eventService = new EventService(client);
+        PageIterator<Event> pageEvents = eventService.pageUserReceivedEvents(mUserLogin, true);
+        return (List) pageEvents.next();
+        //return eventService.getPrivateUserFeedJson(mUserLogin);
     }
 
 }

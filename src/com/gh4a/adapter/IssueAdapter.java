@@ -17,12 +17,15 @@ package com.gh4a.adapter;
 
 import java.util.List;
 
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Label;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -31,7 +34,6 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
-import com.github.api.v2.schema.Issue;
 
 /**
  * The Issue adapter.
@@ -82,7 +84,7 @@ public class IssueAdapter extends RootAdapter<Issue> {
 
         final Issue issue = mObjects.get(position);
         if (issue != null) {
-            ImageDownloader.getInstance().download(issue.getGravatarId(), viewHolder.ivGravatar);
+            ImageDownloader.getInstance().download(issue.getUser().getGravatarId(), viewHolder.ivGravatar);
             viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
 
                 @Override
@@ -90,13 +92,13 @@ public class IssueAdapter extends RootAdapter<Issue> {
                     /** Open user activity */
                     Gh4Application context = (Gh4Application) v.getContext()
                             .getApplicationContext();
-                    context.openUserInfoActivity(v.getContext(), issue.getUser(), null);
+                    context.openUserInfoActivity(v.getContext(), issue.getUser().getLogin(), null);
                 }
             });
             
             if (viewHolder.tvState != null) {
-                viewHolder.tvState.setText(issue.getState().value());
-                if ("closed".equals(issue.getState().value())) {
+                viewHolder.tvState.setText(issue.getState());
+                if ("closed".equals(issue.getState())) {
                     viewHolder.tvState.setBackgroundResource(R.drawable.default_red_box);
                 }
                 else {
@@ -116,12 +118,12 @@ public class IssueAdapter extends RootAdapter<Issue> {
 //            viewHolder.llLabels.addView(tvNumber);
 
             //show labels
-            List<String> labels = issue.getLabels();
+            List<Label> labels = issue.getLabels();
             if (labels != null && !labels.isEmpty()) {
-                for (String label : labels) {
+                for (Label label : labels) {
                     TextView tvLabel = new TextView(v.getContext());
                     tvLabel.setSingleLine(true);
-                    tvLabel.setText(label);
+                    tvLabel.setText(label.getName());
                     tvLabel.setTextAppearance(v.getContext(), R.style.default_text_small);
                     tvLabel.setBackgroundResource(R.drawable.default_grey_box);
                     
@@ -137,7 +139,7 @@ public class IssueAdapter extends RootAdapter<Issue> {
             viewHolder.tvDesc.setText("#" + issue.getNumber() + " - " + StringUtils.doTeaser(issue.getTitle()));
 
             Resources res = v.getResources();
-            String extraData = res.getString(R.string.more_data_3, issue.getUser(),
+            String extraData = res.getString(R.string.more_data_3, issue.getUser().getLogin(),
                     pt.format(issue.getCreatedAt()), issue.getComments() + " "
                             + res.getQuantityString(R.plurals.issue_comment, issue.getComments()));
 

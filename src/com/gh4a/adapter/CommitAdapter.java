@@ -17,12 +17,15 @@ package com.gh4a.adapter;
 
 import java.util.List;
 
+import org.eclipse.egit.github.core.Commit;
+import org.eclipse.egit.github.core.RepositoryCommit;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -30,12 +33,11 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
-import com.github.api.v2.schema.Commit;
 
 /**
  * The Commit adapter.
  */
-public class CommitAdapter extends RootAdapter<Commit> {
+public class CommitAdapter extends RootAdapter<RepositoryCommit> {
 
     /**
      * Instantiates a new commit adapter.
@@ -43,7 +45,7 @@ public class CommitAdapter extends RootAdapter<Commit> {
      * @param context the context
      * @param objects the objects
      */
-    public CommitAdapter(Context context, List<Commit> objects) {
+    public CommitAdapter(Context context, List<RepositoryCommit> objects) {
         super(context, objects);
     }
 
@@ -72,7 +74,7 @@ public class CommitAdapter extends RootAdapter<Commit> {
             viewHolder = (ViewHolder) v.getTag();
         }
 
-        final Commit commit = mObjects.get(position);
+        final RepositoryCommit commit = mObjects.get(position);
         if (commit != null) {
             if (!StringUtils.isBlank(commit.getAuthor().getLogin())) {
                 ImageDownloader.getInstance().download(
@@ -105,13 +107,13 @@ public class CommitAdapter extends RootAdapter<Commit> {
                 });
             }
 
-            viewHolder.tvSha.setText(commit.getId().substring(0, 7));
-            viewHolder.tvDesc.setText(commit.getMessage());
+            viewHolder.tvSha.setText(commit.getCommit().getSha().substring(0, 7));
+            viewHolder.tvDesc.setText(commit.getCommit().getMessage());
 
             Resources res = v.getResources();
             String extraData = String.format(res.getString(R.string.more_data), !StringUtils
                     .isBlank(commit.getAuthor().getLogin()) ? commit.getAuthor().getLogin()
-                    : commit.getCommitter().getLogin(), pt.format(commit.getCommittedDate()));
+                    : commit.getCommitter().getLogin(), pt.format(commit.getCommitter().getCreatedAt()));
 
             viewHolder.tvExtra.setText(extraData);
         }

@@ -17,6 +17,28 @@ package com.gh4a.adapter;
 
 import java.util.List;
 
+import org.eclipse.egit.github.core.Commit;
+import org.eclipse.egit.github.core.GollumPage;
+import org.eclipse.egit.github.core.PullRequest;
+import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.event.CommitCommentPayload;
+import org.eclipse.egit.github.core.event.CreatePayload;
+import org.eclipse.egit.github.core.event.DeletePayload;
+import org.eclipse.egit.github.core.event.DownloadPayload;
+import org.eclipse.egit.github.core.event.Event;
+import org.eclipse.egit.github.core.event.EventRepository;
+import org.eclipse.egit.github.core.event.FollowPayload;
+import org.eclipse.egit.github.core.event.ForkPayload;
+import org.eclipse.egit.github.core.event.GistPayload;
+import org.eclipse.egit.github.core.event.GollumPayload;
+import org.eclipse.egit.github.core.event.IssueCommentPayload;
+import org.eclipse.egit.github.core.event.IssuesPayload;
+import org.eclipse.egit.github.core.event.MemberPayload;
+import org.eclipse.egit.github.core.event.PullRequestPayload;
+import org.eclipse.egit.github.core.event.PushPayload;
+import org.eclipse.egit.github.core.event.WatchPayload;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.text.SpannableString;
@@ -24,8 +46,8 @@ import android.text.style.ClickableSpan;
 import android.text.style.TextAppearanceSpan;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -35,17 +57,11 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
-import com.github.api.v2.schema.ObjectPayloadPullRequest;
-import com.github.api.v2.schema.Payload;
-import com.github.api.v2.schema.PayloadPullRequest;
-import com.github.api.v2.schema.PayloadTarget;
-import com.github.api.v2.schema.Repository;
-import com.github.api.v2.schema.UserFeed;
 
 /**
  * The Feed adapter.
  */
-public class FeedAdapter extends RootAdapter<UserFeed> {
+public class FeedAdapter extends RootAdapter<Event> {
 
     /**
      * Instantiates a new feed adapter.
@@ -53,7 +69,7 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
      * @param context the context
      * @param objects the objects
      */
-    public FeedAdapter(Context context, List<UserFeed> objects) {
+    public FeedAdapter(Context context, List<Event> objects) {
         super(context, objects);
     }
 
@@ -82,9 +98,11 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
             viewHolder = (ViewHolder) v.getTag();
         }
 
-        final UserFeed feed = mObjects.get(position);
-        if (feed != null) {
-            ImageDownloader.getInstance().download(feed.getActorAttributes().getGravatarId(),
+        Event event = mObjects.get(position);
+        final User actor = event.getActor();
+        
+        if (event != null) {
+            ImageDownloader.getInstance().download(actor.getGravatarId(),
                     viewHolder.ivGravatar);
             viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
 
@@ -93,13 +111,13 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
                     /** Open user activity */
                     Gh4Application context = (Gh4Application) v.getContext()
                             .getApplicationContext();
-                    context.openUserInfoActivity(v.getContext(), feed.getActorAttributes()
-                            .getLogin(), feed.getActorAttributes().getName());
+                    context.openUserInfoActivity(v.getContext(), actor
+                            .getLogin(), actor.getName());
                 }
             });
-            viewHolder.tvTitle.setText(formatTitle(feed));
+            viewHolder.tvTitle.setText(formatTitle(event));
             
-            String content = formatDescription(feed, viewHolder, (RelativeLayout) v);
+            String content = formatDescription(event, viewHolder, (RelativeLayout) v);
             if (content != null) {
                 viewHolder.tvDesc.setVisibility(View.VISIBLE);
                 viewHolder.tvDesc.setText(content);
@@ -113,7 +131,7 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
                 viewHolder.tvDesc.setVisibility(View.GONE);
             }
 
-            viewHolder.tvCreatedAt.setText(pt.format(feed.getCreatedAt()));
+            viewHolder.tvCreatedAt.setText(pt.format(event.getCreatedAt()));
         }
         return v;
     }
@@ -126,9 +144,13 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
      * @param baseView the base view
      * @return the string
      */
-    private String formatDescription(UserFeed feed, ViewHolder viewHolder,
+    private String formatDescription(Event event, ViewHolder viewHolder,
             final RelativeLayout baseView) {
-        Payload payload = feed.getPayload();
+        
+        String eventType = event.getType();
+        EventRepository eventRepo = event.getRepo();
+        User actor = event.getActor();
+        
         Resources res = mContext.getResources();
         LinearLayout ll = (LinearLayout) baseView.findViewById(R.id.ll_push_desc);
         ll.removeAllViews();
@@ -137,16 +159,16 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
         generalDesc.setVisibility(View.VISIBLE);
 
         /** PushEvent */
-        if (UserFeed.Type.PUSH_EVENT.equals(feed.getType())) {
+        if (Event.TYPE_PUSH.equals(eventType)) {
             generalDesc.setVisibility(View.GONE);
             ll.setVisibility(View.VISIBLE);
-            List<String[]> shas = payload.getShas();
-            Repository repository = feed.getRepository();
-            boolean isRepoExists = repository != null;
-            for (int i = 0; i < shas.size(); i++) {
-                String[] sha = shas.get(i);
-                SpannableString spannableSha = new SpannableString(sha[0].substring(0, 7));
-                if (isRepoExists) {
+            PushPayload payload = (PushPayload) event.getPayload();
+            List<Commit> commits = payload.getCommits();
+            
+            for (int i = 0; i < commits.size(); i++) {
+                Commit commit = commits.get(i);
+                SpannableString spannableSha = new SpannableString(commit.getSha().substring(0, 7));
+                if (eventRepo != null) {
                     spannableSha.setSpan(new TextAppearanceSpan(baseView.getContext(),
                             R.style.default_text_medium_url), 0, spannableSha.length(), 0);
                 }
@@ -156,14 +178,14 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
                 
                 TextView tvCommitMsg = new TextView(baseView.getContext());
                 tvCommitMsg.setText(spannableSha);
-                tvCommitMsg.append(" " + sha[2]);
+                tvCommitMsg.append(" " + commit.getMessage());
                 tvCommitMsg.setSingleLine(true);
                 tvCommitMsg.setTextAppearance(baseView.getContext(), R.style.default_text_medium);
                 ll.addView(tvCommitMsg);
 
-                if (i == 2 && shas.size() > 3) {// show limit 3 lines
+                if (i == 2 && commits.size() > 3) {// show limit 3 lines
                     TextView tvMoreMsg = new TextView(baseView.getContext());
-                    String text = res.getString(R.string.event_push_desc, shas.size() - 3);
+                    String text = res.getString(R.string.event_push_desc, commits.size() - 3);
                     tvMoreMsg.setText(text);
                     ll.addView(tvMoreMsg);
                     break;
@@ -173,8 +195,10 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
         }
 
         /** CommitCommentEvent */
-        else if (UserFeed.Type.COMMIT_COMMENT_EVENT.equals(feed.getType())) {
-            SpannableString spannableSha = new SpannableString(payload.getCommit().substring(0, 7));
+        else if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
+            CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
+            SpannableString spannableSha = new SpannableString(payload.getComment()
+                    .getCommitId().substring(0, 7));
             spannableSha.setSpan(new TextAppearanceSpan(baseView.getContext(),
                     R.style.default_text_medium_url), 0, spannableSha.length(), 0);
 
@@ -184,8 +208,9 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
         }
 
         /** PullRequestEvent */
-        else if (UserFeed.Type.PULL_REQUEST_EVENT.equals(feed.getType())) {
-            PayloadPullRequest pullRequest = payload.getPullRequest();
+        else if (Event.TYPE_PULL_REQUEST.equals(eventType)) {
+            PullRequestPayload payload = (PullRequestPayload) event.getPayload();
+            PullRequest pullRequest = payload.getPullRequest();
             
             if (!StringUtils.isBlank(pullRequest.getTitle())) {
                 String text = String.format(res.getString(R.string.event_pull_request_desc),
@@ -199,12 +224,13 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
         }
 
         /** FollowEvent */
-        else if (UserFeed.Type.FOLLOW_EVENT.equals(feed.getType())) {
-            PayloadTarget target = payload.getTarget();
+        else if (Event.TYPE_FOLLOW.equals(eventType)) {
+            FollowPayload payload = (FollowPayload) event.getPayload();
+            User target = payload.getTarget();
             if (target != null) {
                 String text = String.format(res.getString(R.string.event_follow_desc),
                         target.getLogin(),
-                        target.getRepos(),
+                        target.getPublicRepos(),
                         target.getFollowers());
                 return text;
             }
@@ -212,37 +238,38 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
         }
 
         /** WatchEvent */
-        else if (UserFeed.Type.WATCH_EVENT.equals(feed.getType())) {
-            Repository repository = feed.getRepository();
+        else if (Event.TYPE_WATCH.equals(eventType)) {
             StringBuilder sb = new StringBuilder();
-            if (repository != null) {
-                sb.append(StringUtils.doTeaser(repository.getDescription()));
+            if (eventRepo != null) {
+                sb.append(StringUtils.doTeaser(eventRepo.getName()));
             }
             return sb.toString();
         }
 
         /** ForkEvent */
-        else if (UserFeed.Type.FORK_EVENT.equals(feed.getType())) {
+        else if (Event.TYPE_FORK.equals(eventType)) {
+            ForkPayload payload = (ForkPayload) event.getPayload();
             String text = String.format(res.getString(R.string.event_fork_desc),
-                    formatToRepoName(feed));
+                    formatToRepoName(payload.getForkee()));
             return text;
         }
 
         /** CreateEvent */
-        else if (UserFeed.Type.CREATE_EVENT.equals(feed.getType())) {
-            if ("repository".equals(payload.getObject())) {
+        else if (Event.TYPE_CREATE.equals(eventType)) {
+            CreatePayload payload = (CreatePayload) event.getPayload();
+            if ("repository".equals(payload.getRefType())) {
                 String text = String.format(res.getString(R.string.event_create_repo_desc),
-                        feed.getActor(),
-                        feed.getPayload().getName());
+                        actor.getLogin(),
+                        eventRepo.getName());
 
                 return text;
             }
-            else if ("branch".equals(payload.getObject()) || "tag".equals(payload.getObject())) {
+            else if ("branch".equals(payload.getRefType()) || "tag".equals(payload.getRefType())) {
                 String text = String.format(res.getString(R.string.event_create_branch_desc),
-                        payload.getObject(),
-                        feed.getActor(),
-                        feed.getPayload().getName(),
-                        feed.getPayload().getObjectName());
+                        payload.getRefType(),
+                        actor.getLogin(),
+                        eventRepo.getName(),
+                        payload.getRef());
 
                 return text;
             }
@@ -251,31 +278,27 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
         }
 
         /** DownloadEvent */
-        else if (UserFeed.Type.DOWNLOAD_EVENT.equals(feed.getType())) {
-            String filename = payload.getUrl();
-            int index = filename.lastIndexOf("/");
-            if (index != -1) {
-                filename = filename.substring(index + 1, filename.length());
-            }
-            return filename;
+        else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
+            DownloadPayload payload = (DownloadPayload) event.getPayload();
+            return payload.getDownload().getName();
         }
 
         /** GollumEvent */
-        else if (UserFeed.Type.GOLLUM_EVENT.equals(feed.getType())) {
-            String text = String.format(res.getString(R.string.event_gollum_desc),
-                    payload.getTitle());
-            return text;
+        else if (Event.TYPE_GOLLUM.equals(eventType)) {
+            GollumPayload payload = (GollumPayload) event.getPayload();
+            List<GollumPage> pages = payload.getPages();
+            if (pages != null && !pages.isEmpty()) {
+                String text = String.format(res.getString(R.string.event_gollum_desc),
+                        pages.get(0).getPageName());
+                return text;
+            }
+            return "";
         }
 
         /** PublicEvent */
-        else if (UserFeed.Type.PUBLIC_EVENT.equals(feed.getType())) {
-            Repository repository = feed.getRepository();
-            if (repository != null) {
-                return StringUtils.doTeaser(repository.getDescription());
-            }
-            else {
-                return payload.getRepo();
-            }
+        else if (Event.TYPE_PUBLIC.equals(eventType)) {
+            eventRepo.getName();
+            return null;
         }
 
         else {
@@ -290,179 +313,178 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
      * @param feed the feed
      * @return the string
      */
-    private String formatTitle(UserFeed feed) {
-        Payload payload = feed.getPayload();
+    private String formatTitle(Event event) {
+        String eventType = event.getType();
+        EventRepository eventRepo = event.getRepo();
+        User actor = event.getActor();
         Resources res = mContext.getResources();
 
         /** PushEvent */
-        if (UserFeed.Type.PUSH_EVENT.equals(feed.getType())) {
+        if (Event.TYPE_PUSH.equals(eventType)) {
+            PushPayload payload = (PushPayload) event.getPayload();
             String text = String.format(res.getString(R.string.event_push_title),
-                    feed.getActor(),
-                    payload.getRef().split("/")[2],
-                    formatFromRepoName(feed));
+                    actor.getLogin(),
+                    payload.getRef(),
+                    formatFromRepoName(eventRepo));
             return text;
         }
 
         /** IssuesEvent */
-        else if (UserFeed.Type.ISSUES_EVENT.equals(feed.getType())) {
+        else if (Event.TYPE_ISSUES.equals(eventType)) {
+            IssuesPayload payload = (IssuesPayload) event.getPayload();
             String text = String.format(res.getString(R.string.event_issues_title),
-                    feed.getActor(),
+                    actor.getLogin(),
                     payload.getAction(),
-                    payload.getNumber(),
-                    formatFromRepoName(feed)); 
+                    payload.getIssue().getNumber(),
+                    formatFromRepoName(eventRepo)); 
             return text;
         }
 
         /** CommitCommentEvent */
-        else if (UserFeed.Type.COMMIT_COMMENT_EVENT.equals(feed.getType())) {
+        else if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
             String text = String.format(res.getString(R.string.event_commit_comment_title),
-                    feed.getActor(),
-                    formatFromRepoName(feed));
+                    actor.getLogin(),
+                    formatFromRepoName(eventRepo));
             return text;
         }
 
         /** PullRequestEvent */
-        else if (UserFeed.Type.PULL_REQUEST_EVENT.equals(feed.getType())) {
+        else if (Event.TYPE_PULL_REQUEST.equals(eventType)) {
+            PullRequestPayload payload = (PullRequestPayload) event.getPayload();
             int pullRequestNumber = payload.getNumber();
-            if (payload.getPullRequest() instanceof ObjectPayloadPullRequest) {
-                pullRequestNumber = ((ObjectPayloadPullRequest) payload.getPullRequest()).getNumber();
-            }
             String text = String.format(res.getString(R.string.event_pull_request_title),
-                    feed.getActor(),
-                    "closed".equals(payload.getAction()) ? "merged" : payload.getAction(),
+                    actor.getLogin(),
+                    payload.getAction(),
                     pullRequestNumber,
-                    formatFromRepoName(feed));
+                    formatFromRepoName(eventRepo));
             return text;
         }
 
         /** WatchEvent */
-        else if (UserFeed.Type.WATCH_EVENT.equals(feed.getType())) {
+        else if (Event.TYPE_WATCH.equals(eventType)) {
+            WatchPayload payload = (WatchPayload) event.getPayload();
             String text = String.format(res.getString(R.string.event_watch_title),
-                    feed.getActor(), payload.getAction(),
-                    formatFromRepoName(feed));
+                    actor.getLogin(), payload.getAction(),
+                    formatFromRepoName(eventRepo));
             return text;
         }
 
         /** GistEvent */
-        else if (UserFeed.Type.GIST_EVENT.equals(feed.getType())) {
+        else if (Event.TYPE_GIST.equals(eventType)) {
+            GistPayload payload = (GistPayload) event.getPayload();
             String text = String.format(res.getString(R.string.event_gist_title),
-                    feed.getActor(),
-                    payload.getAction(), payload.getName());
+                    actor.getLogin(),
+                    payload.getAction(), payload.getGist().getId());
             return text;
         }
 
         /** ForkEvent */
-        else if (UserFeed.Type.FORK_EVENT.equals(feed.getType())) {
+        else if (Event.TYPE_FORK.equals(event.getType())) {
             String text = String.format(res.getString(R.string.event_fork_title), 
-                    feed.getActor(),
-                    formatFromRepoName(feed));
+                    actor.getLogin(),
+                    formatFromRepoName(eventRepo));
             return text;
         }
 
         /** ForkApplyEvent */
-        else if (UserFeed.Type.FORK_APPLY_EVENT.equals(feed.getType())) {
+        else if (Event.TYPE_FORK_APPLY.equals(eventType)) {
             String text = String.format(res.getString(R.string.event_fork_apply_title),
-                    feed.getActor(),
-                    formatFromRepoName(feed));
+                    actor.getLogin(),
+                    formatFromRepoName(eventRepo));
             return text;
         }
 
         /** FollowEvent */
-        else if (UserFeed.Type.FOLLOW_EVENT.equals(feed.getType())) {
+        else if (Event.TYPE_FOLLOW.equals(eventType)) {
+            FollowPayload payload = (FollowPayload) event.getPayload();
             String text = String.format(res.getString(R.string.event_follow_title),
-                    feed.getActor(),
-                    payload.getTarget() != null ? payload.getTarget().getLogin() : payload
-                            .getTargetId());
+                    actor.getLogin(),
+                    payload.getTarget());
             return text;
         }
 
         /** CreateEvent */
-        else if (UserFeed.Type.CREATE_EVENT.equals(feed.getType())) {
+        else if (Event.TYPE_CREATE.equals(eventType)) {
+            CreatePayload payload = (CreatePayload) event.getPayload();
             if ("repository".equals(payload.getRefType())) {
                 String text = String.format(res.getString(R.string.event_create_repo_title),
-                        feed.getActor(), formatFromRepoName(feed));
+                        actor.getLogin(), formatFromRepoName(eventRepo));
                 return text;
             }
             else if ("branch".equals(payload.getRefType()) || "tag".equals(payload.getRefType())) {
                 String text = String.format(res.getString(R.string.event_create_branch_title),
-                        feed.getActor(), payload.getRefType(), payload.getRef(),
-                        formatFromRepoName(feed));
+                        actor.getLogin(), payload.getRefType(), payload.getRef(),
+                        formatFromRepoName(eventRepo));
                 return text;
             }
             else {
-                return feed.getActor();
+                return actor.getLogin();
             }
         }
 
         /** DeleteEvent */
-        else if (UserFeed.Type.DELETE_EVENT.equals(feed.getType())) {
-            if ("repository".equals(payload.getObject())) {
+        else if (Event.TYPE_DELETE.equals(eventType)) {
+            DeletePayload payload = (DeletePayload) event.getPayload();
+            if ("repository".equals(payload.getRefType())) {
                 String text = String.format(res.getString(R.string.event_delete_repo_title),
-                        feed.getActor(), payload.getName());
+                        actor.getLogin(), payload.getRef());
                 return text;
             }
             else {
                 String text = String.format(res.getString(R.string.event_delete_branch_title),
-                        feed.getActor(), payload.getRefType(), payload.getRef(),
-                        formatFromRepoName(feed));
+                        actor.getLogin(), payload.getRefType(), payload.getRef(),
+                        formatFromRepoName(eventRepo));
                 return text;
             }
         }
 
         /** WikiEvent */
-        else if (UserFeed.Type.WIKI_EVENT.equals(feed.getType())) {
-            String text = String.format(res.getString(R.string.event_wiki_title), 
-                    feed.getActor(),
-                    payload.getAction(),
-                    formatFromRepoName(feed));
-            return text;
-        }
+//        else if (Event.TYPE_.WIKI_EVENT.equals(feed.getType())) {
+//            String text = String.format(res.getString(R.string.event_wiki_title), 
+//                    feed.getActor(),
+//                    payload.getAction(),
+//                    formatFromRepoName(feed));
+//            return text;
+//        }
 
         /** MemberEvent */
-        else if (UserFeed.Type.MEMBER_EVENT.equals(feed.getType())) {
+        else if (Event.TYPE_MEMBER.equals(eventType)) {
+            MemberPayload payload = (MemberPayload) event.getPayload();
             String text = String.format(res.getString(R.string.event_member_title),
-                    feed.getActor(), payload.getMember().getLogin(),
-                    formatFromRepoName(feed));
+                    actor.getLogin(), payload.getMember().getLogin(),
+                    formatFromRepoName(eventRepo));
             return text;
         }
 
         /** DownloadEvent */
-        else if (UserFeed.Type.DOWNLOAD_EVENT.equals(feed.getType())) {
+        else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
             String text = String.format(res.getString(R.string.event_download_title),
-                    feed.getActor(),
-                    formatFromRepoName(feed));
+                    actor.getLogin(),
+                    formatFromRepoName(eventRepo));
             return text;
         }
 
         /** GollumEvent */
-        else if (UserFeed.Type.GOLLUM_EVENT.equals(feed.getType())) {
+        else if (Event.TYPE_GOLLUM.equals(eventType)) {
+            GollumPayload payload = (GollumPayload) event.getPayload();
             String text = String.format(res.getString(R.string.event_gollum_title),
-                    feed.getActor(), payload.getAction(), payload.getTitle(),
-                    formatFromRepoName(feed));
+                    actor.getLogin(), "edited", "page",
+                    formatFromRepoName(eventRepo));
             return text;
         }
 
         /** PublicEvent */
-        else if (UserFeed.Type.PUBLIC_EVENT.equals(feed.getType())) {
+        else if (Event.TYPE_PUBLIC.equals(eventType)) {
             String text = String.format(res.getString(R.string.event_public_title),
-                    feed.getActor(), formatFromRepoName(feed));
+                    actor.getLogin(), formatFromRepoName(eventRepo));
             return text;
         }
         
         /** IssueCommentEvent */
-        else if (UserFeed.Type.ISSUE_COMMENT_EVENT.equals(feed.getType())) {
-            String url = feed.getUrl();
-            int idx1 = url.indexOf("/issues/");
-            int idx2 = url.indexOf("#issuecomment");
-            if (idx2 == -1) {//sometime it return comment only
-                idx2 = url.indexOf("#comment");
-            }
-            String issueId = "";
-            if (idx2 != -1) {
-                issueId = url.substring(idx1 + 8, idx2);
-            }
+        else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
+            IssueCommentPayload payload = (IssueCommentPayload) event.getPayload();
             String text = String.format(res.getString(R.string.event_issue_comment),
-                    feed.getActor(), issueId, formatFromRepoName(feed));
+                    actor.getLogin(), payload.getIssue().getNumber(), formatFromRepoName(eventRepo));
             return text;
         }
 
@@ -498,24 +520,16 @@ public class FeedAdapter extends RootAdapter<UserFeed> {
         }
     }
     
-    private static String formatFromRepoName(UserFeed userFeed) {
-        Repository repository = userFeed.getRepository();
+    private static String formatFromRepoName(EventRepository repository) {
         if (repository != null) {
-            return repository.getOwner() + "/" + repository.getName();
+            return repository.getName();
         }
         return "(deleted)";
     }
 
-    private static String formatToRepoName(UserFeed userFeed) {
-        String url = userFeed.getUrl();
-        if (!StringUtils.isBlank(url)) {
-            String[] urlParts = url.split("/");
-            if (urlParts.length > 3) {
-                return urlParts[3] + "/" + urlParts[4];
-            }
-            else {
-                return "(deleted)";
-            }
+    private static String formatToRepoName(Repository repository) {
+        if (repository != null) {
+            return repository.getName();
         }
         return "(deleted)";
     }

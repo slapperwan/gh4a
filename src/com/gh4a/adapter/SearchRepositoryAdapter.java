@@ -18,6 +18,7 @@ package com.gh4a.adapter;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.SearchRepository;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -31,7 +32,7 @@ import com.gh4a.utils.StringUtils;
 /**
  * The Repository adapter.
  */
-public class RepositoryAdapter extends RootAdapter<Repository> {
+public class SearchRepositoryAdapter extends RootAdapter<SearchRepository> {
 
     /** The row layout. */
     protected int mRowLayout;
@@ -42,7 +43,7 @@ public class RepositoryAdapter extends RootAdapter<Repository> {
      * @param context the context
      * @param objects the objects
      */
-    public RepositoryAdapter(Context context, List<Repository> objects) {
+    public SearchRepositoryAdapter(Context context, List<SearchRepository> objects) {
         super(context, objects);
     }
 
@@ -53,7 +54,7 @@ public class RepositoryAdapter extends RootAdapter<Repository> {
      * @param objects the objects
      * @param rowLayout the row layout
      */
-    public RepositoryAdapter(Context context, List<Repository> objects, int rowLayout) {
+    public SearchRepositoryAdapter(Context context, List<SearchRepository> objects, int rowLayout) {
         super(context, objects);
         mRowLayout = rowLayout;
     }
@@ -82,11 +83,11 @@ public class RepositoryAdapter extends RootAdapter<Repository> {
             viewHolder = (ViewHolder) v.getTag();
         }
 
-        Repository repository = mObjects.get(position);
+        SearchRepository repository = mObjects.get(position);
         if (repository != null) {
 
             if (viewHolder.tvTitle != null) {
-                viewHolder.tvTitle.setText(repository.getOwner().getLogin() + " / " + repository.getName());
+                viewHolder.tvTitle.setText(repository.getOwner() + " / " + repository.getName());
             }
 
             if (viewHolder.tvDesc != null) {

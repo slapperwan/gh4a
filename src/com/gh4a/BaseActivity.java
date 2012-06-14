@@ -17,6 +17,9 @@ package com.gh4a;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+import java.util.Locale;
+
+import org.ocpsoft.pretty.time.PrettyTime;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -31,6 +34,7 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -44,9 +48,8 @@ import android.widget.Toast;
 
 import com.gh4a.holder.BreadCrumbHolder;
 import com.markupartist.android.widget.ActionBar;
-import com.markupartist.android.widget.ScrollingTextView;
 import com.markupartist.android.widget.ActionBar.IntentAction;
-import com.ocpsoft.pretty.time.PrettyTime;
+import com.markupartist.android.widget.ScrollingTextView;
 
 /**
  * The Base activity.
@@ -54,7 +57,7 @@ import com.ocpsoft.pretty.time.PrettyTime;
 public class BaseActivity extends Activity {
 
     /** The Constant pt. */
-    protected static final PrettyTime pt = new PrettyTime();
+    protected static final PrettyTime pt = new PrettyTime(new Locale(""));
 
     /* (non-Javadoc)
      * @see android.content.ContextWrapper#getApplicationContext()
@@ -98,7 +101,7 @@ public class BaseActivity extends Activity {
 //            MenuInflater inflater = getMenuInflater();
 //            inflater.inflate(R.menu.authenticated_menu, menu);
 //        }
-        if (!isAuthenticated()) {
+        if (!isAuthorized()) {
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.anon_menu, menu);
         }
@@ -122,7 +125,7 @@ public class BaseActivity extends Activity {
             
             if (sharedPreferences != null) {
                 if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
-                        && sharedPreferences.getString(Constants.User.USER_PASSWORD, null) != null){
+                        && sharedPreferences.getString(Constants.User.USER_AUTH_TOKEN, null) != null){
                     Editor editor = sharedPreferences.edit();
                     editor.clear();
                     editor.commit();
@@ -191,7 +194,7 @@ public class BaseActivity extends Activity {
             
             @Override
             public void onClick(View arg0) {
-                if (isAuthenticated()) {
+                if (isAuthorized()) {
                     Intent intent = new Intent().setClass(BaseActivity.this, IssueCreateActivity.class);
                     intent.putExtra(Constants.Repository.REPO_OWNER, getResources().getString(R.string.my_username));
                     intent.putExtra(Constants.Repository.REPO_NAME, getResources().getString(R.string.my_repo));
@@ -229,7 +232,7 @@ public class BaseActivity extends Activity {
             
             @Override
             public void onClick(View arg0) {
-                if (isAuthenticated()) {
+                if (isAuthorized()) {
                     Intent intent = new Intent().setClass(BaseActivity.this, IssueCreateActivity.class);
                     intent.putExtra(Constants.Repository.REPO_OWNER, getResources().getString(R.string.my_username));
                     intent.putExtra(Constants.Repository.REPO_NAME, getResources().getString(R.string.my_repo));
@@ -302,9 +305,9 @@ public class BaseActivity extends Activity {
      */
     public void setUpActionBar() {
         ActionBar actionBar = (ActionBar) findViewById(R.id.actionbar);
-        if (isAuthenticated()) {
+        if (isAuthorized()) {
             Intent intent = new Intent().setClass(getApplicationContext(), UserActivity.class);
-            intent.putExtra(Constants.User.USER_LOGIN, getAuthUsername());
+            intent.putExtra(Constants.User.USER_LOGIN, getAuthLogin());
             actionBar.setHomeAction(new IntentAction(this, intent, R.drawable.ic_home));
         }
         actionBar.addAction(new IntentAction(this, new Intent(getApplication(),
@@ -318,13 +321,31 @@ public class BaseActivity extends Activity {
      *
      * @return true, if is authenticated
      */
-    public boolean isAuthenticated() {
+//    public boolean isAuthenticated() {
+//        SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
+//                Constants.PREF_NAME, MODE_PRIVATE);
+//        
+//        if (sharedPreferences != null) {
+//            if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
+//                    && sharedPreferences.getString(Constants.User.USER_PASSWORD, null) != null){
+//                return true;
+//            }
+//            else {
+//                return false;
+//            }
+//        }
+//        else {
+//            return false;
+//        }
+//    }
+    
+    public boolean isAuthorized() {
         SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
                 Constants.PREF_NAME, MODE_PRIVATE);
         
         if (sharedPreferences != null) {
             if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
-                    && sharedPreferences.getString(Constants.User.USER_PASSWORD, null) != null){
+                    && sharedPreferences.getString(Constants.User.USER_AUTH_TOKEN, null) != null){
                 return true;
             }
             else {
@@ -341,13 +362,29 @@ public class BaseActivity extends Activity {
      *
      * @return the auth username
      */
-    public String getAuthUsername() {
+//    public String getAuthUsername() {
+//        SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
+//                Constants.PREF_NAME, MODE_PRIVATE);
+//        
+//        if (sharedPreferences != null) {
+//            if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
+//                    && sharedPreferences.getString(Constants.User.USER_PASSWORD, null) != null){
+//                return sharedPreferences.getString(Constants.User.USER_LOGIN, null);
+//            }
+//            else {
+//                return null;
+//            }
+//        }
+//        else {
+//            return null;
+//        }
+//    }
+    
+    public String getAuthLogin() {
         SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
                 Constants.PREF_NAME, MODE_PRIVATE);
-        
         if (sharedPreferences != null) {
-            if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
-                    && sharedPreferences.getString(Constants.User.USER_PASSWORD, null) != null){
+            if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null){
                 return sharedPreferences.getString(Constants.User.USER_LOGIN, null);
             }
             else {
@@ -364,23 +401,23 @@ public class BaseActivity extends Activity {
      *
      * @return the auth password
      */
-    public String getAuthPassword() {
-        SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
-                Constants.PREF_NAME, MODE_PRIVATE);
-        
-        if (sharedPreferences != null) {
-            if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
-                    && sharedPreferences.getString(Constants.User.USER_PASSWORD, null) != null){
-                return sharedPreferences.getString(Constants.User.USER_PASSWORD, null);
-            }
-            else {
-                return null;
-            }
-        }
-        else {
-            return null;
-        }
-    }
+//    public String getAuthPassword() {
+//        SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
+//                Constants.PREF_NAME, MODE_PRIVATE);
+//        
+//        if (sharedPreferences != null) {
+//            if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
+//                    && sharedPreferences.getString(Constants.User.USER_PASSWORD, null) != null){
+//                return sharedPreferences.getString(Constants.User.USER_PASSWORD, null);
+//            }
+//            else {
+//                return null;
+//            }
+//        }
+//        else {
+//            return null;
+//        }
+//    }
     
     /**
      * The Class OnClickBreadCrumb.
@@ -552,5 +589,12 @@ public class BaseActivity extends Activity {
     public String getSettingStringValue(String key) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         return sp.getString(key, null);
+    }
+    
+    public String getAuthToken() {
+        SharedPreferences sharedPreferences = getSharedPreferences(
+                Constants.PREF_NAME, Context.MODE_PRIVATE);
+        String token = sharedPreferences.getString(Constants.User.USER_AUTH_TOKEN, null);
+        return token;
     }
 }

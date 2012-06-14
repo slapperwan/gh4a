@@ -15,18 +15,19 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+
+import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.WatcherService;
 
 import android.os.Bundle;
 import android.widget.AbsListView;
 
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.StringUtils;
-import com.github.api.v2.schema.Repository;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.UserService;
 
 /**
  * The WatchedRepoList activity.
@@ -55,10 +56,11 @@ public class WatchedRepoListActivity extends RepositoryListActivity {
      * @see com.gh4a.RepositoryListActivity#getRepositories()
      */
     @Override
-    protected List<Repository> getRepositories() throws GitHubException {
-        GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-        UserService userService = factory.createUserService();
-        return userService.getWatchedRepositories(mUserLogin);
+    protected List<Repository> getRepositories() throws IOException {
+        GitHubClient client = new GitHubClient();
+        client.setOAuth2Token(getAuthToken());
+        WatcherService watcherService = new WatcherService(client);
+        return watcherService.getWatched(mUserLogin);
     }
 
     /*

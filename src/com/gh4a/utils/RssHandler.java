@@ -8,7 +8,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.gh4a.holder.YourActionFeed;
-import com.github.api.v2.schema.UserFeed;
 
 public class RssHandler extends DefaultHandler {
 
@@ -118,38 +117,38 @@ public class RssHandler extends DefaultHandler {
                 .replaceAll("&#47;", "/")
                 .replaceAll("&raquo;", "");
         
-        if (UserFeed.Type.FOLLOW_EVENT.value().equals(event)) {
-            content = content.replaceAll("\n", " ");
-        }
-        if (UserFeed.Type.PULL_REQUEST_EVENT.value().equals(event)) {
-            content = content.replaceAll("\n", " ");
-        }
-        else if (UserFeed.Type.PUSH_EVENT.value().equals(event)) {
-            StringBuilder sb = new StringBuilder();
-            
-            String[] commitDesc = content.split("\n");
-            for (String str : commitDesc) {
-                String[] committedWord = str.split(" ");
-                if (committedWord.length > 1) {
-                    if (committedWord[1].equals("committed")) {
-                        sb.append(committedWord[2]).append(" ");
-                    }
-                    else {
-                        sb.append(str).append("\n");
-                    }
-                }
-                else {
-                    sb.append(str).append("\n");
-                }
-            }
-            content = sb.toString();
-        }
-        else if (UserFeed.Type.WATCH_EVENT.value().equals(event)) {
-            int index = content.indexOf("\n");
-            if (index != -1) {
-                content = content.replaceAll(content.substring(0, index + 1), "");
-            }
-        }
+//        if (UserFeed.Type.FOLLOW_EVENT.value().equals(event)) {
+//            content = content.replaceAll("\n", " ");
+//        }
+//        if (UserFeed.Type.PULL_REQUEST_EVENT.value().equals(event)) {
+//            content = content.replaceAll("\n", " ");
+//        }
+//        else if (UserFeed.Type.PUSH_EVENT.value().equals(event)) {
+//            StringBuilder sb = new StringBuilder();
+//            
+//            String[] commitDesc = content.split("\n");
+//            for (String str : commitDesc) {
+//                String[] committedWord = str.split(" ");
+//                if (committedWord.length > 1) {
+//                    if (committedWord[1].equals("committed")) {
+//                        sb.append(committedWord[2]).append(" ");
+//                    }
+//                    else {
+//                        sb.append(str).append("\n");
+//                    }
+//                }
+//                else {
+//                    sb.append(str).append("\n");
+//                }
+//            }
+//            content = sb.toString();
+//        }
+//        else if (UserFeed.Type.WATCH_EVENT.value().equals(event)) {
+//            int index = content.indexOf("\n");
+//            if (index != -1) {
+//                content = content.replaceAll(content.substring(0, index + 1), "");
+//            }
+//        }
         return content;
     }
     public List<YourActionFeed> getFeeds() {

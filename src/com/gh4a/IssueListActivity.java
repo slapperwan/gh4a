@@ -15,10 +15,16 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.IssueService;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -29,22 +35,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
 
 import com.gh4a.adapter.IssueAdapter;
 import com.gh4a.db.Bookmark;
 import com.gh4a.db.BookmarkParam;
 import com.gh4a.db.DbHelper;
 import com.gh4a.holder.BreadCrumbHolder;
-import com.github.api.v2.schema.Issue;
-import com.github.api.v2.schema.Issue.State;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.IssueService;
-import com.github.api.v2.services.auth.Authentication;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 import com.markupartist.android.widget.ActionBar;
 import com.markupartist.android.widget.ActionBar.IntentAction;
 
@@ -108,9 +107,9 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
     @Override
     public void setUpActionBar() {
         ActionBar actionBar = (ActionBar) findViewById(R.id.actionbar);
-        if (isAuthenticated()) {
+        if (isAuthorized()) {
             Intent intent = new Intent().setClass(getApplicationContext(), UserActivity.class);
-            intent.putExtra(Constants.User.USER_LOGIN, getAuthUsername());
+            intent.putExtra(Constants.User.USER_LOGIN, getAuthLogin());
             actionBar.setHomeAction(new IntentAction(this, intent, R.drawable.ic_home));
         }
         actionBar.addAction(new IntentAction(this, new Intent(getApplicationContext(),
@@ -142,15 +141,15 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
         b.setData(data);
         breadCrumbHolders[1] = b;
 
-        createBreadcrumb(State.valueOf(mState).value() + " Issues", breadCrumbHolders);
+        createBreadcrumb(mState + " Issues", breadCrumbHolders);
     }
 
     public String getSubTitleAfterLoaded(int numberOfIssues) {
         if (numberOfIssues != -1) {
-            return State.valueOf(mState).value() + " Issues (" + numberOfIssues + ")";
+            return mState + " Issues (" + numberOfIssues + ")";
         }
         else {
-            return State.valueOf(mState).value() + " Issues";
+            return mState + " Issues";
         }
     }
     
@@ -158,13 +157,13 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
         mRowLayout = R.layout.row_issue;
     }
     
-    public List<Issue> getIssues() throws GitHubException {
-        GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-        IssueService service = factory.createIssueService();
-        Authentication auth = new LoginPasswordAuthentication(getAuthUsername(), getAuthPassword());
-        service.setAuthentication(auth);
-        return service.getIssues(mUserLogin, mRepoName, State
-                .valueOf(mState));
+    public List<Issue> getIssues() throws IOException {
+        GitHubClient client = new GitHubClient();
+        client.setOAuth2Token(getAuthToken());
+        IssueService issueService = new IssueService(client);
+        Map<String, String> filterData = new HashMap<String, String>();
+        filterData.put("state", mState);
+        return issueService.getIssues(mUserLogin, mRepoName, filterData);
     }
     
     /**
@@ -200,7 +199,7 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
                 try {
                     return mTarget.get().getIssues();
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -308,7 +307,7 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
                 getApplicationContext().openIssueListActivity(this, mUserLogin, mRepoName, Constants.Issue.ISSUE_STATE_CLOSED);
                 return true;
             case R.id.create_issue:
-                if (isAuthenticated()) {
+                if (isAuthorized()) {
                     Intent intent = new Intent().setClass(IssueListActivity.this, IssueCreateActivity.class);
                     intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
                     intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);

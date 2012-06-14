@@ -51,7 +51,7 @@ public class DashboardActivity extends BaseActivity {
                 Constants.PREF_NAME, MODE_PRIVATE);
         if (sharedPreferences != null) {
             mUserLogin = sharedPreferences.getString(Constants.User.USER_LOGIN, null);
-            mPassword = sharedPreferences.getString(Constants.User.USER_PASSWORD, null);
+            mPassword = sharedPreferences.getString(Constants.User.USER_AUTH_TOKEN, null);
         }
         else {
             Intent intent = new Intent().setClass(getApplicationContext(),
@@ -100,7 +100,7 @@ public class DashboardActivity extends BaseActivity {
             Intent intent = new Intent()
                     .setClass(DashboardActivity.this, UserPrivateActivity.class);
             intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
-            intent.putExtra(Constants.User.USER_PASSWORD, mPassword);
+            intent.putExtra(Constants.User.USER_AUTH_TOKEN, mPassword);
             intent.putExtra(Constants.ACTIONBAR_TITLE, mUserLogin);
             intent.putExtra(Constants.SUBTITLE, "News Feed");
             startActivityForResult(intent, 1);

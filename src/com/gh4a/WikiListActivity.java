@@ -39,17 +39,16 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.AbsListView.OnScrollListener;
-import android.widget.AdapterView.OnItemClickListener;
 
 import com.gh4a.adapter.CommonFeedAdapter;
 import com.gh4a.feeds.FeedHandler;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.holder.Feed;
-import com.github.api.v2.services.constant.ApplicationConstants;
 
 public class WikiListActivity extends BaseActivity {
     
@@ -161,13 +160,13 @@ public class WikiListActivity extends BaseActivity {
                     request.setRequestMethod("GET");
                     request.setDoOutput(true);
                     
-                    if (ApplicationConstants.CONNECT_TIMEOUT > -1) {
-                        request.setConnectTimeout(ApplicationConstants.CONNECT_TIMEOUT);
-                    }
-
-                    if (ApplicationConstants.READ_TIMEOUT > -1) {
-                        request.setReadTimeout(ApplicationConstants.READ_TIMEOUT);
-                    }
+//                    if (ApplicationConstants.CONNECT_TIMEOUT > -1) {
+//                        request.setConnectTimeout(ApplicationConstants.CONNECT_TIMEOUT);
+//                    }
+//
+//                    if (ApplicationConstants.READ_TIMEOUT > -1) {
+//                        request.setReadTimeout(ApplicationConstants.READ_TIMEOUT);
+//                    }
                     request.connect();
                     bis = new BufferedInputStream(request.getInputStream());
                     

@@ -15,12 +15,13 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.util.List;
 
-import com.github.api.v2.schema.UserFeed;
-import com.github.api.v2.services.FeedService;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.PageIterator;
+import org.eclipse.egit.github.core.event.Event;
+import org.eclipse.egit.github.core.service.EventService;
 
 /**
  * The UserPublic activity.
@@ -32,10 +33,12 @@ public class UserPublicActivity extends UserFeedActivity {
      * @see com.gh4a.UserActivity#getFeeds()
      */
     @Override
-    public List<UserFeed> getFeeds() throws GitHubException {
-        GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-        FeedService feedService = factory.createFeedService();
-        return feedService.getPublicUserFeedJson(mUserLogin);
+    public List<Event> getFeeds() throws IOException {
+        GitHubClient client = new GitHubClient();
+        client.setOAuth2Token(getAuthToken());
+        EventService eventService = new EventService(client);
+        PageIterator<Event> pageEvents = eventService.pageUserEvents(mUserLogin, false);
+        return (List) pageEvents.next();
     }
 
 }

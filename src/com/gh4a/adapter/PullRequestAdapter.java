@@ -17,12 +17,14 @@ package com.gh4a.adapter;
 
 import java.util.List;
 
+import org.eclipse.egit.github.core.PullRequest;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -30,7 +32,6 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.ImageDownloader;
-import com.github.api.v2.schema.PullRequest;
 
 /**
  * The PullRequest adapter.
@@ -72,7 +73,7 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> {
 
         final PullRequest pullRequest = mObjects.get(position);
         if (pullRequest != null) {
-            ImageDownloader.getInstance().download(pullRequest.getGravatarId(),
+            ImageDownloader.getInstance().download(pullRequest.getUser().getGravatarId(),
                     viewHolder.ivGravatar);
             viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
 
@@ -81,35 +82,35 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> {
                     /** Open user activity */
                     Gh4Application context = (Gh4Application) v.getContext()
                             .getApplicationContext();
-                    context.openUserInfoActivity(v.getContext(), pullRequest.getIssueUser()
+                    context.openUserInfoActivity(v.getContext(), pullRequest.getUser()
                             .getLogin(), null);
                 }
             });
 
             //show labels
             viewHolder.llLabels.removeAllViews();
-            List<String> labels = pullRequest.getLabels();
-            if (labels != null && !labels.isEmpty()) {
-                for (String label : labels) {
-                    TextView tvLabel = new TextView(v.getContext());
-                    tvLabel.setSingleLine(true);
-                    tvLabel.setText(label);
-                    tvLabel.setTextAppearance(v.getContext(), R.style.default_text_small);
-                    tvLabel.setBackgroundResource(R.drawable.default_grey_box);
-                    
-                    viewHolder.llLabels.addView(tvLabel);
-                }
-                viewHolder.llLabels.setVisibility(View.VISIBLE);
-            }
-            else {
-                viewHolder.llLabels.setVisibility(View.GONE);
-            }
+//            List<String> labels = pullRequest.getLabels();
+//            if (labels != null && !labels.isEmpty()) {
+//                for (String label : labels) {
+//                    TextView tvLabel = new TextView(v.getContext());
+//                    tvLabel.setSingleLine(true);
+//                    tvLabel.setText(label);
+//                    tvLabel.setTextAppearance(v.getContext(), R.style.default_text_small);
+//                    tvLabel.setBackgroundResource(R.drawable.default_grey_box);
+//                    
+//                    viewHolder.llLabels.addView(tvLabel);
+//                }
+//                viewHolder.llLabels.setVisibility(View.VISIBLE);
+//            }
+//            else {
+//                viewHolder.llLabels.setVisibility(View.GONE);
+//            }
             
             viewHolder.tvDesc.setText("#" + pullRequest.getNumber() + " - " + pullRequest.getTitle());
             //viewHolder.tvDesc.setText(StringUtils.doTeaser(pullRequest.getBody()));
             Resources res = v.getResources();
             String extraData = String.format(res.getString(R.string.more_data_3), pullRequest
-                    .getIssueUser().getLogin(), pt.format(pullRequest.getIssueCreatedAt()),
+                    .getUser().getLogin(), pt.format(pullRequest.getCreatedAt()),
                     pullRequest.getComments()
                             + " "
                             + res.getQuantityString(R.plurals.issue_comment, pullRequest

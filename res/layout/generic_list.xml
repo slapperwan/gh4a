@@ -29,10 +29,4 @@
     <include
         layout="@layout/loading"
         android:id="@+id/loading" />
-    <com.google.ads.AdView android:id="@+id/adView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        ads:adUnitId="a14e3ace43e093f"
-        ads:adSize="BANNER"
-         />
 </LinearLayout>

@@ -16,9 +16,11 @@
 package com.gh4a;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.GistService;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -36,11 +38,6 @@ import android.widget.TextView;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
-import com.github.api.v2.services.GistService;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.auth.Authentication;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The GistViewer activity.
@@ -169,22 +166,12 @@ public class GistViewerActivity extends BaseActivity {
         protected String doInBackground(String... params) {
             if (mTarget.get() != null) {
                 try {
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    GistService service = factory.createGistService();
-                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                            mTarget.get().getAuthPassword());
-                    service.setAuthentication(auth);
-                    InputStream is = service.getGistContent(params[0], StringUtils.encodeUrl(params[1]));
-                    try {
-                        return StringUtils.convertStreamToString(is);
-                    }
-                    catch (IOException e) {
-                        Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                        mException = true;
-                        return null;
-                    }
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    GistService gistService = new GistService(client);
+                    return gistService.getGist(params[0]).getFiles().get(params[1]).getContent();
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;

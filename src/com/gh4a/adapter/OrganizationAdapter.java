@@ -2,6 +2,8 @@ package com.gh4a.adapter;
 
 import java.util.List;
 
+import org.eclipse.egit.github.core.User;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,11 +11,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.gh4a.R;
-import com.github.api.v2.schema.Organization;
 
-public class OrganizationAdapter extends RootAdapter<Organization>{
+public class OrganizationAdapter extends RootAdapter<User>{
 
-    public OrganizationAdapter(Context context, List<Organization> objects) {
+    public OrganizationAdapter(Context context, List<User> objects) {
         super(context, objects);
     }
     
@@ -24,7 +25,7 @@ public class OrganizationAdapter extends RootAdapter<Organization>{
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
             v = vi.inflate(R.layout.row_simple, null);
         }
-        Organization organization = mObjects.get(position);
+        User organization = mObjects.get(position);
         if (organization != null) {
             TextView tvFormattedName = (TextView) v.findViewById(R.id.tv_title);
             tvFormattedName.setText(organization.getLogin());

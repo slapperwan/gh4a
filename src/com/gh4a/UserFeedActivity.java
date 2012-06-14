@@ -15,33 +15,45 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import org.eclipse.egit.github.core.Commit;
+import org.eclipse.egit.github.core.GollumPage;
+import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.event.CommitCommentPayload;
+import org.eclipse.egit.github.core.event.DownloadPayload;
+import org.eclipse.egit.github.core.event.Event;
+import org.eclipse.egit.github.core.event.EventRepository;
+import org.eclipse.egit.github.core.event.FollowPayload;
+import org.eclipse.egit.github.core.event.ForkApplyPayload;
+import org.eclipse.egit.github.core.event.ForkPayload;
+import org.eclipse.egit.github.core.event.GistPayload;
+import org.eclipse.egit.github.core.event.GollumPayload;
+import org.eclipse.egit.github.core.event.IssueCommentPayload;
+import org.eclipse.egit.github.core.event.IssuesPayload;
+import org.eclipse.egit.github.core.event.MemberPayload;
+import org.eclipse.egit.github.core.event.PullRequestPayload;
+import org.eclipse.egit.github.core.event.PushPayload;
 
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
 
 import com.gh4a.adapter.FeedAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.StringUtils;
-import com.github.api.v2.schema.ObjectPayloadPullRequest;
-import com.github.api.v2.schema.Payload;
-import com.github.api.v2.schema.Repository;
-import com.github.api.v2.schema.UserFeed;
-import com.github.api.v2.services.GitHubException;
-import com.google.ads.AdRequest;
-import com.google.ads.AdView;
 
 /**
  * The User activity.
@@ -77,12 +89,6 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
 
         setContentView(R.layout.generic_list);
         setUpActionBar();
-        AdView adView = (AdView)this.findViewById(R.id.adView);
-        AdRequest request = new AdRequest();
-//        request.addTestDevice(AdRequest.TEST_EMULATOR);
-//        request.addTestDevice("DA870570FFC173C3F71D204CA2F77E67");
-        adView.loadAd(request);
-
         
         Bundle data = getIntent().getExtras();
         mUserLogin = data.getString(Constants.User.USER_LOGIN);
@@ -91,7 +97,7 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
 
         setBreadCrumb();
 
-        mFeedAdapter = new FeedAdapter(this, new ArrayList<UserFeed>());
+        mFeedAdapter = new FeedAdapter(this, new ArrayList<Event>());
         mListViewFeeds = (ListView) findViewById(R.id.list_view);
         mListViewFeeds.setAdapter(mFeedAdapter);
         registerForContextMenu(mListViewFeeds);
@@ -125,13 +131,13 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
      * 
      * @return the feeds
      */
-    public abstract List<UserFeed> getFeeds();
+    public abstract List<Event> getFeeds() throws IOException;
 
     /**
      * An asynchronous task that runs on a background thread to load activity
      * list.
      */
-    private static class LoadActivityListTask extends AsyncTask<Void, Integer, List<UserFeed>> {
+    private static class LoadActivityListTask extends AsyncTask<Void, Integer, List<Event>> {
 
         /** The target. */
         private WeakReference<UserFeedActivity> mTarget;
@@ -153,12 +159,12 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
-        protected List<UserFeed> doInBackground(Void... params) {
+        protected List<Event> doInBackground(Void... params) {
             if (mTarget.get() != null) {
                 try {
                     return mTarget.get().getFeeds();
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -185,7 +191,7 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
          * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
          */
         @Override
-        protected void onPostExecute(List<UserFeed> result) {
+        protected void onPostExecute(List<Event> result) {
             if (mTarget.get() != null) {
                 mTarget.get().mLoadingDialog.dismiss();
                 if (mException) {
@@ -203,10 +209,10 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
      * 
      * @param feeds the feeds
      */
-    protected void fillData(List<UserFeed> feeds) {
+    protected void fillData(List<Event> feeds) {
         if (feeds != null && feeds.size() > 0) {
             mFeedAdapter.notifyDataSetChanged();
-            for (UserFeed feed : feeds) {
+            for (Event feed : feeds) {
                 mFeedAdapter.add(feed);
             }
         }
@@ -221,30 +227,41 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
      */
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        UserFeed feed = (UserFeed) adapterView.getAdapter().getItem(position);
-
-        UserFeed.Type eventType = feed.getType();
+        Event event = (Event) adapterView.getAdapter().getItem(position);
+        
+        String eventType = event.getType();
+        EventRepository eventRepo = event.getRepo();
+        String[] repoNamePart = eventRepo.getName().split("/");
+        String repoOwner = repoNamePart[0];
+        String repoName = repoNamePart[1];
+        String repoUrl = eventRepo.getUrl();
+        
         Gh4Application context = getApplicationContext();
+        
         /** PushEvent */
-        if (UserFeed.Type.PUSH_EVENT.equals(eventType)) {
-            if (feed.getRepository() != null) {
-                List<String[]> shas = feed.getPayload().getShas();
+        if (Event.TYPE_PUSH.equals(eventType)) {
+            
+            if (eventRepo != null) {
+                PushPayload payload = (PushPayload) event.getPayload();
+
+                List<Commit> commits = payload.getCommits();
                 // if commit > 1, then show compare activity
-                if (shas != null && shas.size() > 1) {
+                if (commits != null && commits.size() > 1) {
                     Intent intent = new Intent().setClass(context, CompareActivity.class);
-                    for (String[] sha : shas) {
-                        intent.putExtra("sha" + sha[0], sha);
+                    for (Commit commit : commits) {
+                        intent.putExtra("sha" + commit.getSha(), commit.getSha());
+                        //intent.putExtra("sha" + sha[0], sha);
                     }
                     
-                    intent.putExtra(Constants.Repository.REPO_OWNER, feed.getRepository().getOwner());
-                    intent.putExtra(Constants.Repository.REPO_NAME, feed.getRepository().getName());
-                    intent.putExtra(Constants.Repository.REPO_URL, feed.getUrl());
+                    intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
+                    intent.putExtra(Constants.Repository.REPO_NAME, repoName);
+                    intent.putExtra(Constants.Repository.REPO_URL, repoUrl);
                     startActivity(intent);
                 }
                 // only 1 commit, then show the commit details
                 else {
-                        context.openCommitInfoActivity(this, feed.getRepository().getOwner(), feed
-                                .getRepository().getName(), feed.getPayload().getShas().get(0)[0]);
+                    context.openCommitInfoActivity(this, repoOwner, repoName,
+                            payload.getCommits().get(0).getSha());
                 }
             }
             else {
@@ -253,10 +270,10 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         }
 
         /** IssueEvent */
-        else if (UserFeed.Type.ISSUES_EVENT.equals(eventType)) {
-            if (feed.getRepository() != null) {
-                context.openIssueActivity(this, feed.getRepository().getOwner(), feed.getRepository()
-                        .getName(), feed.getPayload().getNumber());
+        else if (Event.TYPE_ISSUES.equals(eventType)) {
+            if (eventRepo != null) {
+                IssuesPayload payload = (IssuesPayload) event.getPayload();
+                context.openIssueActivity(this, repoOwner, repoName, payload.getIssue().getNumber());
             }
             else {
                 context.notFoundMessage(this, R.plurals.repository);
@@ -264,9 +281,10 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         }
 
         /** WatchEvent */
-        else if (UserFeed.Type.WATCH_EVENT.equals(eventType)) {
-            if (feed.getRepository() != null) {
-                context.openRepositoryInfoActivity(this, feed.getRepository());
+        else if (Event.TYPE_WATCH.equals(eventType)) {
+            if (eventRepo != null) {
+                context.openRepositoryInfoActivity(this, repoOwner, repoName);
+                //context.openRepositoryInfoActivity(this, feed.getRepository());
             }
             else {
                 context.notFoundMessage(this, R.plurals.repository);
@@ -274,9 +292,10 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         }
 
         /** CreateEvent */
-        else if (UserFeed.Type.CREATE_EVENT.equals(eventType)) {
-            if (feed.getRepository() != null) {
-                context.openRepositoryInfoActivity(this, feed.getRepository());
+        else if (Event.TYPE_CREATE.equals(eventType)) {
+            if (eventRepo != null) {
+                context.openRepositoryInfoActivity(this, repoOwner, repoName);
+                //context.openRepositoryInfoActivity(this, feed.getRepository());
             }
             else {
                 context.notFoundMessage(this, R.plurals.repository);
@@ -284,15 +303,11 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         }
 
         /** PullRequestEvent */
-        else if (UserFeed.Type.PULL_REQUEST_EVENT.equals(eventType)) {
-            if (feed.getRepository() != null) {
-                Payload payload = feed.getPayload();
+        else if (Event.TYPE_PULL_REQUEST.equals(eventType)) {
+            if (eventRepo != null) {
+                PullRequestPayload payload = (PullRequestPayload) event.getPayload();
                 int pullRequestNumber = payload.getNumber();
-                if (payload.getPullRequest() instanceof ObjectPayloadPullRequest) {
-                    pullRequestNumber = ((ObjectPayloadPullRequest) payload.getPullRequest()).getNumber();
-                }
-                context.openPullRequestActivity(this, feed.getRepository().getOwner(), feed
-                        .getRepository().getName(), pullRequestNumber);
+                context.openPullRequestActivity(this, repoOwner, repoName, pullRequestNumber);
             }
             else {
                 context.notFoundMessage(this, R.plurals.repository);
@@ -300,19 +315,19 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         }
 
         /** FollowEvent */
-        else if (UserFeed.Type.FOLLOW_EVENT.equals(eventType)) {
-            Payload payload = feed.getPayload();
+        else if (Event.TYPE_FOLLOW.equals(eventType)) {
+            FollowPayload payload = (FollowPayload) event.getPayload();
             if (payload.getTarget() != null) {
                 context.openUserInfoActivity(this, payload.getTarget().getLogin(), null);
             }
         }
 
         /** CommitCommentEvent */
-        else if (UserFeed.Type.COMMIT_COMMENT_EVENT.equals(eventType)) {
-            Repository repository = feed.getRepository();
-            if (repository != null) {
-                if (!StringUtils.isBlank(feed.getUrl())) {
-                    context.openBrowser(this, feed.getUrl());
+        else if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
+            if (eventRepo != null) {
+                CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
+                if (!StringUtils.isBlank(payload.getComment().getUrl())) {
+                    context.openBrowser(this, payload.getComment().getUrl());
                 }
                 else {
                     context.notFoundMessage(this, "URL");
@@ -324,9 +339,9 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         }
 
         /** DeleteEvent */
-        else if (UserFeed.Type.DELETE_EVENT.equals(eventType)) {
-            if (feed.getRepository() != null) {
-                context.openRepositoryInfoActivity(this, feed.getRepository());
+        else if (Event.TYPE_DELETE.equals(eventType)) {
+            if (eventRepo != null) {
+                context.openRepositoryInfoActivity(this, repoOwner, repoName);
             }
             else {
                 context.notFoundMessage(this, R.plurals.repository);
@@ -339,12 +354,12 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
 //        }
 
         /** DownloadEvent */
-        else if (UserFeed.Type.DOWNLOAD_EVENT.equals(eventType)) {
-            Repository repository = feed.getRepository();
-            if (repository != null) {
-                String url = "https://github.com/" + repository.getOwner() + "/"
-                        + repository.getName() + "/downloads#download_" + feed.getPayload().getId();
-                context.openBrowser(this, url);
+        else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
+            if (eventRepo != null) {
+                DownloadPayload payload = (DownloadPayload) event.getPayload();
+//                String url = "https://github.com/" + repoOwner + "/"
+//                        + repoName + "/downloads#download_" + feed.getPayload().getId();
+                context.openBrowser(this, payload.getDownload().getUrl());
             }
             else {
                 context.notFoundMessage(this, R.plurals.repository);
@@ -352,11 +367,11 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         }
 
         /** ForkEvent */
-        else if (UserFeed.Type.FORK_EVENT.equals(eventType)) {
-            if (getToRepoName(feed) != null
-                    && getToRepoOwner(feed) != null) {
-                context.openRepositoryInfoActivity(this, getToRepoOwner(feed),
-                        getToRepoName(feed));
+        else if (Event.TYPE_FORK.equals(eventType)) {
+            ForkPayload payload = (ForkPayload) event.getPayload();
+            Repository forkee = payload.getForkee();
+            if (forkee != null) {
+                context.openRepositoryInfoActivity(this, forkee);
             }
             else {
                 context.notFoundMessage(this, R.plurals.repository);
@@ -364,10 +379,10 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         }
 
         /** ForkEvent */
-        else if (UserFeed.Type.FORK_APPLY_EVENT.equals(eventType)) {
-            Repository repository = feed.getRepository();
-            if (repository != null) {
-                context.openRepositoryInfoActivity(this, repository);
+        else if (Event.TYPE_FORK_APPLY.equals(eventType)) {
+            if (eventRepo != null) {
+                ForkApplyPayload payload = (ForkApplyPayload) event.getPayload();
+                context.openRepositoryInfoActivity(this, repoOwner, repoName);
             }
             else {
                 context.notFoundMessage(this, R.plurals.repository);
@@ -375,18 +390,17 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         }
 
         /** GollumEvent */
-        else if (UserFeed.Type.GOLLUM_EVENT.equals(eventType)) {
+        else if (Event.TYPE_GOLLUM.equals(eventType)) {
             Intent intent = new Intent().setClass(this, WikiListActivity.class);
-            intent.putExtra(Constants.Repository.REPO_OWNER, feed.getRepository().getOwner());
-            intent.putExtra(Constants.Repository.REPO_NAME, feed.getRepository().getName());
+            intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
+            intent.putExtra(Constants.Repository.REPO_NAME, repoName);
             startActivity(intent);
         }
 
         /** PublicEvent */
-        else if (UserFeed.Type.PUBLIC_EVENT.equals(eventType)) {
-            Repository repository = feed.getRepository();
-            if (repository != null) {
-                context.openRepositoryInfoActivity(this, repository);
+        else if (Event.TYPE_PUBLIC.equals(eventType)) {
+            if (eventRepo != null) {
+                context.openRepositoryInfoActivity(this, repoOwner, repoName);
             }
             else {
                 context.notFoundMessage(this, R.plurals.repository);
@@ -394,46 +408,27 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         }
         
         /** MemberEvent */
-        else if (UserFeed.Type.MEMBER_EVENT.equals(eventType)) {
-            Repository repository = feed.getRepository();
-            if (repository != null) {
-                context.openRepositoryInfoActivity(this, repository);
+        else if (Event.TYPE_MEMBER.equals(eventType)) {
+            if (eventRepo != null) {
+                MemberPayload payload = (MemberPayload) event.getPayload();
+                context.openRepositoryInfoActivity(this, repoOwner, repoName);
             }
             else {
                 context.notFoundMessage(this, R.plurals.repository);
             }
         }
         
-        else if (UserFeed.Type.GIST_EVENT.equals(eventType)) {
-            Payload payload = feed.getPayload();
-            String[] gistPart = payload.getName().split(":");
-            if (gistPart.length > 1) {
-                String gistId = gistPart[1].trim();
-                context.openGistActivity(this, gistId);
-            }
+        /** Gist Event **/
+        else if (Event.TYPE_GIST.equals(eventType)) {
+            GistPayload payload = (GistPayload) event.getPayload();
+            context.openGistActivity(this, payload.getGist().getId());
         }
         
         /** IssueCommentEvent */
-        else if (UserFeed.Type.ISSUE_COMMENT_EVENT.equals(eventType)) {
-            //https://github.com/slapperwan/gh4a/issues/32#issuecomment-1531102
-            String url = feed.getUrl();
-            int idx1 = url.indexOf("/issues/");
-            int idx2 = url.indexOf("#issuecomment");
-            if (idx2 == -1) {//sometime it return comment only
-                idx2 = url.indexOf("#comment");
-            }
-            String issueNumber = "-1";
-            if (idx2 != -1) {
-                issueNumber = url.substring(idx1 + 8, idx2);
-            }
-            if (feed.getRepository() != null) {
-                if (!"-1".equals(issueNumber)) {
-                    context.openIssueActivity(this, feed.getRepository().getOwner(), feed.getRepository().getName(), Integer.parseInt(issueNumber));
-                }
-                else {
-                    context.openIssueListActivity(this, feed.getRepository().getOwner(), feed.getRepository()
-                            .getName(), Constants.Issue.ISSUE_STATE_OPEN);
-                }
+        else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
+            if (eventRepo != null) {
+                IssueCommentPayload payload = (IssueCommentPayload) event.getPayload();
+                context.openIssueActivity(this, repoOwner, repoName, payload.getIssue().getNumber()); 
             }
             else {
                 context.notFoundMessage(this, R.plurals.repository);
@@ -451,100 +446,94 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         super.onCreateContextMenu(menu, v, menuInfo);
         if (v.getId() == R.id.list_view) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-            UserFeed feed = (UserFeed) mFeedAdapter.getItem(info.position);
-            UserFeed.Type eventType = feed.getType();
+            Event event = (Event) mFeedAdapter.getItem(info.position);
+            
+            String eventType = event.getType();
+            EventRepository eventRepo = event.getRepo();
+            String[] repoNamePart = eventRepo.getName().split("/");
+            String repoOwner = repoNamePart[0];
+            String repoName = repoNamePart[1];
+            String repoUrl = eventRepo.getUrl();
+            
             menu.setHeaderTitle("Go to");
 
             /** Common menu */
-            menu.add("User " + feed.getActor());
-            if (feed.getRepository() != null) {
-                menu.add("Repo " + feed.getRepository().getOwner() + "/"
-                        + feed.getRepository().getName());
+            menu.add("User " + event.getActor().getLogin());
+            if (eventRepo != null) {
+                menu.add("Repo " + repoOwner + "/" + repoName);
             }
 
             /** PushEvent extra menu for commits */
-            if (UserFeed.Type.PUSH_EVENT.equals(eventType)) {
-                if (feed.getRepository() != null) {
-                    int index = feed.getUrl().lastIndexOf("/");
-                    if (index != -1) {
-                        menu.add("Compare " + feed.getUrl().substring(index + 1, feed.getUrl().length()));
-                    }
-                    else {
-                        menu.add("Compare");
-                    }
+            if (Event.TYPE_PUSH.equals(eventType)) {
+                if (eventRepo != null) {
+                    PushPayload payload = (PushPayload) event.getPayload();
+                    menu.add("Compare " + payload.getHead());
                     
-                    List<String[]> shas = feed.getPayload().getShas();
-                    for (String[] sha : shas) {
-                        menu.add("Commit " + sha[0].substring(0, 7) + " " + sha[2]);
+                    List<Commit> commits = payload.getCommits();
+                    for (Commit commit : commits) {
+                        menu.add("Commit " + commit.getSha());
                     }
                 }
             }
 
             /** IssueEvent extra menu for commits */
-            else if (UserFeed.Type.ISSUES_EVENT.equals(eventType)) {
-                menu.add("Issue " + feed.getPayload().getNumber());
+            else if (Event.TYPE_ISSUES.equals(eventType)) {
+                IssuesPayload payload = (IssuesPayload) event.getPayload();
+                menu.add("Issue " + payload.getIssue().getNumber());
             }
 
             /** FollowEvent */
-            else if (UserFeed.Type.FOLLOW_EVENT.equals(eventType)) {
-                Payload payload = feed.getPayload();
+            else if (Event.TYPE_FOLLOW.equals(eventType)) {
+                FollowPayload payload = (FollowPayload) event.getPayload();
                 if (payload.getTarget() != null) {
                     menu.add("User " + payload.getTarget().getLogin());
                 }
             }
 
             /** CommitCommentEvent */
-            else if (UserFeed.Type.COMMIT_COMMENT_EVENT.equals(eventType)) {
-                if (feed.getRepository() != null) {
-                    menu.add("Commit " + feed.getPayload().getCommit().substring(0, 7));
+            else if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
+                if (eventRepo != null) {
+                    CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
+                    menu.add("Commit " + payload.getComment().getCommitId().substring(0, 7));
                     menu.add("Comment in browser");
                 }
             }
 
             /** GistEvent */
-            else if (UserFeed.Type.GIST_EVENT.equals(eventType)) {
-                menu.add(feed.getPayload().getName() + " in browser");
+            else if (Event.TYPE_GIST.equals(eventType)) {
+                GistPayload payload = (GistPayload) event.getPayload();
+                menu.add(payload.getGist().getId() + " in browser");
             }
 
             /** DownloadEvent */
-            else if (UserFeed.Type.DOWNLOAD_EVENT.equals(eventType)) {
-                String filename = feed.getPayload().getUrl();
-                int index = filename.lastIndexOf("/");
-                if (index != -1) {
-                    filename = filename.substring(index + 1, filename.length());
-                }
-                else {
-                    filename = "";
-                }
-                menu.add("File " + filename + " in browser");
+            else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
+                DownloadPayload payload = (DownloadPayload) event.getPayload();
+                menu.add("File " + payload.getDownload().getName() + " in browser");
             }
 
             /** ForkEvent */
-            else if (UserFeed.Type.FORK_EVENT.equals(eventType)) {
-                if (getToRepoName(feed) != null
-                        && getToRepoOwner(feed) != null) {
-                    menu.add("Forked repo " + getToRepoOwner(feed) + "/" + getToRepoName(feed));
+            else if (Event.TYPE_FORK.equals(eventType)) {
+                ForkPayload payload = (ForkPayload) event.getPayload();
+                Repository forkee = payload.getForkee();
+                if (forkee != null) {
+                    menu.add("Forked repo " + forkee.getOwner().getLogin() + "/" + forkee.getName());
                 }
             }
 
             /** GollumEvent */
-            else if (UserFeed.Type.GOLLUM_EVENT.equals(eventType)) {
+            else if (Event.TYPE_GOLLUM.equals(eventType)) {
                 menu.add("Wiki in browser");
             }
             
             /** PullRequestEvent */
-            else if (UserFeed.Type.PULL_REQUEST_EVENT.equals(eventType)) {
-                Payload payload = feed.getPayload();
-                int pullRequestNumber = payload.getNumber();
-                if (payload.getPullRequest() instanceof ObjectPayloadPullRequest) {
-                    pullRequestNumber = ((ObjectPayloadPullRequest) payload.getPullRequest()).getNumber();
-                }
-                menu.add("Pull request " + pullRequestNumber);
+            else if (Event.TYPE_PULL_REQUEST.equals(eventType)) {
+                PullRequestPayload payload = (PullRequestPayload) event.getPayload();
+                menu.add("Pull request " + payload.getNumber());
             }
             
             /** IssueCommentEvent */
-            else if (UserFeed.Type.ISSUE_COMMENT_EVENT.equals(eventType)) {
-                menu.add("Open issues");//TODO: Open issue activity instead issue listing (waiting for github response)
+            else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
+                menu.add("Open issues");
             }
         }
     }
@@ -557,8 +546,14 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
                 .getMenuInfo();
-        UserFeed feed = (UserFeed) mFeedAdapter.getItem(info.position);
-
+        Event event = (Event) mFeedAdapter.getItem(info.position);
+        String eventType = event.getType();
+        EventRepository eventRepo = event.getRepo();
+        String[] repoNamePart = eventRepo.getName().split("/");
+        String repoOwner = repoNamePart[0];
+        String repoName = repoNamePart[1];
+        String repoUrl = eventRepo.getUrl();
+        
         String title = item.getTitle().toString();
         String value = title.split(" ")[1];
 
@@ -567,18 +562,16 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         /** User item */
         if (title.startsWith("User")) {
             context
-                    .openUserInfoActivity(this, value, feed.getActorAttributes()
-                            .getName());
+                    .openUserInfoActivity(this, value, event.getActor().getLogin());
         }
         /** Repo item */
         else if (title.startsWith("Repo")) {
-            context.openRepositoryInfoActivity(this, feed.getRepository());
+            context.openRepositoryInfoActivity(this, repoOwner, repoName);
         }
         /** Commit item */
         else if (title.startsWith("Commit")) {
-            if (feed.getRepository() != null) {
-                context.openCommitInfoActivity(this, feed.getRepository().getOwner(), feed
-                        .getRepository().getName(), value);
+            if (eventRepo != null) {
+                context.openCommitInfoActivity(this, repoOwner, repoName, value);
             }
             else {
                 context.notFoundMessage(this, R.plurals.repository);
@@ -586,29 +579,28 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         }
         /** Issue comment item */
         else if (title.startsWith("Open issues")) {
-            context.openIssueListActivity(this, feed.getRepository().getOwner(), feed.getRepository()
-                    .getName(), Constants.Issue.ISSUE_STATE_OPEN);
+            context.openIssueListActivity(this, repoOwner, repoName, Constants.Issue.ISSUE_STATE_OPEN);
         }
         /** Issue item */
         else if (title.startsWith("Issue")) {
-            context.openIssueActivity(this, feed.getRepository().getOwner(), feed.getRepository()
-                    .getName(), feed.getPayload().getNumber());
+            IssuesPayload payload = (IssuesPayload) event.getPayload();
+            context.openIssueActivity(this, repoOwner, repoName, payload.getIssue().getNumber());
         }
         /** Commit comment item */
         else if (title.startsWith("Comment in browser")) {
-            context.openBrowser(this, feed.getUrl());
+            CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
+            context.openBrowser(this, payload.getComment().getUrl());
         }
         /** Gist item */
         else if (title.startsWith("gist")) {
-            context.openBrowser(this, feed.getPayload().getUrl());
+            GistPayload payload = (GistPayload) event.getPayload();
+            context.openBrowser(this, payload.getGist().getUrl());
         }
         /** Download item */
         else if (title.startsWith("File")) {
-            Repository repository = feed.getRepository();
-            if (repository != null) {
-                String url = "https://github.com/" + repository.getOwner() + "/"
-                        + repository.getName() + "/downloads#download_" + feed.getPayload().getId();
-                context.openBrowser(this, url);
+            if (eventRepo != null) {
+                DownloadPayload payload = (DownloadPayload) event.getPayload();
+                context.openBrowser(this, payload.getDownload().getUrl());
             }
             else {
                 context.notFoundMessage(this, R.plurals.repository);
@@ -616,10 +608,10 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         }
         /** Fork item */
         else if (title.startsWith("Forked repo")) {
-            if (getToRepoName(feed) != null
-                    && getToRepoOwner(feed) != null) {
-                context.openRepositoryInfoActivity(this, feed.getActor(), feed.getRepository()
-                        .getName());
+            ForkPayload payload = (ForkPayload) event.getPayload();
+            Repository forkee = payload.getForkee();
+            if (forkee != null) {
+                context.openRepositoryInfoActivity(this, forkee);
             }
             else {
                 context.notFoundMessage(this, R.plurals.repository);
@@ -627,31 +619,31 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         }
         /** Wiki item */
         else if (title.startsWith("Wiki in browser")) {
-            context.openBrowser(this, feed.getUrl());
+            GollumPayload payload = (GollumPayload) event.getPayload();
+            List<GollumPage> pages = payload.getPages();
+            if (pages != null && !pages.isEmpty()) {//TODO: now just open the first page
+                context.openBrowser(this, pages.get(0).getHtmlUrl());                
+            }
         }
         /** Pull Request item */
         else if (title.startsWith("Pull request")) {
-            Payload payload = feed.getPayload();
-            int pullRequestNumber = payload.getNumber();
-            if (payload.getPullRequest() instanceof ObjectPayloadPullRequest) {
-                pullRequestNumber = ((ObjectPayloadPullRequest) payload.getPullRequest()).getNumber();
-            }
-            
-            context.openPullRequestActivity(this, feed.getRepository().getOwner(), feed
-                    .getRepository().getName(), pullRequestNumber);
+            PullRequestPayload payload = (PullRequestPayload) event.getPayload();
+            context.openPullRequestActivity(this, repoOwner, repoName, payload.getNumber());
         }
         
         else if (title.startsWith("Compare")) {
-            if (feed.getRepository() != null) {
-                List<String[]> shas = feed.getPayload().getShas();
+            if (eventRepo != null) {
+                PushPayload payload = (PushPayload) event.getPayload();
+                
+                List<Commit> commits = payload.getCommits();
                 Intent intent = new Intent().setClass(context, CompareActivity.class);
-                for (String[] sha : shas) {
-                    intent.putExtra("sha" + sha[0], sha);
+                for (Commit commit : commits) {
+                    intent.putExtra("sha" + commit.getSha(), commit.getSha());
                 }
                 
-                intent.putExtra(Constants.Repository.REPO_OWNER, feed.getRepository().getOwner());
-                intent.putExtra(Constants.Repository.REPO_NAME, feed.getRepository().getName());
-                intent.putExtra(Constants.Repository.REPO_URL, feed.getUrl());
+                intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
+                intent.putExtra(Constants.Repository.REPO_NAME, repoName);
+                intent.putExtra(Constants.Repository.REPO_URL, event.getRepo().getUrl());
                 startActivity(intent);
             }
         }
@@ -659,31 +651,31 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         return true;
     }
     
-    private static String getToRepoOwner(UserFeed userFeed) {
-        String url = userFeed.getUrl();
-        if (!StringUtils.isBlank(url)) {
-            String[] urlParts = url.split("/");
-            if (urlParts.length > 3) {
-                return urlParts[3];
-            }
-            else {
-                return null;
-            }
-        }
-        return null;
-    }
-    
-    private static String getToRepoName(UserFeed userFeed) {
-        String url = userFeed.getUrl();
-        if (!StringUtils.isBlank(url)) {
-            String[] urlParts = url.split("/");
-            if (urlParts.length > 3) {
-                return urlParts[4];
-            }
-            else {
-                return null;
-            }
-        }
-        return null;
-    }
+//    private static String getToRepoOwner(Event event) {
+//        String url = userFeed.getUrl();
+//        if (!StringUtils.isBlank(url)) {
+//            String[] urlParts = url.split("/");
+//            if (urlParts.length > 3) {
+//                return urlParts[3];
+//            }
+//            else {
+//                return null;
+//            }
+//        }
+//        return null;
+//    }
+//    
+//    private static String getToRepoName(UserFeed userFeed) {
+//        String url = userFeed.getUrl();
+//        if (!StringUtils.isBlank(url)) {
+//            String[] urlParts = url.split("/");
+//            if (urlParts.length > 3) {
+//                return urlParts[4];
+//            }
+//            else {
+//                return null;
+//            }
+//        }
+//        return null;
+//    }
 }

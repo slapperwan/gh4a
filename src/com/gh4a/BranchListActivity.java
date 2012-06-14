@@ -15,10 +15,15 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
+
+import org.eclipse.egit.github.core.RepositoryBranch;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.RepositoryService;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -28,17 +33,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.widget.ListView;
 
-import com.gh4a.adapter.BranchTagAdapter;
+import com.gh4a.adapter.BranchAdapter;
 import com.gh4a.db.Bookmark;
 import com.gh4a.db.BookmarkParam;
 import com.gh4a.db.DbHelper;
-import com.gh4a.holder.BranchTag;
 import com.gh4a.holder.BreadCrumbHolder;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.RepositoryService;
-import com.github.api.v2.services.auth.Authentication;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The BranchList activity.
@@ -108,7 +107,7 @@ public class BranchListActivity extends BaseActivity {
      * to load branch tag list.
      */
     private static class LoadBranchTagListTask extends
-            AsyncTask<Void, Integer, HashMap<String, HashMap<String, String>>> {
+            AsyncTask<Void, Integer, List<RepositoryBranch>> {
 
         /** The target. */
         private WeakReference<BranchListActivity> mTarget;
@@ -130,22 +129,16 @@ public class BranchListActivity extends BaseActivity {
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
-        protected HashMap<String, HashMap<String, String>> doInBackground(Void... params) {
+        protected List<RepositoryBranch> doInBackground(Void... params) {
             if (mTarget.get() != null) {
                 try {
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    RepositoryService service = factory.createRepositoryService();
-                    HashMap<String, HashMap<String, String>> branchTagMap = new HashMap<String, HashMap<String, String>>();
-                    BranchListActivity activity = mTarget.get();
-                    Authentication auth = new LoginPasswordAuthentication(activity.getAuthUsername(), activity.getAuthPassword());
-                    service.setAuthentication(auth);
-                    HashMap<String, String> map = (HashMap<String, String>) service.getBranches(
-                            activity.mUserLogin, activity.mRepoName);
-                    branchTagMap.put("branches", map);
-    
-                    return branchTagMap;
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    RepositoryService repoService = new RepositoryService(client);
+                    return repoService.getBranches(new RepositoryId(mTarget.get().mUserLogin, 
+                            mTarget.get().mRepoName));
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -172,7 +165,7 @@ public class BranchListActivity extends BaseActivity {
          * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
          */
         @Override
-        protected void onPostExecute(HashMap<String, HashMap<String, String>> result) {
+        protected void onPostExecute(List<RepositoryBranch> result) {
             if (mTarget.get() != null) {
                 if (mException) {
                     mTarget.get().showError();
@@ -190,37 +183,22 @@ public class BranchListActivity extends BaseActivity {
      *
      * @param map the map
      */
-    protected void fillData(HashMap<String, HashMap<String, String>> map) {
+    protected void fillData(List<RepositoryBranch> branches) {
         ListView branchListView = (ListView) findViewById(R.id.list_view);
 
-        ArrayList<BranchTag> branchList = new ArrayList<BranchTag>();
-        HashMap<String, String> branchMap = map.get("branches");
-        
-        if (branchMap.size() == 0) {
+        if (branches.size() == 0) {
             getApplicationContext().notFoundMessage(this, "Branches");
             return;
         }
         
-        Iterator<String> it = branchMap.keySet().iterator();
-
-        BranchTag branchTag;
-        while (it.hasNext()) {
-            String name = it.next();
-            branchTag = new BranchTag();
-            branchTag.setName(name);
-            branchTag.setSha(branchMap.get(name));
-
-            branchList.add(branchTag);
-        }
-
-        BranchTagAdapter branchAdapter = new BranchTagAdapter(this, branchList, mUserLogin,
+        BranchAdapter branchAdapter = new BranchAdapter(this, branches, mUserLogin,
                 mRepoName);
         branchListView.setAdapter(branchAdapter);
     }
     
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (isAuthenticated()) {
+        if (isAuthorized()) {
             menu.clear();
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.bookmark_menu, menu);

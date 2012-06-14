@@ -15,9 +15,15 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
-import java.util.List;
+
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.Tree;
+import org.eclipse.egit.github.core.TreeEntry;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.DataService;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -25,17 +31,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
 
 import com.gh4a.adapter.FileAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
-import com.github.api.v2.schema.Tree;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.ObjectService;
-import com.github.api.v2.services.auth.Authentication;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The FileManager activity.
@@ -151,7 +151,7 @@ public class FileManagerActivity extends BaseActivity implements OnItemClickList
     /**
      * An asynchronous task that runs on a background thread to load tree list.
      */
-    private static class LoadTreeListTask extends AsyncTask<Void, Integer, List<Tree>> {
+    private static class LoadTreeListTask extends AsyncTask<Void, Integer, Tree> {
 
         /** The target. */
         private WeakReference<FileManagerActivity> mTarget;
@@ -173,18 +173,17 @@ public class FileManagerActivity extends BaseActivity implements OnItemClickList
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
-        protected List<Tree> doInBackground(Void... params) {
+        protected Tree doInBackground(Void... params) {
             if (mTarget.get() != null) {
                 try {
                     FileManagerActivity activity = mTarget.get();
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    ObjectService objectService = factory.createObjectService();
-                    Authentication auth = new LoginPasswordAuthentication(activity.getAuthUsername(), activity.getAuthPassword());
-                    objectService.setAuthentication(auth);
-                    return objectService.getTree(activity.mUserLogin, activity.mRepoName,
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    DataService dataService = new DataService(client);
+                    return dataService.getTree(new RepositoryId(activity.mUserLogin, activity.mRepoName),
                             activity.mObjectSha);
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -211,7 +210,7 @@ public class FileManagerActivity extends BaseActivity implements OnItemClickList
          * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
          */
         @Override
-        protected void onPostExecute(List<Tree> result) {
+        protected void onPostExecute(Tree result) {
             if (mTarget.get() != null) {
                 if (mException) {
                     mTarget.get().showError();
@@ -229,11 +228,11 @@ public class FileManagerActivity extends BaseActivity implements OnItemClickList
      * 
      * @param trees the trees
      */
-    protected void fillData(List<Tree> trees) {
+    protected void fillData(Tree tree) {
         ListView listView = (ListView) findViewById(R.id.list_view);
         listView.setOnItemClickListener(this);
 
-        FileAdapter fileAdapter = new FileAdapter(this, trees);
+        FileAdapter fileAdapter = new FileAdapter(this, tree.getTree());
         listView.setAdapter(fileAdapter);
     }
 
@@ -243,15 +242,15 @@ public class FileManagerActivity extends BaseActivity implements OnItemClickList
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         FileAdapter adapter = (FileAdapter) adapterView.getAdapter();
-        Tree tree = (Tree) adapter.getItem(position);
-        if (Tree.Type.TREE.equals(tree.getType())) {
+        TreeEntry tree = (TreeEntry) adapter.getItem(position);
+        if ("tree".equals(tree.getType())) {
             Intent intent = new Intent().setClass(this, FileManagerActivity.class);
             intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
             intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
             intent.putExtra(Constants.Object.OBJECT_SHA, tree.getSha());
             intent.putExtra(Constants.Object.TREE_SHA, mTreeSha);
             intent.putExtra(Constants.Repository.REPO_BRANCH, mBranchName);
-            intent.putExtra(Constants.Object.PATH, mPath + "/" + tree.getName());
+            intent.putExtra(Constants.Object.PATH, mPath + "/" + tree.getPath());
             intent.putExtra(Constants.VIEW_ID, mFromBtnId);
             startActivity(intent);
         }
@@ -262,9 +261,10 @@ public class FileManagerActivity extends BaseActivity implements OnItemClickList
             intent.putExtra(Constants.Repository.REPO_BRANCH, mBranchName);
             intent.putExtra(Constants.Object.OBJECT_SHA, tree.getSha());
             intent.putExtra(Constants.Object.TREE_SHA, mTreeSha);
-            intent.putExtra(Constants.Object.NAME, tree.getName());
-            intent.putExtra(Constants.Object.MIME_TYPE, tree.getMimeType());
-            intent.putExtra(Constants.Object.PATH, mPath + "/" + tree.getName());
+            intent.putExtra(Constants.Object.NAME, tree.getPath());
+            //intent.putExtra(Constants.Object.MIME_TYPE, tree.getMimeType());
+            intent.putExtra(Constants.Object.MIME_TYPE, tree.getPath());
+            intent.putExtra(Constants.Object.PATH, mPath + "/" + tree.getPath());
             intent.putExtra(Constants.VIEW_ID, mFromBtnId);
             startActivity(intent);
         }

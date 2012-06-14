@@ -15,9 +15,14 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.UserService;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -25,14 +30,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
 
 import com.gh4a.adapter.UserAdapter;
-import com.github.api.v2.schema.User;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.UserService;
 
 /**
  * The UserList activity.
@@ -120,7 +121,7 @@ public class UserListActivity extends BaseActivity implements OnItemClickListene
                 try {
                     return mTarget.get().getUsers();
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -181,10 +182,11 @@ public class UserListActivity extends BaseActivity implements OnItemClickListene
      * @return the users
      * @throws GitHubException the git hub exception
      */
-    protected List<User> getUsers() throws GitHubException {
-        GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-        UserService service = factory.createUserService();
-        return service.searchUsersByName(mSearchKey);
+    protected List<User> getUsers() throws IOException {
+//        GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+//        UserService service = factory.createUserService();
+//        return service.searchUsersByName(mSearchKey);
+        return new ArrayList<User>();
     }
 
     /**

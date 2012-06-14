@@ -1,28 +1,26 @@
 package com.gh4a;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.OrganizationService;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
 
 import com.gh4a.adapter.SimpleStringAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
-import com.github.api.v2.schema.Organization;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.OrganizationService;
-import com.github.api.v2.services.UserService;
-import com.github.api.v2.services.auth.Authentication;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 public class OrganizationListActivity extends BaseActivity {
 
@@ -70,7 +68,7 @@ public class OrganizationListActivity extends BaseActivity {
         new LoadOrganizationsTask(this).execute();
     }
     
-    private static class LoadOrganizationsTask extends AsyncTask<Void, Void, List<Organization>> {
+    private static class LoadOrganizationsTask extends AsyncTask<Void, Void, List<User>> {
 
         /** The target. */
         private WeakReference<OrganizationListActivity> mTarget;
@@ -93,26 +91,15 @@ public class OrganizationListActivity extends BaseActivity {
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
-        protected List<Organization> doInBackground(Void... arg0) {
+        protected List<User> doInBackground(Void... arg0) {
             if (mTarget.get() != null) {
                 try {
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    if (mTarget.get().mUserLogin.equals(mTarget.get().getAuthUsername())) {
-                        OrganizationService orgService = factory.createOrganizationService();
-                        Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                                mTarget.get().getAuthPassword());
-                        orgService.setAuthentication(auth);
-                        return orgService.getUserOrganizations();    
-                    }
-                    else {
-                        UserService userService = factory.createUserService();
-                        Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                                mTarget.get().getAuthPassword());
-                        userService.setAuthentication(auth);
-                        return userService.getUserOrganizations(mTarget.get().mUserLogin);    
-                    }
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    OrganizationService orgService = new OrganizationService(client);
+                    return orgService.getOrganizations(mTarget.get().mUserLogin);
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     if (e.getCause() != null
                             && e.getCause().getMessage().equalsIgnoreCase(
@@ -144,7 +131,7 @@ public class OrganizationListActivity extends BaseActivity {
          * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
          */
         @Override
-        protected void onPostExecute(List<Organization> result) {
+        protected void onPostExecute(List<User> result) {
             if (mTarget.get() != null) {
                 mTarget.get().mLoadingDialog.dismiss();
                 if (mException && isAuthError) {
@@ -162,9 +149,9 @@ public class OrganizationListActivity extends BaseActivity {
         }
     }
     
-    private void fillData(List<Organization> organizations) {
+    private void fillData(List<User> organizations) {
         if (organizations != null && organizations.size() > 0) {
-            for (Organization org : organizations) {
+            for (User org : organizations) {
                 mAdapter.add(org.getLogin());
             }
         }

@@ -15,7 +15,14 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.egit.github.core.Authorization;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.OAuthService;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -23,7 +30,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,13 +37,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AutoCompleteTextView.Validator;
 
 import com.gh4a.utils.StringUtils;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.UserService;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 import com.markupartist.android.widget.ActionBar;
 import com.markupartist.android.widget.ActionBar.IntentAction;
 
@@ -62,8 +63,8 @@ public class Github4AndroidActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (isAuthenticated()) {
-            getApplicationContext().openUserInfoActivity(this, getAuthUsername(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        if (isAuthorized()) {
+            getApplicationContext().openUserInfoActivity(this, getAuthLogin(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
             finish();
             return;
         }
@@ -107,7 +108,7 @@ public class Github4AndroidActivity extends BaseActivity {
         });
     }
 
-    private static class LoginTask extends AsyncTask<Void, Void, Void> {
+    private static class LoginTask extends AsyncTask<Void, Void, Authorization> {
 
         /** The target. */
         private WeakReference<Github4AndroidActivity> mTarget;
@@ -135,21 +136,42 @@ public class Github4AndroidActivity extends BaseActivity {
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
-        protected Void doInBackground(Void...params) {
+        protected Authorization doInBackground(Void...params) {
             if (mTarget.get() != null) {
                 try {
                     String username = mTarget.get().mEtUserLogin.getText().toString();
                     String password = mTarget.get().mEtPassword.getText().toString();
 
-                    LoginPasswordAuthentication auth = new LoginPasswordAuthentication(username,
+                    GitHubClient client = new GitHubClient();
+                    client.setCredentials(username, 
                             password);
+                    client.setUserAgent("Gh4a");
                     
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    UserService userService = factory.createUserService();
-                    userService.setAuthentication(auth);
-                    userService.getKeys();// test auth
+                    Authorization auth = null;
+                    OAuthService authService = new OAuthService(client);
+                    List<Authorization> auths = authService.getAuthorizations();
+                    for (Authorization authorization : auths) {
+                        if ("Gh4a".equals(authorization.getNote())) {
+                            auth = authorization;
+                            break;
+                        }
+                    }
+                    
+                    if (auth == null) {
+                        auth = new Authorization();
+                        auth.setNote("Gh4a");
+                        auth.setUrl("http://github.com/slapperwan/gh4a");
+                        List<String> scopes = new ArrayList<String>();
+                        scopes.add("user");
+                        scopes.add("repo");
+                        scopes.add("gist");
+                        auth.setScopes(scopes);
+                        
+                        auth = authService.createAuthorization(auth);
+                    }
+                    return auth;
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     if (e.getCause() != null
                             && e.getCause().getMessage().equalsIgnoreCase(
@@ -187,7 +209,7 @@ public class Github4AndroidActivity extends BaseActivity {
          * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
          */
         @Override
-        protected void onPostExecute(Void result) {
+        protected void onPostExecute(Authorization result) {
             if (mTarget.get() != null) {
                 Github4AndroidActivity activity = mTarget.get();
                 activity.mProgressDialog.dismiss();
@@ -203,9 +225,17 @@ public class Github4AndroidActivity extends BaseActivity {
                     SharedPreferences sharedPreferences = activity.getSharedPreferences(
                             Constants.PREF_NAME, MODE_PRIVATE);
                     Editor editor = sharedPreferences.edit();
-                    editor.putString(Constants.User.USER_LOGIN, activity.mEtUserLogin.getText().toString().trim());
-                    editor.putString(Constants.User.USER_PASSWORD, activity.mEtPassword.getText().toString().trim());
+                    editor.putString(Constants.User.USER_AUTH_TOKEN, result.getToken());
+                    editor.putString(Constants.User.USER_LOGIN, mTarget.get().mEtUserLogin.getText().toString());
                     editor.commit();
+                    
+//                    SharedPreferences sharedPreferences = activity.getSharedPreferences(
+//                            Constants.PREF_NAME, MODE_PRIVATE);
+//                    Editor editor = sharedPreferences.edit();
+//                    editor.putString(Constants.User.USER_LOGIN, activity.mEtUserLogin.getText().toString().trim());
+//                    editor.putString(Constants.User.USER_PASSWORD, activity.mEtPassword.getText().toString().trim());
+//                    editor.commit();
+                    
                     activity.getApplicationContext().openUserInfoActivity(activity, activity.mEtUserLogin.getText().toString().trim(),
                             null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     activity.finish();

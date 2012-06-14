@@ -1,9 +1,16 @@
 package com.gh4a;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import org.eclipse.egit.github.core.Commit;
+import org.eclipse.egit.github.core.RepositoryCommit;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.CommitService;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -11,17 +18,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
 
 import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
-import com.github.api.v2.schema.Commit;
-import com.github.api.v2.services.CommitService;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.auth.Authentication;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 public class CommitHistoryActivity extends BaseActivity implements OnItemClickListener {
 
@@ -80,7 +81,7 @@ public class CommitHistoryActivity extends BaseActivity implements OnItemClickLi
         createBreadcrumb("History - " + mFilePath, breadCrumbHolders);
     }
     
-    private static class LoadCommitListTask extends AsyncTask<String, Integer, List<Commit>> {
+    private static class LoadCommitListTask extends AsyncTask<String, Integer, List<RepositoryCommit>> {
 
         /** The target. */
         private WeakReference<CommitHistoryActivity> mTarget;
@@ -102,22 +103,19 @@ public class CommitHistoryActivity extends BaseActivity implements OnItemClickLi
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
-        protected List<Commit> doInBackground(String... params) {
+        protected List<RepositoryCommit> doInBackground(String... params) {
             if (mTarget.get() != null) {
                 CommitHistoryActivity activity = mTarget.get();
-                GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                CommitService commitService = factory.createCommitService();
-                Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                        mTarget.get().getAuthPassword());
-                commitService.setAuthentication(auth);
+                GitHubClient client = new GitHubClient();
+                client.setOAuth2Token(mTarget.get().getAuthToken());
+                CommitService commitService = new CommitService(client);
                 try {
-                    List<Commit> commits = commitService.getCommits(activity.mUserLogin,
-                            activity.mRepoName,
+                    return commitService.getCommits(new RepositoryId(activity.mUserLogin,
+                            activity.mRepoName),
                             activity.mObjectSha,
                             activity.mFilePath);
-                    return commits;
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -144,7 +142,7 @@ public class CommitHistoryActivity extends BaseActivity implements OnItemClickLi
          * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
          */
         @Override
-        protected void onPostExecute(List<Commit> result) {
+        protected void onPostExecute(List<RepositoryCommit> result) {
             if (mTarget.get() != null) {
                 CommitHistoryActivity activity = mTarget.get();
     
@@ -164,15 +162,15 @@ public class CommitHistoryActivity extends BaseActivity implements OnItemClickLi
         }
     }
     
-    protected void fillData(List<Commit> commits) {
+    protected void fillData(List<RepositoryCommit> commits) {
         ListView listView = (ListView) findViewById(R.id.list_view);
         listView.setOnItemClickListener(this);
         
-        CommitAdapter commitAdapter = new CommitAdapter(this, new ArrayList<Commit>());
+        CommitAdapter commitAdapter = new CommitAdapter(this, new ArrayList<RepositoryCommit>());
         listView.setAdapter(commitAdapter);
         
         if (commits != null && commits.size() > 0) {
-            for (Commit commit : commits) {
+            for (RepositoryCommit commit : commits) {
                 commitAdapter.add(commit);
             }
         }

@@ -15,10 +15,16 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import org.eclipse.egit.github.core.PullRequest;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.PullRequestService;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -28,19 +34,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
 
 import com.gh4a.adapter.PullRequestAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
-import com.github.api.v2.schema.PullRequest;
-import com.github.api.v2.schema.Issue.State;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.PullRequestService;
-import com.github.api.v2.services.auth.Authentication;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The PullRequestList activity.
@@ -115,7 +114,7 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
         b.setData(data);
         breadCrumbHolders[1] = b;
 
-        createBreadcrumb(State.valueOf(mState).name() + " Pull Requests", breadCrumbHolders);
+        createBreadcrumb(mState + " Pull Requests", breadCrumbHolders);
     }
 
     /* (non-Javadoc)
@@ -176,16 +175,14 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
             if (mTarget.get() != null) {
                 try {
                     PullRequestListActivity activity = mTarget.get();
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    PullRequestService pullRequestService = factory.createPullRequestService();
                     
-                    Authentication auth = new LoginPasswordAuthentication(activity.getAuthUsername(), activity.getAuthPassword());
-                    pullRequestService.setAuthentication(auth);
-                    
-                    return pullRequestService.getPullRequests(activity.mUserLogin,
-                            activity.mRepoName, State.valueOf(activity.mState));
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    PullRequestService pullRequestService = new PullRequestService(client);
+                    return pullRequestService.getPullRequests(new RepositoryId(activity.mUserLogin,
+                            activity.mRepoName), activity.mState);
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -236,10 +233,10 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
                 mPullRequestAdapter.add(pullRequest);
             }
             mPullRequestAdapter.notifyDataSetChanged();
-            ((TextView) findViewById(R.id.tv_subtitle)).setText(State.valueOf(mState).name() + " Pull Requests (" + pullRequests.size() + ")");
+            ((TextView) findViewById(R.id.tv_subtitle)).setText(mState + " Pull Requests (" + pullRequests.size() + ")");
         }
         else {
-            ((TextView) findViewById(R.id.tv_subtitle)).setText(State.valueOf(mState).name() + " Pull Requests");
+            ((TextView) findViewById(R.id.tv_subtitle)).setText(mState + " Pull Requests");
             getApplicationContext().notFoundMessage(this, "Pull Requests");
         }
     }

@@ -15,10 +15,19 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.IssueService;
+import org.eclipse.egit.github.core.service.LabelService;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -48,13 +57,6 @@ import com.gh4a.db.DbHelper;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
-import com.github.api.v2.schema.Comment;
-import com.github.api.v2.schema.Issue;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.IssueService;
-import com.github.api.v2.services.auth.Authentication;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The IssueInfo activity.
@@ -86,7 +88,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
     protected boolean mCommentsLoaded;// flag to prevent more click which result
                                       // to query to the rest API
     
-    protected List<String> mLabels;
+    protected List<Label> mLabels;
 
     /**
      * Called when the activity is first created.
@@ -163,11 +165,10 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
      * @return the issue
      * @throws GitHubException the git hub exception
      */
-    protected Bundle getIssue() throws GitHubException {
-        GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-        IssueService issueService = factory.createIssueService();
-        Authentication auth = new LoginPasswordAuthentication(getAuthUsername(), getAuthPassword());
-        issueService.setAuthentication(auth);
+    protected Bundle getIssue() throws IOException {
+        GitHubClient client = new GitHubClient();
+        client.setOAuth2Token(getAuthToken());
+        IssueService issueService = new IssueService(client);
         Issue issue = issueService.getIssue(mUserLogin, mRepoName, mIssueNumber);
         mBundle = getApplicationContext().populateIssue(issue);
         return mBundle;
@@ -187,7 +188,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
 
         lvComments.addHeaderView(mHeader, null, false);
         
-        if (isAuthenticated()) {
+        if (isAuthorized()) {
             lvComments.addFooterView(mFooter, null, false);
         }
 
@@ -306,7 +307,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                 try {
                     return mTarget.get().getIssue();
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -354,14 +355,11 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
      * @return the comments
      * @throws GitHubException the git hub exception
      */
-    protected List<Comment> getComments() throws GitHubException {
-        GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-        IssueService issueService = factory.createIssueService();
-        
-        Authentication auth = new LoginPasswordAuthentication(getAuthUsername(), getAuthPassword());
-        issueService.setAuthentication(auth);
-        
-        return issueService.getIssueComments(mUserLogin, mRepoName, mIssueNumber);
+    protected List<Comment> getComments() throws IOException {
+        GitHubClient client = new GitHubClient();
+        client.setOAuth2Token(getAuthToken());
+        IssueService issueService = new IssueService(client);
+        return issueService.getComments(mUserLogin, mRepoName, mIssueNumber);
     }
 
     /**
@@ -398,7 +396,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                     this.hideMainView = params[0];
                     return mTarget.get().getComments();
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -443,7 +441,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
     
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (isAuthenticated()) {
+        if (isAuthorized()) {
             MenuInflater inflater = getMenuInflater();
             menu.clear();
             if ("closed".equals(mBundle.getString(Constants.Issue.ISSUE_STATE))) {
@@ -464,7 +462,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
     public boolean setMenuOptionItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.string.issue_create:
-                if (isAuthenticated()) {
+                if (isAuthorized()) {
                     Intent intent = new Intent().setClass(this, IssueCreateActivity.class);
                     intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
                     intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
@@ -477,7 +475,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                 }                
                 return true;
             case R.string.issue_edit:
-                if (isAuthenticated()) {
+                if (isAuthorized()) {
                     Intent intent = new Intent().setClass(this, IssueEditActivity.class);
                     intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
                     intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
@@ -493,7 +491,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                 }     
                 return true;
             case R.string.issue_close:
-                if (isAuthenticated()) {
+                if (isAuthorized()) {
                     new CloseIssueTask(this, false).execute();
                 }
                 else {
@@ -503,7 +501,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                 }
                 return true;
             case R.string.issue_reopen:
-                if (isAuthenticated()) {
+                if (isAuthorized()) {
                     new ReopenIssueTask(this, false).execute();
                 }
                 else {
@@ -513,7 +511,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                 }
                 return true;
             case R.string.issue_label_add_delete:
-                if (isAuthenticated()) {
+                if (isAuthorized()) {
                     new LoadIssueLabelsTask(this).execute();
                 }
                 else {
@@ -558,17 +556,21 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
             if (mTarget.get() != null) {
                 try {
                     IssueActivity activity = mTarget.get();
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    IssueService service = factory.createIssueService();
-                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                            mTarget.get().getAuthPassword());
-                    service.setAuthentication(auth);
-                    service.closeIssue(activity.mUserLogin, 
-                            activity.mRepoName,
-                            activity.mIssueNumber);
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    IssueService issueService = new IssueService(client);
+                    
+                    Issue issue = new Issue();
+                    issue.setId(activity.mIssueNumber);
+                    issue.setState("closed");
+                    issueService.editIssue(new RepositoryId(activity.mUserLogin,
+                            activity.mRepoName), issue);
+//                    issueService.closeIssue(activity.mUserLogin, 
+//                            activity.mRepoName,
+//                            activity.mIssueNumber);
                     return true;
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -610,7 +612,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                     TextView tvState = (TextView)activity.findViewById(R.id.tv_state);
                     tvState.setBackgroundResource(R.drawable.default_red_box);
                     tvState.setText("closed");
-                    activity.mBundle.putString(Constants.Issue.ISSUE_STATE, Issue.State.CLOSED.value());
+                    activity.mBundle.putString(Constants.Issue.ISSUE_STATE, "closed");
                 }
             }
         }
@@ -647,17 +649,21 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
             if (mTarget.get() != null) {
                 try {
                     IssueActivity activity = mTarget.get();
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    IssueService service = factory.createIssueService();
-                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                            mTarget.get().getAuthPassword());
-                    service.setAuthentication(auth);
-                    service.reopenIssue(activity.mUserLogin, 
-                            activity.mRepoName,
-                            activity.mIssueNumber);
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    IssueService issueService = new IssueService(client);
+                    
+                    Issue issue = new Issue();
+                    issue.setId(activity.mIssueNumber);
+                    issue.setState("open");
+                    issueService.editIssue(new RepositoryId(activity.mUserLogin,
+                            activity.mRepoName), issue);
+//                    service.reopenIssue(activity.mUserLogin, 
+//                            activity.mRepoName,
+//                            activity.mIssueNumber);
                     return true;
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -699,7 +705,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                     TextView tvState = (TextView)activity.findViewById(R.id.tv_state);
                     tvState.setBackgroundResource(R.drawable.default_green_box);
                     tvState.setText("open");
-                    activity.mBundle.putString(Constants.Issue.ISSUE_STATE, Issue.State.OPEN.value());
+                    activity.mBundle.putString(Constants.Issue.ISSUE_STATE, "open");
                 }
             }
         }
@@ -747,18 +753,16 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
 //                    if (cbSign.isChecked()) {
 //                        comment = comment + "\n\n" + activity.getResources().getString(R.string.sign);
 //                    }
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    IssueService service = factory.createIssueService();
-                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                            mTarget.get().getAuthPassword());
-                    service.setAuthentication(auth);
-                    service.addComment(activity.mUserLogin, 
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    IssueService issueService = new IssueService(client);
+                    issueService.createComment(activity.mUserLogin, 
                             activity.mRepoName,
                             activity.mIssueNumber,
                             comment);
                     return true;
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -835,8 +839,8 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
 
         //find which labels for this issue
         for (int i = 0; i < mLabels.size(); i++) {
-            availabelLabelArr[i] = mLabels.get(i);
-            if(currentLabels.contains((String) mLabels.get(i))) {
+            availabelLabelArr[i] = mLabels.get(i).getName();
+            if(currentLabels.contains(mLabels.get(i).getName())) {
                 checkedItems[i] = true;
             }
             else {
@@ -882,7 +886,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
      * An asynchronous task that runs on a background thread
      * to load issue labels.
      */
-    private static class LoadIssueLabelsTask extends AsyncTask<Void, Void, List<String>> {
+    private static class LoadIssueLabelsTask extends AsyncTask<Void, Void, List<Label>> {
 
         /** The target. */
         private WeakReference<IssueActivity> mTarget;
@@ -905,18 +909,17 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
-        protected List<String> doInBackground(Void... params) {
+        protected List<Label> doInBackground(Void... params) {
             if (mTarget.get() != null) {
                 try {
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    IssueService issueService = factory.createIssueService();
-                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                            mTarget.get().getAuthPassword());
-                    issueService.setAuthentication(auth);
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    IssueService issueService = new IssueService(client);
                     
-                    return issueService.getIssueLabels(mTarget.get().mUserLogin, mTarget.get().mRepoName);
+                    return issueService.getIssue(mTarget.get().mUserLogin, 
+                            mTarget.get().mRepoName, mTarget.get().mIssueNumber).getLabels();
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -943,7 +946,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
          * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
          */
         @Override
-        protected void onPostExecute(List<String> result) {
+        protected void onPostExecute(List<Label> result) {
             if (mTarget.get() != null) {
                 IssueActivity activity = mTarget.get();
                 activity.mLoadingDialog.dismiss();
@@ -995,28 +998,26 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
         @Override
         protected Void doInBackground(Void...params) {
             if (mTarget.get() != null) {
-                try {
-                    IssueActivity activity = mTarget.get();
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    IssueService issueService = factory.createIssueService();
-                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                            mTarget.get().getAuthPassword());
-                    issueService.setAuthentication(auth);
-                    
-                    for (int i = 0; i < mCheckedItems.length; i++) {
-                        String label = StringUtils.encodeUrl(mAvailableLabelArr[i]);
-                        if (mCheckedItems[i]) {
-                            issueService.addLabel(activity.mUserLogin, activity.mRepoName, activity.mIssueNumber, label);
-                        }
-                        else {
-                            issueService.removeLabel(activity.mUserLogin, activity.mRepoName, activity.mIssueNumber, label);
-                        }
-                    }
-                }
-                catch (GitHubException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                }
+//                try {
+//                    IssueActivity activity = mTarget.get();
+//                    GitHubClient client = new GitHubClient();
+//                    client.setOAuth2Token(mTarget.get().getAuthToken());
+//                    LabelService labelService = new LabelService(client);
+//                    for (int i = 0; i < mCheckedItems.length; i++) {
+//                        String label = StringUtils.encodeUrl(mAvailableLabelArr[i]);
+//                        if (mCheckedItems[i]) {
+//                            labelService.setLabels(new RepositoryId(activity.mUserLogin, activity.mRepoName),
+//                                    activity.mIssueNumber, label);
+//                        }
+//                        else {
+//                            issueService.removeLabel(activity.mUserLogin, activity.mRepoName, activity.mIssueNumber, label);
+//                        }
+//                    }
+//                }
+//                catch (GitHubException e) {
+//                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+//                    mException = true;
+//                }
             }
             return null;
         }
@@ -1053,7 +1054,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
         }
     }
     
-    private void showIssueLabelsContextMenu(List<String> labels) {
+    private void showIssueLabelsContextMenu(List<Label> labels) {
         if (labels != null && !labels.isEmpty()) {
             mLabels = labels;
             showLabelsDialog();

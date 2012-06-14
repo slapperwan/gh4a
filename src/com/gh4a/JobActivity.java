@@ -27,7 +27,6 @@ import android.widget.TextView;
 
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.StringUtils;
-import com.github.api.v2.schema.Job.Type;
 
 public class JobActivity extends BaseActivity {
 
@@ -135,7 +134,7 @@ public class JobActivity extends BaseActivity {
         sb.append("<h3 style='margin:2px'>").append(mTitle).append("</h3>");
         
         sb.append("<h4 style='margin:2px'>").append(mCompany).append(" - ");
-        if (Type.FULL_TIME.value().equals(mType)) {
+        if ("full_time".equals(mType)) {
             sb.append("<span style='color:#1D9A00'>").append(mType).append("</span>");
         }
         else {

@@ -15,17 +15,16 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.IssueService;
 
 import com.gh4a.holder.BreadCrumbHolder;
-import com.gh4a.utils.StringUtils;
-import com.github.api.v2.schema.Issue;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.IssueService;
-import com.github.api.v2.services.auth.Authentication;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The IssueListByLabel activity.
@@ -85,16 +84,18 @@ public class IssueListByLabelActivity extends IssueListActivity {
      * @see com.gh4a.IssueListActivity#getIssues()
      */
     @Override
-    public List<Issue> getIssues() throws GitHubException {
+    public List<Issue> getIssues() throws IOException {
+        GitHubClient client = new GitHubClient();
+        client.setOAuth2Token(getAuthToken());
+        IssueService issueService = new IssueService(client);
+
         String label = getIntent().getStringExtra(Constants.Issue.ISSUE_LABEL);
-        GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-        IssueService service = factory.createIssueService();
-        label = StringUtils.encodeUrl(label);
+        //label = StringUtils.encodeUrl(label);
         
-        Authentication auth = new LoginPasswordAuthentication(getAuthUsername(), getAuthPassword());
-        service.setAuthentication(auth);
+        Map<String, String> filterData = new HashMap<String, String>();
+        filterData.put("label", label);
         
-        return service.getIssues(mUserLogin, mRepoName, label);
+        return issueService.getIssues(mUserLogin, mRepoName, filterData);
     }
     
     public void setRowLayout() {

@@ -15,17 +15,16 @@
  */
 package com.gh4a;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.CollaboratorService;
+
 import com.gh4a.holder.BreadCrumbHolder;
-import com.github.api.v2.schema.User;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.RepositoryService;
-import com.github.api.v2.services.auth.Authentication;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The CollaboratorList activity.
@@ -107,20 +106,11 @@ public class CollaboratorListActivity extends UserListActivity {
      * (non-Javadoc)
      * @see com.gh4a.UserListActivity#getUsers()
      */
-    protected List<User> getUsers() throws GitHubException {
-        GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-        RepositoryService repositoryService = factory.createRepositoryService();
-        
-        Authentication auth = new LoginPasswordAuthentication(getAuthUsername(), getAuthPassword());
-        repositoryService.setAuthentication(auth);
-        
-        List<String> usernames = repositoryService.getCollaborators(mUserLogin, mRepoName);
-        List<User> users = new ArrayList<User>();
-        for (String username : usernames) {
-            User user = new User();
-            user.setLogin(username);
-            users.add(user);
-        }
-        return users;
+    protected List<User> getUsers() throws IOException {
+        GitHubClient client = new GitHubClient();
+        client.setOAuth2Token(getAuthToken());
+        CollaboratorService collaboratorService = new CollaboratorService(client);
+        return collaboratorService
+                .getCollaborators(new RepositoryId(mUserLogin, mRepoName));
     }
 }

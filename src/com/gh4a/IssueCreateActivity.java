@@ -15,8 +15,13 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.IssueService;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -34,11 +39,6 @@ import com.gh4a.db.BookmarkParam;
 import com.gh4a.db.DbHelper;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.StringUtils;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.IssueService;
-import com.github.api.v2.services.auth.Authentication;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The IssueCreate activity.
@@ -61,7 +61,7 @@ public class IssueCreateActivity extends BaseActivity implements OnClickListener
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        if (!isAuthenticated()) {
+        if (!isAuthorized()) {
             Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
             startActivity(intent);
             finish();
@@ -167,25 +167,20 @@ public class IssueCreateActivity extends BaseActivity implements OnClickListener
             if (mTarget.get() != null) {
                 try {
                     IssueCreateActivity activity = mTarget.get();
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    IssueService service = factory.createIssueService();
-                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                            mTarget.get().getAuthPassword());
-                    service.setAuthentication(auth);
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    IssueService issueService = new IssueService(client);
                     
-                    //CheckBox cbSign = (CheckBox) activity.findViewById(R.id.cb_sign);
-                    String comment = params[1];
-//                    if (cbSign.isChecked()) {
-//                        comment = comment + "\n\n" + activity.getResources().getString(R.string.sign);
-//                    }
+                    Issue issue = new Issue();
+                    issue.setTitle(params[0]);
+                    issue.setBody(params[1]);
                     
-                    service.createIssue(activity.mUserLogin, 
-                            activity.mRepoName, 
-                            params[0], 
-                            comment);
+                    issueService.createIssue(activity.mUserLogin, 
+                            activity.mRepoName, issue);
+                    
                     return true;
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -234,7 +229,7 @@ public class IssueCreateActivity extends BaseActivity implements OnClickListener
     
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (isAuthenticated()) {
+        if (isAuthorized()) {
             menu.clear();
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.bookmark_menu, menu);

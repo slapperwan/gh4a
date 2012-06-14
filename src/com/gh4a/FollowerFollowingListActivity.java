@@ -15,25 +15,26 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.UserService;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
 
 import com.gh4a.adapter.UserAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
-import com.github.api.v2.schema.User;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.UserService;
 
 /**
  * The FollowerFollowingList activity.
@@ -135,18 +136,19 @@ public class FollowerFollowingListActivity extends BaseActivity implements OnIte
             if (mTarget.get() != null) {
                 try {
                     FollowerFollowingListActivity activity = mTarget.get();
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    UserService service = factory.createUserService();
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(activity.getAuthToken());
+                    UserService userService = new UserService(client);
                     List<User> users = new ArrayList<User>();
                     if (activity.mFindFollowers) {
-                        users = service.getUserFollowers(activity.mUserLogin);
+                        userService.getFollowers(activity.mUserLogin);
                     }
                     else {
-                        users = service.getUserFollowing(activity.mUserLogin);
+                        users = userService.getFollowing(activity.mUserLogin);
                     }
                     return users;
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;

@@ -20,20 +20,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
 
 import com.gh4a.adapter.YourActionsAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.holder.YourActionFeed;
 import com.gh4a.utils.RssParser;
-import com.github.api.v2.schema.UserFeed;
 
 /**
  * The UserYourActions activity.
@@ -109,7 +107,9 @@ public class UserYourActionsActivity extends BaseActivity implements OnItemClick
         @Override
         protected List<YourActionFeed> doInBackground(Void... params) {
             if (mTarget.get() != null) {
-                RssParser p = new RssParser(mTarget.get().mUrl, mTarget.get().getAuthUsername(), mTarget.get().getAuthPassword());
+                //RssParser p = new RssParser(mTarget.get().mUrl, mTarget.get().getAuthLogin(), mTarget.get().getAuthPassword());
+                RssParser p = new RssParser(mTarget.get().mUrl, mTarget.get().getAuthLogin(), 
+                        mTarget.get().getAuthToken());
                 try {
                     return p.parse();
                 }
@@ -183,74 +183,74 @@ public class UserYourActionsActivity extends BaseActivity implements OnItemClick
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        YourActionFeed feed = (YourActionFeed) adapterView.getAdapter().getItem(position);
-        String event = feed.getEvent();
-        String actionPath = feed.getActionPath();
-        if (UserFeed.Type.PUSH_EVENT.value().equals(event)
-                && actionPath.contains("compare")) {
-            Intent intent = new Intent().setClass(this, CompareActivity.class);
-            String[] commitMsgs = feed.getContent().split("\n");
-            for (String msg : commitMsgs) {
-                String stripAllmsg = msg.replaceAll("\n", "").replaceAll("\r\n", "");
-                String[] msgPart = msg.split(" ");
-                if (msgPart[0].matches("[0-9a-zA-Z]{7}") && msgPart.length > 1) {
-                    if (!msg.substring(msg.indexOf(msgPart[1]), msg.length()).contains("more commits")) {
-                        String[] shas = new String[4];
-                        shas[0] = msgPart[0];
-                        shas[1] = feed.getEmail();
-                        shas[2] = msg.substring(msg.indexOf(msgPart[1]), msg.length());
-                        shas[3] = feed.getAuthor();//TODO, get actual commit author from content
-                        intent.putExtra("sha" + shas[0], shas);
-                    }
-                }
-            }
-            
-            intent.putExtra(Constants.Repository.REPO_OWNER, feed.getRepoOWner());
-            intent.putExtra(Constants.Repository.REPO_NAME, feed.getRepoName());
-            intent.putExtra(Constants.Repository.REPO_URL, feed.getLink());
-            startActivity(intent);
-        }
-        else if (UserFeed.Type.FOLLOW_EVENT.value().equals(event)) {
-            String[] title = feed.getTitle().split(" ");
-            String username = title[3];
-            getApplicationContext().openUserInfoActivity(this, username, null);
-        }
-        else if (UserFeed.Type.ISSUES_EVENT.value().equals(event)) {
-            String[] title = feed.getTitle().split(" ");
-            String issueNumber = title[3];
-            getApplicationContext().openIssueActivity(this, feed.getRepoOWner(), feed.getRepoName(), Integer.parseInt(issueNumber));
-        }
-        else if (UserFeed.Type.GOLLUM_EVENT.value().equals(event)) {
-            getApplicationContext().openBrowser(this, feed.getLink());
-        }
-        else if (UserFeed.Type.PULL_REQUEST_EVENT.value().equals(event)) {
-            String[] title = feed.getTitle().split(" ");
-            String issueNumber = title[4];
-            getApplicationContext().openPullRequestActivity(this, feed.getRepoOWner(), feed.getRepoName(), Integer.parseInt(issueNumber));
-        }
-        else if (UserFeed.Type.ISSUE_COMMENT_EVENT.value().equals(event)) {
-            String[] title = feed.getTitle().split(" ");
-            String issueNumber = title[4];
-            if ("request".equals(issueNumber)) {//comment in pull request
-                issueNumber = title[5];
-            }
-            getApplicationContext().openIssueActivity(this, feed.getRepoOWner(), feed.getRepoName(), Integer.parseInt(issueNumber));
-        }
-        else {
-            if (feed.getRepoOWner() != null
-                    && feed.getRepoName() != null) {
-                
-                //url is https://github.com/organizations/:organization/:....
-                if ("organizations".equals(feed.getRepoOWner())) {
-                    getApplicationContext().openUserInfoActivity(this, feed.getRepoName(), null);
-                }
-                else {
-                    getApplicationContext().openRepositoryInfoActivity(this, feed.getRepoOWner(), feed.getRepoName());
-                }
-            }
-            else {
-                getApplicationContext().notFoundMessage(this, R.plurals.repository);
-            }
-        }
+//        YourActionFeed feed = (YourActionFeed) adapterView.getAdapter().getItem(position);
+//        String event = feed.getEvent();
+//        String actionPath = feed.getActionPath();
+//        if (UserFeed.Type.PUSH_EVENT.value().equals(event)
+//                && actionPath.contains("compare")) {
+//            Intent intent = new Intent().setClass(this, CompareActivity.class);
+//            String[] commitMsgs = feed.getContent().split("\n");
+//            for (String msg : commitMsgs) {
+//                String stripAllmsg = msg.replaceAll("\n", "").replaceAll("\r\n", "");
+//                String[] msgPart = msg.split(" ");
+//                if (msgPart[0].matches("[0-9a-zA-Z]{7}") && msgPart.length > 1) {
+//                    if (!msg.substring(msg.indexOf(msgPart[1]), msg.length()).contains("more commits")) {
+//                        String[] shas = new String[4];
+//                        shas[0] = msgPart[0];
+//                        shas[1] = feed.getEmail();
+//                        shas[2] = msg.substring(msg.indexOf(msgPart[1]), msg.length());
+//                        shas[3] = feed.getAuthor();//TODO, get actual commit author from content
+//                        intent.putExtra("sha" + shas[0], shas);
+//                    }
+//                }
+//            }
+//            
+//            intent.putExtra(Constants.Repository.REPO_OWNER, feed.getRepoOWner());
+//            intent.putExtra(Constants.Repository.REPO_NAME, feed.getRepoName());
+//            intent.putExtra(Constants.Repository.REPO_URL, feed.getLink());
+//            startActivity(intent);
+//        }
+//        else if (UserFeed.Type.FOLLOW_EVENT.value().equals(event)) {
+//            String[] title = feed.getTitle().split(" ");
+//            String username = title[3];
+//            getApplicationContext().openUserInfoActivity(this, username, null);
+//        }
+//        else if (UserFeed.Type.ISSUES_EVENT.value().equals(event)) {
+//            String[] title = feed.getTitle().split(" ");
+//            String issueNumber = title[3];
+//            getApplicationContext().openIssueActivity(this, feed.getRepoOWner(), feed.getRepoName(), Integer.parseInt(issueNumber));
+//        }
+//        else if (UserFeed.Type.GOLLUM_EVENT.value().equals(event)) {
+//            getApplicationContext().openBrowser(this, feed.getLink());
+//        }
+//        else if (UserFeed.Type.PULL_REQUEST_EVENT.value().equals(event)) {
+//            String[] title = feed.getTitle().split(" ");
+//            String issueNumber = title[4];
+//            getApplicationContext().openPullRequestActivity(this, feed.getRepoOWner(), feed.getRepoName(), Integer.parseInt(issueNumber));
+//        }
+//        else if (UserFeed.Type.ISSUE_COMMENT_EVENT.value().equals(event)) {
+//            String[] title = feed.getTitle().split(" ");
+//            String issueNumber = title[4];
+//            if ("request".equals(issueNumber)) {//comment in pull request
+//                issueNumber = title[5];
+//            }
+//            getApplicationContext().openIssueActivity(this, feed.getRepoOWner(), feed.getRepoName(), Integer.parseInt(issueNumber));
+//        }
+//        else {
+//            if (feed.getRepoOWner() != null
+//                    && feed.getRepoName() != null) {
+//                
+//                //url is https://github.com/organizations/:organization/:....
+//                if ("organizations".equals(feed.getRepoOWner())) {
+//                    getApplicationContext().openUserInfoActivity(this, feed.getRepoName(), null);
+//                }
+//                else {
+//                    getApplicationContext().openRepositoryInfoActivity(this, feed.getRepoOWner(), feed.getRepoName());
+//                }
+//            }
+//            else {
+//                getApplicationContext().notFoundMessage(this, R.plurals.repository);
+//            }
+//        }
     }
 }

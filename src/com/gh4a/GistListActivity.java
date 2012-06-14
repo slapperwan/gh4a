@@ -15,28 +15,26 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import android.content.res.Resources.NotFoundException;
+import org.eclipse.egit.github.core.Gist;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.GistService;
+
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
 
 import com.gh4a.adapter.GistAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
-import com.github.api.v2.schema.Gist;
-import com.github.api.v2.services.GistService;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.auth.Authentication;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The GistList activity.
@@ -115,14 +113,12 @@ public class GistListActivity extends BaseActivity implements OnItemClickListene
         protected List<Gist> doInBackground(String... params) {
             if (mTarget.get() != null) {
                 try {
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    GistService service = factory.createGistService();
-                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                            mTarget.get().getAuthPassword());
-                    service.setAuthentication(auth);
-                    return service.getUserGists(params[0]);                    
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    GistService gistService = new GistService(client);
+                    return gistService.getGists(params[0]);                    
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -193,6 +189,6 @@ public class GistListActivity extends BaseActivity implements OnItemClickListene
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         Gist gist = (Gist) adapterView.getAdapter().getItem(position);
-        getApplicationContext().openGistActivity(this, gist.getRepo());
+        getApplicationContext().openGistActivity(this, gist.getId());
     }
 }

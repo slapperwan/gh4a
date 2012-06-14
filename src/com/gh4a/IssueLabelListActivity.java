@@ -15,10 +15,15 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.LabelService;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -28,26 +33,21 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
 
 import com.gh4a.adapter.SimpleStringAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.StringUtils;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.IssueService;
-import com.github.api.v2.services.auth.Authentication;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The IssueLabelList activity.
@@ -122,7 +122,7 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
      * An asynchronous task that runs on a background thread
      * to load issue labels.
      */
-    private static class LoadIssueLabelsTask extends AsyncTask<Void, Integer, List<String>> {
+    private static class LoadIssueLabelsTask extends AsyncTask<Void, Integer, List<Label>> {
 
         /** The target. */
         private WeakReference<IssueLabelListActivity> mTarget;
@@ -144,20 +144,16 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
-        protected List<String> doInBackground(Void... params) {
+        protected List<Label> doInBackground(Void... params) {
             if (mTarget.get() != null) {
                 try {
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    IssueService issueService = factory.createIssueService();
-                    
-                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(), 
-                            mTarget.get().getAuthPassword());
-                    issueService.setAuthentication(auth);
-                    
-                    return issueService.getIssueLabels(mTarget.get().mUserLogin,
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    LabelService labelService = new LabelService(client);
+                    return labelService.getLabels(mTarget.get().mUserLogin,
                             mTarget.get().mRepoName);
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -184,7 +180,7 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
          * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
          */
         @Override
-        protected void onPostExecute(List<String> result) {
+        protected void onPostExecute(List<Label> result) {
             if (mTarget.get() != null) {
                 IssueLabelListActivity activity = mTarget.get();
                 activity.mLoadingDialog.dismiss();
@@ -204,7 +200,7 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
      *
      * @param result the result
      */
-    private void fillData(List<String> result) {
+    private void fillData(List<Label> result) {
         mListView = (ListView) findViewById(R.id.list_view);
         mListView.setOnItemClickListener(this);
         SimpleStringAdapter adapter = new SimpleStringAdapter(this, new ArrayList<String>());
@@ -212,8 +208,8 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
         registerForContextMenu(mListView);
         
         if (result != null && result.size() > 0) {
-            for (String label : result) {
-                adapter.add(label);
+            for (Label label : result) {
+                adapter.add(label.getName());
             }
         }
         else {
@@ -242,7 +238,7 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
      */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (isAuthenticated()) {
+        if (isAuthorized()) {
             menu.clear();
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.labels_menu, menu);
@@ -257,7 +253,7 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
     public boolean setMenuOptionItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.create_label:
-                if (isAuthenticated()) {
+                if (isAuthorized()) {
                     showCreateLabelForm();
                 }
                 else {
@@ -306,7 +302,7 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
      */
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-        if (isAuthenticated()) {
+        if (isAuthorized()) {
             if (v.getId() == R.id.list_view) {
                 AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
                 String label = (String) mListView.getItemAtPosition(info.position);
@@ -326,7 +322,7 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
         final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         switch (item.getItemId()) {
         case Menu.FIRST + 1:
-            try {
+            //try {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage("Are you sure?")
                        .setCancelable(false)
@@ -343,11 +339,11 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
                        });
                 AlertDialog alert = builder.create();
                 alert.show();
-            }
-            catch (GitHubException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                showMessage(getResources().getString(R.string.issue_error_delete_label), false);
-            }
+//            }
+//            catch (IOException e) {
+//                Log.e(Constants.LOG_TAG, e.getMessage(), e);
+//                showMessage(getResources().getString(R.string.issue_error_delete_label), false);
+//            }
             break;
         case Menu.FIRST + 2:
             String label = (String) mListView.getItemAtPosition(info.position);
@@ -394,15 +390,16 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
             if (mTarget.get() != null) {
                 try {
                     IssueLabelListActivity activity = mTarget.get();
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    IssueService issueService = factory.createIssueService();
-                    Authentication auth = new LoginPasswordAuthentication(activity.getAuthUsername(), activity.getAuthPassword());
-                    issueService.setAuthentication(auth);
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    LabelService labelService = new LabelService(client);
+                    
                     String label = (String) activity.mListView.getItemAtPosition(params[0]);
                     label = StringUtils.encodeUrl(label);
-                    issueService.removeLabelWithoutIssue(activity.mUserLogin, activity.mRepoName, label);
+                    
+                    labelService.deleteLabel(activity.mUserLogin, activity.mRepoName, label);
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                 }
@@ -471,15 +468,19 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
             if (mTarget.get() != null) {
                 try {
                     IssueLabelListActivity activity = mTarget.get();
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    IssueService issueService = factory.createIssueService();
-                    Authentication auth = new LoginPasswordAuthentication(activity.getAuthUsername(), activity.getAuthPassword());
-                    issueService.setAuthentication(auth);
-                    String label = params[0];
-                    label = StringUtils.encodeUrl(label);
-                    issueService.addLabelWithoutIssue(activity.mUserLogin, activity.mRepoName, label);
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    LabelService labelService = new LabelService(client);
+                    
+                    String labelName = params[0];
+                    //labelName = StringUtils.encodeUrl(labelName);
+                    
+                    Label label = new Label();
+                    label.setName(labelName);
+                    
+                    labelService.createLabel(activity.mUserLogin, activity.mRepoName, label);
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                 }

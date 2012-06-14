@@ -17,20 +17,21 @@ package com.gh4a.adapter;
 
 import java.util.List;
 
+import org.eclipse.egit.github.core.Comment;
 import org.xml.sax.XMLReader;
 
 import android.content.Context;
 import android.content.res.Resources;
 import android.text.Editable;
 import android.text.Html;
-import android.text.SpannableStringBuilder;
 import android.text.Html.TagHandler;
+import android.text.SpannableStringBuilder;
 import android.text.style.CharacterStyle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
@@ -40,7 +41,6 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.ImageDownloader;
-import com.github.api.v2.schema.Comment;
 
 /**
  * The Comment adapter.
@@ -82,7 +82,7 @@ public class CommentAdapter extends RootAdapter<Comment> {
 
         final Comment comment = mObjects.get(position);
         if (comment != null) {
-            ImageDownloader.getInstance().download(comment.getGravatarId(), viewHolder.ivGravatar);
+            ImageDownloader.getInstance().download(comment.getUser().getGravatarId(), viewHolder.ivGravatar);
             viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
 
                 @Override
@@ -90,12 +90,12 @@ public class CommentAdapter extends RootAdapter<Comment> {
                     /** Open user activity */
                     Gh4Application context = (Gh4Application) v.getContext()
                             .getApplicationContext();
-                    context.openUserInfoActivity(v.getContext(), comment.getUser(), null);
+                    context.openUserInfoActivity(v.getContext(), comment.getUser().getLogin(), null);
                 }
             });
 
             Resources res = v.getResources();
-            String extraData = String.format(res.getString(R.string.more_data), comment.getUser(),
+            String extraData = String.format(res.getString(R.string.more_data), comment.getUser().getLogin(),
                     pt.format(comment.getCreatedAt()));
 
             viewHolder.tvExtra.setText(extraData);

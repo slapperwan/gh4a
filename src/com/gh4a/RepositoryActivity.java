@@ -15,8 +15,15 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutionException;
+
+import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.RepositoryService;
+import org.eclipse.egit.github.core.service.WatcherService;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -36,12 +43,6 @@ import com.gh4a.db.Bookmark;
 import com.gh4a.db.BookmarkParam;
 import com.gh4a.db.DbHelper;
 import com.gh4a.utils.StringUtils;
-import com.github.api.v2.schema.Repository;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.RepositoryService;
-import com.github.api.v2.services.auth.Authentication;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The Repository activity.
@@ -259,15 +260,14 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
             if (mTarget.get() != null) {
                 try {
                     RepositoryActivity activity = mTarget.get();
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    RepositoryService repositoryService = factory.createRepositoryService();
-                    Authentication auth = new LoginPasswordAuthentication(activity.getAuthUsername(), activity.getAuthPassword());
-                    repositoryService.setAuthentication(auth);
-                    return repositoryService.getRepository(activity.mBundle
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    RepositoryService repoService = new RepositoryService(client);
+                    return repoService.getRepository(activity.mBundle
                             .getString(Constants.Repository.REPO_OWNER), activity.mBundle
                             .getString(Constants.Repository.REPO_NAME));
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -343,13 +343,13 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
         protected Integer doInBackground(Void... arg0) {
             if (mTarget.get() != null) {
                 try {
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    RepositoryService repositoryService = factory.createRepositoryService();
-                    return repositoryService.getForks(
-                            mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER),
-                            mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME)).size();
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    RepositoryService repoService = new RepositoryService(client);
+                    return repoService.getForks(new RepositoryId(mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER), 
+                            mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME))).size();
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -619,7 +619,7 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
      */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (isAuthenticated()) {
+        if (isAuthorized()) {
             menu.clear();
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.repo_menu, menu);
@@ -681,22 +681,20 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
             if (mTarget.get() != null) {
                 isWatchAction = arg0[0];
                 try {
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    RepositoryService repositoryService = factory.createRepositoryService();
-                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                            mTarget.get().getAuthPassword());
-                    repositoryService.setAuthentication(auth);
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    WatcherService watcherService = new WatcherService(client);
+                    RepositoryId repoId = new RepositoryId(mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER), 
+                            mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME));
                     if (isWatchAction) {
-                        repositoryService.watchRepository(mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER),
-                                mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME));
+                        watcherService.watch(repoId);
                     }
                     else {
-                        repositoryService.unwatchRepository(mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER),
-                                mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME));
+                        watcherService.unwatch(repoId);
                     }
                     return true;
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -786,16 +784,14 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
         protected Boolean doInBackground(Boolean... arg0) {
             if (mTarget.get() != null) {
                 try {
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    RepositoryService repositoryService = factory.createRepositoryService();
-                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                            mTarget.get().getAuthPassword());
-                    repositoryService.setAuthentication(auth);
-                    repositoryService.forkRepository(mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER),
-                            mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME));
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    RepositoryService repoService = new RepositoryService(client);
+                    repoService.forkRepository(new RepositoryId(mTarget.get().mBundle.getString(Constants.Repository.REPO_OWNER),
+                            mTarget.get().mBundle.getString(Constants.Repository.REPO_NAME)));
                     return true;
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;

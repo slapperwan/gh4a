@@ -15,8 +15,15 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.List;
+import java.util.Iterator;
+import java.util.Map;
+
+import org.eclipse.egit.github.core.Gist;
+import org.eclipse.egit.github.core.GistFile;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.GistService;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -30,12 +37,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gh4a.utils.StringUtils;
-import com.github.api.v2.schema.Gist;
-import com.github.api.v2.services.GistService;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.auth.Authentication;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The Gist activity.
@@ -92,14 +93,12 @@ public class GistActivity extends BaseActivity {
         protected Gist doInBackground(String... params) {
             if (mTarget.get() != null) {
                 try {
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    GistService service = factory.createGistService();
-                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                            mTarget.get().getAuthPassword());
-                    service.setAuthentication(auth);
-                    return service.getGist(params[0]);                    
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    GistService gistService = new GistService(client);
+                    return gistService.getGist(params[0]);                    
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -148,18 +147,18 @@ public class GistActivity extends BaseActivity {
      */
     private void fillData(final Gist gist) {
         TextView tvName = (TextView) findViewById(R.id.tv_name);
-        tvName.setText(gist.getOwner());
+        tvName.setText(gist.getUser().getLogin());
         tvName.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 getApplicationContext().openUserInfoActivity(GistActivity.this,
-                        gist.getOwner(), null);
+                        gist.getUser().getLogin(), null);
             }
         });
         
         TextView tvGistId = (TextView) findViewById(R.id.tv_gist_id);
-        tvGistId.setText("Gist : " + gist.getRepo());
+        tvGistId.setText("Gist : " + gist.getUser().getLogin());
         
         TextView tvDesc = (TextView) findViewById(R.id.tv_desc);
         if (StringUtils.isBlank(gist.getDescription())) {
@@ -174,12 +173,15 @@ public class GistActivity extends BaseActivity {
         tvCreatedAt.setText(pt.format(gist.getCreatedAt()));
         
         LinearLayout llFiles = (LinearLayout) findViewById(R.id.ll_files);
-        
-        List<String> files = gist.getFiles();
+
+        Map<String, GistFile> files = gist.getFiles();
         if (files != null) {
-            for (final String filename : files) {
+            Iterator<String> iter = files.keySet().iterator();
+            while (iter.hasNext()) {
+                String key = iter.next();
+                final GistFile gistFile = files.get(key);
                 TextView tvFilename = new TextView(getApplicationContext());
-                SpannableString content = new SpannableString(filename);
+                SpannableString content = new SpannableString(gistFile.getFilename());
                 content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
                 tvFilename.setText(content);
                 tvFilename.setTextAppearance(getApplicationContext(),
@@ -191,9 +193,9 @@ public class GistActivity extends BaseActivity {
                     public void onClick(View arg0) {
                         Intent intent = new Intent().setClass(GistActivity.this,
                                 GistViewerActivity.class);
-                        intent.putExtra(Constants.User.USER_LOGIN, gist.getOwner());
-                        intent.putExtra(Constants.Gist.FILENAME, filename);
-                        intent.putExtra(Constants.Gist.ID, gist.getRepo());
+                        intent.putExtra(Constants.User.USER_LOGIN, gist.getUser().getLogin());
+                        intent.putExtra(Constants.Gist.FILENAME, gistFile.getFilename());
+                        intent.putExtra(Constants.Gist.ID, gist.getId());
                         startActivity(intent);
                     }
                 });

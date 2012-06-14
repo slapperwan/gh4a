@@ -16,13 +16,14 @@
 package com.gh4a.adapter;
 
 import java.util.List;
+import java.util.Locale;
+
+import org.ocpsoft.pretty.time.PrettyTime;
 
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-
-import com.ocpsoft.pretty.time.PrettyTime;
 
 /**
  * The Root adapter.
@@ -32,7 +33,7 @@ import com.ocpsoft.pretty.time.PrettyTime;
 public abstract class RootAdapter<T> extends BaseAdapter {
 
     /** The Constant pt. */
-    protected static final PrettyTime pt = new PrettyTime();
+    protected static final PrettyTime pt = new PrettyTime(new Locale(""));
 
     /** The objects. */
     protected List<T> mObjects;

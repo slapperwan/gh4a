@@ -18,8 +18,10 @@ package com.gh4a;
 
 import java.util.ArrayList;
 
-import org.acra.ACRA;
-import org.acra.annotation.ReportsCrashes;
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.Repository;
+import org.ocpsoft.pretty.time.PrettyTime;
 
 import android.app.Application;
 import android.content.Context;
@@ -29,14 +31,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.github.api.v2.schema.Issue;
-import com.github.api.v2.schema.Repository;
-import com.ocpsoft.pretty.time.PrettyTime;
-
 /**
  * The Class Gh4Application.
  */
-@ReportsCrashes(formKey = "dGRIem9SQ2g1WU42Mk1uSTRLREQtYkE6MQ") 
 public class Gh4Application extends Application {
 
     /*
@@ -62,7 +59,7 @@ public class Gh4Application extends Application {
         PrettyTime pt = new PrettyTime();
         Bundle data = new Bundle();
 
-        data.putString(Constants.Repository.REPO_OWNER, repository.getOwner());
+        data.putString(Constants.Repository.REPO_OWNER, repository.getOwner().getLogin());
         data.putString(Constants.Repository.REPO_NAME, repository.getName());
         data.putString(Constants.Repository.REPO_DESC, repository.getDescription());
         data.putString(Constants.Repository.REPO_URL, repository.getUrl());
@@ -71,13 +68,15 @@ public class Gh4Application extends Application {
         data.putString(Constants.Repository.REPO_HOMEPAGE, repository.getHomepage());
         data.putString(Constants.Repository.REPO_CREATED, pt.format(repository.getCreatedAt()));
         data.putString(Constants.Repository.REPO_LANGUANGE,
-                repository.getLanguage() != null ? repository.getLanguage().name() : null);
+                repository.getLanguage() != null ? repository.getLanguage() : null);
         data.putInt(Constants.Repository.REPO_OPEN_ISSUES, repository.getOpenIssues());
         data.putLong(Constants.Repository.REPO_SIZE, repository.getSize());
         data.putString(Constants.Repository.REPO_PUSHED, pt.format(repository.getPushedAt()));
         data.putBoolean(Constants.Repository.REPO_IS_FORKED, repository.isFork());
-        data.putString(Constants.Repository.REPO_PARENT, repository.getParent());
-        data.putString(Constants.Repository.REPO_SOURCE, repository.getSource());
+        data.putString(Constants.Repository.REPO_PARENT, repository.getParent() != null ?
+                repository.getParent().getName() : "");
+        data.putString(Constants.Repository.REPO_SOURCE, repository.getSource() != null ?
+                repository.getSource().getName() : "");
         data.putBoolean(Constants.Repository.REPO_HAS_ISSUES, repository.isHasIssues());
         data.putBoolean(Constants.Repository.REPO_HAS_WIKI, repository.isHasWiki());
 
@@ -97,13 +96,19 @@ public class Gh4Application extends Application {
         data.putInt(Constants.Issue.ISSUE_NUMBER, issue.getNumber());
         data.putString(Constants.Issue.ISSUE_TITLE, issue.getTitle());
         data.putString(Constants.Issue.ISSUE_CREATED_AT, pt.format(issue.getCreatedAt()));
-        data.putString(Constants.Issue.ISSUE_CREATED_BY, issue.getUser());
-        data.putString(Constants.Issue.ISSUE_STATE, issue.getState().value());
+        data.putString(Constants.Issue.ISSUE_CREATED_BY, issue.getUser().getLogin());
+        data.putString(Constants.Issue.ISSUE_STATE, issue.getState());
         data.putString(Constants.Issue.ISSUE_BODY, issue.getBody());
         data.putInt(Constants.Issue.ISSUE_COMMENTS, issue.getComments());
-        data.putString(Constants.GRAVATAR_ID, issue.getGravatarId());
-        data.putString(Constants.Issue.PULL_REQUEST_URL, issue.getPullRequestUrl());
-        data.putStringArrayList(Constants.Issue.ISSUE_LABELS, new ArrayList(issue.getLabels()));
+        data.putString(Constants.GRAVATAR_ID, issue.getUser().getGravatarId());
+        data.putString(Constants.Issue.PULL_REQUEST_URL, issue.getPullRequest().getUrl());
+        
+        //TODO: use Label object
+        ArrayList<String> labels = new ArrayList<String>();
+        for (Label label: issue.getLabels()) {
+            labels.add(label.getName());
+        }
+        data.putStringArrayList(Constants.Issue.ISSUE_LABELS, labels);
         return data;
     }
 

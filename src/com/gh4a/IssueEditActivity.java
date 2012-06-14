@@ -15,8 +15,13 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.IssueService;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -29,11 +34,6 @@ import android.widget.EditText;
 
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.StringUtils;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.IssueService;
-import com.github.api.v2.services.auth.Authentication;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The IssueEdit activity.
@@ -63,7 +63,7 @@ public class IssueEditActivity extends BaseActivity implements OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        if (!isAuthenticated()) {
+        if (!isAuthorized()) {
             Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
             startActivity(intent);
             finish();
@@ -186,19 +186,20 @@ public class IssueEditActivity extends BaseActivity implements OnClickListener {
             if (mTarget.get() != null) {
                 try {
                     IssueEditActivity activity = mTarget.get();
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    IssueService service = factory.createIssueService();
-                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                            mTarget.get().getAuthPassword());
-                    service.setAuthentication(auth);
-                    service.updateIssue(activity.mUserLogin, 
-                            activity.mRepoName,
-                            activity.mIssueNumber,
-                            params[1], 
-                            params[2]);
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    IssueService issueService = new IssueService(client);
+                    
+                    Issue issue = new Issue();
+                    issue.setId(activity.mIssueNumber);
+                    issue.setTitle(params[1]);
+                    issue.setBody(params[2]);
+                    
+                    issueService.editIssue(activity.mUserLogin, 
+                            activity.mRepoName, issue);
                     return true;
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;

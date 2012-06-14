@@ -17,12 +17,14 @@ package com.gh4a.adapter;
 
 import java.util.List;
 
+import org.eclipse.egit.github.core.User;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -30,7 +32,6 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
-import com.github.api.v2.schema.User;
 
 /**
  * The User adapter.
@@ -122,7 +123,7 @@ public class UserAdapter extends RootAdapter<User> {
             if (mShowMoreData && viewHolder.tvExtra != null) {
                 Resources res = v.getResources();
                 String extraData = String.format(res.getString(R.string.user_extra_data), user
-                            .getFollowersCount(), user.getPublicRepoCount());
+                            .getFollowers(), user.getPublicRepos());
                 viewHolder.tvExtra.setText(extraData);
             }
         }

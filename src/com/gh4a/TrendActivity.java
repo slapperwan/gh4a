@@ -35,15 +35,14 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.AdapterView.OnItemClickListener;
 
 import com.gh4a.adapter.TrendAdapter;
 import com.gh4a.feeds.TrendHandler;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.holder.Trend;
-import com.github.api.v2.services.constant.ApplicationConstants;
 
 public class TrendActivity extends BaseActivity {
     
@@ -165,13 +164,13 @@ public class TrendActivity extends BaseActivity {
                     request.setRequestMethod("GET");
                     request.setDoOutput(true);
                     
-                    if (ApplicationConstants.CONNECT_TIMEOUT > -1) {
-                        request.setConnectTimeout(ApplicationConstants.CONNECT_TIMEOUT);
-                    }
-
-                    if (ApplicationConstants.READ_TIMEOUT > -1) {
-                        request.setReadTimeout(ApplicationConstants.READ_TIMEOUT);
-                    }
+//                    if (ApplicationConstants.CONNECT_TIMEOUT > -1) {
+//                        request.setConnectTimeout(ApplicationConstants.CONNECT_TIMEOUT);
+//                    }
+//
+//                    if (ApplicationConstants.READ_TIMEOUT > -1) {
+//                        request.setReadTimeout(ApplicationConstants.READ_TIMEOUT);
+//                    }
                     request.connect();
                     bis = new BufferedInputStream(request.getInputStream());
                     

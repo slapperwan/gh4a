@@ -15,10 +15,19 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.PullRequest;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.IssueService;
+import org.eclipse.egit.github.core.service.PullRequestService;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -31,16 +40,10 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.gh4a.adapter.PullRequestDiscussionAdapter;
+import com.gh4a.Constants.Discussion;
+import com.gh4a.adapter.CommentAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.ImageDownloader;
-import com.github.api.v2.schema.Discussion;
-import com.github.api.v2.schema.PullRequest;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.PullRequestService;
-import com.github.api.v2.services.auth.Authentication;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The PullRequest activity.
@@ -60,7 +63,7 @@ public class PullRequestActivity extends BaseActivity {
     protected LinearLayout mHeader;
 
     /** The pull request adapter. */
-    protected PullRequestDiscussionAdapter mPullRequestDiscussionAdapter;
+    protected CommentAdapter mCommentAdapter;
 
     /** The loading dialog. */
     protected LoadingDialog mLoadingDialog;
@@ -130,9 +133,11 @@ public class PullRequestActivity extends BaseActivity {
      * 
      * @param pullRequest the pull request
      */
-    protected void fillData(final PullRequest pullRequest) {
+    protected void fillData(Map<String, Object> data) {
         ListView lvComments = (ListView) findViewById(R.id.lv_comments);
-
+        final PullRequest pullRequest = (PullRequest) data.get("pullRequest");
+        List<Comment> comments = (List<Comment>) data.get("comments");
+        
         // set details inside listview header
         LayoutInflater infalter = getLayoutInflater();
         mHeader = (LinearLayout) infalter.inflate(R.layout.pull_request_header, lvComments, false);
@@ -140,12 +145,15 @@ public class PullRequestActivity extends BaseActivity {
         lvComments.addHeaderView(mHeader, null, true);
 
         List<Discussion> discussions = new ArrayList<Discussion>();
-        mPullRequestDiscussionAdapter = new PullRequestDiscussionAdapter(PullRequestActivity.this,
-                discussions, mRepoName, pullRequest);
-        lvComments.setAdapter(mPullRequestDiscussionAdapter);
-
+//        mPullRequestDiscussionAdapter = new PullRequestDiscussionAdapter(PullRequestActivity.this,
+//                discussions, mRepoName, pullRequest);
+//        lvComments.setAdapter(mPullRequestDiscussionAdapter);
+        
+        mCommentAdapter = new CommentAdapter(PullRequestActivity.this, new ArrayList<Comment>());
+        lvComments.setAdapter(mCommentAdapter);
+        
         ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
-        ImageDownloader.getInstance().download(pullRequest.getIssueUser().getGravatarId(),
+        ImageDownloader.getInstance().download(pullRequest.getUser().getGravatarId(),
                 ivGravatar);
         ivGravatar.setOnClickListener(new OnClickListener() {
 
@@ -153,8 +161,8 @@ public class PullRequestActivity extends BaseActivity {
             public void onClick(View arg0) {
                 getApplicationContext()
                         .openUserInfoActivity(PullRequestActivity.this,
-                                pullRequest.getIssueUser().getLogin(),
-                                pullRequest.getIssueUser().getName());
+                                pullRequest.getUser().getLogin(),
+                                pullRequest.getUser().getName());
             }
         });
         TextView tvLogin = (TextView) mHeader.findViewById(R.id.tv_login);
@@ -163,10 +171,10 @@ public class PullRequestActivity extends BaseActivity {
         TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
         TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
 
-        tvLogin.setText(pullRequest.getIssueUser().getLogin());
-        tvCreateAt.setText(pt.format(pullRequest.getIssueCreatedAt()));
-        tvState.setText(pullRequest.getState().value());
-        if ("closed".equals(pullRequest.getState().value())) {
+        tvLogin.setText(pullRequest.getUser().getLogin());
+        tvCreateAt.setText(pt.format(pullRequest.getCreatedAt()));
+        tvState.setText(pullRequest.getState());
+        if ("closed".equals(pullRequest.getState())) {
             tvState.setBackgroundResource(R.drawable.default_red_box);
         }
         else {
@@ -176,24 +184,25 @@ public class PullRequestActivity extends BaseActivity {
         tvDesc.setText(pullRequest.getBody());
         
         LinearLayout llLabels = (LinearLayout) findViewById(R.id.ll_labels);
-        List<String> labels = pullRequest.getLabels();
-        if (labels != null && !labels.isEmpty()) {
-            for (String label : labels) {
-                TextView tvLabel = new TextView(getApplicationContext());
-                tvLabel.setSingleLine(true);
-                tvLabel.setText(label);
-                tvLabel.setTextAppearance(getApplicationContext(), R.style.default_text_small);
-                tvLabel.setBackgroundResource(R.drawable.default_grey_box);
-                
-                llLabels.addView(tvLabel);
-            }
-            llLabels.setVisibility(View.VISIBLE);
-        }
-        else {
-            llLabels.setVisibility(View.GONE);
-        }
         
-        fillDiscussion(pullRequest.getDiscussion());
+//        List<String> labels = pullRequest.getIssueUrl();
+//        if (labels != null && !labels.isEmpty()) {
+//            for (String label : labels) {
+//                TextView tvLabel = new TextView(getApplicationContext());
+//                tvLabel.setSingleLine(true);
+//                tvLabel.setText(label);
+//                tvLabel.setTextAppearance(getApplicationContext(), R.style.default_text_small);
+//                tvLabel.setBackgroundResource(R.drawable.default_grey_box);
+//                
+//                llLabels.addView(tvLabel);
+//            }
+//            llLabels.setVisibility(View.VISIBLE);
+//        }
+//        else {
+//            llLabels.setVisibility(View.GONE);
+//        }
+        
+        fillDiscussion(comments);
     }
 
     /**
@@ -201,14 +210,14 @@ public class PullRequestActivity extends BaseActivity {
      * 
      * @param discussions the discussions
      */
-    protected void fillDiscussion(List<Discussion> discussions) {
-        if (discussions != null && discussions.size() > 0) {
-            mPullRequestDiscussionAdapter.notifyDataSetChanged();
-            for (Discussion discussion : discussions) {
-                mPullRequestDiscussionAdapter.add(discussion);
+    protected void fillDiscussion(List<Comment> comments) {
+        if (comments != null && comments.size() > 0) {
+            mCommentAdapter.notifyDataSetChanged();
+            for (Comment comment : comments) {
+                mCommentAdapter.add(comment);
             }
         }
-        mPullRequestDiscussionAdapter.notifyDataSetChanged();
+        mCommentAdapter.notifyDataSetChanged();
         mDiscussionLoaded = true;
     }
 
@@ -216,7 +225,7 @@ public class PullRequestActivity extends BaseActivity {
      * An asynchronous task that runs on a background thread to load pull
      * request.
      */
-    private static class LoadPullRequestTask extends AsyncTask<Void, Integer, PullRequest> {
+    private static class LoadPullRequestTask extends AsyncTask<Void, Integer, Map<String, Object>> {
 
         /** The target. */
         private WeakReference<PullRequestActivity> mTarget;
@@ -238,20 +247,28 @@ public class PullRequestActivity extends BaseActivity {
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
-        protected PullRequest doInBackground(Void... params) {
+        protected Map<String, Object> doInBackground(Void... params) {
             if (mTarget.get() != null) {
                 try {
                     PullRequestActivity activity = mTarget.get();
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    PullRequestService service = factory.createPullRequestService();
                     
-                    Authentication auth = new LoginPasswordAuthentication(activity.getAuthUsername(), activity.getAuthPassword());
-                    service.setAuthentication(auth);
-                    
-                    return service.getPullRequest(activity.mUserLogin, activity.mRepoName,
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    PullRequestService pullRequestService = new PullRequestService(client);
+                    PullRequest pullRequest = pullRequestService.getPullRequest(new RepositoryId(activity.mUserLogin, activity.mRepoName),
                             activity.mPullRequestNumber);
+                    
+                    IssueService issueService = new IssueService();
+                    List<Comment> comments = issueService.getComments(activity.mUserLogin, 
+                            activity.mRepoName, pullRequest.getNumber());
+                    
+                    Map<String, Object> m = new HashMap<String, Object>();
+                    m.put("pullRequest", pullRequest);
+                    m.put("comments", comments);
+                    
+                    return m;
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -278,7 +295,7 @@ public class PullRequestActivity extends BaseActivity {
          * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
          */
         @Override
-        protected void onPostExecute(PullRequest result) {
+        protected void onPostExecute(Map<String, Object> result) {
             if (mTarget.get() != null) {
                 PullRequestActivity activity = mTarget.get();
                 activity.mLoadingDialog.dismiss();

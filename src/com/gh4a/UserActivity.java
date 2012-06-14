@@ -15,8 +15,15 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.List;
+
+import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.OrganizationService;
+import org.eclipse.egit.github.core.service.UserService;
+import org.eclipse.egit.github.core.service.WatcherService;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -25,36 +32,26 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
 
 import com.gh4a.db.Bookmark;
 import com.gh4a.db.BookmarkParam;
 import com.gh4a.db.DbHelper;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
-import com.github.api.v2.schema.Organization;
-import com.github.api.v2.schema.Repository;
-import com.github.api.v2.schema.User;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.OrganizationService;
-import com.github.api.v2.services.RepositoryService;
-import com.github.api.v2.services.UserService;
-import com.github.api.v2.services.auth.Authentication;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The UserInfo activity.
@@ -76,7 +73,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
     /** The user. */
     protected User mUser;
     
-    protected List<Organization> mOrganizations;
+    protected List<User> mOrganizations;
     /**
      * Called when the activity is first created.
      * 
@@ -126,15 +123,12 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         protected User doInBackground(Void... arg0) {
             if (mTarget.get() != null) {
                 try {
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    UserService userService = factory.createUserService();
-                    
-                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                            mTarget.get().getAuthPassword());
-                    userService.setAuthentication(auth);
-                    return userService.getUserByUsername(mTarget.get().mUserLogin);
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    UserService userService = new UserService(client);
+                    return userService.getUser(mTarget.get().mUserLogin);
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     if (e.getCause() != null
                             && e.getCause().getMessage().equalsIgnoreCase(
@@ -175,7 +169,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
                     
                     if (sharedPreferences != null) {
                         if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
-                                && sharedPreferences.getString(Constants.User.USER_PASSWORD, null) != null){
+                                && sharedPreferences.getString(Constants.User.USER_AUTH_TOKEN, null) != null){
                             Editor editor = sharedPreferences.edit();
                             editor.clear();
                             editor.commit();
@@ -192,7 +186,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
                 else {
                     mTarget.get().fillData(result);
                     new LoadWatchedReposTask(mTarget.get()).execute();
-                    if (mTarget.get().mUserLogin.equals(mTarget.get().getAuthUsername())) {
+                    if (mTarget.get().mUserLogin.equals(mTarget.get().getAuthLogin())) {
                         new LoadPushableReposTask(mTarget.get()).execute();
                     }
                     if (Constants.User.USER_TYPE_ORG.equals(result.getType())) { 
@@ -232,11 +226,12 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         protected Integer doInBackground(Void... arg0) {
             if (mTarget.get() != null) {
                 try {
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    UserService userService = factory.createUserService();
-                    return userService.getWatchedRepositories(mTarget.get().mUserLogin).size();
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    WatcherService watcherService = new WatcherService(client);
+                    return watcherService.getWatched(mTarget.get().mUserLogin).size();
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -291,25 +286,26 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         @Override
         protected Integer doInBackground(Void... arg0) {
             if (mTarget.get() != null) {
-                try {
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    RepositoryService repositoryService = factory.createRepositoryService();
-                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                            mTarget.get().getAuthPassword());
-                    repositoryService.setAuthentication(auth);
-                    List<Repository> repos = repositoryService.getPushableRepositories();
-                    if (repos != null && !repos.isEmpty()) {
-                        return repos.size();
-                    }
-                    else {
-                        return 0;
-                    }
-                }
-                catch (GitHubException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
+                return 0;
+//                try {
+//                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
+//                    RepositoryService repositoryService = factory.createRepositoryService();
+//                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
+//                            mTarget.get().getAuthPassword());
+//                    repositoryService.setAuthentication(auth);
+//                    List<Repository> repos = repositoryService.getPushableRepositories();
+//                    if (repos != null && !repos.isEmpty()) {
+//                        return repos.size();
+//                    }
+//                    else {
+//                        return 0;
+//                    }
+//                }
+//                catch (GitHubException e) {
+//                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+//                    mException = true;
+//                    return null;
+//                }
             }
             else {
                 return null;
@@ -361,11 +357,12 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         protected Integer doInBackground(Void... arg0) {
             if (mTarget.get() != null) {
                 try {
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    OrganizationService organizationService = factory.createOrganizationService();
-                    return organizationService.getPublicMembers(mTarget.get().mUserLogin).size();
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    OrganizationService orgService = new OrganizationService(client);
+                    return orgService.getPublicMembers(mTarget.get().mUserLogin).size();
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -412,7 +409,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         //LinearLayout llCompany = (LinearLayout) findViewById(R.id.ll_user_company);
 
         RelativeLayout rlNewsFeed = (RelativeLayout) findViewById(R.id.rl_news_feed);
-        if (mUserLogin.equals(getAuthUsername())) {
+        if (mUserLogin.equals(getAuthLogin())) {
             ImageButton btnNews = (ImageButton) findViewById(R.id.btn_news);
             btnNews.setOnClickListener(this);
             rlNewsFeed.setVisibility(View.VISIBLE);
@@ -433,12 +430,12 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
 //        else {
 //            btnYourActions.setVisibility(View.GONE);
 //        }
-
+        
         Button btnPublicRepos = (Button) findViewById(R.id.btn_pub_repos);
         btnPublicRepos.setOnClickListener(this);
 
         RelativeLayout rlPushableRepos = (RelativeLayout) findViewById(R.id.rl_pushable_repos);
-        if (mUserLogin.equals(getAuthUsername())) {
+        if (mUserLogin.equals(getAuthLogin())) {
             Button btnPushableRepos = (Button) findViewById(R.id.btn_pushable_repos);
             btnPushableRepos.setOnClickListener(this);
             rlPushableRepos.setVisibility(View.VISIBLE);
@@ -464,7 +461,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         RelativeLayout rlFollowing = (RelativeLayout) findViewById(R.id.rl_following);
         if (Constants.User.USER_TYPE_USER.equals(user.getType())) {
             Button btnFollowing = (Button) findViewById(R.id.btn_following);
-            btnFollowing.setText(String.valueOf(user.getFollowingCount()));
+            btnFollowing.setText(String.valueOf(user.getFollowing()));
             btnFollowing.setOnClickListener(this);
             rlFollowing.setVisibility(View.VISIBLE);
         }
@@ -544,17 +541,17 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
             tvLocation.setVisibility(View.GONE);
         }
         
-        btnPublicRepos.setText(String.valueOf(user.getPublicRepoCount() + user.getTotalPrivateRepoCount()));
+        btnPublicRepos.setText(String.valueOf(user.getPublicRepos() + user.getTotalPrivateRepos()));
         
         if (Constants.User.USER_TYPE_USER.equals(user.getType())) {
-            btnFollowers.setText(String.valueOf(user.getFollowersCount()));
+            btnFollowers.setText(String.valueOf(user.getFollowers()));
             ProgressBar progressBar = (ProgressBar) findViewById(R.id.pb_followers);
             progressBar.setVisibility(View.GONE);
         }
         
         RelativeLayout rlPrivateActivity = (RelativeLayout) findViewById(R.id.rl_private_activity);
         if (isSettingEnabled("Private_Repo_Feed") 
-                && mUserLogin.equals(getAuthUsername())
+                && mUserLogin.equals(getAuthLogin())
                 && Constants.User.USER_TYPE_USER.equals(user.getType())) {
             ImageButton btnPrivateActivity = (ImageButton) findViewById(R.id.btn_private_activity);
             btnPrivateActivity.setOnClickListener(this);
@@ -648,7 +645,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         Intent intent = new Intent().setClass(this, UserYourActionsActivity.class);
         intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
         if (isSettingEnabled("Private_Repo_Feed")
-                && mUserLogin.equals(getAuthUsername())
+                && mUserLogin.equals(getAuthLogin())
                 && Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
             intent.putExtra(Constants.Repository.REPO_URL, "https://github.com/" + mUserLogin + ".private.actor.atom");
             startActivity(intent);
@@ -657,7 +654,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
                 && Constants.User.USER_TYPE_ORG.equals(mUser.getType())) {
             if (!StringUtils.isBlank(getSettingStringValue("Api_Token"))) {
                 intent.putExtra(Constants.Repository.REPO_URL, "https://github.com/organizations/" + mUserLogin 
-                        + "/" + getAuthUsername() + ".private.atom?token="
+                        + "/" + getAuthLogin() + ".private.atom?token="
                         + getSettingStringValue("Api_Token"));
                 startActivity(intent);
             }
@@ -762,7 +759,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         if (v.getId() == R.id.btn_organizations) {
             menu.setHeaderTitle("Choose Organization");
             if (mOrganizations != null && !mOrganizations.isEmpty()) {
-                for (Organization organization : mOrganizations) {
+                for (User organization : mOrganizations) {
                 menu.add(organization.getLogin());      
                 }
             }
@@ -792,10 +789,10 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
     
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (isAuthenticated()) {
+        if (isAuthorized()) {
             menu.clear();
             MenuInflater inflater = getMenuInflater();
-            if (!mUserLogin.equals(getAuthUsername())) {
+            if (!mUserLogin.equals(getAuthLogin())) {
                 inflater.inflate(R.menu.user_menu, menu);
             }
             inflater.inflate(R.menu.bookmark_menu, menu);
@@ -854,20 +851,19 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
             if (mTarget.get() != null) {
                 isFollowAction = arg0[0];
                 try {
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    UserService userService = factory.createUserService();
-                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                            mTarget.get().getAuthPassword());
-                    userService.setAuthentication(auth);
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    UserService userService = new UserService(client);
+
                     if (isFollowAction) {
-                        userService.followUser(mTarget.get().mUserLogin);
+                        userService.follow(mTarget.get().mUserLogin);
                     }
                     else {
-                        userService.unfollowUser(mTarget.get().mUserLogin);
+                        userService.unfollow(mTarget.get().mUserLogin);
                     }
                     return true;
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -920,7 +916,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
     /**
      * An asynchronous task that runs on a background thread to load organizations.
      */
-    private static class LoadOrganizationsTask extends AsyncTask<Void, Integer, List<Organization>> {
+    private static class LoadOrganizationsTask extends AsyncTask<Void, Integer, List<User>> {
 
         /** The target. */
         private WeakReference<UserActivity> mTarget;
@@ -942,17 +938,15 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
-        protected List<Organization> doInBackground(Void... arg0) {
+        protected List<User> doInBackground(Void... arg0) {
             if (mTarget.get() != null) {
                 try {
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    UserService userService = factory.createUserService();
-                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                            mTarget.get().getAuthPassword());
-                    userService.setAuthentication(auth);
-                    return userService.getUserOrganizations(mTarget.get().mUserLogin);
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    OrganizationService orgService = new OrganizationService(client);
+                    return orgService.getOrganizations(mTarget.get().mUserLogin);
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -979,7 +973,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
          * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
          */
         @Override
-        protected void onPostExecute(List<Organization> result) {
+        protected void onPostExecute(List<User> result) {
             if (mTarget.get() != null) {
                 mTarget.get().mLoadingDialog.dismiss();
                 if (mException) {
@@ -992,7 +986,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         }
     }
     
-    private void showOrganizationsContextMenu(List<Organization> organizations) {
+    private void showOrganizationsContextMenu(List<User> organizations) {
         mOrganizations = organizations;
         View view = findViewById(R.id.btn_organizations);
         view.showContextMenu();
@@ -1003,7 +997,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         Intent intent = new Intent().setClass(this, BookmarkListActivity.class);
         intent.putExtra(Constants.Bookmark.NAME, mUserLogin + (!StringUtils.isBlank(mUserName) ? " - " + mUserName : ""));
         intent.putExtra(Constants.Bookmark.OBJECT_TYPE, Constants.Bookmark.OBJECT_TYPE_USER);
-        if (getAuthUsername().equals(mUserLogin)) {
+        if (getAuthLogin().equals(mUserLogin)) {
             intent.putExtra(Constants.Bookmark.HIDE_ADD, true);
         }
         else {

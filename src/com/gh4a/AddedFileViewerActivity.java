@@ -15,14 +15,19 @@
  */
 package com.gh4a;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+
+import org.eclipse.egit.github.core.Blob;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.DataService;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,14 +37,7 @@ import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import com.gh4a.holder.BreadCrumbHolder;
-import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
-import com.github.api.v2.schema.Blob;
-import com.github.api.v2.services.GitHubException;
-import com.github.api.v2.services.GitHubServiceFactory;
-import com.github.api.v2.services.ObjectService;
-import com.github.api.v2.services.auth.Authentication;
-import com.github.api.v2.services.auth.LoginPasswordAuthentication;
 
 /**
  * The AddedFileViewer activity.
@@ -120,27 +118,27 @@ public class AddedFileViewerActivity extends BaseActivity {
         });
         
         TextView tvDownload = (TextView) findViewById(R.id.tv_download);
-        tvDownload.setVisibility(View.VISIBLE);
-        tvDownload.setOnClickListener(new OnClickListener() {
-            
-            @Override
-            public void onClick(View view) {
-                String filename = mBlob.getName();
-                int idx = filename.lastIndexOf("/");
-                
-                if (idx != -1) {
-                    filename = filename.substring(filename.lastIndexOf("/") + 1, filename.length());
-                }
-
-                boolean success = FileUtils.save(filename, mBlob.getData());
-                if (success) {
-                    showMessage("File saved at " + Environment.getExternalStorageDirectory().getAbsolutePath() + "/download/" + filename, false);
-                }
-                else {
-                    showMessage("Unable to save the file", false);
-                }
-            }
-        });
+//        tvDownload.setVisibility(View.VISIBLE);
+//        tvDownload.setOnClickListener(new OnClickListener() {
+//            
+//            @Override
+//            public void onClick(View view) {
+//                String filename = mBlob.getName();
+//                int idx = filename.lastIndexOf("/");
+//                
+//                if (idx != -1) {
+//                    filename = filename.substring(filename.lastIndexOf("/") + 1, filename.length());
+//                }
+//
+//                boolean success = FileUtils.save(filename, mBlob.getData());
+//                if (success) {
+//                    showMessage("File saved at " + Environment.getExternalStorageDirectory().getAbsolutePath() + "/download/" + filename, false);
+//                }
+//                else {
+//                    showMessage("Unable to save the file", false);
+//                }
+//            }
+//        });
         
         setBreadCrumb();
 
@@ -215,19 +213,18 @@ public class AddedFileViewerActivity extends BaseActivity {
                 highlight = params[0];
                 try {
                     AddedFileViewerActivity activity = mTarget.get();
-                    GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-                    ObjectService objectService = factory.createObjectService();
-                    String filepath = activity.mFilePath;
-                    Authentication auth = new LoginPasswordAuthentication(mTarget.get().getAuthUsername(),
-                            mTarget.get().getAuthPassword());
-                    objectService.setAuthentication(auth);
-                    filepath = filepath.replaceAll(" ", "%20");
-                    return objectService.getBlob(activity.mUserLogin,
-                                activity.mRepoName,
-                                activity.mTreeSha, 
-                                filepath);
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    DataService dataService = new DataService(client);
+                    return dataService.getBlob(new RepositoryId(activity.mUserLogin,
+                            activity.mRepoName), activity.mTreeSha);
+//                    filepath = filepath.replaceAll(" ", "%20");
+//                    return objectService.getBlob(activity.mUserLogin,
+//                                activity.mRepoName,
+//                                activity.mTreeSha, 
+//                                filepath);
                 }
-                catch (GitHubException e) {
+                catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -312,7 +309,7 @@ public class AddedFileViewerActivity extends BaseActivity {
         // webView.setWebViewClient(new WebChrome2());
         webView.getSettings().setUseWideViewPort(true);
         
-        String data = StringUtils.highlightSyntax(blob.getData(), highlight, mFilePath);
+        String data = StringUtils.highlightSyntax(blob.getContent(), highlight, mFilePath);
         webView.setWebViewClient(webViewClient);
         webView.loadDataWithBaseURL("file:///android_asset/", data, "text/html", "utf-8", "");
     }

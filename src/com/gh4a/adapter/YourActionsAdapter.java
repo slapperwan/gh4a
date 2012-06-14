@@ -4,6 +4,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import org.eclipse.egit.github.core.event.Event;
+
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,7 +20,6 @@ import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.holder.YourActionFeed;
 import com.gh4a.utils.ImageDownloader;
-import com.github.api.v2.schema.UserFeed;
 
 public class YourActionsAdapter extends RootAdapter<YourActionFeed> {
 
@@ -86,7 +87,7 @@ public class YourActionsAdapter extends RootAdapter<YourActionFeed> {
         ll.setVisibility(View.GONE);
         generalDesc.setVisibility(View.VISIBLE);
         
-        if (UserFeed.Type.PUSH_EVENT.value().equals(event)) {
+        if (Event.TYPE_PUSH.equals(event)) {
             generalDesc.setVisibility(View.GONE);
             ll.setVisibility(View.VISIBLE);
             

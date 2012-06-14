@@ -17,12 +17,14 @@ package com.gh4a.adapter;
 
 import java.util.List;
 
+import org.eclipse.egit.github.core.RepositoryBranch;
+
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -31,12 +33,11 @@ import com.gh4a.Constants;
 import com.gh4a.FileManagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.holder.BranchTag;
 
 /**
  * The BranchTag adapter.
  */
-public class BranchTagAdapter extends RootAdapter<BranchTag> {
+public class BranchAdapter extends RootAdapter<RepositoryBranch> {
 
     /** The user login. */
     protected String mUserLogin;
@@ -50,7 +51,7 @@ public class BranchTagAdapter extends RootAdapter<BranchTag> {
      * @param context the context
      * @param objects the objects
      */
-    public BranchTagAdapter(Context context, List<BranchTag> objects) {
+    public BranchAdapter(Context context, List<RepositoryBranch> objects) {
         super(context, objects);
     }
 
@@ -62,7 +63,7 @@ public class BranchTagAdapter extends RootAdapter<BranchTag> {
      * @param userLogin the user login
      * @param repoName the repo name
      */
-    public BranchTagAdapter(Context context, List<BranchTag> objects, String userLogin,
+    public BranchAdapter(Context context, List<RepositoryBranch> objects, String userLogin,
             String repoName) {
         super(context, objects);
         mUserLogin = userLogin;
@@ -100,7 +101,7 @@ public class BranchTagAdapter extends RootAdapter<BranchTag> {
             v = vi.inflate(R.layout.row_branch_tag, null);
         }
 
-        final BranchTag branchTag = mObjects.get(position);
+        final RepositoryBranch branchTag = mObjects.get(position);
         if (branchTag != null) {
             TextView tvText = (TextView) v.findViewById(R.id.tv_title);
             tvText.setText(branchTag.getName());
@@ -114,8 +115,8 @@ public class BranchTagAdapter extends RootAdapter<BranchTag> {
                             .setClass(v.getContext(), FileManagerActivity.class);
                     intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
                     intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                    intent.putExtra(Constants.Object.TREE_SHA, branchTag.getSha());
-                    intent.putExtra(Constants.Object.OBJECT_SHA, branchTag.getSha());
+                    intent.putExtra(Constants.Object.TREE_SHA, branchTag.getCommit().getSha());
+                    intent.putExtra(Constants.Object.OBJECT_SHA, branchTag.getCommit().getSha());
                     intent.putExtra(Constants.Repository.REPO_BRANCH, branchTag.getName());
                     intent.putExtra(Constants.Object.PATH, "Tree");
                     if (v.getContext() instanceof BranchListActivity) {
@@ -143,7 +144,7 @@ public class BranchTagAdapter extends RootAdapter<BranchTag> {
 
                     ((Gh4Application) v.getContext().getApplicationContext())
                             .openCommitListActivity(v.getContext(), mUserLogin, mRepoName,
-                                    branchTag.getName(), branchTag.getSha(), viewId);
+                                    branchTag.getName(), branchTag.getCommit().getSha(), viewId);
                 }
             });
         }

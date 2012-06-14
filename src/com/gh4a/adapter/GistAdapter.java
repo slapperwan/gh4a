@@ -17,6 +17,8 @@ package com.gh4a.adapter;
 
 import java.util.List;
 
+import org.eclipse.egit.github.core.Gist;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +27,6 @@ import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
-import com.github.api.v2.schema.Gist;
 
 /**
  * The Gist adapter.
@@ -67,7 +68,7 @@ public class GistAdapter  extends RootAdapter<Gist> {
         Gist gist = mObjects.get(position);
 
         if (gist != null) {
-            viewHolder.tvTitle.setText("Gist " + gist.getRepo());
+            viewHolder.tvTitle.setText("Gist " + gist.getId());
             if (StringUtils.isBlank(gist.getDescription())) {
                 viewHolder.tvDesc.setVisibility(View.GONE);
             }

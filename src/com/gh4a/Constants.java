@@ -59,7 +59,7 @@ public interface Constants {
         public static final String USER_USERNAME = "USER_USERNAME";
 
         /** The Constant USER_PASSWORD. */
-        public static final String USER_PASSWORD = "USER_PASSWORD";
+        //public static final String USER_PASSWORD = "USER_PASSWORD";
 
         /** The Constant USER_LOGIN. */
         public static final String USER_LOGIN = "USER_LOGIN";
@@ -72,6 +72,8 @@ public interface Constants {
 
         /** The Constant USER_TYPE_ORG. */
         public static final String USER_TYPE_ORG = "Organization";
+        
+        public static final String USER_AUTH_TOKEN = "Token";
     }
 
     /**
