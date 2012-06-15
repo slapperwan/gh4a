@@ -241,7 +241,7 @@
                 <View
                     android:layout_width="fill_parent"
                     android:layout_height="5dp" />
-                <RelativeLayout
+                <!-- RelativeLayout
                     android:id="@+id/rl_private_activity"
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent">
@@ -264,7 +264,7 @@
                         android:layout_height="1dp"
                         android:layout_below="@id/btn_private_activity"
                         android:layout_marginTop="5dp" />
-                </RelativeLayout>
+                </RelativeLayout-->
                 <View
                     android:layout_width="fill_parent"
                     android:layout_height="5dp" />

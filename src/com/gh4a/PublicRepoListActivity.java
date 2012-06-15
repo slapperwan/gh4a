@@ -38,6 +38,8 @@ public class PublicRepoListActivity extends RepositoryListActivity {
 
     /** The user name. */
     protected String mUserName;
+    
+    protected String mType;
 
     /*
      * (non-Javadoc)
@@ -48,6 +50,7 @@ public class PublicRepoListActivity extends RepositoryListActivity {
         Bundle data = getIntent().getExtras();
         mUserLogin = data.getString(Constants.Repository.REPO_OWNER);
         mUserName = data.getString(Constants.User.USER_NAME);
+        mType = data.getString(Constants.User.USER_TYPE);
     }
 
     /*
@@ -59,8 +62,12 @@ public class PublicRepoListActivity extends RepositoryListActivity {
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(getAuthToken());
         RepositoryService repoService = new RepositoryService(client);
+
         if (mUserLogin.equals(getAuthLogin())) {
             return repoService.getRepositories();
+        }
+        else if (Constants.User.USER_TYPE_ORG.equals(mType)) {
+            return repoService.getOrgRepositories(mUserLogin);
         }
         else {
             return repoService.getRepositories(mUserLogin);

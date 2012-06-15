@@ -413,6 +413,9 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
             ImageButton btnNews = (ImageButton) findViewById(R.id.btn_news);
             btnNews.setOnClickListener(this);
             rlNewsFeed.setVisibility(View.VISIBLE);
+            
+            TextView tvPublicActivity = (TextView) findViewById(R.id.tv_pub_activity_label);
+            tvPublicActivity.setText(R.string.user_your_actions);
         }
         else {
             rlNewsFeed.setVisibility(View.GONE);
@@ -549,23 +552,23 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
             progressBar.setVisibility(View.GONE);
         }
         
-        RelativeLayout rlPrivateActivity = (RelativeLayout) findViewById(R.id.rl_private_activity);
-        if (isSettingEnabled("Private_Repo_Feed") 
-                && mUserLogin.equals(getAuthLogin())
-                && Constants.User.USER_TYPE_USER.equals(user.getType())) {
-            ImageButton btnPrivateActivity = (ImageButton) findViewById(R.id.btn_private_activity);
-            btnPrivateActivity.setOnClickListener(this);
-            rlPrivateActivity.setVisibility(View.VISIBLE);
-        }
-        else if (isSettingEnabled("Private_Org_Feed")
-                && Constants.User.USER_TYPE_ORG.equals(user.getType())) {
-            ImageButton btnPrivateActivity = (ImageButton) findViewById(R.id.btn_private_activity);
-            btnPrivateActivity.setOnClickListener(this);
-            rlPrivateActivity.setVisibility(View.VISIBLE);   
-        }
-        else {
-            rlPrivateActivity.setVisibility(View.GONE);
-        }
+//        RelativeLayout rlPrivateActivity = (RelativeLayout) findViewById(R.id.rl_private_activity);
+//        if (isSettingEnabled("Private_Repo_Feed") 
+//                && mUserLogin.equals(getAuthLogin())
+//                && Constants.User.USER_TYPE_USER.equals(user.getType())) {
+//            ImageButton btnPrivateActivity = (ImageButton) findViewById(R.id.btn_private_activity);
+//            btnPrivateActivity.setOnClickListener(this);
+//            rlPrivateActivity.setVisibility(View.VISIBLE);
+//        }
+//        else if (isSettingEnabled("Private_Org_Feed")
+//                && Constants.User.USER_TYPE_ORG.equals(user.getType())) {
+//            ImageButton btnPrivateActivity = (ImageButton) findViewById(R.id.btn_private_activity);
+//            btnPrivateActivity.setOnClickListener(this);
+//            rlPrivateActivity.setVisibility(View.VISIBLE);   
+//        }
+//        else {
+//            rlPrivateActivity.setVisibility(View.GONE);
+//        }
     }
 
     /*
@@ -582,9 +585,9 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         case R.id.btn_public_activity:
             getPublicActivities(view);
             break;
-        case R.id.btn_private_activity:
-            getPrivateActivities(view);
-            break;
+//        case R.id.btn_private_activity:
+//            getPrivateActivities(view);
+//            break;
         case R.id.btn_pub_repos:
             getPublicRepos(view);
             break;
@@ -674,6 +677,8 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         Intent intent = new Intent().setClass(this, PublicRepoListActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
         intent.putExtra(Constants.User.USER_NAME, mUserName);
+        intent.putExtra(Constants.User.USER_NAME, mUserName);
+        intent.putExtra(Constants.User.USER_TYPE_ORG, mUser.getType());
         startActivity(intent);
     }
 

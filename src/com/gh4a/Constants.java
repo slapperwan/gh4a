@@ -73,6 +73,8 @@ public interface Constants {
         /** The Constant USER_TYPE_ORG. */
         public static final String USER_TYPE_ORG = "Organization";
         
+        public static final String USER_TYPE = "Type";
+        
         public static final String USER_AUTH_TOKEN = "Token";
     }
 
