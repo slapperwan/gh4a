@@ -61,7 +61,7 @@ public class Gh4Application extends Application {
         data.putString(Constants.Repository.REPO_OWNER, repository.getOwner().getLogin());
         data.putString(Constants.Repository.REPO_NAME, repository.getName());
         data.putString(Constants.Repository.REPO_DESC, repository.getDescription());
-        data.putString(Constants.Repository.REPO_URL, repository.getUrl());
+        data.putString(Constants.Repository.REPO_URL, repository.getHtmlUrl());
         data.putInt(Constants.Repository.REPO_WATCHERS, repository.getWatchers());
         data.putInt(Constants.Repository.REPO_FORKS, repository.getForks());
         data.putString(Constants.Repository.REPO_HOMEPAGE, repository.getHomepage());
