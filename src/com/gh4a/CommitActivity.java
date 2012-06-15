@@ -18,6 +18,7 @@ package com.gh4a;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -206,7 +207,7 @@ public class CommitActivity extends BaseActivity {
         ImageView ivGravatar = (ImageView) findViewById(R.id.iv_gravatar);
         
         if (!StringUtils.isBlank(commit.getAuthor().getLogin())) {
-            ImageDownloader.getInstance().download(StringUtils.md5Hex(commit.getAuthor().getEmail()),
+            ImageDownloader.getInstance().download(commit.getAuthor().getGravatarId(),
                     ivGravatar);
             ivGravatar.setOnClickListener(new OnClickListener() {
 
@@ -219,7 +220,7 @@ public class CommitActivity extends BaseActivity {
             });
         }
         else {
-            ImageDownloader.getInstance().download(StringUtils.md5Hex(commit.getCommitter().getEmail()),
+            ImageDownloader.getInstance().download(commit.getCommitter().getGravatarId(),
                     ivGravatar);
             ivGravatar.setOnClickListener(new OnClickListener() {
 
@@ -239,9 +240,15 @@ public class CommitActivity extends BaseActivity {
         String extraDataFormat = res.getString(R.string.more_data);
 
         tvMessage.setText(commit.getCommit().getMessage());
+        
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(commit.getCommit().getCommitter().getDate());
+        int timezoneOffset = (cal.get(Calendar.ZONE_OFFSET) + cal.get(Calendar.DST_OFFSET)) / 3600000;
+        cal.add(Calendar.HOUR, timezoneOffset);
+        
         tvExtra.setText(String.format(extraDataFormat, !StringUtils.isBlank(commit.getAuthor()
                 .getLogin()) ? commit.getAuthor().getLogin() : commit.getAuthor().getName(), pt
-                .format(commit.getCommit().getCommitter().getDate())));
+                .format(cal.getTime())));
 
         List<CommitFile> addedFiles = new ArrayList<CommitFile>();
         List<CommitFile> removedFiles = new ArrayList<CommitFile>();

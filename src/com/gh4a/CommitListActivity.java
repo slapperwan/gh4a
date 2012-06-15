@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
@@ -337,14 +336,14 @@ public class CommitListActivity extends BaseActivity implements OnScrollListener
      */
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        Commit commit = (Commit) adapterView.getAdapter().getItem(position);
+        RepositoryCommit commit = (RepositoryCommit) adapterView.getAdapter().getItem(position);
         Intent intent = new Intent().setClass(CommitListActivity.this, CommitActivity.class);
         String[] urlPart = commit.getUrl().split("/");
-
-        intent.putExtra(Constants.Repository.REPO_OWNER, urlPart[1]);
-        intent.putExtra(Constants.Repository.REPO_NAME, urlPart[2]);
-        intent.putExtra(Constants.Object.OBJECT_SHA, urlPart[4]);
-        intent.putExtra(Constants.Object.TREE_SHA, commit.getTree());
+        
+        intent.putExtra(Constants.Repository.REPO_OWNER, urlPart[4]);
+        intent.putExtra(Constants.Repository.REPO_NAME, urlPart[5]);
+        intent.putExtra(Constants.Object.OBJECT_SHA, commit.getSha());
+        intent.putExtra(Constants.Object.TREE_SHA, commit.getCommit().getTree().getSha());
 
         startActivity(intent);
     }
