@@ -232,8 +232,12 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         String eventType = event.getType();
         EventRepository eventRepo = event.getRepo();
         String[] repoNamePart = eventRepo.getName().split("/");
-        String repoOwner = repoNamePart[0];
-        String repoName = repoNamePart[1];
+        String repoOwner = "";
+        String repoName = "";
+        if (repoNamePart.length == 2) {
+            repoOwner = repoNamePart[0];
+            repoName = repoNamePart[1];
+        }
         String repoUrl = eventRepo.getUrl();
         
         Gh4Application context = getApplicationContext();
