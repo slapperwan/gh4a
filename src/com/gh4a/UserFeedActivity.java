@@ -246,16 +246,20 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
 
                 List<Commit> commits = payload.getCommits();
                 // if commit > 1, then show compare activity
+                
                 if (commits != null && commits.size() > 1) {
                     Intent intent = new Intent().setClass(context, CompareActivity.class);
                     for (Commit commit : commits) {
-                        intent.putExtra("sha" + commit.getSha(), commit.getSha());
-                        //intent.putExtra("sha" + sha[0], sha);
+                        String[] commitInfo = new String[4];
+                        commitInfo[0] = commit.getSha();
+                        commitInfo[1] = commit.getAuthor().getEmail();
+                        commitInfo[2] = commit.getMessage();
+                        commitInfo[3] = commit.getAuthor().getName();
+                        intent.putExtra("commit" + commit.getSha(), commitInfo);
                     }
                     
                     intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
                     intent.putExtra(Constants.Repository.REPO_NAME, repoName);
-                    intent.putExtra(Constants.Repository.REPO_URL, repoUrl);
                     startActivity(intent);
                 }
                 // only 1 commit, then show the commit details

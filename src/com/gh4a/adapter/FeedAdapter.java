@@ -44,7 +44,6 @@ import android.content.res.Resources;
 import android.text.SpannableString;
 import android.text.style.ClickableSpan;
 import android.text.style.TextAppearanceSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -238,15 +237,6 @@ public class FeedAdapter extends RootAdapter<Event> {
             return null;
         }
 
-        /** WatchEvent */
-        else if (Event.TYPE_WATCH.equals(eventType)) {
-            StringBuilder sb = new StringBuilder();
-            if (eventRepo != null) {
-                sb.append(StringUtils.doTeaser(eventRepo.getName()));
-            }
-            return sb.toString();
-        }
-
         /** ForkEvent */
         else if (Event.TYPE_FORK.equals(eventType)) {
             ForkPayload payload = (ForkPayload) event.getPayload();
@@ -298,6 +288,18 @@ public class FeedAdapter extends RootAdapter<Event> {
         else if (Event.TYPE_PUBLIC.equals(eventType)) {
             eventRepo.getName();
             return null;
+        }
+        
+        /** IssuesEvent */
+        else if (Event.TYPE_ISSUES.equals(eventType)) {
+            IssuesPayload payload = (IssuesPayload) event.getPayload();
+            return payload.getIssue().getTitle();
+        }
+        
+        /** IssueCommentEvent */
+        else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
+            IssueCommentPayload payload = (IssueCommentPayload) event.getPayload();
+            return payload.getComment().getBody();
         }
 
         else {
@@ -528,7 +530,7 @@ public class FeedAdapter extends RootAdapter<Event> {
 
     private static String formatToRepoName(Repository repository) {
         if (repository != null) {
-            return repository.getName();
+            return repository.getOwner().getLogin() + "/" + repository.getName();
         }
         return "(deleted)";
     }

@@ -30,7 +30,9 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_created_at"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_toRightOf="@id/iv_gravatar" />
+        android:layout_toRightOf="@id/iv_gravatar"
+        android:maxLines="3"
+        android:ellipsize="end" />
 
     <!-- specific only for PushEvent -->
     <LinearLayout
