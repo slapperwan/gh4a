@@ -15,7 +15,6 @@
  */
 package com.gh4a;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +23,7 @@ import java.util.List;
 import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.CommitService;
 
 import android.content.Intent;
@@ -83,6 +83,8 @@ public class CommitListActivity extends BaseActivity implements OnScrollListener
 
     /** The last page. */
     protected boolean lastPage;
+    
+    protected PageIterator<RepositoryCommit> mCommits;
 
     /**
      * Called when the activity is first created.
@@ -207,12 +209,22 @@ public class CommitListActivity extends BaseActivity implements OnScrollListener
                     client.setOAuth2Token(mTarget.get().getAuthToken());
                     CommitService commitService = new CommitService(client);
                     try {
-                        List<RepositoryCommit> commits = commitService.getCommits(new RepositoryId(activity.mUserLogin, 
-                                activity.mRepoName), activity.mTreeSha, null);
+                        if (activity.mCommits == null) {
+                            activity.mCommits = commitService.pageCommits(new RepositoryId(activity.mUserLogin, 
+                                    activity.mRepoName), activity.mTreeSha, null);
+                        }
                         activity.mPage++;
-                        return commits;
+
+                        if (activity.mCommits.hasNext()) {
+                            return (List<RepositoryCommit>) activity.mCommits.next();
+                        }
+                        else {
+                            mException = false;
+                            activity.lastPage = true;
+                            return null;
+                        }
                     }
-                    catch (IOException e) {
+                    catch (Exception e) {
                         if (!e.getMessage().contains("Not Found")) {
                             Log.e(Constants.LOG_TAG, e.getMessage(), e);
                             mException = true;
