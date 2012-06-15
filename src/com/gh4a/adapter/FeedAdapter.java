@@ -484,8 +484,9 @@ public class FeedAdapter extends RootAdapter<Event> {
         /** IssueCommentEvent */
         else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
             IssueCommentPayload payload = (IssueCommentPayload) event.getPayload();
+            String type = payload.getIssue().getPullRequest().getId() != 0 ? "pull request" : "issue";
             String text = String.format(res.getString(R.string.event_issue_comment),
-                    actor.getLogin(), payload.getIssue().getNumber(), formatFromRepoName(eventRepo));
+                    actor.getLogin(), type, payload.getIssue().getNumber(), formatFromRepoName(eventRepo));
             return text;
         }
 
