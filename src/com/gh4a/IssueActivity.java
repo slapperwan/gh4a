@@ -559,17 +559,16 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                     client.setOAuth2Token(mTarget.get().getAuthToken());
                     IssueService issueService = new IssueService(client);
                     
-                    Issue issue = new Issue();
-                    issue.setId(activity.mIssueNumber);
+                    Issue issue = issueService.getIssue(new RepositoryId(activity.mUserLogin,
+                            activity.mRepoName), activity.mIssueNumber);
+                    
                     issue.setState("closed");
+                    
                     issueService.editIssue(new RepositoryId(activity.mUserLogin,
                             activity.mRepoName), issue);
-//                    issueService.closeIssue(activity.mUserLogin, 
-//                            activity.mRepoName,
-//                            activity.mIssueNumber);
                     return true;
                 }
-                catch (IOException e) {
+                catch (Exception e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -652,14 +651,13 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                     client.setOAuth2Token(mTarget.get().getAuthToken());
                     IssueService issueService = new IssueService(client);
                     
-                    Issue issue = new Issue();
-                    issue.setId(activity.mIssueNumber);
+                    Issue issue = issueService.getIssue(new RepositoryId(activity.mUserLogin,
+                            activity.mRepoName), activity.mIssueNumber);
+                    
                     issue.setState("open");
+                    
                     issueService.editIssue(new RepositoryId(activity.mUserLogin,
                             activity.mRepoName), issue);
-//                    service.reopenIssue(activity.mUserLogin, 
-//                            activity.mRepoName,
-//                            activity.mIssueNumber);
                     return true;
                 }
                 catch (IOException e) {
