@@ -126,6 +126,23 @@ public class Gh4Application extends Application {
         intent.putExtra(Constants.Issue.ISSUE_NUMBER, issueNumber);
         context.startActivity(intent);
     }
+    
+    /**
+     * Open issue activity with intent  flags
+     * @param context
+     * @param login
+     * @param repoName
+     * @param issueNumber
+     */
+    public void openIssueActivity(Context context, String login, String repoName, 
+            int issueNumber, int flags) {
+        Intent intent = new Intent().setClass(context, IssueActivity.class);
+        intent.putExtra(Constants.Repository.REPO_OWNER, login);
+        intent.putExtra(Constants.Repository.REPO_NAME, repoName);
+        intent.putExtra(Constants.Issue.ISSUE_NUMBER, issueNumber);
+        intent.setFlags(flags);
+        context.startActivity(intent);
+    }
 
     /**
      * Open issue list activity.
@@ -143,7 +160,7 @@ public class Gh4Application extends Application {
         intent.putExtra(Constants.Issue.ISSUE_STATE, state);
         context.startActivity(intent);
     }
-
+    
     /**
      * Open repository activity.
      * 

@@ -56,7 +56,6 @@ import com.gh4a.db.BookmarkParam;
 import com.gh4a.db.DbHelper;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.ImageDownloader;
-import com.gh4a.utils.StringUtils;
 
 /**
  * The IssueInfo activity.
@@ -169,8 +168,8 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(getAuthToken());
         IssueService issueService = new IssueService(client);
-        Issue issue = issueService.getIssue(mUserLogin, mRepoName, mIssueNumber);
-        mBundle = getApplicationContext().populateIssue(issue);
+        mIssue = issueService.getIssue(mUserLogin, mRepoName, mIssueNumber);
+        mBundle = getApplicationContext().populateIssue(mIssue);
         return mBundle;
     }
 
@@ -914,12 +913,12 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                 try {
                     GitHubClient client = new GitHubClient();
                     client.setOAuth2Token(mTarget.get().getAuthToken());
-                    IssueService issueService = new IssueService(client);
+                    LabelService labelService = new LabelService(client);
                     
-                    return issueService.getIssue(mTarget.get().mUserLogin, 
-                            mTarget.get().mRepoName, mTarget.get().mIssueNumber).getLabels();
+                    return labelService.getLabels(mTarget.get().mUserLogin, 
+                            mTarget.get().mRepoName);
                 }
-                catch (IOException e) {
+                catch (Exception e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
@@ -998,26 +997,33 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
         @Override
         protected Void doInBackground(Void...params) {
             if (mTarget.get() != null) {
-//                try {
-//                    IssueActivity activity = mTarget.get();
-//                    GitHubClient client = new GitHubClient();
-//                    client.setOAuth2Token(mTarget.get().getAuthToken());
-//                    LabelService labelService = new LabelService(client);
-//                    for (int i = 0; i < mCheckedItems.length; i++) {
-//                        String label = StringUtils.encodeUrl(mAvailableLabelArr[i]);
-//                        if (mCheckedItems[i]) {
-//                            labelService.setLabels(new RepositoryId(activity.mUserLogin, activity.mRepoName),
-//                                    activity.mIssueNumber, label);
-//                        }
-//                        else {
-//                            issueService.removeLabel(activity.mUserLogin, activity.mRepoName, activity.mIssueNumber, label);
-//                        }
-//                    }
-//                }
-//                catch (GitHubException e) {
-//                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-//                    mException = true;
-//                }
+                try {
+                    IssueActivity activity = mTarget.get();
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    LabelService labelService = new LabelService(client);
+                    List<Label> toAdd = new ArrayList<Label>();
+                    for (int i = 0; i < mCheckedItems.length; i++) {
+                        String label = mAvailableLabelArr[i];
+                        Label l = new Label();
+                        l.setName(label);
+                        if (mCheckedItems[i]) {
+                            toAdd.add(l);
+                        }
+                    }
+                    
+                    //clear labels from issue
+                    labelService.setLabels(new RepositoryId(activity.mUserLogin, activity.mRepoName),
+                            String.valueOf(activity.mIssueNumber), new ArrayList<Label>());
+                    
+                    //set back labels to issue
+                    labelService.setLabels(new RepositoryId(activity.mUserLogin, activity.mRepoName),
+                            String.valueOf(activity.mIssueNumber), toAdd);
+                }
+                catch (IOException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                }
             }
             return null;
         }
@@ -1048,7 +1054,8 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                 }
                 else {
                     activity.getApplicationContext().openIssueActivity(activity,
-                            activity.mUserLogin, activity.mRepoName, activity.mIssueNumber);
+                            activity.mUserLogin, activity.mRepoName, 
+                            activity.mIssueNumber, Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 }
             }
         }
