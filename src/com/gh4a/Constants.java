@@ -137,6 +137,10 @@ public interface Constants {
         
         /** The Constant REPO_HAS_WIKI. */
         public static final String REPO_HAS_WIKI = "REPO_HAS_WIKI";
+        
+        public static final String BASE = "BASE";
+        
+        public static final String HEAD = "HEAD";
     }
 
     /**

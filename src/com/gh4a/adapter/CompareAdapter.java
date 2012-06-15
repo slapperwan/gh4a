@@ -22,11 +22,9 @@ import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
@@ -69,30 +67,30 @@ public class CompareAdapter extends RootAdapter<String[]> {
             viewHolder = (ViewHolder) v.getTag();
         }
 
-        final String[] sha = mObjects.get(position);
-        if (sha != null && sha.length > 0) {
+        final String[] commitInfo = mObjects.get(position);
+        if (commitInfo != null) {
             ImageDownloader.getInstance().download(
-                    StringUtils.md5Hex(sha[1]), viewHolder.ivGravatar);
-            if (!StringUtils.isBlank(sha[3])) {
-                viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
+                    StringUtils.md5Hex(commitInfo[1]), viewHolder.ivGravatar);
+//            if (!StringUtils.isBlank(commitInfo[3])) {
+//                viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
+//
+//                    @Override
+//                    public void onClick(View v) {
+//                        /** Open user activity */
+//                        Gh4Application context = (Gh4Application) v.getContext()
+//                                .getApplicationContext();
+//                        context.openUserInfoActivity(v.getContext(), commitInfo[3],
+//                                null);
+//                    }
+//                });
+//            }
 
-                    @Override
-                    public void onClick(View v) {
-                        /** Open user activity */
-                        Gh4Application context = (Gh4Application) v.getContext()
-                                .getApplicationContext();
-                        context.openUserInfoActivity(v.getContext(), sha[3],
-                                null);
-                    }
-                });
-            }
-
-            viewHolder.tvSha.setText(sha[0].substring(0, 7));
-            viewHolder.tvDesc.setText(sha[2]);
+            viewHolder.tvSha.setText(commitInfo[0].substring(0, 7));
+            viewHolder.tvDesc.setText(commitInfo[2]);
 
             Resources res = v.getResources();
             String extraData = String.format(res.getString(R.string.more_data_1), 
-                    !StringUtils.isBlank(sha[3]) ? sha[3] : "");
+                    !StringUtils.isBlank(commitInfo[3]) ? commitInfo[3] : "");
 
             viewHolder.tvExtra.setText(extraData);
         }

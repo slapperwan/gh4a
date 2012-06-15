@@ -22,13 +22,9 @@ import java.util.List;
 
 import android.os.Bundle;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.HeaderViewListAdapter;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
 
 import com.gh4a.adapter.CompareAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
@@ -44,8 +40,11 @@ public class CompareActivity extends BaseActivity implements OnItemClickListener
     /** The repo name. */
     protected String mRepoName;
     
-    /** The url. */
-    protected String mUrl;
+    /** The base. */
+    protected String mBase;
+    
+    /** The head */
+    protected String mHead;
     
     /* (non-Javadoc)
      * @see android.app.Activity#onCreate(android.os.Bundle)
@@ -59,7 +58,8 @@ public class CompareActivity extends BaseActivity implements OnItemClickListener
         
         mUserLogin = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
-        mUrl = getIntent().getExtras().getString(Constants.Repository.REPO_URL);
+        mBase = getIntent().getExtras().getString(Constants.Repository.BASE);
+        mHead = getIntent().getExtras().getString(Constants.Repository.HEAD);
         
         setBreadCrumb();
         
@@ -92,20 +92,20 @@ public class CompareActivity extends BaseActivity implements OnItemClickListener
         
         Bundle extra = getIntent().getExtras();
         Iterator<String> iter = extra.keySet().iterator();
-        
-        List<String[]> shas = new ArrayList<String[]>();
+
+        List<String[]> commits = new ArrayList<String[]>();
         while (iter.hasNext()) {
             String key = iter.next();
-            if (key.startsWith("sha")) {
-                String[] sha = extra.getStringArray(key);
-                shas.add(sha);    
+            if (key.startsWith("commit")) {
+                String[] commitInfo = extra.getStringArray(key);
+                commits.add(commitInfo);    
             }
             
         }
         
-        if (shas != null && shas.size() > 0) {
-            for (String[] sha : shas) {
-                compareAdapter.add(sha);
+        if (commits != null && commits.size() > 0) {
+            for (String[] commitInfo : commits) {
+                compareAdapter.add(commitInfo);
             }
         }
         compareAdapter.notifyDataSetChanged();
@@ -136,13 +136,8 @@ public class CompareActivity extends BaseActivity implements OnItemClickListener
         b.setData(data);
         breadCrumbHolders[1] = b;
 
-        int index = mUrl.lastIndexOf("/");
-        if (index != -1) {
-            createBreadcrumb("Compare " + mUrl.substring(index + 1, mUrl.length()), breadCrumbHolders);
-        }
-        else {
-            createBreadcrumb("Compare", breadCrumbHolders);
-        }
+        //createBreadcrumb("Compare " + mBase.substring(0, 7) + "..." + mHead.substring(0, 7), breadCrumbHolders);
+        createBreadcrumb("Compare", breadCrumbHolders);
     }
     
     /* (non-Javadoc)
