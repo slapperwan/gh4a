@@ -17,7 +17,6 @@
 package com.gh4a;
 
 import java.util.ArrayList;
-import java.util.TimeZone;
 
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
@@ -57,7 +56,7 @@ public class Gh4Application extends Application {
      */
     public Bundle populateRepository(Repository repository) {
         Bundle data = new Bundle();
-
+        
         data.putString(Constants.Repository.REPO_OWNER, repository.getOwner().getLogin());
         data.putString(Constants.Repository.REPO_NAME, repository.getName());
         data.putString(Constants.Repository.REPO_DESC, repository.getDescription());
@@ -73,9 +72,9 @@ public class Gh4Application extends Application {
         data.putString(Constants.Repository.REPO_PUSHED, pt.format(repository.getPushedAt()));
         data.putBoolean(Constants.Repository.REPO_IS_FORKED, repository.isFork());
         data.putString(Constants.Repository.REPO_PARENT, repository.getParent() != null ?
-                repository.getParent().getName() : "");
+                repository.getParent().getOwner().getLogin() + "/" + repository.getParent().getName() : "");
         data.putString(Constants.Repository.REPO_SOURCE, repository.getSource() != null ?
-                repository.getSource().getName() : "");
+                repository.getSource().getOwner().getLogin() + "/" + repository.getSource().getName() : "");
         data.putBoolean(Constants.Repository.REPO_HAS_ISSUES, repository.isHasIssues());
         data.putBoolean(Constants.Repository.REPO_HAS_WIKI, repository.isHasWiki());
 
