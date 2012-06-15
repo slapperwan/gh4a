@@ -15,6 +15,7 @@
  */
 package com.gh4a.adapter;
 
+import java.util.Calendar;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Commit;
@@ -79,7 +80,7 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
         if (commit != null) {
             if (!StringUtils.isBlank(commit.getAuthor().getLogin())) {
                 ImageDownloader.getInstance().download(
-                        StringUtils.md5Hex(commit.getAuthor().getEmail()), viewHolder.ivGravatar);
+                        commit.getAuthor().getGravatarId(), viewHolder.ivGravatar);
                 viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
 
                     @Override
@@ -111,10 +112,16 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
             viewHolder.tvSha.setText(commit.getSha().substring(0, 7));
             viewHolder.tvDesc.setText(commit.getCommit().getMessage());
 
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(commit.getCommit().getCommitter().getDate());
+            int timezoneOffset = (cal.get(Calendar.ZONE_OFFSET) + cal.get(Calendar.DST_OFFSET)) / 3600000;
+            cal.add(Calendar.HOUR, timezoneOffset);
+
             Resources res = v.getResources();
             String extraData = String.format(res.getString(R.string.more_data), !StringUtils
                     .isBlank(commit.getAuthor().getLogin()) ? commit.getAuthor().getLogin()
-                    : commit.getCommitter().getLogin(), pt.format(commit.getCommitter().getCreatedAt()));
+                    : commit.getCommitter().getLogin(), 
+                    pt.format(cal.getTime()));
 
             viewHolder.tvExtra.setText(extraData);
         }
