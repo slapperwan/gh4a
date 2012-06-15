@@ -459,21 +459,25 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
             String eventType = event.getType();
             EventRepository eventRepo = event.getRepo();
             String[] repoNamePart = eventRepo.getName().split("/");
-            String repoOwner = repoNamePart[0];
-            String repoName = repoNamePart[1];
+            String repoOwner = null;
+            String repoName = null;
+            if (repoNamePart.length == 2) {
+                repoOwner = repoNamePart[0];
+                repoName = repoNamePart[1];
+            }
             String repoUrl = eventRepo.getUrl();
             
             menu.setHeaderTitle("Go to");
 
             /** Common menu */
             menu.add("User " + event.getActor().getLogin());
-            if (eventRepo != null) {
+            if (repoOwner != null) {
                 menu.add("Repo " + repoOwner + "/" + repoName);
             }
 
             /** PushEvent extra menu for commits */
             if (Event.TYPE_PUSH.equals(eventType)) {
-                if (eventRepo != null) {
+                if (repoOwner != null) {
                     PushPayload payload = (PushPayload) event.getPayload();
                     menu.add("Compare " + payload.getHead());
                     
@@ -500,7 +504,7 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
 
             /** CommitCommentEvent */
             else if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
-                if (eventRepo != null) {
+                if (repoOwner != null) {
                     CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
                     menu.add("Commit " + payload.getComment().getCommitId().substring(0, 7));
                     menu.add("Comment in browser");
@@ -558,8 +562,12 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         String eventType = event.getType();
         EventRepository eventRepo = event.getRepo();
         String[] repoNamePart = eventRepo.getName().split("/");
-        String repoOwner = repoNamePart[0];
-        String repoName = repoNamePart[1];
+        String repoOwner = null;
+        String repoName = null;
+        if (repoNamePart.length == 2) {
+            repoOwner = repoNamePart[0];
+            repoName = repoNamePart[1];
+        }
         String repoUrl = eventRepo.getUrl();
         
         String title = item.getTitle().toString();
@@ -578,7 +586,7 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         }
         /** Commit item */
         else if (title.startsWith("Commit")) {
-            if (eventRepo != null) {
+            if (repoOwner != null) {
                 context.openCommitInfoActivity(this, repoOwner, repoName, value);
             }
             else {
@@ -606,7 +614,7 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         }
         /** Download item */
         else if (title.startsWith("File")) {
-            if (eventRepo != null) {
+            if (repoOwner != null) {
                 DownloadPayload payload = (DownloadPayload) event.getPayload();
                 context.openBrowser(this, payload.getDownload().getUrl());
             }
@@ -640,7 +648,7 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         }
         
         else if (title.startsWith("Compare")) {
-            if (eventRepo != null) {
+            if (repoOwner != null) {
                 PushPayload payload = (PushPayload) event.getPayload();
                 
                 List<Commit> commits = payload.getCommits();
