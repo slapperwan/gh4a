@@ -353,8 +353,6 @@ public class SearchActivity extends BaseActivity {
         client.setOAuth2Token(getAuthToken());
         RepositoryService repoService = new RepositoryService();
         
-        searchKey = StringUtils.encodeUrl(searchKey);
-        searchKey = searchKey.replaceAll("\\.", "%2e");
         if (!StringUtils.isBlank(searchKey)) {
             if ("Any Language".equals(language)) {
                 repositories = repoService.searchRepositories(searchKey, mPage);
@@ -564,13 +562,9 @@ public class SearchActivity extends BaseActivity {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
             if (mTarget.get() != null) {
-                Repository repository = (Repository) adapterView.getAdapter().getItem(position);
-                Intent intent = new Intent().setClass(mTarget.get(), RepositoryActivity.class);
-    
-                Bundle data = mTarget.get().getApplicationContext().populateRepository(repository);
-    
-                intent.putExtra(Constants.DATA_BUNDLE, data);
-                mTarget.get().startActivity(intent);
+                SearchRepository repository = (SearchRepository) adapterView.getAdapter().getItem(position);
+                mTarget.get().getApplicationContext().openRepositoryInfoActivity(mTarget.get(),
+                        repository.getOwner(), repository.getName());
             }
         }
     }
