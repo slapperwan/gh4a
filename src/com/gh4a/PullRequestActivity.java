@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.PullRequest;
+import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.IssueService;
@@ -40,7 +41,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.gh4a.Constants.Discussion;
 import com.gh4a.adapter.CommentAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.ImageDownloader;
@@ -137,6 +137,7 @@ public class PullRequestActivity extends BaseActivity {
         ListView lvComments = (ListView) findViewById(R.id.lv_comments);
         final PullRequest pullRequest = (PullRequest) data.get("pullRequest");
         List<Comment> comments = (List<Comment>) data.get("comments");
+        List<RepositoryCommit> commits = (List<RepositoryCommit>) data.get("commits");
         
         // set details inside listview header
         LayoutInflater infalter = getLayoutInflater();
@@ -144,11 +145,6 @@ public class PullRequestActivity extends BaseActivity {
 
         lvComments.addHeaderView(mHeader, null, true);
 
-        List<Discussion> discussions = new ArrayList<Discussion>();
-//        mPullRequestDiscussionAdapter = new PullRequestDiscussionAdapter(PullRequestActivity.this,
-//                discussions, mRepoName, pullRequest);
-//        lvComments.setAdapter(mPullRequestDiscussionAdapter);
-        
         mCommentAdapter = new CommentAdapter(PullRequestActivity.this, new ArrayList<Comment>());
         lvComments.setAdapter(mCommentAdapter);
         
@@ -202,6 +198,30 @@ public class PullRequestActivity extends BaseActivity {
 //            llLabels.setVisibility(View.GONE);
 //        }
         
+        LinearLayout llCommits = (LinearLayout) findViewById(R.id.ll_commits);
+        llCommits.setBackgroundResource(R.drawable.default_grey_box);
+        for (final RepositoryCommit commit : commits) {
+            TextView tvName = new TextView(getApplicationContext());
+            tvName.setText(commit.getCommit().getCommitter().getName() + " added a commit");
+            tvName.setTextAppearance(getApplicationContext(), R.style.default_text_medium);
+            llCommits.addView(tvName);
+            
+            TextView tvLabel = new TextView(getApplicationContext());
+            tvLabel.setSingleLine(true);
+            tvLabel.setText(commit.getSha().subSequence(0, 7) + " " + commit.getCommit().getMessage());
+            tvLabel.setTextAppearance(getApplicationContext(), R.style.default_text_medium_url);
+            tvLabel.setBackgroundResource(R.drawable.default_link);
+            tvLabel.setOnClickListener(new OnClickListener() {
+                
+                @Override
+                public void onClick(View arg0) {
+                    getApplicationContext().openCommitInfoActivity(PullRequestActivity.this, mUserLogin,
+                            mRepoName, commit.getSha());
+                }
+            });
+            
+            llCommits.addView(tvLabel);
+        }
         fillDiscussion(comments);
     }
 
@@ -251,6 +271,7 @@ public class PullRequestActivity extends BaseActivity {
             if (mTarget.get() != null) {
                 try {
                     PullRequestActivity activity = mTarget.get();
+                    Map<String, Object> m = new HashMap<String, Object>();
                     
                     GitHubClient client = new GitHubClient();
                     client.setOAuth2Token(mTarget.get().getAuthToken());
@@ -258,11 +279,18 @@ public class PullRequestActivity extends BaseActivity {
                     PullRequest pullRequest = pullRequestService.getPullRequest(new RepositoryId(activity.mUserLogin, activity.mRepoName),
                             activity.mPullRequestNumber);
                     
+                    //show commits
+                    if (pullRequest.getCommits() > 0) {
+                        List<RepositoryCommit> commits = pullRequestService.getCommits(new RepositoryId(activity.mUserLogin, activity.mRepoName), 
+                                activity.mPullRequestNumber);
+                        
+                        m.put("commits", commits);
+                    }
+                    
                     IssueService issueService = new IssueService();
                     List<Comment> comments = issueService.getComments(activity.mUserLogin, 
                             activity.mRepoName, pullRequest.getNumber());
                     
-                    Map<String, Object> m = new HashMap<String, Object>();
                     m.put("pullRequest", pullRequest);
                     m.put("comments", comments);
                     

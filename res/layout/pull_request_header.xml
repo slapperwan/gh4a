@@ -71,6 +71,16 @@
             android:layout_height="1dp"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp" />
+        <LinearLayout
+            android:id="@+id/ll_commits"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"/>
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp" />
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content">

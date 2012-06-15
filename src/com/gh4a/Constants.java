@@ -158,10 +158,10 @@ public interface Constants {
         public static final String ISSUE_STATE = "Issue.STATE";
 
         /** The Constant ISSUE_STATE_OPEN. */
-        public static final String ISSUE_STATE_OPEN = "OPEN";
+        public static final String ISSUE_STATE_OPEN = "open";
 
         /** The Constant ISSUE_STATE_CLOSED. */
-        public static final String ISSUE_STATE_CLOSED = "CLOSED";
+        public static final String ISSUE_STATE_CLOSED = "closed";
 
         /** The Constant ISSUE_TITLE. */
         public static final String ISSUE_TITLE = "ISSUE_TITLE";

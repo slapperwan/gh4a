@@ -109,12 +109,15 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> {
             viewHolder.tvDesc.setText("#" + pullRequest.getNumber() + " - " + pullRequest.getTitle());
             //viewHolder.tvDesc.setText(StringUtils.doTeaser(pullRequest.getBody()));
             Resources res = v.getResources();
-            String extraData = String.format(res.getString(R.string.more_data_3), pullRequest
-                    .getUser().getLogin(), pt.format(pullRequest.getCreatedAt()),
-                    pullRequest.getComments()
-                            + " "
-                            + res.getQuantityString(R.plurals.issue_comment, pullRequest
-                                    .getComments()));
+//            String extraData = String.format(res.getString(R.string.more_data_3), pullRequest
+//                    .getUser().getLogin(), pt.format(pullRequest.getCreatedAt()),
+//                    pullRequest.getComments()
+//                            + " "
+//                            + res.getQuantityString(R.plurals.issue_comment, pullRequest
+//                                    .getComments()));
+            
+            String extraData = String.format(res.getString(R.string.more_data), pullRequest
+                    .getUser().getLogin(), pt.format(pullRequest.getCreatedAt()));
             viewHolder.tvExtra.setText(extraData);
         }
         return v;
