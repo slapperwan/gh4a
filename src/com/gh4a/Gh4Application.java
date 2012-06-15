@@ -17,6 +17,7 @@
 package com.gh4a;
 
 import java.util.ArrayList;
+import java.util.TimeZone;
 
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
@@ -42,7 +43,6 @@ public class Gh4Application extends Application {
      */
     @Override
     public void onCreate() {
-        //ACRA.init(this);
         super.onCreate();
     }
 
@@ -56,7 +56,6 @@ public class Gh4Application extends Application {
      * @return the bundle
      */
     public Bundle populateRepository(Repository repository) {
-        PrettyTime pt = new PrettyTime();
         Bundle data = new Bundle();
 
         data.putString(Constants.Repository.REPO_OWNER, repository.getOwner().getLogin());

@@ -44,6 +44,7 @@ import android.content.res.Resources;
 import android.text.SpannableString;
 import android.text.style.ClickableSpan;
 import android.text.style.TextAppearanceSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
