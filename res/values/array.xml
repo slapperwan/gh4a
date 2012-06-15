@@ -30,7 +30,7 @@
     <string-array
         name="search_types_array">
         <item>Repository</item>
-        <item>User</item>
+        <!-- item>User</item-->
     </string-array>
     <string-array
         name="explore_item">
