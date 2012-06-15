@@ -141,7 +141,7 @@ public class FollowerFollowingListActivity extends BaseActivity implements OnIte
                     UserService userService = new UserService(client);
                     List<User> users = new ArrayList<User>();
                     if (activity.mFindFollowers) {
-                        userService.getFollowers(activity.mUserLogin);
+                        users = userService.getFollowers(activity.mUserLogin);
                     }
                     else {
                         users = userService.getFollowing(activity.mUserLogin);
