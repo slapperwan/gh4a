@@ -18,12 +18,10 @@ package com.gh4a.adapter;
 import java.util.Calendar;
 import java.util.List;
 
-import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.RepositoryCommit;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -95,7 +93,7 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
             }
             else {
                 ImageDownloader.getInstance().download(
-                        StringUtils.md5Hex(commit.getCommitter().getEmail()), viewHolder.ivGravatar);
+                        commit.getCommitter().getGravatarId(), viewHolder.ivGravatar);
                 viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
 
                     @Override
