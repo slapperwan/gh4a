@@ -28,6 +28,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -216,13 +217,9 @@ public class AddedFileViewerActivity extends BaseActivity {
                     GitHubClient client = new GitHubClient();
                     client.setOAuth2Token(mTarget.get().getAuthToken());
                     DataService dataService = new DataService(client);
+                    
                     return dataService.getBlob(new RepositoryId(activity.mUserLogin,
-                            activity.mRepoName), activity.mTreeSha);
-//                    filepath = filepath.replaceAll(" ", "%20");
-//                    return objectService.getBlob(activity.mUserLogin,
-//                                activity.mRepoName,
-//                                activity.mTreeSha, 
-//                                filepath);
+                            activity.mRepoName), activity.mObjectSha);
                 }
                 catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
@@ -283,6 +280,8 @@ public class AddedFileViewerActivity extends BaseActivity {
      * @param blob the blob
      */
     protected void fillData(Blob blob, boolean highlight) {
+        String dataBase64 = blob.getContent();
+        String data = new String(Base64.decode(dataBase64.getBytes(), Base64.DEFAULT));
         
         TextView tvViewRaw = (TextView) findViewById(R.id.tv_view_raw);
         if (highlight) {
@@ -309,7 +308,7 @@ public class AddedFileViewerActivity extends BaseActivity {
         // webView.setWebViewClient(new WebChrome2());
         webView.getSettings().setUseWideViewPort(true);
         
-        String data = StringUtils.highlightSyntax(blob.getContent(), highlight, mFilePath);
+        data = StringUtils.highlightSyntax(data, highlight, mFilePath);
         webView.setWebViewClient(webViewClient);
         webView.loadDataWithBaseURL("file:///android_asset/", data, "text/html", "utf-8", "");
     }

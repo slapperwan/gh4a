@@ -74,6 +74,7 @@ public class DiffViewerActivity extends BaseActivity {
         setBreadCrumb();
         
         TextView tvViewFile = (TextView) findViewById(R.id.tv_view);
+        tvViewFile.setVisibility(View.GONE);
         tvViewFile.setText(getResources().getString(R.string.object_view_file_at, mSha.substring(0, 7)));
         tvViewFile.setOnClickListener(new OnClickListener() {
             

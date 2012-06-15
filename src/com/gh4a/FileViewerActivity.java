@@ -22,12 +22,14 @@ import java.util.HashMap;
 import org.eclipse.egit.github.core.Blob;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.service.DataService;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -269,14 +271,9 @@ public class FileViewerActivity extends BaseActivity {
 //                            || activity.mMimeType.equals("application/sh")
 //                            || activity.mMimeType.equals("application/xhtml+xml")) {
                         mShowInBrowser = false;
+                        
                         return dataService.getBlob(new RepositoryId(activity.mUserLogin,
                                 activity.mRepoName), activity.mObjectSha);
-//                        return objectService.getBlob(activity.mUserLogin,
-//                                activity.mRepoName,
-//                                activity.mTreeSha, 
-//                                activity.mPath);
-//                        return objectService.getObjectContent(activity.mUserLogin, activity.mRepoName,
-//                                activity.mObjectSha);
 //                    }
 //                    else {
 //                        mShowInBrowser = true;
@@ -327,7 +324,11 @@ public class FileViewerActivity extends BaseActivity {
                     }
                     else {
                         mTarget.get().mBlob = result;
-                        mTarget.get().fillData(result, mHighlight);
+                        try {
+                            mTarget.get().fillData(result, mHighlight);
+                        } catch (IOException e) {
+                            mTarget.get().showError();
+                        }
                     }
                 }
             }
@@ -338,9 +339,11 @@ public class FileViewerActivity extends BaseActivity {
      * Fill data into UI components.
      * 
      * @param is the is
+     * @throws IOException 
      */
-    protected void fillData(Blob blob, boolean highlight) {
-        String data = blob.getContent();
+    protected void fillData(Blob blob, boolean highlight) throws IOException {
+        String dataBase64 = blob.getContent();
+        String data = new String(Base64.decode(dataBase64.getBytes(), Base64.DEFAULT));
         TextView tvViewRaw = (TextView) findViewById(R.id.tv_view_raw);
         if (highlight) {
             tvViewRaw.setText("Raw");

@@ -281,13 +281,24 @@ public class CommitActivity extends BaseActivity {
 
                 @Override
                 public void onClick(View arg0) {
+//                    Intent intent = new Intent().setClass(CommitActivity.this,
+//                            AddedFileViewerActivity.class);
+//                    intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+//                    intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+//                    intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
+//                    intent.putExtra(Constants.Object.TREE_SHA, commit.getCommit().getTree().getSha());
+//                    intent.putExtra(Constants.Object.PATH, file.getFilename());
+//                    startActivity(intent);
+                    
                     Intent intent = new Intent().setClass(CommitActivity.this,
-                            AddedFileViewerActivity.class);
+                            DiffViewerActivity.class);
                     intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
                     intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                     intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
-                    intent.putExtra(Constants.Object.TREE_SHA, commit.getCommit().getTree().getSha());
+                    //intent.putExtra(Constants.Commit.DIFF, delta.getDiff());
+                    intent.putExtra(Constants.Commit.DIFF, file.getPatch());
                     intent.putExtra(Constants.Object.PATH, file.getFilename());
+                    intent.putExtra(Constants.Object.TREE_SHA, commit.getCommit().getTree().getSha());
                     startActivity(intent);
                 }
             });

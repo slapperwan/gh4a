@@ -243,6 +243,7 @@ public class FileManagerActivity extends BaseActivity implements OnItemClickList
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         FileAdapter adapter = (FileAdapter) adapterView.getAdapter();
         TreeEntry tree = (TreeEntry) adapter.getItem(position);
+        
         if ("tree".equals(tree.getType())) {
             Intent intent = new Intent().setClass(this, FileManagerActivity.class);
             intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
