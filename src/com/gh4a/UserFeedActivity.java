@@ -436,7 +436,13 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
             if (eventRepo != null) {
                 IssueCommentPayload payload = (IssueCommentPayload) event.getPayload();
-                context.openIssueActivity(this, repoOwner, repoName, payload.getIssue().getNumber()); 
+                String type = payload.getIssue().getPullRequest().getDiffUrl() != null ? "pullrequest" : "issue";
+                if ("pullrequest".equals(type)) {
+                    context.openPullRequestActivity(this, repoOwner, repoName, payload.getIssue().getNumber());   
+                }
+                else {
+                    context.openIssueActivity(this, repoOwner, repoName, payload.getIssue().getNumber()); 
+                }
             }
             else {
                 context.notFoundMessage(this, R.plurals.repository);
