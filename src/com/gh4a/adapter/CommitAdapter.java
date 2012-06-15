@@ -22,6 +22,7 @@ import org.eclipse.egit.github.core.RepositoryCommit;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -107,7 +108,7 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
                 });
             }
 
-            viewHolder.tvSha.setText(commit.getCommit().getSha().substring(0, 7));
+            viewHolder.tvSha.setText(commit.getSha().substring(0, 7));
             viewHolder.tvDesc.setText(commit.getCommit().getMessage());
 
             Resources res = v.getResources();

@@ -209,7 +209,7 @@ public class CommitListActivity extends BaseActivity implements OnScrollListener
                     CommitService commitService = new CommitService(client);
                     try {
                         List<RepositoryCommit> commits = commitService.getCommits(new RepositoryId(activity.mUserLogin, 
-                                activity.mRepoName));
+                                activity.mRepoName), activity.mTreeSha, null);
                         activity.mPage++;
                         return commits;
                     }
