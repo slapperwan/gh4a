@@ -58,8 +58,8 @@
     <string name="event_pull_request_desc">%1$s\n%2$d commits with %3$d additions and %4$d deletions</string>
     <string name="event_follow_desc">%1$s has %2$d repositories and %3$d followers</string>
     <string name="event_fork_desc">Forked repository is at %1$s</string>
-    <string name="event_create_repo_desc">New repository is at %1$s/%2$s</string>
-    <string name="event_create_branch_desc">New %1$s is at %2$s/%3$s/tree/%4$s</string>
+    <string name="event_create_repo_desc">New repository is at %1$s</string>
+    <string name="event_create_branch_desc">New %1$s is at %2$s/tree/%3$s</string>
     <string name="event_gollum_desc">View %1$s</string>
     <string name="event_commit_comment_desc">Comment in </string>
     <string name="event_push_desc">%1$d more commits...</string>

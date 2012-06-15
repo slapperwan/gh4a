@@ -259,7 +259,6 @@ public class FeedAdapter extends RootAdapter<Event> {
             CreatePayload payload = (CreatePayload) event.getPayload();
             if ("repository".equals(payload.getRefType())) {
                 String text = String.format(res.getString(R.string.event_create_repo_desc),
-                        actor.getLogin(),
                         eventRepo.getName());
 
                 return text;
@@ -267,7 +266,6 @@ public class FeedAdapter extends RootAdapter<Event> {
             else if ("branch".equals(payload.getRefType()) || "tag".equals(payload.getRefType())) {
                 String text = String.format(res.getString(R.string.event_create_branch_desc),
                         payload.getRefType(),
-                        actor.getLogin(),
                         eventRepo.getName(),
                         payload.getRef());
 
