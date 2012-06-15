@@ -15,10 +15,15 @@
  */
 package com.gh4a;
 
+import static android.content.pm.PackageManager.MATCH_DEFAULT_ONLY;
+
 import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutionException;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -48,6 +53,8 @@ import com.github.api.v2.services.auth.LoginPasswordAuthentication;
  */
 public class RepositoryActivity extends BaseActivity implements OnClickListener {
 
+	private static final String GIT_CLONE_INTENT = "org.openintents.git.clone.PREPARE";
+	
     /** The loading dialog. */
     protected LoadingDialog mLoadingDialog;
 
@@ -623,10 +630,24 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
             menu.clear();
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.repo_menu, menu);
+            if (isIntentAvailable(this, GIT_CLONE_INTENT) && mBundle!=null && mBundle.containsKey(Constants.Repository.REPO_URL)) {
+            	inflater.inflate(R.menu.clone_menu, menu);
+            }
             inflater.inflate(R.menu.bookmark_menu, menu);
         }
         return true;
     }
+    
+    /**
+     * Indicates whether the specified action can be used as an intent.
+     * 
+     * Adapted from http://android-developers.blogspot.com/2009/01/can-i-use-this-intent.html
+     */
+    public static boolean isIntentAvailable(Context context, String action) {
+        PackageManager packageManager = context.getPackageManager();
+        Intent intent = new Intent(action);
+        return !packageManager.queryIntentActivities(intent, MATCH_DEFAULT_ONLY).isEmpty();
+    }   
     
     /* (non-Javadoc)
      * @see com.gh4a.BaseActivity#setMenuOptionItemSelected(android.view.MenuItem)
@@ -642,6 +663,18 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
                 return true;
             case R.id.fork_action:
                 new ForkTask(this).execute(false);
+                return true;
+            case R.id.clone:
+            	Uri repositoryUrl=Uri.parse(mBundle.getString(Constants.Repository.REPO_URL));
+                String host = repositoryUrl.getHost(),path=repositoryUrl.getPath().substring(1);
+                //SSH READ+WRITE : 'git@' domain ':' path '.git'
+                //GIT READ ONLY : 'git://' domain '/' path '.git'
+
+                String cloneUrl=mBundle.getBoolean(Constants.Repository.REPO_PRIVATE)?("git@"+host+":"+path +".git"):("git://"+host+"/"+path +".git");
+		
+                final Intent intent = new Intent(GIT_CLONE_INTENT);
+                intent.putExtra("source-uri", cloneUrl);
+                startActivity(intent);
                 return true;
             default:
                 return true;

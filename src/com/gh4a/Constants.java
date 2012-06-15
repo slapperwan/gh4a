@@ -90,6 +90,9 @@ public interface Constants {
 
         /** The Constant REPO_URL. */
         public static final String REPO_URL = "REPO_URL";
+        
+        /** The Constant REPO_PRIVATE. */
+        public static final String REPO_PRIVATE = "REPO_PRIVATE";
 
         /** The Constant REPO_WATCHERS. */
         public static final String REPO_WATCHERS = "REPO_WATCHERS";
