@@ -101,6 +101,7 @@ public class Gh4Application extends Application {
         data.putInt(Constants.Issue.ISSUE_COMMENTS, issue.getComments());
         data.putString(Constants.GRAVATAR_ID, issue.getUser().getGravatarId());
         data.putString(Constants.Issue.PULL_REQUEST_URL, issue.getPullRequest().getUrl());
+        data.putString(Constants.Issue.PULL_REQUEST_DIFF_URL, issue.getPullRequest().getDiffUrl());
         
         //TODO: use Label object
         ArrayList<String> labels = new ArrayList<String>();

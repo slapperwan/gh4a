@@ -254,7 +254,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
         }
         
         TextView tvPull = (TextView) mHeader.findViewById(R.id.tv_pull);
-        if (mBundle.getString(Constants.Issue.PULL_REQUEST_URL) != null) {
+        if (mBundle.getString(Constants.Issue.PULL_REQUEST_DIFF_URL) != null) {
             tvPull.setVisibility(View.VISIBLE);
             tvPull.setOnClickListener(this);
         }
