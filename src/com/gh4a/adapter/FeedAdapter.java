@@ -44,6 +44,7 @@ import android.content.res.Resources;
 import android.text.SpannableString;
 import android.text.style.ClickableSpan;
 import android.text.style.TextAppearanceSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -484,7 +485,7 @@ public class FeedAdapter extends RootAdapter<Event> {
         /** IssueCommentEvent */
         else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
             IssueCommentPayload payload = (IssueCommentPayload) event.getPayload();
-            String type = payload.getIssue().getPullRequest().getId() != 0 ? "pull request" : "issue";
+            String type = payload.getIssue().getPullRequest().getDiffUrl() != null ? "pull request" : "issue";
             String text = String.format(res.getString(R.string.event_issue_comment),
                     actor.getLogin(), type, payload.getIssue().getNumber(), formatFromRepoName(eventRepo));
             return text;
