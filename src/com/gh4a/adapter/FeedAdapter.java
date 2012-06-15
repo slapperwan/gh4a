@@ -399,7 +399,7 @@ public class FeedAdapter extends RootAdapter<Event> {
             FollowPayload payload = (FollowPayload) event.getPayload();
             String text = String.format(res.getString(R.string.event_follow_title),
                     actor.getLogin(),
-                    payload.getTarget());
+                    payload.getTarget().getLogin());
             return text;
         }
 
