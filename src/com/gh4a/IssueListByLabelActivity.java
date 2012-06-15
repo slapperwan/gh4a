@@ -21,8 +21,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.IssueService;
+import org.eclipse.egit.github.core.service.LabelService;
 
 import com.gh4a.holder.BreadCrumbHolder;
 
@@ -91,9 +93,9 @@ public class IssueListByLabelActivity extends IssueListActivity {
 
         String label = getIntent().getStringExtra(Constants.Issue.ISSUE_LABEL);
         //label = StringUtils.encodeUrl(label);
-        
+
         Map<String, String> filterData = new HashMap<String, String>();
-        filterData.put("label", label);
+        filterData.put("labels", label);
         
         return issueService.getIssues(mUserLogin, mRepoName, filterData);
     }
