@@ -34,7 +34,6 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -130,7 +129,8 @@ public class BaseActivity extends Activity {
                     editor.clear();
                     editor.commit();
                     Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP
+                            |Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     Toast.makeText(this, getResources().getString(R.string.success_logout), Toast.LENGTH_SHORT).show();
                     this.finish();
@@ -555,7 +555,7 @@ public class BaseActivity extends Activity {
         Toast
                 .makeText(getApplication(), "An error occured while fetching data",
                         Toast.LENGTH_SHORT).show();
-        super.finish();
+        //super.finish();
     }
 
     /**
@@ -597,4 +597,23 @@ public class BaseActivity extends Activity {
         String token = sharedPreferences.getString(Constants.User.USER_AUTH_TOKEN, null);
         return token;
     }
+    
+    public void unauthorized() {
+        SharedPreferences sharedPreferences = getSharedPreferences(
+                Constants.PREF_NAME, MODE_PRIVATE);
+        
+        if (sharedPreferences != null) {
+            if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
+                    && sharedPreferences.getString(Constants.User.USER_AUTH_TOKEN, null) != null){
+                Editor editor = sharedPreferences.edit();
+                editor.clear();
+                editor.commit();
+                Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
+            }
+        }
+    }
+    
 }

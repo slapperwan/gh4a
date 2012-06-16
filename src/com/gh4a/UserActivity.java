@@ -130,8 +130,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
                 }
                 catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    if (e.getCause() != null
-                            && e.getCause().getMessage().equalsIgnoreCase(
+                    if (e.getMessage().equalsIgnoreCase(
                                     "Received authentication challenge is null")) {
                         isAuthError = true;
                     }
@@ -164,21 +163,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
             if (mTarget.get() != null) {
                 mTarget.get().mLoadingDialog.dismiss();
                 if (mException && isAuthError) {
-                    SharedPreferences sharedPreferences = mTarget.get().getSharedPreferences(
-                            Constants.PREF_NAME, MODE_PRIVATE);
-                    
-                    if (sharedPreferences != null) {
-                        if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
-                                && sharedPreferences.getString(Constants.User.USER_AUTH_TOKEN, null) != null){
-                            Editor editor = sharedPreferences.edit();
-                            editor.clear();
-                            editor.commit();
-                            Intent intent = new Intent().setClass(mTarget.get(), Github4AndroidActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            mTarget.get().startActivity(intent);
-                            mTarget.get().finish();
-                        }
-                    }
+                    mTarget.get().unauthorized();
                 }
                 else if (mException) {
                     mTarget.get().showError();
@@ -640,7 +625,12 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         Intent intent = new Intent().setClass(this, UserPublicActivity.class);
         intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
         intent.putExtra(Constants.ACTIONBAR_TITLE, mUserLogin);
-        intent.putExtra(Constants.SUBTITLE, getResources().getString(R.string.user_public_activity));
+        if (mUserLogin.equals(getAuthLogin())) {
+            intent.putExtra(Constants.SUBTITLE, getResources().getString(R.string.user_your_actions));
+        }
+        else {
+            intent.putExtra(Constants.SUBTITLE, getResources().getString(R.string.user_public_activity));
+        }
         startActivity(intent);
     }
     

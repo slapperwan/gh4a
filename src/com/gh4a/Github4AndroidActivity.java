@@ -173,8 +173,7 @@ public class Github4AndroidActivity extends BaseActivity {
                 }
                 catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    if (e.getCause() != null
-                            && e.getCause().getMessage().equalsIgnoreCase(
+                    if (e.getMessage().equalsIgnoreCase(
                                     "Received authentication challenge is null")) {
                         isAuthError = true;
                     }
@@ -228,13 +227,6 @@ public class Github4AndroidActivity extends BaseActivity {
                     editor.putString(Constants.User.USER_AUTH_TOKEN, result.getToken());
                     editor.putString(Constants.User.USER_LOGIN, mTarget.get().mEtUserLogin.getText().toString());
                     editor.commit();
-                    
-//                    SharedPreferences sharedPreferences = activity.getSharedPreferences(
-//                            Constants.PREF_NAME, MODE_PRIVATE);
-//                    Editor editor = sharedPreferences.edit();
-//                    editor.putString(Constants.User.USER_LOGIN, activity.mEtUserLogin.getText().toString().trim());
-//                    editor.putString(Constants.User.USER_PASSWORD, activity.mEtPassword.getText().toString().trim());
-//                    editor.commit();
                     
                     activity.getApplicationContext().openUserInfoActivity(activity, activity.mEtUserLogin.getText().toString().trim(),
                             null, Intent.FLAG_ACTIVITY_CLEAR_TOP);

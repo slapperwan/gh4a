@@ -76,6 +76,7 @@ public interface Constants {
         public static final String USER_TYPE = "Type";
         
         public static final String USER_AUTH_TOKEN = "Token";
+        
     }
 
     /**
