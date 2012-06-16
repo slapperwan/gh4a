@@ -325,6 +325,13 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
                 intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                 startActivity(intent);
                 return true;
+            case R.id.view_milestones:
+                intent = new Intent().setClass(IssueListActivity.this, IssueMilestoneListActivity.class);
+                intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                startActivity(intent);
+                return true;    
+                
             default:
                 return true;
         }

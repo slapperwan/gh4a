@@ -3,5 +3,6 @@
     <item android:id="@+id/view_open_issues" android:title="@string/issue_view_open_issues" />
     <item android:id="@+id/view_closed_issues" android:title="@string/issue_view_closed_issues" />
     <item android:id="@+id/view_labels" android:title="@string/issue_view_labels" />
+    <item android:id="@+id/view_milestones" android:title="@string/issue_view_milestones" />
     <item android:id="@+id/create_issue" android:title="@string/issue_create" />
 </menu>
