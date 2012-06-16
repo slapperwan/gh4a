@@ -23,7 +23,9 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
+import org.eclipse.egit.github.core.service.RepositoryService;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -329,6 +331,8 @@ public class IssueMilestoneListActivity extends BaseActivity implements OnItemCl
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        Milestone milestone = (Milestone) mListView.getItemAtPosition(info.position);
+        
         switch (item.getItemId()) {
         case Menu.FIRST + 1:
             //try {
@@ -348,14 +352,8 @@ public class IssueMilestoneListActivity extends BaseActivity implements OnItemCl
                        });
                 AlertDialog alert = builder.create();
                 alert.show();
-//            }
-//            catch (IOException e) {
-//                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-//                showMessage(getResources().getString(R.string.issue_error_delete_label), false);
-//            }
             break;
         case Menu.FIRST + 2:
-            Milestone milestone = (Milestone) mListView.getItemAtPosition(info.position);
             Intent intent = new Intent().setClass(this, IssueListByMilestoneActivity.class);
             intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
             intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
@@ -450,7 +448,7 @@ public class IssueMilestoneListActivity extends BaseActivity implements OnItemCl
     
     /**
      * An asynchronous task that runs on a background thread
-     * to add issue labels.
+     * to add issue milestone.
      */
     private static class AddIssueMilestonesTask extends AsyncTask<String, Void, Void> {
 
