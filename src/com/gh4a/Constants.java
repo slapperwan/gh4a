@@ -198,6 +198,12 @@ public interface Constants {
         
         /** The Constant PULL_REQUEST_DIFF URL */
         public static final String PULL_REQUEST_DIFF_URL = "PULL_REQUEST_DIFF_URL";
+        
+        /** The Constant ISSUE_MILESTONE_NUMBER. */
+        public static final String ISSUE_MILESTONE_NUMBER = "ISSUE_MILESTONE_NUMBER";
+        
+        /** The Constant ISSUE_MILESTONE_TITLE. */
+        public static final String ISSUE_MILESTONE_TITLE = "ISSUE_MILESTONE_TITLE";
     }
 
     /**
