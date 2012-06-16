@@ -37,6 +37,15 @@
                 android:lines="8"
                 android:hint="@string/issue_body" />
             <Button
+                android:id="@+id/btn_label"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/issue_view_labels" />
+            <Spinner
+                android:id="@+id/spinner_milestone"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" />
+            <Button
                 android:text="@string/issue_edit"
                 android:id="@+id/btn_edit"
                 android:layout_width="wrap_content"

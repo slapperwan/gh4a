@@ -17,28 +17,41 @@ package com.gh4a;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.IssueService;
+import org.eclipse.egit.github.core.service.LabelService;
+import org.eclipse.egit.github.core.service.MilestoneService;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 
+import com.gh4a.adapter.MilestoneSimpleAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.StringUtils;
 
 /**
  * The IssueEdit activity.
  */
-public class IssueEditActivity extends BaseActivity implements OnClickListener {
+public class IssueEditActivity extends BaseActivity implements OnClickListener, OnItemSelectedListener {
 
     /** The user login. */
     private String mUserLogin;
@@ -55,6 +68,16 @@ public class IssueEditActivity extends BaseActivity implements OnClickListener {
     
     /** The loading dialog. */
     protected LoadingDialog mLoadingDialog;
+    
+    protected List<Label> mSelectedLabels;
+    
+    protected Milestone mSelectedMilestone;
+    
+    protected List<Label> mLabels;
+    
+    protected List<Milestone> mMilestones;
+    
+    protected Issue mIssue;
     
     /* (non-Javadoc)
      * @see android.app.Activity#onCreate(android.os.Bundle)
@@ -79,14 +102,7 @@ public class IssueEditActivity extends BaseActivity implements OnClickListener {
 
         setBreadCrumb();
         
-        Button btnEdit = (Button) findViewById(R.id.btn_edit);
-        btnEdit.setOnClickListener(this);
-        
-        EditText etTitle = (EditText) findViewById(R.id.et_title);
-        etTitle.setText(mTitle);
-        
-        EditText etDesc = (EditText) findViewById(R.id.et_desc);
-        etDesc.setText(mBody);
+        new LoadIssueTask(this).execute();
     }
     
     /**
@@ -137,20 +153,128 @@ public class IssueEditActivity extends BaseActivity implements OnClickListener {
      */
     @Override
     public void onClick(View v) {
-        EditText etTitle = (EditText) findViewById(R.id.et_title);
-        EditText etDesc = (EditText) findViewById(R.id.et_desc);
-        if (etTitle.getText() == null || StringUtils.isBlank(etTitle.getText().toString())) {
-            showMessage(getResources().getString(R.string.issue_error_title), false);
-        }
-        else {
-            String desc = "";
-            if (etTitle.getText() != null) {
-                desc = etDesc.getText().toString();
+        if (v.getId() == R.id.btn_edit) {
+            EditText etTitle = (EditText) findViewById(R.id.et_title);
+            EditText etDesc = (EditText) findViewById(R.id.et_desc);
+            if (etTitle.getText() == null || StringUtils.isBlank(etTitle.getText().toString())) {
+                showMessage(getResources().getString(R.string.issue_error_title), false);
             }
-            new EditIssueTask(this, false).execute(String.valueOf(mIssueNumber), etTitle.getText().toString(), desc);
+            else {
+                String desc = "";
+                if (etTitle.getText() != null) {
+                    desc = etDesc.getText().toString();
+                }
+                new EditIssueTask(this, false).execute(String.valueOf(mIssueNumber), etTitle.getText().toString(), desc);
+            }
+        }
+        else if (v.getId() == R.id.btn_label) {
+            showLabelsDialog();
         }
     }
 
+    /**
+     * An asynchronous task that runs on a background thread to load issue.
+     */
+    private static class LoadIssueTask extends AsyncTask<Void, Integer, Void> {
+
+        /** The target. */
+        private WeakReference<IssueEditActivity> mTarget;
+        
+        /** The exception. */
+        private boolean mException;
+
+        /**
+         * Instantiates a new load issue task.
+         *
+         * @param activity the activity
+         */
+        public LoadIssueTask(IssueEditActivity activity) {
+            mTarget = new WeakReference<IssueEditActivity>(activity);
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected Void doInBackground(Void... params) {
+            if (mTarget.get() != null) {
+                try {
+                    IssueEditActivity activity = mTarget.get();
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(activity.getAuthToken());
+                    IssueService issueService = new IssueService(client);
+                    activity.mIssue = issueService.getIssue(
+                            activity.mUserLogin, activity.mRepoName, 
+                            activity.mIssueNumber);
+                    
+                    activity.mSelectedLabels = activity.mIssue.getLabels(); 
+                    
+                    LabelService labelService = new LabelService(client);
+                    activity.mLabels = labelService.getLabels(mTarget.get().mUserLogin,
+                            mTarget.get().mRepoName);
+                    
+                    MilestoneService milestoneService = new MilestoneService(client);
+                    activity.mMilestones = milestoneService.getMilestones(mTarget.get().mUserLogin,
+                            mTarget.get().mRepoName, null);
+                }
+                catch (IOException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                }
+            }
+            else {
+            }
+            return null;
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPreExecute()
+         */
+        @Override
+        protected void onPreExecute() {
+            if (mTarget.get() != null) {
+                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            }
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(Void result) {
+            if (mTarget.get() != null) {
+                IssueEditActivity activity = mTarget.get();
+                activity.mLoadingDialog.dismiss();
+    
+                if (mException) {
+                    activity.showError();
+                }
+                else {
+                    activity.fillIssueData();
+                }
+            }
+        }
+    }
+    
+    public void fillIssueData() {
+        EditText etTitle = (EditText) findViewById(R.id.et_title);
+        etTitle.setText(mIssue.getTitle());
+        
+        EditText etDesc = (EditText) findViewById(R.id.et_desc);
+        etDesc.setText(mIssue.getBody());
+        
+        Button btnEdit = (Button) findViewById(R.id.btn_edit);
+        btnEdit.setOnClickListener(this);
+        
+        Button btnLabel = (Button) findViewById(R.id.btn_label);
+        btnLabel.setOnClickListener(this);
+        
+        fillLabelMilestoneData();
+    }
+    
     /**
      * An asynchronous task that runs on a background thread
      * to edit issue.
@@ -190,10 +314,16 @@ public class IssueEditActivity extends BaseActivity implements OnClickListener {
                     client.setOAuth2Token(mTarget.get().getAuthToken());
                     IssueService issueService = new IssueService(client);
                     
-                    Issue issue = new Issue();
-                    issue.setId(activity.mIssueNumber);
+                    Issue issue = activity.mIssue;
+                    
                     issue.setTitle(params[1]);
                     issue.setBody(params[2]);
+                    
+                    issue.setMilestone(activity.mSelectedMilestone);
+                    
+                    if (activity.mSelectedLabels != null) {
+                        issue.setLabels(activity.mSelectedLabels);
+                    }
                     
                     issueService.editIssue(activity.mUserLogin, 
                             activity.mRepoName, issue);
@@ -241,9 +371,121 @@ public class IssueEditActivity extends BaseActivity implements OnClickListener {
                     activity.getApplicationContext().openIssueActivity(activity, 
                             activity.mUserLogin, 
                             activity.mRepoName, 
-                            activity.mIssueNumber);
+                            activity.mIssueNumber, Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 }
             }
         }
+    }
+    
+    public void fillLabelMilestoneData() {
+        Spinner milestoneSpinner = (Spinner) findViewById(R.id.spinner_milestone);
+        
+        List<Milestone> finalMilestones = new ArrayList<Milestone>();
+        
+        Milestone selectMilestone = new Milestone();
+        selectMilestone.setNumber(-1);
+        selectMilestone.setTitle("Select Milestone");
+        finalMilestones.add(selectMilestone);
+        finalMilestones.addAll(mMilestones);
+        
+        MilestoneSimpleAdapter milestoneAdapter = new MilestoneSimpleAdapter(this, finalMilestones);
+        milestoneSpinner.setAdapter(milestoneAdapter);
+        milestoneSpinner.setOnItemSelectedListener(this);
+        
+        if (mIssue.getMilestone() != null) {
+            for (int i = 0; i < finalMilestones.size(); i++) {
+                Milestone m = finalMilestones.get(i);
+                if (m.getNumber() == mIssue.getMilestone().getNumber()) {
+                    milestoneSpinner.setSelection(i);
+                }
+            }
+        }
+        
+        String btnText = "Labels : ";
+        for (Label l : mSelectedLabels) {
+            btnText += l.getName() + ", ";
+        }
+        btnText = btnText.substring(0, btnText.length() - 2);
+        Button btnLabel = (Button) findViewById(R.id.btn_label);
+        btnLabel.setText(btnText);
+    }
+
+    private void showLabelsDialog() {
+        final boolean[] checkedItems = new boolean[mLabels.size()];
+        final String[] availabelLabelArr = new String[mLabels.size()];
+        
+        List<String> currentSelected = new ArrayList<String>();
+        if (mSelectedLabels != null) {
+            for (Label l : mSelectedLabels) {
+                currentSelected.add(l.getName());
+            }
+        }
+        for (int i = 0; i < mLabels.size(); i++) {
+            availabelLabelArr[i] = mLabels.get(i).getName();
+            
+            if(currentSelected.contains(mLabels.get(i).getName())) {
+                checkedItems[i] = true;
+            }
+            else {
+                checkedItems[i] = false;
+            }
+        }
+        
+        AlertDialog.Builder builder = new AlertDialog.Builder(
+                new ContextThemeWrapper(IssueEditActivity.this, android.R.style.Theme));
+        builder.setCancelable(true);
+        builder.setTitle(R.string.issue_labels);
+        builder.setMultiChoiceItems(availabelLabelArr, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton, boolean isChecked) {
+                if (isChecked) {
+                    checkedItems[whichButton] = true;
+                }
+                else {
+                    checkedItems[whichButton] = false;
+                }
+            }
+        });
+        
+        builder.setPositiveButton(R.string.label_it,
+                new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.dismiss();
+                mSelectedLabels = new ArrayList<Label>();
+                
+                String btnText = "Labels : ";
+                for (int i = 0; i < checkedItems.length; i++) {
+                    if (checkedItems[i]) {
+                        btnText += mLabels.get(i).getName() + ", ";
+                        mSelectedLabels.add(mLabels.get(i));
+                    }
+                }
+                btnText = btnText.substring(0, btnText.length() - 2);
+                Button btnLabel = (Button) findViewById(R.id.btn_label);
+                btnLabel.setText(btnText);
+            }
+        })
+        .setNegativeButton(R.string.cancel,
+                new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.dismiss();
+            }
+        })
+       .create();
+        
+        builder.show();
+    }
+    
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView,
+            View view, int position, long id) {
+        
+        MilestoneSimpleAdapter adapter = (MilestoneSimpleAdapter) adapterView.getAdapter();
+        mSelectedMilestone = (Milestone) adapter.getItem(position);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> arg0) {
+        // TODO Auto-generated method stub
+        
     }
 }
