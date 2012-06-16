@@ -44,7 +44,6 @@ import android.content.res.Resources;
 import android.text.SpannableString;
 import android.text.style.ClickableSpan;
 import android.text.style.TextAppearanceSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -151,6 +150,12 @@ public class FeedAdapter extends RootAdapter<Event> {
         String eventType = event.getType();
         EventRepository eventRepo = event.getRepo();
         User actor = event.getActor();
+        
+        //if payload is a base class, return default eventtype.  Think that it is an old event which not supported
+        //by API v3.
+        if (event.getPayload().getClass().getSimpleName().equals("EventPayload")) {
+            return event.getType();
+        }
         
         Resources res = mContext.getResources();
         LinearLayout ll = (LinearLayout) baseView.findViewById(R.id.ll_push_desc);
@@ -293,8 +298,8 @@ public class FeedAdapter extends RootAdapter<Event> {
         
         /** IssuesEvent */
         else if (Event.TYPE_ISSUES.equals(eventType)) {
-            IssuesPayload payload = (IssuesPayload) event.getPayload();
-            return payload.getIssue().getTitle();
+            IssuesPayload eventPayload = (IssuesPayload) event.getPayload();
+            return eventPayload.getIssue().getTitle();
         }
         
         /** IssueCommentEvent */
@@ -320,6 +325,12 @@ public class FeedAdapter extends RootAdapter<Event> {
         EventRepository eventRepo = event.getRepo();
         User actor = event.getActor();
         Resources res = mContext.getResources();
+        
+        //if payload is a base class, return default eventtype.  Think that it is an old event which not supported
+        //by API v3.
+        if (event.getPayload().getClass().getSimpleName().equals("EventPayload")) {
+            return event.getType();
+        }
 
         /** PushEvent */
         if (Event.TYPE_PUSH.equals(eventType)) {
@@ -333,11 +344,11 @@ public class FeedAdapter extends RootAdapter<Event> {
 
         /** IssuesEvent */
         else if (Event.TYPE_ISSUES.equals(eventType)) {
-            IssuesPayload payload = (IssuesPayload) event.getPayload();
+            IssuesPayload eventPayload = (IssuesPayload) event.getPayload();
             String text = String.format(res.getString(R.string.event_issues_title),
                     actor.getLogin(),
-                    payload.getAction(),
-                    payload.getIssue().getNumber(),
+                    eventPayload.getAction(),
+                    eventPayload.getIssue().getNumber(),
                     formatFromRepoName(eventRepo)); 
             return text;
         }

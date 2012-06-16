@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.event.Event;
 import org.eclipse.egit.github.core.service.EventService;
 
@@ -37,8 +36,7 @@ public class UserPublicActivity extends UserFeedActivity {
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(getAuthToken());
         EventService eventService = new EventService(client);
-        PageIterator<Event> pageEvents = eventService.pageUserEvents(mUserLogin, false);
-        return (List) pageEvents.next();
+        return (List<Event>) eventService.pageUserEvents(mUserLogin, false).next();    
     }
 
 }

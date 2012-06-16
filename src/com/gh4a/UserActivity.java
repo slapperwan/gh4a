@@ -609,6 +609,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
     public void getFeeds(View view) {
         Intent intent = new Intent().setClass(this, UserPrivateActivity.class);
         intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
+        intent.putExtra(Constants.User.USER_TYPE, mUser.getType());
         intent.putExtra(Constants.ACTIONBAR_TITLE, mUserLogin
                 + (!StringUtils.isBlank(mUserName) ? " - " + mUserName : ""));
         intent.putExtra(Constants.SUBTITLE, getResources().getString(R.string.user_news_feed));

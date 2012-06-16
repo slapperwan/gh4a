@@ -228,6 +228,13 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         Event event = (Event) adapterView.getAdapter().getItem(position);
+        Gh4Application context = getApplicationContext();
+        
+        //if payload is a base class, return void.  Think that it is an old event which not supported
+        //by API v3.
+        if (event.getPayload().getClass().getSimpleName().equals("EventPayload")) {
+            return;
+        }
         
         String eventType = event.getType();
         EventRepository eventRepo = event.getRepo();
@@ -239,8 +246,6 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
             repoName = repoNamePart[1];
         }
         String repoUrl = eventRepo.getUrl();
-        
-        Gh4Application context = getApplicationContext();
         
         /** PushEvent */
         if (Event.TYPE_PUSH.equals(eventType)) {
@@ -461,6 +466,12 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         if (v.getId() == R.id.list_view) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
             Event event = (Event) mFeedAdapter.getItem(info.position);
+            
+            //if payload is a base class, return void.  Think that it is an old event which not supported
+            //by API v3.
+            if (event.getPayload().getClass().getSimpleName().equals("EventPayload")) {
+                return;
+            }
             
             String eventType = event.getType();
             EventRepository eventRepo = event.getRepo();
