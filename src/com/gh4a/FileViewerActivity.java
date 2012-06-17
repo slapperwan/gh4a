@@ -23,13 +23,13 @@ import org.eclipse.egit.github.core.Blob;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.DataService;
+import org.eclipse.egit.github.core.util.EncodingUtils;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -149,7 +149,7 @@ public class FileViewerActivity extends BaseActivity {
                     filename = filename.substring(filename.lastIndexOf("/") + 1, filename.length());
                 }
 
-                String data = new String(Base64.decode(mBlob.getContent().getBytes(), Base64.DEFAULT));
+                String data = new String(EncodingUtils.fromBase64(mBlob.getContent()));
                 boolean success = FileUtils.save(filename, data);
                 if (success) {
                     showMessage("File saved at " + Environment.getExternalStorageDirectory().getAbsolutePath() + "/download/" + filename, false);
@@ -344,8 +344,7 @@ public class FileViewerActivity extends BaseActivity {
      * @throws IOException 
      */
     protected void fillData(Blob blob, boolean highlight) throws IOException {
-        String dataBase64 = blob.getContent();
-        String data = new String(Base64.decode(dataBase64.getBytes(), Base64.DEFAULT));
+        String data = new String(EncodingUtils.fromBase64(blob.getContent()));
         TextView tvViewRaw = (TextView) findViewById(R.id.tv_view_raw);
         if (highlight) {
             tvViewRaw.setText("Raw");
