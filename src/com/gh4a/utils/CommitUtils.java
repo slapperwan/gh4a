@@ -50,6 +50,10 @@ public class CommitUtils {
         if (repositoryCommit.getAuthor() != null) {
             return repositoryCommit.getAuthor().getGravatarId();
         }
+        else if (repositoryCommit.getCommit().getAuthor() != null
+                && repositoryCommit.getCommit().getAuthor().getEmail() != null) {
+            return StringUtils.md5Hex(repositoryCommit.getCommit().getAuthor().getEmail());
+        }
         else {
             return null;
         }
@@ -58,6 +62,10 @@ public class CommitUtils {
     public static String getCommitterGravatarId(RepositoryCommit repositoryCommit) {
         if (repositoryCommit.getCommitter() != null) {
             return repositoryCommit.getCommitter().getGravatarId();
+        }
+        else if (repositoryCommit.getCommit().getCommitter() != null
+                && repositoryCommit.getCommit().getCommitter().getEmail() != null) {
+            return StringUtils.md5Hex(repositoryCommit.getCommit().getCommitter().getEmail());
         }
         else {
             return null;
