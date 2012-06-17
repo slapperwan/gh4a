@@ -808,10 +808,10 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
             case R.id.about:
                 openAboutDialog();
                 return true;
-            case R.id.settings:
-                Intent intent = new Intent().setClass(this, AppPreferenceActivity.class);
-                startActivity(intent);
-                return true;
+//            case R.id.settings:
+//                Intent intent = new Intent().setClass(this, AppPreferenceActivity.class);
+//                startActivity(intent);
+//                return true;
             default:
                 return true;
         }
