@@ -24,6 +24,7 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
 import android.os.Bundle;
+import android.widget.AbsListView;
 
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.StringUtils;
@@ -96,10 +97,10 @@ public class PublicRepoListActivity extends RepositoryListActivity {
      * @seecom.gh4a.RepositoryListActivity#onScrollStateChanged(android.widget.
      * AbsListView, int)
      */
-//    @Override
-//    public void onScrollStateChanged(AbsListView view, int scrollState) {
-//        mReload = false;
-//    }
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+        mReload = false;
+    }
 
     /*
      * (non-Javadoc)

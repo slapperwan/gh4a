@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.SearchRepository;
 
 import android.content.Intent;
 import android.os.AsyncTask;
