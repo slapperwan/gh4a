@@ -31,6 +31,7 @@ import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
 
@@ -76,36 +77,19 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
 
         final RepositoryCommit commit = mObjects.get(position);
         if (commit != null) {
-            if (!StringUtils.isBlank(commit.getAuthor().getLogin())) {
-                ImageDownloader.getInstance().download(
-                        commit.getAuthor().getGravatarId(), viewHolder.ivGravatar);
-                viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
+            ImageDownloader.getInstance().download(
+                    CommitUtils.getAuthorGravatarId(commit), viewHolder.ivGravatar);
+            viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
 
-                    @Override
-                    public void onClick(View v) {
-                        /** Open user activity */
-                        Gh4Application context = (Gh4Application) v.getContext()
-                                .getApplicationContext();
-                        context.openUserInfoActivity(v.getContext(), commit.getAuthor().getLogin(),
-                                null);
-                    }
-                });
-            }
-            else {
-                ImageDownloader.getInstance().download(
-                        commit.getCommitter().getGravatarId(), viewHolder.ivGravatar);
-                viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-                        /** Open user activity */
-                        Gh4Application context = (Gh4Application) v.getContext()
-                                .getApplicationContext();
-                        context.openUserInfoActivity(v.getContext(), commit.getCommitter().getLogin(),
-                                null);
-                    }
-                });
-            }
+                @Override
+                public void onClick(View v) {
+                    /** Open user activity */
+                    Gh4Application context = (Gh4Application) v.getContext()
+                            .getApplicationContext();
+                    context.openUserInfoActivity(v.getContext(), commit.getAuthor().getLogin(),
+                            null);
+                }
+            });
 
             viewHolder.tvSha.setText(commit.getSha().substring(0, 7));
             viewHolder.tvDesc.setText(commit.getCommit().getMessage());
@@ -116,9 +100,8 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
             cal.add(Calendar.HOUR, timezoneOffset);
 
             Resources res = v.getResources();
-            String extraData = String.format(res.getString(R.string.more_data), !StringUtils
-                    .isBlank(commit.getAuthor().getLogin()) ? commit.getAuthor().getLogin()
-                    : commit.getCommitter().getLogin(), 
+            String extraData = String.format(res.getString(R.string.more_data),
+                    CommitUtils.getAuthorName(commit), 
                     pt.format(cal.getTime()));
 
             viewHolder.tvExtra.setText(extraData);

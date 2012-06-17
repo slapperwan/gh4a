@@ -42,6 +42,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gh4a.holder.BreadCrumbHolder;
+import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
 
@@ -206,32 +207,18 @@ public class CommitActivity extends BaseActivity {
 
         ImageView ivGravatar = (ImageView) findViewById(R.id.iv_gravatar);
         
-        if (commit.getAuthor() != null && !StringUtils.isBlank(commit.getAuthor().getLogin())) {
-            ImageDownloader.getInstance().download(commit.getAuthor().getGravatarId(),
-                    ivGravatar);
-            ivGravatar.setOnClickListener(new OnClickListener() {
+        ImageDownloader.getInstance().download(CommitUtils.getAuthorGravatarId(commit),
+                ivGravatar);
+        ivGravatar.setOnClickListener(new OnClickListener() {
 
-                @Override
-                public void onClick(View v) {
-                    /** Open user activity */
-                    getApplicationContext().openUserInfoActivity(CommitActivity.this,
-                            commit.getAuthor().getLogin(), commit.getAuthor().getName());
-                }
-            });
-        }
-        else if (commit.getCommitter() != null) {
-            ImageDownloader.getInstance().download(commit.getCommitter().getGravatarId(),
-                    ivGravatar);
-            ivGravatar.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    /** Open user activity */
-                    getApplicationContext().openUserInfoActivity(CommitActivity.this,
-                            commit.getCommitter().getLogin(), commit.getCommitter().getName());
-                }
-            });
-        }
+            @Override
+            public void onClick(View v) {
+                /** Open user activity */
+                getApplicationContext().openUserInfoActivity(CommitActivity.this,
+                        commit.getAuthor().getLogin(), commit.getAuthor().getName());
+            }
+        });
+        
         TextView tvMessage = (TextView) findViewById(R.id.tv_message);
         TextView tvExtra = (TextView) findViewById(R.id.tv_extra);
         TextView tvSummary = (TextView) findViewById(R.id.tv_desc);
@@ -246,10 +233,9 @@ public class CommitActivity extends BaseActivity {
         int timezoneOffset = (cal.get(Calendar.ZONE_OFFSET) + cal.get(Calendar.DST_OFFSET)) / 3600000;
         cal.add(Calendar.HOUR, timezoneOffset);
         
-        tvExtra.setText(String.format(extraDataFormat, commit.getCommitter() != null ? 
-                commit.getCommitter().getLogin() : commit.getAuthor() != null ? 
-                        commit.getAuthor().getName() : commit.getCommit().getCommitter().getName(), pt
-                .format(cal.getTime())));
+        tvExtra.setText(String.format(extraDataFormat,
+                CommitUtils.getAuthorName(commit), 
+                pt.format(cal.getTime())));
 
         List<CommitFile> addedFiles = new ArrayList<CommitFile>();
         List<CommitFile> removedFiles = new ArrayList<CommitFile>();
