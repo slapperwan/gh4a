@@ -44,6 +44,7 @@ import android.content.res.Resources;
 import android.text.SpannableString;
 import android.text.style.ClickableSpan;
 import android.text.style.TextAppearanceSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -164,6 +165,7 @@ public class FeedAdapter extends RootAdapter<Event> {
         ll.setVisibility(View.GONE);
         generalDesc.setVisibility(View.VISIBLE);
 
+        Log.i("", "+++++++++++ " + eventType);
         /** PushEvent */
         if (Event.TYPE_PUSH.equals(eventType)) {
             generalDesc.setVisibility(View.GONE);
@@ -203,14 +205,11 @@ public class FeedAdapter extends RootAdapter<Event> {
         /** CommitCommentEvent */
         else if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
             CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
-            SpannableString spannableSha = new SpannableString(payload.getComment()
-                    .getCommitId().substring(0, 7));
-            spannableSha.setSpan(new TextAppearanceSpan(baseView.getContext(),
-                    R.style.default_text_medium_url), 0, spannableSha.length(), 0);
 
-            generalDesc.setText(R.string.event_commit_comment_desc);
-            generalDesc.append(spannableSha);
-            return null;
+            String text = res.getString(R.string.event_commit_comment_desc) + " ";
+            text += payload.getComment().getCommitId().substring(0, 7) 
+                    + " - " + payload.getComment().getBody();
+            return text;
         }
 
         /** PullRequestEvent */

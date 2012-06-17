@@ -339,12 +339,8 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         else if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
             if (eventRepo != null) {
                 CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
-                if (!StringUtils.isBlank(payload.getComment().getUrl())) {
-                    context.openBrowser(this, payload.getComment().getUrl());
-                }
-                else {
-                    context.notFoundMessage(this, "URL");
-                }
+                context.openCommitInfoActivity(this, repoOwner, repoName, 
+                        payload.getComment().getCommitId());
             }
             else {
                 context.notFoundMessage(this, R.plurals.repository);
@@ -524,7 +520,7 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
                 if (repoOwner != null) {
                     CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
                     menu.add("Commit " + payload.getComment().getCommitId().substring(0, 7));
-                    menu.add("Comment in browser");
+                    //menu.add("Comment in browser");
                 }
             }
 
