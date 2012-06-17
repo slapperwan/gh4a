@@ -104,10 +104,12 @@ public class UserAdapter extends RootAdapter<User> {
                     @Override
                     public void onClick(View v) {
                         /** Open user activity */
-                        Gh4Application context = (Gh4Application) v.getContext()
-                                .getApplicationContext();
-                        context.openUserInfoActivity(v.getContext(), user.getLogin(), user
-                                .getName());
+                        if (!StringUtils.isBlank(user.getLogin())) {
+                            Gh4Application context = (Gh4Application) v.getContext()
+                                    .getApplicationContext();
+                            context.openUserInfoActivity(v.getContext(), user.getLogin(), user
+                                    .getLogin());
+                        }
                     }
                 });
             }

@@ -261,11 +261,11 @@ public class StringUtils {
     public static String formatName(String userLogin, String name) {
         String formattedName;
 
-        if (!StringUtils.isBlank(name)) {
-            formattedName = userLogin + " - " + name;
+        if (!StringUtils.isBlank(userLogin)) {
+            formattedName = userLogin + (!StringUtils.isBlank(name) ? " - " + name : "");
         }
         else {
-            formattedName = userLogin;
+            formattedName = name;
         }
         return formattedName;
     }

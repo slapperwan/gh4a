@@ -26,6 +26,8 @@ import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
+import android.util.Log;
+
 import com.gh4a.holder.BreadCrumbHolder;
 
 /**
@@ -118,9 +120,13 @@ public class ContributorListActivity extends UserListActivity {
         
         List<User> users = new ArrayList<User>();
         for (Contributor contributor : contributors) {
+            Log.i("", "++++++++++ " + contributor.getLogin() + " - " + contributor.getName());
             User user = new User();
             user.setName(contributor.getName());
-            user.setLogin(contributor.getLogin());
+            if (contributor.getLogin() != null) {
+                Log.i("", "++++ set");
+                user.setLogin(contributor.getLogin());
+            }
             
             users.add(user);
         }

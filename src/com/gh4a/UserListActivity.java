@@ -34,6 +34,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.gh4a.adapter.UserAdapter;
+import com.gh4a.utils.StringUtils;
 
 /**
  * The UserList activity.
@@ -234,9 +235,11 @@ public class UserListActivity extends BaseActivity implements OnItemClickListene
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         User user = (User) adapterView.getAdapter().getItem(position);
-        Intent intent = new Intent().setClass(UserListActivity.this, UserActivity.class);
-        intent.putExtra(Constants.User.USER_LOGIN, (String) user.getLogin());
-        intent.putExtra(Constants.User.USER_NAME, (String) user.getName());
-        startActivity(intent);
+        if (!StringUtils.isBlank(user.getLogin())) {
+            Intent intent = new Intent().setClass(UserListActivity.this, UserActivity.class);
+            intent.putExtra(Constants.User.USER_LOGIN, (String) user.getLogin());
+            intent.putExtra(Constants.User.USER_NAME, (String) user.getName());
+            startActivity(intent);
+        }
     }
 }
