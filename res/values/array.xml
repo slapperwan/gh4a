@@ -38,6 +38,6 @@
         <item>Trending Repos</item>
         <item>GitHub Blog</item>
         <!-- item>Public Discussion</item-->
-        <item>GitHub Jobs</item>
+        <!-- item>GitHub Jobs</item-->
     </string-array>
 </resources>
