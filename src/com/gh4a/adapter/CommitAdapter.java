@@ -33,7 +33,6 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.ImageDownloader;
-import com.gh4a.utils.StringUtils;
 
 /**
  * The Commit adapter.
@@ -79,17 +78,20 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
         if (commit != null) {
             ImageDownloader.getInstance().download(
                     CommitUtils.getAuthorGravatarId(commit), viewHolder.ivGravatar);
-            viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    /** Open user activity */
-                    Gh4Application context = (Gh4Application) v.getContext()
-                            .getApplicationContext();
-                    context.openUserInfoActivity(v.getContext(), commit.getAuthor().getLogin(),
-                            null);
-                }
-            });
+            
+            if (CommitUtils.getAuthorLogin(commit) != null) {
+                viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
+    
+                    @Override
+                    public void onClick(View v) {
+                        /** Open user activity */
+                        Gh4Application context = (Gh4Application) v.getContext()
+                                .getApplicationContext();
+                        context.openUserInfoActivity(v.getContext(), CommitUtils.getAuthorLogin(commit),
+                                null);
+                    }
+                });
+            }
 
             viewHolder.tvSha.setText(commit.getSha().substring(0, 7));
             viewHolder.tvDesc.setText(commit.getCommit().getMessage());

@@ -44,7 +44,6 @@ import android.widget.TextView;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.ImageDownloader;
-import com.gh4a.utils.StringUtils;
 
 /**
  * The Commit activity.
@@ -209,15 +208,18 @@ public class CommitActivity extends BaseActivity {
         
         ImageDownloader.getInstance().download(CommitUtils.getAuthorGravatarId(commit),
                 ivGravatar);
-        ivGravatar.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                /** Open user activity */
-                getApplicationContext().openUserInfoActivity(CommitActivity.this,
-                        commit.getAuthor().getLogin(), commit.getAuthor().getName());
-            }
-        });
+        
+        if (CommitUtils.getAuthorLogin(commit) != null) {
+            ivGravatar.setOnClickListener(new OnClickListener() {
+    
+                @Override
+                public void onClick(View v) {
+                    /** Open user activity */
+                    getApplicationContext().openUserInfoActivity(CommitActivity.this,
+                            CommitUtils.getAuthorLogin(commit), null);
+                }
+            });
+        }
         
         TextView tvMessage = (TextView) findViewById(R.id.tv_message);
         TextView tvExtra = (TextView) findViewById(R.id.tv_extra);

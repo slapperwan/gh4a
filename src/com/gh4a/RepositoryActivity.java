@@ -161,9 +161,9 @@ public class RepositoryActivity extends BaseActivity implements OnClickListener 
         tvRepoName.setText(mBundle.getString(Constants.Repository.REPO_NAME));
         if (mBundle.getBoolean(Constants.Repository.REPO_IS_FORKED)) {
             tvParentRepo.setVisibility(View.VISIBLE);
-            if (mBundle.getString(Constants.Repository.REPO_SOURCE) != null) {
+            if (mBundle.getString(Constants.Repository.REPO_PARENT) != null) {
                 tvParentRepo.setText("forked from "
-                        + mBundle.getString(Constants.Repository.REPO_PARENT));
+                        + mBundle.getString(Constants.Repository.REPO_SOURCE));
                 tvParentRepo.setOnClickListener(new OnClickListener() {
 
                     @Override

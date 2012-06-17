@@ -4,7 +4,7 @@ import org.eclipse.egit.github.core.RepositoryCommit;
 
 public class CommitUtils {
 
-    public static String getCommitterName(RepositoryCommit repositoryCommit) {
+    public static String getAuthorName(RepositoryCommit repositoryCommit) {
         if (repositoryCommit.getAuthor() != null) {
             return repositoryCommit.getAuthor().getLogin();
         }
@@ -16,7 +16,16 @@ public class CommitUtils {
         }
     }
     
-    public static String getAuthorName(RepositoryCommit repositoryCommit) {
+    public static String getAuthorLogin(RepositoryCommit repositoryCommit) {
+        if (repositoryCommit.getAuthor() != null) {
+            return repositoryCommit.getAuthor().getLogin();
+        }
+        else {
+            return null;
+        }
+    }
+    
+    public static String getCommitterName(RepositoryCommit repositoryCommit) {
         if (repositoryCommit.getCommitter() != null) {
             return repositoryCommit.getCommitter().getLogin();
         }
@@ -25,6 +34,15 @@ public class CommitUtils {
         }
         else {
             return "unknown";
+        }
+    }
+    
+    public static String getCommitterLogin(RepositoryCommit repositoryCommit) {
+        if (repositoryCommit.getCommitter() != null) {
+            return repositoryCommit.getCommitter().getLogin();
+        }
+        else {
+            return null;
         }
     }
     
