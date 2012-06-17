@@ -120,11 +120,9 @@ public class ContributorListActivity extends UserListActivity {
         
         List<User> users = new ArrayList<User>();
         for (Contributor contributor : contributors) {
-            Log.i("", "++++++++++ " + contributor.getLogin() + " - " + contributor.getName());
             User user = new User();
             user.setName(contributor.getName());
             if (contributor.getLogin() != null) {
-                Log.i("", "++++ set");
                 user.setLogin(contributor.getLogin());
             }
             
