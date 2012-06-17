@@ -165,7 +165,6 @@ public class FeedAdapter extends RootAdapter<Event> {
         ll.setVisibility(View.GONE);
         generalDesc.setVisibility(View.VISIBLE);
 
-        Log.i("", "+++++++++++ " + eventType);
         /** PushEvent */
         if (Event.TYPE_PUSH.equals(eventType)) {
             generalDesc.setVisibility(View.GONE);
