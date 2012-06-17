@@ -1,3 +1,8 @@
+v2.0 (Jun 18, 2012)
+- New Github API v3.
+- OAuth2 support
+- Milestone support
+
 v1.3.8 (Oct 10, 2011)
 - Add support for pull request URL as an option to view with Gh4a.
 
