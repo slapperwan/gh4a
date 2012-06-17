@@ -28,6 +28,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -38,6 +39,7 @@ import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import com.gh4a.holder.BreadCrumbHolder;
+import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 
 /**
@@ -119,27 +121,28 @@ public class AddedFileViewerActivity extends BaseActivity {
         });
         
         TextView tvDownload = (TextView) findViewById(R.id.tv_download);
-//        tvDownload.setVisibility(View.VISIBLE);
-//        tvDownload.setOnClickListener(new OnClickListener() {
-//            
-//            @Override
-//            public void onClick(View view) {
-//                String filename = mBlob.getName();
-//                int idx = filename.lastIndexOf("/");
-//                
-//                if (idx != -1) {
-//                    filename = filename.substring(filename.lastIndexOf("/") + 1, filename.length());
-//                }
-//
-//                boolean success = FileUtils.save(filename, mBlob.getData());
-//                if (success) {
-//                    showMessage("File saved at " + Environment.getExternalStorageDirectory().getAbsolutePath() + "/download/" + filename, false);
-//                }
-//                else {
-//                    showMessage("Unable to save the file", false);
-//                }
-//            }
-//        });
+        tvDownload.setVisibility(View.VISIBLE);
+        tvDownload.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View view) {
+                String filename = mFilePath;
+                int idx = mFilePath.lastIndexOf("/");
+                
+                if (idx != -1) {
+                    filename = filename.substring(filename.lastIndexOf("/") + 1, filename.length());
+                }
+
+                String data = new String(Base64.decode(mBlob.getContent().getBytes(), Base64.DEFAULT));
+                boolean success = FileUtils.save(filename, data);
+                if (success) {
+                    showMessage("File saved at " + Environment.getExternalStorageDirectory().getAbsolutePath() + "/download/" + filename, false);
+                }
+                else {
+                    showMessage("Unable to save the file", false);
+                }
+            }
+        });
         
         setBreadCrumb();
 
