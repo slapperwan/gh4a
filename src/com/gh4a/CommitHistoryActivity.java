@@ -179,14 +179,13 @@ public class CommitHistoryActivity extends BaseActivity implements OnItemClickLi
     
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        Commit commit = (Commit) adapterView.getAdapter().getItem(position);
+        RepositoryCommit commit = (RepositoryCommit) adapterView.getAdapter().getItem(position);
         Intent intent = new Intent().setClass(CommitHistoryActivity.this, CommitActivity.class);
-        String[] urlPart = commit.getUrl().split("/");
 
-        intent.putExtra(Constants.Repository.REPO_OWNER, urlPart[1]);
-        intent.putExtra(Constants.Repository.REPO_NAME, urlPart[2]);
-        intent.putExtra(Constants.Object.OBJECT_SHA, urlPart[4]);
-        intent.putExtra(Constants.Object.TREE_SHA, commit.getTree());
+        intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        intent.putExtra(Constants.Object.OBJECT_SHA, commit.getSha());
+        intent.putExtra(Constants.Object.TREE_SHA, commit.getCommit().getTree().getSha());
 
         startActivity(intent);
     }
