@@ -20,12 +20,14 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.LabelService;
 import org.eclipse.egit.github.core.service.MilestoneService;
@@ -47,6 +49,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.gh4a.adapter.AssigneeSimpleAdapter;
 import com.gh4a.adapter.MilestoneSimpleAdapter;
 import com.gh4a.db.Bookmark;
 import com.gh4a.db.BookmarkParam;
@@ -71,6 +74,8 @@ public class IssueCreateActivity extends BaseActivity implements OnClickListener
     protected List<Label> mSelectedLabels;
     
     protected Milestone mSelectedMilestone;
+    
+    protected User mSelectedAssignee;
     
     protected List<Label> mLabels;
     
@@ -101,6 +106,8 @@ public class IssueCreateActivity extends BaseActivity implements OnClickListener
         btnLabel.setOnClickListener(this);
         
         new LoadIssueLabelsTask(this).execute();
+        new LoadMilestonesTask(this).execute();
+        new LoadAssigneesTask(this).execute();
     }
     
     /**
@@ -212,6 +219,10 @@ public class IssueCreateActivity extends BaseActivity implements OnClickListener
                     if (activity.mSelectedLabels != null) {
                         issue.setLabels(activity.mSelectedLabels);
                     }
+                    if (activity.mSelectedAssignee != null
+                            && activity.mSelectedAssignee.getLogin() != null) {
+                        issue.setAssignee(activity.mSelectedAssignee);
+                    }
                     
                     issueService.createIssue(activity.mUserLogin, 
                             activity.mRepoName, issue);
@@ -269,7 +280,7 @@ public class IssueCreateActivity extends BaseActivity implements OnClickListener
      * An asynchronous task that runs on a background thread
      * to load issue labels.
      */
-    private static class LoadIssueLabelsTask extends AsyncTask<Void, Integer, Map<String, Object>> {
+    private static class LoadIssueLabelsTask extends AsyncTask<Void, Integer, List<Label>> {
 
         /** The target. */
         private WeakReference<IssueCreateActivity> mTarget;
@@ -291,24 +302,15 @@ public class IssueCreateActivity extends BaseActivity implements OnClickListener
          * @see android.os.AsyncTask#doInBackground(Params[])
          */
         @Override
-        protected Map<String, Object> doInBackground(Void... params) {
+        protected List<Label> doInBackground(Void... params) {
             if (mTarget.get() != null) {
                 try {
                     GitHubClient client = new GitHubClient();
                     client.setOAuth2Token(mTarget.get().getAuthToken());
                     LabelService labelService = new LabelService(client);
-                    List<Label> labels = labelService.getLabels(mTarget.get().mUserLogin,
+                    return labelService.getLabels(mTarget.get().mUserLogin,
                             mTarget.get().mRepoName);
                     
-                    MilestoneService milestoneService = new MilestoneService(client);
-                    List<Milestone> milestones = milestoneService.getMilestones(mTarget.get().mUserLogin,
-                            mTarget.get().mRepoName, null);
-                    
-                    Map<String, Object> m = new HashMap<String, Object>();
-                    m.put("labels", labels);
-                    m.put("milestones", milestones);
-                    
-                    return m;
                 }
                 catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
@@ -327,9 +329,6 @@ public class IssueCreateActivity extends BaseActivity implements OnClickListener
          */
         @Override
         protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
-            }
         }
 
         /*
@@ -337,26 +336,182 @@ public class IssueCreateActivity extends BaseActivity implements OnClickListener
          * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
          */
         @Override
-        protected void onPostExecute(Map<String, Object> result) {
+        protected void onPostExecute(List<Label> result) {
             if (mTarget.get() != null) {
                 IssueCreateActivity activity = mTarget.get();
-                activity.mLoadingDialog.dismiss();
-    
                 if (mException) {
                     activity.showError();
                 }
                 else {
-                    activity.fillData(result);
+                    activity.mLabels = result;
                 }
             }
         }
     }
     
-    public void fillData(Map<String, Object> labelsAndMilestones) {
-        Spinner milestoneSpinner = (Spinner) findViewById(R.id.spinner_milestone);
+    /**
+     * An asynchronous task that runs on a background thread
+     * to load issue milestone.
+     */
+    private static class LoadMilestonesTask extends AsyncTask<Void, Integer, List<Milestone>> {
+
+        /** The target. */
+        private WeakReference<IssueCreateActivity> mTarget;
         
-        mLabels = (List<Label>) labelsAndMilestones.get("labels");
-        List<Milestone> milestones = (List<Milestone>) labelsAndMilestones.get("milestones");
+        /** The exception. */
+        private boolean mException;
+
+        /**
+         * Instantiates a new load issue task.
+         *
+         * @param activity the activity
+         */
+        public LoadMilestonesTask(IssueCreateActivity activity) {
+            mTarget = new WeakReference<IssueCreateActivity>(activity);
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected List<Milestone> doInBackground(Void... params) {
+            if (mTarget.get() != null) {
+                try {
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    
+                    MilestoneService milestoneService = new MilestoneService(client);
+                    return milestoneService.getMilestones(mTarget.get().mUserLogin,
+                            mTarget.get().mRepoName, null);
+                }
+                catch (IOException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
+            }
+            else {
+                return null;
+            }
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPreExecute()
+         */
+        @Override
+        protected void onPreExecute() {
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(List<Milestone> result) {
+            if (mTarget.get() != null) {
+                IssueCreateActivity activity = mTarget.get();
+    
+                if (mException) {
+                    activity.showError();
+                }
+                else {
+                    activity.fillMilestones(result);
+                }
+            }
+        }
+    }
+    
+    /**
+     * An asynchronous task that runs on a background thread
+     * to load issue milestone.
+     */
+    private static class LoadAssigneesTask extends AsyncTask<Void, Integer, List<User>> {
+
+        /** The target. */
+        private WeakReference<IssueCreateActivity> mTarget;
+        
+        /** The exception. */
+        private boolean mException;
+
+        /**
+         * Instantiates a new load issue task.
+         *
+         * @param activity the activity
+         */
+        public LoadAssigneesTask(IssueCreateActivity activity) {
+            mTarget = new WeakReference<IssueCreateActivity>(activity);
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#doInBackground(Params[])
+         */
+        @Override
+        protected List<User> doInBackground(Void... params) {
+            if (mTarget.get() != null) {
+                try {
+                    GitHubClient client = new GitHubClient();
+                    client.setOAuth2Token(mTarget.get().getAuthToken());
+                    CollaboratorService collabService = new CollaboratorService(client);
+                    return collabService.getCollaborators(new RepositoryId(mTarget.get().mUserLogin,
+                            mTarget.get().mRepoName));
+                }
+                catch (IOException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
+                }
+            }
+            else {
+                return null;
+            }
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPreExecute()
+         */
+        @Override
+        protected void onPreExecute() {
+        }
+
+        /*
+         * (non-Javadoc)
+         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+         */
+        @Override
+        protected void onPostExecute(List<User> result) {
+            if (mTarget.get() != null) {
+                IssueCreateActivity activity = mTarget.get();
+                if (mException) {
+                    activity.showError();
+                }
+                else {
+                    activity.fillAssignees(result);
+                }
+            }
+        }
+    }
+    
+    public void fillAssignees(List<User> assignees) {
+        Spinner assigneeSpinner = (Spinner) findViewById(R.id.spinner_assignee);
+        
+        List<User> finalAssignees = new ArrayList<User>();
+        
+        User assignee = new User();
+        assignee.setName("Select Assignee");
+        finalAssignees.add(assignee);
+        finalAssignees.addAll(assignees);
+        
+        AssigneeSimpleAdapter adapter = new AssigneeSimpleAdapter(this, finalAssignees);
+        assigneeSpinner.setAdapter(adapter);
+        assigneeSpinner.setOnItemSelectedListener(this);
+    }
+    
+    public void fillMilestones(List<Milestone> milestones) {
+        Spinner milestoneSpinner = (Spinner) findViewById(R.id.spinner_milestone);
         
         List<Milestone> finalMilestones = new ArrayList<Milestone>();
         
@@ -485,9 +640,14 @@ public class IssueCreateActivity extends BaseActivity implements OnClickListener
     @Override
     public void onItemSelected(AdapterView<?> adapterView,
             View view, int position, long id) {
-        
-        MilestoneSimpleAdapter adapter = (MilestoneSimpleAdapter) adapterView.getAdapter();
-        mSelectedMilestone = (Milestone) adapter.getItem(position);
+        if (adapterView.getAdapter() instanceof MilestoneSimpleAdapter) {
+            MilestoneSimpleAdapter adapter = (MilestoneSimpleAdapter) adapterView.getAdapter();
+            mSelectedMilestone = (Milestone) adapter.getItem(position);
+        }
+        if (adapterView.getAdapter() instanceof AssigneeSimpleAdapter) {
+            AssigneeSimpleAdapter adapter = (AssigneeSimpleAdapter) adapterView.getAdapter();
+            mSelectedAssignee = (User) adapter.getItem(position);
+        }
     }
 
     @Override

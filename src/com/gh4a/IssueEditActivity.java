@@ -24,7 +24,10 @@ import java.util.List;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.LabelService;
 import org.eclipse.egit.github.core.service.MilestoneService;
@@ -44,6 +47,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.gh4a.adapter.AssigneeSimpleAdapter;
 import com.gh4a.adapter.MilestoneSimpleAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.StringUtils;
@@ -73,9 +77,13 @@ public class IssueEditActivity extends BaseActivity implements OnClickListener, 
     
     protected Milestone mSelectedMilestone;
     
+    protected User mSelectedAssignee;
+    
     protected List<Label> mLabels;
     
     protected List<Milestone> mMilestones;
+    
+    protected List<User> mAssignees;
     
     protected Issue mIssue;
     
@@ -217,6 +225,10 @@ public class IssueEditActivity extends BaseActivity implements OnClickListener, 
                     MilestoneService milestoneService = new MilestoneService(client);
                     activity.mMilestones = milestoneService.getMilestones(mTarget.get().mUserLogin,
                             mTarget.get().mRepoName, null);
+                    
+                    CollaboratorService collabService = new CollaboratorService(client);
+                    activity.mAssignees = collabService.getCollaborators(new RepositoryId(mTarget.get().mUserLogin,
+                            mTarget.get().mRepoName));
                 }
                 catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
@@ -321,6 +333,14 @@ public class IssueEditActivity extends BaseActivity implements OnClickListener, 
                     
                     issue.setMilestone(activity.mSelectedMilestone);
                     
+                    if (activity.mSelectedAssignee != null
+                            && activity.mSelectedAssignee.getLogin() != null) {
+                        issue.setAssignee(activity.mSelectedAssignee);                        
+                    }
+                    else {
+                        issue.setAssignee(null);
+                    }
+                    
                     if (activity.mSelectedLabels != null) {
                         issue.setLabels(activity.mSelectedLabels);
                     }
@@ -378,6 +398,7 @@ public class IssueEditActivity extends BaseActivity implements OnClickListener, 
     }
     
     public void fillLabelMilestoneData() {
+        //Milestone
         Spinner milestoneSpinner = (Spinner) findViewById(R.id.spinner_milestone);
         
         List<Milestone> finalMilestones = new ArrayList<Milestone>();
@@ -401,6 +422,31 @@ public class IssueEditActivity extends BaseActivity implements OnClickListener, 
             }
         }
         
+        //Assignee
+        Spinner assigneeSpinner = (Spinner) findViewById(R.id.spinner_assignee);
+        
+        List<User> finalAssignees = new ArrayList<User>();
+        
+        User selectAssignee = new User();
+        selectAssignee.setName("Select Assignee");
+        finalAssignees.add(selectAssignee);
+        finalAssignees.addAll(mAssignees);
+        
+        AssigneeSimpleAdapter assigneeAdapter = new AssigneeSimpleAdapter(this, finalAssignees);
+        assigneeSpinner.setAdapter(assigneeAdapter);
+        assigneeSpinner.setOnItemSelectedListener(this);
+        
+        if (mIssue.getAssignee() != null) {
+            for (int i = 0; i < finalAssignees.size(); i++) {
+                User u = finalAssignees.get(i);
+                if (u.getLogin() != null
+                        && u.getLogin().equals(mIssue.getAssignee().getLogin())) {
+                    assigneeSpinner.setSelection(i);
+                }
+            }
+        }
+        
+        //Labels
         String btnText = "Labels : ";
         for (Label l : mSelectedLabels) {
             btnText += l.getName() + ", ";
@@ -479,8 +525,14 @@ public class IssueEditActivity extends BaseActivity implements OnClickListener, 
     public void onItemSelected(AdapterView<?> adapterView,
             View view, int position, long id) {
         
-        MilestoneSimpleAdapter adapter = (MilestoneSimpleAdapter) adapterView.getAdapter();
-        mSelectedMilestone = (Milestone) adapter.getItem(position);
+        if (adapterView.getAdapter() instanceof MilestoneSimpleAdapter) {
+            MilestoneSimpleAdapter adapter = (MilestoneSimpleAdapter) adapterView.getAdapter();
+            mSelectedMilestone = (Milestone) adapter.getItem(position);
+        }
+        if (adapterView.getAdapter() instanceof AssigneeSimpleAdapter) {
+            AssigneeSimpleAdapter adapter = (AssigneeSimpleAdapter) adapterView.getAdapter();
+            mSelectedAssignee = (User) adapter.getItem(position);
+        }
     }
 
     @Override

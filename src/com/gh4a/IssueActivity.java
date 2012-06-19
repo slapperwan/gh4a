@@ -211,6 +211,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
         TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
         TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
         TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
+        TextView tvAssignee = (TextView) mHeader.findViewById(R.id.tv_assignee);
         Button btnComments = (Button) mHeader.findViewById(R.id.btn_comments);
         Button btnCreateComment = (Button) mFooter.findViewById(R.id.btn_create);
 
@@ -224,6 +225,19 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
             tvState.setBackgroundResource(R.drawable.default_green_box);
         }
         tvTitle.setText(mBundle.getString(Constants.Issue.ISSUE_TITLE));
+        
+        if (mBundle.getString(Constants.Issue.ISSUE_ASSIGNEE) != null) {
+            tvAssignee.setText("Assigned to " + mBundle.getString(Constants.Issue.ISSUE_ASSIGNEE));
+            tvAssignee.setVisibility(View.VISIBLE);
+            tvAssignee.setOnClickListener(new OnClickListener() {
+                
+                @Override
+                public void onClick(View arg0) {
+                    getApplicationContext().openUserInfoActivity(IssueActivity.this,
+                            mBundle.getString(Constants.Issue.ISSUE_ASSIGNEE), null);
+                }
+            });
+        }
         
         String body = mBundle.getString(Constants.Issue.ISSUE_BODY);
         body = body.replaceAll("\n", "<br/>");

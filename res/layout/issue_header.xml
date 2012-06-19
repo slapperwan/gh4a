@@ -56,12 +56,21 @@
             android:layout_below="@id/tv_state"
             android:layout_toRightOf="@id/iv_gravatar" />
         <TextView
+            android:id="@+id/tv_assignee"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceSmallUrl"
+            android:background="?attr/textAppearanceLink"
+            android:layout_below="@id/tv_title"
+            android:layout_toRightOf="@id/iv_gravatar"
+            android:visibility="gone" />
+        <TextView
             android:id="@+id/tv_pull"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?attr/textAppearanceUrl"
             android:background="?attr/textAppearanceLink"
-            android:layout_below="@id/tv_title"
+            android:layout_below="@id/tv_assignee"
             android:layout_toRightOf="@id/iv_gravatar"
             android:text="View pull request"
             android:visibility="gone" />

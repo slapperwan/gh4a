@@ -41,8 +41,12 @@
                 android:layout_height="wrap_content"
                 android:text="@string/issue_view_labels" />
             <Spinner
+                android:id="@+id/spinner_assignee"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <Spinner
                 android:id="@+id/spinner_milestone"
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <!--
                 CheckBox android:id="@+id/cb_sign"

@@ -204,6 +204,9 @@ public interface Constants {
         
         /** The Constant ISSUE_MILESTONE_TITLE. */
         public static final String ISSUE_MILESTONE_TITLE = "ISSUE_MILESTONE_TITLE";
+        
+        /** The Constant ISSUE_ASSIGNEE. */
+        public static final String ISSUE_ASSIGNEE = "ISSUE_ASSIGNEE";
     }
 
     /**
