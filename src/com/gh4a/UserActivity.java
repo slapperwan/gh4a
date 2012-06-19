@@ -82,12 +82,12 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.user);
-        setUpActionBar();
 
         Bundle data = getIntent().getExtras();
         mUserLogin = data.getString(Constants.User.USER_LOGIN);
         mUserName = data.getString(Constants.User.USER_NAME);
         
+        setUpActionBar();
         new LoadUserInfoTask(this).execute();
     }
 

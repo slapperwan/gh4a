@@ -308,6 +308,13 @@ public class BaseActivity extends Activity {
         if (isAuthorized()) {
             Intent intent = new Intent().setClass(getApplicationContext(), UserActivity.class);
             intent.putExtra(Constants.User.USER_LOGIN, getAuthLogin());
+            if (this instanceof UserActivity) {
+                UserActivity thisActivity = (UserActivity) this;
+
+                if (getAuthLogin().equals(thisActivity.mUserLogin)) {
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                }
+            }
             actionBar.setHomeAction(new IntentAction(this, intent, R.drawable.ic_home));
         }
         actionBar.addAction(new IntentAction(this, new Intent(getApplication(),
