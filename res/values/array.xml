@@ -40,4 +40,10 @@
         <!-- item>Public Discussion</item-->
         <!-- item>GitHub Jobs</item-->
     </string-array>
+    <string-array 
+        name="sort_by_item">
+        <item>Submitted</item>
+        <item>Updated</item>
+        <item>Comments</item>
+    </string-array>
 </resources>

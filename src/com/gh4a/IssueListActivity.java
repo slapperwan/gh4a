@@ -26,10 +26,13 @@ import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.IssueService;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -45,6 +48,7 @@ import com.gh4a.db.BookmarkParam;
 import com.gh4a.db.DbHelper;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.markupartist.android.widget.ActionBar;
+import com.markupartist.android.widget.ActionBar.Action;
 import com.markupartist.android.widget.ActionBar.IntentAction;
 
 /**
@@ -76,6 +80,8 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
     /** The tv subtitle. */
     protected TextView mTvSubtitle;
     
+    protected String mSortBy;
+    
     /**
      * Called when the activity is first created.
      * 
@@ -97,6 +103,7 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
         mIssueAdapter = new IssueAdapter(this, new ArrayList<Issue>(), mRowLayout);
         mListViewIssues.setAdapter(mIssueAdapter);
 
+        mSortBy = "created";
         new LoadIssueListTask(this, true).execute();
     }
 
@@ -112,10 +119,41 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
             intent.putExtra(Constants.User.USER_LOGIN, getAuthLogin());
             actionBar.setHomeAction(new IntentAction(this, intent, R.drawable.ic_home));
         }
-        actionBar.addAction(new IntentAction(this, new Intent(getApplicationContext(),
-                SearchActivity.class), R.drawable.ic_search));
+        actionBar.addAction(new SortSubmittedAction());
     }
 
+    private class SortSubmittedAction implements Action {
+
+        @Override
+        public int getDrawable() {
+            return android.R.drawable.ic_menu_sort_by_size;
+        }
+
+        @Override
+        public void performAction(View view) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(
+                    new ContextThemeWrapper(IssueListActivity.this, android.R.style.Theme));
+            builder.setCancelable(true);
+            builder.setTitle(R.string.sort_by);
+            
+            final String[] sortBy = getResources().getStringArray(R.array.sort_by_item);
+            builder.setItems(sortBy, 
+                    new DialogInterface.OnClickListener() {
+                
+                @Override
+                public void onClick(DialogInterface dialog, int item) {
+                    mSortBy = sortBy[item];
+                    mIssueAdapter.clear();
+                    new LoadIssueListTask(IssueListActivity.this, true).execute();
+                }
+            });
+            
+            builder.create();
+            builder.show();
+        }
+
+    }
+    
     /**
      * Sets the bread crumb.
      */
@@ -163,6 +201,7 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
         IssueService issueService = new IssueService(client);
         Map<String, String> filterData = new HashMap<String, String>();
         filterData.put("state", mState);
+        filterData.put("sort", mSortBy.toLowerCase());
         return issueService.getIssues(mUserLogin, mRepoName, filterData);
     }
     

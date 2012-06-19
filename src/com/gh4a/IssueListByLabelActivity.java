@@ -96,7 +96,7 @@ public class IssueListByLabelActivity extends IssueListActivity {
 
         Map<String, String> filterData = new HashMap<String, String>();
         filterData.put("labels", label);
-        
+        filterData.put("sort", mSortBy.toLowerCase());
         return issueService.getIssues(mUserLogin, mRepoName, filterData);
     }
     

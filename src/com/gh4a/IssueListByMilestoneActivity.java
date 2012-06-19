@@ -88,7 +88,7 @@ public class IssueListByMilestoneActivity extends IssueListActivity {
 
         Map<String, String> filterData = new HashMap<String, String>();
         filterData.put("milestone", String.valueOf(number));
-        
+        filterData.put("sort", mSortBy.toLowerCase());
         return issueService.getIssues(mUserLogin, mRepoName, filterData);
     }
     
