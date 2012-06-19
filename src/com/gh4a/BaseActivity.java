@@ -130,7 +130,7 @@ public class BaseActivity extends Activity {
                     editor.commit();
                     Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP
-                            |Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                            |Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     Toast.makeText(this, getResources().getString(R.string.success_logout), Toast.LENGTH_SHORT).show();
                     this.finish();
