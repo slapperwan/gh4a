@@ -20,7 +20,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.SearchRepository;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
@@ -591,7 +590,7 @@ public class SearchActivity extends BaseActivity {
 
             /** Menu for repository */
             else {
-                Repository repository = (Repository) repositoryAdapter.getItem(info.position);
+                SearchRepository repository = (SearchRepository) repositoryAdapter.getItem(info.position);
                 menu.add("User " + repository.getOwner());
                 menu.add("Repo " + repository.getName());
             }
@@ -625,7 +624,7 @@ public class SearchActivity extends BaseActivity {
             Intent intent = new Intent().setClass(SearchActivity.this, UserActivity.class);
 
             String username = null;
-            if (object instanceof Repository) {
+            if (object instanceof SearchRepository) {
                 SearchRepository repository = (SearchRepository) object;
                 username = repository.getOwner();
             }
@@ -639,11 +638,9 @@ public class SearchActivity extends BaseActivity {
         }
         /** Repo item */
         else if (title.startsWith("Repo")) {
-            Intent intent = new Intent().setClass(SearchActivity.this, RepositoryActivity.class);
-            Repository repository = (Repository) object;
-            Bundle data = getApplicationContext().populateRepository(repository);
-            intent.putExtra(Constants.DATA_BUNDLE, data);
-            startActivity(intent);
+            SearchRepository repository = (SearchRepository) object;
+            getApplicationContext().openRepositoryInfoActivity(this,
+                    repository.getOwner(), repository.getName());
         }
         return true;
     }
