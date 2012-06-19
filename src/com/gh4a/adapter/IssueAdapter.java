@@ -117,6 +117,27 @@ public class IssueAdapter extends RootAdapter<Issue> {
 //            
 //            viewHolder.llLabels.addView(tvNumber);
 
+            //show assignees
+            if (issue.getAssignee() != null) {
+                TextView tvLabel = new TextView(v.getContext());
+                tvLabel.setSingleLine(true);
+                tvLabel.setText("Assignee " + issue.getAssignee().getLogin() + " ");
+                tvLabel.setTextAppearance(v.getContext(), R.style.default_text_small_url);
+                tvLabel.setOnClickListener(new OnClickListener() {
+                    
+                    @Override
+                    public void onClick(View v) {
+                        Gh4Application context = (Gh4Application) v.getContext()
+                                .getApplicationContext();
+                        context.openUserInfoActivity(v.getContext(), 
+                                issue.getAssignee().getLogin(), null);
+                    }
+                });
+                
+                viewHolder.llLabels.addView(tvLabel);
+                viewHolder.llLabels.setVisibility(View.VISIBLE);
+            }
+            
             //show labels
             List<Label> labels = issue.getLabels();
             if (labels != null && !labels.isEmpty()) {
@@ -139,7 +160,8 @@ public class IssueAdapter extends RootAdapter<Issue> {
             viewHolder.tvDesc.setText("#" + issue.getNumber() + " - " + StringUtils.doTeaser(issue.getTitle()));
 
             Resources res = v.getResources();
-            String extraData = res.getString(R.string.more_data_3, issue.getUser().getLogin(),
+            String extraData = res.getString(R.string.more_data_3, 
+                    "by " + issue.getUser().getLogin(),
                     pt.format(issue.getCreatedAt()), issue.getComments() + " "
                             + res.getQuantityString(R.plurals.issue_comment, issue.getComments()));
 
