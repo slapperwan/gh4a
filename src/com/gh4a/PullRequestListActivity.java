@@ -29,15 +29,15 @@ import org.eclipse.egit.github.core.service.PullRequestService;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.adapter.PullRequestAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
 
@@ -244,7 +244,7 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.clear();
-        MenuInflater inflater = getMenuInflater();
+        MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.pull_requests_menu, menu);
         return true;
     }

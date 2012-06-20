@@ -21,7 +21,6 @@ import java.util.Locale;
 
 import org.ocpsoft.pretty.time.PrettyTime;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -34,9 +33,6 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
@@ -45,12 +41,17 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.holder.BreadCrumbHolder;
 
 /**
  * The Base activity.
  */
-public class BaseActivity extends Activity {
+public class BaseActivity extends SherlockActivity {
 
     /** The Constant pt. */
     protected static final PrettyTime pt = new PrettyTime(new Locale(""));
@@ -98,7 +99,7 @@ public class BaseActivity extends Activity {
 //            inflater.inflate(R.menu.authenticated_menu, menu);
 //        }
         if (!isAuthorized()) {
-            MenuInflater inflater = getMenuInflater();
+            MenuInflater inflater = getSupportMenuInflater();
             inflater.inflate(R.menu.anon_menu, menu);
         }
         return true;        
@@ -298,7 +299,7 @@ public class BaseActivity extends Activity {
      * Sets the up action bar.
      */
     public void setUpActionBar() {
-        
+        ActionBar actionBar = getSupportActionBar();
     }
 
     /**
@@ -600,5 +601,5 @@ public class BaseActivity extends Activity {
             }
         }
     }
-    
+
 }

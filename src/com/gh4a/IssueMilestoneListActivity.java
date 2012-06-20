@@ -23,9 +23,7 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
-import org.eclipse.egit.github.core.service.RepositoryService;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -36,9 +34,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -47,6 +42,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.adapter.MilestoneAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.StringUtils;
@@ -243,7 +241,7 @@ public class IssueMilestoneListActivity extends BaseActivity implements OnItemCl
     public boolean onPrepareOptionsMenu(Menu menu) {
         if (isAuthorized()) {
             menu.clear();
-            MenuInflater inflater = getMenuInflater();
+            MenuInflater inflater = getSupportMenuInflater();
             inflater.inflate(R.menu.milestones_menu, menu);
         }
         return true;
@@ -329,7 +327,7 @@ public class IssueMilestoneListActivity extends BaseActivity implements OnItemCl
      * @see android.app.Activity#onContextItemSelected(android.view.MenuItem)
      */
     @Override
-    public boolean onContextItemSelected(MenuItem item) {
+    public boolean onContextItemSelected(android.view.MenuItem item) {
         final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         Milestone milestone = (Milestone) mListView.getItemAtPosition(info.position);
         

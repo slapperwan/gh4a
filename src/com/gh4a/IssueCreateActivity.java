@@ -39,8 +39,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -49,6 +47,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
 import com.gh4a.adapter.AssigneeSimpleAdapter;
 import com.gh4a.adapter.MilestoneSimpleAdapter;
 import com.gh4a.db.Bookmark;
@@ -594,7 +594,7 @@ public class IssueCreateActivity extends BaseActivity implements OnClickListener
     public boolean onPrepareOptionsMenu(Menu menu) {
         if (isAuthorized()) {
             menu.clear();
-            MenuInflater inflater = getMenuInflater();
+            MenuInflater inflater = getSupportMenuInflater();
             inflater.inflate(R.menu.bookmark_menu, menu);
         }
         return true;

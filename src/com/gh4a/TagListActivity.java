@@ -29,10 +29,10 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.widget.ListView;
 
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
 import com.gh4a.adapter.TagAdapter;
 import com.gh4a.db.Bookmark;
 import com.gh4a.db.BookmarkParam;
@@ -199,7 +199,7 @@ public class TagListActivity extends BaseActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         if (isAuthorized()) {
             menu.clear();
-            MenuInflater inflater = getMenuInflater();
+            MenuInflater inflater = getSupportMenuInflater();
             inflater.inflate(R.menu.bookmark_menu, menu);
         }
         return true;

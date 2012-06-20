@@ -38,9 +38,6 @@ import android.text.Html;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -50,6 +47,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.adapter.CommentAdapter;
 import com.gh4a.db.Bookmark;
 import com.gh4a.db.BookmarkParam;
@@ -455,7 +455,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         if (isAuthorized()) {
-            MenuInflater inflater = getMenuInflater();
+            MenuInflater inflater = getSupportMenuInflater();
             menu.clear();
             if ("closed".equals(mBundle.getString(Constants.Issue.ISSUE_STATE))) {
                 menu.add(Menu.FIRST, R.string.issue_reopen, 0, R.string.issue_reopen);

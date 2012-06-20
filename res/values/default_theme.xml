@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="DefaultTheme" parent="android:Theme.Light">
+    <style name="DefaultTheme" parent="Theme.Sherlock.Light.DarkActionBar">
         <item name="android:windowNoTitle">true</item>
         <item name="android:listViewStyle">@style/default_list_view</item>
         <!-- item name="android:textColorPrimaryDisableOnly">#000000</item-->
