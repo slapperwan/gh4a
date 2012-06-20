@@ -5,17 +5,12 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical">
-    <com.markupartist.android.widget.ActionBar
-        android:id="@+id/actionbar"
-        app:title="@string/app_name"
-        style="@style/ActionBar" />
     <ScrollView
         android:id="@id/main_content"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_margin="0dp"
-        android:padding="0dp"
-        android:layout_below="@id/actionbar">
+        android:padding="0dp">
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"

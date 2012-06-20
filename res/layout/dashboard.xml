@@ -5,10 +5,6 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical">
-    <com.markupartist.android.widget.ActionBar
-        android:id="@+id/actionbar"
-        app:title="MineDroid"
-        style="@style/ActionBar" />
     <ScrollView
         android:id="@+id/main_content"
         android:layout_width="fill_parent"

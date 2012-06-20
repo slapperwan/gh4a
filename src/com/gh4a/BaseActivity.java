@@ -46,9 +46,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gh4a.holder.BreadCrumbHolder;
-import com.markupartist.android.widget.ActionBar;
-import com.markupartist.android.widget.ActionBar.IntentAction;
-import com.markupartist.android.widget.ScrollingTextView;
 
 /**
  * The Base activity.
@@ -295,32 +292,13 @@ public class BaseActivity extends Activity {
                 }
             }
         }
-
-        ScrollingTextView tvSubtitle = (ScrollingTextView) this.findViewById(R.id.tv_subtitle);
-        tvSubtitle.setText(subTitle);
     }
 
     /**
      * Sets the up action bar.
      */
     public void setUpActionBar() {
-        ActionBar actionBar = (ActionBar) findViewById(R.id.actionbar);
-        if (isAuthorized()) {
-            Intent intent = new Intent().setClass(getApplicationContext(), UserActivity.class);
-            intent.putExtra(Constants.User.USER_LOGIN, getAuthLogin());
-            if (this instanceof UserActivity) {
-                UserActivity thisActivity = (UserActivity) this;
-
-                if (getAuthLogin().equals(thisActivity.mUserLogin)) {
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                }
-            }
-            actionBar.setHomeAction(new IntentAction(this, intent, R.drawable.ic_home));
-        }
-        actionBar.addAction(new IntentAction(this, new Intent(getApplication(),
-                ExploreActivity.class), R.drawable.ic_explore));
-        actionBar.addAction(new IntentAction(this, new Intent(getApplication(),
-                SearchActivity.class), R.drawable.ic_search));
+        
     }
 
     /**

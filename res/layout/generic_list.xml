@@ -7,10 +7,6 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical">
-    <com.markupartist.android.widget.ActionBar
-        android:id="@+id/actionbar"
-        app:title="@string/app_name"
-        style="@style/ActionBar" />
     <include
         layout="@layout/breadcrumb"
         android:id="@+id/breadcrumb" />

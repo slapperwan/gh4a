@@ -39,8 +39,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gh4a.utils.StringUtils;
-import com.markupartist.android.widget.ActionBar;
-import com.markupartist.android.widget.ActionBar.IntentAction;
 
 /**
  * The Github4Android activity.
@@ -69,11 +67,6 @@ public class Github4AndroidActivity extends BaseActivity {
             return;
         }
         setContentView(R.layout.main);
-
-        // setup actionbar
-        ActionBar actionBar = (ActionBar) findViewById(R.id.actionbar_main);
-        actionBar.addAction(new IntentAction(this, new Intent(getApplicationContext(),
-                SearchActivity.class), R.drawable.ic_search));
 
         // setup title breadcrumb
         createBreadcrumb("Login", null);

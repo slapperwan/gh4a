@@ -22,9 +22,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-import com.markupartist.android.widget.ActionBar;
-import com.markupartist.android.widget.ActionBar.IntentAction;
-
 /**
  * The Dashboard activity.
  */
@@ -58,12 +55,6 @@ public class DashboardActivity extends BaseActivity {
                     Github4AndroidActivity.class);
             startActivity(intent);
         }
-
-        /** Actionbar setup */
-        ActionBar actionBar = (ActionBar) findViewById(R.id.actionbar);
-        actionBar.setTitle("Hi, " + mUserLogin);
-        actionBar.addAction(new IntentAction(this, new Intent(getApplicationContext(),
-                SearchActivity.class), R.drawable.ic_search));
 
         /** Button news feed */
         Button btnNewsFeed = (Button) findViewById(R.id.btn_news_feed);

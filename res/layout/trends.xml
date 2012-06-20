@@ -5,16 +5,11 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical">
-    <com.markupartist.android.widget.ActionBar
-        android:id="@+id/actionbar"
-        app:title="@string/app_name"
-        style="@style/ActionBar" />
     <LinearLayout
         android:id="@+id/breadcrumb"
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/actionbar"
         android:background="?attr/info_box">
         <HorizontalScrollView
             android:layout_height="wrap_content"
@@ -27,15 +22,6 @@
                 android:layout_height="wrap_content">
             </LinearLayout>
         </HorizontalScrollView>
-        <com.markupartist.android.widget.ScrollingTextView
-            android:id="@+id/tv_subtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?attr/textAppearanceSubtitle"
-            android:lines="1"
-            android:marqueeRepeatLimit="marquee_forever"
-            android:scrollHorizontally="true"
-            android:ellipsize="marquee" />
     </LinearLayout>
     <ListView
         android:id="@+id/main_content"

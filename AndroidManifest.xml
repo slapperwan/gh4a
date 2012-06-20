@@ -6,7 +6,7 @@
     android:versionCode="19"
     android:versionName="2.1">
     
-    <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="10" />
+    <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="15" />
     
     <application
         android:icon="@drawable/icon"
@@ -189,8 +189,6 @@
         <activity
             android:name=".IssueListByMilestoneActivity"
             android:configChanges="orientation" />
-        <activity
-            android:name="com.markupartist.android.widget.ActionBar" />
         <activity android:name="BrowseFilter">
             <intent-filter>
                 <action
