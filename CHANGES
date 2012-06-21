@@ -1,3 +1,7 @@
+v2.2 (Jun 21, 2012)
+- Show organization private repositories
+- Handle Download and PullRequestReviewComment event.
+
 v2.1 (Jun 20, 2012)
 - Issue assignee feature
 - Sort issues by Submitted, Updated or Comments

@@ -37,6 +37,7 @@ import org.eclipse.egit.github.core.event.IssueCommentPayload;
 import org.eclipse.egit.github.core.event.IssuesPayload;
 import org.eclipse.egit.github.core.event.MemberPayload;
 import org.eclipse.egit.github.core.event.PullRequestPayload;
+import org.eclipse.egit.github.core.event.PullRequestReviewCommentPayload;
 import org.eclipse.egit.github.core.event.PushPayload;
 
 import android.content.Intent;
@@ -365,9 +366,7 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
             if (eventRepo != null) {
                 DownloadPayload payload = (DownloadPayload) event.getPayload();
-//                String url = "https://github.com/" + repoOwner + "/"
-//                        + repoName + "/downloads#download_" + feed.getPayload().getId();
-                context.openBrowser(this, payload.getDownload().getUrl());
+                context.openBrowser(this, payload.getDownload().getHtmlUrl());
             }
             else {
                 context.notFoundMessage(this, R.plurals.repository);
@@ -448,6 +447,12 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
             else {
                 context.notFoundMessage(this, R.plurals.repository);
             }
+        }
+        
+        /** PullRequestReviewComment */
+        else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
+            PullRequestReviewCommentPayload payload = (PullRequestReviewCommentPayload) event.getPayload();
+            context.openCommitInfoActivity(this, repoOwner, repoName, payload.getComment().getCommitId());
         }
     }
 
@@ -629,7 +634,7 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         else if (title.startsWith("File")) {
             if (repoOwner != null) {
                 DownloadPayload payload = (DownloadPayload) event.getPayload();
-                context.openBrowser(this, payload.getDownload().getUrl());
+                context.openBrowser(this, payload.getDownload().getHtmlUrl());
             }
             else {
                 context.notFoundMessage(this, R.plurals.repository);
