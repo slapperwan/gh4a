@@ -34,13 +34,13 @@
                     android:id="@+id/tv_extra"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textAppearance="@style/default_text_micro"
                     android:layout_toRightOf="@id/iv_gravatar" />
                 <TextView
                     android:id="@+id/tv_message"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
                     android:layout_toRightOf="@id/iv_gravatar"
                     android:layout_below="@id/tv_extra" />
             </RelativeLayout>
@@ -48,7 +48,7 @@
                 android:id="@+id/tv_desc"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium" 
+                android:textAppearance="?android:attr/textAppearanceSmall" 
                 android:padding="7dp"/>
             <LinearLayout
                 android:id="@+id/ll_changed"
@@ -59,7 +59,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="@string/commit_changed" />
             </LinearLayout>
             <LinearLayout
@@ -71,7 +71,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="@string/commit_added" />
             </LinearLayout>
             <LinearLayout
@@ -83,7 +83,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="@string/commit_deleted" />
             </LinearLayout>
         </LinearLayout>

@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="DefaultTheme" parent="Theme.Sherlock.Light.DarkActionBar">
+    <style name="DefaultTheme" parent="Theme.Sherlock.Light">
         <item name="android:windowNoTitle">true</item>
-        <item name="android:listViewStyle">@style/default_list_view</item>
-        <!-- item name="android:textColorPrimaryDisableOnly">#000000</item-->
-        <item name="android:textAppearanceLarge">@style/default_text_large</item>
-        <item name="android:textAppearanceMedium">@style/default_text_medium</item>
+        <!-- item name="android:textAppearanceLarge">@style/default_text_large</item>
+        <item name="android:textAppearanceMedium">@style/default_text_medium</item-->
+        <item name="textAppearanceMicro">@style/default_text_micro</item>
         <item name="textAppearanceMedium">@style/default_text_medium</item>
-        <item name="android:textAppearanceSmall">@style/default_text_small</item>
+        <!-- item name="android:textAppearanceSmall">@style/default_text_small</item-->
         <item name="textAppearanceWhiteSmall">@style/default_text_white_small</item>
         <item name="textAppearanceCode">@style/default_text_code</item>
         <item name="textAppearanceUrl">@style/default_text_medium_url</item>
         <item name="textAppearanceLargeUrl">@style/default_text_large_url</item>
+        <item name="textAppearanceMediumUrl">@style/default_text_medium_url</item>
         <item name="textAppearanceSmallUrl">@style/default_text_small_url</item>
+        <item name="textAppearanceMicroUrl">@style/default_text_micro_url</item>
         <item name="textAppearanceLink">@drawable/default_link</item>
         <item name="textAppearanceSubtitle">@style/default_text_medium_subtitle</item>
         <item name="android:divider">@drawable/default_divider</item>

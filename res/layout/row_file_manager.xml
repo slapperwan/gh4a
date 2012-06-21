@@ -4,7 +4,9 @@
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="?attr/row_box">
+    android:background="?attr/row_box"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp" >
     <ImageView
         android:id="@+id/iv_icon"
         android:layout_width="wrap_content"
@@ -14,7 +16,8 @@
     <TextView
         android:id="@+id/tv_text"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_toRightOf="@id/iv_icon" />
+        android:layout_toRightOf="@id/iv_icon"
+        android:gravity="center_vertical" />
 </RelativeLayout>

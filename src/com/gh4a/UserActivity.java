@@ -605,12 +605,15 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
      * @return the feeds
      */
     public void getFeeds(View view) {
-        Intent intent = new Intent().setClass(this, UserPrivateActivity.class);
-        intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
-        intent.putExtra(Constants.User.USER_TYPE, mUser.getType());
-        intent.putExtra(Constants.ACTIONBAR_TITLE, mUserLogin
-                + (!StringUtils.isBlank(mUserName) ? " - " + mUserName : ""));
-        intent.putExtra(Constants.SUBTITLE, getResources().getString(R.string.user_news_feed));
+//        Intent intent = new Intent().setClass(this, UserPrivateActivity.class);
+//        intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
+//        intent.putExtra(Constants.User.USER_TYPE, mUser.getType());
+//        intent.putExtra(Constants.ACTIONBAR_TITLE, mUserLogin
+//                + (!StringUtils.isBlank(mUserName) ? " - " + mUserName : ""));
+//        intent.putExtra(Constants.SUBTITLE, getResources().getString(R.string.user_news_feed));
+//        startActivity(intent);
+        
+        Intent intent = new Intent().setClass(this, UserNewActivity.class);
         startActivity(intent);
     }
 
@@ -754,7 +757,8 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
             menu.setHeaderTitle("Choose Organization");
             if (mOrganizations != null && !mOrganizations.isEmpty()) {
                 for (User organization : mOrganizations) {
-                menu.add(organization.getLogin());      
+                    menu.add(organization.getLogin());
+                    UserService s ;
                 }
             }
             else {

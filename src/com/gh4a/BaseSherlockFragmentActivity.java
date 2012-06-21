@@ -42,7 +42,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -51,7 +51,7 @@ import com.gh4a.holder.BreadCrumbHolder;
 /**
  * The Base activity.
  */
-public class BaseActivity extends SherlockActivity {
+public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
 
     /** The Constant pt. */
     protected static final PrettyTime pt = new PrettyTime(new Locale(""));
@@ -188,7 +188,7 @@ public class BaseActivity extends SherlockActivity {
             @Override
             public void onClick(View arg0) {
                 if (isAuthorized()) {
-                    Intent intent = new Intent().setClass(BaseActivity.this, IssueCreateActivity.class);
+                    Intent intent = new Intent().setClass(BaseSherlockFragmentActivity.this, IssueCreateActivity.class);
                     intent.putExtra(Constants.Repository.REPO_OWNER, getResources().getString(R.string.my_username));
                     intent.putExtra(Constants.Repository.REPO_NAME, getResources().getString(R.string.my_repo));
                     startActivity(intent);
@@ -226,7 +226,7 @@ public class BaseActivity extends SherlockActivity {
             @Override
             public void onClick(View arg0) {
                 if (isAuthorized()) {
-                    Intent intent = new Intent().setClass(BaseActivity.this, IssueCreateActivity.class);
+                    Intent intent = new Intent().setClass(BaseSherlockFragmentActivity.this, IssueCreateActivity.class);
                     intent.putExtra(Constants.Repository.REPO_OWNER, getResources().getString(R.string.my_username));
                     intent.putExtra(Constants.Repository.REPO_NAME, getResources().getString(R.string.my_repo));
                     startActivity(intent);
@@ -406,15 +406,15 @@ public class BaseActivity extends SherlockActivity {
     private static class OnClickBreadCrumb implements OnClickListener {
 
         /** The target. */
-        private WeakReference<BaseActivity> mTarget;
+        private WeakReference<BaseSherlockFragmentActivity> mTarget;
 
         /**
          * Instantiates a new on click bread crumb.
          *
          * @param activity the activity
          */
-        public OnClickBreadCrumb(BaseActivity activity) {
-            mTarget = new WeakReference<BaseActivity>(activity);
+        public OnClickBreadCrumb(BaseSherlockFragmentActivity activity) {
+            mTarget = new WeakReference<BaseSherlockFragmentActivity>(activity);
         }
 
         /* (non-Javadoc)
@@ -427,7 +427,7 @@ public class BaseActivity extends SherlockActivity {
             String tag = b.getTag();
             HashMap<String, String> data = b.getData();
 
-            BaseActivity baseActivity = mTarget.get();
+            BaseSherlockFragmentActivity baseActivity = mTarget.get();
 
             if (Constants.User.USER_LOGIN.equals(tag)) {
                 mTarget.get().getApplicationContext().openUserInfoActivity(baseActivity,
@@ -473,9 +473,6 @@ public class BaseActivity extends SherlockActivity {
             }
             else if (Constants.Repository.REPO_BRANCH.equals(tag)) {
                 Intent intent = new Intent().setClass(mTarget.get(), FileManagerActivity.class);
-                if (mTarget.get() instanceof CommitListActivity) {
-                    intent = new Intent().setClass(mTarget.get(), CommitListActivity.class);
-                }
                 intent.putExtra(Constants.Repository.REPO_OWNER, data
                         .get(Constants.User.USER_LOGIN));
                 intent.putExtra(Constants.Repository.REPO_NAME, data

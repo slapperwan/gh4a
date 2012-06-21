@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/follow_action" android:title="@string/user_follow_action" />
-    <item android:id="@+id/unfollow_action" android:title="@string/user_unfollow_action" />
+    <item android:id="@+id/follow_action" 
+        android:title="@string/user_follow_action"
+        android:showAsAction="ifRoom" />
+    <item android:id="@+id/unfollow_action"
+        android:title="@string/user_unfollow_action"
+        android:showAsAction="ifRoom" />
 </menu>

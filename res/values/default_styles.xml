@@ -17,6 +17,11 @@
         <item name="android:textColor">#333333</item>
     </style>
     
+    <style name="default_text_micro" parent="@android:style/TextAppearance.Small">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">#333333</item>
+    </style>
+    
     <style name="default_text_white_small" parent="@android:style/TextAppearance.Small">
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">#FFFFFF</item>
@@ -27,15 +32,20 @@
         <item name="android:typeface">monospace</item>
     </style>
 
-    <style name="default_text_large_url" parent="@style/default_text_large">
+    <style name="default_text_large_url" parent="@android:style/TextAppearance.Large">
         <item name="android:textColor">#0000CC</item>
     </style>
     
-    <style name="default_text_medium_url" parent="@style/default_text_medium">
+    <style name="default_text_medium_url" parent="@android:style/TextAppearance.Medium">
         <item name="android:textColor">#0000CC</item>
     </style>
     
-    <style name="default_text_small_url" parent="@style/default_text_small">
+    <style name="default_text_small_url" parent="@android:style/TextAppearance.Small">
+        <item name="android:textColor">#0000CC</item>
+    </style>
+    
+    <style name="default_text_micro_url" parent="@android:style/TextAppearance.Small">
+        <item name="android:textSize">12sp</item>
         <item name="android:textColor">#0000CC</item>
     </style>
 

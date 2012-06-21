@@ -53,7 +53,6 @@ import android.widget.ListView;
 
 import com.gh4a.adapter.FeedAdapter;
 import com.gh4a.holder.BreadCrumbHolder;
-import com.gh4a.utils.StringUtils;
 
 /**
  * The User activity.
@@ -442,7 +441,8 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
                     context.openPullRequestActivity(this, repoOwner, repoName, payload.getIssue().getNumber());   
                 }
                 else {
-                    context.openIssueActivity(this, repoOwner, repoName, payload.getIssue().getNumber()); 
+                    context.openIssueActivity(this, repoOwner, repoName, payload.getIssue().getNumber(),
+                            payload.getIssue().getState()); 
                 }
             }
             else {

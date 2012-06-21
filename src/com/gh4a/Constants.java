@@ -332,4 +332,8 @@ public interface Constants {
     public static String[] MARKDOWN_EXT = {
         "markdown", "md", "mdown", "mkdn", "mkd"
     };
+    
+    public interface Event {
+        public static final String IS_PRIVATE = "Event.isPrivate";
+    }
 }

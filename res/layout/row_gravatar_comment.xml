@@ -21,13 +21,13 @@
         android:id="@+id/tv_extra"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textAppearance="@style/default_text_micro"
         android:layout_toRightOf="@id/iv_gravatar" />
     <TextView
         android:id="@+id/tv_desc"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_toRightOf="@id/iv_gravatar"
         android:autoLink="web"
         android:layout_below="@id/tv_extra" />

@@ -172,30 +172,32 @@ public class FeedAdapter extends RootAdapter<Event> {
             PushPayload payload = (PushPayload) event.getPayload();
             List<Commit> commits = payload.getCommits();
             
-            for (int i = 0; i < commits.size(); i++) {
-                Commit commit = commits.get(i);
-                SpannableString spannableSha = new SpannableString(commit.getSha().substring(0, 7));
-                if (eventRepo != null) {
-                    spannableSha.setSpan(new TextAppearanceSpan(baseView.getContext(),
-                            R.style.default_text_medium_url), 0, spannableSha.length(), 0);
-                }
-                else {
-                    spannableSha = new SpannableString("(deleted)");
-                }
-                
-                TextView tvCommitMsg = new TextView(baseView.getContext());
-                tvCommitMsg.setText(spannableSha);
-                tvCommitMsg.append(" " + commit.getMessage());
-                tvCommitMsg.setSingleLine(true);
-                tvCommitMsg.setTextAppearance(baseView.getContext(), R.style.default_text_medium);
-                ll.addView(tvCommitMsg);
-
-                if (i == 2 && commits.size() > 3) {// show limit 3 lines
-                    TextView tvMoreMsg = new TextView(baseView.getContext());
-                    String text = res.getString(R.string.event_push_desc, commits.size() - 3);
-                    tvMoreMsg.setText(text);
-                    ll.addView(tvMoreMsg);
-                    break;
+            if (commits != null) {
+                for (int i = 0; i < commits.size(); i++) {
+                    Commit commit = commits.get(i);
+                    SpannableString spannableSha = new SpannableString(commit.getSha().substring(0, 7));
+                    if (eventRepo != null) {
+                        spannableSha.setSpan(new TextAppearanceSpan(baseView.getContext(),
+                                R.style.default_text_small_url), 0, spannableSha.length(), 0);
+                    }
+                    else {
+                        spannableSha = new SpannableString("(deleted)");
+                    }
+                    
+                    TextView tvCommitMsg = new TextView(baseView.getContext());
+                    tvCommitMsg.setText(spannableSha);
+                    tvCommitMsg.append(" " + commit.getMessage());
+                    tvCommitMsg.setSingleLine(true);
+                    tvCommitMsg.setTextAppearance(baseView.getContext(), android.R.style.TextAppearance_Small);
+                    ll.addView(tvCommitMsg);
+    
+                    if (i == 2 && commits.size() > 3) {// show limit 3 lines
+                        TextView tvMoreMsg = new TextView(baseView.getContext());
+                        String text = res.getString(R.string.event_push_desc, commits.size() - 3);
+                        tvMoreMsg.setText(text);
+                        ll.addView(tvMoreMsg);
+                        break;
+                    }
                 }
             }
             return null;

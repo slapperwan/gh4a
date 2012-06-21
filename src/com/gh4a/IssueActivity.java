@@ -79,6 +79,8 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
 
     /** The issue number. */
     protected int mIssueNumber;
+    
+    protected String mIssueState;
 
     /** The comment adapter. */
     protected CommentAdapter mCommentAdapter;
@@ -108,6 +110,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
             mUserLogin = mBundle.getString(Constants.Repository.REPO_OWNER);
             mRepoName = mBundle.getString(Constants.Repository.REPO_NAME);
             mIssueNumber = mBundle.getInt(Constants.Issue.ISSUE_NUMBER);
+            mIssueState = mBundle.getString(Constants.Issue.ISSUE_STATE);
             fillData();
         }
         // comes from activity listing
@@ -116,6 +119,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
             mUserLogin = bundle.getString(Constants.Repository.REPO_OWNER);
             mRepoName = bundle.getString(Constants.Repository.REPO_NAME);
             mIssueNumber = bundle.getInt(Constants.Issue.ISSUE_NUMBER);
+            mIssueState = bundle.getString(Constants.Issue.ISSUE_STATE);
             new LoadIssueTask(this).execute();
         }
 
@@ -457,7 +461,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
         if (isAuthorized()) {
             MenuInflater inflater = getSupportMenuInflater();
             menu.clear();
-            if ("closed".equals(mBundle.getString(Constants.Issue.ISSUE_STATE))) {
+            if ("closed".equals(mIssueState)) {
                 menu.add(Menu.FIRST, R.string.issue_reopen, 0, R.string.issue_reopen);
             }
             else {

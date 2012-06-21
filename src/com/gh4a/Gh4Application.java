@@ -26,6 +26,7 @@ import org.ocpsoft.pretty.time.PrettyTime;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
@@ -127,6 +128,25 @@ public class Gh4Application extends Application {
         intent.putExtra(Constants.Repository.REPO_OWNER, login);
         intent.putExtra(Constants.Repository.REPO_NAME, repoName);
         intent.putExtra(Constants.Issue.ISSUE_NUMBER, issueNumber);
+        context.startActivity(intent);
+    }
+    
+    /**
+     * Open issue activity.
+     * 
+     * @param context
+     * @param login
+     * @param repoName
+     * @param issueNumber
+     * @param state
+     */
+    public void openIssueActivity(Context context, String login, String repoName, int issueNumber,
+            String state) {
+        Intent intent = new Intent().setClass(context, IssueActivity.class);
+        intent.putExtra(Constants.Repository.REPO_OWNER, login);
+        intent.putExtra(Constants.Repository.REPO_NAME, repoName);
+        intent.putExtra(Constants.Issue.ISSUE_NUMBER, issueNumber);
+        intent.putExtra(Constants.Issue.ISSUE_STATE, state);
         context.startActivity(intent);
     }
     
@@ -371,5 +391,28 @@ public class Gh4Application extends Application {
         Resources res = context.getResources();
         Toast.makeText(context, String.format(res.getString(R.string.record_not_found), object),
                 Toast.LENGTH_SHORT).show();
+    }
+    
+    public String getAuthLogin() {
+        SharedPreferences sharedPreferences = getSharedPreferences(
+                Constants.PREF_NAME, MODE_PRIVATE);
+        if (sharedPreferences != null) {
+            if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null){
+                return sharedPreferences.getString(Constants.User.USER_LOGIN, null);
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            return null;
+        }
+    }
+    
+    public String getAuthToken() {
+        SharedPreferences sharedPreferences = getSharedPreferences(
+                Constants.PREF_NAME, Context.MODE_PRIVATE);
+        String token = sharedPreferences.getString(Constants.User.USER_AUTH_TOKEN, null);
+        return token;
     }
 }

@@ -7,7 +7,9 @@
     <attr name="textAppearanceCode" format="reference" />
     <attr name="textAppearanceUrl" format="reference" />
     <attr name="textAppearanceLargeUrl" format="reference" />
+    <attr name="textAppearanceMediumUrl" format="reference" />
     <attr name="textAppearanceSmallUrl" format="reference" />
+    <attr name="textAppearanceMicroUrl" format="reference" />
     <attr name="textAppearanceMedium" format="reference" />
     <!-- attr name="textAppearanceSmall" format="reference" /-->
     <attr name="textAppearanceLink" format="reference" />
@@ -15,4 +17,5 @@
     <attr name="comment_box" format="reference" />
     <attr name="textAppearanceSubtitle" format="reference" />
     <attr name="textAppearanceWhiteSmall" format="reference" />
+    <attr name="textAppearanceMicro" format="reference" />
 </resources>
