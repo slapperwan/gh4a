@@ -667,7 +667,7 @@ public class UserActivity extends BaseActivity implements OnClickListener, OnIte
         intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
         intent.putExtra(Constants.User.USER_NAME, mUserName);
         intent.putExtra(Constants.User.USER_NAME, mUserName);
-        intent.putExtra(Constants.User.USER_TYPE_ORG, mUser.getType());
+        intent.putExtra(Constants.User.USER_TYPE, mUser.getType());
         startActivity(intent);
     }
 
