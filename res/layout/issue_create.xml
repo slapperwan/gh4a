@@ -1,66 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res/com.gh4a"
+    android:id="@id/main_content"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical">
-    <include
-        layout="@layout/breadcrumb"
-        android:id="@+id/breadcrumb" />
-    <ScrollView
-        android:id="@id/main_content"
+    android:layout_margin="0dp"
+    android:padding="0dp">
+    <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_margin="0dp"
-        android:padding="0dp">
-        <LinearLayout
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="?attr/row_box">
+        <EditText
+            android:id="@+id/et_title"
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:hint="@string/issue_title" />
+        <EditText
+            android:id="@+id/et_desc"
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:gravity="top"
+            android:lines="8"
+            android:hint="@string/issue_body" />
+        <Button
+            android:id="@+id/btn_label"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="?attr/row_box">
-            <EditText
-                android:id="@+id/et_title"
-                android:layout_height="wrap_content"
-                android:layout_width="fill_parent"
-                android:hint="@string/issue_title" />
-            <EditText
-                android:id="@+id/et_desc"
-                android:layout_height="wrap_content"
-                android:layout_width="fill_parent"
-                android:gravity="top"
-                android:lines="8"
-                android:hint="@string/issue_body" />
-            <Button
-                android:id="@+id/btn_label"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/issue_view_labels" />
-            <Spinner
-                android:id="@+id/spinner_assignee"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            <Spinner
-                android:id="@+id/spinner_milestone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            <!--
-                CheckBox android:id="@+id/cb_sign"
-                android:layout_height="wrap_content"
-                android:layout_width="fill_parent"
-                android:text="@string/promote" android:checked="true" />
-                <TextView android:layout_height="wrap_content"
-                android:layout_width="fill_parent"
-                android:text="@string/promote_desc" /
-            -->
-            <Button
-                android:text="@string/issue_create"
-                android:id="@+id/btn_create"
-                android:layout_width="wrap_content"
-                android:gravity="center_vertical|center_horizontal"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right">
-            </Button>
-        </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+            android:text="@string/issue_view_labels" />
+        <Spinner
+            android:id="@+id/spinner_assignee"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <Spinner
+            android:id="@+id/spinner_milestone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <!--
+            CheckBox android:id="@+id/cb_sign"
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:text="@string/promote" android:checked="true" />
+            <TextView android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:text="@string/promote_desc" /
+        -->
+        <Button
+            android:text="@string/issue_create"
+            android:id="@+id/btn_create"
+            android:layout_width="wrap_content"
+            android:gravity="center_vertical|center_horizontal"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right">
+        </Button>
+    </LinearLayout>
+</ScrollView>

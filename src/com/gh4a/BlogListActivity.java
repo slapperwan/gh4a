@@ -46,7 +46,6 @@ import android.widget.TextView;
 
 import com.gh4a.adapter.CommonFeedAdapter;
 import com.gh4a.feeds.FeedHandler;
-import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.holder.Feed;
 
 public class BlogListActivity extends BaseActivity {
@@ -66,8 +65,6 @@ public class BlogListActivity extends BaseActivity {
         setContentView(R.layout.generic_list);
         setUpActionBar();
 
-        setBreadCrumb();
-        
         mListView = (ListView) findViewById(R.id.list_view);
         mListView.setOnScrollListener(new BlogScrollListener(this));
         CommonFeedAdapter adapter = new CommonFeedAdapter(this, new ArrayList<Feed>());
@@ -87,17 +84,6 @@ public class BlogListActivity extends BaseActivity {
         new LoadBlogsTask(this).execute("true");
     }
 
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[1];
-
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(getResources().getString(R.string.explore));
-        b.setTag(Constants.EXPLORE);
-        breadCrumbHolders[0] = b;
-        
-        createBreadcrumb(getResources().getString(R.string.blog), breadCrumbHolders);
-    }
-    
     private static class LoadBlogsTask extends
             AsyncTask<String, Void, List<Feed>> {
 

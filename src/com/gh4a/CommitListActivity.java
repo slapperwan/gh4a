@@ -17,7 +17,6 @@ package com.gh4a;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryCommit;
@@ -40,7 +39,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gh4a.adapter.CommitAdapter;
-import com.gh4a.holder.BreadCrumbHolder;
 
 /**
  * The CommitList activity.
@@ -107,66 +105,11 @@ public class CommitListActivity extends BaseActivity implements OnScrollListener
         mTreeSha = getIntent().getExtras().getString(Constants.Object.TREE_SHA);
         mFromBtnId = getIntent().getExtras().getInt(Constants.VIEW_ID);
 
-        setBreadCrumb();
-
         mCommitAdapter = new CommitAdapter(this, new ArrayList<RepositoryCommit>());
         mListViewCommits.setAdapter(mCommitAdapter);
         mListViewCommits.setOnScrollListener(this);
 
         new LoadCommitListTask(this).execute("false");
-    }
-
-    /**
-     * Sets the bread crumb.
-     */
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[4];
-
-        // common data
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.User.USER_LOGIN, mUserLogin);
-        data.put(Constants.Repository.REPO_NAME, mRepoName);
-
-        // User
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(mUserLogin);
-        b.setTag(Constants.User.USER_LOGIN);
-        b.setData(data);
-        breadCrumbHolders[0] = b;
-
-        // Repo
-        b = new BreadCrumbHolder();
-        b.setLabel(mRepoName);
-        b.setTag(Constants.Repository.REPO_NAME);
-        b.setData(data);
-        breadCrumbHolders[1] = b;
-
-        // branches/tags
-        b = new BreadCrumbHolder();
-        if (R.id.btn_tags == mFromBtnId) {
-            b.setLabel("tag");
-            b.setTag(Constants.Object.TAGS);
-        }
-        else {
-            b.setTag(Constants.Object.BRANCHES);
-            b.setLabel("branch");
-        }
-
-        b.setData(data);
-        breadCrumbHolders[2] = b;
-
-        // branch name
-        b = new BreadCrumbHolder();
-        b.setLabel(mBranchName);
-        b.setTag(Constants.Repository.REPO_BRANCH);
-        data.put(Constants.Object.TREE_SHA, mTreeSha);
-        data.put(Constants.Repository.REPO_BRANCH, mBranchName);
-        data.put(Constants.Object.TREE_SHA, mTreeSha);
-        data.put(Constants.VIEW_ID, String.valueOf(mFromBtnId));
-        b.setData(data);
-        breadCrumbHolders[3] = b;
-
-        createBreadcrumb("Commits", breadCrumbHolders);
     }
 
     /**

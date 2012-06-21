@@ -34,7 +34,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.gh4a.adapter.UserAdapter;
-import com.gh4a.holder.BreadCrumbHolder;
 
 /**
  * The FollowerFollowingList activity.
@@ -76,8 +75,6 @@ public class FollowerFollowingListActivity extends BaseActivity implements OnIte
         mSubtitle = data.getString(Constants.SUBTITLE);
         mFindFollowers = data.getBoolean("FIND_FOLLOWER");
 
-        setBreadCrumb();
-
         mListViewUsers = (ListView) findViewById(R.id.list_view);
         mListViewUsers.setOnItemClickListener(this);
 
@@ -85,26 +82,6 @@ public class FollowerFollowingListActivity extends BaseActivity implements OnIte
         mListViewUsers.setAdapter(mFollowerFollowingAdapter);
 
         new LoadListTask(this).execute();
-    }
-
-    /**
-     * Sets the bread crumb.
-     */
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[1];
-
-        // common data
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.User.USER_LOGIN, mUserLogin);
-
-        // User
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(mUserLogin);
-        b.setTag(Constants.User.USER_LOGIN);
-        b.setData(data);
-        breadCrumbHolders[0] = b;
-
-        createBreadcrumb(mSubtitle, breadCrumbHolders);
     }
 
     /**

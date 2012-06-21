@@ -63,35 +63,35 @@ public class UserNewActivity extends BaseSherlockFragmentActivity {
         mActionBar.setDisplayShowTitleEnabled(true);
         Tab tab = mActionBar
                 .newTab()
-                .setText("Profile")
+                .setText(R.string.about)
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 0 + "", mPager));
         mActionBar.addTab(tab);
         
         tab = mActionBar
                 .newTab()
-                .setText("News Feed")
+                .setText(R.string.user_news_feed)
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
         mActionBar.addTab(tab);
         
         tab = mActionBar
                 .newTab()
-                .setText("Your Action")
+                .setText(R.string.user_your_actions)
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 2 + "", mPager));
         mActionBar.addTab(tab);
         
         tab = mActionBar
                 .newTab()
-                .setText("Issues")
+                .setText(R.string.issues)
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 3 + "", mPager));
         mActionBar.addTab(tab);
         
         tab = mActionBar
                 .newTab()
-                .setText("Pull Requests")
+                .setText(R.string.pull_requests)
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 4 + "", mPager));
         mActionBar.addTab(tab);

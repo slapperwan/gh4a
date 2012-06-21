@@ -21,54 +21,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.IssueService;
-import org.eclipse.egit.github.core.service.LabelService;
-
-import com.gh4a.holder.BreadCrumbHolder;
 
 /**
  * The IssueListByLabel activity.
  */
 public class IssueListByLabelActivity extends IssueListActivity {
 
-    /**
-     * Sets the bread crumb.
-     */
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[3];
-
-        // common data
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.User.USER_LOGIN, mUserLogin);
-        data.put(Constants.Repository.REPO_NAME, mRepoName);
-
-        // User
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(mUserLogin);
-        b.setTag(Constants.User.USER_LOGIN);
-        b.setData(data);
-        breadCrumbHolders[0] = b;
-
-        // Repo
-        b = new BreadCrumbHolder();
-        b.setLabel(mRepoName);
-        b.setTag(Constants.Repository.REPO_NAME);
-        b.setData(data);
-        breadCrumbHolders[1] = b;
-        
-        // Issues
-        b = new BreadCrumbHolder();
-        b.setLabel("Issues");
-        b.setTag(Constants.Issue.ISSUES);
-        b.setData(data);
-        breadCrumbHolders[2] = b;
-
-        String label = getIntent().getStringExtra(Constants.Issue.ISSUE_LABEL);
-        createBreadcrumb("Filtered by " + label, breadCrumbHolders);
-    }
-    
     /* (non-Javadoc)
      * @see com.gh4a.IssueListActivity#getSubTitleAfterLoaded(int)
      */

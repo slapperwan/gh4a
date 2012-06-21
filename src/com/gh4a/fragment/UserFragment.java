@@ -48,10 +48,6 @@ import com.gh4a.UserNewActivity;
 import com.gh4a.UserPublicActivity;
 import com.gh4a.UserYourActionsActivity;
 import com.gh4a.WatchedRepoListActivity;
-import com.gh4a.Constants.Repository;
-import com.gh4a.R.id;
-import com.gh4a.R.layout;
-import com.gh4a.R.string;
 import com.gh4a.loader.UserLoader;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
@@ -349,7 +345,7 @@ public class UserFragment extends SherlockFragment implements
         intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
         intent.putExtra(Constants.User.USER_NAME, mUserName);
         intent.putExtra(Constants.User.USER_NAME, mUserName);
-        intent.putExtra(Constants.User.USER_TYPE_ORG, mUser.getType());
+        intent.putExtra(Constants.User.USER_TYPE, mUser.getType());
         startActivity(intent);
     }
 

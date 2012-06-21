@@ -24,49 +24,11 @@ import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.IssueService;
 
-import com.gh4a.holder.BreadCrumbHolder;
-
 /**
  * The IssueListByLabel activity.
  */
 public class IssueListByMilestoneActivity extends IssueListActivity {
 
-    /**
-     * Sets the bread crumb.
-     */
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[3];
-
-        // common data
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.User.USER_LOGIN, mUserLogin);
-        data.put(Constants.Repository.REPO_NAME, mRepoName);
-
-        // User
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(mUserLogin);
-        b.setTag(Constants.User.USER_LOGIN);
-        b.setData(data);
-        breadCrumbHolders[0] = b;
-
-        // Repo
-        b = new BreadCrumbHolder();
-        b.setLabel(mRepoName);
-        b.setTag(Constants.Repository.REPO_NAME);
-        b.setData(data);
-        breadCrumbHolders[1] = b;
-        
-        // Issues
-        b = new BreadCrumbHolder();
-        b.setLabel("Issues");
-        b.setTag(Constants.Issue.ISSUES);
-        b.setData(data);
-        breadCrumbHolders[2] = b;
-
-        String milestone = getIntent().getStringExtra(Constants.Issue.ISSUE_MILESTONE_TITLE);
-        createBreadcrumb("Filtered by Milestone " + milestone, breadCrumbHolders);
-    }
-    
     /* (non-Javadoc)
      * @see com.gh4a.IssueListActivity#getSubTitleAfterLoaded(int)
      */

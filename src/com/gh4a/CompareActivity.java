@@ -16,7 +16,6 @@
 package com.gh4a;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,7 +26,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.gh4a.adapter.CompareAdapter;
-import com.gh4a.holder.BreadCrumbHolder;
 
 /**
  * The Compare activity.
@@ -60,8 +58,6 @@ public class CompareActivity extends BaseActivity implements OnItemClickListener
         mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
         mBase = getIntent().getExtras().getString(Constants.Repository.BASE);
         mHead = getIntent().getExtras().getString(Constants.Repository.HEAD);
-        
-        setBreadCrumb();
         
         fillData();
     }
@@ -111,35 +107,6 @@ public class CompareActivity extends BaseActivity implements OnItemClickListener
         compareAdapter.notifyDataSetChanged();
     }
 
-    /**
-     * Sets the bread crumb.
-     */
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[2];
-
-        // common data
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.User.USER_LOGIN, mUserLogin);
-        data.put(Constants.Repository.REPO_NAME, mRepoName);
-
-        // User
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(mUserLogin);
-        b.setTag(Constants.User.USER_LOGIN);
-        b.setData(data);
-        breadCrumbHolders[0] = b;
-
-        // Repo
-        b = new BreadCrumbHolder();
-        b.setLabel(mRepoName);
-        b.setTag(Constants.Repository.REPO_NAME);
-        b.setData(data);
-        breadCrumbHolders[1] = b;
-
-        //createBreadcrumb("Compare " + mBase.substring(0, 7) + "..." + mHead.substring(0, 7), breadCrumbHolders);
-        createBreadcrumb("Compare", breadCrumbHolders);
-    }
-    
     /* (non-Javadoc)
      * @see android.widget.AdapterView.OnItemClickListener#onItemClick(android.widget.AdapterView, android.view.View, int, long)
      */

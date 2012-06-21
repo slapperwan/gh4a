@@ -21,7 +21,6 @@ import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
@@ -47,7 +46,6 @@ import android.widget.TextView;
 
 import com.gh4a.adapter.CommonFeedAdapter;
 import com.gh4a.feeds.FeedHandler;
-import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.holder.Feed;
 
 public class WikiListActivity extends BaseActivity {
@@ -72,8 +70,6 @@ public class WikiListActivity extends BaseActivity {
         mRepoName = getIntent().getStringExtra(Constants.Repository.REPO_NAME);
         mWikiUrl = "https://github.com/" + mUserLogin + "/" + mRepoName + "/wiki.atom?page=";
         
-        setBreadCrumb();
-        
         mListView = (ListView) findViewById(R.id.list_view);
         //mListView.setOnScrollListener(new WikiScrollListener(this));
         CommonFeedAdapter adapter = new CommonFeedAdapter(this, new ArrayList<Feed>(), false, false);
@@ -95,31 +91,6 @@ public class WikiListActivity extends BaseActivity {
         new LoadWikiTask(this).execute("true");
     }
 
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[2];
-
-        // common data
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.User.USER_LOGIN, mUserLogin);
-        data.put(Constants.Repository.REPO_NAME, mRepoName);
-
-        // User
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(mUserLogin);
-        b.setTag(Constants.User.USER_LOGIN);
-        b.setData(data);
-        breadCrumbHolders[0] = b;
-
-        // Repo
-        b = new BreadCrumbHolder();
-        b.setLabel(mRepoName);
-        b.setTag(Constants.Repository.REPO_NAME);
-        b.setData(data);
-        breadCrumbHolders[1] = b;
-
-        createBreadcrumb(getResources().getString(R.string.recent_wiki), breadCrumbHolders);
-    }
-    
     private static class LoadWikiTask extends
             AsyncTask<String, Void, List<Feed>> {
 

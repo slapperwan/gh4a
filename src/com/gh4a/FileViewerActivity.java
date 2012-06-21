@@ -38,7 +38,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
 
-import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 
@@ -160,71 +159,7 @@ public class FileViewerActivity extends BaseActivity {
             }
         });
         
-        setBreadCrumb();
-
         new LoadContentTask(this).execute(true);
-    }
-
-    /**
-     * Sets the bread crumb.
-     */
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders;
-        if (!mPath.equals(mBranchName)) {
-            breadCrumbHolders = new BreadCrumbHolder[4];
-        }
-        else {
-            breadCrumbHolders = new BreadCrumbHolder[3];
-        }
-
-        // common data
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.User.USER_LOGIN, mUserLogin);
-        data.put(Constants.Repository.REPO_NAME, mRepoName);
-
-        // User
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(mUserLogin);
-        b.setTag(Constants.User.USER_LOGIN);
-        b.setData(data);
-        breadCrumbHolders[0] = b;
-
-        // Repo
-        b = new BreadCrumbHolder();
-        b.setLabel(mRepoName);
-        b.setTag(Constants.Repository.REPO_NAME);
-        b.setData(data);
-        breadCrumbHolders[1] = b;
-
-        // branches/tags
-        b = new BreadCrumbHolder();
-        if (R.id.btn_tags == mFromBtnId) {
-            b.setLabel(getResources().getString(R.string.repo_tag));
-            b.setTag(Constants.Object.TAGS);
-        }
-        else {
-            b.setTag(Constants.Object.BRANCHES);
-            b.setLabel(getResources().getString(R.string.repo_branch));
-        }
-        b.setData(data);
-        breadCrumbHolders[2] = b;
-
-        // branch name
-        if (!mPath.equals(mBranchName)) {
-            b = new BreadCrumbHolder();
-            b.setLabel(mBranchName);
-            b.setTag(Constants.Repository.REPO_BRANCH);
-            data.put(Constants.Object.TREE_SHA, mTreeSha);
-            data.put(Constants.Repository.REPO_BRANCH, mBranchName);
-            data.put(Constants.Object.PATH, mPath);
-            data.put(Constants.VIEW_ID, String.valueOf(mFromBtnId));
-            b.setData(data);
-            breadCrumbHolders[3] = b;
-        }
-        if (!mPath.equals("Tree")) {
-            mPath = mPath.replaceFirst("Tree/", "");
-        }
-        createBreadcrumb(mPath, breadCrumbHolders);
     }
 
     /**

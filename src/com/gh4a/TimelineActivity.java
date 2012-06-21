@@ -20,8 +20,6 @@ import java.util.List;
 import org.eclipse.egit.github.core.event.Event;
 import org.eclipse.egit.github.core.service.EventService;
 
-import com.gh4a.holder.BreadCrumbHolder;
-
 
 
 public class TimelineActivity extends UserFeedActivity {
@@ -32,15 +30,4 @@ public class TimelineActivity extends UserFeedActivity {
         return (List<Event>) eventService.pagePublicEvents().next();    
     }
 
-    @Override
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[1];
-
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(getResources().getString(R.string.explore));
-        b.setTag(Constants.EXPLORE);
-        breadCrumbHolders[0] = b;
-        
-        createBreadcrumb(getResources().getStringArray(R.array.explore_item)[0], breadCrumbHolders);
-    }
 }

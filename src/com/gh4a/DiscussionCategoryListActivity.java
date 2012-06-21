@@ -15,11 +15,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
 
 import com.gh4a.adapter.DiscussionCategoryAdapter;
-import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.StringUtils;
 
 public class DiscussionCategoryListActivity extends BaseActivity {
@@ -31,8 +30,6 @@ public class DiscussionCategoryListActivity extends BaseActivity {
         setContentView(R.layout.generic_list);
         setUpActionBar();
 
-        setBreadCrumb();
-
         try {
             fillData();
         }
@@ -40,17 +37,6 @@ public class DiscussionCategoryListActivity extends BaseActivity {
             Log.e(Constants.LOG_TAG, e.getMessage(), e);
             showError();
         }
-    }
-    
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[1];
-
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(getResources().getString(R.string.explore));
-        b.setTag(Constants.EXPLORE);
-        breadCrumbHolders[0] = b;
-        
-        createBreadcrumb(getResources().getStringArray(R.array.explore_item)[3], breadCrumbHolders);
     }
     
     private void fillData() throws IOException, JSONException {

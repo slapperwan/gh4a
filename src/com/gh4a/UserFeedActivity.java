@@ -18,7 +18,6 @@ package com.gh4a;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Commit;
@@ -53,7 +52,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.gh4a.adapter.FeedAdapter;
-import com.gh4a.holder.BreadCrumbHolder;
 
 /**
  * The User activity.
@@ -95,8 +93,6 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         mActionBarTitle = data.getString(Constants.ACTIONBAR_TITLE);
         mSubtitle = data.getString(Constants.SUBTITLE);
 
-        setBreadCrumb();
-
         mFeedAdapter = new FeedAdapter(this, new ArrayList<Event>());
         mListViewFeeds = (ListView) findViewById(R.id.list_view);
         mListViewFeeds.setAdapter(mFeedAdapter);
@@ -104,26 +100,6 @@ public abstract class UserFeedActivity extends BaseActivity implements OnItemCli
         mListViewFeeds.setOnItemClickListener(this);
 
         new LoadActivityListTask(this).execute();
-    }
-
-    /**
-     * Sets the bread crumb.
-     */
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[1];
-
-        // common data
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.User.USER_LOGIN, mUserLogin);
-
-        // User
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(mUserLogin);
-        b.setTag(Constants.User.USER_LOGIN);
-        b.setData(data);
-        breadCrumbHolders[0] = b;
-
-        createBreadcrumb(mSubtitle, breadCrumbHolders);
     }
 
     /**

@@ -24,7 +24,6 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -44,7 +43,6 @@ import android.widget.TextView;
 
 import com.gh4a.adapter.DiscussionCommentFeedAdapter;
 import com.gh4a.feeds.DiscussionHandler;
-import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.holder.Feed;
 
 public class DiscussionActivity extends BaseActivity {
@@ -69,8 +67,6 @@ public class DiscussionActivity extends BaseActivity {
         mFromTitle = getIntent().getStringExtra(Constants.Discussion.FROM_TITLE);
         mTitle = getIntent().getStringExtra(Constants.Discussion.TITLE);
         
-        setBreadCrumb();
-        
 //        mListView = (ListView) findViewById(R.id.list_view);
 //        CommonFeedAdapter adapter = new CommonFeedAdapter(this, new ArrayList<Feed>(), false, true);
 //        mListView.setAdapter(adapter);
@@ -88,32 +84,6 @@ public class DiscussionActivity extends BaseActivity {
         new LoadDiscussionsTask(this).execute("true");
     }
 
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[3];
-
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(getResources().getString(R.string.explore));
-        b.setTag(Constants.EXPLORE);
-        breadCrumbHolders[0] = b;
-        
-        b = new BreadCrumbHolder();
-        b.setLabel(getResources().getStringArray(R.array.explore_item)[3]);
-        b.setTag(Constants.Discussion.CATEGORY);
-        breadCrumbHolders[1] = b;
-        
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.Discussion.URL, mFromUrl);
-        data.put(Constants.Discussion.TITLE, mFromTitle);
-        
-        b = new BreadCrumbHolder();
-        b.setLabel(mFromTitle);
-        b.setTag(Constants.Discussion.DISCUSSIONS);
-        b.setData(data);
-        breadCrumbHolders[2] = b;
-        
-        createBreadcrumb(mTitle, breadCrumbHolders);
-    }
-    
     private static class LoadDiscussionsTask extends
             AsyncTask<String, Void, List<Feed>> {
 

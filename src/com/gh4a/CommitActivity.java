@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.CommitFile;
@@ -41,7 +40,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.ImageDownloader;
 
@@ -83,37 +81,7 @@ public class CommitActivity extends BaseActivity {
         mObjectSha = data.getString(Constants.Object.OBJECT_SHA);
         mTreeSha = data.getString(Constants.Object.TREE_SHA);
 
-        setBreadCrumb();
-
         new LoadCommitInfoTask(this).execute();
-    }
-
-    /**
-     * Sets the bread crumb.
-     */
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[2];
-
-        // common data
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.User.USER_LOGIN, mUserLogin);
-        data.put(Constants.Repository.REPO_NAME, mRepoName);
-
-        // User
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(mUserLogin);
-        b.setTag(Constants.User.USER_LOGIN);
-        b.setData(data);
-        breadCrumbHolders[0] = b;
-
-        // Repo
-        b = new BreadCrumbHolder();
-        b.setLabel(mRepoName);
-        b.setTag(Constants.Repository.REPO_NAME);
-        b.setData(data);
-        breadCrumbHolders[1] = b;
-
-        createBreadcrumb("Commit - " + mObjectSha.substring(0, 7), breadCrumbHolders);
     }
 
     /**

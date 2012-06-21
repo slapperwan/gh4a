@@ -68,9 +68,6 @@ public class Github4AndroidActivity extends BaseActivity {
         }
         setContentView(R.layout.main);
 
-        // setup title breadcrumb
-        createBreadcrumb("Login", null);
-        
         mEtUserLogin = (EditText) findViewById(R.id.et_username_main);
         mEtPassword = (EditText) findViewById(R.id.et_password_main);
 

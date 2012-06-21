@@ -44,7 +44,6 @@ import android.widget.TextView;
 
 import com.gh4a.adapter.CommonFeedAdapter;
 import com.gh4a.feeds.DiscussionHandler;
-import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.holder.Feed;
 
 public class DiscussionListActivity extends BaseActivity {
@@ -67,8 +66,6 @@ public class DiscussionListActivity extends BaseActivity {
         mUrl = getIntent().getStringExtra(Constants.Discussion.URL);
         mTitle = getIntent().getStringExtra(Constants.Discussion.TITLE);
         
-        setBreadCrumb();
-        
         mListView = (ListView) findViewById(R.id.list_view);
         mListView.setOnScrollListener(new DiscussionScrollListener(this));
         CommonFeedAdapter adapter = new CommonFeedAdapter(this, new ArrayList<Feed>(), false, true);
@@ -87,22 +84,6 @@ public class DiscussionListActivity extends BaseActivity {
         });
         
         new LoadDiscussionsTask(this).execute("true");
-    }
-
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[2];
-
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(getResources().getString(R.string.explore));
-        b.setTag(Constants.EXPLORE);
-        breadCrumbHolders[0] = b;
-        
-        b = new BreadCrumbHolder();
-        b.setLabel(getResources().getStringArray(R.array.explore_item)[3]);
-        b.setTag(Constants.Discussion.CATEGORY);
-        breadCrumbHolders[1] = b;
-        
-        createBreadcrumb(mTitle, breadCrumbHolders);
     }
     
     private static class LoadDiscussionsTask extends

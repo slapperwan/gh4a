@@ -18,15 +18,12 @@ package com.gh4a;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
-
-import com.gh4a.holder.BreadCrumbHolder;
 
 public class BlogActivity extends BaseActivity {
 
@@ -70,29 +67,11 @@ public class BlogActivity extends BaseActivity {
             }
         });
         
-        setBreadCrumb();
-
         mLoadingDialog = LoadingDialog.show(this, true, true);
         
         fillData();
     }
     
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[2];
-
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(getResources().getString(R.string.explore));
-        b.setTag(Constants.EXPLORE);
-        breadCrumbHolders[0] = b;
-        
-        b = new BreadCrumbHolder();
-        b.setLabel(getResources().getString(R.string.blog));
-        b.setTag(Constants.Blog.BLOG);
-        breadCrumbHolders[1] = b;
-        
-        createBreadcrumb(mTitle, breadCrumbHolders);
-    }
-
     private void fillData() {
         
         WebView webView = (WebView) findViewById(R.id.web_view);

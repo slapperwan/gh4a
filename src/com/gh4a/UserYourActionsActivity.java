@@ -17,7 +17,6 @@ package com.gh4a;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import android.os.AsyncTask;
@@ -29,7 +28,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.gh4a.adapter.YourActionsAdapter;
-import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.holder.YourActionFeed;
 import com.gh4a.utils.RssParser;
 
@@ -56,29 +54,7 @@ public class UserYourActionsActivity extends BaseActivity implements OnItemClick
         mUserLogin = getIntent().getExtras().getString(Constants.User.USER_LOGIN);
         mUrl = getIntent().getExtras().getString(Constants.Repository.REPO_URL);
         
-        setBreadCrumb();
-        
         new LoadActivityListTask(this).execute();
-    }
-    
-    /**
-     * Sets the bread crumb.
-     */
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[1];
-
-        // common data
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.User.USER_LOGIN, mUserLogin);
-
-        // User
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(mUserLogin);
-        b.setTag(Constants.User.USER_LOGIN);
-        b.setData(data);
-        breadCrumbHolders[0] = b;
-
-        createBreadcrumb(getResources().getString(R.string.user_private_activity), breadCrumbHolders);
     }
     
     private static class LoadActivityListTask extends AsyncTask<Void, Integer, List<YourActionFeed>> {

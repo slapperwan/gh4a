@@ -15,8 +15,6 @@
  */
 package com.gh4a;
 
-import java.util.HashMap;
-
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,8 +24,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
-
-import com.gh4a.holder.BreadCrumbHolder;
 
 public class WikiActivity extends BaseActivity {
 
@@ -75,44 +71,11 @@ public class WikiActivity extends BaseActivity {
             }
         });
         
-        setBreadCrumb();
-
         mLoadingDialog = LoadingDialog.show(this, true, true);
         
         fillData();
     }
     
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[3];
-
-        // common data
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.User.USER_LOGIN, mUserLogin);
-        data.put(Constants.Repository.REPO_NAME, mRepoName);
-
-        // User
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(mUserLogin);
-        b.setTag(Constants.User.USER_LOGIN);
-        b.setData(data);
-        breadCrumbHolders[0] = b;
-
-        // Repo
-        b = new BreadCrumbHolder();
-        b.setLabel(mRepoName);
-        b.setTag(Constants.Repository.REPO_NAME);
-        b.setData(data);
-        breadCrumbHolders[1] = b;
-
-        b = new BreadCrumbHolder();
-        b.setLabel(getResources().getString(R.string.recent_wiki));
-        b.setTag(Constants.Wiki.WIKI);
-        b.setData(data);
-        breadCrumbHolders[2] = b;
-        
-        createBreadcrumb(mTitle, breadCrumbHolders);
-    }
-
     private void fillData() {
         
         WebView webView = (WebView) findViewById(R.id.web_view);

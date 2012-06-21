@@ -25,7 +25,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
 
-import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.StringUtils;
 
 public class JobActivity extends BaseActivity {
@@ -89,29 +88,11 @@ public class JobActivity extends BaseActivity {
             tvViewInBrowser.setVisibility(View.GONE);
         }
         
-        setBreadCrumb();
-
         mLoadingDialog = LoadingDialog.show(this, true, true);
         
         fillData();
     }
     
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[2];
-
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(getResources().getString(R.string.explore));
-        b.setTag(Constants.EXPLORE);
-        breadCrumbHolders[0] = b;
-        
-        b = new BreadCrumbHolder();
-        b.setLabel(getResources().getString(R.string.jobs));
-        b.setTag(Constants.Job.JOB);
-        breadCrumbHolders[1] = b;
-        
-        createBreadcrumb(mTitle, breadCrumbHolders);
-    }
-
     private void fillData() {
         
         WebView webView = (WebView) findViewById(R.id.web_view);

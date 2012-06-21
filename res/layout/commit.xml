@@ -1,91 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res/com.gh4a"
+    android:id="@+id/main_content"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical">
-    <include
-        layout="@layout/breadcrumb"
-        android:id="@+id/breadcrumb" />
-    <ScrollView
-        android:id="@+id/main_content"
+    android:layout_margin="0dp"
+    android:padding="0dp">
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_margin="0dp"
-        android:padding="0dp">
-        <LinearLayout
+        android:layout_height="fill_parent">
+        <RelativeLayout
+            android:id="@+id/ll"
             android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
-            <RelativeLayout
-                android:id="@+id/ll"
-                android:orientation="vertical"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:background="?attr/comment_box">
-                <ImageView
-                    android:id="@+id/iv_gravatar"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginTop="5dp" />
-                <TextView
-                    android:id="@+id/tv_extra"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/default_text_micro"
-                    android:layout_toRightOf="@id/iv_gravatar" />
-                <TextView
-                    android:id="@+id/tv_message"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:layout_toRightOf="@id/iv_gravatar"
-                    android:layout_below="@id/tv_extra" />
-            </RelativeLayout>
+            android:layout_height="wrap_content"
+            android:background="?attr/comment_box">
+            <ImageView
+                android:id="@+id/iv_gravatar"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="5dp" />
             <TextView
-                android:id="@+id/tv_desc"
-                android:layout_width="fill_parent"
+                android:id="@+id/tv_extra"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall" 
-                android:padding="7dp"/>
-            <LinearLayout
-                android:id="@+id/ll_changed"
-                android:layout_margin="10dp"
-                android:orientation="vertical"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/commit_changed" />
-            </LinearLayout>
-            <LinearLayout
-                android:id="@+id/ll_added"
-                android:layout_margin="10dp"
-                android:orientation="vertical"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/commit_added" />
-            </LinearLayout>
-            <LinearLayout
-                android:id="@+id/ll_deleted"
-                android:layout_margin="10dp"
-                android:orientation="vertical"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:text="@string/commit_deleted" />
-            </LinearLayout>
+                android:textAppearance="@style/default_text_micro"
+                android:layout_toRightOf="@id/iv_gravatar" />
+            <TextView
+                android:id="@+id/tv_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_toRightOf="@id/iv_gravatar"
+                android:layout_below="@id/tv_extra" />
+        </RelativeLayout>
+        <TextView
+            android:id="@+id/tv_desc"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall" 
+            android:padding="7dp"/>
+        <LinearLayout
+            android:id="@+id/ll_changed"
+            android:layout_margin="10dp"
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/commit_changed" />
         </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+        <LinearLayout
+            android:id="@+id/ll_added"
+            android:layout_margin="10dp"
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/commit_added" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/ll_deleted"
+            android:layout_margin="10dp"
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/commit_deleted" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

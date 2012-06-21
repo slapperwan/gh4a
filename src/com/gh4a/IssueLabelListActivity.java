@@ -46,7 +46,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.adapter.SimpleStringAdapter;
-import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.StringUtils;
 
 /**
@@ -78,44 +77,7 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
         mUserLogin = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
 
-        setBreadCrumb();
-        
         new LoadIssueLabelsTask(this).execute();
-    }
-    
-    /**
-     * Sets the bread crumb.
-     */
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[3];
-
-        // common data
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.User.USER_LOGIN, mUserLogin);
-        data.put(Constants.Repository.REPO_NAME, mRepoName);
-
-        // User
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(mUserLogin);
-        b.setTag(Constants.User.USER_LOGIN);
-        b.setData(data);
-        breadCrumbHolders[0] = b;
-
-        // Repo
-        b = new BreadCrumbHolder();
-        b.setLabel(mRepoName);
-        b.setTag(Constants.Repository.REPO_NAME);
-        b.setData(data);
-        breadCrumbHolders[1] = b;
-
-        // Issues
-        b = new BreadCrumbHolder();
-        b.setLabel("Issues");
-        b.setTag(Constants.Issue.ISSUES);
-        b.setData(data);
-        breadCrumbHolders[2] = b;
-        
-        createBreadcrumb("Labels", breadCrumbHolders);
     }
     
     /**

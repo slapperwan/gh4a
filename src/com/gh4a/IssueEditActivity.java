@@ -18,7 +18,6 @@ package com.gh4a;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Issue;
@@ -49,7 +48,6 @@ import android.widget.Spinner;
 
 import com.gh4a.adapter.AssigneeSimpleAdapter;
 import com.gh4a.adapter.MilestoneSimpleAdapter;
-import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.StringUtils;
 
 /**
@@ -108,54 +106,9 @@ public class IssueEditActivity extends BaseActivity implements OnClickListener, 
         mTitle = getIntent().getExtras().getString(Constants.Issue.ISSUE_TITLE);
         mBody = getIntent().getExtras().getString(Constants.Issue.ISSUE_BODY);
 
-        setBreadCrumb();
-        
         new LoadIssueTask(this).execute();
     }
     
-    /**
-     * Sets the bread crumb.
-     */
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[4];
-
-        // common data
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.User.USER_LOGIN, mUserLogin);
-        data.put(Constants.Repository.REPO_NAME, mRepoName);
-
-        // User
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(mUserLogin);
-        b.setTag(Constants.User.USER_LOGIN);
-        b.setData(data);
-        breadCrumbHolders[0] = b;
-
-        // Repo
-        b = new BreadCrumbHolder();
-        b.setLabel(mRepoName);
-        b.setTag(Constants.Repository.REPO_NAME);
-        b.setData(data);
-        breadCrumbHolders[1] = b;
-
-        // Issues
-        b = new BreadCrumbHolder();
-        b.setLabel("Issues");
-        b.setTag(Constants.Issue.ISSUES);
-        b.setData(data);
-        breadCrumbHolders[2] = b;
-        
-        // Issue
-        b = new BreadCrumbHolder();
-        b.setLabel("Issue #" + mIssueNumber);
-        b.setTag(Constants.Issue.ISSUE);
-        data.put(Constants.Issue.ISSUE_NUMBER, String.valueOf(mIssueNumber));
-        b.setData(data);
-        breadCrumbHolders[3] = b;
-
-        createBreadcrumb("Edit Issue #" + mIssueNumber, breadCrumbHolders);
-    }
-
     /* (non-Javadoc)
      * @see android.view.View.OnClickListener#onClick(android.view.View)
      */

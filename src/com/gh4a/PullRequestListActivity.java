@@ -18,7 +18,6 @@ package com.gh4a;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.PullRequest;
@@ -39,7 +38,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.adapter.PullRequestAdapter;
-import com.gh4a.holder.BreadCrumbHolder;
 
 /**
  * The PullRequestList activity.
@@ -81,40 +79,10 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
         mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
         mState = getIntent().getExtras().getString(Constants.PullRequest.STATE);
 
-        setBreadCrumb();
-
         mPullRequestAdapter = new PullRequestAdapter(this, new ArrayList<PullRequest>());
         listView.setAdapter(mPullRequestAdapter);
 
         new LoadPullRequestListTask(this, true).execute();
-    }
-
-    /**
-     * Sets the bread crumb.
-     */
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[2];
-
-        // common data
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.User.USER_LOGIN, mUserLogin);
-        data.put(Constants.Repository.REPO_NAME, mRepoName);
-
-        // User
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(mUserLogin);
-        b.setTag(Constants.User.USER_LOGIN);
-        b.setData(data);
-        breadCrumbHolders[0] = b;
-
-        // Repo
-        b = new BreadCrumbHolder();
-        b.setLabel(mRepoName);
-        b.setTag(Constants.Repository.REPO_NAME);
-        b.setData(data);
-        breadCrumbHolders[1] = b;
-
-        createBreadcrumb(mState + " Pull Requests", breadCrumbHolders);
     }
 
     /* (non-Javadoc)
@@ -233,10 +201,8 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
                 mPullRequestAdapter.add(pullRequest);
             }
             mPullRequestAdapter.notifyDataSetChanged();
-            ((TextView) findViewById(R.id.tv_subtitle)).setText(mState + " Pull Requests (" + pullRequests.size() + ")");
         }
         else {
-            ((TextView) findViewById(R.id.tv_subtitle)).setText(mState + " Pull Requests");
             getApplicationContext().notFoundMessage(this, "Pull Requests");
         }
     }

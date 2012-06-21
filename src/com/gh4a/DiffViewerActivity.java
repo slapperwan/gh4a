@@ -15,8 +15,6 @@
  */
 package com.gh4a;
 
-import java.util.HashMap;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -25,8 +23,6 @@ import android.view.View.OnClickListener;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.TextView;
-
-import com.gh4a.holder.BreadCrumbHolder;
 
 /**
  * The DiffViewer activity.
@@ -71,8 +67,6 @@ public class DiffViewerActivity extends BaseActivity {
         mDiff = data.getString(Constants.Commit.DIFF);
         mFilePath = data.getString(Constants.Object.PATH);
 
-        setBreadCrumb();
-        
         TextView tvViewFile = (TextView) findViewById(R.id.tv_view);
         tvViewFile.setVisibility(View.GONE);
         tvViewFile.setText(getResources().getString(R.string.object_view_file_at, mSha.substring(0, 7)));
@@ -111,42 +105,6 @@ public class DiffViewerActivity extends BaseActivity {
         s.setSupportZoom(true);
         s.setUseWideViewPort(true);
         diffView.loadDataWithBaseURL("file:///android_asset/", formatted, "text/html", "utf-8", "");
-    }
-
-    /**
-     * Sets the bread crumb.
-     */
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[3];
-
-        // common data
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.User.USER_LOGIN, mUserLogin);
-        data.put(Constants.Repository.REPO_NAME, mRepoName);
-
-        // User
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(mUserLogin);
-        b.setTag(Constants.User.USER_LOGIN);
-        b.setData(data);
-        breadCrumbHolders[0] = b;
-
-        // Repo
-        b = new BreadCrumbHolder();
-        b.setLabel(mRepoName);
-        b.setTag(Constants.Repository.REPO_NAME);
-        b.setData(data);
-        breadCrumbHolders[1] = b;
-
-        // Commit
-        b = new BreadCrumbHolder();
-        b.setLabel(String.format(getResources().getString(R.string.commit_sha, mSha.substring(0, 7))));
-        b.setTag(Constants.Commit.COMMIT);
-        data.put(Constants.Object.OBJECT_SHA, mSha);
-        b.setData(data);
-        breadCrumbHolders[2] = b;
-
-        createBreadcrumb(mFilePath, breadCrumbHolders);
     }
 
     /**

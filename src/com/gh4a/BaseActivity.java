@@ -15,8 +15,6 @@
  */
 package com.gh4a;
 
-import java.lang.ref.WeakReference;
-import java.util.HashMap;
 import java.util.Locale;
 
 import org.ocpsoft.pretty.time.PrettyTime;
@@ -31,14 +29,10 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.text.SpannableString;
-import android.text.style.UnderlineSpan;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -46,7 +40,6 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.gh4a.holder.BreadCrumbHolder;
 
 /**
  * The Base activity.
@@ -259,38 +252,6 @@ public class BaseActivity extends SherlockActivity {
     }
     
     /**
-     * Creates the breadcrumb.
-     *
-     * @param subTitle the sub title
-     * @param breadCrumbHolders the bread crumb holders
-     */
-    public void createBreadcrumb(String subTitle, BreadCrumbHolder... breadCrumbHolders) {
-        if (breadCrumbHolders != null) {
-            LinearLayout llPart = (LinearLayout) this.findViewById(R.id.ll_part);
-            for (int i = 0; i < breadCrumbHolders.length; i++) {
-                TextView tvBreadCrumb = new TextView(getApplication());
-                SpannableString part = new SpannableString(breadCrumbHolders[i].getLabel());
-                part.setSpan(new UnderlineSpan(), 0, part.length(), 0);
-                tvBreadCrumb.append(part);
-                tvBreadCrumb.setTag(breadCrumbHolders[i]);
-                tvBreadCrumb.setBackgroundResource(R.drawable.default_link);
-                tvBreadCrumb.setTextAppearance(getApplication(), R.style.default_text_small);
-                tvBreadCrumb.setSingleLine(true);
-                tvBreadCrumb.setOnClickListener(new OnClickBreadCrumb(this));
-    
-                llPart.addView(tvBreadCrumb);
-    
-                if (i < breadCrumbHolders.length - 1) {
-                    TextView slash = new TextView(getApplication());
-                    slash.setText(" / ");
-                    slash.setTextAppearance(getApplication(), R.style.default_text_small);
-                    llPart.addView(slash);
-                }
-            }
-        }
-    }
-
-    /**
      * Sets the up action bar.
      */
     public void setUpActionBar() {
@@ -400,135 +361,6 @@ public class BaseActivity extends SherlockActivity {
 //        }
 //    }
     
-    /**
-     * The Class OnClickBreadCrumb.
-     */
-    private static class OnClickBreadCrumb implements OnClickListener {
-
-        /** The target. */
-        private WeakReference<BaseActivity> mTarget;
-
-        /**
-         * Instantiates a new on click bread crumb.
-         *
-         * @param activity the activity
-         */
-        public OnClickBreadCrumb(BaseActivity activity) {
-            mTarget = new WeakReference<BaseActivity>(activity);
-        }
-
-        /* (non-Javadoc)
-         * @see android.view.View.OnClickListener#onClick(android.view.View)
-         */
-        @Override
-        public void onClick(View view) {
-            TextView breadCrumb = (TextView) view;
-            BreadCrumbHolder b = (BreadCrumbHolder) breadCrumb.getTag();
-            String tag = b.getTag();
-            HashMap<String, String> data = b.getData();
-
-            BaseActivity baseActivity = mTarget.get();
-
-            if (Constants.User.USER_LOGIN.equals(tag)) {
-                mTarget.get().getApplicationContext().openUserInfoActivity(baseActivity,
-                        data.get(Constants.User.USER_LOGIN), null);
-            }
-            else if (Constants.Repository.REPO_NAME.equals(tag)) {
-                mTarget.get().getApplicationContext().openRepositoryInfoActivity(baseActivity,
-                        data.get(Constants.User.USER_LOGIN),
-                        data.get(Constants.Repository.REPO_NAME));
-            }
-            else if (Constants.Issue.ISSUES.equals(tag)) {
-                mTarget.get().getApplicationContext().openIssueListActivity(baseActivity,
-                        data.get(Constants.User.USER_LOGIN),
-                        data.get(Constants.Repository.REPO_NAME), Constants.Issue.ISSUE_STATE_OPEN);
-            }
-            else if (Constants.Issue.ISSUE.equals(tag)) {
-                mTarget.get().getApplicationContext().openIssueActivity(baseActivity,
-                        data.get(Constants.User.USER_LOGIN),
-                        data.get(Constants.Repository.REPO_NAME),
-                        Integer.parseInt(data.get(Constants.Issue.ISSUE_NUMBER)));
-            }
-            else if (Constants.Commit.COMMITS.equals(tag)) {
-                mTarget.get().getApplicationContext().openBranchListActivity(baseActivity,
-                        data.get(Constants.User.USER_LOGIN),
-                        data.get(Constants.Repository.REPO_NAME), R.id.btn_commits);
-            }
-            else if (Constants.PullRequest.PULL_REQUESTS.equals(tag)) {
-                mTarget.get().getApplicationContext().openPullRequestListActivity(baseActivity,
-                        data.get(Constants.User.USER_LOGIN),
-                        data.get(Constants.Repository.REPO_NAME),
-                        Constants.Issue.ISSUE_STATE_OPEN);
-            }
-            else if (Constants.Object.TREE.equals(tag)) {
-                mTarget.get().getApplicationContext().openBranchListActivity(baseActivity,
-                        data.get(Constants.User.USER_LOGIN),
-                        data.get(Constants.Repository.REPO_NAME), R.id.btn_branches);
-            }
-            else if (Constants.Commit.COMMIT.equals(tag)) {
-                mTarget.get().getApplicationContext().openCommitInfoActivity(baseActivity,
-                        data.get(Constants.User.USER_LOGIN),
-                        data.get(Constants.Repository.REPO_NAME),
-                        data.get(Constants.Object.OBJECT_SHA));
-            }
-            else if (Constants.Repository.REPO_BRANCH.equals(tag)) {
-                Intent intent = new Intent().setClass(mTarget.get(), FileManagerActivity.class);
-                if (mTarget.get() instanceof CommitListActivity) {
-                    intent = new Intent().setClass(mTarget.get(), CommitListActivity.class);
-                }
-                intent.putExtra(Constants.Repository.REPO_OWNER, data
-                        .get(Constants.User.USER_LOGIN));
-                intent.putExtra(Constants.Repository.REPO_NAME, data
-                        .get(Constants.Repository.REPO_NAME));
-                intent.putExtra(Constants.Object.TREE_SHA, data.get(Constants.Object.TREE_SHA));
-                intent.putExtra(Constants.Object.OBJECT_SHA, data.get(Constants.Object.TREE_SHA));
-                intent.putExtra(Constants.Object.PATH, "Tree");
-                intent.putExtra(Constants.Repository.REPO_BRANCH, data
-                        .get(Constants.Repository.REPO_BRANCH));
-                intent.putExtra(Constants.VIEW_ID, Integer.parseInt(data.get(Constants.VIEW_ID)));
-                mTarget.get().startActivity(intent);
-            }
-            else if (Constants.Object.BRANCHES.equals(tag)) {
-                mTarget.get().getApplicationContext().openBranchListActivity(mTarget.get(),
-                        data.get(Constants.User.USER_LOGIN),
-                        data.get(Constants.Repository.REPO_NAME), R.id.btn_branches);
-            }
-            else if (Constants.Object.TAGS.equals(tag)) {
-                mTarget.get().getApplicationContext().openTagListActivity(mTarget.get(),
-                        data.get(Constants.User.USER_LOGIN),
-                        data.get(Constants.Repository.REPO_NAME), R.id.btn_branches);
-            }
-            else if (Constants.EXPLORE.equals(tag)) {
-                Intent intent = new Intent().setClass(mTarget.get(), ExploreActivity.class);
-                mTarget.get().startActivity(intent);
-            }
-            else if (Constants.Blog.BLOG.equals(tag)) {
-                Intent intent = new Intent().setClass(mTarget.get(), BlogListActivity.class);
-                mTarget.get().startActivity(intent);
-            }
-            else if (Constants.Wiki.WIKI.equals(tag)) {
-                Intent intent = new Intent().setClass(mTarget.get(), WikiListActivity.class);
-                intent.putExtra(Constants.Repository.REPO_OWNER, data.get(Constants.User.USER_LOGIN));
-                intent.putExtra(Constants.Repository.REPO_NAME, data.get(Constants.Repository.REPO_NAME));
-                mTarget.get().startActivity(intent);
-            }
-            else if (Constants.Discussion.CATEGORY.equals(tag)) {
-                Intent intent = new Intent().setClass(mTarget.get(), DiscussionCategoryListActivity.class);
-                mTarget.get().startActivity(intent);
-            }
-            else if (Constants.Discussion.DISCUSSIONS.equals(tag)) {
-                Intent intent = new Intent().setClass(mTarget.get(), DiscussionListActivity.class);
-                intent.putExtra(Constants.Discussion.URL, data.get(Constants.Discussion.URL));
-                intent.putExtra(Constants.Discussion.TITLE, data.get(Constants.Discussion.TITLE));
-                mTarget.get().startActivity(intent);
-            }
-            else if (Constants.Job.JOB.equals(tag)) {
-                Intent intent = new Intent().setClass(mTarget.get(), JobListActivity.class);
-                mTarget.get().startActivity(intent);
-            }
-        }
-    };
-
     /**
      * Show error.
      */

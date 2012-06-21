@@ -5,9 +5,6 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical">
-    <include
-        layout="@layout/breadcrumb"
-        android:id="@+id/breadcrumb" />
     <FrameLayout
         android:id="@id/main_content"
         android:layout_height="match_parent"

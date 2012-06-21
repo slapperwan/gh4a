@@ -1,36 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res/com.gh4a"
+    android:id="@+id/main_content"
+    android:layout_height="match_parent"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical">
-    <include
-        layout="@layout/breadcrumb"
-        android:id="@+id/breadcrumb" />
-    <FrameLayout
-        android:id="@+id/main_content"
-        android:layout_height="match_parent"
-        android:layout_width="fill_parent"
-        android:orientation="vertical"
-        android:layout_weight="1">
-        <ListView
-            android:id="@+id/lv_comments"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:padding="0dp">
-        </ListView>
-    </FrameLayout>
-    <!-- EditText
-        android:id="@+id/et_comment_field"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:lines="3"
-        android:gravity="top" />
-    <Button
-        android:id="@+id/btn_add_comment"
+    android:orientation="vertical"
+    android:layout_weight="1">
+    <ListView
+        android:id="@+id/lv_comments"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Comment"
-        android:visibility="gone" /-->
-</LinearLayout>
+        android:layout_height="fill_parent"
+        android:padding="0dp">
+    </ListView>
+</FrameLayout>

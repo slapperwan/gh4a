@@ -10,10 +10,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import com.gh4a.adapter.BookmarkAdapter;
 import com.gh4a.db.Bookmark;
@@ -32,7 +32,6 @@ public class BookmarkListActivity extends BaseActivity {
 
         setContentView(R.layout.generic_list);
         setUpActionBar();
-        createBreadcrumb(getResources().getString(R.string.bookmarks), null);
         
         mName = getIntent().getStringExtra(Constants.Bookmark.NAME);
         mObjectType = getIntent().getStringExtra(Constants.Bookmark.OBJECT_TYPE);

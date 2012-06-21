@@ -43,7 +43,6 @@ import com.gh4a.adapter.IssueAdapter;
 import com.gh4a.db.Bookmark;
 import com.gh4a.db.BookmarkParam;
 import com.gh4a.db.DbHelper;
-import com.gh4a.holder.BreadCrumbHolder;
 
 /**
  * The IssueList activity.
@@ -88,7 +87,6 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
         setContentView(R.layout.generic_list);
         setUpActionBar();
         setRequestData();
-        setBreadCrumb();
         setRowLayout();
 
         mListViewIssues = (ListView) findViewById(R.id.list_view);
@@ -107,34 +105,6 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
      */
     @Override
     public void setUpActionBar() {
-    }
-
-    /**
-     * Sets the bread crumb.
-     */
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[2];
-
-        // common data
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.User.USER_LOGIN, mUserLogin);
-        data.put(Constants.Repository.REPO_NAME, mRepoName);
-
-        // User
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(mUserLogin);
-        b.setTag(Constants.User.USER_LOGIN);
-        b.setData(data);
-        breadCrumbHolders[0] = b;
-
-        // Repo
-        b = new BreadCrumbHolder();
-        b.setLabel(mRepoName);
-        b.setTag(Constants.Repository.REPO_NAME);
-        b.setData(data);
-        breadCrumbHolders[1] = b;
-
-        createBreadcrumb(mState + " Issues", breadCrumbHolders);
     }
 
     public String getSubTitleAfterLoaded(int numberOfIssues) {
@@ -255,11 +225,9 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
             for (Issue issue : issues) {
                 mIssueAdapter.add(issue);
             }
-            ((TextView) findViewById(R.id.tv_subtitle)).setText(getSubTitleAfterLoaded(issues.size()));
             mIssueAdapter.notifyDataSetChanged();
         }
         else {
-            ((TextView) findViewById(R.id.tv_subtitle)).setText(getSubTitleAfterLoaded(-1));
             getApplicationContext().notFoundMessage(this, R.plurals.issue);
         }
     }

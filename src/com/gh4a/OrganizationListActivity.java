@@ -3,7 +3,6 @@ package com.gh4a;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.User;
@@ -20,7 +19,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.gh4a.adapter.SimpleStringAdapter;
-import com.gh4a.holder.BreadCrumbHolder;
 
 public class OrganizationListActivity extends BaseActivity {
 
@@ -36,21 +34,6 @@ public class OrganizationListActivity extends BaseActivity {
 
         setUpActionBar();
         mUserLogin = getIntent().getStringExtra(Constants.User.USER_LOGIN);
-        
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[1];
-
-        // common data
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.User.USER_LOGIN, mUserLogin);
-
-        // User
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(mUserLogin);
-        b.setTag(Constants.User.USER_LOGIN);
-        b.setData(data);
-        breadCrumbHolders[0] = b;
-
-        createBreadcrumb(getResources().getString(R.string.user_organizations), breadCrumbHolders);
         
         ListView mListView = (ListView) findViewById(R.id.list_view);
         mListView.setOnItemClickListener(new OnItemClickListener() {

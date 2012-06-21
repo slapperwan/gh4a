@@ -18,7 +18,6 @@ package com.gh4a;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Gist;
@@ -34,7 +33,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.gh4a.adapter.GistAdapter;
-import com.gh4a.holder.BreadCrumbHolder;
 
 /**
  * The GistList activity.
@@ -59,29 +57,7 @@ public class GistListActivity extends BaseActivity implements OnItemClickListene
         
         mUserLogin = getIntent().getExtras().getString(Constants.User.USER_LOGIN);
         
-        setBreadCrumb();
-        
         new LoadGistTask(this).execute(mUserLogin);
-    }
-    
-    /**
-     * Sets the bread crumb.
-     */
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[1];
-
-        // common data
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.User.USER_LOGIN, mUserLogin);
-
-        // User
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(mUserLogin);
-        b.setTag(Constants.User.USER_LOGIN);
-        b.setData(data);
-        breadCrumbHolders[0] = b;
-
-        createBreadcrumb(getResources().getString(R.string.gist_public), breadCrumbHolders);
     }
     
     /**

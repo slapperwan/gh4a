@@ -16,14 +16,11 @@
 package com.gh4a;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.OrganizationService;
-
-import com.gh4a.holder.BreadCrumbHolder;
 
 public class OrganizationMemberListActivity extends UserListActivity {
 
@@ -66,27 +63,6 @@ public class OrganizationMemberListActivity extends UserListActivity {
     @Override
     protected void setRowLayout() {
         mRowLayout = R.layout.row_gravatar_2;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.UserListActivity#setBreadCrumbs()
-     */
-    protected void setBreadCrumbs() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[1];
-
-        // common data
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.User.USER_LOGIN, mUserLogin);
-
-        // User
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(mUserLogin);
-        b.setTag(Constants.User.USER_LOGIN);
-        b.setData(data);
-        breadCrumbHolders[0] = b;
-
-        createBreadcrumb(mSubtitle, breadCrumbHolders);
     }
 
     /*

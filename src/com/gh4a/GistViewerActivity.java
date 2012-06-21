@@ -17,7 +17,6 @@ package com.gh4a;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
 
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.GistService;
@@ -35,7 +34,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
 
-import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 
@@ -107,29 +105,7 @@ public class GistViewerActivity extends BaseActivity {
             }
         });
         
-        setBreadCrumb();
-        
         new LoadGistTask(this, true).execute(mGistId, mFilename);
-    }
-    
-    /**
-     * Sets the bread crumb.
-     */
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[1];
-
-        // common data
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.User.USER_LOGIN, mUserLogin);
-
-        // User
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(mUserLogin);
-        b.setTag(Constants.User.USER_LOGIN);
-        b.setData(data);
-        breadCrumbHolders[0] = b;
-
-        createBreadcrumb(getResources().getString(R.string.gist_filename, mFilename), breadCrumbHolders);
     }
     
     /**

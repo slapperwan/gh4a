@@ -16,15 +16,12 @@
 package com.gh4a;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CollaboratorService;
-
-import com.gh4a.holder.BreadCrumbHolder;
 
 /**
  * The CollaboratorList activity.
@@ -71,35 +68,6 @@ public class CollaboratorListActivity extends UserListActivity {
     @Override
     protected void setRowLayout() {
         mRowLayout = R.layout.row_simple;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.UserListActivity#setBreadCrumbs()
-     */
-    protected void setBreadCrumbs() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[2];
-
-        // common data
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.User.USER_LOGIN, mUserLogin);
-        data.put(Constants.Repository.REPO_NAME, mRepoName);
-
-        // User
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(mUserLogin);
-        b.setTag(Constants.User.USER_LOGIN);
-        b.setData(data);
-        breadCrumbHolders[0] = b;
-
-        // Repo
-        b = new BreadCrumbHolder();
-        b.setLabel(mRepoName);
-        b.setTag(Constants.Repository.REPO_NAME);
-        b.setData(data);
-        breadCrumbHolders[1] = b;
-
-        createBreadcrumb(mSubtitle, breadCrumbHolders);
     }
 
     /*

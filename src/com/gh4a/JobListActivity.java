@@ -15,29 +15,6 @@
  */
 package com.gh4a;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
-
-import android.content.Intent;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.TextView;
-
-import com.gh4a.Constants.Job;
-import com.gh4a.adapter.JobAdapter;
-import com.gh4a.holder.BreadCrumbHolder;
 
 public class JobListActivity extends BaseActivity {
     

@@ -228,6 +228,7 @@
     <!-- Pull Request -->
     <string name="pull_request_title">Pull Request</string>
     <string name="pull_request_comments">Discussion</string>
+    <string name="pull_requests">Pull Requests</string>
     
     <!-- Object -->
     <string name="object_tree">Tree</string>

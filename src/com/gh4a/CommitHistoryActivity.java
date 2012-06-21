@@ -3,10 +3,8 @@ package com.gh4a;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
@@ -22,7 +20,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.gh4a.adapter.CommitAdapter;
-import com.gh4a.holder.BreadCrumbHolder;
 
 public class CommitHistoryActivity extends BaseActivity implements OnItemClickListener {
 
@@ -51,34 +48,7 @@ public class CommitHistoryActivity extends BaseActivity implements OnItemClickLi
         mFilePath = getIntent().getExtras().getString(Constants.Object.PATH);
         mObjectSha = getIntent().getExtras().getString(Constants.Object.OBJECT_SHA);
         
-        setBreadCrumb();
-        
         new LoadCommitListTask(this).execute();
-    }
-    
-    protected void setBreadCrumb() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[2];
-
-        // common data
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.User.USER_LOGIN, mUserLogin);
-        data.put(Constants.Repository.REPO_NAME, mRepoName);
-
-        // User
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(mUserLogin);
-        b.setTag(Constants.User.USER_LOGIN);
-        b.setData(data);
-        breadCrumbHolders[0] = b;
-
-        // Repo
-        b = new BreadCrumbHolder();
-        b.setLabel(mRepoName);
-        b.setTag(Constants.Repository.REPO_NAME);
-        b.setData(data);
-        breadCrumbHolders[1] = b;
-
-        createBreadcrumb("History - " + mFilePath, breadCrumbHolders);
     }
     
     private static class LoadCommitListTask extends AsyncTask<String, Integer, List<RepositoryCommit>> {

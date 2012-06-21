@@ -16,7 +16,6 @@
 package com.gh4a;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Repository;
@@ -26,7 +25,6 @@ import org.eclipse.egit.github.core.service.WatcherService;
 import android.os.Bundle;
 import android.widget.AbsListView;
 
-import com.gh4a.holder.BreadCrumbHolder;
 import com.gh4a.utils.StringUtils;
 
 /**
@@ -90,24 +88,4 @@ public class WatchedRepoListActivity extends RepositoryListActivity {
         mReload = false;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.RepositoryListActivity#setBreadCrumbs()
-     */
-    protected void setBreadCrumbs() {
-        BreadCrumbHolder[] breadCrumbHolders = new BreadCrumbHolder[1];
-
-        // common data
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put(Constants.User.USER_LOGIN, mUserLogin);
-
-        // User
-        BreadCrumbHolder b = new BreadCrumbHolder();
-        b.setLabel(mUserLogin);
-        b.setTag(Constants.User.USER_LOGIN);
-        b.setData(data);
-        breadCrumbHolders[0] = b;
-
-        createBreadcrumb(mSubtitle, breadCrumbHolders);
-    }
 }
