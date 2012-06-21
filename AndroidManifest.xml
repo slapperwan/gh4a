@@ -192,6 +192,9 @@
         <activity
             android:name=".UserNewActivity"
             android:configChanges="orientation" />
+        <activity
+            android:name=".RepositoryNewActivity"
+            android:configChanges="orientation" />
         <activity android:name="BrowseFilter">
             <intent-filter>
                 <action

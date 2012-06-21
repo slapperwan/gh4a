@@ -239,7 +239,7 @@ public class Gh4Application extends Application {
      * @param flags the flags
      */
     public void openUserInfoActivity(Context context, String login, String name, int flags) {
-        Intent intent = new Intent().setClass(context, UserActivity.class);
+        Intent intent = new Intent().setClass(context, UserNewActivity.class);
         intent.putExtra(Constants.User.USER_LOGIN, login);
         intent.putExtra(Constants.User.USER_NAME, name);
         intent.setFlags(flags);

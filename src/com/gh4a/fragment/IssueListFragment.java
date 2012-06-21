@@ -32,10 +32,6 @@ import android.widget.ListView;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.gh4a.Constants;
 import com.gh4a.R;
-import com.gh4a.Constants.Repository;
-import com.gh4a.Constants.User;
-import com.gh4a.R.id;
-import com.gh4a.R.layout;
 import com.gh4a.adapter.IssueAdapter;
 import com.gh4a.loader.IssueListLoader;
 
@@ -98,9 +94,7 @@ public class IssueListFragment extends SherlockFragment
     
     private void fillData(List<Issue> issues) {
         if (issues != null && issues.size() > 0) {
-            for (Issue issue : issues) {
-                mAdapter.add(issue);
-            }
+            mAdapter.addAll(issues);
             mAdapter.notifyDataSetChanged();
         }
     }

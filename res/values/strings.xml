@@ -141,6 +141,7 @@
     <string name="repo_branch">branch</string>
     <string name="repo_contributors">Contributors</string>
     <string name="repo_collaborators">Collaborators</string>
+    <string name="repo_files">Files</string>
     
     <!-- Commit -->
     <plurals name="commit">

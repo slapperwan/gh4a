@@ -16,12 +16,9 @@
 package com.gh4a.fragment;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
-import org.eclipse.egit.github.core.RepositoryIssue;
+import org.eclipse.egit.github.core.TreeEntry;
 
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -34,49 +31,36 @@ import android.widget.ListView;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.gh4a.Constants;
 import com.gh4a.R;
-import com.gh4a.adapter.RepositoryIssueAdapter;
-import com.gh4a.loader.RepositoryIssueListLoader;
+import com.gh4a.adapter.FileAdapter;
+import com.gh4a.loader.ContentListLoader;
 
-public class RepositoryIssueListFragment extends SherlockFragment 
-    implements LoaderManager.LoaderCallbacks<List<RepositoryIssue>> {
+public class ContentListFragment extends SherlockFragment 
+    implements LoaderManager.LoaderCallbacks<List<TreeEntry>> {
 
-    private Map<String, String> mFilterData;
+    protected String mRepoOwner;
+    protected String mRepoName;
     private ListView mListView;
-    private RepositoryIssueAdapter mAdapter;
-    
-    public static RepositoryIssueListFragment newInstance(Map<String, String> filterData) {
-        
-        RepositoryIssueListFragment f = new RepositoryIssueListFragment();
+    private FileAdapter mAdapter;
+
+    public static ContentListFragment newInstance(String repoOwner, String repoName) {
+        ContentListFragment f = new ContentListFragment();
 
         Bundle args = new Bundle();
-        if (filterData != null) {
-            Iterator<String> i = filterData.keySet().iterator();
-            while (i.hasNext()) {
-                String key = i.next();
-                args.putString(key, filterData.get(key));
-            }
-        }
+        args.putString(Constants.Repository.REPO_OWNER, repoOwner);
+        args.putString(Constants.Repository.REPO_NAME, repoName);
         f.setArguments(args);
+        
         return f;
     }
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mFilterData = new HashMap<String, String>();
         
-        Bundle args = getArguments();
-        Iterator<String> i = args.keySet().iterator();
-        while (i.hasNext()) {
-            String key = i.next();
-            if (Constants.User.USER_LOGIN != key 
-                    && Constants.Repository.REPO_NAME != key) {
-                mFilterData.put(key, args.getString(key));
-            }
-        }
+        mRepoOwner = getArguments().getString(Constants.Repository.REPO_OWNER);
+        mRepoName = getArguments().getString(Constants.Repository.REPO_NAME);
     }
-
+    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
@@ -89,33 +73,32 @@ public class RepositoryIssueListFragment extends SherlockFragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        mAdapter = new RepositoryIssueAdapter(getSherlockActivity(), new ArrayList<RepositoryIssue>());
+        mAdapter = new FileAdapter(getSherlockActivity(), new ArrayList<TreeEntry>());
         mListView.setAdapter(mAdapter);
         
         getLoaderManager().initLoader(0, null, this);
         getLoaderManager().getLoader(0).forceLoad();
     }
-    
-    private void fillData(List<RepositoryIssue> issues) {
-        if (issues != null && issues.size() > 0) {
-            mAdapter.addAll(issues);
-            mAdapter.notifyDataSetChanged();
+
+    private void fillData(List<TreeEntry> entries) {
+        if (entries != null && entries.size() > 0) {
+            mAdapter.addAll(entries);
         }
+        mAdapter.notifyDataSetChanged();
+    }
+    
+    @Override
+    public Loader<List<TreeEntry>> onCreateLoader(int id, Bundle args) {
+        return new ContentListLoader(getSherlockActivity(), mRepoOwner, mRepoName);
     }
 
     @Override
-    public Loader<List<RepositoryIssue>> onCreateLoader(int id, Bundle args) {
-        return new RepositoryIssueListLoader(getSherlockActivity(), mFilterData);
+    public void onLoadFinished(Loader<List<TreeEntry>> loader, List<TreeEntry> entries) {
+        fillData(entries);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<RepositoryIssue>> loader, List<RepositoryIssue> issues) {
-        fillData(issues);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<List<RepositoryIssue>> arg0) {
+    public void onLoaderReset(Loader<List<TreeEntry>> arg0) {
         // TODO Auto-generated method stub
-        
     }
 }

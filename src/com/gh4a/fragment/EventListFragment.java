@@ -84,10 +84,7 @@ public class EventListFragment extends SherlockFragment
 
     private void fillData(List<Event> events) {
         if (events != null && events.size() > 0) {
-            mAdapter.notifyDataSetChanged();
-            for (Event event : events) {
-                mAdapter.add(event);
-            }
+            mAdapter.addAll(events);
         }
         mAdapter.notifyDataSetChanged();
     }

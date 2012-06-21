@@ -282,7 +282,7 @@ public class RepositoryListActivity extends BaseActivity implements OnScrollList
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         Repository repository = (Repository) adapterView.getAdapter().getItem(position);
         Intent intent = new Intent()
-                .setClass(RepositoryListActivity.this, RepositoryActivity.class);
+                .setClass(RepositoryListActivity.this, RepositoryNewActivity.class);
 
         Bundle data = getApplicationContext().populateRepository(repository);
 

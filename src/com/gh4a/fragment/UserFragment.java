@@ -92,11 +92,10 @@ public class UserFragment extends SherlockFragment implements
         getLoaderManager().getLoader(0).forceLoad();
     }
     
-    private void fillData(User user) {
-        mUser = user;
+    private void fillData() {
         View v = getView();
         ImageView ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-        ImageDownloader.getInstance().download(user.getGravatarId(), ivGravatar, 80);
+        ImageDownloader.getInstance().download(mUser.getGravatarId(), ivGravatar, 80);
 
         TextView tvName = (TextView) v.findViewById(R.id.tv_name);
         TextView tvCreated = (TextView) v.findViewById(R.id.tv_created_at);
@@ -146,7 +145,7 @@ public class UserFragment extends SherlockFragment implements
         Button btnFollowers = (Button) v.findViewById(R.id.btn_followers);
         btnFollowers.setOnClickListener(this);
         TextView tvFollowers = (TextView) v.findViewById(R.id.tv_followers_label);
-        if (Constants.User.USER_TYPE_USER.equals(user.getType())) {
+        if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
             tvFollowers.setText(R.string.user_followers);
         }
         else {
@@ -155,9 +154,9 @@ public class UserFragment extends SherlockFragment implements
         
         //hide following if organization
         RelativeLayout rlFollowing = (RelativeLayout) v.findViewById(R.id.rl_following);
-        if (Constants.User.USER_TYPE_USER.equals(user.getType())) {
+        if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
             Button btnFollowing = (Button) v.findViewById(R.id.btn_following);
-            btnFollowing.setText(String.valueOf(user.getFollowing()));
+            btnFollowing.setText(String.valueOf(mUser.getFollowing()));
             btnFollowing.setOnClickListener(this);
             rlFollowing.setVisibility(View.VISIBLE);
         }
@@ -167,7 +166,7 @@ public class UserFragment extends SherlockFragment implements
         
         //hide organizations if organization
         RelativeLayout rlOrganizations = (RelativeLayout) v.findViewById(R.id.rl_organizations);
-        if (Constants.User.USER_TYPE_USER.equals(user.getType())) {
+        if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
             ImageButton btnOrganizations = (ImageButton) v.findViewById(R.id.btn_organizations);
             btnOrganizations.setOnClickListener(this);
             //registerForContextMenu(btnOrganizations);
@@ -178,7 +177,7 @@ public class UserFragment extends SherlockFragment implements
         }
         
         RelativeLayout rlGists = (RelativeLayout) v.findViewById(R.id.rl_gists);
-        if (Constants.User.USER_TYPE_USER.equals(user.getType())) {
+        if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
             ImageButton btnGists = (ImageButton) v.findViewById(R.id.btn_gists);
             btnGists.setOnClickListener(this);
             btnGists.setVisibility(View.VISIBLE);
@@ -187,20 +186,20 @@ public class UserFragment extends SherlockFragment implements
             rlGists.setVisibility(View.GONE);
         }
 
-        tvName.setText(StringUtils.formatName(user.getLogin(), user.getName()));
-        if (Constants.User.USER_TYPE_ORG.equals(user.getType())) {
+        tvName.setText(StringUtils.formatName(mUser.getLogin(), mUser.getName()));
+        if (Constants.User.USER_TYPE_ORG.equals(mUser.getType())) {
             tvName.append(" (");
             tvName.append(Constants.User.USER_TYPE_ORG);
             tvName.append(")");
         }
-        tvCreated.setText(user.getCreatedAt() != null ? 
+        tvCreated.setText(mUser.getCreatedAt() != null ? 
                 getResources().getString(R.string.user_created_at,
-                        StringUtils.formatDate(user.getCreatedAt())) : "");
+                        StringUtils.formatDate(mUser.getCreatedAt())) : "");
 
         //show email row if not blank
         TextView tvEmail = (TextView) v.findViewById(R.id.tv_email);
-        if (!StringUtils.isBlank(user.getEmail())) {
-            tvEmail.setText(user.getEmail());
+        if (!StringUtils.isBlank(mUser.getEmail())) {
+            tvEmail.setText(mUser.getEmail());
             tvEmail.setVisibility(View.VISIBLE);
         }
         else {
@@ -209,8 +208,8 @@ public class UserFragment extends SherlockFragment implements
         
         //show website if not blank
         TextView tvWebsite = (TextView) v.findViewById(R.id.tv_website);
-        if (!StringUtils.isBlank(user.getBlog())) {
-            tvWebsite.setText(user.getBlog());
+        if (!StringUtils.isBlank(mUser.getBlog())) {
+            tvWebsite.setText(mUser.getBlog());
             tvWebsite.setVisibility(View.VISIBLE);
         }
         else {
@@ -219,8 +218,8 @@ public class UserFragment extends SherlockFragment implements
         
         //show company if not blank
         TextView tvCompany = (TextView) v.findViewById(R.id.tv_company);
-        if (!StringUtils.isBlank(user.getCompany())) {
-            tvCompany.setText(user.getCompany());
+        if (!StringUtils.isBlank(mUser.getCompany())) {
+            tvCompany.setText(mUser.getCompany());
             tvCompany.setVisibility(View.VISIBLE);
         }
         else {
@@ -229,18 +228,18 @@ public class UserFragment extends SherlockFragment implements
         
         //Show location if not blank
         TextView tvLocation = (TextView) v.findViewById(R.id.tv_location);
-        if (!StringUtils.isBlank(user.getLocation())) {
-            tvLocation.setText(user.getLocation());
+        if (!StringUtils.isBlank(mUser.getLocation())) {
+            tvLocation.setText(mUser.getLocation());
             tvLocation.setVisibility(View.VISIBLE);
         }
         else {
             tvLocation.setVisibility(View.GONE);
         }
         
-        btnPublicRepos.setText(String.valueOf(user.getPublicRepos() + user.getTotalPrivateRepos()));
+        btnPublicRepos.setText(String.valueOf(mUser.getPublicRepos() + mUser.getTotalPrivateRepos()));
         
-        if (Constants.User.USER_TYPE_USER.equals(user.getType())) {
-            btnFollowers.setText(String.valueOf(user.getFollowers()));
+        if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
+            btnFollowers.setText(String.valueOf(mUser.getFollowers()));
             ProgressBar progressBar = (ProgressBar) v.findViewById(R.id.pb_followers);
             progressBar.setVisibility(View.GONE);
         }
@@ -451,7 +450,8 @@ public class UserFragment extends SherlockFragment implements
     @Override
     public void onLoadFinished(Loader<User> loader, User user) {
         if (user != null) {
-            fillData(user);
+            this.mUser = user;
+            fillData();
         }
     }
     
