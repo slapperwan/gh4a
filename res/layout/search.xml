@@ -9,8 +9,7 @@
     <RelativeLayout
         android:id="@+id/rl_top"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/info_box">
+        android:layout_height="wrap_content" >
         <LinearLayout
             android:id="@+id/ll_spinner"
             android:layout_width="fill_parent"

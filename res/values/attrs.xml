@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <attr name="info_box" format="reference" />
-    <attr name="row_box" format="reference" />
     <attr name="red_box" format="reference" />
     <attr name="green_box" format="reference" />
     <attr name="textAppearanceCode" format="reference" />

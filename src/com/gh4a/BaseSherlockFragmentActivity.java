@@ -136,6 +136,15 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         case R.id.bookmarks:
             openBookmarkActivity();
             return true;
+        case android.R.id.home:
+            if (isAuthorized()) {
+                getApplicationContext().openUserInfoActivity(this, getAuthLogin(), null);
+            }
+            else {
+                intent = new Intent().setClass(this, Github4AndroidActivity.class);
+                startActivity(intent);
+            }
+            return true;     
         default:
             return setMenuOptionItemSelected(item);
         }
@@ -299,29 +308,6 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         }
     }
     
-    /**
-     * Gets the auth username.
-     *
-     * @return the auth username
-     */
-//    public String getAuthUsername() {
-//        SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
-//                Constants.PREF_NAME, MODE_PRIVATE);
-//        
-//        if (sharedPreferences != null) {
-//            if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
-//                    && sharedPreferences.getString(Constants.User.USER_PASSWORD, null) != null){
-//                return sharedPreferences.getString(Constants.User.USER_LOGIN, null);
-//            }
-//            else {
-//                return null;
-//            }
-//        }
-//        else {
-//            return null;
-//        }
-//    }
-    
     public String getAuthLogin() {
         SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
                 Constants.PREF_NAME, MODE_PRIVATE);
@@ -428,5 +414,5 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
             }
         }
     }
-
+    
 }

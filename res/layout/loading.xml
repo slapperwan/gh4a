@@ -8,7 +8,6 @@
         android:textAppearance="?attr/textAppearanceSubtitle"
         android:padding="10dp"
         android:text="@string/loading_msg"
-        android:background="?attr/info_box"
         android:visibility="gone"
         android:gravity="center_horizontal" />
 </merge>

@@ -42,6 +42,7 @@ import org.eclipse.egit.github.core.event.WatchPayload;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.text.SpannableString;
 import android.text.style.ClickableSpan;
 import android.text.style.TextAppearanceSpan;
@@ -88,11 +89,18 @@ public class FeedAdapter extends RootAdapter<Event> {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
             v = vi.inflate(R.layout.feed_row, null);
 
+            Typeface boldCondensed = Typeface.createFromAsset(v.getContext().getAssets(), "fonts/Roboto-BoldCondensed.ttf");
+            Typeface light = Typeface.createFromAsset(v.getContext().getAssets(), "fonts/Roboto-Regular.ttf");
+            Typeface italic = Typeface.createFromAsset(v.getContext().getAssets(), "fonts/Roboto-Italic.ttf");
+            
             viewHolder = new ViewHolder();
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
             viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
+            viewHolder.tvTitle.setTypeface(boldCondensed);
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+            viewHolder.tvDesc.setTypeface(light);
             viewHolder.tvCreatedAt = (TextView) v.findViewById(R.id.tv_created_at);
+            viewHolder.tvCreatedAt.setTypeface(italic);
             v.setTag(viewHolder);
         }
         else {
@@ -173,6 +181,10 @@ public class FeedAdapter extends RootAdapter<Event> {
             List<Commit> commits = payload.getCommits();
             
             if (commits != null) {
+                
+                Typeface regular = Typeface.createFromAsset(baseView.getContext().getAssets(), "fonts/Roboto-Regular.ttf");
+                Typeface lightItalic = Typeface.createFromAsset(baseView.getContext().getAssets(), "fonts/Roboto-Italic.ttf");
+                
                 for (int i = 0; i < commits.size(); i++) {
                     Commit commit = commits.get(i);
                     SpannableString spannableSha = new SpannableString(commit.getSha().substring(0, 7));
@@ -189,12 +201,14 @@ public class FeedAdapter extends RootAdapter<Event> {
                     tvCommitMsg.append(" " + commit.getMessage());
                     tvCommitMsg.setSingleLine(true);
                     tvCommitMsg.setTextAppearance(baseView.getContext(), android.R.style.TextAppearance_Small);
+                    tvCommitMsg.setTypeface(regular);
                     ll.addView(tvCommitMsg);
     
                     if (i == 2 && commits.size() > 3) {// show limit 3 lines
                         TextView tvMoreMsg = new TextView(baseView.getContext());
                         String text = res.getString(R.string.event_push_desc, commits.size() - 3);
                         tvMoreMsg.setText(text);
+                        tvMoreMsg.setTypeface(lightItalic);
                         ll.addView(tvMoreMsg);
                         break;
                     }

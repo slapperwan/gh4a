@@ -10,8 +10,7 @@
         android:id="@+id/main_content"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="?attr/row_box">
+        android:orientation="vertical">
         <EditText
             android:id="@+id/et_title"
             android:layout_height="wrap_content"

@@ -12,8 +12,7 @@
         android:orientation="vertical">
         <RelativeLayout
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:background="?attr/info_box">
+            android:layout_height="fill_parent" >
             <LinearLayout
                 android:id="@+id/ll_repository_info"
                 android:layout_height="fill_parent"
@@ -93,12 +92,6 @@
                     android:layout_alignParentRight="true"
                     android:src="@drawable/ic_more" />
             </RelativeLayout>
-            <View
-                android:background="?android:attr/divider"
-                android:layout_width="fill_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp" />
             <RelativeLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content">
@@ -116,12 +109,6 @@
                     android:layout_alignParentRight="true"
                     android:src="@drawable/ic_more" />
             </RelativeLayout>
-            <View
-                android:background="?android:attr/divider"
-                android:layout_width="fill_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp" />
             <RelativeLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content">
@@ -139,12 +126,6 @@
                     android:layout_alignParentRight="true"
                     android:src="@drawable/ic_more" />
             </RelativeLayout>
-            <View
-                android:background="?android:attr/divider"
-                android:layout_width="fill_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp" />
             <RelativeLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content">
@@ -162,12 +143,6 @@
                     android:layout_alignParentRight="true"
                     android:src="@drawable/ic_more" />
             </RelativeLayout>
-            <View
-                android:background="?android:attr/divider"
-                android:layout_width="fill_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp" />
             <RelativeLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content">
@@ -185,12 +160,6 @@
                     android:layout_alignParentRight="true"
                     android:src="@drawable/ic_more" />
             </RelativeLayout>
-            <View
-                android:background="?android:attr/divider"
-                android:layout_width="fill_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp" />
             <RelativeLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content">
@@ -207,12 +176,6 @@
                     android:layout_alignRight="@id/tv_watchers_label"
                     android:layout_alignParentRight="true" />
             </RelativeLayout>
-            <View
-                android:background="?android:attr/divider"
-                android:layout_width="fill_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp" />
             <RelativeLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content">
@@ -229,13 +192,6 @@
                     android:layout_alignRight="@id/tv_forks_label"
                     android:layout_alignParentRight="true" />
             </RelativeLayout>
-            <View
-                android:id="@+id/issues_divider"
-                android:background="?android:attr/divider"
-                android:layout_width="fill_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp" />
             <RelativeLayout
                 android:id="@+id/rl_open_issues"
                 android:layout_width="fill_parent"
@@ -253,13 +209,6 @@
                     android:layout_alignRight="@id/tv_issues_label"
                     android:layout_alignParentRight="true" />
             </RelativeLayout>
-            <View
-                android:id="@+id/wiki_divider"
-                android:background="?android:attr/divider"
-                android:layout_width="fill_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp" />
             <RelativeLayout
                 android:id="@+id/rl_wiki"
                 android:layout_width="fill_parent"

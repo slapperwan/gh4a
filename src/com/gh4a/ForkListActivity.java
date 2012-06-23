@@ -23,76 +23,16 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
-import android.widget.AbsListView;
-
-/**
- * The ForkList activity.
- */
 public class ForkListActivity extends RepositoryListActivity {
 
-    /** The user login. */
-    protected String mUserLogin;
+    private String mUserLogin;
+    private String mRepoName;
 
-    /** The repo name. */
-    protected String mRepoName;
-
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.RepositoryListActivity#setRequestData()
-     */
-    @Override
-    protected void setRequestData() {
-        mUserLogin = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.RepositoryListActivity#getRepositories()
-     */
-    @Override
     protected List<Repository> getRepositories() throws IOException {
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(getAuthToken());
         RepositoryService repoService = new RepositoryService(client);
         
         return repoService.getForks(new RepositoryId(mUserLogin, mRepoName));
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.RepositoryListActivity#setTitleBar()
-     */
-    @Override
-    protected void setTitleBar() {
-        mTitleBar = mUserLogin + " / " + mRepoName;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.RepositoryListActivity#setSubtitle()
-     */
-    @Override
-    protected void setSubtitle() {
-        mSubtitle = "Network Members";
-    }
-
-    /*
-     * (non-Javadoc)
-     * @seecom.gh4a.RepositoryListActivity#onScrollStateChanged(android.widget.
-     * AbsListView, int)
-     */
-    @Override
-    public void onScrollStateChanged(AbsListView view, int scrollState) {
-        mReload = false;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.RepositoryListActivity#setRowLayout()
-     */
-    @Override
-    protected void setRowLayout() {
-        mRowLayout = R.layout.row_simple;
     }
 }

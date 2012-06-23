@@ -3,7 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="?attr/row_box"
     android:layout_marginTop="4dp"
     android:layout_marginBottom="4dp">
     <TextView
@@ -31,11 +30,4 @@
             android:text="@string/commits"
             android:layout_alignParentRight="true" />
     </LinearLayout>
-    <View
-        android:background="?android:attr/divider"
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginTop="10dp"
-        android:layout_below="@id/ll" />
 </RelativeLayout>

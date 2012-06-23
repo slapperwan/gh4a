@@ -86,7 +86,7 @@
     <string name="user_location">Location</string>
     <string name="user_created_at">Member since %1$s</string>
     <string name="user_pub_repos">Repositories</string>
-    <string name="user_watched_repos">Watched Repositories</string>
+    <string name="user_watched_repos">Watched</string>
     <string name="user_pushable_repos">Pushable Repositories</string>
     <string name="user_extra_data">%1$d followers | %2$d repos</string>
     <string name="user_news_feed">News Feed</string>
@@ -214,6 +214,9 @@
     <string name="issue_label_add_delete">Add/Remove labels</string>
     <string name="issue_error_label_add_delete">Cannot add/remove label</string>
     <string name="issue_labels">Labels</string>
+    <string name="issues_submitted">Submitted</string>
+    <string name="issues_updated">Updated</string>
+    <string name="issues_comments">Comments</string>
 
     <!-- Issue comment -->
     <plurals name="issue_comment">

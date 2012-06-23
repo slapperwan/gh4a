@@ -14,7 +14,7 @@
         android:theme="@style/DefaultTheme"
         android:name="com.gh4a.Gh4Application">
         <activity
-            android:name=".Github4AndroidActivity">
+            android:name=".Github4AndroidActivity" >
             <intent-filter>
                 <action
                     android:name="android.intent.action.MAIN" />
@@ -26,10 +26,7 @@
             android:name=".SearchActivity"
             android:configChanges="orientation" />
         <activity
-            android:name=".DashboardActivity" />
-        <activity
-            android:name=".RepositoryListActivity"
-            android:configChanges="orientation" />
+            android:name=".RepositoryListActivity" />
         <activity
             android:name=".RepositoryActivity"
             android:configChanges="orientation" />
@@ -37,14 +34,7 @@
             android:name=".UserListActivity"
             android:configChanges="orientation" />
         <activity
-            android:name=".UserActivity"
-            android:configChanges="orientation" />
-        <activity
-            android:name=".UserPublicActivity"
-            android:configChanges="orientation" />
-        <activity
-            android:name=".UserPrivateActivity"
-            android:configChanges="orientation" />
+            android:name=".UserActivity" />
         <activity
             android:name=".CommitListActivity"
             android:configChanges="orientation" />
@@ -59,12 +49,6 @@
             android:configChanges="orientation" />
         <activity
             android:name=".FollowerFollowingListActivity"
-            android:configChanges="orientation" />
-        <activity
-            android:name=".PublicRepoListActivity"
-            android:configChanges="orientation" />
-        <activity
-            android:name=".WatchedRepoListActivity"
             android:configChanges="orientation" />
         <activity
             android:name=".IssueListActivity"
@@ -188,12 +172,6 @@
             android:configChanges="orientation" />
         <activity
             android:name=".IssueListByMilestoneActivity"
-            android:configChanges="orientation" />
-        <activity
-            android:name=".UserNewActivity"
-            android:configChanges="orientation" />
-        <activity
-            android:name=".RepositoryNewActivity"
             android:configChanges="orientation" />
         <activity android:name="BrowseFilter">
             <intent-filter>

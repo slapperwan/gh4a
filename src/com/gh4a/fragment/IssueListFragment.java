@@ -30,6 +30,8 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.adapter.IssueAdapter;
@@ -90,6 +92,11 @@ public class IssueListFragment extends SherlockFragment
         View v = inflater.inflate(R.layout.generic_list, container, false);
         mListView = (ListView) v.findViewById(R.id.list_view);
         return v;
+    }
+    
+    @Override
+    public void onDestroyView() {
+        getFragmentManager().beginTransaction().detach(this).commit();
     }
     
     private void fillData(List<Issue> issues) {

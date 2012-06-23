@@ -182,9 +182,6 @@ public class RepositoryFragment extends SherlockFragment implements
         else {
             RelativeLayout rlOpenIssues = (RelativeLayout) v.findViewById(R.id.rl_open_issues);
             rlOpenIssues.setVisibility(View.GONE);
-            
-            View divider = (View) v.findViewById(R.id.issues_divider);
-            divider.setVisibility(View.GONE);
         }
         
         if (mRepository.isHasWiki()) {
@@ -194,9 +191,6 @@ public class RepositoryFragment extends SherlockFragment implements
         else {
             RelativeLayout rlWiki = (RelativeLayout) v.findViewById(R.id.rl_wiki);
             rlWiki.setVisibility(View.GONE);
-            
-            View divider = (View) v.findViewById(R.id.wiki_divider);
-            divider.setVisibility(View.GONE);
         }
     }
 

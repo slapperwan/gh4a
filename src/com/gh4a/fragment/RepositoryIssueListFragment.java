@@ -26,12 +26,15 @@ import org.eclipse.egit.github.core.RepositoryIssue;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.adapter.RepositoryIssueAdapter;
@@ -62,6 +65,7 @@ public class RepositoryIssueListFragment extends SherlockFragment
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onCreate RepositoryIssueListFragment");
         super.onCreate(savedInstanceState);
 
         mFilterData = new HashMap<String, String>();
@@ -80,6 +84,7 @@ public class RepositoryIssueListFragment extends SherlockFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
+        Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onCreateView RepositoryIssueListFragment");
         View v = inflater.inflate(R.layout.generic_list, container, false);
         mListView = (ListView) v.findViewById(R.id.list_view);
         return v;
@@ -87,6 +92,7 @@ public class RepositoryIssueListFragment extends SherlockFragment
     
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
+        Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onActivityCreated RepositoryIssueListFragment");
         super.onActivityCreated(savedInstanceState);
         
         mAdapter = new RepositoryIssueAdapter(getSherlockActivity(), new ArrayList<RepositoryIssue>());

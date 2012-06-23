@@ -33,36 +33,10 @@ import com.gh4a.utils.StringUtils;
  */
 public class RepositoryAdapter extends RootAdapter<Repository> {
 
-    /** The row layout. */
-    protected int mRowLayout;
-
-    /**
-     * Instantiates a new repository adapter.
-     * 
-     * @param context the context
-     * @param objects the objects
-     */
     public RepositoryAdapter(Context context, List<Repository> objects) {
         super(context, objects);
     }
 
-    /**
-     * Instantiates a new repository adapter.
-     * 
-     * @param context the context
-     * @param objects the objects
-     * @param rowLayout the row layout
-     */
-    public RepositoryAdapter(Context context, List<Repository> objects, int rowLayout) {
-        super(context, objects);
-        mRowLayout = rowLayout;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.adapter.RootAdapter#doGetView(int, android.view.View,
-     * android.view.ViewGroup)
-     */
     @Override
     public View doGetView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
@@ -70,7 +44,7 @@ public class RepositoryAdapter extends RootAdapter<Repository> {
 
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(mRowLayout, null);
+            v = vi.inflate(R.layout.row_simple_3, null);
 
             viewHolder = new ViewHolder();
             viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
@@ -114,18 +88,9 @@ public class RepositoryAdapter extends RootAdapter<Repository> {
         return v;
     }
 
-    /**
-     * The Class ViewHolder.
-     */
     private static class ViewHolder {
-        
-        /** The tv title. */
         public TextView tvTitle;
-        
-        /** The tv desc. */
         public TextView tvDesc;
-        
-        /** The tv extra. */
         public TextView tvExtra;
     }
 }

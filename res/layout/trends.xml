@@ -9,8 +9,7 @@
         android:id="@+id/breadcrumb"
         android:orientation="vertical"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/info_box">
+        android:layout_height="wrap_content" >
         <HorizontalScrollView
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"

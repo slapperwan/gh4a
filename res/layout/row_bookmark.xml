@@ -3,8 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="?attr/row_box">
+    android:layout_height="fill_parent">
     <ImageView
         android:id="@+id/iv_add"
         android:layout_width="wrap_content"

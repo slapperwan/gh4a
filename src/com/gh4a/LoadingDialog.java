@@ -110,10 +110,6 @@ public class LoadingDialog extends Dialog {
     public static LoadingDialog show(Context context, CharSequence title, CharSequence message,
             boolean indeterminate, boolean cancelable, OnCancelListener cancelListener,
             boolean hideMainView, int themeId) {
-        if (hideMainView) {
-            Activity activity = (Activity) context;
-            activity.findViewById(R.id.main_content).setVisibility(View.INVISIBLE);
-        }
         LoadingDialog dialog = new LoadingDialog(context, themeId);
         dialog.setTitle(title);
         dialog.setCancelable(cancelable);
@@ -131,8 +127,6 @@ public class LoadingDialog extends Dialog {
      */
     public void dismiss() {
         super.dismiss();
-        Activity activity = (Activity) ((ContextThemeWrapper) getContext()).getBaseContext();
-        activity.findViewById(R.id.main_content).setVisibility(View.VISIBLE);
     }
 
     /**

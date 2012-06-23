@@ -18,15 +18,15 @@ package com.gh4a.fragment;
 import org.eclipse.egit.github.core.User;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -35,25 +35,19 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.FollowerFollowingListActivity;
 import com.gh4a.GistListActivity;
 import com.gh4a.OrganizationListActivity;
 import com.gh4a.OrganizationMemberListActivity;
-import com.gh4a.PublicRepoListActivity;
-import com.gh4a.PushableRepoListActivity;
 import com.gh4a.R;
-import com.gh4a.UserNewActivity;
-import com.gh4a.UserPublicActivity;
-import com.gh4a.UserYourActionsActivity;
-import com.gh4a.WatchedRepoListActivity;
+import com.gh4a.RepositoryListActivity;
 import com.gh4a.loader.UserLoader;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
 
 public class UserFragment extends SherlockFragment implements 
-    OnClickListener, OnItemClickListener, LoaderManager.LoaderCallbacks<User> {
+    OnClickListener, LoaderManager.LoaderCallbacks<User> {
 
     private String mUserLogin;
     private String mUserName;
@@ -72,6 +66,7 @@ public class UserFragment extends SherlockFragment implements
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onCreate UserFragment");
         super.onCreate(savedInstanceState);
         mUserLogin = getArguments().getString(Constants.User.USER_LOGIN);
         mUserName = getArguments().getString(Constants.User.USER_NAME);
@@ -80,12 +75,15 @@ public class UserFragment extends SherlockFragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
+        Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onCreateView UserFragment");
         View v = inflater.inflate(R.layout.user, container, false);
+        setRetainInstance(true);
         return v;
     }
     
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
+        Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onActivityCreated UserFragment");
         super.onActivityCreated(savedInstanceState);
         
         getLoaderManager().initLoader(0, null, this);
@@ -93,60 +91,28 @@ public class UserFragment extends SherlockFragment implements
     }
     
     private void fillData() {
+        Typeface boldCondensed = Typeface.createFromAsset(getActivity().getAssets(), "fonts/Roboto-BoldCondensed.ttf");
+        Typeface light = Typeface.createFromAsset(getActivity().getAssets(), "fonts/Roboto-Regular.ttf");
+        
         View v = getView();
         ImageView ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
         ImageDownloader.getInstance().download(mUser.getGravatarId(), ivGravatar, 80);
 
         TextView tvName = (TextView) v.findViewById(R.id.tv_name);
+        tvName.setTypeface(boldCondensed);
+        
         TextView tvCreated = (TextView) v.findViewById(R.id.tv_created_at);
-
-        RelativeLayout rlNewsFeed = (RelativeLayout) v.findViewById(R.id.rl_news_feed);
-        if (mUserLogin.equals(((UserNewActivity)getActivity()).getAuthLogin())) {
-            ImageButton btnNews = (ImageButton) v.findViewById(R.id.btn_news);
-            btnNews.setOnClickListener(this);
-            rlNewsFeed.setVisibility(View.VISIBLE);
-            
-            TextView tvPublicActivity = (TextView) v.findViewById(R.id.tv_pub_activity_label);
-            tvPublicActivity.setText(R.string.user_your_actions);
-        }
-        else {
-            rlNewsFeed.setVisibility(View.GONE);
-        }
-        
-        ImageButton btnPublicActivity = (ImageButton) v.findViewById(R.id.btn_public_activity);
-        btnPublicActivity.setOnClickListener(this);
-        
-//        Button btnYourActions = (Button) findViewById(R.id.btn_your_actions);
-//        
-//        if (mUserLogin.equals(getAuthUsername())) {
-//            btnYourActions.setOnClickListener(this);
-//            btnYourActions.setVisibility(View.VISIBLE);
-//        }
-//        else {
-//            btnYourActions.setVisibility(View.GONE);
-//        }
+        tvCreated.setTypeface(light);
         
         Button btnPublicRepos = (Button) v.findViewById(R.id.btn_pub_repos);
         btnPublicRepos.setOnClickListener(this);
-
-        RelativeLayout rlPushableRepos = (RelativeLayout) v.findViewById(R.id.rl_pushable_repos);
-        if (mUserLogin.equals(((UserNewActivity) getActivity()).getAuthLogin())) {
-            Button btnPushableRepos = (Button) v.findViewById(R.id.btn_pushable_repos);
-            btnPushableRepos.setOnClickListener(this);
-            rlPushableRepos.setVisibility(View.VISIBLE);
-        }
-        else {
-            rlPushableRepos.setVisibility(View.GONE);
-        }
-        
-        Button btnWatchedRepos = (Button) v.findViewById(R.id.btn_watched_repos);
-        btnWatchedRepos.setOnClickListener(this);
 
         Button btnFollowers = (Button) v.findViewById(R.id.btn_followers);
         btnFollowers.setOnClickListener(this);
         TextView tvFollowers = (TextView) v.findViewById(R.id.tv_followers_label);
         if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
             tvFollowers.setText(R.string.user_followers);
+            tvFollowers.setTypeface(boldCondensed);
         }
         else {
             tvFollowers.setText(R.string.user_members);
@@ -171,6 +137,9 @@ public class UserFragment extends SherlockFragment implements
             btnOrganizations.setOnClickListener(this);
             //registerForContextMenu(btnOrganizations);
             rlOrganizations.setVisibility(View.VISIBLE);
+            
+            TextView tvOrg = (TextView) v.findViewById(R.id.tv_organizations_label);
+            tvOrg.setTypeface(boldCondensed);
         }
         else {
             rlOrganizations.setVisibility(View.GONE);
@@ -192,12 +161,14 @@ public class UserFragment extends SherlockFragment implements
             tvName.append(Constants.User.USER_TYPE_ORG);
             tvName.append(")");
         }
+        
         tvCreated.setText(mUser.getCreatedAt() != null ? 
                 getResources().getString(R.string.user_created_at,
                         StringUtils.formatDate(mUser.getCreatedAt())) : "");
 
         //show email row if not blank
         TextView tvEmail = (TextView) v.findViewById(R.id.tv_email);
+        tvEmail.setTypeface(light);
         if (!StringUtils.isBlank(mUser.getEmail())) {
             tvEmail.setText(mUser.getEmail());
             tvEmail.setVisibility(View.VISIBLE);
@@ -215,6 +186,7 @@ public class UserFragment extends SherlockFragment implements
         else {
             tvWebsite.setVisibility(View.GONE);
         }
+        tvWebsite.setTypeface(light);
         
         //show company if not blank
         TextView tvCompany = (TextView) v.findViewById(R.id.tv_company);
@@ -225,6 +197,7 @@ public class UserFragment extends SherlockFragment implements
         else {
             tvCompany.setVisibility(View.GONE);
         }
+        tvCompany.setTypeface(light);
         
         //Show location if not blank
         TextView tvLocation = (TextView) v.findViewById(R.id.tv_location);
@@ -235,6 +208,7 @@ public class UserFragment extends SherlockFragment implements
         else {
             tvLocation.setVisibility(View.GONE);
         }
+        tvLocation.setTypeface(light);
         
         btnPublicRepos.setText(String.valueOf(mUser.getPublicRepos() + mUser.getTotalPrivateRepos()));
         
@@ -243,6 +217,15 @@ public class UserFragment extends SherlockFragment implements
             ProgressBar progressBar = (ProgressBar) v.findViewById(R.id.pb_followers);
             progressBar.setVisibility(View.GONE);
         }
+        
+        TextView tvPubRepo = (TextView) v.findViewById(R.id.tv_pub_repos_label);
+        tvPubRepo.setTypeface(boldCondensed);
+        
+        TextView tvFollowing = (TextView) v.findViewById(R.id.tv_following_label);
+        tvFollowing.setTypeface(boldCondensed);
+        
+        TextView tvGist = (TextView) v.findViewById(R.id.tv_gists_label);
+        tvGist.setTypeface(boldCondensed);
         
     }
 
@@ -254,15 +237,6 @@ public class UserFragment extends SherlockFragment implements
         int id = view.getId();
 
         switch (id) {
-        case R.id.btn_news:
-            getFeeds(view);
-            break;
-        case R.id.btn_public_activity:
-            getPublicActivities(view);
-            break;
-//        case R.id.btn_private_activity:
-//            getPrivateActivities(view);
-//            break;
         case R.id.btn_pub_repos:
             getPublicRepos(view);
             break;
@@ -272,88 +246,25 @@ public class UserFragment extends SherlockFragment implements
         case R.id.btn_following:
             getFollowing(view);
             break;
-        case R.id.btn_watched_repos:
-            getWatchedRepos(view);
-            break;
         case R.id.btn_organizations:
             getOrganizations(view);
             break;
         case R.id.btn_gists:
             getGists(view);
             break;
-        case R.id.btn_pushable_repos:
-            getPushableRepos(view);
-            break;
-          
         default:
             break;
         }
     }
 
-    /**
-     * Gets the feeds when Activity button clicked.
-     *
-     * @param view the view
-     * @return the feeds
-     */
-    public void getFeeds(View view) {
-//        Intent intent = new Intent().setClass(this, UserPrivateActivity.class);
-//        intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
-//        intent.putExtra(Constants.User.USER_TYPE, mUser.getType());
-//        intent.putExtra(Constants.ACTIONBAR_TITLE, mUserLogin
-//                + (!StringUtils.isBlank(mUserName) ? " - " + mUserName : ""));
-//        intent.putExtra(Constants.SUBTITLE, getResources().getString(R.string.user_news_feed));
-//        startActivity(intent);
-        
-        Intent intent = new Intent().setClass(this.getActivity(), UserNewActivity.class);
-        startActivity(intent);
-    }
-
-    /**
-     * Gets the your actions.
-     *
-     * @param view the view
-     * @return the your actions
-     */
-    public void getPublicActivities(View view) {
-        Intent intent = new Intent().setClass(this.getActivity(), UserPublicActivity.class);
-        intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
-        intent.putExtra(Constants.ACTIONBAR_TITLE, mUserLogin);
-        if (mUserLogin.equals(((UserNewActivity) getActivity()).getAuthLogin())) {
-            intent.putExtra(Constants.SUBTITLE, getResources().getString(R.string.user_your_actions));
-        }
-        else {
-            intent.putExtra(Constants.SUBTITLE, getResources().getString(R.string.user_public_activity));
-        }
-        startActivity(intent);
-    }
-    
-    public void getPrivateActivities(View view) {
-        Intent intent = new Intent().setClass(this.getActivity(), UserYourActionsActivity.class);
-        intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
-    }
-    
-    /**
-     * Gets the public repos when Public Repository button clicked.
-     *
-     * @param view the view
-     * @return the public repos
-     */
     public void getPublicRepos(View view) {
-        Intent intent = new Intent().setClass(this.getActivity(), PublicRepoListActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
-        intent.putExtra(Constants.User.USER_NAME, mUserName);
+        Intent intent = new Intent().setClass(this.getActivity(), RepositoryListActivity.class);
+        intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
         intent.putExtra(Constants.User.USER_NAME, mUserName);
         intent.putExtra(Constants.User.USER_TYPE, mUser.getType());
         startActivity(intent);
     }
 
-    /**
-     * Gets the followers when Followers button clicked.
-     *
-     * @param view the view
-     * @return the followers
-     */
     public void getFollowers(View view) {
         if (Constants.User.USER_TYPE_ORG.equals(mUser.getType())) {
             Intent intent = new Intent().setClass(this.getActivity(), OrganizationMemberListActivity.class);
@@ -374,12 +285,6 @@ public class UserFragment extends SherlockFragment implements
         }
     }
 
-    /**
-     * Gets the following when Following button clicked.
-     *
-     * @param view the view
-     * @return the following
-     */
     public void getFollowing(View view) {
         Intent intent = new Intent().setClass(this.getActivity(), FollowerFollowingListActivity.class);
         intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
@@ -390,41 +295,6 @@ public class UserFragment extends SherlockFragment implements
         startActivity(intent);
     }
 
-    /**
-     * Gets the watched repos.
-     * 
-     * @param view the view
-     * @return the watched repos
-     */
-    public void getWatchedRepos(View view) {
-        Intent intent = new Intent().setClass(this.getActivity(), WatchedRepoListActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
-        intent.putExtra(Constants.User.USER_NAME, mUserName);
-        startActivity(intent);
-    }
-    
-    /**
-     * Gets the pushable repos.
-     *
-     * @param view the view
-     * @return the pushable repos
-     */
-    public void getPushableRepos(View view) {
-        Intent intent = new Intent().setClass(this.getActivity(), PushableRepoListActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
-        intent.putExtra(Constants.User.USER_NAME, mUserName);
-        startActivity(intent);
-    }
-    
-    /* (non-Javadoc)
-     * @see android.widget.AdapterView.OnItemClickListener#onItemClick(android.widget.AdapterView, android.view.View, int, long)
-     */
-    @Override
-    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-        // TODO Auto-generated method stub
-        
-    }
-    
     public void getOrganizations(View view) {
         Intent intent = new Intent().setClass(this.getActivity(), OrganizationListActivity.class);
         intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
@@ -435,11 +305,6 @@ public class UserFragment extends SherlockFragment implements
         Intent intent = new Intent().setClass(this.getActivity(), GistListActivity.class);
         intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
         startActivity(intent);
-    }
-    
-    public boolean onContextItemSelected(MenuItem item) {
-        String orgLogin = item.getTitle().toString();
-        return true;
     }
     
     @Override

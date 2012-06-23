@@ -3,8 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="horizontal"
-    android:background="?attr/row_box">
+    android:orientation="horizontal">
     <Button
         android:text="All Commits"
         android:id="@+id/btn_all_commits"
