@@ -5,5 +5,5 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:textAppearance="?android:attr/textAppearanceMedium"
-    android:layout_marginTop="4dp"
-    android:layout_marginBottom="4dp" />
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp" />

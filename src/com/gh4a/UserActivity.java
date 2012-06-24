@@ -178,9 +178,7 @@ public class UserActivity extends BaseSherlockFragmentActivity {
         Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onConfigurationChanged " + newConfig.orientation);
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE
                 || newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            Log.i(Constants.LOG_TAG, "+++++ onConfigurationChanged getSelectedNavigationIndex " + mActionBar.getSelectedNavigationIndex());
             //invalidateOptionsMenu();
         } 
     }
-    
 }

@@ -18,45 +18,49 @@ package com.gh4a.adapter;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 
-/**
- * The SimpleString adapter.
- */
 public class SimpleStringAdapter extends RootAdapter<String> {
 
-    /**
-     * Instantiates a new follower following adapter.
-     * 
-     * @param context the context
-     * @param objects the objects
-     */
     public SimpleStringAdapter(Context context, List<String> objects) {
         super(context, objects);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.adapter.RootAdapter#doGetView(int, android.view.View,
-     * android.view.ViewGroup)
-     */
     @Override
     public View doGetView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
+        ViewHolder viewHolder = null;
+        
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
             v = vi.inflate(R.layout.row_simple, null);
+            
+            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+            Typeface boldCondensed = app.boldCondensed;
+            
+            viewHolder = new ViewHolder();
+            viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
+            viewHolder.tvTitle.setTypeface(boldCondensed);
         }
+        
         String username = mObjects.get(position);
+        
         if (username != null) {
             TextView tvFormattedName = (TextView) v.findViewById(R.id.tv_title);
             tvFormattedName.setText(username);
         }
+        
         return v;
+    }
+    
+    private static class ViewHolder {
+        public TextView tvTitle;
     }
 }

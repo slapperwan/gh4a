@@ -21,6 +21,7 @@ import org.eclipse.egit.github.core.User;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -30,6 +31,7 @@ import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.adapter.PullRequestDiscussionAdapter.ViewHolder;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
 
@@ -38,41 +40,19 @@ import com.gh4a.utils.StringUtils;
  */
 public class UserAdapter extends RootAdapter<User> {
 
-    /** The row layout. */
     private int mRowLayout;
-
-    /** The show more data. */
     private boolean mShowMoreData;
-    
-    /**
-     * Instantiates a new user adapter.
-     * 
-     * @param context the context
-     * @param objects the objects
-     */
+
     public UserAdapter(Context context, List<User> objects) {
         super(context, objects);
     }
 
-    /**
-     * Instantiates a new user adapter.
-     * 
-     * @param context the context
-     * @param objects the objects
-     * @param rowLayout the row layout
-     * @param showMoreData the show more data
-     */
     public UserAdapter(Context context, List<User> objects, int rowLayout, boolean showMoreData) {
         super(context, objects);
         mRowLayout = rowLayout;
         mShowMoreData = showMoreData;
     }
     
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.adapter.RootAdapter#doGetView(int, android.view.View,
-     * android.view.ViewGroup)
-     */
     @Override
     public View doGetView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
@@ -82,11 +62,27 @@ public class UserAdapter extends RootAdapter<User> {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
             v = vi.inflate(mRowLayout, null);
 
+            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+            Typeface boldCondensed = app.boldCondensed;
+            Typeface regular = app.regular;
+            Typeface italic = app.italic;
+            
             viewHolder = new ViewHolder();
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
+            
             viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
+            viewHolder.tvTitle.setTypeface(boldCondensed);
+            
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+            if (viewHolder.tvDesc != null) {
+                viewHolder.tvDesc.setTypeface(regular);
+            }
+            
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+            if (viewHolder.tvExtra != null) {
+                viewHolder.tvExtra.setTypeface(italic);
+            }
+            
             v.setTag(viewHolder);
         }
         else {
@@ -132,23 +128,11 @@ public class UserAdapter extends RootAdapter<User> {
         return v;
     }
 
-    /**
-     * The Class ViewHolder.
-     */
     private static class ViewHolder {
-
-        /** The tv title. */
         public TextView tvTitle;
-        
-        /** The iv gravatar. */
         public ImageView ivGravatar;
-        
-        /** The tv desc. */
         public TextView tvDesc;
-        
-        /** The tv extra. */
         public TextView tvExtra;
-
     }
 
 }

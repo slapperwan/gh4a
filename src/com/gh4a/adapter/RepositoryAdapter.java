@@ -20,17 +20,16 @@ import java.util.List;
 import org.eclipse.egit.github.core.Repository;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
-/**
- * The Repository adapter.
- */
 public class RepositoryAdapter extends RootAdapter<Repository> {
 
     public RepositoryAdapter(Context context, List<Repository> objects) {
@@ -46,10 +45,21 @@ public class RepositoryAdapter extends RootAdapter<Repository> {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
             v = vi.inflate(R.layout.row_simple_3, null);
 
+            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+            Typeface boldCondensed = app.boldCondensed;
+            Typeface regular = app.regular;
+            Typeface italic = app.italic;
+            
             viewHolder = new ViewHolder();
             viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
+            viewHolder.tvTitle.setTypeface(boldCondensed);
+            
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+            viewHolder.tvDesc.setTypeface(regular);
+            
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+            viewHolder.tvExtra.setTypeface(italic);
+            
             v.setTag(viewHolder);
         }
         else {

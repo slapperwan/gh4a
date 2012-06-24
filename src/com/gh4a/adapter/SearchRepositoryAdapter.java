@@ -21,11 +21,13 @@ import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.SearchRepository;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
@@ -73,10 +75,25 @@ public class SearchRepositoryAdapter extends RootAdapter<SearchRepository> {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
             v = vi.inflate(mRowLayout, null);
 
+            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+            Typeface boldCondensed = app.boldCondensed;
+            Typeface regular = app.regular;
+            Typeface italic = app.italic;
+            
             viewHolder = new ViewHolder();
             viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
+            viewHolder.tvTitle.setTypeface(boldCondensed);
+            
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+            if (viewHolder.tvDesc != null) {
+                viewHolder.tvDesc.setTypeface(regular);
+            }
+            
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+            if (viewHolder.tvExtra != null) {
+                viewHolder.tvExtra.setTypeface(italic);
+            }
+            
             v.setTag(viewHolder);
         }
         else {

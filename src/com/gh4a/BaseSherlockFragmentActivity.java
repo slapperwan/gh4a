@@ -414,5 +414,4 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
             }
         }
     }
-    
 }

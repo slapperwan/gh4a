@@ -61,135 +61,145 @@
                     android:autoLink="map" />
             </LinearLayout>
         </RelativeLayout>
-        <LinearLayout
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="10dp"
+            />
+        <TableLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:orientation="vertical"
-            android:layout_margin="0dp">
-            <RelativeLayout
-                android:layout_width="fill_parent"
-                android:layout_height="48dp"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="2dp" >
-                <TextView
-                    android:id="@+id/tv_pub_repos_label"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="@string/user_pub_repos"
-                    android:gravity="center_vertical" />
-                <Button
-                    android:id="@+id/btn_pub_repos"
-                    android:layout_width="80dp"
-                    android:layout_height="fill_parent"
-                    android:layout_alignRight="@id/tv_pub_repos_label"
-                    android:layout_alignParentRight="true" />
-            </RelativeLayout>
-            <RelativeLayout
-                android:layout_width="fill_parent"
-                android:layout_height="48dp"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="2dp">
-                <TextView
-                    android:id="@+id/tv_followers_label"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="@string/user_followers"
-                    android:gravity="center_vertical" />
-                <RelativeLayout
-                    android:id="@+id/rl_btn_followers"
+            android:padding="16dp" >
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                
+                <TableLayout
+                    android:id="@+id/cell_followers"
                     android:layout_width="wrap_content"
-                    android:layout_height="fill_parent"
-                    android:layout_alignRight="@id/tv_followers_label">
-                    <Button
-                        android:id="@+id/btn_followers"
-                        android:layout_width="80dp"
-                        android:layout_height="fill_parent"
-                        android:layout_centerInParent="true" />
-                    <ProgressBar
-                        android:id="@+id/pb_followers"
-                        android:layout_height="20dp"
-                        android:layout_width="20dp"
-                        android:indeterminateBehavior="repeat"
-                        android:indeterminate="true"
-                        style="@android:style/Widget.ProgressBar"
-                        android:indeterminateOnly="true"
-                        android:layout_centerInParent="true" />
-                </RelativeLayout>
-            </RelativeLayout>
-            <RelativeLayout
-                android:id="@+id/rl_following"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:drawable/list_selector_background" >
+                    <TableRow
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:id="@+id/tv_followers_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceLarge" />
+                    </TableRow>
+                    <TableRow>
+                        <TextView
+                            android:id="@+id/tv_followers_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?attr/textAppearanceSmall"
+                            android:text="@string/user_followers" />
+                    </TableRow>
+                </TableLayout>
+                <TableLayout
+                    android:id="@+id/cell_following"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:drawable/list_selector_background" >
+                    <TableRow
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:id="@+id/tv_following_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceLarge" />
+                    </TableRow>
+                    <TableRow>
+                        <TextView
+                            android:id="@+id/tv_following_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?attr/textAppearanceSmall"
+                            android:text="@string/user_following" />
+                    </TableRow>
+                </TableLayout>
+                <TableLayout
+                    android:id="@+id/cell_organizations"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:drawable/list_selector_background" >
+                    <TableRow
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:id="@+id/tv_organizations_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceLarge"
+                            android:text="View"/>
+                    </TableRow>
+                    <TableRow>
+                        <TextView
+                            android:id="@+id/tv_organizations_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?attr/textAppearanceSmall"
+                            android:text="@string/user_organizations" />
+                    </TableRow>
+                </TableLayout>
+                <TableLayout
+                    android:id="@+id/cell_gists"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:drawable/list_selector_background" >
+                    <TableRow
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:id="@+id/tv_gists_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceLarge"
+                            android:text="View" />
+                    </TableRow>
+                    <TableRow>
+                        <TextView
+                            android:id="@+id/tv_gists_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?attr/textAppearanceSmall"
+                            android:text="@string/gist_public" />
+                    </TableRow>
+                </TableLayout>
+            </TableRow>
+        </TableLayout>
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="10dp" />
+        <LinearLayout
+            android:id="@+id/ll_top_repos"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+            <TextView
+                android:id="@+id/tv_pub_repos_label"
                 android:layout_width="fill_parent"
-                android:layout_height="48dp"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="2dp" >
-                <TextView
-                    android:id="@+id/tv_following_label"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="@string/user_following"
-                    android:gravity="center_vertical" />
-                <Button
-                    android:id="@+id/btn_following"
-                    android:layout_width="80dp"
-                    android:layout_height="fill_parent"
-                    android:layout_alignRight="@id/tv_following_label"
-                    android:layout_alignParentRight="true" />
-            </RelativeLayout>
-            <RelativeLayout
-                android:id="@+id/rl_organizations"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/user_pub_repos" />
+            <View 
+                android:id="@+id/v_repo_divider"
                 android:layout_width="fill_parent"
-                android:layout_height="48dp"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="2dp" >
-                <TextView
-                    android:id="@+id/tv_organizations_label"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="@string/user_organizations"
-                    android:gravity="center_vertical" />
-                <ImageButton
-                    android:id="@+id/btn_organizations"
-                    android:layout_width="80dp"
-                    android:layout_height="fill_parent"
-                    android:layout_alignRight="@id/tv_organizations_label"
-                    android:layout_alignParentRight="true"
-                    android:src="@drawable/ic_more" />
-            </RelativeLayout>
-            <RelativeLayout
-                android:id="@+id/rl_gists"
+                android:layout_height="1dp"
+                android:background="#ff0099cc" />
+            <View
                 android:layout_width="fill_parent"
-                android:layout_height="48dp"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="2dp" >
-                <TextView
-                    android:id="@+id/tv_gists_label"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="@string/gist_public"
-                    android:gravity="center_vertical" />
-                <ImageButton
-                    android:id="@+id/btn_gists"
-                    android:layout_width="80dp"
-                    android:layout_height="fill_parent"
-                    android:layout_alignRight="@id/tv_gists_label"
-                    android:layout_alignParentRight="true"
-                    android:src="@drawable/ic_more" />
-            </RelativeLayout>
+                android:layout_height="10dp" />
         </LinearLayout>
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="16dp" />
     </LinearLayout>
 </ScrollView>

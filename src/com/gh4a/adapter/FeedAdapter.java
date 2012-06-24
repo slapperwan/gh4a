@@ -88,19 +88,24 @@ public class FeedAdapter extends RootAdapter<Event> {
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
             v = vi.inflate(R.layout.feed_row, null);
-
-            Typeface boldCondensed = Typeface.createFromAsset(v.getContext().getAssets(), "fonts/Roboto-BoldCondensed.ttf");
-            Typeface light = Typeface.createFromAsset(v.getContext().getAssets(), "fonts/Roboto-Regular.ttf");
-            Typeface italic = Typeface.createFromAsset(v.getContext().getAssets(), "fonts/Roboto-Italic.ttf");
             
+            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+            Typeface boldCondensed = app.boldCondensed;
+            Typeface regular = app.regular;
+            Typeface italic = app.italic;
+
             viewHolder = new ViewHolder();
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
+            
             viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
             viewHolder.tvTitle.setTypeface(boldCondensed);
+            
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-            viewHolder.tvDesc.setTypeface(light);
+            viewHolder.tvDesc.setTypeface(regular);
+            
             viewHolder.tvCreatedAt = (TextView) v.findViewById(R.id.tv_created_at);
             viewHolder.tvCreatedAt.setTypeface(italic);
+            
             v.setTag(viewHolder);
         }
         else {
@@ -182,8 +187,9 @@ public class FeedAdapter extends RootAdapter<Event> {
             
             if (commits != null) {
                 
-                Typeface regular = Typeface.createFromAsset(baseView.getContext().getAssets(), "fonts/Roboto-Regular.ttf");
-                Typeface lightItalic = Typeface.createFromAsset(baseView.getContext().getAssets(), "fonts/Roboto-Italic.ttf");
+                Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+                Typeface regular = app.regular;
+                Typeface italic = app.italic;
                 
                 for (int i = 0; i < commits.size(); i++) {
                     Commit commit = commits.get(i);
@@ -208,7 +214,7 @@ public class FeedAdapter extends RootAdapter<Event> {
                         TextView tvMoreMsg = new TextView(baseView.getContext());
                         String text = res.getString(R.string.event_push_desc, commits.size() - 3);
                         tvMoreMsg.setText(text);
-                        tvMoreMsg.setTypeface(lightItalic);
+                        tvMoreMsg.setTypeface(italic);
                         ll.addView(tvMoreMsg);
                         break;
                     }

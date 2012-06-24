@@ -9,14 +9,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:layout_marginTop="4dp"
-    android:layout_marginBottom="4dp" >
+    android:layout_height="fill_parent" >
     <ImageView
         android:id="@+id/iv_gravatar"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginRight="5dp"
+        android:layout_marginRight="8dp"
         android:layout_marginTop="5dp" />
     <TextView
         android:id="@+id/tv_desc"

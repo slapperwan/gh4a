@@ -107,7 +107,7 @@ public class RepositoryListFragment extends SherlockFragment
 
     @Override
     public Loader<List<Repository>> onCreateLoader(int id, Bundle args) {
-        return new RepositoryListLoader(getSherlockActivity(), mLogin, mUserType);
+        return new RepositoryListLoader(getSherlockActivity(), mLogin, mUserType, null, -1);
     }
 
     @Override

@@ -15,9 +15,15 @@
  */
 package com.gh4a.fragment;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.User;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -27,27 +33,28 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageButton;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.gh4a.Constants;
 import com.gh4a.FollowerFollowingListActivity;
+import com.gh4a.Gh4Application;
 import com.gh4a.GistListActivity;
 import com.gh4a.OrganizationListActivity;
 import com.gh4a.OrganizationMemberListActivity;
 import com.gh4a.R;
 import com.gh4a.RepositoryListActivity;
+import com.gh4a.loader.RepositoryListLoader;
 import com.gh4a.loader.UserLoader;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
 
 public class UserFragment extends SherlockFragment implements 
-    OnClickListener, LoaderManager.LoaderCallbacks<User> {
+    OnClickListener, LoaderManager.LoaderCallbacks<Object> {
 
     private String mUserLogin;
     private String mUserName;
@@ -91,10 +98,13 @@ public class UserFragment extends SherlockFragment implements
     }
     
     private void fillData() {
-        Typeface boldCondensed = Typeface.createFromAsset(getActivity().getAssets(), "fonts/Roboto-BoldCondensed.ttf");
-        Typeface light = Typeface.createFromAsset(getActivity().getAssets(), "fonts/Roboto-Regular.ttf");
-        
         View v = getView();
+        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
+        Typeface boldCondensed = app.boldCondensed;
+        Typeface condensed = app.condensed;
+        Typeface regular = app.regular;
+        Typeface italic = app.italic;
+        
         ImageView ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
         ImageDownloader.getInstance().download(mUser.getGravatarId(), ivGravatar, 80);
 
@@ -102,57 +112,74 @@ public class UserFragment extends SherlockFragment implements
         tvName.setTypeface(boldCondensed);
         
         TextView tvCreated = (TextView) v.findViewById(R.id.tv_created_at);
-        tvCreated.setTypeface(light);
+        tvCreated.setTypeface(app.regular);
         
-        Button btnPublicRepos = (Button) v.findViewById(R.id.btn_pub_repos);
-        btnPublicRepos.setOnClickListener(this);
-
-        Button btnFollowers = (Button) v.findViewById(R.id.btn_followers);
-        btnFollowers.setOnClickListener(this);
+        TextView tvFollowersCount = (TextView) v.findViewById(R.id.tv_followers_count);
+        tvFollowersCount.setTypeface(boldCondensed);
+        tvFollowersCount.setText(String.valueOf(mUser.getFollowers()));
+        
+        TableLayout tlFollowers = (TableLayout) v.findViewById(R.id.cell_followers);
+        tlFollowers.setOnClickListener(this);
+        
         TextView tvFollowers = (TextView) v.findViewById(R.id.tv_followers_label);
+        tvFollowers.setTypeface(condensed);
         if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
             tvFollowers.setText(R.string.user_followers);
-            tvFollowers.setTypeface(boldCondensed);
         }
         else {
             tvFollowers.setText(R.string.user_members);
         }
         
         //hide following if organization
-        RelativeLayout rlFollowing = (RelativeLayout) v.findViewById(R.id.rl_following);
+        TextView tvFollowing = (TextView) v.findViewById(R.id.tv_following_label);
         if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
-            Button btnFollowing = (Button) v.findViewById(R.id.btn_following);
-            btnFollowing.setText(String.valueOf(mUser.getFollowing()));
-            btnFollowing.setOnClickListener(this);
-            rlFollowing.setVisibility(View.VISIBLE);
+            tvFollowing.setTypeface(condensed);
+            tvFollowing.setVisibility(View.VISIBLE);
+            
+            TextView tvFollowingCount = (TextView) v.findViewById(R.id.tv_following_count);
+            tvFollowingCount.setTypeface(boldCondensed);
+            tvFollowingCount.setText(String.valueOf(mUser.getFollowing()));
+            
+            TableLayout tl = (TableLayout) v.findViewById(R.id.cell_following);
+            tl.setOnClickListener(this);
         }
         else {
-            rlFollowing.setVisibility(View.GONE);
+            tvFollowing.setVisibility(View.GONE);
         }
         
         //hide organizations if organization
-        RelativeLayout rlOrganizations = (RelativeLayout) v.findViewById(R.id.rl_organizations);
+        TextView tvOrgCount = (TextView) v.findViewById(R.id.tv_organizations_count);
+        TextView tvOrg = (TextView) v.findViewById(R.id.tv_organizations_label);
         if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
-            ImageButton btnOrganizations = (ImageButton) v.findViewById(R.id.btn_organizations);
-            btnOrganizations.setOnClickListener(this);
-            //registerForContextMenu(btnOrganizations);
-            rlOrganizations.setVisibility(View.VISIBLE);
+            tvOrg.setTypeface(condensed);
+            tvOrg.setVisibility(View.VISIBLE);
+
+            tvOrgCount.setTypeface(boldCondensed);
+            tvOrgCount.setVisibility(View.VISIBLE);
             
-            TextView tvOrg = (TextView) v.findViewById(R.id.tv_organizations_label);
-            tvOrg.setTypeface(boldCondensed);
+            TableLayout tl = (TableLayout) v.findViewById(R.id.cell_organizations);
+            tl.setOnClickListener(this);
         }
         else {
-            rlOrganizations.setVisibility(View.GONE);
+            tvOrg.setVisibility(View.GONE);
+            tvOrgCount.setVisibility(View.GONE);
         }
         
-        RelativeLayout rlGists = (RelativeLayout) v.findViewById(R.id.rl_gists);
+        TextView tvGistCount = (TextView) v.findViewById(R.id.tv_gists_count);
+        TextView tvGist = (TextView) v.findViewById(R.id.tv_gists_label);
         if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
-            ImageButton btnGists = (ImageButton) v.findViewById(R.id.btn_gists);
-            btnGists.setOnClickListener(this);
-            btnGists.setVisibility(View.VISIBLE);
+            tvGist.setTypeface(condensed);
+            tvGist.setVisibility(View.VISIBLE);
+            
+            tvGistCount.setTypeface(boldCondensed);
+            tvGistCount.setVisibility(View.VISIBLE);
+            
+            TableLayout tl = (TableLayout) v.findViewById(R.id.cell_gists);
+            tl.setOnClickListener(this);
         }
         else {
-            rlGists.setVisibility(View.GONE);
+            tvGist.setVisibility(View.GONE);
+            tvGistCount.setVisibility(View.GONE);
         }
 
         tvName.setText(StringUtils.formatName(mUser.getLogin(), mUser.getName()));
@@ -168,7 +195,7 @@ public class UserFragment extends SherlockFragment implements
 
         //show email row if not blank
         TextView tvEmail = (TextView) v.findViewById(R.id.tv_email);
-        tvEmail.setTypeface(light);
+        tvEmail.setTypeface(regular);
         if (!StringUtils.isBlank(mUser.getEmail())) {
             tvEmail.setText(mUser.getEmail());
             tvEmail.setVisibility(View.VISIBLE);
@@ -186,7 +213,7 @@ public class UserFragment extends SherlockFragment implements
         else {
             tvWebsite.setVisibility(View.GONE);
         }
-        tvWebsite.setTypeface(light);
+        tvWebsite.setTypeface(regular);
         
         //show company if not blank
         TextView tvCompany = (TextView) v.findViewById(R.id.tv_company);
@@ -197,7 +224,7 @@ public class UserFragment extends SherlockFragment implements
         else {
             tvCompany.setVisibility(View.GONE);
         }
-        tvCompany.setTypeface(light);
+        tvCompany.setTypeface(regular);
         
         //Show location if not blank
         TextView tvLocation = (TextView) v.findViewById(R.id.tv_location);
@@ -208,25 +235,14 @@ public class UserFragment extends SherlockFragment implements
         else {
             tvLocation.setVisibility(View.GONE);
         }
-        tvLocation.setTypeface(light);
-        
-        btnPublicRepos.setText(String.valueOf(mUser.getPublicRepos() + mUser.getTotalPrivateRepos()));
-        
-        if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
-            btnFollowers.setText(String.valueOf(mUser.getFollowers()));
-            ProgressBar progressBar = (ProgressBar) v.findViewById(R.id.pb_followers);
-            progressBar.setVisibility(View.GONE);
-        }
+        tvLocation.setTypeface(regular);
         
         TextView tvPubRepo = (TextView) v.findViewById(R.id.tv_pub_repos_label);
         tvPubRepo.setTypeface(boldCondensed);
+        tvPubRepo.setTextColor(Color.parseColor("#0099cc"));
         
-        TextView tvFollowing = (TextView) v.findViewById(R.id.tv_following_label);
-        tvFollowing.setTypeface(boldCondensed);
-        
-        TextView tvGist = (TextView) v.findViewById(R.id.tv_gists_label);
-        tvGist.setTypeface(boldCondensed);
-        
+        getLoaderManager().initLoader(1, null, this);
+        getLoaderManager().getLoader(1).forceLoad();
     }
 
     /*
@@ -237,19 +253,16 @@ public class UserFragment extends SherlockFragment implements
         int id = view.getId();
 
         switch (id) {
-        case R.id.btn_pub_repos:
-            getPublicRepos(view);
-            break;
-        case R.id.btn_followers:
+        case R.id.cell_followers:
             getFollowers(view);
             break;
-        case R.id.btn_following:
+        case R.id.cell_following:
             getFollowing(view);
             break;
-        case R.id.btn_organizations:
+        case R.id.cell_organizations:
             getOrganizations(view);
             break;
-        case R.id.btn_gists:
+        case R.id.cell_gists:
             getGists(view);
             break;
         default:
@@ -306,23 +319,112 @@ public class UserFragment extends SherlockFragment implements
         intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
         startActivity(intent);
     }
-    
-    @Override
-    public Loader<User> onCreateLoader(int id, Bundle args) {
-        return new UserLoader(getSherlockActivity(), mUserLogin);
+
+    public void fillTopRepos(List<Repository> repos) {
+        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
+        Typeface boldCondensed = app.boldCondensed;
+        Typeface regular = app.regular;
+        Typeface italic = app.italic;
+        
+        View v = getView();
+        LinearLayout ll = (LinearLayout) v.findViewById(R.id.ll_top_repos);
+        
+        for (final Repository repository : repos) {
+            View rowView = getLayoutInflater(null).inflate(R.layout.row_simple_3, null);
+            rowView.setBackgroundResource(android.R.drawable.list_selector_background);
+            rowView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
+                    app.openRepositoryInfoActivity(getSherlockActivity(), repository);
+                }
+            });
+            
+            TextView tvTitle = (TextView) rowView.findViewById(R.id.tv_title);
+            tvTitle.setTypeface(boldCondensed);
+            TextView tvDesc = (TextView) rowView.findViewById(R.id.tv_desc);
+            tvDesc.setTypeface(regular);
+            tvDesc.setSingleLine(true);
+            TextView tvExtra = (TextView) rowView.findViewById(R.id.tv_extra);
+            tvExtra.setTypeface(italic);
+            
+            tvTitle.setText(repository.getOwner().getLogin() + " / " + repository.getName());
+            
+            if (!StringUtils.isBlank(repository.getDescription())) {
+                tvDesc.setVisibility(View.VISIBLE);
+                tvDesc.setText(StringUtils.doTeaser(repository.getDescription()));
+            }
+            else {
+                tvDesc.setVisibility(View.GONE);
+            }
+            
+            String extraData = (repository.getLanguage() != null ? repository.getLanguage()
+                    + " | " : "")
+                    + StringUtils.toHumanReadbleFormat(repository.getSize())
+                    + " | "
+                    + repository.getForks()
+                    + " forks | "
+                    + repository.getWatchers()
+                    + " watchers";
+            tvExtra.setText(extraData);
+            
+            View divider = new View(getActivity());
+            divider.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, 16));
+            
+            ll.addView(rowView);
+            ll.addView(divider);
+        }
+        
+        TextView tvMore = new TextView(getSherlockActivity());
+        tvMore.setTypeface(italic);
+        tvMore.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+        tvMore.setBackgroundResource(android.R.drawable.list_selector_background);
+        if (!repos.isEmpty()) {
+            tvMore.setText("View more");
+            tvMore.setOnClickListener(new OnClickListener() {
+                
+                @Override
+                public void onClick(View view) {
+                    getPublicRepos(view);
+                }
+            });
+        }
+        else {
+            tvMore.setText("Repositories not found");
+        }
+        ll.addView(tvMore);
     }
     
     @Override
-    public void onLoadFinished(Loader<User> loader, User user) {
-        if (user != null) {
-            this.mUser = user;
-            fillData();
+    public Loader onCreateLoader(int id, Bundle arg1) {
+        if (id == 0) {
+            return new UserLoader(getSherlockActivity(), mUserLogin);
+        }
+        else {
+            Map<String, String> filterData = new HashMap<String, String>();
+            filterData.put("sort", "pushed");
+            return new RepositoryListLoader(getSherlockActivity(), mUserLogin, 
+                    mUser.getType(), filterData, 5);
         }
     }
-    
+
     @Override
-    public void onLoaderReset(Loader<User> arg0) {
+    public void onLoadFinished(Loader loader, Object object) {
+        if (object != null) {
+            if (loader instanceof UserLoader) {
+                this.mUser = (User) object;
+                fillData();
+            }
+            else if (loader instanceof RepositoryListLoader) {
+                fillTopRepos((List<Repository>) object);
+            }
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Object> arg0) {
         // TODO Auto-generated method stub
         
     }
+    
 }

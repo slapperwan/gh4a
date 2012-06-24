@@ -28,6 +28,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -37,6 +38,11 @@ import android.widget.Toast;
  */
 public class Gh4Application extends Application {
 
+    public Typeface boldCondensed;
+    public Typeface condensed;
+    public Typeface regular;
+    public Typeface italic;
+    
     /*
      * (non-Javadoc)
      * @see android.app.Application#onCreate()
@@ -44,6 +50,11 @@ public class Gh4Application extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        
+        boldCondensed = Typeface.createFromAsset(getAssets(), "fonts/Roboto-BoldCondensed.ttf");
+        condensed = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Condensed.ttf");
+        regular = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Regular.ttf");
+        italic = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Italic.ttf");
     }
 
     /** The Constant pt. */
@@ -415,4 +426,5 @@ public class Gh4Application extends Application {
         String token = sharedPreferences.getString(Constants.User.USER_AUTH_TOKEN, null);
         return token;
     }
+    
 }

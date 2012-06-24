@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="windowTitleBackgroundStyle">#507AAA</color>
-    <color name="titletextcolor">#F8F8F8</color>
+    <color name="titletextcolor">#0099cc</color>
 
     <!-- For action bar -->
     <color name="actionbar_title">#FDFDFD</color>
