@@ -58,6 +58,7 @@
                 android:id="@+id/tv_url"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:textColorLink="@color/titletextcolor"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:autoLink="web" />
             <TextView

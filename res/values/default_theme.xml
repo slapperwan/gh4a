@@ -27,11 +27,6 @@
         -->
         <!-- item name="button_dashboard">@style/default_button_dashboard</item-->
         <item name="comment_box">@drawable/default_comment_box</item>
-        <item name="android:listViewStyle">@style/OctoDroidListViewStyle</item>
     </style>
     
-    <style name="OctoDroidListViewStyle" parent="Sherlock.__Widget.Holo.ListView">
-        <item name="android:divider">@drawable/abs__list_divider_holo_dark</item>
-        <item name="android:listSelector">@drawable/abs__list_selector_holo_dark</item>
-    </style>
 </resources>
