@@ -10,7 +10,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp" >
     <ImageView
         android:id="@+id/iv_gravatar"
         android:layout_width="40dp"

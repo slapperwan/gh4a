@@ -18,13 +18,15 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.adapter.SimpleStringAdapter;
 
-public class OrganizationListActivity extends BaseActivity {
+public class OrganizationListActivity extends BaseSherlockFragmentActivity {
 
     private String mUserLogin;
     private LoadingDialog mLoadingDialog;
     private SimpleStringAdapter mAdapter;
+    private ActionBar mActionBar;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,8 +34,13 @@ public class OrganizationListActivity extends BaseActivity {
 
         setContentView(R.layout.generic_list);
 
-        setUpActionBar();
         mUserLogin = getIntent().getStringExtra(Constants.User.USER_LOGIN);
+        
+        mActionBar = getSupportActionBar();
+        mActionBar.setTitle(R.string.user_organizations);
+        mActionBar.setSubtitle(mUserLogin);
+        mActionBar.setDisplayShowTitleEnabled(true);
+        mActionBar.setHomeButtonEnabled(true);
         
         ListView mListView = (ListView) findViewById(R.id.list_view);
         mListView.setOnItemClickListener(new OnItemClickListener() {

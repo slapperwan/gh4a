@@ -53,12 +53,13 @@ public class UserAdapter extends RootAdapter<User> {
     public View doGetView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
         ViewHolder viewHolder = null;
-
+        Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+        
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
             v = vi.inflate(mRowLayout, null);
 
-            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+            
             Typeface boldCondensed = app.boldCondensed;
             Typeface regular = app.regular;
             Typeface italic = app.italic;
