@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.PageIterator;
+import org.eclipse.egit.github.core.service.UserService;
 
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -36,7 +39,7 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.adapter.UserAdapter;
-import com.gh4a.loader.FollowersFollowingListLoader;
+import com.gh4a.loader.PageIteratorLoader;
 
 public class FollowersFollowingListFragment extends SherlockFragment 
     implements LoaderManager.LoaderCallbacks<List<User>>, OnItemClickListener {
@@ -45,7 +48,7 @@ public class FollowersFollowingListFragment extends SherlockFragment
     private boolean mFindFollowers;
     private ListView mListView;
     private UserAdapter mAdapter;
-    private List<User> mUsers;
+    private PageIterator<User> mDataIterator;
     
     public static FollowersFollowingListFragment newInstance(String login, boolean mFindFollowers) {
         FollowersFollowingListFragment f = new FollowersFollowingListFragment();
@@ -82,12 +85,27 @@ public class FollowersFollowingListFragment extends SherlockFragment
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         
+        loadData();
+
         getLoaderManager().initLoader(0, null, this);
         getLoaderManager().getLoader(0).forceLoad();
     }
+    
+    private void loadData() {
+        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
+        GitHubClient client = new GitHubClient();
+        client.setOAuth2Token(app.getAuthToken());
+        UserService userService = new UserService(client);
+        if (mFindFollowers) {
+            mDataIterator = userService.pageFollowers(mLogin);
+        } 
+        else {
+            mDataIterator = userService.pageFollowing(mLogin);
+        }
+    }
 
-    private void fillData() {
-        mAdapter.addAll(mUsers);
+    private void fillData(List<User> users) {
+        mAdapter.addAll(users);
         mAdapter.notifyDataSetChanged();
     }
 
@@ -100,21 +118,13 @@ public class FollowersFollowingListFragment extends SherlockFragment
 
     @Override
     public Loader<List<User>> onCreateLoader(int id, Bundle args) {
-        if (mFindFollowers) {
-            return new FollowersFollowingListLoader(getSherlockActivity(), 
-                    mLogin, -1, true);
-        }
-        else {
-            return new FollowersFollowingListLoader(getSherlockActivity(), 
-                    mLogin, -1, false);
-        }
+        return new PageIteratorLoader<User>(getSherlockActivity(), mDataIterator);
     }
 
     @Override
     public void onLoadFinished(Loader<List<User>> loader, List<User> users) {
         if (users != null) {
-            mUsers = users;
-            fillData();
+            fillData(users);
         }
     }
 

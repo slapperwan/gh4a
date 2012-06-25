@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.egit.github.core.RepositoryIssue;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.PageIterator;
+import org.eclipse.egit.github.core.service.IssueService;
 
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -33,12 +36,11 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
 import com.gh4a.Constants;
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.adapter.RepositoryIssueAdapter;
-import com.gh4a.loader.RepositoryIssueListLoader;
+import com.gh4a.loader.PageIteratorLoader;
 
 public class RepositoryIssueListFragment extends SherlockFragment 
     implements LoaderManager.LoaderCallbacks<List<RepositoryIssue>> {
@@ -46,6 +48,7 @@ public class RepositoryIssueListFragment extends SherlockFragment
     private Map<String, String> mFilterData;
     private ListView mListView;
     private RepositoryIssueAdapter mAdapter;
+    private PageIterator<RepositoryIssue> mDataIterator;
     
     public static RepositoryIssueListFragment newInstance(Map<String, String> filterData) {
         
@@ -98,8 +101,18 @@ public class RepositoryIssueListFragment extends SherlockFragment
         mAdapter = new RepositoryIssueAdapter(getSherlockActivity(), new ArrayList<RepositoryIssue>());
         mListView.setAdapter(mAdapter);
         
+        loadData();
+        
         getLoaderManager().initLoader(0, null, this);
         getLoaderManager().getLoader(0).forceLoad();
+    }
+    
+    public void loadData() {
+        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
+        GitHubClient client = new GitHubClient();
+        client.setOAuth2Token(app.getAuthToken());
+        IssueService issueService = new IssueService(client);
+        mDataIterator = issueService.pageIssues(mFilterData);
     }
     
     private void fillData(List<RepositoryIssue> issues) {
@@ -111,7 +124,7 @@ public class RepositoryIssueListFragment extends SherlockFragment
 
     @Override
     public Loader<List<RepositoryIssue>> onCreateLoader(int id, Bundle args) {
-        return new RepositoryIssueListLoader(getSherlockActivity(), mFilterData);
+        return new PageIteratorLoader<RepositoryIssue>(getSherlockActivity(), mDataIterator);
     }
 
     @Override

@@ -15,69 +15,96 @@
  */
 package com.gh4a;
 
-import java.io.IOException;
-import java.util.List;
+import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.view.ViewGroup;
 
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.WatcherService;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.Tab;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.gh4a.fragment.WatcherListFragment;
 
-/**
- * The WatcherList activity.
- */
-public class WatcherListActivity extends UserListActivity {
+public class WatcherListActivity extends BaseSherlockFragmentActivity  {
 
-    /** The user login. */
-    protected String mUserLogin;
-
-    /** The repo name. */
-    protected String mRepoName;
-
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.UserListActivity#setRequestData()
-     */
+    private String mRepoOwner;
+    private String mRepoName;
+    private ThisPageAdapter mAdapter;
+    private ViewPager mPager;
+    private ActionBar mActionBar;
+    private int tabCount;
+    
     @Override
-    protected void setRequestData() {
-        mUserLogin = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
-        mShowMoreData = false;
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.view_pager);
+        
+        Bundle data = getIntent().getExtras();
+        mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
+        mRepoName = data.getString(Constants.Repository.REPO_NAME);
+
+        tabCount = 2;
+        
+        mActionBar = getSupportActionBar();
+        mAdapter = new ThisPageAdapter(getSupportFragmentManager());
+        mPager = (ViewPager) findViewById(R.id.pager);
+        mPager.setAdapter(mAdapter);
+        
+        mPager.setOnPageChangeListener(new OnPageChangeListener() {
+
+            @Override
+            public void onPageScrollStateChanged(int arg0) {}
+            
+            @Override
+            public void onPageScrolled(int arg0, float arg1, int arg2) {}
+
+            @Override
+            public void onPageSelected(int position) {
+                mActionBar.setSelectedNavigationItem(position);
+            }
+        });
+        
+        mActionBar.setTitle(mRepoName);
+        mActionBar.setSubtitle(mRepoOwner);
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        mActionBar.setDisplayShowTitleEnabled(true);
+        mActionBar.setHomeButtonEnabled(true);
+        
+        Tab tab = mActionBar
+                .newTab()
+                .setText(R.string.repo_watchers)
+                .setTabListener(
+                        new TabListener<SherlockFragmentActivity>(this, 0 + "", mPager));
+        mActionBar.addTab(tab);
+        
+        tab = mActionBar
+                .newTab()
+                .setText(R.string.repo_forks)
+                .setTabListener(
+                        new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
+        mActionBar.addTab(tab);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.UserListActivity#setTitleBar()
-     */
-    protected void setTitleBar() {
-        mTitleBar = mUserLogin + " / " + mRepoName;
-    }
+    public class ThisPageAdapter extends FragmentStatePagerAdapter {
 
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.UserListActivity#setSubtitle()
-     */
-    protected void setSubtitle() {
-        mSubtitle = getResources().getString(R.string.repo_watchers);
-    }
+        public ThisPageAdapter(FragmentManager fm) {
+            super(fm);
+        }
 
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.UserListActivity#setRowLayout()
-     */
-    @Override
-    protected void setRowLayout() {
-        mRowLayout = R.layout.row_gravatar_1;
-    }
+        @Override
+        public int getCount() {
+            return tabCount;
+        }
 
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.UserListActivity#getUsers()
-     */
-    protected List<User> getUsers() throws IOException {
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(getAuthToken());
-        WatcherService watcherService = new WatcherService(client);
-        return watcherService.getWatchers(new RepositoryId(mUserLogin, mRepoName));
+        @Override
+        public android.support.v4.app.Fragment getItem(int position) {
+            return WatcherListFragment.newInstance(mRepoOwner, mRepoName);
+        }
+        
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+        }
     }
 }

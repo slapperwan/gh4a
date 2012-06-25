@@ -15,10 +15,14 @@
  */
 package com.gh4a.fragment;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.PageIterator;
+import org.eclipse.egit.github.core.service.WatcherService;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -38,7 +42,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
-import com.gh4a.loader.WatchedRepositoryListLoader;
+import com.gh4a.loader.PageIteratorLoader;
 
 public class WatchedRepositoryListFragment extends SherlockFragment 
     implements LoaderManager.LoaderCallbacks<List<Repository>>, OnItemClickListener {
@@ -46,6 +50,7 @@ public class WatchedRepositoryListFragment extends SherlockFragment
     private String mLogin;
     private ListView mListView;
     private RepositoryAdapter mAdapter;
+    private PageIterator<Repository> mDataIterator;
     
     public static WatchedRepositoryListFragment newInstance(String login) {
         WatchedRepositoryListFragment f = new WatchedRepositoryListFragment();
@@ -79,10 +84,25 @@ public class WatchedRepositoryListFragment extends SherlockFragment
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         
+        loadData();
+        
         getLoaderManager().initLoader(0, null, this);
         getLoaderManager().getLoader(0).forceLoad();
     }
 
+    public void loadData() {
+        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
+        GitHubClient client = new GitHubClient();
+        client.setOAuth2Token(app.getAuthToken());
+        WatcherService watcherService = new WatcherService(client);
+        try {
+            mDataIterator = watcherService.pageWatched(mLogin);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+    
     private void fillData(List<Repository> repositories) {
         if (repositories != null && repositories.size() > 0) {
             mAdapter.addAll(repositories);
@@ -104,7 +124,7 @@ public class WatchedRepositoryListFragment extends SherlockFragment
 
     @Override
     public Loader<List<Repository>> onCreateLoader(int id, Bundle args) {
-        return new WatchedRepositoryListLoader(getSherlockActivity(), mLogin);
+        return new PageIteratorLoader<Repository>(getSherlockActivity(), mDataIterator);
     }
 
     @Override

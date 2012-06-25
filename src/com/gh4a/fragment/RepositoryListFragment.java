@@ -16,9 +16,13 @@
 package com.gh4a.fragment;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.PageIterator;
+import org.eclipse.egit.github.core.service.RepositoryService;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -38,7 +42,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
-import com.gh4a.loader.RepositoryListLoader;
+import com.gh4a.loader.PageIteratorLoader;
 
 public class RepositoryListFragment extends SherlockFragment 
     implements LoaderManager.LoaderCallbacks<List<Repository>>, OnItemClickListener {
@@ -47,6 +51,7 @@ public class RepositoryListFragment extends SherlockFragment
     private String mUserType;
     private ListView mListView;
     private RepositoryAdapter mAdapter;
+    private PageIterator<Repository> mDataIterator;
     
     public static RepositoryListFragment newInstance(String login, String userType) {
         RepositoryListFragment f = new RepositoryListFragment();
@@ -82,10 +87,28 @@ public class RepositoryListFragment extends SherlockFragment
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         
+        loadData();
+        
         getLoaderManager().initLoader(0, null, this);
         getLoaderManager().getLoader(0).forceLoad();
     }
 
+    public void loadData() {
+        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
+        GitHubClient client = new GitHubClient();
+        client.setOAuth2Token(app.getAuthToken());
+        RepositoryService repoService = new RepositoryService(client);
+        if (mLogin.equals(app.getAuthLogin())) {
+            mDataIterator = repoService.pageRepositories(new HashMap<String, String>());
+        }
+        else if (Constants.User.USER_TYPE_ORG.equals(mUserType)) {
+            mDataIterator = repoService.pageOrgRepositories(mLogin, new HashMap<String, String>());
+        }
+        else {
+            mDataIterator = repoService.pageRepositories(mLogin, new HashMap<String, String>(), 100);
+        }
+    }
+    
     private void fillData(List<Repository> repositories) {
         if (repositories != null && repositories.size() > 0) {
             mAdapter.addAll(repositories);
@@ -107,7 +130,7 @@ public class RepositoryListFragment extends SherlockFragment
 
     @Override
     public Loader<List<Repository>> onCreateLoader(int id, Bundle args) {
-        return new RepositoryListLoader(getSherlockActivity(), mLogin, mUserType, null, -1);
+        return new PageIteratorLoader<Repository>(getSherlockActivity(), mDataIterator);
     }
 
     @Override

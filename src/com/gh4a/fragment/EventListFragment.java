@@ -21,6 +21,8 @@ import java.util.List;
 import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.GollumPage;
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.event.CommitCommentPayload;
 import org.eclipse.egit.github.core.event.DownloadPayload;
 import org.eclipse.egit.github.core.event.Event;
@@ -36,6 +38,7 @@ import org.eclipse.egit.github.core.event.MemberPayload;
 import org.eclipse.egit.github.core.event.PullRequestPayload;
 import org.eclipse.egit.github.core.event.PullRequestReviewCommentPayload;
 import org.eclipse.egit.github.core.event.PushPayload;
+import org.eclipse.egit.github.core.service.EventService;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -60,7 +63,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.WikiListActivity;
 import com.gh4a.adapter.FeedAdapter;
-import com.gh4a.loader.EventListLoader;
+import com.gh4a.loader.PageIteratorLoader;
 
 public class EventListFragment extends SherlockFragment 
     implements LoaderManager.LoaderCallbacks<List<Event>>, OnItemClickListener {
@@ -69,6 +72,7 @@ public class EventListFragment extends SherlockFragment
     private boolean mIsPrivate;
     private ListView mListView;
     private FeedAdapter mAdapter;
+    private PageIterator<Event> mDataIterator;
 
     public static EventListFragment newInstance(String login, boolean isPrivate) {
         EventListFragment f = new EventListFragment();
@@ -108,8 +112,23 @@ public class EventListFragment extends SherlockFragment
         mListView.setOnItemClickListener(this);
         registerForContextMenu(mListView);
         
+        loadData();
+        
         getLoaderManager().initLoader(0, null, this);
         getLoaderManager().getLoader(0).forceLoad();
+    }
+    
+    public void loadData() {
+        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
+        GitHubClient client = new GitHubClient();
+        client.setOAuth2Token(app.getAuthToken());
+        EventService eventService = new EventService(client);
+        if (mIsPrivate) {
+            mDataIterator = eventService.pageUserReceivedEvents(mLogin, true);
+        }
+        else {
+            mDataIterator = eventService.pageUserEvents(mLogin, false);
+        }
     }
     
     private void fillData(List<Event> events) {
@@ -121,7 +140,7 @@ public class EventListFragment extends SherlockFragment
     
     @Override
     public Loader<List<Event>> onCreateLoader(int id, Bundle args) {
-        return new EventListLoader(getSherlockActivity(), mLogin, mIsPrivate);
+        return new PageIteratorLoader<Event>(getSherlockActivity(), mDataIterator);
     }
 
     @Override

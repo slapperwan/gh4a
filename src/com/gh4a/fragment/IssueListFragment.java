@@ -15,11 +15,18 @@
  */
 package com.gh4a.fragment;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.PageIterator;
+import org.eclipse.egit.github.core.event.Event;
+import org.eclipse.egit.github.core.service.EventService;
+import org.eclipse.egit.github.core.service.IssueService;
 
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -33,6 +40,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.gh4a.Constants;
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.adapter.IssueAdapter;
 import com.gh4a.loader.IssueListLoader;
@@ -41,20 +49,21 @@ public class IssueListFragment extends SherlockFragment
     implements LoaderManager.LoaderCallbacks<List<Issue>> {
 
     private String mState;
-    private String mLogin;
-    private String mRepo;
+    private String mRepoOwner;
+    private String mRepoName;
     private Map<String, String> mFilterData;
     private ListView mListView;
     private IssueAdapter mAdapter;
+    private PageIterator<Event> mDataIterator;
     
-    static IssueListFragment newInstance(String login, String repo, 
+    static IssueListFragment newInstance(String repoOwner, String repoName, 
             Map<String, String> filterData) {
         
         IssueListFragment f = new IssueListFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.User.USER_LOGIN, login);
-        args.putString(Constants.Repository.REPO_NAME, repo);
+        args.putString(Constants.Repository.REPO_OWNER, repoOwner);
+        args.putString(Constants.Repository.REPO_NAME, repoName);
         
         if (filterData != null) {
             Iterator<String> i = filterData.keySet().iterator();
@@ -72,8 +81,8 @@ public class IssueListFragment extends SherlockFragment
         super.onCreate(savedInstanceState);
 
         super.onCreate(savedInstanceState);
-        mLogin = getArguments().getString(Constants.User.USER_LOGIN);
-        mRepo = getArguments().getString(Constants.Repository.REPO_NAME);
+        mRepoOwner = getArguments().getString(Constants.User.USER_LOGIN);
+        mRepoName = getArguments().getString(Constants.Repository.REPO_NAME);
 
         Bundle args = getArguments();
         Iterator<String> i = args.keySet().iterator();
@@ -94,9 +103,12 @@ public class IssueListFragment extends SherlockFragment
         return v;
     }
     
-    @Override
-    public void onDestroyView() {
-        getFragmentManager().beginTransaction().detach(this).commit();
+    public void loadData() {
+        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
+        GitHubClient client = new GitHubClient();
+        client.setOAuth2Token(app.getAuthToken());
+        IssueService issueService = new IssueService(client);
+        issueService.pageIssues(new RepositoryId(mRepoOwner, mRepoName), new HashMap<String, String>());
     }
     
     private void fillData(List<Issue> issues) {
@@ -108,7 +120,7 @@ public class IssueListFragment extends SherlockFragment
 
     @Override
     public Loader<List<Issue>> onCreateLoader(int id, Bundle args) {
-        return new IssueListLoader(getSherlockActivity(), mLogin, mRepo, mFilterData);
+        return new IssueListLoader(getSherlockActivity(), mRepoOwner, mRepoName, mFilterData);
     }
 
     @Override
