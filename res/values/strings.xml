@@ -40,7 +40,7 @@
     <!-- Activity event -->
     <string name="event_push_title">%1$s pushed to %2$s at %3$s</string>
     <string name="event_watch_title">%1$s %2$s watching %3$s</string>
-    <string name="event_gist_title">%1$s %2$s %3$s</string>
+    <string name="event_gist_title">%1$s %2$s gist: %3$s</string>
     <string name="event_fork_title">%1$s forked %2$s</string>
     <string name="event_commit_comment_title">%1$s commented on %2$s</string>
     <string name="event_fork_apply_title">%1$s applied fork commits to %2$s</string>

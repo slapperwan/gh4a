@@ -417,7 +417,8 @@ public class FeedAdapter extends RootAdapter<Event> {
             GistPayload payload = (GistPayload) event.getPayload();
             String text = String.format(res.getString(R.string.event_gist_title),
                     actor.getLogin(),
-                    payload.getAction(), payload.getGist().getId());
+                    payload.getAction(), 
+                    payload.getGist() != null ? payload.getGist().getId() : "(deleted)");
             return text;
         }
 
