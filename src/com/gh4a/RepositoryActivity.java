@@ -62,6 +62,8 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity {
         mActionBar.setTitle(mRepoName);
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         mActionBar.setDisplayShowTitleEnabled(true);
+        mActionBar.setHomeButtonEnabled(true);
+        
         Tab tab = mActionBar
                 .newTab()
                 .setText(R.string.about)

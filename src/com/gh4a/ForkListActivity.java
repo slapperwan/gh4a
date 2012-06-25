@@ -23,12 +23,16 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
+import android.os.Bundle;
+
 public class ForkListActivity extends RepositoryListActivity {
 
-    private String mUserLogin;
     private String mRepoName;
 
     protected List<Repository> getRepositories() throws IOException {
+        Bundle data = getIntent().getExtras();
+        mRepoName = data.getString(Constants.Repository.REPO_NAME);
+        
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(getAuthToken());
         RepositoryService repoService = new RepositoryService(client);

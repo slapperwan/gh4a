@@ -25,21 +25,13 @@ import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
-/**
- * The ContributorList activity.
- */
+import android.util.Log;
+
 public class ContributorListActivity extends UserListActivity {
 
-    /** The user login. */
     protected String mUserLogin;
-
-    /** The repo name. */
     protected String mRepoName;
 
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.UserListActivity#setRequestData()
-     */
     @Override
     protected void setRequestData() {
         mUserLogin = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
@@ -47,35 +39,11 @@ public class ContributorListActivity extends UserListActivity {
         mShowMoreData = false;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.UserListActivity#setTitleBar()
-     */
-    protected void setTitleBar() {
-        mTitleBar = mUserLogin + " / " + mRepoName;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.UserListActivity#setSubtitle()
-     */
-    protected void setSubtitle() {
-        mSubtitle = getResources().getString(R.string.repo_contributors);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.UserListActivity#setRowLayout()
-     */
     @Override
     protected void setRowLayout() {
         mRowLayout = R.layout.row_gravatar_1;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.UserListActivity#getUsers()
-     */
     protected List<User> getUsers() throws IOException {
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(getAuthToken());
@@ -90,6 +58,7 @@ public class ContributorListActivity extends UserListActivity {
             user.setName(contributor.getName());
             if (contributor.getLogin() != null) {
                 user.setLogin(contributor.getLogin());
+                user.setAvatarUrl(contributor.getAvatarUrl());
             }
             
             users.add(user);

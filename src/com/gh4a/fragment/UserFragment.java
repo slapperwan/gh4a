@@ -103,7 +103,6 @@ public class UserFragment extends SherlockFragment implements
         Typeface boldCondensed = app.boldCondensed;
         Typeface condensed = app.condensed;
         Typeface regular = app.regular;
-        Typeface italic = app.italic;
         
         ImageView ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
         ImageDownloader.getInstance().download(mUser.getGravatarId(), ivGravatar, 80);
@@ -112,7 +111,7 @@ public class UserFragment extends SherlockFragment implements
         tvName.setTypeface(boldCondensed);
         
         TextView tvCreated = (TextView) v.findViewById(R.id.tv_created_at);
-        tvCreated.setTypeface(app.regular);
+        tvCreated.setTypeface(regular);
         
         TextView tvFollowersCount = (TextView) v.findViewById(R.id.tv_followers_count);
         tvFollowersCount.setTypeface(boldCondensed);
@@ -182,7 +181,7 @@ public class UserFragment extends SherlockFragment implements
             tvGistCount.setVisibility(View.GONE);
         }
 
-        tvName.setText(StringUtils.formatName(mUser.getLogin(), mUser.getName()));
+        tvName.setText(StringUtils.isBlank(mUser.getName()) ? mUser.getLogin() : mUser.getName());
         if (Constants.User.USER_TYPE_ORG.equals(mUser.getType())) {
             tvName.append(" (");
             tvName.append(Constants.User.USER_TYPE_ORG);
@@ -342,9 +341,11 @@ public class UserFragment extends SherlockFragment implements
             
             TextView tvTitle = (TextView) rowView.findViewById(R.id.tv_title);
             tvTitle.setTypeface(boldCondensed);
+            
             TextView tvDesc = (TextView) rowView.findViewById(R.id.tv_desc);
             tvDesc.setTypeface(regular);
             tvDesc.setSingleLine(true);
+            
             TextView tvExtra = (TextView) rowView.findViewById(R.id.tv_extra);
             tvExtra.setTypeface(italic);
             

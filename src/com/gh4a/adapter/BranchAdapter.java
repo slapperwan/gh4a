@@ -119,12 +119,12 @@ public class BranchAdapter extends RootAdapter<RepositoryBranch> {
                     intent.putExtra(Constants.Object.OBJECT_SHA, branchTag.getCommit().getSha());
                     intent.putExtra(Constants.Repository.REPO_BRANCH, branchTag.getName());
                     intent.putExtra(Constants.Object.PATH, "Tree");
-                    if (v.getContext() instanceof BranchListActivity) {
-                        intent.putExtra(Constants.VIEW_ID, R.id.btn_branches);
-                    }
-                    else {
-                        intent.putExtra(Constants.VIEW_ID, R.id.btn_tags);
-                    }
+//                    if (v.getContext() instanceof BranchListActivity) {
+//                        intent.putExtra(Constants.VIEW_ID, R.id.btn_branches);
+//                    }
+//                    else {
+//                        intent.putExtra(Constants.VIEW_ID, R.id.btn_tags);
+//                    }
                     v.getContext().startActivity(intent);
                 }
             });
@@ -134,13 +134,13 @@ public class BranchAdapter extends RootAdapter<RepositoryBranch> {
 
                 @Override
                 public void onClick(View v) {
-                    int viewId;
-                    if (v.getContext() instanceof BranchListActivity) {
-                        viewId = R.id.btn_branches;
-                    }
-                    else {
-                        viewId = R.id.btn_tags;
-                    }
+                    int viewId = 0;
+//                    if (v.getContext() instanceof BranchListActivity) {
+//                        viewId = R.id.btn_branches;
+//                    }
+//                    else {
+//                        viewId = R.id.btn_tags;
+//                    }
 
                     ((Gh4Application) v.getContext().getApplicationContext())
                             .openCommitListActivity(v.getContext(), mUserLogin, mRepoName,

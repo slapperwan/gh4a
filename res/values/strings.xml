@@ -34,6 +34,8 @@
     <string name="donate">Donate</string>
     <string name="donate_text">Gh4a is open source and will always be available for free.  If you find it useful consider donating via Paypal (slapperwan.pp@gmail.com).  Thank you.</string>
     <string name="sort_by">Sort By (desc)</string>
+    <string name="other_info">Other Information</string>
+    <string name="view">View</string>
     
     <!-- Activity event -->
     <string name="event_push_title">%1$s pushed to %2$s at %3$s</string>
@@ -258,7 +260,7 @@
     <string name="blog">GitHub Blog</string>
     
     <!-- Recent Wiki Updates -->
-    <string name="recent_wiki">Recent Wiki Updates</string>
+    <string name="recent_wiki">Wiki</string>
     
     <!-- GitHub Jobs -->
     <string name="jobs">GitHub Jobs</string>

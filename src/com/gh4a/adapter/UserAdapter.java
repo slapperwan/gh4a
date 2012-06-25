@@ -31,13 +31,9 @@ import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.adapter.PullRequestDiscussionAdapter.ViewHolder;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
 
-/**
- * The User adapter.
- */
 public class UserAdapter extends RootAdapter<User> {
 
     private int mRowLayout;
@@ -94,7 +90,19 @@ public class UserAdapter extends RootAdapter<User> {
         if (user != null) {
 
             if (viewHolder.ivGravatar != null) {
-                ImageDownloader.getInstance().download(user.getGravatarId(), viewHolder.ivGravatar);
+                if (!StringUtils.isBlank(user.getGravatarId())) {
+                    ImageDownloader.getInstance().download(user.getGravatarId(), viewHolder.ivGravatar);    
+                }
+                else if (!StringUtils.isBlank(user.getEmail())) {
+                    ImageDownloader.getInstance().download(StringUtils.md5Hex(user.getEmail()), viewHolder.ivGravatar);
+                }
+                else if (!StringUtils.isBlank(user.getAvatarUrl())) { 
+                    ImageDownloader.getInstance().downloadByUrl(user.getAvatarUrl(), viewHolder.ivGravatar);
+                }
+                else {
+                    ImageDownloader.getInstance().download(null, viewHolder.ivGravatar);
+                }
+                
                 viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
 
                     @Override

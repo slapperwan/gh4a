@@ -23,21 +23,11 @@ import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 
-/**
- * The CollaboratorList activity.
- */
 public class CollaboratorListActivity extends UserListActivity {
 
-    /** The user login. */
     protected String mUserLogin;
-
-    /** The repo name. */
     protected String mRepoName;
 
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.UserListActivity#setRequestData()
-     */
     @Override
     protected void setRequestData() {
         mUserLogin = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
@@ -45,35 +35,11 @@ public class CollaboratorListActivity extends UserListActivity {
         mShowMoreData = false;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.UserListActivity#setTitleBar()
-     */
-    protected void setTitleBar() {
-        mTitleBar = mUserLogin + " / " + mRepoName;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.UserListActivity#setSubtitle()
-     */
-    protected void setSubtitle() {
-        mSubtitle = getResources().getString(R.string.repo_collaborators);
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.UserListActivity#setRowLayout()
-     */
     @Override
     protected void setRowLayout() {
-        mRowLayout = R.layout.row_simple;
+        mRowLayout = R.layout.row_gravatar_1;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.UserListActivity#getUsers()
-     */
     protected List<User> getUsers() throws IOException {
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(getAuthToken());

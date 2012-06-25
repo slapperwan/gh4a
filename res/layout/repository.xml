@@ -8,74 +8,193 @@
     android:padding="0dp">
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
-        <RelativeLayout
+        <LinearLayout
+            android:id="@+id/ll_repository_info"
+            android:layout_height="fill_parent"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent" >
+            android:orientation="vertical"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp">
             <LinearLayout
-                android:id="@+id/ll_repository_info"
+                android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:orientation="vertical"
-                android:layout_width="match_parent">
-                <LinearLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:id="@+id/tv_login"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="?attr/textAppearanceLink"
-                        android:textAppearance="?attr/textAppearanceMediumUrl" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text=" / " />
-                    <TextView
-                        android:id="@+id/tv_name"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium" 
-                        android:singleLine="true"/>
-                </LinearLayout>
+                android:orientation="horizontal">
                 <TextView
-                    android:id="@+id/tv_parent"
+                    android:id="@+id/tv_login"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?attr/textAppearanceLink"
-                    android:textAppearance="?attr/textAppearanceMicroUrl" />
-                <View
-                    android:id="@+id/separator"
-                    android:layout_width="fill_parent"
-                    android:layout_height="10dp" />
+                    android:textAppearance="?attr/textAppearanceLargeUrl" />
                 <TextView
-                    android:id="@+id/tv_desc"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-                <TextView
-                    android:id="@+id/tv_url"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:autoLink="web" />
-                <TextView
-                    android:id="@+id/tv_language"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:layout_below="@id/tv_desc"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="/" />
+                <TextView
+                    android:id="@+id/tv_name"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
             </LinearLayout>
-        </RelativeLayout>
-        <LinearLayout
+            <TextView
+                android:id="@+id/tv_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/textAppearanceLink"
+                android:textAppearance="?attr/textAppearanceMicroUrl" />
+            <View
+                android:id="@+id/separator"
+                android:layout_width="fill_parent"
+                android:layout_height="10dp" />
+            <TextView
+                android:id="@+id/tv_desc"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+            <TextView
+                android:id="@+id/tv_url"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:autoLink="web" />
+            <TextView
+                android:id="@+id/tv_language"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+        </LinearLayout>
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="10dp"
+            />
+        <TableLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            android:padding="16dp" >
+            <TableRow>
+                
+                <TableLayout
+                    android:id="@+id/cell_issues"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:drawable/list_selector_background" >
+                    <TableRow>
+                        <TextView
+                            android:id="@+id/tv_issues_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceLarge" />
+                    </TableRow>
+                    <TableRow>
+                        <TextView
+                            android:id="@+id/tv_issues_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?attr/textAppearanceSmall"
+                            android:text="@string/issues" />
+                    </TableRow>
+                </TableLayout>
+                
+                <TableLayout
+                    android:id="@+id/cell_watchers"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:drawable/list_selector_background" >
+                    <TableRow>
+                        <TextView
+                            android:id="@+id/tv_watchers_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceLarge" />
+                    </TableRow>
+                    <TableRow>
+                        <TextView
+                            android:id="@+id/tv_watchers_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?attr/textAppearanceSmall"
+                            android:text="@string/repo_watchers" />
+                    </TableRow>
+                </TableLayout>
+                <TableLayout
+                    android:id="@+id/cell_forks"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:drawable/list_selector_background" >
+                    <TableRow>
+                        <TextView
+                            android:id="@+id/tv_forks_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceLarge" />
+                    </TableRow>
+                    <TableRow>
+                        <TextView
+                            android:id="@+id/tv_forks_label"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?attr/textAppearanceSmall"
+                            android:text="@string/repo_network" />
+                    </TableRow>
+                </TableLayout>
+                <TableLayout
+                    android:id="@+id/cell_pull_requests"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:drawable/list_selector_background" >
+                    <TableRow>
+                        <TextView
+                            android:id="@+id/tv_pull_requests_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceLarge"
+                            android:text="@string/view" />
+                    </TableRow>
+                    <TableRow>
+                        <TextView
+                            android:id="@+id/tv_pull_requests_label"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?attr/textAppearanceSmall"
+                            android:text="@string/pull_requests" />
+                    </TableRow>
+                </TableLayout>
+            </TableRow>
+        </TableLayout>
+        
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="10dp" />
+        <LinearLayout
+            android:id="@+id/ll_others"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_margin="10dp">
-            <RelativeLayout
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+            <TextView
+                android:id="@+id/other_info"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/other_info" />
+            <View 
+                android:id="@+id/v_repo_divider"
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="#ff0099cc" />
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="10dp" />
+
+            <!-- RelativeLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content">
                 <TextView
@@ -108,125 +227,37 @@
                     android:layout_alignRight="@id/tv_tags_label"
                     android:layout_alignParentRight="true"
                     android:src="@drawable/ic_more" />
-            </RelativeLayout>
-            <RelativeLayout
+            </RelativeLayout-->
+            
+            <TextView
+                android:id="@+id/tv_contributors_label"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/tv_pull_requests_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="@string/pull_request_title" />
-                <ImageButton
-                    android:id="@+id/btn_pull_requests"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignRight="@id/tv_pull_requests_label"
-                    android:layout_alignParentRight="true"
-                    android:src="@drawable/ic_more" />
-            </RelativeLayout>
-            <RelativeLayout
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:background="@android:drawable/list_selector_background"
+                android:text="@string/repo_contributors"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp" />
+            
+            <TextView
+                android:id="@+id/tv_collaborators_label"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/tv_contributors_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="@string/repo_contributors" />
-                <ImageButton
-                    android:id="@+id/btn_contributors"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignRight="@id/tv_contributors_label"
-                    android:layout_alignParentRight="true"
-                    android:src="@drawable/ic_more" />
-            </RelativeLayout>
-            <RelativeLayout
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:background="@android:drawable/list_selector_background"
+                android:text="@string/repo_collaborators"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp" />
+            
+            <TextView
+                android:id="@+id/tv_wiki_label"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/tv_collaborators_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="@string/repo_collaborators" />
-                <ImageButton
-                    android:id="@+id/btn_collaborators"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignRight="@id/tv_collaborators_label"
-                    android:layout_alignParentRight="true"
-                    android:src="@drawable/ic_more" />
-            </RelativeLayout>
-            <RelativeLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/tv_watchers_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="@string/repo_watchers" />
-                <Button
-                    android:id="@+id/btn_watchers"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignRight="@id/tv_watchers_label"
-                    android:layout_alignParentRight="true" />
-            </RelativeLayout>
-            <RelativeLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/tv_forks_label"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="@string/repo_network" />
-                <Button
-                    android:id="@+id/btn_forks"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignRight="@id/tv_forks_label"
-                    android:layout_alignParentRight="true" />
-            </RelativeLayout>
-            <RelativeLayout
-                android:id="@+id/rl_open_issues"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/tv_issues_label"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="@string/issues" />
-                <Button
-                    android:id="@+id/btn_open_issues"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignRight="@id/tv_issues_label"
-                    android:layout_alignParentRight="true" />
-            </RelativeLayout>
-            <RelativeLayout
-                android:id="@+id/rl_wiki"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/tv_wiki_label"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="@string/recent_wiki" />
-                <ImageButton
-                    android:id="@+id/btn_wiki"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignRight="@id/tv_wiki_label"
-                    android:layout_alignParentRight="true"
-                    android:src="@drawable/ic_more" />
-            </RelativeLayout>
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:background="@android:drawable/list_selector_background"
+                android:text="@string/recent_wiki"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

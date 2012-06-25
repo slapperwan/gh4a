@@ -18,6 +18,8 @@ package com.gh4a.fragment;
 import org.eclipse.egit.github.core.Repository;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -27,9 +29,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.RelativeLayout;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
@@ -85,38 +85,18 @@ public class RepositoryFragment extends SherlockFragment implements
         getLoaderManager().getLoader(0).forceLoad();
     }
 
-    /**
-     * Fill data into UI components.
-     */
     public void fillData() {
         View v = getView();
         final Gh4Application app = (Gh4Application) getActivity().getApplicationContext();
+        Typeface boldCondensed = app.boldCondensed;
+        Typeface condensed = app.condensed;
+        Typeface regular = app.regular;
+        Typeface italic = app.italic;
         
-        ImageButton btnBranches = (ImageButton) v.findViewById(R.id.btn_branches);
-        btnBranches.setOnClickListener(this);
-
-        ImageButton btnTags = (ImageButton) v.findViewById(R.id.btn_tags);
-        btnTags.setOnClickListener(this);
-
-        ImageButton btnPullRequests = (ImageButton) v.findViewById(R.id.btn_pull_requests);
-        btnPullRequests.setOnClickListener(this);
-
-        Button btnWatchers = (Button) v.findViewById(R.id.btn_watchers);
-        btnWatchers.setOnClickListener(this);
-
-        Button btnForks = (Button) v.findViewById(R.id.btn_forks);
-        btnForks.setOnClickListener(this);
-
-        Button btnOpenIssues = (Button) v.findViewById(R.id.btn_open_issues);
-        btnOpenIssues.setOnClickListener(this);
-        
-        ImageButton btnCollaborators = (ImageButton) v.findViewById(R.id.btn_collaborators);
-        btnCollaborators.setOnClickListener(this);
-        
-        ImageButton btnContributors = (ImageButton) v.findViewById(R.id.btn_contributors);
-        btnContributors.setOnClickListener(this);
-
         TextView tvOwner = (TextView) v.findViewById(R.id.tv_login);
+        tvOwner.setText(mRepoOwner);
+        tvOwner.setTextColor(Color.parseColor("#0099cc"));
+        tvOwner.setTypeface(boldCondensed);
         tvOwner.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -126,26 +106,36 @@ public class RepositoryFragment extends SherlockFragment implements
             }
         });
         TextView tvRepoName = (TextView) v.findViewById(R.id.tv_name);
-        TextView tvParentRepo = (TextView) v.findViewById(R.id.tv_parent);
-        TextView tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        TextView tvUrl = (TextView) v.findViewById(R.id.tv_url);
-        TextView tvLanguage = (TextView) v.findViewById(R.id.tv_language);
-        
-        tvOwner.setText(mRepoOwner);
         tvRepoName.setText(mRepoName);
+        tvRepoName.setTypeface(boldCondensed);
+        
+        TextView tvParentRepo = (TextView) v.findViewById(R.id.tv_parent);
+        
+        TextView tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+        tvDesc.setTypeface(regular);
+        
+        TextView tvUrl = (TextView) v.findViewById(R.id.tv_url);
+        tvUrl.setTypeface(regular);
+        
+        TextView tvLanguage = (TextView) v.findViewById(R.id.tv_language);
+        tvLanguage.setTypeface(regular);
         
         if (mRepository.isFork()) {
             tvParentRepo.setVisibility(View.VISIBLE);
+            tvParentRepo.setTypeface(italic);
+
             if (mRepository.getParent() != null) {
                 tvParentRepo.setText("forked from "
+                        + mRepository.getParent().getOwner().getLogin() 
+                        + "/" 
                         + mRepository.getParent().getName());
                 tvParentRepo.setOnClickListener(new OnClickListener() {
 
                     @Override
                     public void onClick(View arg0) {
-                        String[] repoPart = mRepository.getName().split("/");
                         app.openRepositoryInfoActivity(getSherlockActivity(),
-                                repoPart[0], repoPart[1]);
+                                mRepository.getParent().getOwner().getLogin(),
+                                mRepository.getParent().getName());
                     }
                 });
             }
@@ -173,25 +163,94 @@ public class RepositoryFragment extends SherlockFragment implements
         
         tvUrl.setText(mRepository.getHtmlUrl());
 
-        btnWatchers.setText(String.valueOf(mRepository.getWatchers()));
-        btnForks.setText(String.valueOf(mRepository.getForks()));
-
+        TableLayout tlWatchers = (TableLayout) v.findViewById(R.id.cell_watchers);
+        tlWatchers.setOnClickListener(this);
+        
+        TextView tvWatchers = (TextView) v.findViewById(R.id.tv_watchers_label);
+        tvWatchers.setTypeface(condensed);
+        
+        TextView tvWatchersCount = (TextView) v.findViewById(R.id.tv_watchers_count);
+        tvWatchersCount.setText(String.valueOf(mRepository.getWatchers()));
+        tvWatchersCount.setTypeface(boldCondensed);
+        
+        TableLayout tlForks = (TableLayout) v.findViewById(R.id.cell_forks);
+        tlForks.setOnClickListener(this);
+        
+        TextView tvForks = (TextView) v.findViewById(R.id.tv_forks_label);
+        tvForks.setTypeface(condensed);
+        
+        TextView tvForksCount = (TextView) v.findViewById(R.id.tv_forks_count);
+        tvForksCount.setTypeface(boldCondensed);
+        tvForksCount.setText(String.valueOf(mRepository.getForks()));
+        
+        TableLayout tlIssues = (TableLayout) v.findViewById(R.id.cell_issues);
+        TextView tvIssues = (TextView) v.findViewById(R.id.tv_issues_label);
+        TextView tvIssuesCount = (TextView) v.findViewById(R.id.tv_issues_count);
+        
         if (mRepository.isHasIssues()) {
-            btnOpenIssues.setText(String.valueOf(mRepository.getOpenIssues()));
+            tlIssues.setVisibility(View.VISIBLE);
+            tlIssues.setOnClickListener(this);
+            
+            tvIssues.setTypeface(condensed);
+            tvIssues.setVisibility(View.VISIBLE);
+            
+            tvIssuesCount.setTypeface(boldCondensed);
+            tvIssuesCount.setText(String.valueOf(mRepository.getOpenIssues()));
+            tvIssuesCount.setVisibility(View.VISIBLE);
         }
         else {
-            RelativeLayout rlOpenIssues = (RelativeLayout) v.findViewById(R.id.rl_open_issues);
-            rlOpenIssues.setVisibility(View.GONE);
+            tlIssues.setVisibility(View.GONE);
+            tvIssues.setVisibility(View.GONE);
+            tvIssuesCount.setVisibility(View.GONE);
         }
         
-        if (mRepository.isHasWiki()) {
-            ImageButton btnWiki = (ImageButton) v.findViewById(R.id.btn_wiki);
-            btnWiki.setOnClickListener(this);
+        TableLayout tlPullRequests = (TableLayout) v.findViewById(R.id.cell_pull_requests);
+        tlPullRequests.setOnClickListener(this);
+        
+        TextView tvPullRequestsCount = (TextView) v.findViewById(R.id.tv_pull_requests_count);
+        tvPullRequestsCount.setTypeface(boldCondensed);
+        
+        TextView tvPullRequests = (TextView) v.findViewById(R.id.tv_pull_requests_label);
+        tvPullRequests.setTypeface(condensed);
+        
+        if (mRepository.isHasIssues()) {
+            tlIssues.setVisibility(View.VISIBLE);
+            tlIssues.setOnClickListener(this);
+            
+            tvIssues.setTypeface(condensed);
+            tvIssues.setVisibility(View.VISIBLE);
+            
+            tvIssuesCount.setTypeface(boldCondensed);
+            tvIssuesCount.setText(String.valueOf(mRepository.getOpenIssues()));
+            tvIssuesCount.setVisibility(View.VISIBLE);
         }
         else {
-            RelativeLayout rlWiki = (RelativeLayout) v.findViewById(R.id.rl_wiki);
-            rlWiki.setVisibility(View.GONE);
+            tlIssues.setVisibility(View.GONE);
+            tvIssues.setVisibility(View.GONE);
+            tvIssuesCount.setVisibility(View.GONE);
         }
+        
+        TextView tvWiki = (TextView) v.findViewById(R.id.tv_wiki_label);
+        if (mRepository.isHasWiki()) {
+            tvWiki.setTypeface(boldCondensed);
+            tvWiki.setOnClickListener(this);
+            tvWiki.setVisibility(View.VISIBLE);
+        }
+        else {
+            tvWiki.setVisibility(View.GONE);
+        }
+        
+        TextView tvContributor = (TextView) v.findViewById(R.id.tv_contributors_label);
+        tvContributor.setOnClickListener(this);
+        tvContributor.setTypeface(boldCondensed);
+        
+        TextView tvCollaborators = (TextView) v.findViewById(R.id.tv_collaborators_label);
+        tvCollaborators.setOnClickListener(this);
+        tvCollaborators.setTypeface(boldCondensed);
+        
+        TextView tvOthers = (TextView) v.findViewById(R.id.other_info);
+        tvOthers.setTypeface(boldCondensed);
+        tvOthers.setTextColor(Color.parseColor("#0099cc"));
     }
 
     @Override
@@ -200,57 +259,47 @@ public class RepositoryFragment extends SherlockFragment implements
         Gh4Application app = (Gh4Application) getActivity().getApplicationContext();
         
         switch (id) {
-        case R.id.btn_branches:
-            app.openBranchListActivity(getActivity(),
-                    mRepoOwner, mRepoName, R.id.btn_branches);
-            break;
-        case R.id.btn_tags:
-            app.openTagListActivity(getActivity(),
-                    mRepoOwner, mRepoName, R.id.btn_tags);
-            break;
         case R.id.btn_commits:
             app.openBranchListActivity(getActivity(),
                     mRepoOwner, mRepoName, R.id.btn_commits);
             break;
-        case R.id.btn_pull_requests:
+        case R.id.cell_pull_requests:
             app.openPullRequestListActivity(getActivity(),
                     mRepoOwner, mRepoName,
                     Constants.Issue.ISSUE_STATE_OPEN);
             break;
-        case R.id.btn_watchers:
-            getWatchers(view);
-            break;
-        case R.id.btn_forks:
-            getNetworks(view);
-            break;
-        case R.id.btn_contributors:
+        case R.id.tv_contributors_label:
             getContributors(view);
             break;
-        case R.id.btn_collaborators:
+        case R.id.tv_collaborators_label:
             getCollaborators(view);
             break;
-        case R.id.btn_open_issues:
+        case R.id.cell_issues:
             app.openIssueListActivity(getActivity(),
                     mRepoOwner, mRepoName,
                     Constants.Issue.ISSUE_STATE_OPEN);
             break;
-        case R.id.btn_wiki:
-            Intent intent = new Intent().setClass(getActivity(), WikiListActivity.class);
-            intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-            intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-            startActivity(intent);
+        case R.id.cell_watchers:
+            getWatchers(view);
+            break;
+        case R.id.cell_forks:
+            getNetworks(view);
+            break;
+        case R.id.tv_wiki_label:
+            getWiki(view);
             break;
         default:
             break;
         }
     }
 
-    /**
-     * Gets the watchers when Watchers button clicked.
-     * 
-     * @param view the view
-     * @return the watchers
-     */
+    public void getWiki(View view) {
+        Intent intent = new Intent().setClass(getActivity(), WikiListActivity.class);
+        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        startActivity(intent);
+    }
+    
     public void getWatchers(View view) {
         Intent intent = new Intent().setClass(getActivity(), WatcherListActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
@@ -258,25 +307,13 @@ public class RepositoryFragment extends SherlockFragment implements
         startActivity(intent);
     }
 
-    /**
-     * Gets the networks when Networkd button clicked.
-     * 
-     * @param view the view
-     * @return the networks
-     */
     public void getNetworks(View view) {
         Intent intent = new Intent().setClass(getActivity(), ForkListActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+        intent.putExtra(Constants.User.USER_LOGIN, mRepoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
         startActivity(intent);
     }
 
-    /**
-     * Gets the open issues when Open Issues button clicked.
-     * 
-     * @param view the view
-     * @return the open issues
-     */
     public void getOpenIssues(View view) {
         Intent intent = new Intent().setClass(getActivity(), IssueListActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
@@ -285,12 +322,6 @@ public class RepositoryFragment extends SherlockFragment implements
         startActivity(intent);
     }
 
-    /**
-     * Gets the contributors.
-     *
-     * @param view the view
-     * @return the contributors
-     */
     public void getContributors(View view) {
         Intent intent = new Intent().setClass(getActivity(), ContributorListActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
@@ -298,12 +329,6 @@ public class RepositoryFragment extends SherlockFragment implements
         startActivity(intent);
     }
     
-    /**
-     * Gets the collaborators.
-     *
-     * @param view the view
-     * @return the collaborators
-     */
     public void getCollaborators(View view) {
         Intent intent = new Intent().setClass(getActivity(), CollaboratorListActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
