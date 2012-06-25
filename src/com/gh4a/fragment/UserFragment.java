@@ -286,13 +286,7 @@ public class UserFragment extends SherlockFragment implements
         else {
             Intent intent = new Intent().setClass(this.getActivity(), FollowerFollowingListActivity.class);
             intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
-            if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
-                intent.putExtra(Constants.SUBTITLE, getResources().getString(R.string.user_followers));
-            }
-            else {
-                intent.putExtra(Constants.SUBTITLE, getResources().getString(R.string.user_members));
-            }
-            intent.putExtra(Constants.FIND_FOLLOWER, true);
+            intent.putExtra("FIND_FOLLOWERS", true);
             startActivity(intent);
         }
     }
@@ -300,10 +294,7 @@ public class UserFragment extends SherlockFragment implements
     public void getFollowing(View view) {
         Intent intent = new Intent().setClass(this.getActivity(), FollowerFollowingListActivity.class);
         intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
-        intent.putExtra(Constants.ACTIONBAR_TITLE, mUserLogin
-                + (!StringUtils.isBlank(mUserName) ? " - " + mUserName : ""));
-        intent.putExtra(Constants.SUBTITLE, getResources().getString(R.string.user_following));
-        intent.putExtra(Constants.FIND_FOLLOWER, false);
+        intent.putExtra("FIND_FOLLOWERS", false);
         startActivity(intent);
     }
 

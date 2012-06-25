@@ -15,183 +15,104 @@
  */
 package com.gh4a;
 
-import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.UserService;
-
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.view.ViewGroup;
 
-import com.gh4a.adapter.UserAdapter;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.Tab;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.gh4a.fragment.FollowersFollowingListFragment;
 
-/**
- * The FollowerFollowingList activity.
- */
-public class FollowerFollowingListActivity extends BaseActivity implements OnItemClickListener {
+public class FollowerFollowingListActivity extends BaseSherlockFragmentActivity {
 
-    /** The user login. */
-    protected String mUserLogin;
+    private String mUserLogin;
+    private boolean mFindFollowers;// flag to search followers or followingprivate ThisPageAdapter mAdapter;
+    private ThisPageAdapter mAdapter;
+    private ViewPager mPager;
+    private ActionBar mActionBar;
+    private int tabCount;
 
-    /** The sub title. */
-    protected String mSubtitle;
-
-    /** The loading dialog. */
-    protected LoadingDialog mLoadingDialog;
-
-    /** The follower following adapter. */
-    protected UserAdapter mFollowerFollowingAdapter;
-
-    /** The list view users. */
-    protected ListView mListViewUsers;
-
-    /** The find followers. */
-    protected boolean mFindFollowers;// flag to search followers or following
-
-    /**
-     * Called when the activity is first created.
-     * 
-     * @param savedInstanceState the saved instance state
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.generic_list);
-        setUpActionBar();
-
+        setContentView(R.layout.view_pager);
+        
         Bundle data = getIntent().getExtras();
         mUserLogin = data.getString(Constants.User.USER_LOGIN);
-        mSubtitle = data.getString(Constants.SUBTITLE);
-        mFindFollowers = data.getBoolean("FIND_FOLLOWER");
+        mFindFollowers = data.getBoolean("FIND_FOLLOWERS");
 
-        mListViewUsers = (ListView) findViewById(R.id.list_view);
-        mListViewUsers.setOnItemClickListener(this);
+        tabCount = 2;
+        
+        mActionBar = getSupportActionBar();
+        mAdapter = new ThisPageAdapter(getSupportFragmentManager());
+        mPager = (ViewPager) findViewById(R.id.pager);
+        mPager.setAdapter(mAdapter);
+        
+        mPager.setOnPageChangeListener(new OnPageChangeListener() {
 
-        mFollowerFollowingAdapter = new UserAdapter(this, new ArrayList<User>(), R.layout.row_gravatar_1, false);
-        mListViewUsers.setAdapter(mFollowerFollowingAdapter);
+            @Override
+            public void onPageScrollStateChanged(int arg0) {}
+            
+            @Override
+            public void onPageScrolled(int arg0, float arg1, int arg2) {}
 
-        new LoadListTask(this).execute();
+            @Override
+            public void onPageSelected(int position) {
+                mActionBar.setSelectedNavigationItem(position);
+            }
+        });
+        
+        mActionBar.setTitle(mUserLogin);
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        mActionBar.setDisplayShowTitleEnabled(true);
+        mActionBar.setHomeButtonEnabled(true);
+        
+        Tab tab = mActionBar
+                .newTab()
+                .setText(R.string.user_followers)
+                .setTabListener(
+                        new TabListener<SherlockFragmentActivity>(this, 0 + "", mPager));
+        mActionBar.addTab(tab, mFindFollowers);
+        
+        tab = mActionBar
+                .newTab()
+                .setText(R.string.user_following)
+                .setTabListener(
+                        new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
+        mActionBar.addTab(tab, !mFindFollowers);
     }
 
-    /**
-     * An asynchronous task that runs on a background thread to load list.
-     */
-    private static class LoadListTask extends AsyncTask<Void, Integer, List<User>> {
+    public class ThisPageAdapter extends FragmentStatePagerAdapter {
 
-        /** The target. */
-        private WeakReference<FollowerFollowingListActivity> mTarget;
-        
-        /** The exception. */
-        private boolean mException;
-
-        /**
-         * Instantiates a new load list task.
-         *
-         * @param activity the activity
-         */
-        public LoadListTask(FollowerFollowingListActivity activity) {
-            mTarget = new WeakReference<FollowerFollowingListActivity>(activity);
+        public ThisPageAdapter(FragmentManager fm) {
+            super(fm);
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
         @Override
-        protected List<User> doInBackground(Void... params) {
-            if (mTarget.get() != null) {
-                try {
-                    FollowerFollowingListActivity activity = mTarget.get();
-                    GitHubClient client = new GitHubClient();
-                    client.setOAuth2Token(activity.getAuthToken());
-                    UserService userService = new UserService(client);
-                    List<User> users = new ArrayList<User>();
-                    if (activity.mFindFollowers) {
-                        users = userService.getFollowers(activity.mUserLogin);
-                    }
-                    else {
-                        users = userService.getFollowing(activity.mUserLogin);
-                    }
-                    return users;
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
+        public int getCount() {
+            return tabCount;
+        }
+
+        @Override
+        public android.support.v4.app.Fragment getItem(int position) {
+            if (position == 0) {
+                return FollowersFollowingListFragment.newInstance(
+                        FollowerFollowingListActivity.this.mUserLogin,
+                        true);
             }
             else {
-                return null;
+                return FollowersFollowingListFragment.newInstance(
+                        FollowerFollowingListActivity.this.mUserLogin,
+                        false);
             }
         }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
+        
         @Override
-        protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                FollowerFollowingListActivity activity = mTarget.get();
-                activity.mLoadingDialog = LoadingDialog.show(activity, true, true);
-            }
+        public void destroyItem(ViewGroup container, int position, Object object) {
         }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
-        @Override
-        protected void onPostExecute(List<User> result) {
-            if (mTarget.get() != null) {
-                FollowerFollowingListActivity activity = mTarget.get();
-                activity.mLoadingDialog.dismiss();
-    
-                if (mException) {
-                    activity.showError();
-                }
-                else {
-                    activity.fillData(result);
-                }
-            }
-        }
-    }
-
-    /**
-     * Fill data into UI components.
-     * 
-     * @param usernames the usernames
-     */
-    protected void fillData(List<User> users) {
-        if (users != null && users.size() > 0) {
-            mFollowerFollowingAdapter.notifyDataSetChanged();
-            for (User user : users) {
-                mFollowerFollowingAdapter.add(user);
-            }
-        }
-        mFollowerFollowingAdapter.notifyDataSetChanged();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see
-     * android.widget.AdapterView.OnItemClickListener#onItemClick(android.widget
-     * .AdapterView, android.view.View, int, long)
-     */
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        User user = (User) adapterView.getAdapter().getItem(position);
-        getApplicationContext().openUserInfoActivity(this, user.getLogin(), user.getName());
     }
 }
