@@ -17,13 +17,16 @@ package com.gh4a;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
+import java.util.List;
 
+import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.RepositoryBranch;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.Tree;
 import org.eclipse.egit.github.core.TreeEntry;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.DataService;
+import org.eclipse.egit.github.core.service.RepositoryService;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -36,40 +39,12 @@ import android.widget.ListView;
 
 import com.gh4a.adapter.FileAdapter;
 
-/**
- * The FileManager activity.
- */
 public class FileManagerActivity extends BaseActivity implements OnItemClickListener {
 
-    /** The user login. */
-    protected String mUserLogin;
+    private String mRepoOwner;
+    private String mRepoName;
+    private String mObjectSha;
 
-    /** The repo name. */
-    protected String mRepoName;
-
-    /** The object sha. */
-    protected String mObjectSha;
-
-    /** The tree sha. */
-    private String mTreeSha;
-
-    /** The branch name. */
-    private String mBranchName;
-
-    /** The path. */
-    protected String mPath;
-
-    /** The from btn id. */
-    protected int mFromBtnId;
-
-    /** The loading dialog. */
-    protected LoadingDialog mLoadingDialog;
-
-    /**
-     * Called when the activity is first created.
-     * 
-     * @param savedInstanceState the saved instance state
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,50 +52,51 @@ public class FileManagerActivity extends BaseActivity implements OnItemClickList
         setContentView(R.layout.generic_list);
         setUpActionBar();
 
-        mUserLogin = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
+        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
         mObjectSha = getIntent().getExtras().getString(Constants.Object.OBJECT_SHA);
-        mTreeSha = getIntent().getExtras().getString(Constants.Object.TREE_SHA);
-        mBranchName = getIntent().getExtras().getString(Constants.Repository.REPO_BRANCH);
-        mPath = getIntent().getExtras().getString(Constants.Object.PATH);
-        mFromBtnId = getIntent().getExtras().getInt(Constants.VIEW_ID);
 
         new LoadTreeListTask(this).execute();
     }
 
-    /**
-     * An asynchronous task that runs on a background thread to load tree list.
-     */
     private static class LoadTreeListTask extends AsyncTask<Void, Integer, Tree> {
 
-        /** The target. */
         private WeakReference<FileManagerActivity> mTarget;
-
-        /** The exception. */
         private boolean mException;
 
-        /**
-         * Instantiates a new load tree list task.
-         * 
-         * @param activity the activity
-         */
         public LoadTreeListTask(FileManagerActivity activity) {
             mTarget = new WeakReference<FileManagerActivity>(activity);
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
         @Override
         protected Tree doInBackground(Void... params) {
             if (mTarget.get() != null) {
                 try {
                     FileManagerActivity activity = mTarget.get();
+                    
                     GitHubClient client = new GitHubClient();
                     client.setOAuth2Token(mTarget.get().getAuthToken());
+                    
+                    if (activity.mObjectSha == null) {
+                        RepositoryService repoService = new RepositoryService(client);
+                        Repository repo = repoService.getRepository(activity.mRepoOwner, 
+                                activity.mRepoName);
+                        String masterBranch = repo.getMasterBranch();
+                        
+                        List<RepositoryBranch> branches = repoService.getBranches(
+                                new RepositoryId(activity.mRepoOwner, 
+                                        activity.mRepoName));
+                        
+                        for (RepositoryBranch repositoryBranch : branches) {
+                            if (repositoryBranch.getName().equals(masterBranch)) {
+                                activity.mObjectSha = repositoryBranch.getCommit().getSha();
+                                break;
+                            }
+                        }
+                    }
+                    
                     DataService dataService = new DataService(client);
-                    return dataService.getTree(new RepositoryId(activity.mUserLogin, activity.mRepoName),
+                    return dataService.getTree(new RepositoryId(activity.mRepoOwner, activity.mRepoName),
                             activity.mObjectSha);
                 }
                 catch (IOException e) {
@@ -134,21 +110,10 @@ public class FileManagerActivity extends BaseActivity implements OnItemClickList
             }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
         @Override
         protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
-            }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
         @Override
         protected void onPostExecute(Tree result) {
             if (mTarget.get() != null) {
@@ -157,17 +122,11 @@ public class FileManagerActivity extends BaseActivity implements OnItemClickList
                 }
                 else {
                     mTarget.get().fillData(result);
-                    mTarget.get().mLoadingDialog.dismiss();
                 }
             }
         }
     }
 
-    /**
-     * Fill data into UI components.
-     * 
-     * @param trees the trees
-     */
     protected void fillData(Tree tree) {
         ListView listView = (ListView) findViewById(R.id.list_view);
         listView.setOnItemClickListener(this);
@@ -176,9 +135,6 @@ public class FileManagerActivity extends BaseActivity implements OnItemClickList
         listView.setAdapter(fileAdapter);
     }
 
-    /* (non-Javadoc)
-     * @see android.widget.AdapterView.OnItemClickListener#onItemClick(android.widget.AdapterView, android.view.View, int, long)
-     */
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         FileAdapter adapter = (FileAdapter) adapterView.getAdapter();
@@ -186,27 +142,18 @@ public class FileManagerActivity extends BaseActivity implements OnItemClickList
         
         if ("tree".equals(tree.getType())) {
             Intent intent = new Intent().setClass(this, FileManagerActivity.class);
-            intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+            intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
             intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
             intent.putExtra(Constants.Object.OBJECT_SHA, tree.getSha());
-            intent.putExtra(Constants.Object.TREE_SHA, mTreeSha);
-            intent.putExtra(Constants.Repository.REPO_BRANCH, mBranchName);
-            intent.putExtra(Constants.Object.PATH, mPath + "/" + tree.getPath());
-            intent.putExtra(Constants.VIEW_ID, mFromBtnId);
             startActivity(intent);
         }
         else {
             Intent intent = new Intent().setClass(this, FileViewerActivity.class);
-            intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+            intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
             intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-            intent.putExtra(Constants.Repository.REPO_BRANCH, mBranchName);
+            intent.putExtra(Constants.Repository.REPO_BRANCH, "master");
             intent.putExtra(Constants.Object.OBJECT_SHA, tree.getSha());
-            intent.putExtra(Constants.Object.TREE_SHA, mTreeSha);
             intent.putExtra(Constants.Object.NAME, tree.getPath());
-            //intent.putExtra(Constants.Object.MIME_TYPE, tree.getMimeType());
-            intent.putExtra(Constants.Object.MIME_TYPE, tree.getPath());
-            intent.putExtra(Constants.Object.PATH, mPath + "/" + tree.getPath());
-            intent.putExtra(Constants.VIEW_ID, mFromBtnId);
             startActivity(intent);
         }
     }

@@ -11,12 +11,11 @@ import android.view.ViewGroup;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.gh4a.fragment.ContentListFragment;
 import com.gh4a.fragment.RepositoryFragment;
 
 public class RepositoryActivity extends BaseSherlockFragmentActivity {
 
-    private static final int NUM_ITEMS = 3;
+    private static final int NUM_ITEMS = 2;
     private String mRepoOwner;
     private String mRepoName;
     private RepositoryAdapter mAdapter;
@@ -73,16 +72,9 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity {
         
         tab = mActionBar
                 .newTab()
-                .setText(R.string.repo_files)
-                .setTabListener(
-                        new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
-        mActionBar.addTab(tab);
-        
-        tab = mActionBar
-                .newTab()
                 .setText(getResources().getQuantityString(R.plurals.commit, 2))
                 .setTabListener(
-                        new TabListener<SherlockFragmentActivity>(this, 2 + "", mPager));
+                        new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
         mActionBar.addTab(tab);
         
     }
@@ -105,10 +97,6 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity {
                         RepositoryActivity.this.mRepoName);
             }
             else if (position == 1) {
-                return ContentListFragment.newInstance(RepositoryActivity.this.mRepoOwner,
-                        RepositoryActivity.this.mRepoName);
-            }
-            else if (position == 2) {
                 return RepositoryFragment.newInstance(RepositoryActivity.this.mRepoOwner,
                         RepositoryActivity.this.mRepoName);
             }
@@ -123,4 +111,5 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity {
             //
         }
     }
+    
 }

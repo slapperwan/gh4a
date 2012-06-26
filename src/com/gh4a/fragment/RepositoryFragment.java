@@ -36,6 +36,7 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.gh4a.CollaboratorListActivity;
 import com.gh4a.Constants;
 import com.gh4a.ContributorListActivity;
+import com.gh4a.FileManagerActivity;
 import com.gh4a.ForkListActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.IssueListActivity;
@@ -240,6 +241,10 @@ public class RepositoryFragment extends SherlockFragment implements
             tvWiki.setVisibility(View.GONE);
         }
         
+        TextView tvFiles = (TextView) v.findViewById(R.id.tv_files);
+        tvFiles.setOnClickListener(this);
+        tvFiles.setTypeface(boldCondensed);
+        
         TextView tvContributor = (TextView) v.findViewById(R.id.tv_contributors_label);
         tvContributor.setOnClickListener(this);
         tvContributor.setTypeface(boldCondensed);
@@ -288,11 +293,20 @@ public class RepositoryFragment extends SherlockFragment implements
         case R.id.tv_wiki_label:
             getWiki(view);
             break;
+        case R.id.tv_files:
+            getFiles(view);
         default:
             break;
         }
     }
 
+    public void getFiles(View view) {
+        Intent intent = new Intent().setClass(getActivity(), FileManagerActivity.class);
+        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        startActivity(intent);
+    }
+    
     public void getWiki(View view) {
         Intent intent = new Intent().setClass(getActivity(), WikiListActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);

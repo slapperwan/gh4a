@@ -22,11 +22,13 @@ public class ContentListLoader extends AsyncTaskLoader<List<TreeEntry>> {
 
     private String mRepoOwner;
     private String mRepoName;
+    private String mSha;
     
-    public ContentListLoader(Context context, String repoOwner, String repoName) {
+    public ContentListLoader(Context context, String repoOwner, String repoName, String sha) {
         super(context);
-        this.mRepoOwner = repoOwner;
-        this.mRepoName = repoName;
+        mRepoOwner = repoOwner;
+        mRepoName = repoName;
+        mSha = sha;
     }
     
     @Override
@@ -39,17 +41,18 @@ public class ContentListLoader extends AsyncTaskLoader<List<TreeEntry>> {
         DataService dataService = new DataService(client);
         
         try {
-            Repository repo = repoService.getRepository(mRepoOwner, mRepoName);
-            String masterBranch = repo.getMasterBranch();
-            
-            String sha = null;
-            List<RepositoryBranch> branches = repoService.getBranches(new RepositoryId(mRepoOwner, mRepoName));
-            for (RepositoryBranch repositoryBranch : branches) {
-                if (repositoryBranch.getName().equals(masterBranch)) {
-                    sha = repositoryBranch.getCommit().getSha();
+            if (mSha == null) {
+                Repository repo = repoService.getRepository(mRepoOwner, mRepoName);
+                String masterBranch = repo.getMasterBranch();
+                List<RepositoryBranch> branches = repoService.getBranches(new RepositoryId(mRepoOwner, mRepoName));
+                for (RepositoryBranch repositoryBranch : branches) {
+                    if (repositoryBranch.getName().equals(masterBranch)) {
+                        mSha = repositoryBranch.getCommit().getSha();
+                        break;
+                    }
                 }
             }
-            return dataService.getTree(new RepositoryId(mRepoOwner, mRepoName), sha).getTree();
+            return dataService.getTree(new RepositoryId(mRepoOwner, mRepoName), mSha).getTree();
         } catch (IOException e) {
             Log.e(Constants.LOG_TAG, e.getMessage(), e);
             return null;

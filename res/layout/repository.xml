@@ -231,6 +231,16 @@
             </RelativeLayout-->
             
             <TextView
+                android:id="@+id/tv_files"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:background="@android:drawable/list_selector_background"
+                android:text="@string/repo_files"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp" />
+            
+            <TextView
                 android:id="@+id/tv_contributors_label"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"

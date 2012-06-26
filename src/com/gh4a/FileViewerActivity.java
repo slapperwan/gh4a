@@ -54,28 +54,9 @@ public class FileViewerActivity extends BaseActivity {
 
     /** The object sha. */
     protected String mObjectSha;
-
-    /** The tree sha. */
-    private String mTreeSha;
-
-    /** The name. */
-    protected String mName;
-
-    /** The mime type. */
-    private String mMimeType;
-
-    /** The path. */
     private String mPath;
-
-    /** The branch name. */
     private String mBranchName;
-
-    /** The from btn id. */
-    private int mFromBtnId;
-
-    /** The loading dialog. */
-    protected LoadingDialog mLoadingDialog;
-    
+    protected String mName;
     private Blob mBlob;
 
     /**
@@ -93,13 +74,10 @@ public class FileViewerActivity extends BaseActivity {
         mUserLogin = getIntent().getStringExtra(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getStringExtra(Constants.Repository.REPO_NAME);
         mObjectSha = getIntent().getStringExtra(Constants.Object.OBJECT_SHA);
-        mTreeSha = getIntent().getStringExtra(Constants.Object.TREE_SHA);
-        mName = getIntent().getStringExtra(Constants.Object.NAME);
-        mMimeType = getIntent().getStringExtra(Constants.Object.MIME_TYPE);
         mPath = getIntent().getStringExtra(Constants.Object.PATH);
         mBranchName = getIntent().getStringExtra(Constants.Repository.REPO_BRANCH);
-        mFromBtnId = getIntent().getExtras().getInt(Constants.VIEW_ID);
-
+        mName = getIntent().getStringExtra(Constants.Object.NAME);
+        
         TextView tvViewInBrowser = (TextView) findViewById(R.id.tv_in_browser);
         tvViewInBrowser.setVisibility(View.GONE);
         
@@ -235,9 +213,6 @@ public class FileViewerActivity extends BaseActivity {
          */
         @Override
         protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
-            }
         }
 
         /*
@@ -256,7 +231,6 @@ public class FileViewerActivity extends BaseActivity {
                                 + mTarget.get().mRepoName + "/raw/" + mTarget.get().mBranchName + "/"
                                 + mTarget.get().mPath;
                         mTarget.get().getApplicationContext().openBrowser(mTarget.get(), url);
-                        mTarget.get().mLoadingDialog.dismiss();
                         mTarget.get().finish();
                     }
                     else {
@@ -322,9 +296,6 @@ public class FileViewerActivity extends BaseActivity {
 
         @Override
         public void onPageFinished(WebView webView, String url) {
-            if (mLoadingDialog != null && mLoadingDialog.isShowing()) {
-                mLoadingDialog.dismiss();
-            }
         }
         
         @Override
