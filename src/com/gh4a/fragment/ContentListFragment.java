@@ -42,10 +42,11 @@ public class ContentListFragment extends SherlockFragment
 
     private String mRepoOwner;
     private String mRepoName;
-    private String mSha;
+    public String mSha;
     private ListView mListView;
-    private FileAdapter mAdapter;
+    public FileAdapter mAdapter;
     private OnTreeSelectedListener mCallback;
+    private List<TreeEntry> mTreentries;
 
     public static ContentListFragment newInstance(String repoOwner, String repoName,
             String sha) {
@@ -93,13 +94,25 @@ public class ContentListFragment extends SherlockFragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        mAdapter = new FileAdapter(getSherlockActivity(), new ArrayList<TreeEntry>());
-        mListView.setAdapter(mAdapter);
-        
-        getLoaderManager().initLoader(0, null, this);
-        getLoaderManager().getLoader(0).forceLoad();
+        if (mTreentries == null) {
+            mTreentries = new ArrayList<TreeEntry>();
+            mAdapter = new FileAdapter(getSherlockActivity(), mTreentries);
+            mListView.setAdapter(mAdapter);
+            
+            getLoaderManager().initLoader(0, null, this);
+            getLoaderManager().getLoader(0).forceLoad();
+        }
+        else {
+            mAdapter = new FileAdapter(getSherlockActivity(), mTreentries);
+            mListView.setAdapter(mAdapter);
+            mAdapter.notifyDataSetChanged();
+        }
     }
-
+    
+    public void setTreeEntryList(List<TreeEntry> treeEntries) {
+        mTreentries = treeEntries;
+    }
+    
     private void fillData(List<TreeEntry> entries) {
         if (entries != null && entries.size() > 0) {
             mAdapter.addAll(entries);
@@ -125,21 +138,13 @@ public class ContentListFragment extends SherlockFragment
     public interface OnTreeSelectedListener {
         public void onTreeSelected(int position, 
                 AdapterView<?> adapterView,
-                TreeEntry treeEntry);
-
-        void onTreeSelected();
+                TreeEntry treeEntry,
+                List<TreeEntry> entries);
     }
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         TreeEntry treeEntry = (TreeEntry) adapterView.getAdapter().getItem(position);
-        
-        mSha = treeEntry.getSha();
-        
-        mAdapter.clear();
-        getLoaderManager().restartLoader(0, null, this);
-        getLoaderManager().getLoader(0).forceLoad();
-        
-        //mCallback.onTreeSelected(position, adapterView, treeEntry);
+        mCallback.onTreeSelected(position, adapterView, treeEntry, mTreentries);
     }
 }

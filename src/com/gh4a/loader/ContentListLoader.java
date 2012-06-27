@@ -52,6 +52,7 @@ public class ContentListLoader extends AsyncTaskLoader<List<TreeEntry>> {
                     }
                 }
             }
+
             return dataService.getTree(new RepositoryId(mRepoOwner, mRepoName), mSha).getTree();
         } catch (IOException e) {
             Log.e(Constants.LOG_TAG, e.getMessage(), e);
