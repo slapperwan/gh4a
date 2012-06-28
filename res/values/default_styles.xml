@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
     <style name="default_text_large" parent="@android:style/TextAppearance.Large">
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">bold</item>
@@ -14,6 +14,11 @@
 
     <style name="default_text_small" parent="@android:style/TextAppearance.Medium">
         <item name="android:textSize">14sp</item>
+    </style>
+    
+    <style name="default_text_small_italic" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">italic</item>
     </style>
     
     <style name="default_text_micro" parent="@android:style/TextAppearance.Small">

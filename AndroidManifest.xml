@@ -6,7 +6,7 @@
     android:versionCode="20"
     android:versionName="2.2">
     
-    <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="15" />
+    <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="16" />
     
     <application
         android:icon="@drawable/icon"

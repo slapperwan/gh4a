@@ -44,7 +44,9 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.text.SpannableString;
+import android.text.TextUtils;
 import android.text.style.ClickableSpan;
+import android.text.style.StyleSpan;
 import android.text.style.TextAppearanceSpan;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -103,8 +105,8 @@ public class FeedAdapter extends RootAdapter<Event> {
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
             viewHolder.tvDesc.setTypeface(regular);
             
-            viewHolder.tvCreatedAt = (TextView) v.findViewById(R.id.tv_created_at);
-            viewHolder.tvCreatedAt.setTypeface(italic);
+//            viewHolder.tvCreatedAt = (TextView) v.findViewById(R.id.tv_created_at);
+//            viewHolder.tvCreatedAt.setTypeface(italic);
             
             v.setTag(viewHolder);
         }
@@ -129,7 +131,13 @@ public class FeedAdapter extends RootAdapter<Event> {
                             .getLogin(), actor.getName());
                 }
             });
-            viewHolder.tvTitle.setText(formatTitle(event));
+//            viewHolder.tvTitle.setText(formatTitle(event));
+            
+            SpannableString createdAt = new SpannableString(pt.format(event.getCreatedAt()));
+            createdAt.setSpan(new TextAppearanceSpan(v.getContext(), R.style.default_text_small_italic),
+                    0, createdAt.length(), 0);
+            
+            viewHolder.tvTitle.setText(TextUtils.concat(formatTitle(event), " ", createdAt));
             
             String content = formatDescription(event, viewHolder, (RelativeLayout) v);
             if (content != null) {
@@ -145,7 +153,7 @@ public class FeedAdapter extends RootAdapter<Event> {
                 viewHolder.tvDesc.setVisibility(View.GONE);
             }
 
-            viewHolder.tvCreatedAt.setText(pt.format(event.getCreatedAt()));
+            //viewHolder.tvCreatedAt.setText(pt.format(event.getCreatedAt()));
         }
         return v;
     }

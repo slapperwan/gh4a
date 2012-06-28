@@ -5,36 +5,38 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:paddingTop="8dp"
-    android:paddingBottom="8dp" >
-    <ImageView
-        android:id="@+id/iv_gravatar"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="5dp"/>
+    android:paddingBottom="8dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp" >
     <TextView
         android:id="@+id/tv_title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textSize="17sp"
-        android:textColor="#000000"
-        android:layout_toRightOf="@id/iv_gravatar" />
-    <TextView
-        android:id="@+id/tv_created_at"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tv_title"
-        android:textAppearance="@style/default_text_micro"
-        android:layout_toRightOf="@id/iv_gravatar" />
+        android:textColor="#000000" />
+    <ImageView
+        android:id="@+id/iv_gravatar"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="5dp"
+        android:layout_below="@id/tv_title" />
     <TextView
         android:id="@+id/tv_desc"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_created_at"
+        android:layout_below="@id/tv_title"
         android:layout_toRightOf="@id/iv_gravatar"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:maxLines="3"
+        android:maxLines="4"
         android:ellipsize="end" />
+    <!-- TextView
+        android:id="@+id/tv_created_at"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_desc"
+        android:textAppearance="@style/default_text_micro"
+        android:layout_toRightOf="@id/iv_gravatar" /-->
 
     <!-- specific only for PushEvent -->
     <LinearLayout
@@ -44,6 +46,6 @@
         android:layout_height="fill_parent"
         android:visibility="gone"
         android:layout_toRightOf="@id/iv_gravatar"
-        android:layout_below="@id/tv_created_at"
+        android:layout_below="@id/tv_desc"
         android:layout_marginRight="7dp" />
 </RelativeLayout>
