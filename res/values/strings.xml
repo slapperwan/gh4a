@@ -7,6 +7,7 @@
     <string name="more_data_1">%1$s</string>
     <string name="more_data">%1$s | %2$s</string>
     <string name="more_data_3">%1$s | %2$s | %3$s</string>
+    <string name="more_commit_data">%1$s authored %2$s</string>
     <string name="loading_msg">Loading...</string>
     <string name="search">Search</string>
     <string name="activity">Activity</string>

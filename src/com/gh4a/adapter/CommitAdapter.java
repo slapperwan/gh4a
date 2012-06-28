@@ -22,6 +22,7 @@ import org.eclipse.egit.github.core.RepositoryCommit;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -34,26 +35,12 @@ import com.gh4a.R;
 import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.ImageDownloader;
 
-/**
- * The Commit adapter.
- */
 public class CommitAdapter extends RootAdapter<RepositoryCommit> {
 
-    /**
-     * Instantiates a new commit adapter.
-     * 
-     * @param context the context
-     * @param objects the objects
-     */
     public CommitAdapter(Context context, List<RepositoryCommit> objects) {
         super(context, objects);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.adapter.RootAdapter#doGetView(int, android.view.View,
-     * android.view.ViewGroup)
-     */
     @Override
     public View doGetView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
@@ -62,11 +49,20 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
             v = vi.inflate(R.layout.row_commit, null);
+            
+            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+            Typeface boldCondensed = app.boldCondensed;
+            Typeface italic = app.italic;
+            
             viewHolder = new ViewHolder();
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+            viewHolder.tvDesc.setTypeface(boldCondensed);
+            
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+            viewHolder.tvExtra.setTypeface(italic);
+            
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-            viewHolder.tvSha = (TextView) v.findViewById(R.id.tv_sha);
+            //viewHolder.tvSha = (TextView) v.findViewById(R.id.tv_sha);
 
             v.setTag(viewHolder);
         }
@@ -92,7 +88,7 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
                 }
             });
 
-            viewHolder.tvSha.setText(commit.getSha().substring(0, 7));
+            //viewHolder.tvSha.setText(commit.getSha().substring(0, 7));
             viewHolder.tvDesc.setText(commit.getCommit().getMessage());
 
             Calendar cal = Calendar.getInstance();
@@ -101,7 +97,7 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
             cal.add(Calendar.HOUR, timezoneOffset);
 
             Resources res = v.getResources();
-            String extraData = String.format(res.getString(R.string.more_data),
+            String extraData = String.format(res.getString(R.string.more_commit_data),
                     CommitUtils.getAuthorName(commit), 
                     pt.format(cal.getTime()));
 
@@ -110,21 +106,10 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
         return v;
     }
 
-    /**
-     * The Class ViewHolder.
-     */
     private static class ViewHolder {
-        
-        /** The iv gravatar. */
         public ImageView ivGravatar;
-        
-        /** The tv desc. */
         public TextView tvDesc;
-        
-        /** The tv extra. */
         public TextView tvExtra;
-        
-        /** The sha. */
-        public TextView tvSha;
+        //public TextView tvSha;
     }
 }

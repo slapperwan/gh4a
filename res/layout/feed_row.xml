@@ -4,7 +4,7 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:paddingTop="8dp"
+    android:paddingTop="10dp"
     android:paddingBottom="10dp"
     android:paddingLeft="16dp"
     android:paddingRight="16dp" >
@@ -19,6 +19,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginRight="8dp"
+        android:layout_marginTop="5dp"
         android:layout_below="@id/tv_title" />
     <TextView
         android:id="@+id/tv_desc"
@@ -27,7 +28,7 @@
         android:layout_below="@id/tv_title"
         android:layout_toRightOf="@id/iv_gravatar"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:maxLines="4"
+        android:maxLines="3"
         android:ellipsize="end" />
     <!-- TextView
         android:id="@+id/tv_created_at"

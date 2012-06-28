@@ -18,6 +18,7 @@ import android.widget.AdapterView;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.gh4a.fragment.CommitListFragment;
 import com.gh4a.fragment.ContentListFragment;
 import com.gh4a.fragment.ContentListFragment.OnTreeSelectedListener;
 import com.gh4a.fragment.RepositoryFragment;
@@ -145,7 +146,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
             }
             
             else if (position == 2) {
-                return RepositoryFragment.newInstance(mRepoOwner, mRepoName);
+                return CommitListFragment.newInstance(mRepoOwner, mRepoName);
             }
 
             else {

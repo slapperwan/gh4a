@@ -94,7 +94,6 @@ public class FeedAdapter extends RootAdapter<Event> {
             Gh4Application app = (Gh4Application) mContext.getApplicationContext();
             Typeface boldCondensed = app.boldCondensed;
             Typeface regular = app.regular;
-            Typeface italic = app.italic;
 
             viewHolder = new ViewHolder();
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
