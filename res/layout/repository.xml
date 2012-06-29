@@ -169,7 +169,39 @@
                 </TableLayout>
             </TableRow>
         </TableLayout>
-        
+        <LinearLayout
+            android:id="@+id/ll_readme"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="10dp" />
+            <TextView
+                android:id="@+id/readme_title"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/readme" />
+            <View 
+                android:id="@+id/v_repo_divider"
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="#ff0099cc" />
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="10dp" />
+            <TextView 
+                android:id="@+id/readme"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="10" />
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="6dp" />
+        </LinearLayout>
         <View
             android:layout_width="fill_parent"
             android:layout_height="10dp" />
@@ -180,65 +212,23 @@
             android:orientation="vertical"
             android:paddingLeft="16dp"
             android:paddingRight="16dp">
+            
             <TextView
                 android:id="@+id/other_info"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/other_info" />
+            
             <View 
                 android:id="@+id/v_repo_divider"
                 android:layout_width="fill_parent"
                 android:layout_height="1dp"
                 android:background="#ff0099cc" />
+            
             <View
                 android:layout_width="fill_parent"
                 android:layout_height="10dp" />
-
-            <!-- RelativeLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/tv_branches_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="@string/repo_branches" />
-                <ImageButton
-                    android:id="@+id/btn_branches"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignRight="@id/tv_branches_label"
-                    android:layout_alignParentRight="true"
-                    android:src="@drawable/ic_more" />
-            </RelativeLayout>
-            <RelativeLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/tv_tags_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="@string/repo_tags" />
-                <ImageButton
-                    android:id="@+id/btn_tags"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignRight="@id/tv_tags_label"
-                    android:layout_alignParentRight="true"
-                    android:src="@drawable/ic_more" />
-            </RelativeLayout-->
-            
-            <TextView
-                android:id="@+id/tv_files"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:background="@android:drawable/list_selector_background"
-                android:text="@string/repo_files"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp" />
             
             <TextView
                 android:id="@+id/tv_contributors_label"

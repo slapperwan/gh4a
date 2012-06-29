@@ -37,6 +37,7 @@
     <string name="sort_by">Sort By (desc)</string>
     <string name="other_info">Other Information</string>
     <string name="view">View</string>
+    <string name="readme">Readme</string>
     
     <!-- Activity event -->
     <string name="event_push_title">%1$s pushed to %2$s at %3$s</string>

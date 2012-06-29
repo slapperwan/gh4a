@@ -15,20 +15,32 @@
  */
 package com.gh4a.fragment;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.eclipse.egit.github.core.Content;
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.util.EncodingUtils;
 
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.text.Html;
+import android.text.Html.ImageGetter;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
@@ -36,18 +48,19 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.gh4a.CollaboratorListActivity;
 import com.gh4a.Constants;
 import com.gh4a.ContributorListActivity;
-import com.gh4a.FileManagerActivity;
 import com.gh4a.ForkListActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.IssueListActivity;
 import com.gh4a.R;
 import com.gh4a.WatcherListActivity;
 import com.gh4a.WikiListActivity;
+import com.gh4a.loader.ReadmeLoader;
 import com.gh4a.loader.RepositoryLoader;
 import com.gh4a.utils.StringUtils;
+import com.petebevin.markdown.MarkdownProcessor;
 
 public class RepositoryFragment extends SherlockFragment implements 
-    OnClickListener, OnItemClickListener, LoaderManager.LoaderCallbacks<Repository> {
+    OnClickListener, OnItemClickListener, LoaderManager.LoaderCallbacks {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -241,10 +254,6 @@ public class RepositoryFragment extends SherlockFragment implements
             tvWiki.setVisibility(View.GONE);
         }
         
-        TextView tvFiles = (TextView) v.findViewById(R.id.tv_files);
-        tvFiles.setOnClickListener(this);
-        tvFiles.setTypeface(boldCondensed);
-        
         TextView tvContributor = (TextView) v.findViewById(R.id.tv_contributors_label);
         tvContributor.setOnClickListener(this);
         tvContributor.setTypeface(boldCondensed);
@@ -258,6 +267,56 @@ public class RepositoryFragment extends SherlockFragment implements
         tvOthers.setTextColor(Color.parseColor("#0099cc"));
     }
 
+    public void fillReadme(Content readme) {
+        if (readme != null) {
+            final Gh4Application app = (Gh4Application) getActivity().getApplicationContext();
+            Typeface boldCondensed = app.boldCondensed;
+            Typeface regular = app.regular;
+            
+            TextView tvReadmeTitle = (TextView) getView().findViewById(R.id.readme_title);
+            tvReadmeTitle.setTypeface(boldCondensed);
+            tvReadmeTitle.setTextColor(Color.parseColor("#0099cc"));
+            
+            String content = new String(EncodingUtils.fromBase64(readme.getContent()));
+            MarkdownProcessor m = new MarkdownProcessor();
+            String html = m.markdown(content);
+            TextView tvReadme = (TextView) getView().findViewById(R.id.readme);
+            tvReadme.setTypeface(regular);
+            tvReadme.setText(Html.fromHtml(html, new ImageGetter() {
+                @Override
+                public Drawable getDrawable(String source) {
+                    try {
+                        URL url = new URL(source);
+                        Object content = url.getContent();
+                        InputStream is = (InputStream) content;
+                        Drawable drawable = Drawable.createFromStream(is, null);
+                        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable
+                                .getIntrinsicHeight());
+                        return drawable;
+                        
+                    } catch (MalformedURLException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
+            }, null));
+            
+            tvReadme.setMovementMethod(LinkMovementMethod.getInstance());
+            
+            LinearLayout llReadme = (LinearLayout) getView().findViewById(R.id.ll_readme);
+            llReadme.setVisibility(View.VISIBLE);
+            
+        }
+        else {
+            LinearLayout llReadme = (LinearLayout) getView().findViewById(R.id.ll_readme);
+            llReadme.setVisibility(View.GONE);
+        }
+    }
+    
     @Override
     public void onClick(View view) {
         int id = view.getId();
@@ -293,20 +352,11 @@ public class RepositoryFragment extends SherlockFragment implements
         case R.id.tv_wiki_label:
             getWiki(view);
             break;
-        case R.id.tv_files:
-            getFiles(view);
         default:
             break;
         }
     }
 
-    public void getFiles(View view) {
-        Intent intent = new Intent().setClass(getActivity(), FileManagerActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-        startActivity(intent);
-    }
-    
     public void getWiki(View view) {
         Intent intent = new Intent().setClass(getActivity(), WikiListActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
@@ -351,20 +401,33 @@ public class RepositoryFragment extends SherlockFragment implements
     }
 
     @Override
-    public Loader<Repository> onCreateLoader(int arg0, Bundle arg1) {
-        return new RepositoryLoader(getSherlockActivity(), mRepoOwner, mRepoName);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Repository> loader, Repository repository) {
-        if (repository != null) {
-            this.mRepository = repository;
-            fillData();
+    public Loader onCreateLoader(int id, Bundle bundle) {
+        if (id == 0) {
+            return new RepositoryLoader(getSherlockActivity(), mRepoOwner, mRepoName);
+        }
+        else {
+            return new ReadmeLoader(getSherlockActivity(), mRepoOwner, mRepoName);
         }
     }
 
     @Override
-    public void onLoaderReset(Loader<Repository> arg0) {
+    public void onLoadFinished(Loader loader, Object object) {
+        if (object instanceof Repository) {
+            getLoaderManager().initLoader(1, null, this);
+            getLoaderManager().getLoader(1).forceLoad();
+            
+            if (object != null) {
+                this.mRepository = (Repository) object;
+                fillData();
+            }
+        }
+        else {
+            fillReadme((Content) object);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader arg0) {
         // TODO Auto-generated method stub
         
     }
