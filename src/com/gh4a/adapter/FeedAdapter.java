@@ -46,7 +46,6 @@ import android.graphics.Typeface;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
-import android.text.style.StyleSpan;
 import android.text.style.TextAppearanceSpan;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -372,9 +371,10 @@ public class FeedAdapter extends RootAdapter<Event> {
         /** PushEvent */
         if (Event.TYPE_PUSH.equals(eventType)) {
             PushPayload payload = (PushPayload) event.getPayload();
+            String[] refPart = payload.getRef().split("/"); 
             String text = String.format(res.getString(R.string.event_push_title),
                     actor.getLogin(),
-                    payload.getRef(),
+                    refPart.length == 3 ? refPart[2] : payload.getRef(),
                     formatFromRepoName(eventRepo));
             return text;
         }
