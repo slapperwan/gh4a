@@ -158,7 +158,7 @@ public interface Constants {
         public static final String ISSUES = "Issue.ISSUES";
 
         /** The Constant ISSUE_STATE. */
-        public static final String ISSUE_STATE = "Issue.STATE";
+        public static final String ISSUE_STATE = "state";
 
         /** The Constant ISSUE_STATE_OPEN. */
         public static final String ISSUE_STATE_OPEN = "open";

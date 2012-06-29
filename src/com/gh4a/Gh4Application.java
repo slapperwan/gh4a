@@ -195,6 +195,16 @@ public class Gh4Application extends Application {
         context.startActivity(intent);
     }
     
+    public void openIssueListActivity(Context context, String repoOwner, String repoName,
+            String state, int flags) {
+        Intent intent = new Intent().setClass(context, IssueListActivity.class);
+        intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
+        intent.putExtra(Constants.Repository.REPO_NAME, repoName);
+        intent.putExtra(Constants.Issue.ISSUE_STATE, state);
+        intent.setFlags(flags);
+        context.startActivity(intent);
+    }
+    
     /**
      * Open repository activity.
      * 

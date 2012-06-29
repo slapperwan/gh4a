@@ -156,7 +156,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="?android:attr/textAppearanceLarge"
-                            android:text="@string/view" />
+                            android:text="Pull" />
                     </TableRow>
                     <TableRow>
                         <TextView
@@ -164,7 +164,7 @@
                             android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
                             android:textAppearance="?attr/textAppearanceSmall"
-                            android:text="@string/pull_requests" />
+                            android:text="Requests" />
                     </TableRow>
                 </TableLayout>
             </TableRow>

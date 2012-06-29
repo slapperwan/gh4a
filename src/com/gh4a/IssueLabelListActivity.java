@@ -188,11 +188,11 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
         SimpleStringAdapter adapter = (SimpleStringAdapter) adapterView.getAdapter();
         String label = (String) adapter.getItem(position);
         
-        Intent intent = new Intent().setClass(this, IssueListByLabelActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-        intent.putExtra(Constants.Issue.ISSUE_LABEL, label);
-        startActivity(intent);
+//        Intent intent = new Intent().setClass(this, IssueListByLabelActivity.class);
+//        intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+//        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+//        intent.putExtra(Constants.Issue.ISSUE_LABEL, label);
+//        startActivity(intent);
     }
     
     /* (non-Javadoc)
@@ -309,11 +309,11 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
             break;
         case Menu.FIRST + 2:
             String label = (String) mListView.getItemAtPosition(info.position);
-            Intent intent = new Intent().setClass(this, IssueListByLabelActivity.class);
-            intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
-            intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-            intent.putExtra(Constants.Issue.ISSUE_LABEL, label);
-            startActivity(intent);
+//            Intent intent = new Intent().setClass(this, IssueListByLabelActivity.class);
+//            intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+//            intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+//            intent.putExtra(Constants.Issue.ISSUE_LABEL, label);
+//            startActivity(intent);
             break;
         default:
             break;

@@ -15,263 +15,159 @@
  */
 package com.gh4a;
 
-import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.IssueService;
-
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.view.ViewGroup;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.Tab;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.gh4a.adapter.IssueAdapter;
-import com.gh4a.db.Bookmark;
-import com.gh4a.db.BookmarkParam;
-import com.gh4a.db.DbHelper;
+import com.gh4a.fragment.IssueListFragment;
 
-/**
- * The IssueList activity.
- */
-public class IssueListActivity extends BaseActivity implements OnItemClickListener {
+public class IssueListActivity extends BaseSherlockFragmentActivity {
 
-    /** The state. */
-    protected String mState;
+    private String mRepoOwner;
+    private String mRepoName;
+    private String mState;
+    private ThisPageAdapter mAdapter;
+    private ViewPager mPager;
+    private ActionBar mActionBar;
+    private int tabCount;
 
-    /** The user login. */
-    protected String mUserLogin;
-
-    /** The repo name. */
-    protected String mRepoName;
-
-    /** The loading dialog. */
-    protected LoadingDialog mLoadingDialog;
-
-    /** The issue adapter. */
-    protected IssueAdapter mIssueAdapter;
-
-    /** The list view issues. */
-    protected ListView mListViewIssues;
-
-    /** The row layout. */
-    protected int mRowLayout;
-
-    /** The tv subtitle. */
-    protected TextView mTvSubtitle;
-    
-    protected String mSortBy;
-    
-    /**
-     * Called when the activity is first created.
-     * 
-     * @param savedInstanceState the saved instance state
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.generic_list);
-        setUpActionBar();
-        setRequestData();
-        setRowLayout();
-
-        mListViewIssues = (ListView) findViewById(R.id.list_view);
-        mListViewIssues.setOnItemClickListener(this);
-
-        mIssueAdapter = new IssueAdapter(this, new ArrayList<Issue>(), mRowLayout);
-        mListViewIssues.setAdapter(mIssueAdapter);
-
-        mSortBy = "created";
-        new LoadIssueListTask(this, true).execute();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.BaseActivity#setUpActionBar()
-     */
-    @Override
-    public void setUpActionBar() {
-    }
-
-    public String getSubTitleAfterLoaded(int numberOfIssues) {
-        if (numberOfIssues != -1) {
-            return mState + " Issues (" + numberOfIssues + ")";
-        }
-        else {
-            return mState + " Issues";
-        }
-    }
-    
-    public void setRowLayout() {
-        mRowLayout = R.layout.row_issue;
-    }
-    
-    public List<Issue> getIssues() throws IOException {
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(getAuthToken());
-        IssueService issueService = new IssueService(client);
-        Map<String, String> filterData = new HashMap<String, String>();
-        filterData.put("state", mState);
-        filterData.put("sort", mSortBy.toLowerCase());
-        return issueService.getIssues(mUserLogin, mRepoName, filterData);
-    }
-    
-    /**
-     * An asynchronous task that runs on a background thread to load issue list.
-     */
-    private static class LoadIssueListTask extends AsyncTask<Void, Integer, List<Issue>> {
-
-        /** The target. */
-        private WeakReference<IssueListActivity> mTarget;
+        setContentView(R.layout.view_pager);
         
-        /** The exception. */
-        private boolean mException;
-        
-        private boolean mHideMainView;
-
-        /**
-         * Instantiates a new load issue list task.
-         *
-         * @param activity the activity
-         */
-        public LoadIssueListTask(IssueListActivity activity, boolean hideMainView) {
-            mTarget = new WeakReference<IssueListActivity>(activity);
-            mHideMainView = hideMainView;
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
-        @Override
-        protected List<Issue> doInBackground(Void... params) {
-            if (mTarget.get() != null) {
-                try {
-                    return mTarget.get().getIssues();
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
-            }
-            else {
-                return null;
-            }
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
-        @Override
-        protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, mHideMainView);
-            }
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
-        @Override
-        protected void onPostExecute(List<Issue> result) {
-            if (mTarget.get() != null) {
-                IssueListActivity activity = mTarget.get();
-                activity.mLoadingDialog.dismiss();
-    
-                if (mException) {
-                    activity.showError();
-                }
-                else {
-                    activity.fillData(result);
-                }
-            }
-        }
-    }
-
-    /**
-     * Sets the request data.
-     */
-    protected void setRequestData() {
         Bundle data = getIntent().getExtras();
-        mUserLogin = data.getString(Constants.Repository.REPO_OWNER);
+        mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
         mState = data.getString(Constants.Issue.ISSUE_STATE);
-    }
+        
+        tabCount = 3;
+        
+        mActionBar = getSupportActionBar();
+        mAdapter = new ThisPageAdapter(getSupportFragmentManager());
+        mPager = (ViewPager) findViewById(R.id.pager);
+        mPager.setAdapter(mAdapter);
+        
+        mPager.setOnPageChangeListener(new OnPageChangeListener() {
 
-    /**
-     * Fill data into UI components.
-     * 
-     * @param issues the issues
-     */
-    protected void fillData(List<Issue> issues) {
-        if (issues != null && issues.size() > 0) {
-            for (Issue issue : issues) {
-                mIssueAdapter.add(issue);
+            @Override
+            public void onPageScrollStateChanged(int arg0) {}
+            
+            @Override
+            public void onPageScrolled(int arg0, float arg1, int arg2) {}
+
+            @Override
+            public void onPageSelected(int position) {
+                mActionBar.setSelectedNavigationItem(position);
             }
-            mIssueAdapter.notifyDataSetChanged();
-        }
-        else {
-            getApplicationContext().notFoundMessage(this, R.plurals.issue);
-        }
+        });
+        
+        mActionBar.setTitle(R.string.issues);
+        mActionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        mActionBar.setDisplayShowTitleEnabled(true);
+        mActionBar.setHomeButtonEnabled(true);
+        
+        Tab tab = mActionBar
+                .newTab()
+                .setText(R.string.issues_submitted)
+                .setTabListener(
+                        new TabListener<SherlockFragmentActivity>(this, 0 + "", mPager));
+        mActionBar.addTab(tab);
+        
+        tab = mActionBar
+                .newTab()
+                .setText(R.string.issues_updated)
+                .setTabListener(
+                        new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
+        mActionBar.addTab(tab);
+        
+        tab = mActionBar
+                .newTab()
+                .setText(R.string.issues_comments)
+                .setTabListener(
+                        new TabListener<SherlockFragmentActivity>(this, 2 + "", mPager));
+        mActionBar.addTab(tab);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * android.widget.AdapterView.OnItemClickListener#onItemClick(android.widget
-     * .AdapterView, android.view.View, int, long)
-     */
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        Issue issue = (Issue) adapterView.getAdapter().getItem(position);
-        Intent intent = new Intent().setClass(IssueListActivity.this, IssueActivity.class);
-        Bundle data = getApplicationContext().populateIssue(issue);
-        // extra data
-        data.putString(Constants.Repository.REPO_OWNER, mUserLogin);
-        data.putString(Constants.Repository.REPO_NAME, mRepoName);
-        intent.putExtra(Constants.DATA_BUNDLE, data);
-        startActivity(intent);
+    public class ThisPageAdapter extends FragmentStatePagerAdapter {
+
+        public ThisPageAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public int getCount() {
+            return tabCount;
+        }
+
+        @Override
+        public android.support.v4.app.Fragment getItem(int position) {
+            Map<String, String> filterData = new HashMap<String, String>();
+            filterData.put("state", mState);
+            
+            if (position == 0) {
+                filterData.put("sort", "created");
+                return IssueListFragment.newInstance(mRepoOwner, mRepoName, filterData);
+            }
+            else if (position == 1) {
+                filterData.put("sort", "updated");
+                return IssueListFragment.newInstance(mRepoOwner, mRepoName, filterData);
+            }
+            else {
+                filterData.put("sort", "comments");
+                return IssueListFragment.newInstance(mRepoOwner, mRepoName, filterData);
+            }
+        }
+        
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+        }
     }
     
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu) {
         menu.clear();
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.issues_menu, menu);
-        inflater.inflate(R.menu.bookmark_menu, menu);
-        return true;
+        if ("open".equals(mState)) {
+            menu.removeItem(R.id.view_open_issues);
+        }
+        else {
+            menu.removeItem(R.id.view_closed_issues);
+        }
+        
+        return super.onCreateOptionsMenu(menu);
     }
     
     @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.view_open_issues:
-                getApplicationContext().openIssueListActivity(this, mUserLogin, mRepoName, Constants.Issue.ISSUE_STATE_OPEN);
+                getApplicationContext().openIssueListActivity(this, mRepoOwner, mRepoName, 
+                        Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 return true;
             case R.id.view_closed_issues:
-                getApplicationContext().openIssueListActivity(this, mUserLogin, mRepoName, Constants.Issue.ISSUE_STATE_CLOSED);
+                getApplicationContext().openIssueListActivity(this, mRepoOwner, mRepoName,
+                        Constants.Issue.ISSUE_STATE_CLOSED, Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 return true;
             case R.id.create_issue:
                 if (isAuthorized()) {
-                    Intent intent = new Intent().setClass(IssueListActivity.this, IssueCreateActivity.class);
-                    intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+                    Intent intent = new Intent().setClass(this, IssueCreateActivity.class);
+                    intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
                     intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                     startActivity(intent);
                 }
@@ -283,13 +179,13 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
                 return true;
             case R.id.view_labels:
                 Intent intent = new Intent().setClass(IssueListActivity.this, IssueLabelListActivity.class);
-                intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+                intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
                 intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                 startActivity(intent);
                 return true;
             case R.id.view_milestones:
                 intent = new Intent().setClass(IssueListActivity.this, IssueMilestoneListActivity.class);
-                intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+                intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
                 intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                 startActivity(intent);
                 return true;    
@@ -298,47 +194,4 @@ public class IssueListActivity extends BaseActivity implements OnItemClickListen
                 return true;
         }
     }
-    
-    @Override
-    public void openBookmarkActivity() {
-        Intent intent = new Intent().setClass(this, BookmarkListActivity.class);
-        intent.putExtra(Constants.Bookmark.NAME, "Issues at " + mUserLogin + "/" + mRepoName);
-        intent.putExtra(Constants.Bookmark.OBJECT_TYPE, Constants.Bookmark.OBJECT_TYPE_ISSUE);
-        startActivityForResult(intent, 100);
-    }
-    
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 100) {
-           if (resultCode == Constants.Bookmark.ADD) {
-               DbHelper db = new DbHelper(this);
-               Bookmark b = new Bookmark();
-               b.setName("Issues at " + mUserLogin + "/" + mRepoName);
-               b.setObjectType(Constants.Bookmark.OBJECT_TYPE_ISSUE);
-               b.setObjectClass(IssueListActivity.class.getName());
-               long id = db.saveBookmark(b);
-               
-               BookmarkParam[] params = new BookmarkParam[3];
-               BookmarkParam param = new BookmarkParam();
-               param.setBookmarkId(id);
-               param.setKey(Constants.Repository.REPO_OWNER);
-               param.setValue(mUserLogin);
-               params[0] = param;
-               
-               param = new BookmarkParam();
-               param.setBookmarkId(id);
-               param.setKey(Constants.Repository.REPO_NAME);
-               param.setValue(mRepoName);
-               params[1] = param;
-               
-               param = new BookmarkParam();
-               param.setBookmarkId(id);
-               param.setKey(Constants.Issue.ISSUE_STATE);
-               param.setValue(mState);
-               params[2] = param;
-               
-               db.saveBookmarkParam(params);
-           }
-        }
-     }
 }

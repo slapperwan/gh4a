@@ -191,6 +191,8 @@
     <string name="issue_error_edit">Cannot edit issue</string>
     <string name="issue_reopen">Reopen Issue</string>
     <string name="issue_close">Close Issue</string>
+    <string name="issue_open">Open Issues</string>
+    <string name="issue_closed">Closed Issues</string>
     <string name="issue_success_close">Successful close issue</string>
     <string name="issue_error_close">Cannot close issue</string>
     <string name="issue_success_reopen">Successful reopen issue</string>

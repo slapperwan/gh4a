@@ -187,12 +187,12 @@ public class IssueMilestoneListActivity extends BaseActivity implements OnItemCl
         MilestoneAdapter adapter = (MilestoneAdapter) adapterView.getAdapter();
         Milestone milestone = (Milestone) adapter.getItem(position);
         
-        Intent intent = new Intent().setClass(this, IssueListByMilestoneActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-        intent.putExtra(Constants.Issue.ISSUE_MILESTONE_NUMBER, milestone.getNumber());
-        intent.putExtra(Constants.Issue.ISSUE_MILESTONE_TITLE, milestone.getTitle());
-        startActivity(intent);
+//        Intent intent = new Intent().setClass(this, IssueListByMilestoneActivity.class);
+//        intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+//        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+//        intent.putExtra(Constants.Issue.ISSUE_MILESTONE_NUMBER, milestone.getNumber());
+//        intent.putExtra(Constants.Issue.ISSUE_MILESTONE_TITLE, milestone.getTitle());
+//        startActivity(intent);
     }
     
     /* (non-Javadoc)
@@ -313,12 +313,12 @@ public class IssueMilestoneListActivity extends BaseActivity implements OnItemCl
                 alert.show();
             break;
         case Menu.FIRST + 2:
-            Intent intent = new Intent().setClass(this, IssueListByMilestoneActivity.class);
-            intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
-            intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-            intent.putExtra(Constants.Issue.ISSUE_MILESTONE_NUMBER, milestone.getNumber());
-            intent.putExtra(Constants.Issue.ISSUE_MILESTONE_TITLE, milestone.getTitle());
-            startActivity(intent);
+//            Intent intent = new Intent().setClass(this, IssueListByMilestoneActivity.class);
+//            intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+//            intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+//            intent.putExtra(Constants.Issue.ISSUE_MILESTONE_NUMBER, milestone.getNumber());
+//            intent.putExtra(Constants.Issue.ISSUE_MILESTONE_TITLE, milestone.getTitle());
+//            startActivity(intent);
             break;
         default:
             break;

@@ -68,7 +68,7 @@ public class IssueAdapter extends RootAdapter<Issue> {
 
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(mRowLayout, null);
+            v = vi.inflate(R.layout.row_issue, null);
             viewHolder = new ViewHolder();
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
