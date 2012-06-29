@@ -196,8 +196,7 @@
             <TextView 
                 android:id="@+id/readme"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:maxLines="10" />
+                android:layout_height="wrap_content" />
             <View
                 android:layout_width="fill_parent"
                 android:layout_height="6dp" />

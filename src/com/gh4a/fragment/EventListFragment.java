@@ -48,6 +48,7 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,26 +66,28 @@ import com.gh4a.WikiListActivity;
 import com.gh4a.adapter.FeedAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 
-public class EventListFragment extends SherlockFragment 
+public abstract class EventListFragment extends SherlockFragment 
     implements LoaderManager.LoaderCallbacks<List<Event>>, OnItemClickListener {
 
+    static final int MENU_USER = 1;
+    static final int MENU_REPO = 2;
+    static final int MENU_COMMIT = 3;
+    static final int MENU_OPEN_ISSUES = 4;
+    static final int MENU_ISSUE = 5;
+    static final int MENU_COMMENT_IN_BROWSER = 6;
+    static final int MENU_GIST = 7;
+    static final int MENU_FILE = 8;
+    static final int MENU_FORKED_REPO = 9;
+    static final int MENU_WIKI_IN_BROWSER = 10;
+    static final int MENU_PULL_REQ = 11;
+    static final int MENU_COMPARE = 12;
+    
     private String mLogin;
     private boolean mIsPrivate;
     private ListView mListView;
     private FeedAdapter mAdapter;
     private PageIterator<Event> mDataIterator;
 
-    public static EventListFragment newInstance(String login, boolean isPrivate) {
-        EventListFragment f = new EventListFragment();
-
-        Bundle args = new Bundle();
-        args.putString(Constants.User.USER_LOGIN, login);
-        args.putBoolean(Constants.Event.IS_PRIVATE, isPrivate);
-        f.setArguments(args);
-        
-        return f;
-    }
-    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onCreate EventListFragment");
@@ -378,13 +381,17 @@ public class EventListFragment extends SherlockFragment
         }
     }
     
+    public abstract int getMenuGroupId();
+    
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
+        
         if (v.getId() == R.id.list_view) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
             Event event = (Event) mAdapter.getItem(info.position);
-            
+            int groupId = getMenuGroupId();
+
             //if payload is a base class, return void.  Think that it is an old event which not supported
             //by API v3.
             if (event.getPayload().getClass().getSimpleName().equals("EventPayload")) {
@@ -405,20 +412,20 @@ public class EventListFragment extends SherlockFragment
             menu.setHeaderTitle("Go to");
 
             /** Common menu */
-            menu.add("User " + event.getActor().getLogin());
+            menu.add(groupId, MENU_USER, Menu.NONE, "User " + event.getActor().getLogin());
             if (repoOwner != null) {
-                menu.add("Repo " + repoOwner + "/" + repoName);
+                menu.add(groupId, MENU_REPO, Menu.NONE, "Repo " + repoOwner + "/" + repoName);
             }
 
             /** PushEvent extra menu for commits */
             if (Event.TYPE_PUSH.equals(eventType)) {
                 if (repoOwner != null) {
                     PushPayload payload = (PushPayload) event.getPayload();
-                    menu.add("Compare " + payload.getHead());
+                    menu.add(groupId, MENU_COMPARE, Menu.NONE, "Compare " + payload.getHead());
                     
                     List<Commit> commits = payload.getCommits();
                     for (Commit commit : commits) {
-                        menu.add("Commit " + commit.getSha());
+                        menu.add(groupId, MENU_COMMIT, Menu.NONE, "Commit " + commit.getSha());
                     }
                 }
             }
@@ -426,14 +433,14 @@ public class EventListFragment extends SherlockFragment
             /** IssueEvent extra menu for commits */
             else if (Event.TYPE_ISSUES.equals(eventType)) {
                 IssuesPayload payload = (IssuesPayload) event.getPayload();
-                menu.add("Issue " + payload.getIssue().getNumber());
+                menu.add(groupId, MENU_ISSUE, Menu.NONE, "Issue " + payload.getIssue().getNumber());
             }
 
             /** FollowEvent */
             else if (Event.TYPE_FOLLOW.equals(eventType)) {
                 FollowPayload payload = (FollowPayload) event.getPayload();
                 if (payload.getTarget() != null) {
-                    menu.add("User " + payload.getTarget().getLogin());
+                    menu.add(groupId, MENU_USER, Menu.NONE, "User " + payload.getTarget().getLogin());
                 }
             }
 
@@ -441,7 +448,7 @@ public class EventListFragment extends SherlockFragment
             else if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
                 if (repoOwner != null) {
                     CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
-                    menu.add("Commit " + payload.getComment().getCommitId().substring(0, 7));
+                    menu.add(groupId, MENU_COMMIT, Menu.NONE, "Commit " + payload.getComment().getCommitId().substring(0, 7));
                     //menu.add("Comment in browser");
                 }
             }
@@ -449,13 +456,13 @@ public class EventListFragment extends SherlockFragment
             /** GistEvent */
             else if (Event.TYPE_GIST.equals(eventType)) {
                 GistPayload payload = (GistPayload) event.getPayload();
-                menu.add(payload.getGist().getId() + " in browser");
+                menu.add(groupId, MENU_GIST, Menu.NONE, "Gist " + payload.getGist().getId());
             }
 
             /** DownloadEvent */
             else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
                 DownloadPayload payload = (DownloadPayload) event.getPayload();
-                menu.add("File " + payload.getDownload().getName() + " in browser");
+                menu.add(groupId, MENU_FILE, Menu.NONE, "File " + payload.getDownload().getName());
             }
 
             /** ForkEvent */
@@ -463,34 +470,33 @@ public class EventListFragment extends SherlockFragment
                 ForkPayload payload = (ForkPayload) event.getPayload();
                 Repository forkee = payload.getForkee();
                 if (forkee != null) {
-                    menu.add("Forked repo " + forkee.getOwner().getLogin() + "/" + forkee.getName());
+                    menu.add(groupId, MENU_FORKED_REPO, Menu.NONE, "Forked repo " + forkee.getOwner().getLogin() + "/" + forkee.getName());
                 }
             }
 
             /** GollumEvent */
             else if (Event.TYPE_GOLLUM.equals(eventType)) {
-                menu.add("Wiki in browser");
+                menu.add(groupId, MENU_WIKI_IN_BROWSER, Menu.NONE, "Wiki in browser");
             }
             
             /** PullRequestEvent */
             else if (Event.TYPE_PULL_REQUEST.equals(eventType)) {
                 PullRequestPayload payload = (PullRequestPayload) event.getPayload();
-                menu.add("Pull request " + payload.getNumber());
+                menu.add(groupId, MENU_PULL_REQ, Menu.NONE, "Pull request " + payload.getNumber());
             }
             
             /** IssueCommentEvent */
             else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
-                menu.add("Open issues");
+                menu.add(groupId, MENU_OPEN_ISSUES, Menu.NONE, "Open issues");
             }
         }
     }
     
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
+    public boolean open(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
                 .getMenuInfo();
+        
         Event event = (Event) mAdapter.getItem(info.position);
-        String eventType = event.getType();
         EventRepository eventRepo = event.getRepo();
         String[] repoNamePart = eventRepo.getName().split("/");
         String repoOwner = null;
@@ -499,7 +505,6 @@ public class EventListFragment extends SherlockFragment
             repoOwner = repoNamePart[0];
             repoName = repoNamePart[1];
         }
-        String repoUrl = eventRepo.getUrl();
         
         String title = item.getTitle().toString();
         String value = title.split(" ")[1];
@@ -509,7 +514,7 @@ public class EventListFragment extends SherlockFragment
         /** User item */
         if (title.startsWith("User")) {
             context
-                    .openUserInfoActivity(getSherlockActivity(), value, event.getActor().getLogin());
+                    .openUserInfoActivity(getSherlockActivity(), value, null);
         }
         /** Repo item */
         else if (title.startsWith("Repo")) {
@@ -539,9 +544,9 @@ public class EventListFragment extends SherlockFragment
             context.openBrowser(getSherlockActivity(), payload.getComment().getUrl());
         }
         /** Gist item */
-        else if (title.startsWith("gist")) {
+        else if (title.startsWith("Gist")) {
             GistPayload payload = (GistPayload) event.getPayload();
-            context.openBrowser(getSherlockActivity(), payload.getGist().getUrl());
+            context.openGistActivity(getSherlockActivity(), payload.getGist().getId());
         }
         /** Download item */
         else if (title.startsWith("File")) {
@@ -594,7 +599,7 @@ public class EventListFragment extends SherlockFragment
                 startActivity(intent);
             }
         }
-
         return true;
     }
+    
 }

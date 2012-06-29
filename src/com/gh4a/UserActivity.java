@@ -3,7 +3,6 @@ package com.gh4a;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -19,7 +18,8 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.SubMenu;
-import com.gh4a.fragment.EventListFragment;
+import com.gh4a.fragment.PrivateEventListFragment;
+import com.gh4a.fragment.PublicEventListFragment;
 import com.gh4a.fragment.RepositoryIssueListFragment;
 import com.gh4a.fragment.UserFragment;
 
@@ -127,11 +127,11 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                         UserActivity.this.mUserName);
             }
             else if (position == 1) {
-                return EventListFragment.newInstance(UserActivity.this.mUserLogin, 
+                return PrivateEventListFragment.newInstance(UserActivity.this.mUserLogin, 
                         UserActivity.this.isLoginUserPage);
             }
             else if (position == 2 && isLoginUserPage) {
-                return EventListFragment.newInstance(UserActivity.this.mUserLogin, false);
+                return PublicEventListFragment.newInstance(UserActivity.this.mUserLogin, false);
             }
             else if (position == 3 && isLoginUserPage) {
                 Map<String, String> filterData = new HashMap<String, String>();

@@ -29,24 +29,12 @@ import com.gh4a.R;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
 
-/**
- * The Compare adapter.
- */
 public class CompareAdapter extends RootAdapter<String[]> {
 
-    /**
-     * Instantiates a new compare adapter.
-     *
-     * @param context the context
-     * @param objects the objects
-     */
     public CompareAdapter(Context context, List<String[]> objects) {
         super(context, objects);
     }
 
-    /* (non-Javadoc)
-     * @see com.gh4a.adapter.RootAdapter#doGetView(int, android.view.View, android.view.ViewGroup)
-     */
     @Override
     public View doGetView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
@@ -59,7 +47,7 @@ public class CompareAdapter extends RootAdapter<String[]> {
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-            viewHolder.tvSha = (TextView) v.findViewById(R.id.tv_sha);
+            //viewHolder.tvSha = (TextView) v.findViewById(R.id.tv_sha);
 
             v.setTag(viewHolder);
         }
@@ -85,7 +73,7 @@ public class CompareAdapter extends RootAdapter<String[]> {
 //                });
 //            }
 
-            viewHolder.tvSha.setText(commitInfo[0].substring(0, 7));
+            //viewHolder.tvSha.setText(commitInfo[0].substring(0, 7));
             viewHolder.tvDesc.setText(commitInfo[2]);
 
             Resources res = v.getResources();
@@ -97,9 +85,6 @@ public class CompareAdapter extends RootAdapter<String[]> {
         return v;
     }
     
-    /**
-     * The Class ViewHolder.
-     */
     private static class ViewHolder {
         
         /** The iv gravatar. */
