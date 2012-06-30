@@ -8,6 +8,8 @@
     <string name="more_data">%1$s | %2$s</string>
     <string name="more_data_3">%1$s | %2$s | %3$s</string>
     <string name="more_commit_data">%1$s authored %2$s</string>
+    <string name="more_issue_data">&lt;i>&lt;b>%1$s&lt;/b> by &lt;b>%2$s&lt;/b> %3$s | %4$s&lt;/i></string>
+    <string name="more_issue_assignee">&lt;i>Assigned to &lt;b>%1$s&lt;/b>&lt;/i></string>
     <string name="loading_msg">Loading...</string>
     <string name="search">Search</string>
     <string name="activity">Activity</string>
