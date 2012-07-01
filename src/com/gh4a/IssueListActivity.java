@@ -16,6 +16,7 @@
 package com.gh4a;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import android.content.Intent;
@@ -24,7 +25,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
@@ -32,9 +36,12 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.gh4a.fragment.IssueListFragment;
+import com.gh4a.fragment.IssueListByCommentsFragment;
+import com.gh4a.fragment.IssueListBySubmittedFragment;
+import com.gh4a.fragment.IssueListByUpdatedFragment;
 
-public class IssueListActivity extends BaseSherlockFragmentActivity {
+public class IssueListActivity extends BaseSherlockFragmentActivity
+    implements OnClickListener {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -43,16 +50,37 @@ public class IssueListActivity extends BaseSherlockFragmentActivity {
     private ViewPager mPager;
     private ActionBar mActionBar;
     private int tabCount;
+    private Map<String, String> mFilterData;
+    private Button mBtnSort;
+    private Button mBtnFilterByLabels;
+    private Button mBtnFilterByMilestone;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.view_pager);
+        setContentView(R.layout.issue_list_view_pager);
         
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
         mState = data.getString(Constants.Issue.ISSUE_STATE);
+        int position = data.getInt("position");
+        
+        mFilterData = new HashMap<String, String>();
+        Iterator<String> filter = data.keySet().iterator();
+        while (filter.hasNext()) {
+            String key = filter.next();
+            if (!Constants.Repository.REPO_OWNER.equals(key)
+                    && !Constants.Repository.REPO_NAME.equals(key)) {
+                
+                if (key.equals("position")) {
+                    mFilterData.put(key, String.valueOf(data.getInt(key)));
+                }
+                else {
+                    mFilterData.put(key, data.getString(key));
+                }
+            }
+        }
         
         tabCount = 3;
         
@@ -86,21 +114,30 @@ public class IssueListActivity extends BaseSherlockFragmentActivity {
                 .setText(R.string.issues_submitted)
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 0 + "", mPager));
-        mActionBar.addTab(tab);
+        mActionBar.addTab(tab, position == 0);
         
         tab = mActionBar
                 .newTab()
                 .setText(R.string.issues_updated)
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
-        mActionBar.addTab(tab);
+        mActionBar.addTab(tab, position == 1);
         
         tab = mActionBar
                 .newTab()
                 .setText(R.string.issues_comments)
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 2 + "", mPager));
-        mActionBar.addTab(tab);
+        mActionBar.addTab(tab, position == 2);
+        
+        mBtnSort = (Button) findViewById(R.id.btn_sort);
+        mBtnSort.setOnClickListener(this);
+        
+        mBtnFilterByLabels = (Button) findViewById(R.id.btn_labels);
+        mBtnFilterByLabels.setOnClickListener(this);
+        
+        mBtnFilterByMilestone = (Button) findViewById(R.id.btn_milestone);
+        mBtnFilterByMilestone.setOnClickListener(this);
     }
 
     public class ThisPageAdapter extends FragmentStatePagerAdapter {
@@ -116,21 +153,19 @@ public class IssueListActivity extends BaseSherlockFragmentActivity {
 
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
-            Map<String, String> filterData = new HashMap<String, String>();
-            filterData.put("state", mState);
-            
             if (position == 0) {
-                filterData.put("sort", "created");
-                return IssueListFragment.newInstance(mRepoOwner, mRepoName, filterData);
+                return IssueListBySubmittedFragment.newInstance(mRepoOwner, mRepoName, mFilterData);
             }
+            
             else if (position == 1) {
-                filterData.put("sort", "updated");
-                return IssueListFragment.newInstance(mRepoOwner, mRepoName, filterData);
+                return IssueListByUpdatedFragment.newInstance(mRepoOwner, mRepoName, mFilterData);
             }
-            else {
-                filterData.put("sort", "comments");
-                return IssueListFragment.newInstance(mRepoOwner, mRepoName, filterData);
+            
+            else if (position == 2) {
+                return IssueListByCommentsFragment.newInstance(mRepoOwner, mRepoName, mFilterData);
             }
+            
+            return null;
         }
         
         @Override
@@ -193,5 +228,32 @@ public class IssueListActivity extends BaseSherlockFragmentActivity {
             default:
                 return true;
         }
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+        case R.id.btn_sort:
+            Intent intent = new Intent().setClass(this, IssueListActivity.class);
+            intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+            intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+            intent.putExtra(Constants.Issue.ISSUE_STATE, mState);
+            intent.putExtra("position", mPager.getCurrentItem());
+            String direction = mFilterData.get("direction");
+            if ("desc".equals(direction) || direction == null) {
+                intent.putExtra("direction", "asc");
+            }
+            else {
+                intent.putExtra("direction", "desc");
+            }
+            
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            break;
+
+        default:
+            break;
+        }
+        
     }
 }

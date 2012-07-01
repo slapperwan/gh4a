@@ -31,6 +31,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,26 +58,6 @@ public class IssueListFragment extends SherlockFragment
     private IssueAdapter mAdapter;
     private PageIterator<Issue> mDataIterator;
     
-    public static IssueListFragment newInstance(String repoOwner, String repoName, 
-            Map<String, String> filterData) {
-        
-        IssueListFragment f = new IssueListFragment();
-
-        Bundle args = new Bundle();
-        args.putString(Constants.Repository.REPO_OWNER, repoOwner);
-        args.putString(Constants.Repository.REPO_NAME, repoName);
-        
-        if (filterData != null) {
-            Iterator<String> i = filterData.keySet().iterator();
-            while (i.hasNext()) {
-                String key = i.next();
-                args.putString(key, filterData.get(key));
-            }
-        }
-        f.setArguments(args);
-        return f;
-    }
-    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,6 +83,7 @@ public class IssueListFragment extends SherlockFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.generic_list, container, false);
+        
         mListView = (ListView) v.findViewById(R.id.list_view);
         return v;
     }
@@ -136,6 +118,7 @@ public class IssueListFragment extends SherlockFragment
     }
     
     private void fillData(List<Issue> issues) {
+        Log.i("", "+++++++++++++ filldata " + mFilterData.get("sort"));
         if (issues != null && issues.size() > 0) {
             mAdapter.addAll(issues);
             mAdapter.notifyDataSetChanged();
@@ -169,4 +152,6 @@ public class IssueListFragment extends SherlockFragment
         intent.putExtra(Constants.DATA_BUNDLE, data);
         startActivity(intent);
     }
+
+        
 }

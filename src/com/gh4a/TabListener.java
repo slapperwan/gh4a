@@ -21,16 +21,13 @@ public class TabListener<T extends SherlockFragmentActivity> implements ActionBa
     }
 
     public void onTabSelected(Tab tab, FragmentTransaction ft) {
-        Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onTabSelected " + tab + ", " + mActivity.getSupportActionBar().getSelectedNavigationIndex());
-        //mPager.setCurrentItem(Integer.parseInt(mTag));
-        mPager.setCurrentItem(mActivity.getSupportActionBar().getSelectedNavigationIndex());
+        mPager.setCurrentItem(Integer.parseInt(mTag));
+        //mPager.setCurrentItem(mActivity.getSupportActionBar().getSelectedNavigationIndex());
     }
 
     public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-        Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onTabUnselected " + tab);
     }
 
     public void onTabReselected(Tab tab, FragmentTransaction ft) {
-        Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onTabReselected " + tab);
     }
 }

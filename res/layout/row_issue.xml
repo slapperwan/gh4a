@@ -13,6 +13,22 @@
     android:paddingTop="10dp"
     android:paddingBottom="10dp" >
     <ImageView
+        android:id="@+id/iv_comments"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:paddingRight="5dp"
+        android:src="@drawable/comments"
+        android:layout_alignParentRight="true" />
+    <TextView
+        android:id="@+id/tv_comments"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="5dp"
+        android:textAppearance="@style/default_text_micro"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/iv_comments" />
+    <ImageView
         android:id="@+id/iv_gravatar"
         android:layout_width="40dp"
         android:layout_height="40dp"
@@ -22,8 +38,9 @@
         android:id="@+id/tv_desc"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="17sp"
         android:layout_toRightOf="@id/iv_gravatar"
+        android:layout_toLeftOf="@id/iv_comments"
         android:maxLines="2"
         android:ellipsize="end" />
     <LinearLayout
@@ -32,6 +49,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_toRightOf="@id/iv_gravatar"
+        android:layout_toLeftOf="@id/iv_comments"
         android:layout_below="@id/tv_desc" />
     <TextView
         android:id="@+id/tv_extra"
