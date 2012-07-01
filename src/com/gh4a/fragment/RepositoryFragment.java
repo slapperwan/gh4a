@@ -290,9 +290,12 @@ public class RepositoryFragment extends SherlockFragment implements
                         Object content = url.getContent();
                         InputStream is = (InputStream) content;
                         Drawable drawable = Drawable.createFromStream(is, null);
-                        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable
-                                .getIntrinsicHeight());
-                        return drawable;
+                        if (drawable != null) {
+                            drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable
+                                    .getIntrinsicHeight());
+                            return drawable;
+                        }
+                        return null;
                         
                     } catch (MalformedURLException e) {
                         // TODO Auto-generated catch block
