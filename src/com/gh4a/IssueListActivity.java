@@ -15,16 +15,25 @@
  */
 package com.gh4a;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
+import org.eclipse.egit.github.core.Label;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -39,9 +48,11 @@ import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.fragment.IssueListByCommentsFragment;
 import com.gh4a.fragment.IssueListBySubmittedFragment;
 import com.gh4a.fragment.IssueListByUpdatedFragment;
+import com.gh4a.loader.LabelListLoader;
+import com.gh4a.loader.MilestoneListLoader;
 
 public class IssueListActivity extends BaseSherlockFragmentActivity
-    implements OnClickListener {
+    implements OnClickListener, LoaderManager.LoaderCallbacks {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -71,7 +82,8 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         while (filter.hasNext()) {
             String key = filter.next();
             if (!Constants.Repository.REPO_OWNER.equals(key)
-                    && !Constants.Repository.REPO_NAME.equals(key)) {
+                    && !Constants.Repository.REPO_NAME.equals(key)
+                    && !"position".equals(key)) {
                 
                 if (key.equals("position")) {
                     mFilterData.put(key, String.valueOf(data.getInt(key)));
@@ -138,6 +150,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         
         mBtnFilterByMilestone = (Button) findViewById(R.id.btn_milestone);
         mBtnFilterByMilestone.setOnClickListener(this);
+        
     }
 
     public class ThisPageAdapter extends FragmentStatePagerAdapter {
@@ -234,26 +247,126 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
     public void onClick(View view) {
         switch (view.getId()) {
         case R.id.btn_sort:
-            Intent intent = new Intent().setClass(this, IssueListActivity.class);
-            intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-            intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-            intent.putExtra(Constants.Issue.ISSUE_STATE, mState);
-            intent.putExtra("position", mPager.getCurrentItem());
             String direction = mFilterData.get("direction");
             if ("desc".equals(direction) || direction == null) {
-                intent.putExtra("direction", "asc");
+                mFilterData.put("direction", "asc");
             }
             else {
-                intent.putExtra("direction", "desc");
+                mFilterData.put("direction", "desc");
             }
+            reloadIssueList();
+            break;
             
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
+        case R.id.btn_labels:
+            getSupportLoaderManager().initLoader(0, null, this);
+            getSupportLoaderManager().getLoader(0).forceLoad();
             break;
 
         default:
             break;
         }
+    }
+    
+    private void reloadIssueList() {
+        Intent intent = new Intent().setClass(this, IssueListActivity.class);
+        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        intent.putExtra(Constants.Issue.ISSUE_STATE, mState);
+        intent.putExtra("position", mPager.getCurrentItem());
+        intent.putExtra("direction", mFilterData.get("direction"));
+        intent.putExtra("labels", mFilterData.get("labels"));
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+    }
+    
+    private void showLabelsDialog(List<Label> allLabels) {
+        String selectedLabels = mFilterData.get("labels");
+        String[] checkedLabels = new String[] {};
+        
+        if (selectedLabels != null) {
+            checkedLabels = selectedLabels.split(",");
+        }
+        List<String> checkLabelStringList = Arrays.asList(checkedLabels);
+        final boolean[] checkedItems = new boolean[allLabels.size()];
+
+        final String[] allLabelArray = new String[allLabels.size()];
+        
+        //find which labels for this issue
+        for (int i = 0; i < allLabels.size(); i++) {
+            Label l = allLabels.get(i);
+            allLabelArray[i] = l.getName();
+            if(checkLabelStringList.contains(l.getName())) {
+                checkedItems[i] = true;
+            }
+            else {
+                checkedItems[i] = false;
+            }
+        }
+        
+        //final boolean[] newCheckedItems = new boolean[availableLabels.size()];
+        
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme));
+        builder.setCancelable(true);
+        builder.setTitle(R.string.issue_labels);
+        builder.setMultiChoiceItems(allLabelArray, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton, boolean isChecked) {
+                if (isChecked) {
+                    checkedItems[whichButton] = true;
+                }
+                else {
+                    checkedItems[whichButton] = false;
+                }
+            }
+        });
+        
+        builder.setPositiveButton(R.string.label_it,
+                new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.dismiss();
+                String labels = "";
+                for (int i = 0; i < allLabelArray.length; i++) {
+                    if (checkedItems[i]) {
+                        labels += allLabelArray[i] + ",";
+                    }
+                }
+                mFilterData.put("labels", labels);
+                reloadIssueList();
+            }
+        })
+        .setNegativeButton(R.string.cancel,
+                new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.dismiss();
+            }
+        })
+       .create();
+        
+        builder.show();
+    }
+
+    @Override
+    public Loader onCreateLoader(int id, Bundle args) {
+        if (id == 0) {
+            return new LabelListLoader(this, mRepoOwner, mRepoName);
+        }
+        else {
+            return new MilestoneListLoader(this, mRepoOwner, mRepoName, "open");
+        }
+    }
+
+    @Override
+    public void onLoadFinished(Loader loader, Object object) {
+        if (loader.getId() == 0) {
+            showLabelsDialog((List<Label>) object);
+        }
+        else {
+            
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader loader) {
+        // TODO Auto-generated method stub
         
     }
 }

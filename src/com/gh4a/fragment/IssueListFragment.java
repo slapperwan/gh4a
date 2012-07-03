@@ -118,7 +118,6 @@ public class IssueListFragment extends SherlockFragment
     }
     
     private void fillData(List<Issue> issues) {
-        Log.i("", "+++++++++++++ filldata " + mFilterData.get("sort"));
         if (issues != null && issues.size() > 0) {
             mAdapter.addAll(issues);
             mAdapter.notifyDataSetChanged();
