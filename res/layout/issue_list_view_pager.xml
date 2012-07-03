@@ -19,18 +19,21 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content" 
             android:layout_weight="1"
-            android:text="Sort"/>  
+            android:drawableLeft="@drawable/navigation_expand"
+            android:text="" />  
         <Button
             android:id="@+id/btn_labels"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1" 
-            android:text="By Labels"/>
+            android:layout_weight="2" 
+            android:text="@string/issue_labels"
+            android:drawableLeft="@drawable/collections_labels" />
         <Button
             android:id="@+id/btn_milestone"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1" 
-            android:text="By Milestone"/>    
+            android:layout_weight="2" 
+            android:text="@string/issue_view_milestones"
+            android:drawableLeft="@drawable/collections_view_as_list" />    
     </LinearLayout>
 </RelativeLayout>

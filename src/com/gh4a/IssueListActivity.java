@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.Milestone;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -145,6 +146,16 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         mBtnSort = (Button) findViewById(R.id.btn_sort);
         mBtnSort.setOnClickListener(this);
         
+        String direction = mFilterData.get("direction");
+        if ("desc".equals(direction) || direction == null) {
+            mBtnSort.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.navigation_expand),
+                    null, null, null);
+        }
+        else {
+            mBtnSort.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.navigation_collapse),
+                    null, null, null);
+        }
+        
         mBtnFilterByLabels = (Button) findViewById(R.id.btn_labels);
         mBtnFilterByLabels.setOnClickListener(this);
         
@@ -177,7 +188,6 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
             else if (position == 2) {
                 return IssueListByCommentsFragment.newInstance(mRepoOwner, mRepoName, mFilterData);
             }
-            
             return null;
         }
         
@@ -261,6 +271,11 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
             getSupportLoaderManager().initLoader(0, null, this);
             getSupportLoaderManager().getLoader(0).forceLoad();
             break;
+            
+        case R.id.btn_milestone:
+            getSupportLoaderManager().initLoader(1, null, this);
+            getSupportLoaderManager().getLoader(1).forceLoad();
+            break;
 
         default:
             break;
@@ -275,6 +290,9 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         intent.putExtra("position", mPager.getCurrentItem());
         intent.putExtra("direction", mFilterData.get("direction"));
         intent.putExtra("labels", mFilterData.get("labels"));
+        if (mFilterData.get("milestone") != null) {
+            intent.putExtra("milestone", mFilterData.get("milestone"));
+        }
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
@@ -303,11 +321,9 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
             }
         }
         
-        //final boolean[] newCheckedItems = new boolean[availableLabels.size()];
-        
         AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme));
         builder.setCancelable(true);
-        builder.setTitle(R.string.issue_labels);
+        builder.setTitle(R.string.issue_filter_by_labels);
         builder.setMultiChoiceItems(allLabelArray, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
             public void onClick(DialogInterface dialog, int whichButton, boolean isChecked) {
                 if (isChecked) {
@@ -319,7 +335,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
             }
         });
         
-        builder.setPositiveButton(R.string.label_it,
+        builder.setPositiveButton(R.string.ok,
                 new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 dialog.dismiss();
@@ -336,6 +352,59 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         .setNegativeButton(R.string.cancel,
                 new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.dismiss();
+            }
+        })
+       .create();
+        
+        builder.show();
+    }
+    
+    private void showMilestonesDialog(List<Milestone> allMilestones) {
+        String[] milestones = new String[allMilestones.size() + 1];
+        final int[] milestoneIds = new int[allMilestones.size() + 1];
+        
+        milestones[0] = getResources().getString(R.string.issue_filter_by_any_milestone);
+        milestoneIds[0] = 0;
+        
+        String checkedMilestoneNumber = mFilterData.get("milestone");
+        int checkedItem = checkedMilestoneNumber != null && !"".equals(checkedMilestoneNumber) ? 
+                 Integer.parseInt(checkedMilestoneNumber) : 0;
+        
+        for (int i = 1; i <= allMilestones.size(); i++) {
+            Milestone m = allMilestones.get(i - 1);
+            milestones[i] = m.getTitle();
+            milestoneIds[i] = m.getNumber();
+            if (m.getNumber() == checkedItem) {
+                checkedItem = i;
+            }
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme));
+        builder.setCancelable(true);
+        builder.setTitle(R.string.issue_filter_by_milestone);
+        builder.setSingleChoiceItems(milestones, checkedItem, new DialogInterface.OnClickListener() {
+            
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (which == 0) {
+                    mFilterData.remove("milestone");
+                }
+                else {
+                    mFilterData.put("milestone", String.valueOf(milestoneIds[which]));
+                }
+            }
+        });
+        
+        builder.setPositiveButton(R.string.ok,
+                new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                reloadIssueList();
+            }
+        })
+        .setNegativeButton(R.string.cancel,
+                new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
             }
         })
@@ -360,7 +429,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
             showLabelsDialog((List<Label>) object);
         }
         else {
-            
+            showMilestonesDialog((List<Milestone>) object);
         }
     }
 
