@@ -589,7 +589,7 @@ public class FeedAdapter extends RootAdapter<Event> {
     }
 
     private static String formatToRepoName(Repository repository) {
-        if (repository != null) {
+        if (repository != null && repository.getOwner() != null) {
             return repository.getOwner().getLogin() + "/" + repository.getName();
         }
         return "(deleted)";
