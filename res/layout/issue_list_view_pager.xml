@@ -14,13 +14,12 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_alignParentBottom="true">
-        <Button
+        <ImageButton
             android:id="@+id/btn_sort"
             android:layout_width="0dp"
             android:layout_height="wrap_content" 
             android:layout_weight="1"
-            android:drawableLeft="@drawable/navigation_expand"
-            android:text="" />  
+            android:src="@drawable/navigation_expand" />  
         <Button
             android:id="@+id/btn_labels"
             android:layout_width="0dp"

@@ -39,6 +39,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
@@ -63,7 +64,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
     private ActionBar mActionBar;
     private int tabCount;
     private Map<String, String> mFilterData;
-    private Button mBtnSort;
+    private ImageButton mBtnSort;
     private Button mBtnFilterByLabels;
     private Button mBtnFilterByMilestone;
 
@@ -143,17 +144,15 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
                         new TabListener<SherlockFragmentActivity>(this, 2 + "", mPager));
         mActionBar.addTab(tab, position == 2);
         
-        mBtnSort = (Button) findViewById(R.id.btn_sort);
+        mBtnSort = (ImageButton) findViewById(R.id.btn_sort);
         mBtnSort.setOnClickListener(this);
         
         String direction = mFilterData.get("direction");
         if ("desc".equals(direction) || direction == null) {
-            mBtnSort.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.navigation_expand),
-                    null, null, null);
+            mBtnSort.setImageDrawable(getResources().getDrawable(R.drawable.navigation_expand));
         }
         else {
-            mBtnSort.setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(R.drawable.navigation_collapse),
-                    null, null, null);
+            mBtnSort.setImageDrawable(getResources().getDrawable(R.drawable.navigation_collapse));
         }
         
         mBtnFilterByLabels = (Button) findViewById(R.id.btn_labels);
