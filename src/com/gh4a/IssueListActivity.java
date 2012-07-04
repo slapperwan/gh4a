@@ -54,6 +54,7 @@ import com.gh4a.fragment.IssueListByUpdatedFragment;
 import com.gh4a.loader.CollaboratorListLoader;
 import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.MilestoneListLoader;
+import com.gh4a.utils.StringUtils;
 
 public class IssueListActivity extends BaseSherlockFragmentActivity
     implements OnClickListener, LoaderManager.LoaderCallbacks {
@@ -294,10 +295,12 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
                 String[] milestoneIdString = mFilterData.get("milestonesIdPassToNextActivity").split(",");
                 List<Milestone> milestones = new ArrayList<Milestone>();
                 for (int i = 0; i < milestoneString.length; i++) {
-                    Milestone m = new Milestone();
-                    m.setTitle(milestoneString[i]);
-                    m.setNumber(Integer.parseInt(milestoneIdString[i]));
-                    milestones.add(m);
+                    if (!StringUtils.isBlank(milestoneIdString[i])) {
+                        Milestone m = new Milestone();
+                        m.setTitle(milestoneString[i]);
+                        m.setNumber(Integer.parseInt(milestoneIdString[i]));
+                        milestones.add(m);
+                    }
                 }
                 showMilestonesDialog(milestones);
             }
@@ -373,6 +376,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
             }
             labelsPassToNextActivity += l.getName() + ",";
         }
+        
         mFilterData.put("labelsPassToNextActivity", labelsPassToNextActivity);
         
         AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme));
@@ -438,6 +442,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
             milestonesPassToNextActivity += m.getTitle() + ",";
             milestonesIdPassToNextActivity += m.getNumber() + ",";
         }
+        
         mFilterData.put("milestonesPassToNextActivity", milestonesPassToNextActivity);
         mFilterData.put("milestonesIdPassToNextActivity", milestonesIdPassToNextActivity);
         
@@ -492,6 +497,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
             }
             assigneesPassToNextActivity += u.getLogin() + ",";
         }
+        
         mFilterData.put("assigneesPassToNextActivity", assigneesPassToNextActivity);
         
         AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme));
