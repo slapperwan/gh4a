@@ -15,6 +15,7 @@
  */
 package com.gh4a;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,7 +36,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -270,15 +270,53 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
             break;
             
         case R.id.btn_labels:
-            getSupportLoaderManager().getLoader(0).forceLoad();
+            if (mFilterData.get("labelsPassToNextActivity") == null) {
+                getSupportLoaderManager().getLoader(0).forceLoad();
+            }
+            else {
+                String[] labelString = mFilterData.get("labelsPassToNextActivity").split(",");
+                List<Label> labels = new ArrayList<Label>();
+                for (String labelName : labelString) {
+                    Label l = new Label();
+                    l.setName(labelName);
+                    labels.add(l);
+                }
+                showLabelsDialog(labels);
+            }
             break;
             
         case R.id.btn_milestone:
-            getSupportLoaderManager().getLoader(1).forceLoad();
+            if (mFilterData.get("milestonesPassToNextActivity") == null) {
+                getSupportLoaderManager().getLoader(1).forceLoad();
+            }
+            else {
+                String[] milestoneString = mFilterData.get("milestonesPassToNextActivity").split(",");
+                String[] milestoneIdString = mFilterData.get("milestonesIdPassToNextActivity").split(",");
+                List<Milestone> milestones = new ArrayList<Milestone>();
+                for (int i = 0; i < milestoneString.length; i++) {
+                    Milestone m = new Milestone();
+                    m.setTitle(milestoneString[i]);
+                    m.setNumber(Integer.parseInt(milestoneIdString[i]));
+                    milestones.add(m);
+                }
+                showMilestonesDialog(milestones);
+            }
             break;
             
         case R.id.btn_assignee:
-            getSupportLoaderManager().getLoader(2).forceLoad();
+            if (mFilterData.get("assigneesPassToNextActivity") == null) {
+                getSupportLoaderManager().getLoader(2).forceLoad();
+            }
+            else {
+                String[] assigneeString = mFilterData.get("assigneesPassToNextActivity").split(",");
+                List<User> users = new ArrayList<User>();
+                for (String login : assigneeString) {
+                    User user = new User();
+                    user.setLogin(login);
+                    users.add(user);
+                }
+                showAssigneesDialog(users);
+            }
             break;
 
         default:
@@ -300,6 +338,12 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         if (mFilterData.get("assignee") != null) {
             intent.putExtra("assignee", mFilterData.get("assignee"));
         }
+        
+        intent.putExtra("labelsPassToNextActivity", mFilterData.get("labelsPassToNextActivity"));
+        intent.putExtra("milestonesPassToNextActivity", mFilterData.get("milestonesPassToNextActivity"));
+        intent.putExtra("milestonesIdPassToNextActivity", mFilterData.get("milestonesIdPassToNextActivity"));
+        intent.putExtra("assigneesPassToNextActivity", mFilterData.get("assigneesPassToNextActivity"));
+        
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
@@ -316,7 +360,8 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
 
         final String[] allLabelArray = new String[allLabels.size()];
         
-        //find which labels for this issue
+        String labelsPassToNextActivity = "";
+        
         for (int i = 0; i < allLabels.size(); i++) {
             Label l = allLabels.get(i);
             allLabelArray[i] = l.getName();
@@ -326,7 +371,9 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
             else {
                 checkedItems[i] = false;
             }
+            labelsPassToNextActivity += l.getName() + ",";
         }
+        mFilterData.put("labelsPassToNextActivity", labelsPassToNextActivity);
         
         AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme));
         builder.setCancelable(true);
@@ -368,7 +415,6 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
     }
     
     private void showMilestonesDialog(List<Milestone> allMilestones) {
-        Log.i("", "+++++++++++++++++ 1111");
         String[] milestones = new String[allMilestones.size() + 1];
         final int[] milestoneIds = new int[allMilestones.size() + 1];
         
@@ -379,6 +425,9 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         int checkedItem = checkedMilestoneNumber != null && !"".equals(checkedMilestoneNumber) ? 
                  Integer.parseInt(checkedMilestoneNumber) : 0;
         
+        String milestonesPassToNextActivity = "";
+        String milestonesIdPassToNextActivity = "";
+        
         for (int i = 1; i <= allMilestones.size(); i++) {
             Milestone m = allMilestones.get(i - 1);
             milestones[i] = m.getTitle();
@@ -386,11 +435,12 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
             if (m.getNumber() == checkedItem) {
                 checkedItem = i;
             }
+            milestonesPassToNextActivity += m.getTitle() + ",";
+            milestonesIdPassToNextActivity += m.getNumber() + ",";
         }
+        mFilterData.put("milestonesPassToNextActivity", milestonesPassToNextActivity);
+        mFilterData.put("milestonesIdPassToNextActivity", milestonesIdPassToNextActivity);
         
-        Log.i("", "+++++++++++++++++ 222 " + milestones);
-        Log.i("", "+++++++++++++++++ 333 " + milestoneIds);
-        Log.i("", "+++++++++++++++++ 444 " + checkedItem);
         AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme));
         builder.setCancelable(true);
         builder.setTitle(R.string.issue_filter_by_milestone);
@@ -433,13 +483,17 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         String checkedAssignee = mFilterData.get("assignee");
         int checkedItem = 0;
         
+        String assigneesPassToNextActivity = "";
         for (int i = 1; i <= allAssignees.size(); i++) {
             User u = allAssignees.get(i - 1);
             assignees[i] = u.getLogin();
             if (u.getLogin().equalsIgnoreCase(checkedAssignee)) {
                 checkedItem = i;
             }
+            assigneesPassToNextActivity += u.getLogin() + ",";
         }
+        mFilterData.put("assigneesPassToNextActivity", assigneesPassToNextActivity);
+        
         AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme));
         builder.setCancelable(true);
         builder.setTitle(R.string.issue_filter_by_assignee);
