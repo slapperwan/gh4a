@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
+import org.eclipse.egit.github.core.User;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -34,11 +35,11 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -50,6 +51,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.fragment.IssueListByCommentsFragment;
 import com.gh4a.fragment.IssueListBySubmittedFragment;
 import com.gh4a.fragment.IssueListByUpdatedFragment;
+import com.gh4a.loader.CollaboratorListLoader;
 import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.MilestoneListLoader;
 
@@ -65,8 +67,9 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
     private int tabCount;
     private Map<String, String> mFilterData;
     private ImageButton mBtnSort;
-    private Button mBtnFilterByLabels;
-    private Button mBtnFilterByMilestone;
+    private ImageButton mBtnFilterByLabels;
+    private ImageButton mBtnFilterByMilestone;
+    private ImageButton mBtnFilterByAssignee;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -86,13 +89,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
             if (!Constants.Repository.REPO_OWNER.equals(key)
                     && !Constants.Repository.REPO_NAME.equals(key)
                     && !"position".equals(key)) {
-                
-                if (key.equals("position")) {
-                    mFilterData.put(key, String.valueOf(data.getInt(key)));
-                }
-                else {
-                    mFilterData.put(key, data.getString(key));
-                }
+                mFilterData.put(key, data.getString(key));
             }
         }
         
@@ -155,12 +152,18 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
             mBtnSort.setImageDrawable(getResources().getDrawable(R.drawable.navigation_collapse));
         }
         
-        mBtnFilterByLabels = (Button) findViewById(R.id.btn_labels);
+        mBtnFilterByLabels = (ImageButton) findViewById(R.id.btn_labels);
         mBtnFilterByLabels.setOnClickListener(this);
         
-        mBtnFilterByMilestone = (Button) findViewById(R.id.btn_milestone);
+        mBtnFilterByMilestone = (ImageButton) findViewById(R.id.btn_milestone);
         mBtnFilterByMilestone.setOnClickListener(this);
         
+        mBtnFilterByAssignee = (ImageButton) findViewById(R.id.btn_assignee);
+        mBtnFilterByAssignee.setOnClickListener(this);
+        
+        getSupportLoaderManager().initLoader(0, null, this);
+        getSupportLoaderManager().initLoader(1, null, this);
+        getSupportLoaderManager().initLoader(2, null, this);
     }
 
     public class ThisPageAdapter extends FragmentStatePagerAdapter {
@@ -267,13 +270,15 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
             break;
             
         case R.id.btn_labels:
-            getSupportLoaderManager().initLoader(0, null, this);
             getSupportLoaderManager().getLoader(0).forceLoad();
             break;
             
         case R.id.btn_milestone:
-            getSupportLoaderManager().initLoader(1, null, this);
             getSupportLoaderManager().getLoader(1).forceLoad();
+            break;
+            
+        case R.id.btn_assignee:
+            getSupportLoaderManager().getLoader(2).forceLoad();
             break;
 
         default:
@@ -291,6 +296,9 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         intent.putExtra("labels", mFilterData.get("labels"));
         if (mFilterData.get("milestone") != null) {
             intent.putExtra("milestone", mFilterData.get("milestone"));
+        }
+        if (mFilterData.get("assignee") != null) {
+            intent.putExtra("assignee", mFilterData.get("assignee"));
         }
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
@@ -360,6 +368,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
     }
     
     private void showMilestonesDialog(List<Milestone> allMilestones) {
+        Log.i("", "+++++++++++++++++ 1111");
         String[] milestones = new String[allMilestones.size() + 1];
         final int[] milestoneIds = new int[allMilestones.size() + 1];
         
@@ -378,6 +387,10 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
                 checkedItem = i;
             }
         }
+        
+        Log.i("", "+++++++++++++++++ 222 " + milestones);
+        Log.i("", "+++++++++++++++++ 333 " + milestoneIds);
+        Log.i("", "+++++++++++++++++ 444 " + checkedItem);
         AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme));
         builder.setCancelable(true);
         builder.setTitle(R.string.issue_filter_by_milestone);
@@ -411,14 +424,66 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         
         builder.show();
     }
+    
+    private void showAssigneesDialog(List<User> allAssignees) {
+        final String[] assignees = new String[allAssignees.size() + 1];
+        
+        assignees[0] = getResources().getString(R.string.issue_filter_by_any_assignee);
+        
+        String checkedAssignee = mFilterData.get("assignee");
+        int checkedItem = 0;
+        
+        for (int i = 1; i <= allAssignees.size(); i++) {
+            User u = allAssignees.get(i - 1);
+            assignees[i] = u.getLogin();
+            if (u.getLogin().equalsIgnoreCase(checkedAssignee)) {
+                checkedItem = i;
+            }
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme));
+        builder.setCancelable(true);
+        builder.setTitle(R.string.issue_filter_by_assignee);
+        builder.setSingleChoiceItems(assignees, checkedItem, new DialogInterface.OnClickListener() {
+            
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (which == 0) {
+                    mFilterData.remove("assignee");
+                }
+                else {
+                    mFilterData.put("assignee", assignees[which]);
+                }
+            }
+        });
+        
+        builder.setPositiveButton(R.string.ok,
+                new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                reloadIssueList();
+            }
+        })
+        .setNegativeButton(R.string.cancel,
+                new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        })
+       .create();
+        
+        builder.show();
+    }
 
     @Override
     public Loader onCreateLoader(int id, Bundle args) {
         if (id == 0) {
             return new LabelListLoader(this, mRepoOwner, mRepoName);
         }
-        else {
+        else if (id == 1) {
             return new MilestoneListLoader(this, mRepoOwner, mRepoName, "open");
+        }
+        else {
+            return new CollaboratorListLoader(this, mRepoOwner, mRepoName);
         }
     }
 
@@ -427,8 +492,11 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         if (loader.getId() == 0) {
             showLabelsDialog((List<Label>) object);
         }
-        else {
+        else if (loader.getId() == 1) {
             showMilestonesDialog((List<Milestone>) object);
+        }
+        else {
+            showAssigneesDialog((List<User>) object);
         }
     }
 

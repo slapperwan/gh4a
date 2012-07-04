@@ -20,19 +20,23 @@
             android:layout_height="wrap_content" 
             android:layout_weight="1"
             android:src="@drawable/navigation_expand" />  
-        <Button
+        <ImageButton
             android:id="@+id/btn_labels"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2" 
-            android:text="@string/issue_labels"
-            android:drawableLeft="@drawable/collections_labels" />
-        <Button
+            android:layout_weight="1" 
+            android:src="@drawable/collections_labels" />
+        <ImageButton
             android:id="@+id/btn_milestone"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2" 
-            android:text="@string/issue_view_milestones"
-            android:drawableLeft="@drawable/collections_view_as_list" />    
+            android:layout_weight="1" 
+            android:src="@drawable/collections_view_as_list" />  
+        <ImageButton
+            android:id="@+id/btn_assignee"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" 
+            android:src="@drawable/social_person" />    
     </LinearLayout>
 </RelativeLayout>
