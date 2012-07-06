@@ -9,7 +9,7 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical" >
         <EditText
             android:id="@+id/et_title"
             android:layout_height="wrap_content"
@@ -22,35 +22,75 @@
             android:gravity="top"
             android:lines="8"
             android:hint="@string/issue_body" />
-        <Button
-            android:id="@+id/btn_label"
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="10dp" />
+        <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/issue_view_labels" />
-        <Spinner
-            android:id="@+id/spinner_assignee"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <Spinner
-            android:id="@+id/spinner_milestone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <!--
-            CheckBox android:id="@+id/cb_sign"
-            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+            <TextView
+                android:id="@+id/tv_issue_label_add"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/issue_label_add" />
+            <View 
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="#ff0099cc" />
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="10dp" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/ll_labels"
             android:layout_width="fill_parent"
-            android:text="@string/promote" android:checked="true" />
-            <TextView android:layout_height="wrap_content"
-            android:layout_width="fill_parent"
-            android:text="@string/promote_desc" /
-        -->
-        <Button
-            android:text="@string/issue_create"
-            android:id="@+id/btn_create"
-            android:layout_width="wrap_content"
-            android:gravity="center_vertical|center_horizontal"
             android:layout_height="wrap_content"
-            android:layout_gravity="right">
-        </Button>
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:orientation="vertical">
+        </LinearLayout>
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="10dp" />
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/btn_milestone"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:text="@string/issue_milestone"
+                android:drawableLeft="@drawable/collections_view_as_list" />
+            <TextView
+                android:id="@+id/tv_selected_milestone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" 
+                android:textAppearance="?android:attr/textAppearanceMedium" />  
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/btn_assignee"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:text="@string/issue_assignee" 
+                android:drawableLeft="@drawable/social_person" />
+            <TextView
+                android:id="@+id/tv_selected_assignee"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" 
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

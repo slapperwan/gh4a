@@ -361,7 +361,7 @@ public class UserFragment extends SherlockFragment implements
             tvExtra.setText(extraData);
             
             View divider = new View(getActivity());
-            divider.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, 16));
+            divider.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, 20));
             
             ll.addView(rowView);
             ll.addView(divider);

@@ -23,63 +23,58 @@ import java.util.List;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
-import org.eclipse.egit.github.core.service.LabelService;
-import org.eclipse.egit.github.core.service.MilestoneService;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
-import com.gh4a.adapter.AssigneeSimpleAdapter;
-import com.gh4a.adapter.MilestoneSimpleAdapter;
-import com.gh4a.db.Bookmark;
-import com.gh4a.db.BookmarkParam;
-import com.gh4a.db.DbHelper;
+import com.actionbarsherlock.view.MenuItem;
+import com.gh4a.loader.CollaboratorListLoader;
+import com.gh4a.loader.LabelListLoader;
+import com.gh4a.loader.MilestoneListLoader;
 import com.gh4a.utils.StringUtils;
 
-/**
- * The IssueCreate activity.
- */
-public class IssueCreateActivity extends BaseActivity implements OnClickListener, OnItemSelectedListener {
+public class IssueCreateActivity extends BaseSherlockFragmentActivity 
+    implements OnClickListener, LoaderManager.LoaderCallbacks {
 
-    /** The user login. */
-    private String mUserLogin;
-
-    /** The repo name. */
+    private String mRepoOwner;
     private String mRepoName;
+    private ActionBar mActionBar;
+    private LoadingDialog mLoadingDialog;
+    private List<Label> mSelectedLabels;
+    private Milestone mSelectedMilestone;
+    private User mSelectedAssignee;
+    private EditText mEtTitle;
+    private EditText mEtDesc;
+    private Button mBtnMilestone;
+    private Button mBtnAssignee;
+    private TextView mTvSelectedMilestone;
+    private TextView mTvSelectedAssignee;
+    private List<Label> mAllLabel;
+    private List<Milestone> mAllMilestone;
+    private List<User> mAllAssignee;
+    private LinearLayout mLinearLayoutLabels;
     
-    /** The loading dialog. */
-    protected LoadingDialog mLoadingDialog;
-    
-    protected List<Label> mSelectedLabels;
-    
-    protected Milestone mSelectedMilestone;
-    
-    protected User mSelectedAssignee;
-    
-    protected List<Label> mLabels;
-    
-    /* (non-Javadoc)
-     * @see android.app.Activity#onCreate(android.os.Bundle)
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,76 +85,112 @@ public class IssueCreateActivity extends BaseActivity implements OnClickListener
             finish();
         }
         setContentView(R.layout.issue_create);
-        setUpActionBar();
-        
-        mUserLogin = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
 
-        Button btnCreate = (Button) findViewById(R.id.btn_create);
-        btnCreate.setOnClickListener(this);
+        mSelectedLabels = new ArrayList<Label>();
+        Bundle data = getIntent().getExtras();
         
-        Button btnLabel = (Button) findViewById(R.id.btn_label);
-        btnLabel.setOnClickListener(this);
+        mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
+        mRepoName = data.getString(Constants.Repository.REPO_NAME);
+
+        mActionBar = getSupportActionBar();
+        mActionBar.setTitle(R.string.issue_create);
+        mActionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
+        mActionBar.setDisplayShowTitleEnabled(true);
+        mActionBar.setHomeButtonEnabled(true);
         
-        new LoadIssueLabelsTask(this).execute();
-        new LoadMilestonesTask(this).execute();
-        new LoadAssigneesTask(this).execute();
+        mEtTitle = (EditText) findViewById(R.id.et_title);
+        mEtDesc = (EditText) findViewById(R.id.et_desc);
+        
+        mBtnMilestone = (Button) findViewById(R.id.btn_milestone);
+        mBtnMilestone.setOnClickListener(this);
+        
+        mBtnAssignee = (Button) findViewById(R.id.btn_assignee);
+        mBtnAssignee.setOnClickListener(this);
+        
+        mLinearLayoutLabels = (LinearLayout) findViewById(R.id.ll_labels);
+        mTvSelectedMilestone = (TextView) findViewById(R.id.tv_selected_milestone);
+        mTvSelectedMilestone.setTypeface(getApplicationContext().boldCondensed);
+        
+        mTvSelectedAssignee = (TextView) findViewById(R.id.tv_selected_assignee);
+        mTvSelectedAssignee.setTypeface(getApplicationContext().boldCondensed);
+        
+        TextView tvIssueLabelAdd = (TextView) findViewById(R.id.tv_issue_label_add);
+        tvIssueLabelAdd.setTypeface(getApplicationContext().boldCondensed);
+        tvIssueLabelAdd.setTextColor(Color.parseColor("#0099cc"));
+        
+        getSupportLoaderManager().initLoader(0, null, this);
+        getSupportLoaderManager().getLoader(0).forceLoad();
+        
+        getSupportLoaderManager().initLoader(1, null, this);
+        getSupportLoaderManager().initLoader(2, null, this);
     }
     
-    /* (non-Javadoc)
-     * @see android.view.View.OnClickListener#onClick(android.view.View)
-     */
     @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.btn_create) {
-            EditText etTitle = (EditText) findViewById(R.id.et_title);
-            EditText etDesc = (EditText) findViewById(R.id.et_desc);
-            if (etTitle.getText() == null || StringUtils.isBlank(etTitle.getText().toString())) {
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getSupportMenuInflater();
+        inflater.inflate(R.menu.accept_cancel, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.accept:
+            if (mEtTitle.getText() == null || StringUtils.isBlank(mEtTitle.getText().toString())) {
                 showMessage(getResources().getString(R.string.issue_error_title), false);
             }
             else {
-                String desc = "";
-                if (etTitle.getText() != null) {
-                    desc = etDesc.getText().toString();
-                }
-                new CreateIssueTask(this, false).execute(etTitle.getText().toString(), desc);
+                new CreateIssueTask(this, false).execute();
             }
+            return true;
+
+        case R.id.cancel:
+            getApplicationContext().openIssueListActivity(this, mRepoOwner, mRepoName, Constants.Issue.ISSUE_STATE_OPEN);
+            return true;
+        
+        default:
+            return true;
         }
-        else if (v.getId() == R.id.btn_label) {
-            showLabelsDialog();
+    }
+    
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+
+        case R.id.btn_milestone:
+            if (mAllMilestone == null) {
+                getSupportLoaderManager().getLoader(1).forceLoad();
+            }
+            else {
+                showMilestonesDialog();
+            }
+            break;
+            
+        case R.id.btn_assignee:
+            if (mAllAssignee == null) {
+                getSupportLoaderManager().getLoader(2).forceLoad();
+            }
+            else {
+                showAssigneesDialog();
+            }
+            break;
+
+        default:
+            break;
         }
     }
 
-    /**
-     * An asynchronous task that runs on a background thread
-     * to create issue.
-     */
     private static class CreateIssueTask extends AsyncTask<String, Void, Boolean> {
 
-        /** The target. */
         private WeakReference<IssueCreateActivity> mTarget;
-        
-        /** The exception. */
         private boolean mException;
-        
-        /** The hide main view. */
         private boolean mHideMainView;
 
-        /**
-         * Instantiates a new load issue list task.
-         *
-         * @param activity the activity
-         * @param hideMainView the hide main view
-         */
         public CreateIssueTask(IssueCreateActivity activity, boolean hideMainView) {
             mTarget = new WeakReference<IssueCreateActivity>(activity);
             mHideMainView = hideMainView;
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
         @Override
         protected Boolean doInBackground(String... params) {
             if (mTarget.get() != null) {
@@ -170,22 +201,22 @@ public class IssueCreateActivity extends BaseActivity implements OnClickListener
                     IssueService issueService = new IssueService(client);
                     
                     Issue issue = new Issue();
-                    issue.setTitle(params[0]);
-                    issue.setBody(params[1]);
+                    issue.setTitle(activity.mEtTitle.getText().toString());
+                    issue.setBody(activity.mEtDesc.getText().toString());
                     
-                    if (activity.mSelectedMilestone != null
-                            && activity.mSelectedMilestone.getNumber() != -1) {
+                    if (activity.mSelectedMilestone != null) {
                         issue.setMilestone(activity.mSelectedMilestone);
                     }
-                    if (activity.mSelectedLabels != null) {
+                
+                    if (activity.mSelectedLabels != null && !activity.mSelectedLabels.isEmpty()) {
                         issue.setLabels(activity.mSelectedLabels);
                     }
-                    if (activity.mSelectedAssignee != null
-                            && activity.mSelectedAssignee.getLogin() != null) {
+                    
+                    if (activity.mSelectedAssignee != null) {
                         issue.setAssignee(activity.mSelectedAssignee);
                     }
                     
-                    issueService.createIssue(activity.mUserLogin, 
+                    issueService.createIssue(activity.mRepoOwner, 
                             activity.mRepoName, issue);
                     
                     return true;
@@ -201,10 +232,6 @@ public class IssueCreateActivity extends BaseActivity implements OnClickListener
             }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
         @Override
         protected void onPreExecute() {
             if (mTarget.get() != null) {
@@ -212,10 +239,6 @@ public class IssueCreateActivity extends BaseActivity implements OnClickListener
             }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
         @Override
         protected void onPostExecute(Boolean result) {
             if (mTarget.get() != null) {
@@ -229,7 +252,7 @@ public class IssueCreateActivity extends BaseActivity implements OnClickListener
                     activity.showMessage(activity.getResources().getString(R.string.issue_success_create),
                             false);
                     activity.getApplicationContext().openIssueListActivity(activity, 
-                            activity.mUserLogin, 
+                            activity.mRepoOwner, 
                             activity.mRepoName, 
                             Constants.Issue.ISSUE_STATE_OPEN);
                 }
@@ -237,312 +260,55 @@ public class IssueCreateActivity extends BaseActivity implements OnClickListener
         }
     }
     
-    /**
-     * An asynchronous task that runs on a background thread
-     * to load issue labels.
-     */
-    private static class LoadIssueLabelsTask extends AsyncTask<Void, Integer, List<Label>> {
-
-        /** The target. */
-        private WeakReference<IssueCreateActivity> mTarget;
+    private void showMilestonesDialog() {
+        final String[] milestones = new String[mAllMilestone.size() + 1];
         
-        /** The exception. */
-        private boolean mException;
-
-        /**
-         * Instantiates a new load issue task.
-         *
-         * @param activity the activity
-         */
-        public LoadIssueLabelsTask(IssueCreateActivity activity) {
-            mTarget = new WeakReference<IssueCreateActivity>(activity);
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
-        @Override
-        protected List<Label> doInBackground(Void... params) {
-            if (mTarget.get() != null) {
-                try {
-                    GitHubClient client = new GitHubClient();
-                    client.setOAuth2Token(mTarget.get().getAuthToken());
-                    LabelService labelService = new LabelService(client);
-                    return labelService.getLabels(mTarget.get().mUserLogin,
-                            mTarget.get().mRepoName);
-                    
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
-            }
-            else {
-                return null;
-            }
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
-        @Override
-        protected void onPreExecute() {
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
-        @Override
-        protected void onPostExecute(List<Label> result) {
-            if (mTarget.get() != null) {
-                IssueCreateActivity activity = mTarget.get();
-                if (mException) {
-                    activity.showError();
-                }
-                else {
-                    activity.mLabels = result;
-                }
-            }
-        }
-    }
-    
-    /**
-     * An asynchronous task that runs on a background thread
-     * to load issue milestone.
-     */
-    private static class LoadMilestonesTask extends AsyncTask<Void, Integer, List<Milestone>> {
-
-        /** The target. */
-        private WeakReference<IssueCreateActivity> mTarget;
+        milestones[0] = getResources().getString(R.string.issue_clear_milestone);
         
-        /** The exception. */
-        private boolean mException;
-
-        /**
-         * Instantiates a new load issue task.
-         *
-         * @param activity the activity
-         */
-        public LoadMilestonesTask(IssueCreateActivity activity) {
-            mTarget = new WeakReference<IssueCreateActivity>(activity);
+        int checkedItem = 0;
+        if (mSelectedMilestone != null) {
+            checkedItem = mSelectedMilestone.getNumber();
         }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
-        @Override
-        protected List<Milestone> doInBackground(Void... params) {
-            if (mTarget.get() != null) {
-                try {
-                    GitHubClient client = new GitHubClient();
-                    client.setOAuth2Token(mTarget.get().getAuthToken());
-                    
-                    MilestoneService milestoneService = new MilestoneService(client);
-                    return milestoneService.getMilestones(mTarget.get().mUserLogin,
-                            mTarget.get().mRepoName, null);
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
-            }
-            else {
-                return null;
-            }
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
-        @Override
-        protected void onPreExecute() {
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
-        @Override
-        protected void onPostExecute(List<Milestone> result) {
-            if (mTarget.get() != null) {
-                IssueCreateActivity activity = mTarget.get();
-    
-                if (mException) {
-                    activity.showError();
-                }
-                else {
-                    activity.fillMilestones(result);
-                }
-            }
-        }
-    }
-    
-    /**
-     * An asynchronous task that runs on a background thread
-     * to load issue milestone.
-     */
-    private static class LoadAssigneesTask extends AsyncTask<Void, Integer, List<User>> {
-
-        /** The target. */
-        private WeakReference<IssueCreateActivity> mTarget;
         
-        /** The exception. */
-        private boolean mException;
-
-        /**
-         * Instantiates a new load issue task.
-         *
-         * @param activity the activity
-         */
-        public LoadAssigneesTask(IssueCreateActivity activity) {
-            mTarget = new WeakReference<IssueCreateActivity>(activity);
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
-        @Override
-        protected List<User> doInBackground(Void... params) {
-            if (mTarget.get() != null) {
-                try {
-                    GitHubClient client = new GitHubClient();
-                    client.setOAuth2Token(mTarget.get().getAuthToken());
-                    CollaboratorService collabService = new CollaboratorService(client);
-                    return collabService.getCollaborators(new RepositoryId(mTarget.get().mUserLogin,
-                            mTarget.get().mRepoName));
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
-            }
-            else {
-                return null;
-            }
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
-        @Override
-        protected void onPreExecute() {
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
-        @Override
-        protected void onPostExecute(List<User> result) {
-            if (mTarget.get() != null) {
-                IssueCreateActivity activity = mTarget.get();
-                if (mException) {
-                    activity.showError();
-                }
-                else {
-                    activity.fillAssignees(result);
-                }
-            }
-        }
-    }
-    
-    public void fillAssignees(List<User> assignees) {
-        Spinner assigneeSpinner = (Spinner) findViewById(R.id.spinner_assignee);
-        
-        List<User> finalAssignees = new ArrayList<User>();
-        
-        User assignee = new User();
-        assignee.setName("Select Assignee");
-        finalAssignees.add(assignee);
-        finalAssignees.addAll(assignees);
-        
-        AssigneeSimpleAdapter adapter = new AssigneeSimpleAdapter(this, finalAssignees);
-        assigneeSpinner.setAdapter(adapter);
-        assigneeSpinner.setOnItemSelectedListener(this);
-    }
-    
-    public void fillMilestones(List<Milestone> milestones) {
-        Spinner milestoneSpinner = (Spinner) findViewById(R.id.spinner_milestone);
-        
-        List<Milestone> finalMilestones = new ArrayList<Milestone>();
-        
-        Milestone selectMilestone = new Milestone();
-        selectMilestone.setNumber(-1);
-        selectMilestone.setTitle("Select Milestone");
-        finalMilestones.add(selectMilestone);
-        finalMilestones.addAll(milestones);
-        
-        MilestoneSimpleAdapter milestoneAdapter = new MilestoneSimpleAdapter(this, finalMilestones);
-        milestoneSpinner.setAdapter(milestoneAdapter);
-        milestoneSpinner.setOnItemSelectedListener(this);
-    }
-    
-    private void showLabelsDialog() {
-        final boolean[] checkedItems = new boolean[mLabels.size()];
-        final String[] availabelLabelArr = new String[mLabels.size()];
-        
-        List<String> currentSelected = new ArrayList<String>();
-        if (mSelectedLabels != null) {
-            for (Label l : mSelectedLabels) {
-                currentSelected.add(l.getName());
-            }
-        }
-        for (int i = 0; i < mLabels.size(); i++) {
-            availabelLabelArr[i] = mLabels.get(i).getName();
-            
-            if(currentSelected.contains(mLabels.get(i).getName())) {
-                checkedItems[i] = true;
-            }
-            else {
-                checkedItems[i] = false;
+        for (int i = 1; i <= mAllMilestone.size(); i++) {
+            Milestone m = mAllMilestone.get(i - 1);
+            milestones[i] = m.getTitle();
+            if (m.getNumber() == checkedItem) {
+                checkedItem = i;
             }
         }
         
-        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(IssueCreateActivity.this, android.R.style.Theme));
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme));
         builder.setCancelable(true);
-        builder.setTitle(R.string.issue_labels);
-        builder.setMultiChoiceItems(availabelLabelArr, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton, boolean isChecked) {
-                if (isChecked) {
-                    checkedItems[whichButton] = true;
+        builder.setTitle(R.string.issue_milestone);
+        builder.setSingleChoiceItems(milestones, checkedItem, new DialogInterface.OnClickListener() {
+            
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (which == 0) {
+                    mSelectedMilestone = null;
                 }
                 else {
-                    checkedItems[whichButton] = false;
+                    mSelectedMilestone = mAllMilestone.get(which - 1);
                 }
             }
         });
         
-        builder.setPositiveButton(R.string.label_it,
+        builder.setPositiveButton(R.string.ok,
                 new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.dismiss();
-                mSelectedLabels = new ArrayList<Label>();
-                
-                String btnText = "Labels : ";
-                for (int i = 0; i < checkedItems.length; i++) {
-                    if (checkedItems[i]) {
-                        btnText += mLabels.get(i).getName() + ", ";
-                        mSelectedLabels.add(mLabels.get(i));
-                    }
+            public void onClick(DialogInterface dialog, int which) {
+                if (mSelectedMilestone != null) {
+                    mTvSelectedMilestone.setText(mSelectedMilestone.getTitle());
                 }
-                btnText = btnText.substring(0, btnText.length() - 2);
-                Button btnLabel = (Button) findViewById(R.id.btn_label);
-                btnLabel.setText(btnText);
+                else {
+                    mTvSelectedAssignee.setText(null);
+                }
+                dialog.dismiss();
             }
         })
         .setNegativeButton(R.string.cancel,
                 new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
+            public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
             }
         })
@@ -551,68 +317,137 @@ public class IssueCreateActivity extends BaseActivity implements OnClickListener
         builder.show();
     }
     
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        if (isAuthorized()) {
-            menu.clear();
-            MenuInflater inflater = getSupportMenuInflater();
-            inflater.inflate(R.menu.bookmark_menu, menu);
+    private void showAssigneesDialog() {
+        final String[] assignees = new String[mAllAssignee.size() + 1];
+        assignees[0] = getResources().getString(R.string.issue_clear_assignee);
+        
+        int checkedItem = 0;
+        
+        for (int i = 1; i <= mAllAssignee.size(); i++) {
+            User u = mAllAssignee.get(i - 1);
+            assignees[i] = u.getLogin();
+            if (mSelectedAssignee != null
+                    && u.getLogin().equalsIgnoreCase(mSelectedAssignee.getLogin())) {
+                checkedItem = i;
+            }
         }
-        return true;
+        
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme));
+        builder.setCancelable(true);
+        builder.setTitle(R.string.issue_assignee);
+        builder.setSingleChoiceItems(assignees, checkedItem, new DialogInterface.OnClickListener() {
+            
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (which == 0) {
+                    mSelectedAssignee = null;
+                }
+                else {
+                    mSelectedAssignee = mAllAssignee.get(which - 1);
+                }
+            }
+        });
+        
+        builder.setPositiveButton(R.string.ok,
+                new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                if (mSelectedAssignee != null) {
+                    mTvSelectedAssignee.setText(mSelectedAssignee.getLogin());
+                }
+                else {
+                    mTvSelectedAssignee.setText(null);
+                }
+                dialog.dismiss();
+            }
+        })
+        .setNegativeButton(R.string.cancel,
+                new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        })
+       .create();
+        
+        builder.show();
+    }
+    
+    public void fillLabels() {
+        final Typeface boldCondensed = getApplicationContext().boldCondensed;
+        final Typeface condensed = getApplicationContext().condensed;
+        
+        for (final Label label : mAllLabel) {
+            final View rowView = getLayoutInflater().inflate(R.layout.row_issue_create_label, null);
+            View viewColor = (View) rowView.findViewById(R.id.view_color);
+            viewColor.setBackgroundColor(Color.parseColor("#" + label.getColor()));
+            //viewColor.setPadding(10, 10, 10, 10);
+            
+            final TextView tvLabel = (TextView) rowView.findViewById(R.id.tv_title);
+            tvLabel.setTypeface(condensed);
+            tvLabel.setText(label.getName());
+            tvLabel.setOnClickListener(new OnClickListener() {
+                
+                @Override
+                public void onClick(View v) {
+                    if (mSelectedLabels.contains(label)) {
+                        mSelectedLabels.remove(label);
+                        
+                        tvLabel.setTypeface(condensed);
+                        tvLabel.setBackgroundColor(Color.WHITE);
+                        tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+                    }
+                    else {
+                        mSelectedLabels.add(label);
+                        
+                        tvLabel.setTypeface(boldCondensed);
+                        tvLabel.setBackgroundColor(Color.parseColor("#" + label.getColor()));
+                        int r = Color.red(Color.parseColor("#" + label.getColor()));
+                        int g = Color.green(Color.parseColor("#" + label.getColor()));
+                        int b = Color.blue(Color.parseColor("#" + label.getColor()));
+                        if (r + g + b < 383) {
+                            tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_dark));
+                        }
+                        else {
+                            tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+                        }                    
+                    }
+                }
+            });
+            
+            mLinearLayoutLabels.addView(rowView);
+        }
     }
     
     @Override
-    public void openBookmarkActivity() {
-        Intent intent = new Intent().setClass(this, BookmarkListActivity.class);
-        intent.putExtra(Constants.Bookmark.NAME, "Create issue at " + mUserLogin + "/" + mRepoName);
-        intent.putExtra(Constants.Bookmark.OBJECT_TYPE, Constants.Bookmark.OBJECT_TYPE_ISSUE);
-        startActivityForResult(intent, 100);
-    }
-    
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 100) {
-           if (resultCode == Constants.Bookmark.ADD) {
-               DbHelper db = new DbHelper(this);
-               Bookmark b = new Bookmark();
-               b.setName("Create issue at " + mUserLogin + "/" + mRepoName);
-               b.setObjectType(Constants.Bookmark.OBJECT_TYPE_ISSUE);
-               b.setObjectClass(IssueCreateActivity.class.getName());
-               long id = db.saveBookmark(b);
-               
-               BookmarkParam[] params = new BookmarkParam[2];
-               BookmarkParam param = new BookmarkParam();
-               param.setBookmarkId(id);
-               param.setKey(Constants.Repository.REPO_OWNER);
-               param.setValue(mUserLogin);
-               params[0] = param;
-               
-               param = new BookmarkParam();
-               param.setBookmarkId(id);
-               param.setKey(Constants.Repository.REPO_NAME);
-               param.setValue(mRepoName);
-               params[1] = param;
-               
-               db.saveBookmarkParam(params);
-           }
+    public Loader onCreateLoader(int id, Bundle args) {
+        if (id == 0) {
+            return new LabelListLoader(this, mRepoOwner, mRepoName);
         }
-     }
-
-    @Override
-    public void onItemSelected(AdapterView<?> adapterView,
-            View view, int position, long id) {
-        if (adapterView.getAdapter() instanceof MilestoneSimpleAdapter) {
-            MilestoneSimpleAdapter adapter = (MilestoneSimpleAdapter) adapterView.getAdapter();
-            mSelectedMilestone = (Milestone) adapter.getItem(position);
+        else if (id == 1) {
+            return new MilestoneListLoader(this, mRepoOwner, mRepoName, "open");
         }
-        if (adapterView.getAdapter() instanceof AssigneeSimpleAdapter) {
-            AssigneeSimpleAdapter adapter = (AssigneeSimpleAdapter) adapterView.getAdapter();
-            mSelectedAssignee = (User) adapter.getItem(position);
+        else {
+            return new CollaboratorListLoader(this, mRepoOwner, mRepoName);
         }
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> arg0) {
+    public void onLoadFinished(Loader loader, Object object) {
+        if (loader.getId() == 0) {
+            mAllLabel = (List<Label>) object;
+            fillLabels();
+        }
+        else if (loader.getId() == 1) {
+            mAllMilestone = (List<Milestone>) object;
+            showMilestonesDialog();
+        }
+        else {
+            mAllAssignee = (List<User>) object;
+            showAssigneesDialog();
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader arg0) {
         // TODO Auto-generated method stub
         
     }
