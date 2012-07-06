@@ -79,7 +79,7 @@
                 
                 <TableLayout
                     android:id="@+id/cell_issues"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@android:drawable/list_selector_background" >
@@ -102,7 +102,7 @@
                 
                 <TableLayout
                     android:id="@+id/cell_watchers"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@android:drawable/list_selector_background" >
@@ -124,7 +124,7 @@
                 </TableLayout>
                 <TableLayout
                     android:id="@+id/cell_forks"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@android:drawable/list_selector_background" >
@@ -146,7 +146,7 @@
                 </TableLayout>
                 <TableLayout
                     android:id="@+id/cell_pull_requests"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@android:drawable/list_selector_background" >

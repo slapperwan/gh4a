@@ -37,7 +37,7 @@ public class OrganizationMemberListActivity extends UserListActivity {
     @Override
     protected void setRequestData() {
         mUserLogin = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
-        mShowMoreData = true;
+        mShowMoreData = false;
     }
 
     /*
@@ -62,7 +62,7 @@ public class OrganizationMemberListActivity extends UserListActivity {
      */
     @Override
     protected void setRowLayout() {
-        mRowLayout = R.layout.row_gravatar_2;
+        mRowLayout = R.layout.row_gravatar_1;
     }
 
     /*

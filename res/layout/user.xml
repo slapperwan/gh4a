@@ -79,8 +79,31 @@
                 android:layout_height="wrap_content">
                 
                 <TableLayout
+                    android:id="@+id/cell_org_members"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:drawable/list_selector_background" >
+                    <TableRow>
+                        <TextView
+                            android:id="@+id/tv_members_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceLarge"
+                            android:text="@string/view" />
+                    </TableRow>
+                    <TableRow>
+                        <TextView
+                            android:id="@+id/tv_members_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?attr/textAppearanceSmall"
+                            android:text="@string/user_members" />
+                    </TableRow>
+                </TableLayout>
+                <TableLayout
                     android:id="@+id/cell_followers"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@android:drawable/list_selector_background" >
@@ -102,7 +125,7 @@
                 </TableLayout>
                 <TableLayout
                     android:id="@+id/cell_following"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@android:drawable/list_selector_background" >
@@ -123,31 +146,30 @@
                     </TableRow>
                 </TableLayout>
                 <TableLayout
-                    android:id="@+id/cell_organizations"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/cell_repos"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@android:drawable/list_selector_background" >
                     <TableRow>
                         <TextView
-                            android:id="@+id/tv_organizations_count"
+                            android:id="@+id/tv_repos_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceLarge"
-                            android:text="@string/view"/>
+                            android:textAppearance="?android:attr/textAppearanceLarge" />
                     </TableRow>
                     <TableRow>
                         <TextView
-                            android:id="@+id/tv_organizations_label"
+                            android:id="@+id/tv_repos_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="?attr/textAppearanceSmall"
-                            android:text="@string/user_organizations" />
+                            android:text="@string/repo_short" />
                     </TableRow>
                 </TableLayout>
                 <TableLayout
                     android:id="@+id/cell_gists"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@android:drawable/list_selector_background" >
@@ -156,8 +178,7 @@
                             android:id="@+id/tv_gists_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceLarge"
-                            android:text="@string/view" />
+                            android:textAppearance="?android:attr/textAppearanceLarge" />
                     </TableRow>
                     <TableRow>
                         <TextView
@@ -165,7 +186,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="?attr/textAppearanceSmall"
-                            android:text="@string/gist_public" />
+                            android:text="@string/gist" />
                     </TableRow>
                 </TableLayout>
             </TableRow>
@@ -198,5 +219,51 @@
         <View
             android:layout_width="fill_parent"
             android:layout_height="16dp" />
+        <LinearLayout
+            android:id="@+id/ll_orgs"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+            <TextView
+                android:id="@+id/tv_orgs"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/user_organizations" />
+            <View 
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="#ff0099cc" />
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="10dp" />
+        </LinearLayout>
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="16dp" />
+        
+        <LinearLayout
+            android:id="@+id/ll_others"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+            <TextView
+                android:id="@+id/other_info"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/other_info" />
+            <View 
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="#ff0099cc" />
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="10dp" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>
