@@ -159,7 +159,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
             return true;
 
         case R.id.cancel:
-            getApplicationContext().openIssueListActivity(this, mRepoOwner, mRepoName, Constants.Issue.ISSUE_STATE_OPEN);
+            finish();
             return true;
         
         default:
@@ -227,11 +227,11 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
                     issue.setAssignee(activity.mSelectedAssignee);
                     
                     if (activity.mEditMode) {
-                        issueService.editIssue(activity.mRepoOwner, 
+                        activity.mEditIssue = issueService.editIssue(activity.mRepoOwner, 
                                 activity.mRepoName, issue);
                     }
                     else {
-                        issueService.createIssue(activity.mRepoOwner, 
+                        activity.mEditIssue = issueService.createIssue(activity.mRepoOwner, 
                                 activity.mRepoName, issue);
                     }
                     
@@ -268,10 +268,11 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
                     activity.showMessage(activity.getResources().getString(
                             activity.mEditMode ? R.string.issue_success_edit : R.string.issue_success_create),
                             false);
-                    activity.getApplicationContext().openIssueListActivity(activity, 
+                    activity.getApplicationContext().openIssueActivity(activity, 
                             activity.mRepoOwner, 
-                            activity.mRepoName, 
-                            Constants.Issue.ISSUE_STATE_OPEN);
+                            activity.mRepoName,
+                            activity.mEditIssue.getNumber(),
+                            Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 }
             }
         }
