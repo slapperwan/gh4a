@@ -31,7 +31,12 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity {
         mUserLogin = data.getString(Constants.User.USER_LOGIN);
         mUserType = data.getString(Constants.User.USER_TYPE);
 
-        tabCount = 2;
+        if (Constants.User.USER_TYPE_ORG.equals(mUserType)) {
+            tabCount = 1;
+        }
+        else {
+            tabCount = 2;
+        }
         
         mActionBar = getSupportActionBar();
         mAdapter = new ThisPageAdapter(getSupportFragmentManager());
@@ -64,12 +69,14 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity {
                         new TabListener<SherlockFragmentActivity>(this, 0 + "", mPager));
         mActionBar.addTab(tab);
         
-        tab = mActionBar
-                .newTab()
-                .setText(R.string.user_watched_repos)
-                .setTabListener(
-                        new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
-        mActionBar.addTab(tab);
+        if (tabCount == 2) {
+            tab = mActionBar
+                    .newTab()
+                    .setText(R.string.user_watched_repos)
+                    .setTabListener(
+                            new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
+            mActionBar.addTab(tab);
+        }
         
     }
     
