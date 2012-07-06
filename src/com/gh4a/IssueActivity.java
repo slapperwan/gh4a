@@ -454,7 +454,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                 return true;
             case R.string.issue_edit:
                 if (isAuthorized()) {
-                    Intent intent = new Intent().setClass(this, IssueEditActivity.class);
+                    Intent intent = new Intent().setClass(this, IssueCreateActivity.class);
                     intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
                     intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                     intent.putExtra(Constants.Issue.ISSUE_NUMBER, mBundle.getInt(Constants.Issue.ISSUE_NUMBER));

@@ -97,9 +97,6 @@
             android:name=".IssueCreateActivity"
             android:configChanges="orientation" />
         <activity
-            android:name=".IssueEditActivity"
-            android:configChanges="orientation" />
-        <activity
             android:name=".IssueLabelListActivity"
             android:configChanges="orientation" />
         <activity

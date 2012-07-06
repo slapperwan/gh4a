@@ -50,6 +50,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.loader.CollaboratorListLoader;
+import com.gh4a.loader.IssueLoader;
 import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.MilestoneListLoader;
 import com.gh4a.utils.StringUtils;
@@ -74,6 +75,9 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
     private List<Milestone> mAllMilestone;
     private List<User> mAllAssignee;
     private LinearLayout mLinearLayoutLabels;
+    private int mIssueNumber;
+    private boolean mEditMode; 
+    private Issue mEditIssue;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -91,9 +95,13 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
         
         mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
+        mIssueNumber = data.getInt(Constants.Issue.ISSUE_NUMBER);
+        if (mIssueNumber != 0) {
+            mEditMode = true;
+        }
 
         mActionBar = getSupportActionBar();
-        mActionBar.setTitle(R.string.issue_create);
+        mActionBar.setTitle(mEditMode ? R.string.issue_edit : R.string.issue_create);
         mActionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         mActionBar.setDisplayShowTitleEnabled(true);
         mActionBar.setHomeButtonEnabled(true);
@@ -119,10 +127,16 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
         tvIssueLabelAdd.setTextColor(Color.parseColor("#0099cc"));
         
         getSupportLoaderManager().initLoader(0, null, this);
-        getSupportLoaderManager().getLoader(0).forceLoad();
-        
         getSupportLoaderManager().initLoader(1, null, this);
         getSupportLoaderManager().initLoader(2, null, this);
+        
+        if (mEditMode) {
+            getSupportLoaderManager().initLoader(3, null, this);
+            getSupportLoaderManager().getLoader(3).forceLoad();
+        }
+        else {
+            getSupportLoaderManager().getLoader(0).forceLoad();
+        }
     }
     
     @Override
@@ -140,7 +154,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
                 showMessage(getResources().getString(R.string.issue_error_title), false);
             }
             else {
-                new CreateIssueTask(this, false).execute();
+                new SaveIssueTask(this, false).execute();
             }
             return true;
 
@@ -180,13 +194,13 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
         }
     }
 
-    private static class CreateIssueTask extends AsyncTask<String, Void, Boolean> {
+    private static class SaveIssueTask extends AsyncTask<String, Void, Boolean> {
 
         private WeakReference<IssueCreateActivity> mTarget;
         private boolean mException;
         private boolean mHideMainView;
 
-        public CreateIssueTask(IssueCreateActivity activity, boolean hideMainView) {
+        public SaveIssueTask(IssueCreateActivity activity, boolean hideMainView) {
             mTarget = new WeakReference<IssueCreateActivity>(activity);
             mHideMainView = hideMainView;
         }
@@ -201,23 +215,25 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
                     IssueService issueService = new IssueService(client);
                     
                     Issue issue = new Issue();
+                    if (activity.mEditMode) {
+                        issue = activity.mEditIssue;
+                    }
+                    
                     issue.setTitle(activity.mEtTitle.getText().toString());
                     issue.setBody(activity.mEtDesc.getText().toString());
                     
-                    if (activity.mSelectedMilestone != null) {
-                        issue.setMilestone(activity.mSelectedMilestone);
-                    }
-                
-                    if (activity.mSelectedLabels != null && !activity.mSelectedLabels.isEmpty()) {
-                        issue.setLabels(activity.mSelectedLabels);
-                    }
+                    issue.setLabels(activity.mSelectedLabels);
+                    issue.setMilestone(activity.mSelectedMilestone);
+                    issue.setAssignee(activity.mSelectedAssignee);
                     
-                    if (activity.mSelectedAssignee != null) {
-                        issue.setAssignee(activity.mSelectedAssignee);
+                    if (activity.mEditMode) {
+                        issueService.editIssue(activity.mRepoOwner, 
+                                activity.mRepoName, issue);
                     }
-                    
-                    issueService.createIssue(activity.mRepoOwner, 
-                            activity.mRepoName, issue);
+                    else {
+                        issueService.createIssue(activity.mRepoOwner, 
+                                activity.mRepoName, issue);
+                    }
                     
                     return true;
                 }
@@ -249,7 +265,8 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
                     activity.showError(false);
                 }
                 else {
-                    activity.showMessage(activity.getResources().getString(R.string.issue_success_create),
+                    activity.showMessage(activity.getResources().getString(
+                            activity.mEditMode ? R.string.issue_success_edit : R.string.issue_success_create),
                             false);
                     activity.getApplicationContext().openIssueListActivity(activity, 
                             activity.mRepoOwner, 
@@ -301,7 +318,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
                     mTvSelectedMilestone.setText(mSelectedMilestone.getTitle());
                 }
                 else {
-                    mTvSelectedAssignee.setText(null);
+                    mTvSelectedMilestone.setText(null);
                 }
                 dialog.dismiss();
             }
@@ -413,8 +430,54 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
                 }
             });
             
+            if (mEditMode) {
+                if (mSelectedLabels.contains(label)) {
+                    tvLabel.setTypeface(boldCondensed);
+                    tvLabel.setBackgroundColor(Color.parseColor("#" + label.getColor()));
+                    int r = Color.red(Color.parseColor("#" + label.getColor()));
+                    int g = Color.green(Color.parseColor("#" + label.getColor()));
+                    int b = Color.blue(Color.parseColor("#" + label.getColor()));
+                    if (r + g + b < 383) {
+                        tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_dark));
+                    }
+                    else {
+                        tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+                    }           
+                }
+                else {
+                    tvLabel.setTypeface(condensed);
+                    tvLabel.setBackgroundColor(Color.WHITE);
+                    tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+                }
+            }
+            
             mLinearLayoutLabels.addView(rowView);
         }
+    }
+    
+    private void fillIssueData() {
+        EditText etTitle = (EditText) findViewById(R.id.et_title);
+        etTitle.setText(mEditIssue.getTitle());
+        
+        EditText etDesc = (EditText) findViewById(R.id.et_desc);
+        etDesc.setText(mEditIssue.getBody());
+        
+        mSelectedLabels = new ArrayList<Label>();
+        mSelectedLabels.addAll(mEditIssue.getLabels());
+        
+        mSelectedMilestone = mEditIssue.getMilestone();
+        
+        mSelectedAssignee = mEditIssue.getAssignee();
+        
+        if (mSelectedMilestone != null) {
+            mTvSelectedMilestone.setText(mEditIssue.getMilestone().getTitle());
+        }
+        
+        if (mSelectedAssignee != null) {
+            mTvSelectedAssignee.setText(mSelectedAssignee.getLogin());
+        }
+        
+        getSupportLoaderManager().getLoader(0).forceLoad();//load labels
     }
     
     @Override
@@ -425,8 +488,11 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
         else if (id == 1) {
             return new MilestoneListLoader(this, mRepoOwner, mRepoName, "open");
         }
-        else {
+        else if (id == 2) {
             return new CollaboratorListLoader(this, mRepoOwner, mRepoName);
+        }
+        else {
+            return new IssueLoader(this, mRepoOwner, mRepoName, mIssueNumber);
         }
     }
 
@@ -440,9 +506,13 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
             mAllMilestone = (List<Milestone>) object;
             showMilestonesDialog();
         }
-        else {
+        else if (loader.getId() == 2) {
             mAllAssignee = (List<User>) object;
             showAssigneesDialog();
+        }
+        else {
+            mEditIssue = (Issue) object;
+            fillIssueData();
         }
     }
 
