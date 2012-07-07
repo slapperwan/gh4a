@@ -22,6 +22,7 @@ import org.xml.sax.XMLReader;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Html.TagHandler;
@@ -67,12 +68,18 @@ public class CommentAdapter extends RootAdapter<Comment> {
         View v = convertView;
         ViewHolder viewHolder;
         if (v == null) {
+            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+            Typeface regular = app.regular;
+            
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
             v = vi.inflate(R.layout.row_gravatar_comment, null);
             viewHolder = new ViewHolder();
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+            viewHolder.tvDesc.setTypeface(regular);
+
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+            viewHolder.tvExtra.setTypeface(regular);
 
             v.setTag(viewHolder);
         }
@@ -95,7 +102,7 @@ public class CommentAdapter extends RootAdapter<Comment> {
             });
 
             Resources res = v.getResources();
-            String extraData = String.format(res.getString(R.string.more_data), comment.getUser().getLogin(),
+            String extraData = String.format(res.getString(R.string.more_comment_data), comment.getUser().getLogin(),
                     pt.format(comment.getCreatedAt()));
 
             viewHolder.tvExtra.setText(extraData);

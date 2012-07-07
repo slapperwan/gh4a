@@ -31,7 +31,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -144,11 +143,10 @@ public class IssueListFragment extends SherlockFragment
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         Issue issue = (Issue) adapterView.getAdapter().getItem(position);
         Intent intent = new Intent().setClass(getSherlockActivity(), IssueActivity.class);
-        Bundle data = ((Gh4Application) getSherlockActivity().getApplication()).populateIssue(issue);
-        // extra data
-        data.putString(Constants.Repository.REPO_OWNER, mRepoOwner);
-        data.putString(Constants.Repository.REPO_NAME, mRepoName);
-        intent.putExtra(Constants.DATA_BUNDLE, data);
+        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        intent.putExtra(Constants.Issue.ISSUE_NUMBER, issue.getNumber());
+        intent.putExtra(Constants.Issue.ISSUE_STATE, issue.getState());
         startActivity(intent);
     }
 

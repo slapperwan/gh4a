@@ -26,16 +26,16 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.IssueService;
-import org.eclipse.egit.github.core.service.LabelService;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.text.Html;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -46,102 +46,56 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.adapter.CommentAdapter;
-import com.gh4a.db.Bookmark;
-import com.gh4a.db.BookmarkParam;
-import com.gh4a.db.DbHelper;
+import com.gh4a.loader.IssueLoader;
 import com.gh4a.utils.ImageDownloader;
 
-/**
- * The IssueInfo activity.
- */
-public class IssueActivity extends BaseActivity implements OnClickListener {
+public class IssueActivity extends BaseSherlockFragmentActivity implements 
+    OnClickListener, LoaderManager.LoaderCallbacks<Issue> {
 
-    /** The issue. */
-    protected Issue mIssue;
-
-    /** The loading dialog. */
-    protected LoadingDialog mLoadingDialog;
-
-    /** The bundle. */
-    protected Bundle mBundle;
-
-    /** The user login. */
-    protected String mUserLogin;
-
-    /** The repo name. */
-    protected String mRepoName;
-
-    /** The issue number. */
-    protected int mIssueNumber;
-    
-    protected String mIssueState;
-
-    /** The comment adapter. */
-    protected CommentAdapter mCommentAdapter;
-
-    /** The comments loaded. */
-    protected boolean mCommentsLoaded;// flag to prevent more click which result
+    private Issue mIssue;
+    private String mRepoOwner;
+    private String mRepoName;
+    private int mIssueNumber;
+    private String mIssueState;
+    private CommentAdapter mCommentAdapter;
+    private boolean mCommentsLoaded;// flag to prevent more click which result
                                       // to query to the rest API
     
     protected List<Label> mLabels;
 
-    /**
-     * Called when the activity is first created.
-     * 
-     * @param savedInstanceState the saved instance state
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.issue);
-        setUpActionBar();
 
-        mBundle = getIntent().getExtras().getBundle(Constants.DATA_BUNDLE);
+        Bundle data = getIntent().getExtras();
 
-        // comes from issue listing, the details already populated
-        if (mBundle != null) {
-            mUserLogin = mBundle.getString(Constants.Repository.REPO_OWNER);
-            mRepoName = mBundle.getString(Constants.Repository.REPO_NAME);
-            mIssueNumber = mBundle.getInt(Constants.Issue.ISSUE_NUMBER);
-            mIssueState = mBundle.getString(Constants.Issue.ISSUE_STATE);
-            fillData();
-        }
-        // comes from activity listing
-        else {
-            Bundle bundle = getIntent().getExtras();
-            mUserLogin = bundle.getString(Constants.Repository.REPO_OWNER);
-            mRepoName = bundle.getString(Constants.Repository.REPO_NAME);
-            mIssueNumber = bundle.getInt(Constants.Issue.ISSUE_NUMBER);
-            mIssueState = bundle.getString(Constants.Issue.ISSUE_STATE);
-            new LoadIssueTask(this).execute();
-        }
-
+        mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
+        mRepoName = data.getString(Constants.Repository.REPO_NAME);
+        mIssueNumber = data.getInt(Constants.Issue.ISSUE_NUMBER);
+        mIssueState = data.getString(Constants.Issue.ISSUE_STATE);
+        
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(getResources().getString(R.string.Issue) + " #" + mIssueNumber);
+        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        
+        getSupportLoaderManager().initLoader(0, null, this);
+        getSupportLoaderManager().getLoader(0).forceLoad();
     }
 
-    /**
-     * Gets the issue.
-     *
-     * @return the issue
-     * @throws GitHubException the git hub exception
-     */
-    protected Bundle getIssue() throws IOException {
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(getAuthToken());
-        IssueService issueService = new IssueService(client);
-        mIssue = issueService.getIssue(mUserLogin, mRepoName, mIssueNumber);
-        mBundle = getApplicationContext().populateIssue(mIssue);
-        return mBundle;
-    }
-
-    /**
-     * Fill data into UI components.
-     */
-    protected void fillData() {
+    private void fillData() {
+        
+        new LoadCommentsTask(this).execute();
+        
+        Typeface boldCondensed = getApplicationContext().boldCondensed;
+        
         ListView lvComments = (ListView) findViewById(R.id.lv_comments);
         // set details inside listview header
         LayoutInflater infalter = getLayoutInflater();
@@ -161,88 +115,120 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
 
         ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
         ImageDownloader imageDownloader = new ImageDownloader();
-        imageDownloader.download(mBundle.getString(Constants.GRAVATAR_ID), ivGravatar);
+        imageDownloader.download(mIssue.getUser().getGravatarId(), ivGravatar);
         ivGravatar.setOnClickListener(new OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
                 getApplicationContext().openUserInfoActivity(IssueActivity.this,
-                        mBundle.getString(Constants.Issue.ISSUE_CREATED_BY), null);
+                        mIssue.getUser().getLogin(), null);
             }
         });
 
-        TextView tvLogin = (TextView) mHeader.findViewById(R.id.tv_login);
-        TextView tvCreateAt = (TextView) mHeader.findViewById(R.id.tv_created_at);
+        TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
         TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
         TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
+        TextView tvDescTitle = (TextView) mHeader.findViewById(R.id.desc_title);
+        tvDescTitle.setTypeface(getApplicationContext().boldCondensed);
+        tvDescTitle.setTextColor(Color.parseColor("#0099cc"));
+        
+        TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
+        tvCommentTitle.setTypeface(getApplicationContext().boldCondensed);
+        tvCommentTitle.setTextColor(Color.parseColor("#0099cc"));
+        tvCommentTitle.setText(getResources().getString(R.string.issue_comments) + " (" + mIssue.getComments() + ")");
+        
         TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
-        TextView tvAssignee = (TextView) mHeader.findViewById(R.id.tv_assignee);
-        Button btnComments = (Button) mHeader.findViewById(R.id.btn_comments);
+        TextView tvMilestone = (TextView) mHeader.findViewById(R.id.tv_milestone);
         Button btnCreateComment = (Button) mFooter.findViewById(R.id.btn_create);
 
-        tvLogin.setText(mBundle.getString(Constants.Issue.ISSUE_CREATED_BY));
-        tvCreateAt.setText(mBundle.getString(Constants.Issue.ISSUE_CREATED_AT));
-        tvState.setText(mBundle.getString(Constants.Issue.ISSUE_STATE));
-        if ("closed".equals(mBundle.getString(Constants.Issue.ISSUE_STATE))) {
+        tvExtra.setText(getResources().getString(R.string.issue_open_by_user,
+                mIssue.getUser().getLogin(),
+                pt.format(mIssue.getCreatedAt())));
+        
+        tvState.setText(mIssue.getState());
+        if ("closed".equals(mIssue.getState())) {
             tvState.setBackgroundResource(R.drawable.default_red_box);
         }
         else {
             tvState.setBackgroundResource(R.drawable.default_green_box);
         }
-        tvTitle.setText(mBundle.getString(Constants.Issue.ISSUE_TITLE));
+        tvTitle.setText(mIssue.getTitle());
+        tvTitle.setTypeface(boldCondensed);
         
-        if (mBundle.getString(Constants.Issue.ISSUE_ASSIGNEE) != null) {
-            tvAssignee.setText("Assigned to " + mBundle.getString(Constants.Issue.ISSUE_ASSIGNEE));
+        if (mIssue.getAssignee() != null) {
+            TextView tvAssignee = (TextView) mHeader.findViewById(R.id.tv_assignee);
+            tvAssignee.setText(mIssue.getAssignee().getLogin() + " is assigned");
             tvAssignee.setVisibility(View.VISIBLE);
             tvAssignee.setOnClickListener(new OnClickListener() {
                 
                 @Override
                 public void onClick(View arg0) {
                     getApplicationContext().openUserInfoActivity(IssueActivity.this,
-                            mBundle.getString(Constants.Issue.ISSUE_ASSIGNEE), null);
+                            mIssue.getAssignee().getLogin(), null);
+                }
+            });
+            
+            ImageView ivAssignee = (ImageView) mHeader.findViewById(R.id.iv_assignee);
+            ivAssignee.setVisibility(View.VISIBLE);
+            imageDownloader.download(mIssue.getAssignee().getGravatarId(), ivAssignee);
+            ivAssignee.setOnClickListener(new OnClickListener() {
+
+                @Override
+                public void onClick(View arg0) {
+                    getApplicationContext().openUserInfoActivity(IssueActivity.this,
+                            mIssue.getAssignee().getLogin(), null);
                 }
             });
         }
         
-        String body = mBundle.getString(Constants.Issue.ISSUE_BODY);
+        if (mIssue.getMilestone() != null) {
+            tvMilestone.setText(getResources().getString(R.string.issue_milestone) + ": " + mIssue.getMilestone().getTitle());
+        }
+        else {
+            tvMilestone.setVisibility(View.GONE);
+        }
+        
+        String body = mIssue.getBody();
         body = body.replaceAll("\n", "<br/>");
         tvDesc.setText(Html.fromHtml(body));
-        
-        btnComments.setText(String.valueOf(mBundle.getInt(Constants.Issue.ISSUE_COMMENTS)));
-        btnComments.setOnClickListener(this);
         
         btnCreateComment.setOnClickListener(this);
         
         LinearLayout llLabels = (LinearLayout) findViewById(R.id.ll_labels);
-        ArrayList<String> labels = mBundle.getStringArrayList(Constants.Issue.ISSUE_LABELS);
+        List<Label> labels = mIssue.getLabels();
+        
         if (labels != null && !labels.isEmpty()) {
-            for (String label : labels) {
-                TextView tvLabel = new TextView(getApplicationContext());
+            for (Label label : labels) {
+                TextView tvLabel = new TextView(this);
                 tvLabel.setSingleLine(true);
-                tvLabel.setText(label);
-                tvLabel.setTextAppearance(getApplicationContext(), R.style.default_text_small);
-                tvLabel.setBackgroundResource(R.drawable.default_grey_box);
-                
+                tvLabel.setText(label.getName());
+                tvLabel.setTextAppearance(this, R.style.default_text_micro);
+                tvLabel.setBackgroundColor(Color.parseColor("#" + label.getColor()));
+                tvLabel.setPadding(5, 2, 5, 2);
+                int r = Color.red(Color.parseColor("#" + label.getColor()));
+                int g = Color.green(Color.parseColor("#" + label.getColor()));
+                int b = Color.blue(Color.parseColor("#" + label.getColor()));
+                if (r + g + b < 383) {
+                    tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_dark));
+                }
+                else {
+                    tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+                }
                 llLabels.addView(tvLabel);
             }
-            llLabels.setVisibility(View.VISIBLE);
         }
         else {
             llLabels.setVisibility(View.GONE);
         }
         
         TextView tvPull = (TextView) mHeader.findViewById(R.id.tv_pull);
-        if (mBundle.getString(Constants.Issue.PULL_REQUEST_DIFF_URL) != null) {
+        if (mIssue.getPullRequest() != null
+                && mIssue.getPullRequest().getDiffUrl() != null) {
             tvPull.setVisibility(View.VISIBLE);
             tvPull.setOnClickListener(this);
         }
     }
 
-    /**
-     * Fill comments into UI components.
-     * 
-     * @param comments the comments
-     */
     protected void fillComments(List<Comment> comments) {
         mCommentAdapter.clear();
         if (comments != null && comments.size() > 0) {
@@ -255,123 +241,26 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
         mCommentsLoaded = true;
     }
 
-    /**
-     * An asynchronous task that runs on a background thread to load issue.
-     */
-    private static class LoadIssueTask extends AsyncTask<Void, Integer, Bundle> {
-
-        /** The target. */
-        private WeakReference<IssueActivity> mTarget;
-        
-        /** The exception. */
-        private boolean mException;
-
-        /**
-         * Instantiates a new load issue task.
-         *
-         * @param activity the activity
-         */
-        public LoadIssueTask(IssueActivity activity) {
-            mTarget = new WeakReference<IssueActivity>(activity);
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
-        @Override
-        protected Bundle doInBackground(Void... params) {
-            if (mTarget.get() != null) {
-                try {
-                    return mTarget.get().getIssue();
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
-            }
-            else {
-                return null;
-            }
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
-        @Override
-        protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
-            }
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
-        @Override
-        protected void onPostExecute(Bundle result) {
-            if (mTarget.get() != null) {
-                IssueActivity activity = mTarget.get();
-                activity.mLoadingDialog.dismiss();
-    
-                if (mException) {
-                    activity.showError();
-                }
-                else {
-                    activity.fillData();
-                }
-            }
-        }
-    }
-
-    /**
-     * Gets the comments.
-     *
-     * @return the comments
-     * @throws GitHubException the git hub exception
-     */
-    protected List<Comment> getComments() throws IOException {
+    private List<Comment> getComments() throws IOException {
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(getAuthToken());
         IssueService issueService = new IssueService(client);
-        return issueService.getComments(mUserLogin, mRepoName, mIssueNumber);
+        return issueService.getComments(mRepoOwner, mRepoName, mIssueNumber);
     }
 
-    /**
-     * An asynchronous task that runs on a background thread to load comments.
-     */
     private static class LoadCommentsTask extends AsyncTask<Boolean, Integer, List<Comment>> {
 
-        /** The hide main view. */
-        private boolean hideMainView;
-        
-        /** The target. */
         private WeakReference<IssueActivity> mTarget;
-        
-        /** The exception. */
         private boolean mException;
 
-        /**
-         * Instantiates a new load comments task.
-         *
-         * @param activity the activity
-         */
         public LoadCommentsTask(IssueActivity activity) {
             mTarget = new WeakReference<IssueActivity>(activity);
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
         @Override
         protected List<Comment> doInBackground(Boolean... params) {
             if (mTarget.get() != null) {
                 try {
-                    this.hideMainView = params[0];
                     return mTarget.get().getComments();
                 }
                 catch (IOException e) {
@@ -385,27 +274,14 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
             }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
         @Override
         protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true,
-                        hideMainView);
-            }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
         @Override
         protected void onPostExecute(List<Comment> result) {
             if (mTarget.get() != null) {
                 IssueActivity activity = mTarget.get();
-                activity.mLoadingDialog.dismiss();
     
                 if (mException) {
                     activity.showError(false);
@@ -429,9 +305,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                 menu.add(Menu.FIRST, R.string.issue_close, 0, R.string.issue_close);
             }
             menu.add(Menu.FIRST, R.string.issue_edit, 0, R.string.issue_edit);
-            menu.add(Menu.FIRST, R.string.issue_label_add_delete, 0, R.string.issue_label_add_delete);
             menu.add(Menu.FIRST, R.string.issue_create, 0, R.string.issue_create);
-            inflater.inflate(R.menu.bookmark_menu, menu);
         }
         return true;
     }
@@ -442,7 +316,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
             case R.string.issue_create:
                 if (isAuthorized()) {
                     Intent intent = new Intent().setClass(this, IssueCreateActivity.class);
-                    intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+                    intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
                     intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                     startActivity(intent);
                 }
@@ -455,11 +329,9 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
             case R.string.issue_edit:
                 if (isAuthorized()) {
                     Intent intent = new Intent().setClass(this, IssueCreateActivity.class);
-                    intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+                    intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
                     intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                    intent.putExtra(Constants.Issue.ISSUE_NUMBER, mBundle.getInt(Constants.Issue.ISSUE_NUMBER));
-                    intent.putExtra(Constants.Issue.ISSUE_TITLE, mBundle.getString(Constants.Issue.ISSUE_TITLE));
-                    intent.putExtra(Constants.Issue.ISSUE_BODY, mBundle.getString(Constants.Issue.ISSUE_BODY));
+                    intent.putExtra(Constants.Issue.ISSUE_NUMBER, mIssue.getNumber());
                     startActivity(intent);
                 }
                 else {
@@ -488,16 +360,6 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                     finish();
                 }
                 return true;
-            case R.string.issue_label_add_delete:
-                if (isAuthorized()) {
-                    new LoadIssueLabelsTask(this).execute();
-                }
-                else {
-                    Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-                return true;
             default:
                 return true;
         }
@@ -505,30 +367,15 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
     
     private static class CloseIssueTask extends AsyncTask<Void, Void, Boolean> {
 
-        /** The target. */
         private WeakReference<IssueActivity> mTarget;
-        
-        /** The exception. */
         private boolean mException;
-        
-        /** The hide main view. */
         private boolean mHideMainView;
 
-        /**
-         * Instantiates a new load issue list task.
-         *
-         * @param activity the activity
-         * @param hideMainView the hide main view
-         */
         public CloseIssueTask(IssueActivity activity, boolean hideMainView) {
             mTarget = new WeakReference<IssueActivity>(activity);
             mHideMainView = hideMainView;
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
         @Override
         protected Boolean doInBackground(Void... params) {
             if (mTarget.get() != null) {
@@ -538,12 +385,12 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                     client.setOAuth2Token(mTarget.get().getAuthToken());
                     IssueService issueService = new IssueService(client);
                     
-                    Issue issue = issueService.getIssue(new RepositoryId(activity.mUserLogin,
+                    Issue issue = issueService.getIssue(new RepositoryId(activity.mRepoOwner,
                             activity.mRepoName), activity.mIssueNumber);
                     
                     issue.setState("closed");
                     
-                    issueService.editIssue(new RepositoryId(activity.mUserLogin,
+                    activity.mIssue = issueService.editIssue(new RepositoryId(activity.mRepoOwner,
                             activity.mRepoName), issue);
                     return true;
                 }
@@ -558,26 +405,16 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
             }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
         @Override
         protected void onPreExecute() {
             if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, mHideMainView);
             }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
         @Override
         protected void onPostExecute(Boolean result) {
             if (mTarget.get() != null) {
                 IssueActivity activity = mTarget.get();
-                activity.mLoadingDialog.dismiss();
     
                 if (mException) {
                     activity.showMessage(activity.getResources().getString(R.string.issue_error_close),
@@ -589,7 +426,6 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                     TextView tvState = (TextView)activity.findViewById(R.id.tv_state);
                     tvState.setBackgroundResource(R.drawable.default_red_box);
                     tvState.setText("closed");
-                    activity.mBundle.putString(Constants.Issue.ISSUE_STATE, "closed");
                 }
             }
         }
@@ -597,30 +433,15 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
     
     private static class ReopenIssueTask extends AsyncTask<Void, Void, Boolean> {
 
-        /** The target. */
         private WeakReference<IssueActivity> mTarget;
-        
-        /** The exception. */
         private boolean mException;
-        
-        /** The hide main view. */
         private boolean mHideMainView;
 
-        /**
-         * Instantiates a new load issue list task.
-         *
-         * @param activity the activity
-         * @param hideMainView the hide main view
-         */
         public ReopenIssueTask(IssueActivity activity, boolean hideMainView) {
             mTarget = new WeakReference<IssueActivity>(activity);
             mHideMainView = hideMainView;
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
         @Override
         protected Boolean doInBackground(Void... params) {
             if (mTarget.get() != null) {
@@ -630,12 +451,12 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                     client.setOAuth2Token(mTarget.get().getAuthToken());
                     IssueService issueService = new IssueService(client);
                     
-                    Issue issue = issueService.getIssue(new RepositoryId(activity.mUserLogin,
+                    Issue issue = issueService.getIssue(new RepositoryId(activity.mRepoOwner,
                             activity.mRepoName), activity.mIssueNumber);
                     
                     issue.setState("open");
                     
-                    issueService.editIssue(new RepositoryId(activity.mUserLogin,
+                    activity.mIssue = issueService.editIssue(new RepositoryId(activity.mRepoOwner,
                             activity.mRepoName), issue);
                     return true;
                 }
@@ -650,26 +471,14 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
             }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
         @Override
         protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, mHideMainView);
-            }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
         @Override
         protected void onPostExecute(Boolean result) {
             if (mTarget.get() != null) {
                 IssueActivity activity = mTarget.get();
-                activity.mLoadingDialog.dismiss();
     
                 if (mException) {
                     activity.showMessage(activity.getResources().getString(R.string.issue_error_reopen),
@@ -681,42 +490,22 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                     TextView tvState = (TextView)activity.findViewById(R.id.tv_state);
                     tvState.setBackgroundResource(R.drawable.default_green_box);
                     tvState.setText("open");
-                    activity.mBundle.putString(Constants.Issue.ISSUE_STATE, "open");
                 }
             }
         }
     }
     
-    /**
-     * An asynchronous task that runs on a background thread
-     * to comment issue.
-     */
     private static class CommentIssueTask extends AsyncTask<Void, Void, Boolean> {
 
-        /** The target. */
         private WeakReference<IssueActivity> mTarget;
-        
-        /** The exception. */
         private boolean mException;
-        
-        /** The hide main view. */
         private boolean mHideMainView;
 
-        /**
-         * Instantiates a new load issue list task.
-         *
-         * @param activity the activity
-         * @param hideMainView the hide main view
-         */
         public CommentIssueTask(IssueActivity activity, boolean hideMainView) {
             mTarget = new WeakReference<IssueActivity>(activity);
             mHideMainView = hideMainView;
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
         @Override
         protected Boolean doInBackground(Void... params) {
             if (mTarget.get() != null) {
@@ -732,7 +521,7 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
                     GitHubClient client = new GitHubClient();
                     client.setOAuth2Token(mTarget.get().getAuthToken());
                     IssueService issueService = new IssueService(client);
-                    issueService.createComment(activity.mUserLogin, 
+                    issueService.createComment(activity.mRepoOwner, 
                             activity.mRepoName,
                             activity.mIssueNumber,
                             comment);
@@ -749,26 +538,14 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
             }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
         @Override
         protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, mHideMainView);
-            }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
         @Override
         protected void onPostExecute(Boolean result) {
             if (mTarget.get() != null) {
                 IssueActivity activity = mTarget.get();
-                activity.mLoadingDialog.dismiss();
     
                 if (mException) {
                     activity.showMessage(activity.getResources().getString(R.string.issue_error_comment),
@@ -790,304 +567,32 @@ public class IssueActivity extends BaseActivity implements OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-        case R.id.btn_comments:
-            if (!mCommentsLoaded) {
-                new LoadCommentsTask(this).execute(false);
-            }
-            break;
         case R.id.btn_create:
             new CommentIssueTask(this, false).execute();
             break;
         case R.id.tv_pull:
             getApplicationContext().openPullRequestActivity(this,
-                    mUserLogin, mRepoName, mIssueNumber);
+                    mRepoOwner, mRepoName, mIssueNumber);
             break;
         default:
             break;
         }
     }
     
-    private void showLabelsDialog() {
-        final boolean[] checkedItems = new boolean[mLabels.size()];
-
-        final String[] availabelLabelArr = new String[mLabels.size()];
-        ArrayList<String> currentLabels = mBundle.getStringArrayList(Constants.Issue.ISSUE_LABELS);
-
-        //find which labels for this issue
-        for (int i = 0; i < mLabels.size(); i++) {
-            availabelLabelArr[i] = mLabels.get(i).getName();
-            if(currentLabels.contains(mLabels.get(i).getName())) {
-                checkedItems[i] = true;
-            }
-            else {
-                checkedItems[i] = false;
-            }
-        }
-        
-        //final boolean[] newCheckedItems = new boolean[availableLabels.size()];
-        
-        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(IssueActivity.this, android.R.style.Theme));
-        builder.setCancelable(true);
-        builder.setTitle(R.string.issue_labels);
-        builder.setMultiChoiceItems(availabelLabelArr, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton, boolean isChecked) {
-                if (isChecked) {
-                    checkedItems[whichButton] = true;
-                }
-                else {
-                    checkedItems[whichButton] = false;
-                }
-            }
-        });
-        
-        builder.setPositiveButton(R.string.label_it,
-                new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.dismiss();
-                new TagIssueLabelsTask(IssueActivity.this, availabelLabelArr, checkedItems).execute();
-            }
-        })
-        .setNegativeButton(R.string.cancel,
-                new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.dismiss();
-            }
-        })
-       .create();
-        
-        builder.show();
-    }
-    
-    /**
-     * An asynchronous task that runs on a background thread
-     * to load issue labels.
-     */
-    private static class LoadIssueLabelsTask extends AsyncTask<Void, Void, List<Label>> {
-
-        /** The target. */
-        private WeakReference<IssueActivity> mTarget;
-        
-        /** The exception. */
-        private boolean mException;
-        
-        /**
-         * Instantiates a new load issue list task.
-         *
-         * @param activity the activity
-         * @param hideMainView the hide main view
-         */
-        public LoadIssueLabelsTask(IssueActivity activity) {
-            mTarget = new WeakReference<IssueActivity>(activity);
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
-        @Override
-        protected List<Label> doInBackground(Void... params) {
-            if (mTarget.get() != null) {
-                try {
-                    GitHubClient client = new GitHubClient();
-                    client.setOAuth2Token(mTarget.get().getAuthToken());
-                    LabelService labelService = new LabelService(client);
-                    
-                    return labelService.getLabels(mTarget.get().mUserLogin, 
-                            mTarget.get().mRepoName);
-                }
-                catch (Exception e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
-            }
-            else {
-                return null;
-            }
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
-        @Override
-        protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, false);
-            }
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
-        @Override
-        protected void onPostExecute(List<Label> result) {
-            if (mTarget.get() != null) {
-                IssueActivity activity = mTarget.get();
-                activity.mLoadingDialog.dismiss();
-    
-                if (mException) {
-                    activity.showError(false);
-                }
-                else {
-                    activity.showIssueLabelsContextMenu(result);
-                }
-            }
-        }
-    }
-    
-    /**
-     * An asynchronous task that runs on a background thread
-     * to tag issue labels.
-     */
-    private static class TagIssueLabelsTask extends AsyncTask<Void, Void, Void> {
-
-        /** The target. */
-        private WeakReference<IssueActivity> mTarget;
-        
-        /** The exception. */
-        private boolean mException;
-        
-        /** The available label arr. */
-        private String[] mAvailableLabelArr;
-        
-        /** The checked items. */
-        private boolean[] mCheckedItems;
-        
-        /**
-         * Instantiates a new load issue list task.
-         *
-         * @param activity the activity
-         * @param hideMainView the hide main view
-         */
-        public TagIssueLabelsTask(IssueActivity activity, String[] availableLabelArr, boolean[] checkedItems) {
-            mTarget = new WeakReference<IssueActivity>(activity);
-            mAvailableLabelArr = availableLabelArr;
-            mCheckedItems = checkedItems;
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
-        @Override
-        protected Void doInBackground(Void...params) {
-            if (mTarget.get() != null) {
-                try {
-                    IssueActivity activity = mTarget.get();
-                    GitHubClient client = new GitHubClient();
-                    client.setOAuth2Token(mTarget.get().getAuthToken());
-                    LabelService labelService = new LabelService(client);
-                    List<Label> toAdd = new ArrayList<Label>();
-                    for (int i = 0; i < mCheckedItems.length; i++) {
-                        String label = mAvailableLabelArr[i];
-                        Label l = new Label();
-                        l.setName(label);
-                        if (mCheckedItems[i]) {
-                            toAdd.add(l);
-                        }
-                    }
-                    
-                    //clear labels from issue
-                    labelService.setLabels(new RepositoryId(activity.mUserLogin, activity.mRepoName),
-                            String.valueOf(activity.mIssueNumber), new ArrayList<Label>());
-                    
-                    //set back labels to issue
-                    labelService.setLabels(new RepositoryId(activity.mUserLogin, activity.mRepoName),
-                            String.valueOf(activity.mIssueNumber), toAdd);
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                }
-            }
-            return null;
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
-        @Override
-        protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, false);
-            }
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
-        @Override
-        protected void onPostExecute(Void result) {
-            if (mTarget.get() != null) {
-                IssueActivity activity = mTarget.get();
-                activity.mLoadingDialog.dismiss();
-    
-                if (mException) {
-                    activity.showMessage(activity.getResources().getString(R.string.issue_error_label_add_delete), false);
-                }
-                else {
-                    activity.getApplicationContext().openIssueActivity(activity,
-                            activity.mUserLogin, activity.mRepoName, 
-                            activity.mIssueNumber, Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                }
-            }
-        }
-    }
-    
-    private void showIssueLabelsContextMenu(List<Label> labels) {
-        if (labels != null && !labels.isEmpty()) {
-            mLabels = labels;
-            showLabelsDialog();
-        }
-        else {
-            getApplicationContext().notFoundMessage(this, getResources().getString(R.string.issue_labels));
-        }
-    }
-    
     @Override
-    public void openBookmarkActivity() {
-        Intent intent = new Intent().setClass(this, BookmarkListActivity.class);
-        intent.putExtra(Constants.Bookmark.NAME, "Issue #" + mIssueNumber + " at " + mUserLogin + "/" + mRepoName);
-        intent.putExtra(Constants.Bookmark.OBJECT_TYPE, Constants.Bookmark.OBJECT_TYPE_ISSUE);
-        startActivityForResult(intent, 100);
+    public Loader<Issue> onCreateLoader(int arg0, Bundle arg1) {
+        return new IssueLoader(this, mRepoOwner, mRepoName, mIssueNumber);
     }
-    
+
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 100) {
-           if (resultCode == Constants.Bookmark.ADD) {
-               DbHelper db = new DbHelper(this);
-               Bookmark b = new Bookmark();
-               b.setName("Issue #" + mIssueNumber + " at " + mUserLogin + "/" + mRepoName);
-               b.setObjectType(Constants.Bookmark.OBJECT_TYPE_ISSUE);
-               b.setObjectClass(IssueActivity.class.getName());
-               long id = db.saveBookmark(b);
-               
-               BookmarkParam[] params = new BookmarkParam[3];
-               BookmarkParam param = new BookmarkParam();
-               param.setBookmarkId(id);
-               param.setKey(Constants.Repository.REPO_OWNER);
-               param.setValue(mUserLogin);
-               params[0] = param;
-               
-               param = new BookmarkParam();
-               param.setBookmarkId(id);
-               param.setKey(Constants.Repository.REPO_NAME);
-               param.setValue(mRepoName);
-               params[1] = param;
-               
-               param = new BookmarkParam();
-               param.setBookmarkId(id);
-               param.setKey(Constants.Issue.ISSUE_NUMBER);
-               param.setValue(String.valueOf(mIssueNumber));
-               params[2] = param;
-               
-               db.saveBookmarkParam(params);
-           }
-        }
-     }
+    public void onLoadFinished(Loader<Issue> loader, Issue issue) {
+        mIssue = issue;
+        fillData();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Issue> arg0) {
+        // TODO Auto-generated method stub
+        
+    }
 }

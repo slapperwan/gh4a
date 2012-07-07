@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Gh4a</string>
+    <string name="app_name">OctoDroid</string>
 
     <!-- Common -->
     <string name="record_not_found">%1$s not found</string>
@@ -10,6 +10,7 @@
     <string name="more_commit_data">%1$s authored %2$s</string>
     <string name="more_issue_data">%1$s by %2$s %3$s</string>
     <string name="more_issue_assignee">Assigned to %1$s</string>
+    <string name="more_comment_data">by %1$s %2$s</string>
     <string name="loading_msg">Loading...</string>
     <string name="search">Search</string>
     <string name="activity">Activity</string>
@@ -233,6 +234,7 @@
     <string name="issue_filter_by_any_assignee">Any assignee</string>
     <string name="issue_clear_milestone">No milestone</string>
     <string name="issue_clear_assignee">No assignee</string>
+    <string name="issue_open_by_user">by %1$s %2$s</string>
 
     <!-- Issue comment -->
     <plurals name="issue_comment">

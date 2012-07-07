@@ -2,106 +2,129 @@
     android:layout_width="fill_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="fill_parent"
-    android:orientation="vertical">
+    android:orientation="vertical" >
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="?attr/comment_box">
-        <ImageView
-            android:id="@+id/iv_gravatar"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginTop="5dp" />
-        <LinearLayout
-            android:id="@+id/ll_top"
-            android:orientation="horizontal"
-            android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp" >
+        <RelativeLayout
+            android:id="@+id/ll_top_issue"
             android:layout_width="fill_parent"
-            android:layout_toRightOf="@id/iv_gravatar">
+            android:layout_height="fill_parent" >
+            <ImageView
+                android:id="@+id/iv_gravatar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp" />
             <TextView
-                android:id="@+id/tv_login"
+                android:id="@+id/tv_extra"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textAppearance="@style/default_text_small"
+                android:layout_toRightOf="@id/iv_gravatar" />
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:layout_toRightOf="@id/iv_gravatar"
+                android:layout_below="@id/tv_extra" />
+        </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/ll_more"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginTop="16dp"
+            android:layout_below="@id/ll_top_issue"
+            android:background="@drawable/default_info_box" >
+            <TextView
+                android:id="@+id/tv_state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="2dp"
                 android:textAppearance="@style/default_text_micro" />
-            <TextView
+            <LinearLayout
+                android:id="@+id/ll_labels"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=" | " />
+                android:orientation="horizontal"
+                android:layout_toRightOf="@id/tv_state" />
             <TextView
-                android:id="@+id/tv_created_at"
+                android:id="@+id/tv_milestone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/default_text_micro" />
-        </LinearLayout>
-        <TextView
-            android:id="@+id/tv_state"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/ll_top"
-            android:layout_toRightOf="@id/iv_gravatar"
-            android:textAppearance="@style/default_text_micro" />
-        <LinearLayout
-            android:id="@+id/ll_labels"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/ll_top"
-            android:orientation="horizontal"
-            android:layout_toRightOf="@id/tv_state" />
-        <TextView
-            android:id="@+id/tv_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textStyle="bold"
-            android:layout_below="@id/tv_state"
-            android:layout_toRightOf="@id/iv_gravatar" />
-        <TextView
-            android:id="@+id/tv_assignee"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?attr/textAppearanceSmallUrl"
-            android:background="?attr/textAppearanceLink"
-            android:layout_below="@id/tv_title"
-            android:layout_toRightOf="@id/iv_gravatar"
-            android:visibility="gone" />
-        <TextView
-            android:id="@+id/tv_pull"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?attr/textAppearanceUrl"
-            android:background="?attr/textAppearanceLink"
-            android:layout_below="@id/tv_assignee"
-            android:layout_toRightOf="@id/iv_gravatar"
-            android:text="View pull request"
-            android:visibility="gone" />
+                android:layout_below="@id/tv_state"
+                android:textAppearance="@style/default_text_small" />
+            <ImageView
+                android:id="@+id/iv_assignee"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="3dp"
+                android:layout_below="@id/tv_milestone"
+                android:visibility="gone" />
+            <TextView
+                android:id="@+id/tv_assignee"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:textAppearance="?attr/textAppearanceSmallUrl"
+                android:background="?attr/textAppearanceLink"
+                android:layout_below="@id/tv_milestone"
+                android:layout_toRightOf="@id/iv_assignee"
+                android:visibility="gone" />
+            <TextView
+                android:id="@+id/tv_pull"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?attr/textAppearanceSmallUrl"
+                android:background="?attr/textAppearanceLink"
+                android:layout_below="@id/tv_assignee"
+                android:text="View pull request"
+                android:visibility="gone" />
+        </RelativeLayout>
     </RelativeLayout>
-    <LinearLayout
+    <LinearLayout 
+        android:id="@+id/ll_others"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:orientation="vertical"
-        android:layout_margin="10dp">
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp" >
+        <TextView
+            android:id="@+id/desc_title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Description" />
+        <View 
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="10dp"
+            android:background="#ff0099cc" />
+        
         <TextView
             android:id="@+id/tv_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall" 
             android:autoLink="web"/>
-        <RelativeLayout
+        
+        <TextView
+            android:id="@+id/comment_title"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:id="@+id/tv_comments_label"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/issue_comments" />
-            <Button
-                android:id="@+id/btn_comments"
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:layout_alignRight="@id/tv_comments_label"
-                android:layout_alignParentRight="true" />
-        </RelativeLayout>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <View 
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="10dp"
+            android:background="#ff0099cc" />
     </LinearLayout>
 </LinearLayout>
