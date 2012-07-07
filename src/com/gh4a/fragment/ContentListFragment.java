@@ -18,7 +18,8 @@ package com.gh4a.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.egit.github.core.TreeEntry;
+import org.eclipse.egit.github.core.Content;
+import org.eclipse.egit.github.core.Repository;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -36,26 +37,29 @@ import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.adapter.FileAdapter;
 import com.gh4a.loader.ContentListLoader;
+import com.gh4a.loader.RepositoryLoader;
 
 public class ContentListFragment extends SherlockFragment 
-    implements LoaderManager.LoaderCallbacks<List<TreeEntry>>, OnItemClickListener {
+    implements LoaderManager.LoaderCallbacks, OnItemClickListener {
 
     private String mRepoOwner;
     private String mRepoName;
-    public String mSha;
+    public String mPath;
+    public String mRef;
     private ListView mListView;
     public FileAdapter mAdapter;
     private OnTreeSelectedListener mCallback;
-    private List<TreeEntry> mTreentries;
+    private List<Content> mContents;
 
     public static ContentListFragment newInstance(String repoOwner, String repoName,
-            String sha) {
+            String path, String ref) {
         ContentListFragment f = new ContentListFragment();
 
         Bundle args = new Bundle();
         args.putString(Constants.Repository.REPO_OWNER, repoOwner);
         args.putString(Constants.Repository.REPO_NAME, repoName);
-        args.putString(Constants.Object.OBJECT_SHA, sha);
+        args.putString(Constants.Object.PATH, path);
+        args.putString(Constants.Object.REF, ref);
         f.setArguments(args);
         
         return f;
@@ -67,7 +71,8 @@ public class ContentListFragment extends SherlockFragment
         
         mRepoOwner = getArguments().getString(Constants.Repository.REPO_OWNER);
         mRepoName = getArguments().getString(Constants.Repository.REPO_NAME);
-        mSha = getArguments().getString(Constants.Object.OBJECT_SHA);
+        mPath = getArguments().getString(Constants.Object.PATH);
+        mRef = getArguments().getString(Constants.Object.REF);
     }
     
     @Override
@@ -94,26 +99,28 @@ public class ContentListFragment extends SherlockFragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        if (mTreentries == null) {
-            mTreentries = new ArrayList<TreeEntry>();
-            mAdapter = new FileAdapter(getSherlockActivity(), mTreentries);
+        if (mContents == null) {
+            mContents = new ArrayList<Content>();
+            mAdapter = new FileAdapter(getSherlockActivity(), mContents);
             mListView.setAdapter(mAdapter);
             
             getLoaderManager().initLoader(0, null, this);
-            getLoaderManager().getLoader(0).forceLoad();
+            
+            getLoaderManager().initLoader(1, null, this);
+            getLoaderManager().getLoader(1).forceLoad();
         }
         else {
-            mAdapter = new FileAdapter(getSherlockActivity(), mTreentries);
+            mAdapter = new FileAdapter(getSherlockActivity(), mContents);
             mListView.setAdapter(mAdapter);
             mAdapter.notifyDataSetChanged();
         }
     }
     
-    public void setTreeEntryList(List<TreeEntry> treeEntries) {
-        mTreentries = treeEntries;
+    public void setTreeEntryList(List<Content> contents) {
+        mContents = contents;
     }
     
-    private void fillData(List<TreeEntry> entries) {
+    private void fillData(List<Content> entries) {
         if (entries != null && entries.size() > 0) {
             mAdapter.addAll(entries);
         }
@@ -121,30 +128,43 @@ public class ContentListFragment extends SherlockFragment
     }
     
     @Override
-    public Loader<List<TreeEntry>> onCreateLoader(int id, Bundle args) {
-        return new ContentListLoader(getSherlockActivity(), mRepoOwner, mRepoName, mSha);
+    public Loader onCreateLoader(int id, Bundle args) {
+        if (id == 0) {
+            return new ContentListLoader(getSherlockActivity(), mRepoOwner, mRepoName, mPath, mRef);
+        }
+        else {
+            return new RepositoryLoader(getSherlockActivity(), mRepoOwner, mRepoName);            
+        }
     }
 
     @Override
-    public void onLoadFinished(Loader<List<TreeEntry>> loader, List<TreeEntry> entries) {
-        fillData(entries);
+    public void onLoadFinished(Loader loader, Object object) {
+        if (loader.getId() == 0) {
+            fillData((List<Content>) object);
+        }
+        else {
+            mRef = ((Repository) object).getMasterBranch();
+            getLoaderManager().getLoader(0).forceLoad();
+        }
     }
 
     @Override
-    public void onLoaderReset(Loader<List<TreeEntry>> arg0) {
+    public void onLoaderReset(Loader loader) {
         // TODO Auto-generated method stub
     }
     
     public interface OnTreeSelectedListener {
         public void onTreeSelected(int position, 
                 AdapterView<?> adapterView,
-                TreeEntry treeEntry,
-                List<TreeEntry> entries);
+                Content content,
+                List<Content> contents,
+                String ref);
     }
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        TreeEntry treeEntry = (TreeEntry) adapterView.getAdapter().getItem(position);
-        mCallback.onTreeSelected(position, adapterView, treeEntry, mTreentries);
+        Content content = (Content) adapterView.getAdapter().getItem(position);
+        mCallback.onTreeSelected(position, adapterView, content, mContents, mRef);
     }
+
 }

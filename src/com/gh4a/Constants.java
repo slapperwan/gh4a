@@ -267,6 +267,8 @@ public interface Constants {
 
         /** The Constant TAGS. */
         public static final String TAGS = "Object.TAGS";
+        
+        public static final String REF = "Object.REF";
     }
     
     /**

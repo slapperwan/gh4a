@@ -17,6 +17,7 @@ package com.gh4a.adapter;
 
 import java.util.List;
 
+import org.eclipse.egit.github.core.Content;
 import org.eclipse.egit.github.core.TreeEntry;
 
 import android.content.Context;
@@ -29,26 +30,12 @@ import android.widget.TextView;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
-/**
- * The FollowerFollowing adapter.
- */
-public class FileAdapter extends RootAdapter<TreeEntry> {
+public class FileAdapter extends RootAdapter<Content> {
 
-    /**
-     * Instantiates a new follower following adapter.
-     * 
-     * @param context the context
-     * @param objects the objects
-     */
-    public FileAdapter(Context context, List<TreeEntry> objects) {
+    public FileAdapter(Context context, List<Content> objects) {
         super(context, objects);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.adapter.RootAdapter#doGetView(int, android.view.View,
-     * android.view.ViewGroup)
-     */
     @Override
     public View doGetView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
@@ -56,30 +43,23 @@ public class FileAdapter extends RootAdapter<TreeEntry> {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
             v = vi.inflate(R.layout.row_file_manager, null);
         }
-        TreeEntry tree = mObjects.get(position);
-        if (tree != null) {
+        Content content = mObjects.get(position);
+        if (content != null) {
             ImageView ivIcon = (ImageView) v.findViewById(R.id.iv_icon);
-            ivIcon.setBackgroundResource(getIconId(tree.getType(), StringUtils
-                    .getFileExtension(tree.getPath())));
+            ivIcon.setBackgroundResource(getIconId(content.getType(), StringUtils
+                    .getFileExtension(content.getName())));
 
             TextView tvFilename = (TextView) v.findViewById(R.id.tv_text);
-            tvFilename.setText(tree.getPath());
+            tvFilename.setText(content.getName());
         }
         return v;
     }
 
-    /**
-     * Gets the icon id.
-     *
-     * @param type the type
-     * @param ext the ext
-     * @return the icon id
-     */
     private int getIconId(String type, String ext) {
-        if ("tree".equals(type)) {
+        if ("dir".equals(type)) {
             return R.drawable.folder;
         }
-        else if ("blob".equals(type)) {
+        else if ("file".equals(type)) {
             if ("png".equalsIgnoreCase(ext) || "ico".equalsIgnoreCase(ext)
                     || "jpg".equalsIgnoreCase(ext) || "jpeg".equalsIgnoreCase(ext)
                     || "gif".equalsIgnoreCase(ext)) {

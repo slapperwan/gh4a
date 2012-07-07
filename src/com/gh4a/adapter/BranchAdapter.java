@@ -20,7 +20,6 @@ import java.util.List;
 import org.eclipse.egit.github.core.RepositoryBranch;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -28,9 +27,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.gh4a.BranchListActivity;
-import com.gh4a.Constants;
-import com.gh4a.FileManagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 
@@ -107,28 +103,6 @@ public class BranchAdapter extends RootAdapter<RepositoryBranch> {
             tvText.setText(branchTag.getName());
 
             Button btnTree = (Button) v.findViewById(R.id.btn_tree);
-            btnTree.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent()
-                            .setClass(v.getContext(), FileManagerActivity.class);
-                    intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
-                    intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                    intent.putExtra(Constants.Object.TREE_SHA, branchTag.getCommit().getSha());
-                    intent.putExtra(Constants.Object.OBJECT_SHA, branchTag.getCommit().getSha());
-                    intent.putExtra(Constants.Repository.REPO_BRANCH, branchTag.getName());
-                    intent.putExtra(Constants.Object.PATH, "Tree");
-//                    if (v.getContext() instanceof BranchListActivity) {
-//                        intent.putExtra(Constants.VIEW_ID, R.id.btn_branches);
-//                    }
-//                    else {
-//                        intent.putExtra(Constants.VIEW_ID, R.id.btn_tags);
-//                    }
-                    v.getContext().startActivity(intent);
-                }
-            });
-
             Button btnCommits = (Button) v.findViewById(R.id.btn_commits);
             btnCommits.setOnClickListener(new OnClickListener() {
 

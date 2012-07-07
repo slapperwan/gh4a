@@ -17,12 +17,11 @@ package com.gh4a;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
 
-import org.eclipse.egit.github.core.Blob;
+import org.eclipse.egit.github.core.Content;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.DataService;
+import org.eclipse.egit.github.core.service.ContentService;
 import org.eclipse.egit.github.core.util.EncodingUtils;
 
 import android.content.Intent;
@@ -41,29 +40,16 @@ import android.widget.TextView;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 
-/**
- * The DiffViewer activity.
- */
 public class FileViewerActivity extends BaseActivity {
 
-    /** The user login. */
-    protected String mUserLogin;
-
-    /** The repo name. */
+    protected String mRepoOwner;
     protected String mRepoName;
-
-    /** The object sha. */
-    protected String mObjectSha;
     private String mPath;
-    private String mBranchName;
-    protected String mName;
-    private Blob mBlob;
+    private String mRef;
+    private String mSha;
+    private String mName;
+    private Content mContent;
 
-    /**
-     * Called when the activity is first created.
-     * 
-     * @param savedInstanceState the saved instance state
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,11 +57,11 @@ public class FileViewerActivity extends BaseActivity {
         setContentView(R.layout.web_viewer);
         setUpActionBar();
 
-        mUserLogin = getIntent().getStringExtra(Constants.Repository.REPO_OWNER);
+        mRepoOwner = getIntent().getStringExtra(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getStringExtra(Constants.Repository.REPO_NAME);
-        mObjectSha = getIntent().getStringExtra(Constants.Object.OBJECT_SHA);
         mPath = getIntent().getStringExtra(Constants.Object.PATH);
-        mBranchName = getIntent().getStringExtra(Constants.Repository.REPO_BRANCH);
+        mRef = getIntent().getStringExtra(Constants.Object.REF);
+        mSha = getIntent().getStringExtra(Constants.Object.OBJECT_SHA);
         mName = getIntent().getStringExtra(Constants.Object.NAME);
         
         TextView tvViewInBrowser = (TextView) findViewById(R.id.tv_in_browser);
@@ -88,9 +74,9 @@ public class FileViewerActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent().setClass(FileViewerActivity.this, CommitHistoryActivity.class);
-                intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+                intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
                 intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                intent.putExtra(Constants.Object.OBJECT_SHA, mBranchName);
+                intent.putExtra(Constants.Object.OBJECT_SHA, mSha);
                 intent.putExtra(Constants.Object.PATH, mPath);
                 
                 startActivity(intent);
@@ -126,7 +112,7 @@ public class FileViewerActivity extends BaseActivity {
                     filename = filename.substring(filename.lastIndexOf("/") + 1, filename.length());
                 }
 
-                String data = new String(EncodingUtils.fromBase64(mBlob.getContent()));
+                String data = new String(EncodingUtils.fromBase64(mContent.getContent()));
                 boolean success = FileUtils.save(filename, data);
                 if (success) {
                     showMessage("File saved at " + Environment.getExternalStorageDirectory().getAbsolutePath() + "/download/" + filename, false);
@@ -140,61 +126,28 @@ public class FileViewerActivity extends BaseActivity {
         new LoadContentTask(this).execute(true);
     }
 
-    /**
-     * An asynchronous task that runs on a background thread to load tree list.
-     */
-    private static class LoadContentTask extends AsyncTask<Boolean, Integer, Blob> {
+    private static class LoadContentTask extends AsyncTask<Boolean, Integer, Content> {
 
-        /** The target. */
         private WeakReference<FileViewerActivity> mTarget;
-
-        /** The exception. */
         private boolean mException;
-
-        /** The show in browser. */
         private boolean mShowInBrowser;
-        
         private boolean mHighlight;
 
-        /**
-         * Instantiates a new load tree list task.
-         * 
-         * @param activity the activity
-         */
         public LoadContentTask(FileViewerActivity activity) {
             mTarget = new WeakReference<FileViewerActivity>(activity);
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
         @Override
-        protected Blob doInBackground(Boolean... params) {
+        protected Content doInBackground(Boolean... params) {
             if (mTarget.get() != null) {
                 mHighlight = params[0];
                 try {
                     FileViewerActivity activity = mTarget.get();
                     GitHubClient client = new GitHubClient();
                     client.setOAuth2Token(mTarget.get().getAuthToken());
-                    DataService dataService = new DataService(client);
-                    
-                    // only show mimetype text/* and xml to WebView, else open
-                    // default browser
-//                    if (activity.mMimeType.startsWith("text")
-//                            || activity.mMimeType.equals("application/xml")
-//                            || activity.mMimeType.equals("application/sh")
-//                            || activity.mMimeType.equals("application/xhtml+xml")) {
-                        mShowInBrowser = false;
-                        
-                        return dataService.getBlob(new RepositoryId(activity.mUserLogin,
-                                activity.mRepoName), activity.mObjectSha);
-//                    }
-//                    else {
-//                        mShowInBrowser = true;
-//                        return null;
-//                    }
-    
+                    ContentService contentService = new ContentService(client);
+                    return contentService.getContent(new RepositoryId(activity.mRepoOwner, activity.mRepoName), 
+                            activity.mPath, activity.mRef);
                 }
                 catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
@@ -207,34 +160,26 @@ public class FileViewerActivity extends BaseActivity {
             }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
         @Override
         protected void onPreExecute() {
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
         @Override
-        protected void onPostExecute(Blob result) {
+        protected void onPostExecute(Content result) {
             if (mTarget.get() != null) {
                 if (mException) {
                     mTarget.get().showError();
                 }
                 else {
                     if (mShowInBrowser) {
-                        String url = "https://github.com/" + mTarget.get().mUserLogin + "/"
-                                + mTarget.get().mRepoName + "/raw/" + mTarget.get().mBranchName + "/"
+                        String url = "https://github.com/" + mTarget.get().mRepoOwner + "/"
+                                + mTarget.get().mRepoName + "/blob/" + mTarget.get().mRef + "/"
                                 + mTarget.get().mPath;
                         mTarget.get().getApplicationContext().openBrowser(mTarget.get(), url);
                         mTarget.get().finish();
                     }
                     else {
-                        mTarget.get().mBlob = result;
+                        mTarget.get().mContent = result;
                         try {
                             mTarget.get().fillData(result, mHighlight);
                         } catch (IOException e) {
@@ -246,14 +191,8 @@ public class FileViewerActivity extends BaseActivity {
         }
     }
 
-    /**
-     * Fill data into UI components.
-     * 
-     * @param is the is
-     * @throws IOException 
-     */
-    protected void fillData(Blob blob, boolean highlight) throws IOException {
-        String data = new String(EncodingUtils.fromBase64(blob.getContent()));
+    protected void fillData(Content content, boolean highlight) throws IOException {
+        String data = new String(EncodingUtils.fromBase64(content.getContent()));
         TextView tvViewRaw = (TextView) findViewById(R.id.tv_view_raw);
         if (highlight) {
             tvViewRaw.setText("Raw");
@@ -276,20 +215,11 @@ public class FileViewerActivity extends BaseActivity {
         s.setSupportMultipleWindows(true);
         s.setJavaScriptEnabled(true);
 
-        // webView.setWebViewClient(new WebChrome2());
         webView.getSettings().setUseWideViewPort(true);
 
-        String content;
-        //try {
-            //content = StringUtils.convertStreamToString(is);
-            String highlighted = StringUtils.highlightSyntax(data, highlight, mName);
-            webView.setWebViewClient(webViewClient);
-            webView.loadDataWithBaseURL("file:///android_asset/", highlighted, "text/html", "utf-8", "");
-        //}
-        //catch (IOException e) {
-        //    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-        //    showError();
-        //}
+        String highlighted = StringUtils.highlightSyntax(data, highlight, mName);
+        webView.setWebViewClient(webViewClient);
+        webView.loadDataWithBaseURL("file:///android_asset/", highlighted, "text/html", "utf-8", "");
     }
 
     private WebViewClient webViewClient = new WebViewClient() {

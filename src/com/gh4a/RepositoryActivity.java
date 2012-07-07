@@ -3,7 +3,7 @@ package com.gh4a;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.egit.github.core.TreeEntry;
+import org.eclipse.egit.github.core.Content;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -34,7 +34,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     private ViewPager mPager;
     private ActionBar mActionBar;
     private List<ContentListFragment> fileStacks;//to keep track folders for use in on back pressed
-    private List<List<TreeEntry>> treeEntriesList;
+    private List<List<Content>> mContentList;
     private boolean backPressed;
     
     @Override
@@ -43,7 +43,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         setContentView(R.layout.view_pager);
         
         fileStacks = new ArrayList<ContentListFragment>();
-        treeEntriesList = new ArrayList<List<TreeEntry>>();
+        mContentList = new ArrayList<List<Content>>();
         
         Bundle data = getIntent().getExtras().getBundle(Constants.DATA_BUNDLE);
         if (data != null) {
@@ -106,7 +106,9 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     public class RepositoryAdapter extends FragmentStatePagerAdapter {
 
         public ContentListFragment mFragmentFiles;
-        public TreeEntry mTreeEntry;
+        public Content mContent;
+        public String mPath;
+        public String mRef;
         
         public RepositoryAdapter(FragmentManager fm) {
             super(fm);
@@ -125,7 +127,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
             
             else if (position == 1) {
                 if (mFragmentFiles == null) {
-                    mFragmentFiles = ContentListFragment.newInstance(mRepoOwner, mRepoName, null);
+                    mFragmentFiles = ContentListFragment.newInstance(mRepoOwner, mRepoName, null, null);
                     fileStacks.add(mFragmentFiles);
                 }
                 
@@ -133,13 +135,13 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
                     fileStacks.remove(mFragmentFiles);
                     getSupportFragmentManager().beginTransaction().remove(mFragmentFiles).commit();
                     mFragmentFiles = fileStacks.get(fileStacks.size() - 1);
-                    mFragmentFiles.setTreeEntryList(treeEntriesList.get(fileStacks.size() - 1));
+                    mFragmentFiles.setTreeEntryList(mContentList.get(fileStacks.size() - 1));
                 }
                 
                 else {
                     getSupportFragmentManager().beginTransaction().remove(mAdapter.mFragmentFiles).commit();
                     mFragmentFiles = ContentListFragment.newInstance(mRepoOwner, mRepoName, 
-                            mTreeEntry.getSha());
+                            mPath, mRef);
                     fileStacks.add(mFragmentFiles);
                 }
                 return mFragmentFiles;
@@ -163,7 +165,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         
         @Override
         public int getItemPosition(Object object) {
-            if (object instanceof ContentListFragment && !StringUtils.isBlank(mTreeEntry.getSha())) {
+            if (object instanceof ContentListFragment && !StringUtils.isBlank(mContent.getSha())) {
                 return POSITION_NONE;
             }
             return POSITION_UNCHANGED;
@@ -172,19 +174,23 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
 
     @Override
     public void onTreeSelected(int position, AdapterView<?> adapterView,
-            TreeEntry treeEntry, List<TreeEntry> entries) {
-        if ("tree".equals(treeEntry.getType())) {
+            Content content, List<Content> contents, String ref) {
+        if ("dir".equals(content.getType())) {
             backPressed = false;
-            mAdapter.mTreeEntry = treeEntry;
-            treeEntriesList.add(entries);
+            mAdapter.mContent = content;
+            mAdapter.mRef = ref;
+            mAdapter.mPath = mAdapter.mPath != null ? mAdapter.mPath + "/" + content.getPath() : content.getPath();
+            mContentList.add(contents);
             mAdapter.notifyDataSetChanged();
         }
         else {
             Intent intent = new Intent().setClass(this, FileViewerActivity.class);
             intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
             intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-            intent.putExtra(Constants.Object.OBJECT_SHA, treeEntry.getSha());
-            intent.putExtra(Constants.Object.NAME, treeEntry.getPath());
+            intent.putExtra(Constants.Object.PATH, mAdapter.mPath + "/" + content.getPath());
+            intent.putExtra(Constants.Object.REF, ref);
+            intent.putExtra(Constants.Object.NAME, content.getName());
+            intent.putExtra(Constants.Object.OBJECT_SHA, content.getSha());
             startActivity(intent);
         }
     }
@@ -204,6 +210,9 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     public void onBackPressed() {
         if (mPager.getCurrentItem() == 1) {
             backPressed = true;
+            if (mAdapter.mPath.lastIndexOf("/") != -1) {
+                mAdapter.mPath = mAdapter.mPath.substring(0, mAdapter.mPath.lastIndexOf("/"));
+            }
             if (fileStacks.size() > 1) {
                 mAdapter.notifyDataSetChanged();
                 return;
