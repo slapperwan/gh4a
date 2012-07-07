@@ -75,8 +75,9 @@ public class IssueAdapter extends RootAdapter<Issue> {
             viewHolder.llLabels = (LinearLayout) v.findViewById(R.id.ll_labels);
             
             viewHolder.tvState = (TextView) v.findViewById(R.id.tv_state);
+            
             viewHolder.tvAssignedTo = (TextView) v.findViewById(R.id.tv_assignee);
-            viewHolder.tvExtra.setTypeface(regular);
+            viewHolder.tvAssignedTo.setTypeface(regular);
             
             viewHolder.tvComments = (TextView) v.findViewById(R.id.tv_comments);
             viewHolder.tvComments.setTextColor(v.getResources().getColor(android.R.color.primary_text_light));

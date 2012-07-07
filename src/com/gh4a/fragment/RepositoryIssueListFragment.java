@@ -26,6 +26,7 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.IssueService;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -33,17 +34,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.IssueActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.RepositoryIssueAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 
 public class RepositoryIssueListFragment extends SherlockFragment 
-    implements LoaderManager.LoaderCallbacks<List<RepositoryIssue>> {
+    implements LoaderManager.LoaderCallbacks<List<RepositoryIssue>>, OnItemClickListener {
 
     private Map<String, String> mFilterData;
     private ListView mListView;
@@ -100,6 +104,7 @@ public class RepositoryIssueListFragment extends SherlockFragment
         
         mAdapter = new RepositoryIssueAdapter(getSherlockActivity(), new ArrayList<RepositoryIssue>());
         mListView.setAdapter(mAdapter);
+        mListView.setOnItemClickListener(this);
         
         loadData();
         
@@ -136,5 +141,16 @@ public class RepositoryIssueListFragment extends SherlockFragment
     public void onLoaderReset(Loader<List<RepositoryIssue>> arg0) {
         // TODO Auto-generated method stub
         
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View arg1, int position, long id) {
+        RepositoryIssue issue = (RepositoryIssue) adapterView.getAdapter().getItem(position);
+        Intent intent = new Intent().setClass(getSherlockActivity(), IssueActivity.class);
+        intent.putExtra(Constants.Repository.REPO_OWNER, issue.getRepository().getOwner().getLogin());
+        intent.putExtra(Constants.Repository.REPO_NAME, issue.getRepository().getName());
+        intent.putExtra(Constants.Issue.ISSUE_NUMBER, issue.getNumber());
+        intent.putExtra(Constants.Issue.ISSUE_STATE, issue.getState());
+        startActivity(intent);
     }
 }

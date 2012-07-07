@@ -22,6 +22,9 @@ import org.eclipse.egit.github.core.RepositoryIssue;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -33,34 +36,13 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.ImageDownloader;
-import com.gh4a.utils.StringUtils;
 
-/**
- * The Issue adapter.
- */
 public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> {
 
-    private int mRowLayout;
-    /**
-     * Instantiates a new issue adapter.
-     * 
-     * @param context the context
-     * @param objects the objects
-     */
     public RepositoryIssueAdapter(Context context, List<RepositoryIssue> objects) {
         super(context, objects);
     }
     
-    public RepositoryIssueAdapter(Context context, List<RepositoryIssue> objects, int rowLayout) {
-        super(context, objects);
-        mRowLayout = rowLayout;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.adapter.RootAdapter#doGetView(int, android.view.View,
-     * android.view.ViewGroup)
-     */
     @Override
     public View doGetView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
@@ -69,12 +51,32 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> {
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
             v = vi.inflate(R.layout.row_issue, null);
+            
+            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+            Typeface boldCondensed = app.boldCondensed;
+            Typeface regular = app.regular;
+            
             viewHolder = new ViewHolder();
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
+            
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+            viewHolder.tvDesc.setTypeface(boldCondensed);
+            
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+            viewHolder.tvExtra.setTypeface(regular);
+            
             viewHolder.llLabels = (LinearLayout) v.findViewById(R.id.ll_labels);
             viewHolder.tvState = (TextView) v.findViewById(R.id.tv_state);
+            
+            viewHolder.tvAssignedTo = (TextView) v.findViewById(R.id.tv_assignee);
+            viewHolder.tvAssignedTo.setTypeface(regular);
+            
+            viewHolder.tvComments = (TextView) v.findViewById(R.id.tv_comments);
+            viewHolder.tvComments.setTextColor(v.getResources().getColor(android.R.color.primary_text_light));
+            
+            viewHolder.tvRepo = (TextView) v.findViewById(R.id.tv_repo);
+            viewHolder.tvRepo.setTypeface(regular);
+            viewHolder.tvRepo.setVisibility(View.VISIBLE);
             
             v.setTag(viewHolder);
         }
@@ -108,27 +110,6 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> {
             
             viewHolder.llLabels.removeAllViews();
             
-            //show assignees
-            if (issue.getAssignee() != null) {
-                TextView tvLabel = new TextView(v.getContext());
-                tvLabel.setSingleLine(true);
-                tvLabel.setText("Assignee " + issue.getAssignee().getLogin() + " ");
-                tvLabel.setTextAppearance(v.getContext(), R.style.default_text_small_url);
-                tvLabel.setOnClickListener(new OnClickListener() {
-                    
-                    @Override
-                    public void onClick(View v) {
-                        Gh4Application context = (Gh4Application) v.getContext()
-                                .getApplicationContext();
-                        context.openUserInfoActivity(v.getContext(), 
-                                issue.getAssignee().getLogin(), null);
-                    }
-                });
-                
-                viewHolder.llLabels.addView(tvLabel);
-                viewHolder.llLabels.setVisibility(View.VISIBLE);
-            }
-            
             //show labels
             List<Label> labels = issue.getLabels();
             if (labels != null && !labels.isEmpty()) {
@@ -136,59 +117,61 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> {
                     TextView tvLabel = new TextView(v.getContext());
                     tvLabel.setSingleLine(true);
                     tvLabel.setText(label.getName());
-                    tvLabel.setTextAppearance(v.getContext(), R.style.default_text_small);
-                    tvLabel.setBackgroundResource(R.drawable.default_grey_box);
-                    
+                    tvLabel.setTextAppearance(v.getContext(), R.style.default_text_micro);
+                    tvLabel.setBackgroundColor(Color.parseColor("#" + label.getColor()));
+                    tvLabel.setPadding(5, 2, 5, 2);
+                    int r = Color.red(Color.parseColor("#" + label.getColor()));
+                    int g = Color.green(Color.parseColor("#" + label.getColor()));
+                    int b = Color.blue(Color.parseColor("#" + label.getColor()));
+                    if (r + g + b < 383) {
+                        tvLabel.setTextColor(v.getResources().getColor(android.R.color.primary_text_dark));
+                    }
+                    else {
+                        tvLabel.setTextColor(v.getResources().getColor(android.R.color.primary_text_light));
+                    }
                     viewHolder.llLabels.addView(tvLabel);
                 }
-                viewHolder.llLabels.setVisibility(View.VISIBLE);
             }
-            else {
-                viewHolder.llLabels.setVisibility(View.GONE);
-            }
-            //viewHolder.llLabels.setVisibility(View.VISIBLE);
             
-            viewHolder.tvDesc.setText("(" + issue.getRepository().getName() + ") #" + issue.getNumber() + " - " + StringUtils.doTeaser(issue.getTitle()));
+            viewHolder.tvDesc.setText(issue.getTitle());
 
             Resources res = v.getResources();
-            String extraData = res.getString(R.string.more_data_3, 
-                    "by " + issue.getUser().getLogin(),
-                    pt.format(issue.getCreatedAt()), issue.getComments() + " "
-                            + res.getQuantityString(R.plurals.issue_comment, issue.getComments()));
+            String extraData = res.getString(R.string.more_issue_data, 
+                    "#" + issue.getNumber(),
+                    issue.getUser().getLogin(),
+                    pt.format(issue.getCreatedAt()));
 
-            viewHolder.tvExtra.setText(extraData);
+            viewHolder.tvExtra.setText(Html.fromHtml(extraData));
+            
+            if (issue.getAssignee() != null) {
+                String assignedTo = res.getString(R.string.more_issue_assignee,
+                        issue.getAssignee().getLogin());
+                viewHolder.tvAssignedTo.setText(Html.fromHtml(assignedTo));
+                viewHolder.tvAssignedTo.setVisibility(View.VISIBLE);
+            }
+            else {
+                viewHolder.tvAssignedTo.setVisibility(View.GONE);
+            }
+            
+            viewHolder.tvComments.setText(String.valueOf(issue.getComments()));
+            
+            viewHolder.tvRepo.setText("on " + issue.getRepository().getOwner().getLogin() + "/" + issue.getRepository().getName());
         }
         return v;
     }
 
-    /**
-     * Adds the object.
-     * 
-     * @param issue the issue
-     */
     public void add(RepositoryIssue issue) {
         mObjects.add(issue);
     }
 
-    /**
-     * The Class ViewHolder.
-     */
     private static class ViewHolder {
-
-        /** The iv gravatar. */
         public ImageView ivGravatar;
-        
-        /** The tv desc. */
         public TextView tvDesc;
-        
-        /** The tv extra. */
         public TextView tvExtra;
-        
-        /** The ll labels. */
         public LinearLayout llLabels;
-        
-        /** The tv state. */
         public TextView tvState;
-
+        public TextView tvAssignedTo;
+        public TextView tvComments;
+        public TextView tvRepo;
     }
 }

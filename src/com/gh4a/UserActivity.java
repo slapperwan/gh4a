@@ -150,29 +150,6 @@ public class UserActivity extends BaseSherlockFragmentActivity {
         }
     }
     
-    @Override
-    public boolean setMenuOptionItemSelected(MenuItem item) {
-        return true;
-    }
-    
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (isLoginUserPage) {
-            int selectedTabIndex = mActionBar.getSelectedNavigationIndex();
-            if (selectedTabIndex == 3) {
-                SubMenu subMenu1 = menu.addSubMenu("Action Item");
-                subMenu1.add(R.string.issues_submitted);
-                subMenu1.add(R.string.issues_updated);
-                subMenu1.add(R.string.issues_comments);
-        
-                MenuItem subMenu1Item = subMenu1.getItem();
-                subMenu1Item.setIcon(R.drawable.abs__ic_menu_share_holo_dark);
-                subMenu1Item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            }
-        }
-        return super.onCreateOptionsMenu(menu);
-    }
-    
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onConfigurationChanged " + newConfig.orientation);
