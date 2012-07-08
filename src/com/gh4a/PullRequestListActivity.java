@@ -15,55 +15,40 @@
  */
 package com.gh4a;
 
-import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
-import android.os.AsyncTask;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.TextView;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.adapter.PullRequestAdapter;
+import com.gh4a.loader.PageIteratorLoader;
 
-/**
- * The PullRequestList activity.
- */
-public class PullRequestListActivity extends BaseActivity implements OnItemClickListener {
+public class PullRequestListActivity extends BaseSherlockFragmentActivity 
+    implements OnItemClickListener, LoaderManager.LoaderCallbacks<List<PullRequest>> {
 
-    /** The user login. */
-    protected String mUserLogin;
+    private String mRepoOwner;
+    private String mRepoName;
+    private String mState;
+    private PullRequestAdapter mPullRequestAdapter;
+    private PageIterator<PullRequest> mDataIterator;
     
-    /** The repo name. */
-    protected String mRepoName;
-    
-    /** The state. */
-    protected String mState;
-
-    /** The pull request adapter. */
-    protected PullRequestAdapter mPullRequestAdapter;
-    
-    /** The loading dialog. */
-    protected LoadingDialog mLoadingDialog;
-
-    /**
-     * Called when the activity is first created.
-     * 
-     * @param savedInstanceState the saved instance state
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,127 +60,40 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
 
         listView.setOnItemClickListener(this);
 
-        mUserLogin = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
+        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
         mState = getIntent().getExtras().getString(Constants.PullRequest.STATE);
 
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(R.string.pull_requests);
+        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
+        
         mPullRequestAdapter = new PullRequestAdapter(this, new ArrayList<PullRequest>());
         listView.setAdapter(mPullRequestAdapter);
 
-        new LoadPullRequestListTask(this, true).execute();
+        loadData(mState);
+        
+        getSupportLoaderManager().initLoader(0, null, this);
+        getSupportLoaderManager().getLoader(0).forceLoad();
+    }
+    
+    private void loadData(String state) {
+        GitHubClient client = new GitHubClient();
+        client.setOAuth2Token(getAuthToken());
+        PullRequestService pullRequestService = new PullRequestService(client);
+        mDataIterator = pullRequestService.pagePullRequests(new RepositoryId(mRepoOwner, mRepoName), mState);
     }
 
-    /* (non-Javadoc)
-     * @see android.widget.AdapterView.OnItemClickListener#onItemClick(android.widget.AdapterView, android.view.View, int, long)
-     */
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         PullRequest pullRequest = (PullRequest) mPullRequestAdapter.getItem(position);
-        getApplicationContext().openPullRequestActivity(PullRequestListActivity.this, mUserLogin,
+        getApplicationContext().openPullRequestActivity(PullRequestListActivity.this, mRepoOwner,
                 mRepoName, pullRequest.getNumber());
     }
 
-    // private OnItemClickListener onItemClick = new OnItemClickListener() {
-    //
-    // @Override
-    // public void onItemClick(AdapterView<?> adapterView, View view, int
-    // position, long id) {
-    // PullRequest pullRequest = (PullRequest)
-    // mPullRequestAdapter.getItem(position);
-    // getApplicationContext().openPullRequestActivity(PullRequestListActivity.this,
-    // mUserLogin, mRepoName, pullRequest.getNumber());
-    // }
-    //        
-    // };
-
-    /**
-     * An asynchronous task that runs on a background thread
-     * to load pull request list.
-     */
-    private static class LoadPullRequestListTask extends
-            AsyncTask<Void, Integer, List<PullRequest>> {
-
-        /** The target. */
-        private WeakReference<PullRequestListActivity> mTarget;
-        
-        /** The exception. */
-        private boolean mException;
-        
-        /** The hide main view. */
-        private boolean mHideMainView;
-
-        /**
-         * Instantiates a new load pull request list task.
-         *
-         * @param activity the activity
-         */
-        public LoadPullRequestListTask(PullRequestListActivity activity, boolean hideMainView) {
-            mTarget = new WeakReference<PullRequestListActivity>(activity);
-            mHideMainView = hideMainView;
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
-        @Override
-        protected List<PullRequest> doInBackground(Void... params) {
-            if (mTarget.get() != null) {
-                try {
-                    PullRequestListActivity activity = mTarget.get();
-                    
-                    GitHubClient client = new GitHubClient();
-                    client.setOAuth2Token(mTarget.get().getAuthToken());
-                    PullRequestService pullRequestService = new PullRequestService(client);
-                    return pullRequestService.getPullRequests(new RepositoryId(activity.mUserLogin,
-                            activity.mRepoName), activity.mState);
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
-            }
-            else {
-                return null;
-            }
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
-        @Override
-        protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, mHideMainView);
-            }
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
-        @Override
-        protected void onPostExecute(List<PullRequest> result) {
-            if (mTarget.get() != null) {
-                if (mException) {
-                    mTarget.get().showError();
-                }
-                else {
-                    mTarget.get().fillData(result);
-                    mTarget.get().mLoadingDialog.dismiss();
-                }
-            }
-        }
-    }
-
-    /**
-     * Fill data into UI components.
-     *
-     * @param pullRequests the pull requests
-     */
-    protected void fillData(List<PullRequest> pullRequests) {
+    private void fillData(List<PullRequest> pullRequests) {
         if (pullRequests != null && !pullRequests.isEmpty()) {
             for (PullRequest pullRequest : pullRequests) {
                 mPullRequestAdapter.add(pullRequest);
@@ -212,6 +110,12 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
         menu.clear();
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.pull_requests_menu, menu);
+        if ("open".equals(mState)) {
+            menu.removeItem(R.id.view_open_issues);
+        }
+        else {
+            menu.removeItem(R.id.view_closed_issues);
+        }
         return true;
     }
     
@@ -221,15 +125,31 @@ public class PullRequestListActivity extends BaseActivity implements OnItemClick
         
         switch (item.getItemId()) {
             case R.id.view_open_issues:
-                mState = Constants.Issue.ISSUE_STATE_OPEN;
-                new LoadPullRequestListTask(this, false).execute();
+                getApplicationContext().openPullRequestListActivity(this, mRepoOwner, mRepoName,
+                        Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 return true;
             case R.id.view_closed_issues:
-                mState = Constants.Issue.ISSUE_STATE_CLOSED;
-                new LoadPullRequestListTask(this, false).execute();
+                getApplicationContext().openPullRequestListActivity(this, mRepoOwner, mRepoName,
+                        Constants.Issue.ISSUE_STATE_CLOSED, Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 return true;
             default:
                 return true;
         }
+    }
+
+    @Override
+    public Loader<List<PullRequest>> onCreateLoader(int id, Bundle arg1) {
+        return new PageIteratorLoader<PullRequest>(this, mDataIterator);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<PullRequest>> loader, List<PullRequest> pullRequests) {
+        fillData(pullRequests);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<PullRequest>> arg0) {
+        // TODO Auto-generated method stub
+        
     }
 }

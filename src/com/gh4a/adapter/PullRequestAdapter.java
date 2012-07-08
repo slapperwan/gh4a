@@ -21,36 +21,24 @@ import org.eclipse.egit.github.core.PullRequest;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.ImageDownloader;
 
-/**
- * The PullRequest adapter.
- */
 public class PullRequestAdapter extends RootAdapter<PullRequest> {
 
-    /**
-     * Instantiates a new pull request adapter.
-     *
-     * @param context the context
-     * @param objects the objects
-     */
     public PullRequestAdapter(Context context, List<PullRequest> objects) {
         super(context, objects);
     }
 
-    /* (non-Javadoc)
-     * @see com.gh4a.adapter.RootAdapter#doGetView(int, android.view.View, android.view.ViewGroup)
-     */
     @Override
     public View doGetView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
@@ -58,13 +46,26 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> {
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
             v = vi.inflate(R.layout.row_issue, null);
+            
+            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+            Typeface boldCondensed = app.boldCondensed;
+            Typeface regular = app.regular;
+            
             viewHolder = new ViewHolder();
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-            //viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
+            
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+            viewHolder.tvDesc.setTypeface(boldCondensed);
+            
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-            viewHolder.llLabels = (LinearLayout) v.findViewById(R.id.ll_labels);
-
+            viewHolder.tvExtra.setTypeface(regular);
+            
+            viewHolder.tvComments = (TextView) v.findViewById(R.id.tv_comments);
+            viewHolder.tvComments.setVisibility(View.GONE);
+            
+            viewHolder.ivComments = (ImageView) v.findViewById(R.id.iv_comments);
+            viewHolder.ivComments.setVisibility(View.GONE);
+            
             v.setTag(viewHolder);
         }
         else {
@@ -87,61 +88,26 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> {
                 }
             });
 
-            //show labels
-            viewHolder.llLabels.removeAllViews();
-//            List<String> labels = pullRequest.getLabels();
-//            if (labels != null && !labels.isEmpty()) {
-//                for (String label : labels) {
-//                    TextView tvLabel = new TextView(v.getContext());
-//                    tvLabel.setSingleLine(true);
-//                    tvLabel.setText(label);
-//                    tvLabel.setTextAppearance(v.getContext(), R.style.default_text_small);
-//                    tvLabel.setBackgroundResource(R.drawable.default_grey_box);
-//                    
-//                    viewHolder.llLabels.addView(tvLabel);
-//                }
-//                viewHolder.llLabels.setVisibility(View.VISIBLE);
-//            }
-//            else {
-//                viewHolder.llLabels.setVisibility(View.GONE);
-//            }
-            
-            viewHolder.tvDesc.setText("#" + pullRequest.getNumber() + " - " + pullRequest.getTitle());
-            //viewHolder.tvDesc.setText(StringUtils.doTeaser(pullRequest.getBody()));
+            viewHolder.tvDesc.setText(pullRequest.getTitle());
             Resources res = v.getResources();
-//            String extraData = String.format(res.getString(R.string.more_data_3), pullRequest
-//                    .getUser().getLogin(), pt.format(pullRequest.getCreatedAt()),
-//                    pullRequest.getComments()
-//                            + " "
-//                            + res.getQuantityString(R.plurals.issue_comment, pullRequest
-//                                    .getComments()));
             
-            String extraData = String.format(res.getString(R.string.more_data), pullRequest
-                    .getUser().getLogin(), pt.format(pullRequest.getCreatedAt()));
+            String extraData = res.getString(R.string.more_issue_data, 
+                    "#" + pullRequest.getNumber(),
+                    pullRequest.getUser().getLogin(),
+                    pt.format(pullRequest.getCreatedAt()));
+            
             viewHolder.tvExtra.setText(extraData);
+            
+            viewHolder.tvComments.setText(String.valueOf(pullRequest.getComments()));
         }
         return v;
     }
 
-    /**
-     * The Class ViewHolder.
-     */
     private static class ViewHolder {
-
-        /** The iv gravatar. */
         public ImageView ivGravatar;
-        
-        /** The tv title. */
-        //public TextView tvTitle;
-        
-        /** The tv desc. */
         public TextView tvDesc;
-        
-        /** The tv extra. */
         public TextView tvExtra;
-        
-        /** The ll labels. */
-        public LinearLayout llLabels;
-
+        public ImageView ivComments;
+        public TextView tvComments;
     }
 }
