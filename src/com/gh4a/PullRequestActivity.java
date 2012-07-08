@@ -40,6 +40,7 @@ import com.gh4a.adapter.CommentAdapter;
 import com.gh4a.loader.IssueCommentsLoader;
 import com.gh4a.loader.PullRequestLoader;
 import com.gh4a.loader.RepositoryCommitsLoader;
+import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.ImageDownloader;
 
 public class PullRequestActivity extends BaseSherlockFragmentActivity
@@ -140,7 +141,7 @@ public class PullRequestActivity extends BaseSherlockFragmentActivity
         llCommits.setBackgroundResource(R.drawable.default_info_box);
         for (final RepositoryCommit commit : commits) {
             TextView tvName = new TextView(getApplicationContext());
-            tvName.setText(commit.getCommit().getCommitter().getName() + " added a commit");
+            tvName.setText(CommitUtils.getAuthorLogin(commit) + " added a commit");
             tvName.setTextAppearance(getApplicationContext(), R.style.default_text_medium);
             llCommits.addView(tvName);
             
