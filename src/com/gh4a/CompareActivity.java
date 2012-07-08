@@ -25,62 +25,37 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.adapter.CompareAdapter;
 
-/**
- * The Compare activity.
- */
 public class CompareActivity extends BaseActivity implements OnItemClickListener {
 
-    /** The user login. */
-    protected String mUserLogin;
-
-    /** The repo name. */
-    protected String mRepoName;
+    private String mRepoOwner;
+    private String mRepoName;
+    private String mBase;
+    private String mHead;
     
-    /** The base. */
-    protected String mBase;
-    
-    /** The head */
-    protected String mHead;
-    
-    /* (non-Javadoc)
-     * @see android.app.Activity#onCreate(android.os.Bundle)
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.generic_list);
-        setUpActionBar();
         
-        mUserLogin = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
+        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
         mBase = getIntent().getExtras().getString(Constants.Repository.BASE);
         mHead = getIntent().getExtras().getString(Constants.Repository.HEAD);
         
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(R.string.commit_compare);
+        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        
         fillData();
     }
     
-    /**
-     * Fill data into UI components.
-     */
     private void fillData() {
         ListView listView = (ListView) findViewById(R.id.list_view);
-        
-//        LinearLayout ll = (LinearLayout) getLayoutInflater().inflate(R.layout.compare_footer, listView, false);
-//        listView.addFooterView(ll);
-//        Button btnAllCommits = (Button) ll.findViewById(R.id.btn_all_commits);
-//        btnAllCommits.setOnClickListener(new OnClickListener() {
-//            
-//            @Override
-//            public void onClick(View arg0) {
-//                getApplicationContext().openBranchListActivity(CompareActivity.this,
-//                        mUserLogin,
-//                        mRepoName,
-//                        R.id.btn_branches);
-//            }
-//        });
         
         CompareAdapter compareAdapter = new CompareAdapter(this, new ArrayList<String[]>());
         listView.setAdapter(compareAdapter);
@@ -107,15 +82,12 @@ public class CompareActivity extends BaseActivity implements OnItemClickListener
         compareAdapter.notifyDataSetChanged();
     }
 
-    /* (non-Javadoc)
-     * @see android.widget.AdapterView.OnItemClickListener#onItemClick(android.widget.AdapterView, android.view.View, int, long)
-     */
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         CompareAdapter adapter = (CompareAdapter) adapterView.getAdapter();
         String[] sha = (String[]) adapter.getItem(position);
         
-        getApplicationContext().openCommitInfoActivity(this, mUserLogin, mRepoName, 
+        getApplicationContext().openCommitInfoActivity(this, mRepoOwner, mRepoName, 
                 sha[0]);        
     }
 }

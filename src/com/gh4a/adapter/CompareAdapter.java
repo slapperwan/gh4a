@@ -19,12 +19,14 @@ import java.util.List;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
@@ -43,9 +45,18 @@ public class CompareAdapter extends RootAdapter<String[]> {
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
             v = vi.inflate(R.layout.row_commit, null);
+            
+            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+            Typeface boldCondensed = app.boldCondensed;
+            Typeface italic = app.italic;
+            
             viewHolder = new ViewHolder();
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+            viewHolder.tvDesc.setTypeface(boldCondensed);
+            
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+            viewHolder.tvExtra.setTypeface(italic);
+            
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
             //viewHolder.tvSha = (TextView) v.findViewById(R.id.tv_sha);
 
