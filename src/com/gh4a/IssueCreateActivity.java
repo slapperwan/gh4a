@@ -101,7 +101,9 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
         }
 
         mActionBar = getSupportActionBar();
-        mActionBar.setTitle(mEditMode ? R.string.issue_edit : R.string.issue_create);
+        mActionBar.setTitle(mEditMode ? 
+                getResources().getString(R.string.issue_edit)  + " #" + mIssueNumber 
+                : getResources().getString(R.string.issue_create));
         mActionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         mActionBar.setDisplayShowTitleEnabled(true);
         mActionBar.setHomeButtonEnabled(true);

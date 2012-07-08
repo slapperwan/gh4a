@@ -296,16 +296,15 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         if (isAuthorized()) {
-            MenuInflater inflater = getSupportMenuInflater();
             menu.clear();
+            MenuInflater inflater = getSupportMenuInflater();
+            inflater.inflate(R.menu.issue_menu, menu);
             if ("closed".equals(mIssueState)) {
-                menu.add(Menu.FIRST, R.string.issue_reopen, 0, R.string.issue_reopen);
+                menu.removeItem(R.id.issue_close);
             }
             else {
-                menu.add(Menu.FIRST, R.string.issue_close, 0, R.string.issue_close);
+                menu.removeItem(R.id.issue_reopen);
             }
-            menu.add(Menu.FIRST, R.string.issue_edit, 0, R.string.issue_edit);
-            menu.add(Menu.FIRST, R.string.issue_create, 0, R.string.issue_create);
         }
         return true;
     }
@@ -313,7 +312,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
     @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.string.issue_create:
+            case R.id.issue_create:
                 if (isAuthorized()) {
                     Intent intent = new Intent().setClass(this, IssueCreateActivity.class);
                     intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
@@ -326,7 +325,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
                     finish();
                 }                
                 return true;
-            case R.string.issue_edit:
+            case R.id.issue_edit:
                 if (isAuthorized()) {
                     Intent intent = new Intent().setClass(this, IssueCreateActivity.class);
                     intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
@@ -340,7 +339,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
                     finish();
                 }     
                 return true;
-            case R.string.issue_close:
+            case R.id.issue_close:
                 if (isAuthorized()) {
                     new CloseIssueTask(this, false).execute();
                 }
@@ -350,7 +349,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
                     finish();
                 }
                 return true;
-            case R.string.issue_reopen:
+            case R.id.issue_reopen:
                 if (isAuthorized()) {
                     new ReopenIssueTask(this, false).execute();
                 }

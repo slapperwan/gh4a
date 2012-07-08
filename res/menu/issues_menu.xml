@@ -10,13 +10,13 @@
     
     <item android:id="@+id/view_labels"
         android:title="@string/issue_view_labels"
-        android:showAsAction="ifRoom|withText" />
+        android:showAsAction="never" />
     
     <item android:id="@+id/view_milestones"
          android:title="@string/issue_view_milestones"
-         android:showAsAction="ifRoom|withText" />
+         android:showAsAction="never" />
     
     <item android:id="@+id/create_issue"
          android:title="@string/issue_create"
-         android:showAsAction="ifRoom|withText" />
+         android:showAsAction="never" />
 </menu>
