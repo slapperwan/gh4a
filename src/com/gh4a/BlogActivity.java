@@ -18,12 +18,9 @@ package com.gh4a;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.TextView;
 
 public class BlogActivity extends BaseActivity {
 
@@ -48,25 +45,6 @@ public class BlogActivity extends BaseActivity {
         mContent = getIntent().getStringExtra(Constants.Blog.CONTENT);
         mLink = getIntent().getStringExtra(Constants.Blog.LINK);
 
-        TextView tvHistoryFile = (TextView) findViewById(R.id.tv_view);
-        tvHistoryFile.setVisibility(View.GONE);
-        
-        TextView tvViewRaw = (TextView) findViewById(R.id.tv_view_raw);
-        tvViewRaw.setVisibility(View.GONE);
-
-        TextView tvDownload = (TextView) findViewById(R.id.tv_download);
-        tvDownload.setVisibility(View.GONE);
-        
-        TextView tvViewInBrowser = (TextView) findViewById(R.id.tv_in_browser);
-        tvViewInBrowser.setVisibility(View.VISIBLE);
-        tvViewInBrowser.setOnClickListener(new OnClickListener() {
-            
-            @Override
-            public void onClick(View arg0) {
-                getApplicationContext().openBrowser(BlogActivity.this, mLink);
-            }
-        });
-        
         mLoadingDialog = LoadingDialog.show(this, true, true);
         
         fillData();

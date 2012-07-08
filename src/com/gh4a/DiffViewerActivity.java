@@ -15,14 +15,10 @@
  */
 package com.gh4a;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.TextView;
 
 /**
  * The DiffViewer activity.
@@ -66,33 +62,6 @@ public class DiffViewerActivity extends BaseActivity {
         mTreeSha = data.getString(Constants.Object.TREE_SHA);
         mDiff = data.getString(Constants.Commit.DIFF);
         mFilePath = data.getString(Constants.Object.PATH);
-
-        TextView tvViewFile = (TextView) findViewById(R.id.tv_view);
-        tvViewFile.setVisibility(View.GONE);
-        tvViewFile.setText(getResources().getString(R.string.object_view_file_at, mSha.substring(0, 7)));
-        tvViewFile.setOnClickListener(new OnClickListener() {
-            
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent().setClass(DiffViewerActivity.this, AddedFileViewerActivity.class);
-                intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
-                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                intent.putExtra(Constants.Object.OBJECT_SHA, mSha);
-                intent.putExtra(Constants.Object.TREE_SHA, mTreeSha);
-                intent.putExtra(Constants.Object.PATH, mFilePath);
-                
-                startActivity(intent);
-            }
-        });
-        
-        TextView tvViewRaw = (TextView) findViewById(R.id.tv_view_raw);
-        tvViewRaw.setVisibility(View.GONE);
-        
-        TextView tvDownload = (TextView) findViewById(R.id.tv_download);
-        tvDownload.setVisibility(View.GONE);
-        
-        TextView tvViewInBrowser = (TextView) findViewById(R.id.tv_in_browser);
-        tvViewInBrowser.setVisibility(View.GONE);
 
         WebView diffView = (WebView) findViewById(R.id.web_view);
         String formatted = highlightSyntax();

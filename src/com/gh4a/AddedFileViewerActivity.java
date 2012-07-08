@@ -28,16 +28,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.TextView;
 
-import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 
 /**
@@ -83,65 +78,6 @@ public class AddedFileViewerActivity extends BaseActivity {
         mObjectSha = getIntent().getStringExtra(Constants.Object.OBJECT_SHA);
         mFilePath = getIntent().getStringExtra(Constants.Object.PATH);
 
-        TextView tvViewInBrowser = (TextView) findViewById(R.id.tv_in_browser);
-        tvViewInBrowser.setVisibility(View.GONE);
-        
-        TextView tvHistoryFile = (TextView) findViewById(R.id.tv_view);
-        tvHistoryFile.setText(getResources().getString(R.string.object_view_history));
-        tvHistoryFile.setOnClickListener(new OnClickListener() {
-            
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent().setClass(AddedFileViewerActivity.this, CommitHistoryActivity.class);
-                intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
-                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
-                intent.putExtra(Constants.Object.PATH, mFilePath);
-                
-                startActivity(intent);
-            }
-        });
-        
-        TextView tvViewRaw = (TextView) findViewById(R.id.tv_view_raw);
-        tvViewRaw.setVisibility(View.VISIBLE);
-        tvViewRaw.setOnClickListener(new OnClickListener() {
-            
-            @Override
-            public void onClick(View view) {
-                TextView tvViewRaw = (TextView) view;
-                if ("Raw".equals(tvViewRaw.getText())) {
-                    new LoadContentTask(AddedFileViewerActivity.this).execute(false);
-                }
-                else {
-                    new LoadContentTask(AddedFileViewerActivity.this).execute(true);
-                }
-            }
-        });
-        
-        TextView tvDownload = (TextView) findViewById(R.id.tv_download);
-        tvDownload.setVisibility(View.VISIBLE);
-        tvDownload.setOnClickListener(new OnClickListener() {
-            
-            @Override
-            public void onClick(View view) {
-                String filename = mFilePath;
-                int idx = mFilePath.lastIndexOf("/");
-                
-                if (idx != -1) {
-                    filename = filename.substring(filename.lastIndexOf("/") + 1, filename.length());
-                }
-
-                String data = new String(EncodingUtils.fromBase64(mBlob.getContent()));
-                boolean success = FileUtils.save(filename, data);
-                if (success) {
-                    showMessage("File saved at " + Environment.getExternalStorageDirectory().getAbsolutePath() + "/download/" + filename, false);
-                }
-                else {
-                    showMessage("Unable to save the file", false);
-                }
-            }
-        });
-        
         new LoadContentTask(this).execute(true);
     }
 
@@ -244,14 +180,6 @@ public class AddedFileViewerActivity extends BaseActivity {
      */
     protected void fillData(Blob blob, boolean highlight) {
         String data = new String(EncodingUtils.fromBase64(blob.getContent()));
-        
-        TextView tvViewRaw = (TextView) findViewById(R.id.tv_view_raw);
-        if (highlight) {
-            tvViewRaw.setText("Raw");
-        }
-        else {
-            tvViewRaw.setText("Highlight");
-        }
         
         WebView webView = (WebView) findViewById(R.id.web_view);
 
