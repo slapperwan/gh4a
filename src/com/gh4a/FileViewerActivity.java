@@ -48,7 +48,6 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.web_viewer);
-        setUpActionBar();
 
         mRepoOwner = getIntent().getStringExtra(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getStringExtra(Constants.Repository.REPO_NAME);

@@ -15,11 +15,13 @@
             android:orientation="vertical"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/comment_box">
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp" >
             <ImageView
                 android:id="@+id/iv_gravatar"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_marginRight="5dp"
                 android:layout_marginTop="5dp" />
             <TextView
@@ -41,42 +43,76 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall" 
-            android:padding="7dp"/>
+            android:textStyle="italic"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp" />
         <LinearLayout
             android:id="@+id/ll_changed"
-            android:layout_margin="10dp"
             android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp" >
             <TextView
+                android:id="@+id/commit_changed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/commit_changed" />
+            <View 
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="#ff0099cc" />
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="10dp" />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/ll_added"
-            android:layout_margin="10dp"
             android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp" >
             <TextView
+                android:id="@+id/commit_added"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/commit_added" />
+            <View 
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="#ff0099cc" />
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="10dp" />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/ll_deleted"
-            android:layout_margin="10dp"
             android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp" >
             <TextView
+                android:id="@+id/commit_deleted"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/commit_deleted" />
+            <View 
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="#ff0099cc" />
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="10dp" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

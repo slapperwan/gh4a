@@ -29,6 +29,8 @@ import org.eclipse.egit.github.core.service.CommitService;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -36,38 +38,21 @@ import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.ImageDownloader;
 
-/**
- * The Commit activity.
- */
 public class CommitActivity extends BaseActivity {
 
-    /** The loading dialog. */
-    protected LoadingDialog mLoadingDialog;
-
-    /** The user login. */
-    protected String mUserLogin;
-
-    /** The repo name. */
-    protected String mRepoName;
-
-    /** The object sha. */
-    protected String mObjectSha;
+    private String mRepoOwner;
+    private String mRepoName;
+    private String mObjectSha;
     
-    /** The tree sha. */
-    protected String mTreeSha;
-    
-    /**
-     * Called when the activity is first created.
-     * 
-     * @param savedInstanceState the saved instance state
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,39 +61,27 @@ public class CommitActivity extends BaseActivity {
         setUpActionBar();
 
         Bundle data = getIntent().getExtras();
-        mUserLogin = data.getString(Constants.Repository.REPO_OWNER);
+        mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
         mObjectSha = data.getString(Constants.Object.OBJECT_SHA);
-        mTreeSha = data.getString(Constants.Object.TREE_SHA);
 
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(getResources().getQuantityString(R.plurals.commit, 1) + " " + mObjectSha.substring(0, 7));
+        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        
         new LoadCommitInfoTask(this).execute();
     }
 
-    /**
-     * An asynchronous task that runs on a background thread to load commit
-     * info.
-     */
     private static class LoadCommitInfoTask extends AsyncTask<Void, Integer, RepositoryCommit> {
 
-        /** The target. */
         private WeakReference<CommitActivity> mTarget;
-        
-        /** The exception. */
         private boolean mException;
 
-        /**
-         * Instantiates a new load commit info task.
-         *
-         * @param activity the activity
-         */
         public LoadCommitInfoTask(CommitActivity activity) {
             mTarget = new WeakReference<CommitActivity>(activity);
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
         @Override
         protected RepositoryCommit doInBackground(Void... params) {
             if (mTarget.get() != null) {
@@ -117,7 +90,7 @@ public class CommitActivity extends BaseActivity {
                     GitHubClient client = new GitHubClient();
                     client.setOAuth2Token(mTarget.get().getAuthToken());
                     CommitService commitService = new CommitService(client);
-                    return commitService.getCommit(new RepositoryId(activity.mUserLogin, activity.mRepoName),
+                    return commitService.getCommit(new RepositoryId(activity.mRepoOwner, activity.mRepoName),
                             activity.mObjectSha);
                 }
                 catch (IOException e) {
@@ -131,26 +104,13 @@ public class CommitActivity extends BaseActivity {
             }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
         @Override
         protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                CommitActivity activity = mTarget.get();
-                activity.mLoadingDialog = LoadingDialog.show(activity, true, true);
-            }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
         @Override
         protected void onPostExecute(RepositoryCommit result) {
             if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog.dismiss();
                 if (mException) {
                     mTarget.get().showError();
                 }
@@ -162,12 +122,7 @@ public class CommitActivity extends BaseActivity {
 
     }
 
-    /**
-     * Fill data into UI components.
-     * 
-     * @param commit the commit
-     */
-    protected void fillData(final RepositoryCommit commit) {
+    private void fillData(final RepositoryCommit commit) {
         LinearLayout llChanged = (LinearLayout) findViewById(R.id.ll_changed);
         LinearLayout llAdded = (LinearLayout) findViewById(R.id.ll_added);
         LinearLayout llDeleted = (LinearLayout) findViewById(R.id.ll_deleted);
@@ -190,9 +145,26 @@ public class CommitActivity extends BaseActivity {
         }
         
         TextView tvMessage = (TextView) findViewById(R.id.tv_message);
+        tvMessage.setTypeface(getApplicationContext().regular);
+        
         TextView tvExtra = (TextView) findViewById(R.id.tv_extra);
+        tvExtra.setTypeface(getApplicationContext().regular);
+        
         TextView tvSummary = (TextView) findViewById(R.id.tv_desc);
-
+        tvSummary.setTypeface(getApplicationContext().regular);
+        
+        TextView tvChangeTitle = (TextView) findViewById(R.id.commit_changed);
+        tvChangeTitle.setTypeface(getApplicationContext().boldCondensed);
+        tvChangeTitle.setTextColor(Color.parseColor("#0099cc"));
+        
+        TextView tvAddedTitle = (TextView) findViewById(R.id.commit_added);
+        tvAddedTitle.setTypeface(getApplicationContext().boldCondensed);
+        tvAddedTitle.setTextColor(Color.parseColor("#0099cc"));
+        
+        TextView tvDeletedTitle = (TextView) findViewById(R.id.commit_deleted);
+        tvDeletedTitle.setTypeface(getApplicationContext().boldCondensed);
+        tvDeletedTitle.setTextColor(Color.parseColor("#0099cc"));
+        
         Resources res = getResources();
         String extraDataFormat = res.getString(R.string.more_data);
 
@@ -228,55 +200,46 @@ public class CommitActivity extends BaseActivity {
         
         for (final CommitFile file: addedFiles) {
             TextView tvFilename = new TextView(getApplicationContext());
-            SpannableString content = new SpannableString(file.getFilename());
-            content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-            tvFilename.setText(content);
-            tvFilename.setTextAppearance(getApplicationContext(),
-                    R.style.default_text_medium_url);
+            tvFilename.setText(file.getFilename());
+            tvFilename.setPadding(0, 5, 0, 5);
+            tvFilename.setTypeface(Typeface.MONOSPACE);
+            tvFilename.setTextColor(Color.parseColor("#0099cc"));
             tvFilename.setBackgroundResource(R.drawable.default_link);
             tvFilename.setOnClickListener(new OnClickListener() {
 
                 @Override
                 public void onClick(View arg0) {
-//                    Intent intent = new Intent().setClass(CommitActivity.this,
-//                            AddedFileViewerActivity.class);
-//                    intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
-//                    intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-//                    intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
-//                    intent.putExtra(Constants.Object.TREE_SHA, commit.getCommit().getTree().getSha());
-//                    intent.putExtra(Constants.Object.PATH, file.getFilename());
-//                    startActivity(intent);
-                    
                     Intent intent = new Intent().setClass(CommitActivity.this,
                             DiffViewerActivity.class);
-                    intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+                    intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
                     intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                     intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
-                    //intent.putExtra(Constants.Commit.DIFF, delta.getDiff());
                     intent.putExtra(Constants.Commit.DIFF, file.getPatch());
                     intent.putExtra(Constants.Object.PATH, file.getFilename());
                     intent.putExtra(Constants.Object.TREE_SHA, commit.getCommit().getTree().getSha());
                     startActivity(intent);
                 }
             });
+            
             llAdded.addView(tvFilename);
         }
         
         for (final CommitFile file: removedFiles) {
             TextView tvFilename = new TextView(getApplicationContext());
             tvFilename.setText(file.getFilename());
-            tvFilename.setTextAppearance(getApplicationContext(),
-                    R.style.default_text_medium);
+            tvFilename.setPadding(0, 5, 0, 5);
+            tvFilename.setTypeface(Typeface.MONOSPACE);
+            tvFilename.setTextColor(Color.BLACK);
+            
             llDeleted.addView(tvFilename);
         }
 
         for (final CommitFile file: modifiedFiles) {
             TextView tvFilename = new TextView(getApplicationContext());
-            SpannableString content = new SpannableString(file.getFilename());
-            content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-            tvFilename.setText(content);
-            tvFilename.setTextAppearance(getApplicationContext(),
-                    R.style.default_text_medium_url);
+            tvFilename.setText(file.getFilename());
+            tvFilename.setPadding(0, 5, 0, 5);
+            tvFilename.setTypeface(Typeface.MONOSPACE);
+            tvFilename.setTextColor(Color.parseColor("#0099cc"));
             tvFilename.setBackgroundResource(R.drawable.default_link);
             tvFilename.setOnClickListener(new OnClickListener() {
 
@@ -284,75 +247,44 @@ public class CommitActivity extends BaseActivity {
                 public void onClick(View arg0) {
                     Intent intent = new Intent().setClass(CommitActivity.this,
                             DiffViewerActivity.class);
-                    intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+                    intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
                     intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                     intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
-                    //intent.putExtra(Constants.Commit.DIFF, delta.getDiff());
                     intent.putExtra(Constants.Commit.DIFF, file.getPatch());
                     intent.putExtra(Constants.Object.PATH, file.getFilename());
                     intent.putExtra(Constants.Object.TREE_SHA, commit.getCommit().getTree().getSha());
                     startActivity(intent);
                 }
             });
+            
             llChanged.addView(tvFilename);
         }
-//        List<Delta> modifiedList = commit.getModified();
-//        if (modifiedList != null) {
-//            for (final Delta delta : modifiedList) {
-//                TextView tvFilename = new TextView(getApplicationContext());
-//                SpannableString content = new SpannableString(delta.getFilename());
-//                content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-//                tvFilename.setText(content);
-//                tvFilename.setTextAppearance(getApplicationContext(),
-//                        R.style.default_text_medium_url);
-//                tvFilename.setBackgroundResource(R.drawable.default_link);
-//                tvFilename.setOnClickListener(new OnClickListener() {
-//
-//                    @Override
-//                    public void onClick(View arg0) {
-//                        Intent intent = new Intent().setClass(CommitActivity.this,
-//                                DiffViewerActivity.class);
-//                        intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
-//                        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-//                        intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
-//                        intent.putExtra(Constants.Commit.DIFF, delta.getDiff());
-//                        intent.putExtra(Constants.Object.PATH, delta.getFilename());
-//                        intent.putExtra(Constants.Object.TREE_SHA, commit.getTree());
-//                        startActivity(intent);
-//                    }
-//                });
-//                llChanged.addView(tvFilename);
-//            }
-//            modifiedCount = modifiedList.size();
-//        }
 
-        if (commit.getStats().getAdditions() == 0) {
+        if (addedFiles.size() == 0) {
             TextView tvFilename = new TextView(getApplicationContext());
-            tvFilename.setTextAppearance(getApplicationContext(),
-                    R.style.default_text_medium);
+            tvFilename.setTypeface(getApplicationContext().regular);
+            tvFilename.setTextColor(Color.BLACK);
             tvFilename.setText(R.string.commit_no_files);
             llAdded.addView(tvFilename);
         }
         
-        if (commit.getStats().getDeletions() == 0) {
+        if (removedFiles.size() == 0) {
             TextView tvFilename = new TextView(getApplicationContext());
-            tvFilename.setTextAppearance(getApplicationContext(),
-                    R.style.default_text_medium);
+            tvFilename.setTypeface(getApplicationContext().regular);
+            tvFilename.setTextColor(Color.BLACK);
             tvFilename.setText(R.string.commit_no_files);
             llDeleted.addView(tvFilename);
         }
         
-        if (commit.getFiles().size() == 0) {
+        if (modifiedFiles.size() == 0) {
             TextView tvFilename = new TextView(getApplicationContext());
-            tvFilename.setTextAppearance(getApplicationContext(),
-                    R.style.default_text_medium);
+            tvFilename.setTypeface(getApplicationContext().regular);
+            tvFilename.setTextColor(Color.BLACK);
             tvFilename.setText(R.string.commit_no_files);
             llChanged.addView(tvFilename);
         }
         
         tvSummary.setText(String.format(getResources().getString(R.string.commit_summary),
                 commit.getFiles().size(), commit.getStats().getAdditions(), commit.getStats().getDeletions()));
-
-        mLoadingDialog.dismiss();
     }
 }
