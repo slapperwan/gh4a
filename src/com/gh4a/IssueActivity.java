@@ -63,10 +63,6 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
     private int mIssueNumber;
     private String mIssueState;
     private CommentAdapter mCommentAdapter;
-    private boolean mCommentsLoaded;// flag to prevent more click which result
-                                      // to query to the rest API
-    
-    protected List<Label> mLabels;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -100,6 +96,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         // set details inside listview header
         LayoutInflater infalter = getLayoutInflater();
         LinearLayout mHeader = (LinearLayout) infalter.inflate(R.layout.issue_header, lvComments, false);
+        mHeader.setClickable(false);
         
         // comment form at footer
         LinearLayout mFooter = (LinearLayout) infalter.inflate(R.layout.issue_footer, lvComments, false);
@@ -191,6 +188,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         String body = mIssue.getBody();
         body = body.replaceAll("\n", "<br/>");
         tvDesc.setText(Html.fromHtml(body));
+        tvDesc.setTypeface(getApplicationContext().regular);
         
         btnCreateComment.setOnClickListener(this);
         
@@ -238,7 +236,6 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
             }
         }
         mCommentAdapter.notifyDataSetChanged();
-        mCommentsLoaded = true;
     }
 
     private List<Comment> getComments() throws IOException {

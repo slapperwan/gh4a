@@ -15,24 +15,18 @@
  */
 package com.gh4a;
 
-import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.RepositoryCommit;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.IssueService;
-import org.eclipse.egit.github.core.service.PullRequestService;
 
-import android.os.AsyncTask;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -41,40 +35,22 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.adapter.CommentAdapter;
+import com.gh4a.loader.IssueCommentsLoader;
+import com.gh4a.loader.PullRequestLoader;
+import com.gh4a.loader.RepositoryCommitsLoader;
 import com.gh4a.utils.ImageDownloader;
 
-/**
- * The PullRequest activity.
- */
-public class PullRequestActivity extends BaseActivity {
+public class PullRequestActivity extends BaseSherlockFragmentActivity
+    implements LoaderManager.LoaderCallbacks {
 
-    /** The user login. */
-    protected String mUserLogin;
+    private String mRepoOwner;
+    private String mRepoName;
+    private int mPullRequestNumber;
+    private LinearLayout mHeader;
+    private CommentAdapter mCommentAdapter;
 
-    /** The repo name. */
-    protected String mRepoName;
-
-    /** The pull request number. */
-    protected int mPullRequestNumber;
-
-    /** The header. */
-    protected LinearLayout mHeader;
-
-    /** The pull request adapter. */
-    protected CommentAdapter mCommentAdapter;
-
-    /** The loading dialog. */
-    protected LoadingDialog mLoadingDialog;
-
-    /** The discussion loaded. */
-    protected boolean mDiscussionLoaded;
-
-    /**
-     * Called when the activity is first created.
-     * 
-     * @param savedInstanceState the saved instance state
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,28 +59,32 @@ public class PullRequestActivity extends BaseActivity {
         setUpActionBar();
 
         Bundle data = getIntent().getExtras();
-        mUserLogin = data.getString(Constants.Repository.REPO_OWNER);
+        mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
         mPullRequestNumber = data.getInt(Constants.PullRequest.NUMBER);
 
-        new LoadPullRequestTask(this).execute();
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(getResources().getString(R.string.pull_request_title) + " #" + mPullRequestNumber);
+        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        
+        getSupportLoaderManager().initLoader(0, null, this);
+        getSupportLoaderManager().getLoader(0).forceLoad();
+        
+        getSupportLoaderManager().initLoader(1, null, this);
+        getSupportLoaderManager().initLoader(2, null, this);
     }
 
-    /**
-     * Fill data into UI components.
-     * 
-     * @param pullRequest the pull request
-     */
-    protected void fillData(Map<String, Object> data) {
+    private void fillData(final PullRequest pullRequest) {
+        getSupportLoaderManager().getLoader(1).forceLoad();
+        getSupportLoaderManager().getLoader(2).forceLoad();
+        
         ListView lvComments = (ListView) findViewById(R.id.lv_comments);
-        final PullRequest pullRequest = (PullRequest) data.get("pullRequest");
-        List<Comment> comments = (List<Comment>) data.get("comments");
-        List<RepositoryCommit> commits = (List<RepositoryCommit>) data.get("commits");
         
         // set details inside listview header
         LayoutInflater infalter = getLayoutInflater();
         mHeader = (LinearLayout) infalter.inflate(R.layout.pull_request_header, lvComments, false);
-
+        mHeader.setClickable(false);
         lvComments.addHeaderView(mHeader, null, true);
 
         mCommentAdapter = new CommentAdapter(PullRequestActivity.this, new ArrayList<Comment>());
@@ -123,14 +103,17 @@ public class PullRequestActivity extends BaseActivity {
                                 pullRequest.getUser().getName());
             }
         });
-        TextView tvLogin = (TextView) mHeader.findViewById(R.id.tv_login);
-        TextView tvCreateAt = (TextView) mHeader.findViewById(R.id.tv_created_at);
+        
+        TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
         TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
         TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
+        
         TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
-
-        tvLogin.setText(pullRequest.getUser().getLogin());
-        tvCreateAt.setText(pt.format(pullRequest.getCreatedAt()));
+        TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
+        tvCommentTitle.setTypeface(getApplicationContext().boldCondensed);
+        tvCommentTitle.setTextColor(Color.parseColor("#0099cc"));
+        tvCommentTitle.setText(getResources().getString(R.string.pull_request_comments) + " (" + pullRequest.getComments() + ")");
+        
         tvState.setText(pullRequest.getState());
         if ("closed".equals(pullRequest.getState())) {
             tvState.setBackgroundResource(R.drawable.default_red_box);
@@ -139,29 +122,22 @@ public class PullRequestActivity extends BaseActivity {
             tvState.setBackgroundResource(R.drawable.default_green_box);
         }
         tvTitle.setText(pullRequest.getTitle());
-        tvDesc.setText(pullRequest.getBody());
+        tvTitle.setTypeface(getApplicationContext().boldCondensed);
         
-        LinearLayout llLabels = (LinearLayout) findViewById(R.id.ll_labels);
+        String body = pullRequest.getBody();
+        body = body.replaceAll("\n", "<br/>");
+        tvDesc.setText(Html.fromHtml(body));
+        tvDesc.setTypeface(getApplicationContext().regular);
         
-//        List<String> labels = pullRequest.getIssueUrl();
-//        if (labels != null && !labels.isEmpty()) {
-//            for (String label : labels) {
-//                TextView tvLabel = new TextView(getApplicationContext());
-//                tvLabel.setSingleLine(true);
-//                tvLabel.setText(label);
-//                tvLabel.setTextAppearance(getApplicationContext(), R.style.default_text_small);
-//                tvLabel.setBackgroundResource(R.drawable.default_grey_box);
-//                
-//                llLabels.addView(tvLabel);
-//            }
-//            llLabels.setVisibility(View.VISIBLE);
-//        }
-//        else {
-//            llLabels.setVisibility(View.GONE);
-//        }
+        tvExtra.setText(getResources().getString(R.string.issue_open_by_user,
+                pullRequest.getUser().getLogin(),
+                pt.format(pullRequest.getCreatedAt())));
         
+    }
+    
+    private void fillCommits(List<RepositoryCommit> commits) {
         LinearLayout llCommits = (LinearLayout) findViewById(R.id.ll_commits);
-        llCommits.setBackgroundResource(R.drawable.default_grey_box);
+        llCommits.setBackgroundResource(R.drawable.default_info_box);
         for (final RepositoryCommit commit : commits) {
             TextView tvName = new TextView(getApplicationContext());
             tvName.setText(commit.getCommit().getCommitter().getName() + " added a commit");
@@ -171,28 +147,21 @@ public class PullRequestActivity extends BaseActivity {
             TextView tvLabel = new TextView(getApplicationContext());
             tvLabel.setSingleLine(true);
             tvLabel.setText(commit.getSha().subSequence(0, 7) + " " + commit.getCommit().getMessage());
-            tvLabel.setTextAppearance(getApplicationContext(), R.style.default_text_medium_url);
+            tvLabel.setTextAppearance(getApplicationContext(), R.style.default_text_small_url);
             tvLabel.setBackgroundResource(R.drawable.default_link);
             tvLabel.setOnClickListener(new OnClickListener() {
                 
                 @Override
                 public void onClick(View arg0) {
-                    getApplicationContext().openCommitInfoActivity(PullRequestActivity.this, mUserLogin,
+                    getApplicationContext().openCommitInfoActivity(PullRequestActivity.this, mRepoOwner,
                             mRepoName, commit.getSha());
                 }
             });
             
             llCommits.addView(tvLabel);
         }
-        fillDiscussion(comments);
     }
-
-    /**
-     * Fill comment into UI components.
-     * 
-     * @param discussions the discussions
-     */
-    protected void fillDiscussion(List<Comment> comments) {
+    private void fillDiscussion(List<Comment> comments) {
         if (comments != null && comments.size() > 0) {
             mCommentAdapter.notifyDataSetChanged();
             for (Comment comment : comments) {
@@ -200,104 +169,37 @@ public class PullRequestActivity extends BaseActivity {
             }
         }
         mCommentAdapter.notifyDataSetChanged();
-        mDiscussionLoaded = true;
     }
 
-    /**
-     * An asynchronous task that runs on a background thread to load pull
-     * request.
-     */
-    private static class LoadPullRequestTask extends AsyncTask<Void, Integer, Map<String, Object>> {
+    @Override
+    public Loader onCreateLoader(int id, Bundle arg1) {
+        if (id == 0) {
+            return new PullRequestLoader(this, mRepoOwner, mRepoName, mPullRequestNumber);
+        }
+        else if (id == 1) {
+            return new IssueCommentsLoader(this, mRepoOwner, mRepoName, mPullRequestNumber);
+        }
+        else {
+            return new RepositoryCommitsLoader(this, mRepoOwner, mRepoName, mPullRequestNumber);
+        }
+    }
 
-        /** The target. */
-        private WeakReference<PullRequestActivity> mTarget;
+    @Override
+    public void onLoadFinished(Loader loader, Object object) {
+        if (loader.getId() == 0) {
+            fillData((PullRequest) object);
+        }
+        else if (loader.getId() == 1) {
+            fillDiscussion((List<Comment>) object);
+        }
+        else {
+            fillCommits((List<RepositoryCommit>) object);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader arg0) {
+        // TODO Auto-generated method stub
         
-        /** The exception. */
-        private boolean mException;
-
-        /**
-         * Instantiates a new load pull request task.
-         *
-         * @param activity the activity
-         */
-        public LoadPullRequestTask(PullRequestActivity activity) {
-            mTarget = new WeakReference<PullRequestActivity>(activity);
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
-        @Override
-        protected Map<String, Object> doInBackground(Void... params) {
-            if (mTarget.get() != null) {
-                try {
-                    PullRequestActivity activity = mTarget.get();
-                    Map<String, Object> m = new HashMap<String, Object>();
-                    
-                    GitHubClient client = new GitHubClient();
-                    client.setOAuth2Token(mTarget.get().getAuthToken());
-                    PullRequestService pullRequestService = new PullRequestService(client);
-                    PullRequest pullRequest = pullRequestService.getPullRequest(new RepositoryId(activity.mUserLogin, activity.mRepoName),
-                            activity.mPullRequestNumber);
-                    
-                    //show commits
-                    if (pullRequest.getCommits() > 0) {
-                        List<RepositoryCommit> commits = pullRequestService.getCommits(new RepositoryId(activity.mUserLogin, activity.mRepoName), 
-                                activity.mPullRequestNumber);
-                        
-                        m.put("commits", commits);
-                    }
-                    
-                    IssueService issueService = new IssueService();
-                    List<Comment> comments = issueService.getComments(activity.mUserLogin, 
-                            activity.mRepoName, pullRequest.getNumber());
-                    
-                    m.put("pullRequest", pullRequest);
-                    m.put("comments", comments);
-                    
-                    return m;
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
-            }
-            else {
-                return null;
-            }
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
-        @Override
-        protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
-            }
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
-        @Override
-        protected void onPostExecute(Map<String, Object> result) {
-            if (mTarget.get() != null) {
-                PullRequestActivity activity = mTarget.get();
-                activity.mLoadingDialog.dismiss();
-    
-                if (mException) {
-                    activity.showError();
-                }
-                else {
-                    activity.fillData(result);
-                }
-            }
-        }
     }
-
 }
