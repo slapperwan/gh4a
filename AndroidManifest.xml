@@ -13,7 +13,7 @@
         android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <application
-        android:icon="@drawable/icon"
+        android:icon="@drawable/octodroid"
         android:label="@string/app_name"
         android:theme="@style/DefaultTheme"
         android:name="com.gh4a.Gh4Application">
@@ -80,9 +80,6 @@
             android:configChanges="orientation" />
         <activity
             android:name=".FileViewerActivity"
-            android:configChanges="orientation" />
-        <activity
-            android:name=".AddedFileViewerActivity"
             android:configChanges="orientation" />
         <activity
             android:name=".OrganizationMemberListActivity"
@@ -155,12 +152,6 @@
             android:configChanges="orientation" />
         <activity
             android:name="DiscussionActivity"
-            android:configChanges="orientation" />
-        <activity
-            android:name="JobListActivity"
-            android:configChanges="orientation" />
-        <activity
-            android:name="JobActivity"
             android:configChanges="orientation" />
         <activity
             android:name="OrganizationListActivity"
