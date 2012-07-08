@@ -15,54 +15,41 @@
  */
 package com.gh4a;
 
+import com.actionbarsherlock.app.ActionBar;
+
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
-/**
- * The DiffViewer activity.
- */
 public class DiffViewerActivity extends BaseActivity {
 
-    /** The user login. */
-    protected String mUserLogin;
+    private String mRepoOwner;
+    private String mRepoName;
+    private String mSha;
+    private String mDiff;
+    private String mFilePath;
+    private String mTreeSha;
 
-    /** The repo name. */
-    protected String mRepoName;
-
-    /** The sha. */
-    protected String mSha;
-
-    /** The diff. */
-    protected String mDiff;
-
-    /** The filename. */
-    protected String mFilePath;
-    
-    /** The tree sha. */
-    protected String mTreeSha;
-
-    /**
-     * Called when the activity is first created.
-     * 
-     * @param savedInstanceState the saved instance state
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.web_viewer);
-        setUpActionBar();
 
         Bundle data = getIntent().getExtras();
-        mUserLogin = data.getString(Constants.Repository.REPO_OWNER);
+        mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
         mSha = data.getString(Constants.Object.OBJECT_SHA);
         mTreeSha = data.getString(Constants.Object.TREE_SHA);
         mDiff = data.getString(Constants.Commit.DIFF);
         mFilePath = data.getString(Constants.Object.PATH);
 
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(mFilePath);
+        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        
         WebView diffView = (WebView) findViewById(R.id.web_view);
         String formatted = highlightSyntax();
         WebSettings s = diffView.getSettings();
@@ -76,11 +63,6 @@ public class DiffViewerActivity extends BaseActivity {
         diffView.loadDataWithBaseURL("file:///android_asset/", formatted, "text/html", "utf-8", "");
     }
 
-    /**
-     * Highlight syntax.
-     * 
-     * @return the string
-     */
     private String highlightSyntax() {
         StringBuilder content = new StringBuilder();
         content.append("<html><head><title></title>");
