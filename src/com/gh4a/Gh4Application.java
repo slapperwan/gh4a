@@ -335,6 +335,16 @@ public class Gh4Application extends Application {
         intent.putExtra(Constants.PullRequest.STATE, state);
         context.startActivity(intent);
     }
+    
+    public void openPullRequestListActivity(Context context, String repoOwner, String repoName, String state,
+            int flags) {
+        Intent intent = new Intent().setClass(context, PullRequestListActivity.class);
+        intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
+        intent.putExtra(Constants.Repository.REPO_NAME, repoName);
+        intent.putExtra(Constants.PullRequest.STATE, state);
+        intent.setFlags(flags);
+        context.startActivity(intent);
+    }
 
     /**
      * Open branch list activity.
