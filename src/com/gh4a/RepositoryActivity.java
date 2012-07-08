@@ -187,7 +187,9 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
             Intent intent = new Intent().setClass(this, FileViewerActivity.class);
             intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
             intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-            intent.putExtra(Constants.Object.PATH, mAdapter.mPath + "/" + content.getPath());
+            intent.putExtra(Constants.Object.PATH, 
+                    mAdapter.mPath != null ? mAdapter.mPath + "/" + content.getName()
+                            : content.getName());
             intent.putExtra(Constants.Object.REF, ref);
             intent.putExtra(Constants.Object.NAME, content.getName());
             intent.putExtra(Constants.Object.OBJECT_SHA, content.getSha());
@@ -210,9 +212,13 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     public void onBackPressed() {
         if (mPager.getCurrentItem() == 1) {
             backPressed = true;
-            if (mAdapter.mPath.lastIndexOf("/") != -1) {
+            if (mAdapter.mPath != null && mAdapter.mPath.lastIndexOf("/") != -1) {
                 mAdapter.mPath = mAdapter.mPath.substring(0, mAdapter.mPath.lastIndexOf("/"));
             }
+            else {
+                mAdapter.mPath = null;
+            }
+            
             if (fileStacks.size() > 1) {
                 mAdapter.notifyDataSetChanged();
                 return;
