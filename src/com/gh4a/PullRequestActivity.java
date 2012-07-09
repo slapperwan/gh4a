@@ -42,6 +42,7 @@ import com.gh4a.loader.PullRequestLoader;
 import com.gh4a.loader.RepositoryCommitsLoader;
 import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.ImageDownloader;
+import com.gh4a.utils.StringUtils;
 
 public class PullRequestActivity extends BaseSherlockFragmentActivity
     implements LoaderManager.LoaderCallbacks {
@@ -126,10 +127,11 @@ public class PullRequestActivity extends BaseSherlockFragmentActivity
         tvTitle.setTypeface(getApplicationContext().boldCondensed);
         
         String body = pullRequest.getBody();
-        body = body.replaceAll("\n", "<br/>");
-        tvDesc.setText(Html.fromHtml(body));
-        tvDesc.setTypeface(getApplicationContext().regular);
-        
+        if (!StringUtils.isBlank(body)) {
+            body = body.replaceAll("\n", "<br/>");
+            tvDesc.setText(Html.fromHtml(body));
+            tvDesc.setTypeface(getApplicationContext().regular);
+        }
         tvExtra.setText(getResources().getString(R.string.issue_open_by_user,
                 pullRequest.getUser().getLogin(),
                 pt.format(pullRequest.getCreatedAt())));

@@ -53,6 +53,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.adapter.CommentAdapter;
 import com.gh4a.loader.IssueLoader;
 import com.gh4a.utils.ImageDownloader;
+import com.gh4a.utils.StringUtils;
 
 public class IssueActivity extends BaseSherlockFragmentActivity implements 
     OnClickListener, LoaderManager.LoaderCallbacks<Issue> {
@@ -186,10 +187,11 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         }
         
         String body = mIssue.getBody();
-        body = body.replaceAll("\n", "<br/>");
-        tvDesc.setText(Html.fromHtml(body));
-        tvDesc.setTypeface(getApplicationContext().regular);
-        
+        if (!StringUtils.isBlank(body)) {
+            body = body.replaceAll("\n", "<br/>");
+            tvDesc.setText(Html.fromHtml(body));
+            tvDesc.setTypeface(getApplicationContext().regular);
+        }
         btnCreateComment.setOnClickListener(this);
         
         LinearLayout llLabels = (LinearLayout) findViewById(R.id.ll_labels);
