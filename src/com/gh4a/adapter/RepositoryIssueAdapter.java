@@ -110,6 +110,14 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> {
             
             viewHolder.llLabels.removeAllViews();
             
+            TextView tvNumber = new TextView(v.getContext());
+            tvNumber.setSingleLine(true);
+            tvNumber.setText(String.valueOf(issue.getNumber()));
+            tvNumber.setTypeface(null, Typeface.BOLD);
+            tvNumber.setBackgroundColor(Color.LTGRAY);
+            tvNumber.setPadding(2, 2, 2, 2);
+            viewHolder.llLabels.addView(tvNumber);
+            
             //show labels
             List<Label> labels = issue.getLabels();
             if (labels != null && !labels.isEmpty()) {
@@ -117,9 +125,9 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> {
                     TextView tvLabel = new TextView(v.getContext());
                     tvLabel.setSingleLine(true);
                     tvLabel.setText(label.getName());
-                    tvLabel.setTextAppearance(v.getContext(), R.style.default_text_micro);
+                    tvLabel.setTextSize(10);
                     tvLabel.setBackgroundColor(Color.parseColor("#" + label.getColor()));
-                    tvLabel.setPadding(5, 2, 5, 2);
+                    tvLabel.setPadding(2, 2, 2, 2);
                     int r = Color.red(Color.parseColor("#" + label.getColor()));
                     int g = Color.green(Color.parseColor("#" + label.getColor()));
                     int b = Color.blue(Color.parseColor("#" + label.getColor()));
@@ -137,7 +145,6 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> {
 
             Resources res = v.getResources();
             String extraData = res.getString(R.string.more_issue_data, 
-                    "#" + issue.getNumber(),
                     issue.getUser().getLogin(),
                     pt.format(issue.getCreatedAt()));
 

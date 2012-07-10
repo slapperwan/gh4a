@@ -1,10 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <!--
-        Layout 
-        ====== 
-        Avatar    Description (Medium) 
-                  Extra (Small)
-    -->
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
@@ -28,18 +22,20 @@
         android:textAppearance="@style/default_text_micro"
         android:layout_alignParentRight="true"
         android:layout_below="@id/iv_comments" />
-    <ImageView
-        android:id="@+id/iv_gravatar"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="5dp" />
+    <LinearLayout
+        android:id="@+id/ll_labels"
+        android:layout_width="45dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="4dp" >
+    </LinearLayout>
     <TextView
         android:id="@+id/tv_desc"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textSize="17sp"
-        android:layout_toRightOf="@id/iv_gravatar"
+        android:layout_toRightOf="@id/ll_labels"
         android:layout_toLeftOf="@id/iv_comments"
         android:maxLines="2"
         android:ellipsize="end" />
@@ -48,17 +44,17 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textAppearance="@style/default_text_small"
-        android:layout_toRightOf="@id/iv_gravatar"
+        android:layout_toRightOf="@id/ll_labels"
         android:layout_toLeftOf="@id/iv_comments"
         android:layout_below="@id/tv_desc"
         android:visibility="gone" />
-    <LinearLayout
-        android:id="@+id/ll_labels"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_toRightOf="@id/iv_gravatar"
-        android:layout_toLeftOf="@id/iv_comments"
+    <ImageView
+        android:id="@+id/iv_gravatar"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_toRightOf="@id/ll_labels"
         android:layout_below="@id/tv_repo" />
     <TextView
         android:id="@+id/tv_extra"
@@ -66,7 +62,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="@style/default_text_micro"
         android:layout_toRightOf="@id/iv_gravatar"
-        android:layout_below="@id/ll_labels" />
+        android:layout_below="@id/tv_repo" />
     <TextView
         android:id="@+id/tv_assignee"
         android:layout_width="wrap_content"
