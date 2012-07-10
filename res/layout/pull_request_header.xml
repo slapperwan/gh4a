@@ -5,37 +5,35 @@
     android:orientation="vertical">
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="16dp" >
+        android:layout_height="fill_parent">
+        <TextView
+            android:id="@+id/tv_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/default_text_micro"
+            android:layout_marginRight="5dp" />
         <ImageView
             android:id="@+id/iv_gravatar"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_toRightOf="@id/tv_state"
             android:layout_marginRight="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dp" />
+            android:layout_marginTop="10dp" />
         <TextView
             android:id="@+id/tv_extra"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="@style/default_text_small"
-            android:layout_toRightOf="@id/iv_gravatar" />
-        <TextView
-            android:id="@+id/tv_state"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tv_extra"
             android:layout_toRightOf="@id/iv_gravatar"
-            android:textAppearance="?attr/textAppearanceWhiteSmall" />
+            android:layout_marginTop="10dp" />
         <TextView
             android:id="@+id/tv_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:textSize="17sp"
-            android:layout_below="@id/tv_state"
-            android:layout_toRightOf="@id/iv_gravatar" />
+            android:layout_toRightOf="@id/tv_state"
+            android:layout_below="@id/iv_gravatar" />
     </RelativeLayout>
     <LinearLayout
         android:layout_width="fill_parent"

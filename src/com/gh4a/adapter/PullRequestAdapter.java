@@ -45,7 +45,7 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> {
         ViewHolder viewHolder;
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_issue, null);
+            v = vi.inflate(R.layout.row_gravatar_2, null);
             
             Gh4Application app = (Gh4Application) mContext.getApplicationContext();
             Typeface boldCondensed = app.boldCondensed;
@@ -59,12 +59,6 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> {
             
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
             viewHolder.tvExtra.setTypeface(regular);
-            
-            viewHolder.tvComments = (TextView) v.findViewById(R.id.tv_comments);
-            viewHolder.tvComments.setVisibility(View.GONE);
-            
-            viewHolder.ivComments = (ImageView) v.findViewById(R.id.iv_comments);
-            viewHolder.ivComments.setVisibility(View.GONE);
             
             v.setTag(viewHolder);
         }
@@ -92,13 +86,10 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> {
             Resources res = v.getResources();
             
             String extraData = res.getString(R.string.more_issue_data, 
-                    "#" + pullRequest.getNumber(),
                     pullRequest.getUser().getLogin(),
                     pt.format(pullRequest.getCreatedAt()));
             
             viewHolder.tvExtra.setText(extraData);
-            
-            viewHolder.tvComments.setText(String.valueOf(pullRequest.getComments()));
         }
         return v;
     }
@@ -107,7 +98,5 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> {
         public ImageView ivGravatar;
         public TextView tvDesc;
         public TextView tvExtra;
-        public ImageView ivComments;
-        public TextView tvComments;
     }
 }

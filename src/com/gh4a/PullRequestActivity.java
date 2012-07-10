@@ -56,7 +56,7 @@ public class PullRequestActivity extends BaseSherlockFragmentActivity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        
         setContentView(R.layout.pull_request);
         setUpActionBar();
 
@@ -117,11 +117,14 @@ public class PullRequestActivity extends BaseSherlockFragmentActivity
         tvCommentTitle.setText(getResources().getString(R.string.pull_request_comments) + " (" + pullRequest.getComments() + ")");
         
         tvState.setText(pullRequest.getState());
+        tvState.setTextColor(Color.WHITE);
         if ("closed".equals(pullRequest.getState())) {
             tvState.setBackgroundResource(R.drawable.default_red_box);
+            tvState.setText("C\nL\nO\nS\nE\nD");
         }
         else {
             tvState.setBackgroundResource(R.drawable.default_green_box);
+            tvState.setText("O\nP\nE\nN");
         }
         tvTitle.setText(pullRequest.getTitle());
         tvTitle.setTypeface(getApplicationContext().boldCondensed);
