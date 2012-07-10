@@ -20,11 +20,13 @@ import java.util.List;
 import org.eclipse.egit.github.core.Gist;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
@@ -55,6 +57,7 @@ public class GistAdapter  extends RootAdapter<Gist> {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
             v = vi.inflate(R.layout.row_simple_3, null);
 
+            
             viewHolder = new ViewHolder();
             viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
@@ -68,7 +71,7 @@ public class GistAdapter  extends RootAdapter<Gist> {
         Gist gist = mObjects.get(position);
 
         if (gist != null) {
-            viewHolder.tvTitle.setText("Gist " + gist.getId());
+            viewHolder.tvTitle.setText(gist.getId());
             if (StringUtils.isBlank(gist.getDescription())) {
                 viewHolder.tvDesc.setVisibility(View.GONE);
             }

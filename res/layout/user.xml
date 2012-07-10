@@ -186,7 +186,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="?attr/textAppearanceSmall"
-                            android:text="@string/gist" />
+                            android:text="@string/gists" />
                     </TableRow>
                 </TableLayout>
             </TableRow>

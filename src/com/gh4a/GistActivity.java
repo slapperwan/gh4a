@@ -36,59 +36,38 @@ import android.view.View.OnClickListener;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.utils.StringUtils;
 
-/**
- * The Gist activity.
- */
 public class GistActivity extends BaseActivity {
 
-    /** The gist id. */
     private String mGistId;
     
-    /** The loading dialog. */
-    private LoadingDialog mLoadingDialog;
-    
-    /* (non-Javadoc)
-     * @see android.app.Activity#onCreate(android.os.Bundle)
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.gist);
-        setUpActionBar();
         
         mGistId = getIntent().getExtras().getString(Constants.Gist.ID);
+        
+        ActionBar mActionBar = getSupportActionBar();
+        mActionBar.setTitle(getResources().getQuantityString(R.plurals.gist, 1) + " " + mGistId);
+        mActionBar.setDisplayShowTitleEnabled(true);
+        mActionBar.setHomeButtonEnabled(true);
         
         new LoadGistTask(this).execute(mGistId);
     }
     
-    /**
-     * An asynchronous task that runs on a background thread
-     * to load gist.
-     */
     private static class LoadGistTask extends AsyncTask<String, Void, Gist> {
 
-        /** The target. */
         private WeakReference<GistActivity> mTarget;
-        
-        /** The exception. */
         private boolean mException;
         
-        /**
-         * Instantiates a new load issue list task.
-         *
-         * @param activity the activity
-         */
         public LoadGistTask(GistActivity activity) {
             mTarget = new WeakReference<GistActivity>(activity);
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
         @Override
         protected Gist doInBackground(String... params) {
             if (mTarget.get() != null) {
@@ -109,26 +88,14 @@ public class GistActivity extends BaseActivity {
             }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
         @Override
         protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, true);
-            }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
         @Override
         protected void onPostExecute(Gist result) {
             if (mTarget.get() != null) {
                 GistActivity activity = mTarget.get();
-                activity.mLoadingDialog.dismiss();
     
                 if (mException) {
                     activity.showError();
@@ -140,26 +107,7 @@ public class GistActivity extends BaseActivity {
         }
     }
     
-    /**
-     * Fill data into UI components.
-     *
-     * @param gist the gist
-     */
     private void fillData(final Gist gist) {
-        TextView tvName = (TextView) findViewById(R.id.tv_name);
-        tvName.setText(gist.getUser().getLogin());
-        tvName.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                getApplicationContext().openUserInfoActivity(GistActivity.this,
-                        gist.getUser().getLogin(), null);
-            }
-        });
-        
-        TextView tvGistId = (TextView) findViewById(R.id.tv_gist_id);
-        tvGistId.setText("Gist : " + gist.getUser().getLogin());
-        
         TextView tvDesc = (TextView) findViewById(R.id.tv_desc);
         if (StringUtils.isBlank(gist.getDescription())) {
             tvDesc.setVisibility(View.GONE);

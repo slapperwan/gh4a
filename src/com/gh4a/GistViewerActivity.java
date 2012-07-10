@@ -30,75 +30,45 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.utils.StringUtils;
 
-/**
- * The GistViewer activity.
- */
 public class GistViewerActivity extends BaseActivity {
 
-    /** The user login. */
     private String mUserLogin;
-    
-    /** The filename. */
     private String mFilename;
-    
-    /** The gist id. */
     private String mGistId;
-    
-    /** The loading dialog. */
-    private LoadingDialog mLoadingDialog;
-    
-    /** The data. */
     private String mData;
-    
-    /* (non-Javadoc)
-     * @see android.app.Activity#onCreate(android.os.Bundle)
-     */
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.web_viewer);
-        setUpActionBar();
         
         mUserLogin = getIntent().getExtras().getString(Constants.User.USER_LOGIN);
         mFilename = getIntent().getExtras().getString(Constants.Gist.FILENAME);
         mGistId = getIntent().getExtras().getString(Constants.Gist.ID);
+
+        ActionBar mActionBar = getSupportActionBar();
+        mActionBar.setTitle(mFilename);
+        mActionBar.setDisplayShowTitleEnabled(true);
+        mActionBar.setHomeButtonEnabled(true);
         
         new LoadGistTask(this, true).execute(mGistId, mFilename);
     }
     
-    /**
-     * An asynchronous task that runs on a background thread
-     * to load gist.
-     */
     private static class LoadGistTask extends AsyncTask<String, Void, String> {
 
-        /** The target. */
         private WeakReference<GistViewerActivity> mTarget;
-        
-        /** The exception. */
         private boolean mException;
-        
-        /** The highlight. */
         private boolean mHighlight;
         
-        /**
-         * Instantiates a new load issue list task.
-         *
-         * @param activity the activity
-         * @param highlight the highlight
-         */
         public LoadGistTask(GistViewerActivity activity, boolean highlight) {
             mTarget = new WeakReference<GistViewerActivity>(activity);
             mHighlight = highlight;
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
         @Override
         protected String doInBackground(String... params) {
             if (mTarget.get() != null) {
@@ -119,21 +89,10 @@ public class GistViewerActivity extends BaseActivity {
             }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
         @Override
         protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, true);
-            }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
         @Override
         protected void onPostExecute(String result) {
             if (mTarget.get() != null) {
@@ -149,12 +108,6 @@ public class GistViewerActivity extends BaseActivity {
         }
     }
     
-    /**
-     * Fill data into UI components.
-     *
-     * @param is the is
-     * @param highlight the highlight
-     */
     private void fillData(String data, boolean highlight) {
         WebView webView = (WebView) findViewById(R.id.web_view);
 
@@ -178,14 +131,10 @@ public class GistViewerActivity extends BaseActivity {
         webView.loadDataWithBaseURL("file:///android_asset/", highlighted, "text/html", "utf-8", "");
     }
 
-    /** The web view client. */
     private WebViewClient webViewClient = new WebViewClient() {
 
         @Override
         public void onPageFinished(WebView webView, String url) {
-            if (mLoadingDialog != null && mLoadingDialog.isShowing()) {
-                mLoadingDialog.dismiss();
-            }
         }
         
         @Override

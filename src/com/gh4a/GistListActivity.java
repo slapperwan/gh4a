@@ -32,59 +32,39 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.adapter.GistAdapter;
 
-/**
- * The GistList activity.
- */
 public class GistListActivity extends BaseActivity implements OnItemClickListener {
 
-    /** The user login. */
     private String mUserLogin;
-    
-    /** The loading dialog. */
-    private LoadingDialog mLoadingDialog;
-    
-    /* (non-Javadoc)
-     * @see android.app.Activity#onCreate(android.os.Bundle)
-     */
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.generic_list);
-        setUpActionBar();
         
         mUserLogin = getIntent().getExtras().getString(Constants.User.USER_LOGIN);
+        
+        ActionBar mActionBar = getSupportActionBar();
+        mActionBar.setTitle(getResources().getQuantityString(R.plurals.gist, 0));
+        mActionBar.setSubtitle(mUserLogin);
+        mActionBar.setDisplayShowTitleEnabled(true);
+        mActionBar.setHomeButtonEnabled(true);
         
         new LoadGistTask(this).execute(mUserLogin);
     }
     
-    /**
-     * An asynchronous task that runs on a background thread
-     * to load gist.
-     */
     private static class LoadGistTask extends AsyncTask<String, Void, List<Gist>> {
 
-        /** The target. */
         private WeakReference<GistListActivity> mTarget;
-        
-        /** The exception. */
         private boolean mException;
         
-        /**
-         * Instantiates a new load issue list task.
-         *
-         * @param activity the activity
-         */
         public LoadGistTask(GistListActivity activity) {
             mTarget = new WeakReference<GistListActivity>(activity);
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
         @Override
         protected List<Gist> doInBackground(String... params) {
             if (mTarget.get() != null) {
@@ -105,26 +85,14 @@ public class GistListActivity extends BaseActivity implements OnItemClickListene
             }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
         @Override
         protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, true);
-            }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
         @Override
         protected void onPostExecute(List<Gist> result) {
             if (mTarget.get() != null) {
                 GistListActivity activity = mTarget.get();
-                activity.mLoadingDialog.dismiss();
     
                 if (mException) {
                     activity.showError();
@@ -136,11 +104,6 @@ public class GistListActivity extends BaseActivity implements OnItemClickListene
         }
     }
     
-    /**
-     * Fill data into UI components.
-     *
-     * @param gists the gists
-     */
     private void fillData(List<Gist> gists) {
         ListView listView = (ListView) findViewById(R.id.list_view);
         listView.setOnItemClickListener(this);
@@ -159,9 +122,6 @@ public class GistListActivity extends BaseActivity implements OnItemClickListene
         adapter.notifyDataSetChanged();
     }
 
-    /* (non-Javadoc)
-     * @see android.widget.AdapterView.OnItemClickListener#onItemClick(android.widget.AdapterView, android.view.View, int, long)
-     */
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         Gist gist = (Gist) adapterView.getAdapter().getItem(position);

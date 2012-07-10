@@ -259,7 +259,11 @@
     <string name="object_view_history">History</string>
     
     <!-- Gist -->
-    <string name="gist">Gist</string>
+    <plurals name="gist">
+        <item quantity="one">Gist</item>
+        <item quantity="other">Gists</item>
+    </plurals>
+    <string name="gists">Gists</string>
     <string name="gist_public">Public Gist</string>
     <string name="gist_filename">Gist - %1$s</string>
     

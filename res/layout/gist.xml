@@ -1,75 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res/com.gh4a"
+    android:id="@id/main_content"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical">
-    <ScrollView
-        android:id="@id/main_content"
+    android:layout_margin="0dp"
+    android:padding="0dp">
+    <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_margin="0dp"
-        android:padding="0dp">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+        <TextView
+            android:id="@+id/tv_desc"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/tv_created_at"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
         <LinearLayout
+            android:id="@+id/ll_files"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:orientation="vertical">
-            <RelativeLayout
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent" >
-                <LinearLayout
-                    android:id="@+id/ll_repository_info"
-                    android:layout_height="fill_parent"
-                    android:orientation="vertical"
-                    android:layout_width="match_parent">
-                    <LinearLayout
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
-                        android:orientation="horizontal">
-                        <TextView
-                            android:id="@+id/tv_login_label"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceLarge"
-                            android:text="@string/repo_owner" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceLarge"
-                            android:text=" : " />
-                        <TextView
-                            android:id="@+id/tv_name"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="?attr/textAppearanceLink"
-                            android:textAppearance="?attr/textAppearanceLargeUrl" 
-                            android:singleLine="true"/>
-                    </LinearLayout>
-                    <TextView
-                        android:id="@+id/tv_gist_id"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
-                    <TextView
-                        android:id="@+id/tv_desc"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium" />
-                    <TextView
-                        android:id="@+id/tv_created_at"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-                </LinearLayout>
-            </RelativeLayout>
-            <LinearLayout
-                android:id="@+id/ll_files"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:orientation="vertical"
-                android:layout_margin="10dp">
-            </LinearLayout>
+            android:orientation="vertical"
+            android:layout_margin="10dp">
         </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+    </LinearLayout>
+</ScrollView>
