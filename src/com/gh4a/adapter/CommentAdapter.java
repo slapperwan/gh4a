@@ -21,7 +21,6 @@ import org.eclipse.egit.github.core.Comment;
 import org.xml.sax.XMLReader;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.text.Editable;
 import android.text.Html;
@@ -101,11 +100,7 @@ public class CommentAdapter extends RootAdapter<Comment> {
                 }
             });
 
-            Resources res = v.getResources();
-            String extraData = String.format(res.getString(R.string.more_comment_data), comment.getUser().getLogin(),
-                    pt.format(comment.getCreatedAt()));
-
-            viewHolder.tvExtra.setText(extraData);
+            viewHolder.tvExtra.setText(comment.getUser().getLogin() + "\n" + pt.format(comment.getCreatedAt()));
             
             String body = comment.getBody();
             body = body.replaceAll("\n", "<br/>");

@@ -1,21 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ListView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res/com.gh4a"
+    android:id="@+id/lv_comments"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical">
-    <FrameLayout
-        android:id="@id/main_content"
-        android:layout_height="match_parent"
-        android:layout_width="fill_parent"
-        android:orientation="vertical"
-        android:layout_weight="1">
-        <ListView
-            android:id="@+id/lv_comments"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:padding="0dp">
-        </ListView>
-    </FrameLayout>
-</LinearLayout>
+    android:padding="0dp" >
+</ListView>

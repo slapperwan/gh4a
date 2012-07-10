@@ -10,28 +10,28 @@
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="12dp"
     android:paddingLeft="16dp"
     android:paddingRight="16dp" >
     <ImageView
         android:id="@+id/iv_gravatar"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_marginRight="5dp"
         android:layout_marginTop="5dp" />
     <TextView
         android:id="@+id/tv_extra"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/default_text_micro"
+        android:textAppearance="@style/default_text_small"
         android:layout_toRightOf="@id/iv_gravatar" />
     <TextView
         android:id="@+id/tv_desc"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:layout_toRightOf="@id/iv_gravatar"
-        android:autoLink="web"
-        android:layout_below="@id/tv_extra" />
+        android:layout_below="@id/iv_gravatar"
+        android:autoLink="web" />
 </RelativeLayout>
