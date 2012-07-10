@@ -48,7 +48,6 @@ public class RepositoryAdapter extends RootAdapter<Repository> {
             Gh4Application app = (Gh4Application) mContext.getApplicationContext();
             Typeface boldCondensed = app.boldCondensed;
             Typeface regular = app.regular;
-            Typeface italic = app.italic;
             
             viewHolder = new ViewHolder();
             viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
@@ -58,7 +57,7 @@ public class RepositoryAdapter extends RootAdapter<Repository> {
             viewHolder.tvDesc.setTypeface(regular);
             
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-            viewHolder.tvExtra.setTypeface(italic);
+            viewHolder.tvExtra.setTextAppearance(mContext, R.style.default_text_micro);
             
             v.setTag(viewHolder);
         }
@@ -85,11 +84,11 @@ public class RepositoryAdapter extends RootAdapter<Repository> {
 
             if (viewHolder.tvExtra != null) {
                 String extraData = (repository.getLanguage() != null ? repository.getLanguage()
-                        + " | " : "")
+                        + "   " : "")
                         + StringUtils.toHumanReadbleFormat(repository.getSize())
-                        + " | "
+                        + "   "
                         + repository.getForks()
-                        + " forks | "
+                        + " forks   "
                         + repository.getWatchers()
                         + " watchers";
                 viewHolder.tvExtra.setText(extraData);

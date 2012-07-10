@@ -124,7 +124,6 @@ public class UserFragment extends SherlockFragment implements
             tlFollowers.setOnClickListener(this);
             
             TextView tvFollowers = (TextView) v.findViewById(R.id.tv_followers_label);
-            tvFollowers.setTypeface(condensed);
             tvFollowers.setText(R.string.user_followers);
             
             tlOrgMembers.setVisibility(View.GONE);
@@ -141,7 +140,6 @@ public class UserFragment extends SherlockFragment implements
         TableLayout tlFollowing = (TableLayout) v.findViewById(R.id.cell_following);
         if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
             TextView tvFollowing = (TextView) v.findViewById(R.id.tv_following_label);
-            tvFollowing.setTypeface(condensed);
             
             TextView tvFollowingCount = (TextView) v.findViewById(R.id.tv_following_count);
             tvFollowingCount.setTypeface(boldCondensed);
@@ -155,7 +153,6 @@ public class UserFragment extends SherlockFragment implements
         
         TableLayout tlRepos = (TableLayout) v.findViewById(R.id.cell_repos);
         TextView tvRepos = (TextView) v.findViewById(R.id.tv_repos_label);
-        tvRepos.setTypeface(condensed);
         
         TextView tvReposCount = (TextView) v.findViewById(R.id.tv_repos_count);
         tvReposCount.setTypeface(boldCondensed);
@@ -173,7 +170,6 @@ public class UserFragment extends SherlockFragment implements
         TableLayout tlGists = (TableLayout) v.findViewById(R.id.cell_gists);
         if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
             TextView tvGists = (TextView) v.findViewById(R.id.tv_gists_label);
-            tvGists.setTypeface(condensed);
             
             TextView tvGistsCount = (TextView) v.findViewById(R.id.tv_gists_count);
             tvGistsCount.setTypeface(boldCondensed);
@@ -332,7 +328,6 @@ public class UserFragment extends SherlockFragment implements
         Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
         Typeface boldCondensed = app.boldCondensed;
         Typeface regular = app.regular;
-        Typeface italic = app.italic;
         
         View v = getView();
         LinearLayout ll = (LinearLayout) v.findViewById(R.id.ll_top_repos);
@@ -357,7 +352,7 @@ public class UserFragment extends SherlockFragment implements
             tvDesc.setSingleLine(true);
             
             TextView tvExtra = (TextView) rowView.findViewById(R.id.tv_extra);
-            tvExtra.setTypeface(italic);
+            tvExtra.setTextAppearance(getSherlockActivity(), R.style.default_text_micro);
             
             tvTitle.setText(repository.getOwner().getLogin() + " / " + repository.getName());
             
@@ -370,11 +365,11 @@ public class UserFragment extends SherlockFragment implements
             }
             
             String extraData = (repository.getLanguage() != null ? repository.getLanguage()
-                    + " | " : "")
+                    + "   " : "")
                     + StringUtils.toHumanReadbleFormat(repository.getSize())
-                    + " | "
+                    + "   "
                     + repository.getForks()
-                    + " forks | "
+                    + " forks   "
                     + repository.getWatchers()
                     + " watchers";
             tvExtra.setText(extraData);
@@ -393,7 +388,6 @@ public class UserFragment extends SherlockFragment implements
         }
         
         TextView tvMore = new TextView(getSherlockActivity());
-        tvMore.setTypeface(italic);
         tvMore.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
         tvMore.setBackgroundResource(android.R.drawable.list_selector_background);
         if (!repos.isEmpty()) {

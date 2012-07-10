@@ -119,7 +119,7 @@
                             android:id="@+id/tv_followers_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?attr/textAppearanceSmall"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
                             android:text="@string/user_followers" />
                     </TableRow>
                 </TableLayout>
@@ -141,7 +141,7 @@
                             android:id="@+id/tv_following_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?attr/textAppearanceSmall"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
                             android:text="@string/user_following" />
                     </TableRow>
                 </TableLayout>
@@ -163,7 +163,7 @@
                             android:id="@+id/tv_repos_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?attr/textAppearanceSmall"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
                             android:text="@string/repo_short" />
                     </TableRow>
                 </TableLayout>
@@ -185,7 +185,7 @@
                             android:id="@+id/tv_gists_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?attr/textAppearanceSmall"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
                             android:text="@string/gists" />
                     </TableRow>
                 </TableLayout>

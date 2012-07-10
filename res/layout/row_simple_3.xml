@@ -19,7 +19,7 @@
         android:id="@+id/tv_title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="17sp" />
+        android:textAppearance="?android:attr/textAppearanceMedium" />
     <TextView
         android:id="@+id/tv_desc"
         android:layout_width="fill_parent"
