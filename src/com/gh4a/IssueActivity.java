@@ -39,11 +39,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -142,18 +144,21 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         tvExtra.setText(getResources().getString(R.string.issue_open_by_user,
                 mIssue.getUser().getLogin(),
                 pt.format(mIssue.getCreatedAt())));
-        
-        tvState.setText(mIssue.getState());
+        tvState.setTextColor(Color.WHITE);
         if ("closed".equals(mIssue.getState())) {
             tvState.setBackgroundResource(R.drawable.default_red_box);
+            tvState.setText("C\nL\nO\nS\nE\nD");
         }
         else {
             tvState.setBackgroundResource(R.drawable.default_green_box);
+            tvState.setText("O\nP\nE\nN");
         }
         tvTitle.setText(mIssue.getTitle());
         tvTitle.setTypeface(boldCondensed);
         
+        boolean showInfoBox = false;
         if (mIssue.getAssignee() != null) {
+            showInfoBox = true;
             TextView tvAssignee = (TextView) mHeader.findViewById(R.id.tv_assignee);
             tvAssignee.setText(mIssue.getAssignee().getLogin() + " is assigned");
             tvAssignee.setVisibility(View.VISIBLE);
@@ -180,6 +185,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         }
         
         if (mIssue.getMilestone() != null) {
+            showInfoBox = true;
             tvMilestone.setText(getResources().getString(R.string.issue_milestone) + ": " + mIssue.getMilestone().getTitle());
         }
         else {
@@ -198,11 +204,12 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         List<Label> labels = mIssue.getLabels();
         
         if (labels != null && !labels.isEmpty()) {
+            showInfoBox = true;
             for (Label label : labels) {
                 TextView tvLabel = new TextView(this);
                 tvLabel.setSingleLine(true);
                 tvLabel.setText(label.getName());
-                tvLabel.setTextAppearance(this, R.style.default_text_micro);
+                tvLabel.setTextAppearance(this, R.style.default_text_small);
                 tvLabel.setBackgroundColor(Color.parseColor("#" + label.getColor()));
                 tvLabel.setPadding(5, 2, 5, 2);
                 int r = Color.red(Color.parseColor("#" + label.getColor()));
@@ -215,6 +222,10 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
                     tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_light));
                 }
                 llLabels.addView(tvLabel);
+                
+                View v = new View(this);
+                v.setLayoutParams(new LayoutParams(5, LayoutParams.WRAP_CONTENT));
+                llLabels.addView(v);
             }
         }
         else {
@@ -224,8 +235,14 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         TextView tvPull = (TextView) mHeader.findViewById(R.id.tv_pull);
         if (mIssue.getPullRequest() != null
                 && mIssue.getPullRequest().getDiffUrl() != null) {
+            showInfoBox = true;
             tvPull.setVisibility(View.VISIBLE);
             tvPull.setOnClickListener(this);
+        }
+        
+        if (!showInfoBox) {
+            RelativeLayout rl = (RelativeLayout) mHeader.findViewById(R.id.info_box);
+            rl.setVisibility(View.GONE);
         }
     }
 
@@ -423,7 +440,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
                             false);
                     TextView tvState = (TextView)activity.findViewById(R.id.tv_state);
                     tvState.setBackgroundResource(R.drawable.default_red_box);
-                    tvState.setText("closed");
+                    tvState.setText("C\nL\nO\nS\nE\nD");
                 }
             }
         }
@@ -487,7 +504,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
                             false);
                     TextView tvState = (TextView)activity.findViewById(R.id.tv_state);
                     tvState.setBackgroundResource(R.drawable.default_green_box);
-                    tvState.setText("open");
+                    tvState.setText("O\nP\nE\nN");
                 }
             }
         }
