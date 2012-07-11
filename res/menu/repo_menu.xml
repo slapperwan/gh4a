@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/watch_action" android:title="@string/repo_watch_action" />
-    <item android:id="@+id/unwatch_action" android:title="@string/repo_unwatch_action" />
-    <item android:id="@+id/fork_action" android:title="@string/repo_fork_action" />
+    <item android:id="@+id/branches" 
+        android:title="@string/repo_branch"
+        android:showAsAction="always" />
+    
+    <item android:id="@+id/tags"
+        android:title="@string/repo_tag"
+        android:showAsAction="never" />
 </menu>

@@ -37,13 +37,12 @@ import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.adapter.FileAdapter;
 import com.gh4a.loader.ContentListLoader;
-import com.gh4a.loader.RepositoryLoader;
+import com.gh4a.utils.StringUtils;
 
 public class ContentListFragment extends SherlockFragment 
-    implements LoaderManager.LoaderCallbacks, OnItemClickListener {
+    implements LoaderManager.LoaderCallbacks<List<Content>>, OnItemClickListener {
 
-    private String mRepoOwner;
-    private String mRepoName;
+    private Repository mRepository;
     public String mPath;
     public String mRef;
     private ListView mListView;
@@ -51,15 +50,14 @@ public class ContentListFragment extends SherlockFragment
     private OnTreeSelectedListener mCallback;
     private List<Content> mContents;
 
-    public static ContentListFragment newInstance(String repoOwner, String repoName,
+    public static ContentListFragment newInstance(Repository repository,
             String path, String ref) {
         ContentListFragment f = new ContentListFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.Repository.REPO_OWNER, repoOwner);
-        args.putString(Constants.Repository.REPO_NAME, repoName);
         args.putString(Constants.Object.PATH, path);
         args.putString(Constants.Object.REF, ref);
+        args.putSerializable("REPOSITORY", repository);
         f.setArguments(args);
         
         return f;
@@ -69,10 +67,12 @@ public class ContentListFragment extends SherlockFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        mRepoOwner = getArguments().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.REPO_NAME);
+        mRepository = (Repository) getArguments().getSerializable("REPOSITORY");
         mPath = getArguments().getString(Constants.Object.PATH);
         mRef = getArguments().getString(Constants.Object.REF);
+        if (StringUtils.isBlank(mRef)) {
+            mRef = mRepository.getMasterBranch();
+        }
     }
     
     @Override
@@ -105,9 +105,7 @@ public class ContentListFragment extends SherlockFragment
             mListView.setAdapter(mAdapter);
             
             getLoaderManager().initLoader(0, null, this);
-            
-            getLoaderManager().initLoader(1, null, this);
-            getLoaderManager().getLoader(1).forceLoad();
+            getLoaderManager().getLoader(0).forceLoad();
         }
         else {
             mAdapter = new FileAdapter(getSherlockActivity(), mContents);
@@ -128,24 +126,14 @@ public class ContentListFragment extends SherlockFragment
     }
     
     @Override
-    public Loader onCreateLoader(int id, Bundle args) {
-        if (id == 0) {
-            return new ContentListLoader(getSherlockActivity(), mRepoOwner, mRepoName, mPath, mRef);
-        }
-        else {
-            return new RepositoryLoader(getSherlockActivity(), mRepoOwner, mRepoName);            
-        }
+    public Loader<List<Content>> onCreateLoader(int id, Bundle args) {
+        return new ContentListLoader(getSherlockActivity(), mRepository.getOwner().getLogin(),
+                mRepository.getName(), mPath, mRef);
     }
 
     @Override
-    public void onLoadFinished(Loader loader, Object object) {
-        if (loader.getId() == 0) {
-            fillData((List<Content>) object);
-        }
-        else {
-            mRef = ((Repository) object).getMasterBranch();
-            getLoaderManager().getLoader(0).forceLoad();
-        }
+    public void onLoadFinished(Loader<List<Content>> loader, List<Content> contents) {
+        fillData(contents);
     }
 
     @Override

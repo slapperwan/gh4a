@@ -38,8 +38,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
@@ -55,23 +53,21 @@ import com.gh4a.R;
 import com.gh4a.WatcherListActivity;
 import com.gh4a.WikiListActivity;
 import com.gh4a.loader.ReadmeLoader;
-import com.gh4a.loader.RepositoryLoader;
 import com.gh4a.utils.StringUtils;
 import com.petebevin.markdown.MarkdownProcessor;
 
 public class RepositoryFragment extends SherlockFragment implements 
-    OnClickListener, OnItemClickListener, LoaderManager.LoaderCallbacks {
+    OnClickListener, LoaderManager.LoaderCallbacks<Content> {
 
+    private Repository mRepository;
     private String mRepoOwner;
     private String mRepoName;
-    private Repository mRepository;
     
-    public static RepositoryFragment newInstance(String repoOwner, String repoName) {
+    public static RepositoryFragment newInstance(Repository repository) {
         RepositoryFragment f = new RepositoryFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.Repository.REPO_OWNER, repoOwner);
-        args.putString(Constants.Repository.REPO_NAME, repoName);
+        args.putSerializable("REPOSITORY", repository);
         f.setArguments(args);
         
         return f;
@@ -80,8 +76,9 @@ public class RepositoryFragment extends SherlockFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.REPO_NAME);
+        mRepository = (Repository) getArguments().getSerializable("REPOSITORY");
+        mRepoOwner = mRepository.getOwner().getLogin();
+        mRepoName = mRepository.getName();
     }
 
     @Override
@@ -95,8 +92,10 @@ public class RepositoryFragment extends SherlockFragment implements
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        getLoaderManager().initLoader(0, null, this);
-        getLoaderManager().getLoader(0).forceLoad();
+        fillData();
+        
+        getLoaderManager().initLoader(1, null, this);
+        getLoaderManager().getLoader(1).forceLoad();
     }
 
     public void fillData() {
@@ -404,39 +403,17 @@ public class RepositoryFragment extends SherlockFragment implements
     }
 
     @Override
-    public Loader onCreateLoader(int id, Bundle bundle) {
-        if (id == 0) {
-            return new RepositoryLoader(getSherlockActivity(), mRepoOwner, mRepoName);
-        }
-        else {
-            return new ReadmeLoader(getSherlockActivity(), mRepoOwner, mRepoName);
-        }
+    public Loader<Content> onCreateLoader(int id, Bundle bundle) {
+        return new ReadmeLoader(getSherlockActivity(), mRepoOwner, mRepoName);
     }
 
     @Override
-    public void onLoadFinished(Loader loader, Object object) {
-        if (object instanceof Repository) {
-            getLoaderManager().initLoader(1, null, this);
-            getLoaderManager().getLoader(1).forceLoad();
-            
-            if (object != null) {
-                this.mRepository = (Repository) object;
-                fillData();
-            }
-        }
-        else {
-            fillReadme((Content) object);
-        }
+    public void onLoadFinished(Loader<Content> loader, Content content) {
+        fillReadme(content);
     }
 
     @Override
     public void onLoaderReset(Loader arg0) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
         // TODO Auto-generated method stub
         
     }

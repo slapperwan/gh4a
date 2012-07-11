@@ -18,7 +18,7 @@ package com.gh4a.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.egit.github.core.RepositoryBranch;
+import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
@@ -42,26 +42,22 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.adapter.CommitAdapter;
-import com.gh4a.loader.GetBranchLoader;
 import com.gh4a.loader.PageIteratorLoader;
 
 public class CommitListFragment extends SherlockFragment 
-    implements LoaderManager.LoaderCallbacks, OnItemClickListener {
+    implements LoaderManager.LoaderCallbacks<List<RepositoryCommit>>, OnItemClickListener {
 
-    private String mRepoOwner;
-    private String mRepoName;
+    private Repository mRepository;
     private ListView mListView;
     private CommitAdapter mAdapter;
     private PageIterator<RepositoryCommit> mDataIterator;
-    private RepositoryBranch mBranch;
     
-    public static CommitListFragment newInstance(String repoOwner, String repoName) {
+    public static CommitListFragment newInstance(Repository repository) {
         
         CommitListFragment f = new CommitListFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.Repository.REPO_OWNER, repoOwner);
-        args.putString(Constants.Repository.REPO_NAME, repoName);
+        args.putSerializable("REPOSITORY", repository);
         f.setArguments(args);
         
         return f;
@@ -70,8 +66,7 @@ public class CommitListFragment extends SherlockFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.REPO_NAME);
+        mRepository = (Repository) getArguments().getSerializable("REPOSITORY");
     }
 
     @Override
@@ -90,6 +85,8 @@ public class CommitListFragment extends SherlockFragment
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         
+        loadData();
+        
         getLoaderManager().initLoader(0, null, this);
         getLoaderManager().getLoader(0).forceLoad();
     }
@@ -99,11 +96,8 @@ public class CommitListFragment extends SherlockFragment
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(app.getAuthToken());
         CommitService commitService = new CommitService(client);
-        mDataIterator = commitService.pageCommits(new RepositoryId(mRepoOwner, mRepoName), 
-                mBranch.getCommit().getSha(), null);
-        
-        getLoaderManager().initLoader(1, null, this);
-        getLoaderManager().getLoader(1).forceLoad();
+        mDataIterator = commitService.pageCommits(new RepositoryId(mRepository.getOwner().getLogin(), mRepository.getName()), 
+                mRepository.getMasterBranch(), null);
     }
     
     private void fillData(List<RepositoryCommit> commits) {
@@ -114,29 +108,17 @@ public class CommitListFragment extends SherlockFragment
     }
 
     @Override
-    public Loader onCreateLoader(int id, Bundle args) {
-        if (id == 0) {
-            return new GetBranchLoader(getSherlockActivity(), mRepoOwner, mRepoName, 
-                    null);
-        }
-        else {
-            return new PageIteratorLoader<RepositoryCommit>(getSherlockActivity(), mDataIterator);
-        }
+    public Loader<List<RepositoryCommit>> onCreateLoader(int id, Bundle args) {
+        return new PageIteratorLoader<RepositoryCommit>(getSherlockActivity(), mDataIterator);
     }
 
     @Override
-    public void onLoadFinished(Loader loader, Object object) {
-        if (loader instanceof GetBranchLoader) {
-            mBranch = (RepositoryBranch) object;
-            loadData();
-        }
-        else if (loader instanceof PageIteratorLoader) {
-            fillData((List<RepositoryCommit>) object);
-        }
+    public void onLoadFinished(Loader<List<RepositoryCommit>> loader, List<RepositoryCommit> commits) {
+        fillData(commits);
     }
 
     @Override
-    public void onLoaderReset(Loader arg0) {
+    public void onLoaderReset(Loader<List<RepositoryCommit>> arg0) {
         // TODO Auto-generated method stub
     }
     
