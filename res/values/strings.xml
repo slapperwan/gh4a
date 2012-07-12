@@ -43,6 +43,8 @@
     <string name="readme">Readme</string>
     <string name="ok">@android:string/ok</string>
     <string name="sort">Sort</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
     
     <!-- Activity event -->
     <string name="event_push_title">%1$s pushed to %2$s at %3$s</string>
@@ -236,6 +238,7 @@
     <string name="issue_clear_milestone">No milestone</string>
     <string name="issue_clear_assignee">No assignee</string>
     <string name="issue_open_by_user">by %1$s %2$s</string>
+    <string name="issue_manage_labels">Manage Labels</string>
 
     <!-- Issue comment -->
     <plurals name="issue_comment">

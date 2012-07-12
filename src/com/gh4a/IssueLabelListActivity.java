@@ -17,94 +17,63 @@ package com.gh4a;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.LabelService;
 
+import com.actionbarsherlock.app.ActionBar;
+
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.gh4a.adapter.SimpleStringAdapter;
-import com.gh4a.utils.StringUtils;
+public class IssueLabelListActivity extends BaseActivity {
 
-/**
- * The IssueLabelList activity.
- */
-public class IssueLabelListActivity extends BaseActivity implements OnItemClickListener {
-
-    /** The user login. */
-    private String mUserLogin;
-
-    /** The repo name. */
+    private String mRepoOwner;
     private String mRepoName;
-    
-    /** The loading dialog. */
-    protected LoadingDialog mLoadingDialog;
-    
-    /** The list view. */
     protected ListView mListView;
-    
-    /* (non-Javadoc)
-     * @see android.app.Activity#onCreate(android.os.Bundle)
-     */
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        setContentView(R.layout.generic_list);
-        setUpActionBar();
+        setContentView(R.layout.ll_placeholder);
         
-        mUserLogin = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
+        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
-
+        
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(R.string.issue_manage_labels);
+        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        
         new LoadIssueLabelsTask(this).execute();
     }
     
-    /**
-     * An asynchronous task that runs on a background thread
-     * to load issue labels.
-     */
     private static class LoadIssueLabelsTask extends AsyncTask<Void, Integer, List<Label>> {
 
-        /** The target. */
         private WeakReference<IssueLabelListActivity> mTarget;
-        
-        /** The exception. */
         private boolean mException;
 
-        /**
-         * Instantiates a new load issue task.
-         *
-         * @param activity the activity
-         */
         public LoadIssueLabelsTask(IssueLabelListActivity activity) {
             mTarget = new WeakReference<IssueLabelListActivity>(activity);
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
         @Override
         protected List<Label> doInBackground(Void... params) {
             if (mTarget.get() != null) {
@@ -112,7 +81,7 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
                     GitHubClient client = new GitHubClient();
                     client.setOAuth2Token(mTarget.get().getAuthToken());
                     LabelService labelService = new LabelService(client);
-                    return labelService.getLabels(mTarget.get().mUserLogin,
+                    return labelService.getLabels(mTarget.get().mRepoOwner,
                             mTarget.get().mRepoName);
                 }
                 catch (IOException e) {
@@ -126,27 +95,14 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
             }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
         @Override
         protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
-            }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
         @Override
         protected void onPostExecute(List<Label> result) {
             if (mTarget.get() != null) {
                 IssueLabelListActivity activity = mTarget.get();
-                activity.mLoadingDialog.dismiss();
-    
                 if (mException) {
                     activity.showError();
                 }
@@ -157,198 +113,188 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
         }
     }
     
-    /**
-     * Fill data into UI components.
-     *
-     * @param result the result
-     */
     private void fillData(List<Label> result) {
-        mListView = (ListView) findViewById(R.id.list_view);
-        mListView.setOnItemClickListener(this);
-        SimpleStringAdapter adapter = new SimpleStringAdapter(this, new ArrayList<String>());
-        mListView.setAdapter(adapter);
-        registerForContextMenu(mListView);
+        final Typeface boldCondensed = getApplicationContext().boldCondensed;
+        final Typeface condensed = getApplicationContext().condensed;
         
-        if (result != null && result.size() > 0) {
-            for (Label label : result) {
-                adapter.add(label.getName());
-            }
+        LinearLayout ll = (LinearLayout) findViewById(R.id.ll);
+        ll.removeAllViews();
+        
+        for (final Label label : result) {
+            final View rowView = getLayoutInflater().inflate(R.layout.row_issue_label, null);
+            final View viewColor = (View) rowView.findViewById(R.id.view_color);
+            
+            final EditText etLabel = (EditText) rowView.findViewById(R.id.et_label);
+            final TextView tvLabel = (TextView) rowView.findViewById(R.id.tv_title);
+            tvLabel.setTypeface(condensed);
+            tvLabel.setText(label.getName());
+            
+            viewColor.setBackgroundColor(Color.parseColor("#" + label.getColor()));
+            viewColor.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    LinearLayout llEdit = (LinearLayout) rowView.findViewById(R.id.ll_edit);
+                    if (llEdit.getVisibility() == View.VISIBLE) {
+                        llEdit.setVisibility(View.GONE);
+                        
+                        tvLabel.setTypeface(condensed);
+                        unselectLabel(tvLabel, viewColor, label.getColor());
+                    }
+                    else {
+                        llEdit.setVisibility(View.VISIBLE);
+                        
+                        tvLabel.setTypeface(boldCondensed);
+                        selectLabel(tvLabel, viewColor, label.getColor());
+                        etLabel.setText(label.getName());
+                    }
+                }
+            });
+            
+            tvLabel.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    LinearLayout llEdit = (LinearLayout) rowView.findViewById(R.id.ll_edit);
+                    if (llEdit.getVisibility() == View.VISIBLE) {
+                        llEdit.setVisibility(View.GONE);
+                        
+                        tvLabel.setTypeface(condensed);
+                        unselectLabel(tvLabel, viewColor, label.getColor());
+                    }
+                    else {
+                        llEdit.setVisibility(View.VISIBLE);
+                        
+                        tvLabel.setTypeface(boldCondensed);
+                        selectLabel(tvLabel, viewColor, label.getColor());
+                        etLabel.setText(label.getName());
+                    }
+                }
+            });
+            
+            final View color1 = (View) rowView.findViewById(R.id.color_444444);
+            color1.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color1.getTag());}
+            });
+            
+            final View color2 = (View) rowView.findViewById(R.id.color_02d7e1);
+            color2.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color2.getTag());}
+            });
+            
+            final View color3 = (View) rowView.findViewById(R.id.color_02e10c);
+            color3.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color3.getTag());}
+            });
+            
+            final View color4 = (View) rowView.findViewById(R.id.color_0b02e1);
+            color4.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color4.getTag());}
+            });
+            
+            final View color5 = (View) rowView.findViewById(R.id.color_d7e102);
+            color5.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color5.getTag());}
+            });
+            
+            final View color6 = (View) rowView.findViewById(R.id.color_DDDDDD);
+            color6.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color6.getTag());}
+            });
+            
+            final View color7 = (View) rowView.findViewById(R.id.color_e102d8);
+            color7.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color7.getTag());}
+            });
+            
+            final View color8 = (View) rowView.findViewById(R.id.color_e10c02);
+            color8.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color8.getTag());}
+            });
+            
+            Button btnSave = (Button) rowView.findViewById(R.id.btn_save);
+            btnSave.setOnClickListener(new OnClickListener() {
+                
+                @Override
+                public void onClick(View arg0) {
+                    String selectedColor = (String) tvLabel.getTag();
+                    String newLabelName = etLabel.getText().toString();
+                    new AddIssueLabelsTask(IssueLabelListActivity.this).execute(label.getName(), 
+                            newLabelName, selectedColor, "true");
+                }
+            });
+            
+            Button btnDelete = (Button) rowView.findViewById(R.id.btn_delete);
+            btnDelete.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View arg0) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(IssueLabelListActivity.this,
+                            android.R.style.Theme));
+                    builder.setTitle("Delete " + label.getName() + "?");
+                    builder.setMessage("Are you sure?");
+                    builder.setPositiveButton(R.string.ok,
+                            new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            dialog.dismiss();
+                            new DeleteIssueLabelsTask(IssueLabelListActivity.this).execute(label.getName());
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel,
+                            new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            dialog.dismiss();
+                        }
+                    })
+                   .create();
+                    
+                    builder.show();
+                }
+            });
+            
+            ll.addView(rowView);
+        }
+    }
+
+    private void selectLabel(TextView tvLabel, View viewColor, String color) {
+        tvLabel.setTag(color);
+        
+        viewColor.setBackgroundColor(Color.parseColor("#" + color));
+        tvLabel.setBackgroundColor(Color.parseColor("#" + color));
+        int r = Color.red(Color.parseColor("#" + color));
+        int g = Color.green(Color.parseColor("#" + color));
+        int b = Color.blue(Color.parseColor("#" + color));
+        if (r + g + b < 383) {
+            tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_dark));
         }
         else {
-            getApplicationContext().notFoundMessage(this, "Labels");
-        }
-        adapter.notifyDataSetChanged();
+            tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+        }                    
     }
+    
+    private void unselectLabel(TextView tvLabel, View viewColor, String color) {
+        tvLabel.setTag(color);
+        tvLabel.setBackgroundColor(Color.WHITE);
+        tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+        viewColor.setBackgroundColor(Color.parseColor("#" + color));
+    }
+    
+    private static class DeleteIssueLabelsTask extends AsyncTask<String, Void, Void> {
 
-    /* (non-Javadoc)
-     * @see android.widget.AdapterView.OnItemClickListener#onItemClick(android.widget.AdapterView, android.view.View, int, long)
-     */
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        SimpleStringAdapter adapter = (SimpleStringAdapter) adapterView.getAdapter();
-        String label = (String) adapter.getItem(position);
-        
-//        Intent intent = new Intent().setClass(this, IssueListByLabelActivity.class);
-//        intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
-//        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-//        intent.putExtra(Constants.Issue.ISSUE_LABEL, label);
-//        startActivity(intent);
-    }
-    
-    /* (non-Javadoc)
-     * @see android.app.Activity#onPrepareOptionsMenu(android.view.Menu)
-     */
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        if (isAuthorized()) {
-            menu.clear();
-            MenuInflater inflater = getSupportMenuInflater();
-            inflater.inflate(R.menu.labels_menu, menu);
-        }
-        return true;
-    }
-    
-    /* (non-Javadoc)
-     * @see com.gh4a.BaseActivity#setMenuOptionItemSelected(android.view.MenuItem)
-     */
-    @Override
-    public boolean setMenuOptionItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.create_label:
-                if (isAuthorized()) {
-                    showCreateLabelForm();
-                }
-                else {
-                    Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-                return true;
-            default:
-                return true;
-        }
-    }
-    
-    /**
-     * Show create label form.
-     */
-    private void showCreateLabelForm() {
-        final Dialog dialog = new Dialog(this);
-
-        dialog.setContentView(R.layout.issue_create_label);
-        dialog.setTitle("Create Label");
-        dialog.setCancelable(true);
-        
-        final TextView tvLabel = (TextView) dialog.findViewById(R.id.et_title);
-        Button btnCreate = (Button) dialog.findViewById(R.id.btn_create);
-        btnCreate.setOnClickListener(new OnClickListener() {
-            
-            @Override
-            public void onClick(View arg0) {
-                String label = tvLabel.getText().toString();
-                if (!StringUtils.isBlank(label)) {
-                    dialog.dismiss();
-                    new AddIssueLabelsTask(IssueLabelListActivity.this).execute(label);
-                }
-                else {
-                    showMessage(getResources().getString(R.string.issue_error_label), false);
-                }
-            }
-        });
-        
-        dialog.show();
-    }
-    
-    /* (non-Javadoc)
-     * @see android.app.Activity#onCreateContextMenu(android.view.ContextMenu, android.view.View, android.view.ContextMenu.ContextMenuInfo)
-     */
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-        if (isAuthorized()) {
-            if (v.getId() == R.id.list_view) {
-                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-                String label = (String) mListView.getItemAtPosition(info.position);
-                
-                menu.setHeaderTitle(label);
-                menu.add(0, Menu.FIRST + 1, 0, "Delete");
-                menu.add(0, Menu.FIRST + 2, 0, "View Issues");
-            }
-        }
-    }
-    
-    /* (non-Javadoc)
-     * @see android.app.Activity#onContextItemSelected(android.view.MenuItem)
-     */
-    @Override
-    public boolean onContextItemSelected(android.view.MenuItem item) {
-        final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        switch (item.getItemId()) {
-        case Menu.FIRST + 1:
-            //try {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage("Are you sure?")
-                       .setCancelable(false)
-                       .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                           public void onClick(DialogInterface dialog, int id) {
-                               dialog.dismiss();
-                               new DeleteIssueLabelsTask(IssueLabelListActivity.this).execute(info.position);
-                           }
-                       })
-                       .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                           public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                           }
-                       });
-                AlertDialog alert = builder.create();
-                alert.show();
-//            }
-//            catch (IOException e) {
-//                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-//                showMessage(getResources().getString(R.string.issue_error_delete_label), false);
-//            }
-            break;
-        case Menu.FIRST + 2:
-            String label = (String) mListView.getItemAtPosition(info.position);
-//            Intent intent = new Intent().setClass(this, IssueListByLabelActivity.class);
-//            intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
-//            intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-//            intent.putExtra(Constants.Issue.ISSUE_LABEL, label);
-//            startActivity(intent);
-            break;
-        default:
-            break;
-        }
-        
-        return true;
-    }
-    
-    /**
-     * An asynchronous task that runs on a background thread
-     * to delete issue labels.
-     */
-    private static class DeleteIssueLabelsTask extends AsyncTask<Integer, Void, Void> {
-
-        /** The target. */
         private WeakReference<IssueLabelListActivity> mTarget;
-        
-        /** The exception. */
         private boolean mException;
         
-        /**
-         * Instantiates a new load issue list task.
-         *
-         * @param activity the activity
-         */
         public DeleteIssueLabelsTask(IssueLabelListActivity activity) {
             mTarget = new WeakReference<IssueLabelListActivity>(activity);
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
         @Override
-        protected Void doInBackground(Integer... params) {
+        protected Void doInBackground(String... params) {
             if (mTarget.get() != null) {
                 try {
                     IssueLabelListActivity activity = mTarget.get();
@@ -356,10 +302,8 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
                     client.setOAuth2Token(mTarget.get().getAuthToken());
                     LabelService labelService = new LabelService(client);
                     
-                    String label = (String) activity.mListView.getItemAtPosition(params[0]);
-                    label = StringUtils.encodeUrl(label);
-                    
-                    labelService.deleteLabel(activity.mUserLogin, activity.mRepoName, label);
+                    String labelName = params[0];
+                    labelService.deleteLabel(activity.mRepoOwner, activity.mRepoName, labelName);
                 }
                 catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
@@ -369,26 +313,14 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
             return null;
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
         @Override
         protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, false);
-            }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
         @Override
         protected void onPostExecute(Void result) {
             if (mTarget.get() != null) {
                 IssueLabelListActivity activity = mTarget.get();
-                activity.mLoadingDialog.dismiss();
     
                 if (mException) {
                     activity.showError();
@@ -400,31 +332,15 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
         }
     }
     
-    /**
-     * An asynchronous task that runs on a background thread
-     * to add issue labels.
-     */
     private static class AddIssueLabelsTask extends AsyncTask<String, Void, Void> {
 
-        /** The target. */
         private WeakReference<IssueLabelListActivity> mTarget;
-        
-        /** The exception. */
         private boolean mException;
         
-        /**
-         * Instantiates a new load issue list task.
-         *
-         * @param activity the activity
-         */
         public AddIssueLabelsTask(IssueLabelListActivity activity) {
             mTarget = new WeakReference<IssueLabelListActivity>(activity);
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
         @Override
         protected Void doInBackground(String... params) {
             if (mTarget.get() != null) {
@@ -435,12 +351,21 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
                     LabelService labelService = new LabelService(client);
                     
                     String labelName = params[0];
+                    String newLabelName = params[1];
+                    String color = params[2];
+                    boolean edit = Boolean.valueOf(params[3]);
                     //labelName = StringUtils.encodeUrl(labelName);
                     
                     Label label = new Label();
-                    label.setName(labelName);
+                    label.setName(newLabelName);
+                    label.setColor(color);
                     
-                    labelService.createLabel(activity.mUserLogin, activity.mRepoName, label);
+                    if (edit) {
+                        labelService.editLabel(new RepositoryId(activity.mRepoOwner, activity.mRepoName), labelName, label);
+                    }
+                    else {
+                        labelService.createLabel(activity.mRepoOwner, activity.mRepoName, label);
+                    }
                 }
                 catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
@@ -450,26 +375,14 @@ public class IssueLabelListActivity extends BaseActivity implements OnItemClickL
             return null;
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
         @Override
         protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, false);
-            }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
         @Override
         protected void onPostExecute(Void result) {
             if (mTarget.get() != null) {
                 IssueLabelListActivity activity = mTarget.get();
-                activity.mLoadingDialog.dismiss();
     
                 if (mException) {
                     activity.showMessage(activity.getResources().getString(R.string.issue_error_create_label), false);
