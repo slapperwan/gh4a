@@ -72,7 +72,6 @@ public class SearchActivity extends BaseActivity {
         registerForContextMenu(mListViewResults);
 
         final Spinner languageSpinner = (Spinner) findViewById(R.id.spinner_language);
-        final Spinner searchTypeSpinner = (Spinner) findViewById(R.id.spinner_search_type);
         final EditText etSearchKey = (EditText) findViewById(R.id.et_search);
         ImageButton btnSearch = (ImageButton) findViewById(R.id.btn_search);
 
@@ -83,15 +82,7 @@ public class SearchActivity extends BaseActivity {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     String searchKey = etSearchKey.getText().toString();
                     String selectedLanguage = (String) languageSpinner.getSelectedItem();
-                    if (searchTypeSpinner.getSelectedItemPosition() == 1) {
-                        mSearchByUser = true;
-                        searchUser(searchKey);
-                    }
-                    else {
-                        mSearchByUser = false;
-                        searchRepository(searchKey, selectedLanguage);
-                    }
-
+                    searchRepository(searchKey, selectedLanguage);
                     hideKeyboard(etSearchKey.getWindowToken());
 
                     return true;
@@ -107,15 +98,7 @@ public class SearchActivity extends BaseActivity {
             public void onClick(View v) {
                 String searchKey = etSearchKey.getText().toString();
                 String selectedLanguage = (String) languageSpinner.getSelectedItem();
-                if (searchTypeSpinner.getSelectedItemPosition() == 1) {
-                    mSearchByUser = true;
-                    searchUser(searchKey);
-                }
-                else {
-                    mSearchByUser = false;
-                    searchRepository(searchKey, selectedLanguage);
-                }
-
+                searchRepository(searchKey, selectedLanguage);
                 hideKeyboard(etSearchKey.getWindowToken());
             }
         });
@@ -123,7 +106,6 @@ public class SearchActivity extends BaseActivity {
 
     protected void searchRepository(final String searchKey, final String language) {
         mListViewResults.setOnItemClickListener(new OnRepositoryClickListener(this));
-
         repositories = new ArrayList<SearchRepository>();
         repositoryAdapter = new SearchRepositoryAdapter(this, repositories);
         mListViewResults.setAdapter(repositoryAdapter);
@@ -132,13 +114,8 @@ public class SearchActivity extends BaseActivity {
 
     protected void searchUser(final String searchKey) {
         mListViewResults.setOnItemClickListener(new OnUserClickListener(this));
-        mListViewResults.setOnScrollListener(null);// reset listener as the API
-                                                   // doesn't have the
-                                                   // pagination
-
         userAdapter = new UserAdapter(this, new ArrayList<User>(), R.layout.row_gravatar_1, true);
         mListViewResults.setAdapter(userAdapter);
-
         new LoadUserTask(this).execute(new String[] { searchKey });
     }
 
