@@ -35,6 +35,7 @@ import com.gh4a.fragment.ContentListFragment.OnTreeSelectedListener;
 import com.gh4a.fragment.RepositoryFragment;
 import com.gh4a.loader.BranchListLoader;
 import com.gh4a.loader.RepositoryLoader;
+import com.gh4a.loader.TagListLoader;
 import com.gh4a.utils.StringUtils;
 
 public class RepositoryActivity extends BaseSherlockFragmentActivity
@@ -276,6 +277,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
                 getSupportLoaderManager().getLoader(1).forceLoad();
                 return true;
             case R.id.tags:
+                getSupportLoaderManager().getLoader(2).forceLoad();
                 return true;    
             default:
                 return true;
@@ -287,8 +289,11 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         if (id == 0) {
             return new RepositoryLoader(this, mRepoOwner, mRepoName);
         }
-        else {
+        else if (id == 1) {
             return new BranchListLoader(this, mRepoOwner, mRepoName);
+        }
+        else {
+            return new TagListLoader(this, mRepoOwner, mRepoName);
         }
     }
 
@@ -301,6 +306,10 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         else if (loader.getId() == 1) {
             this.mBranches = (List<RepositoryBranch>) object;
             showBranchesDialog();
+        }
+        else {
+            this.mTags = (List<RepositoryTag>) object;
+            showTagsDialog();
         }
     }
 
@@ -318,13 +327,55 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         
         AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme));
         builder.setCancelable(true);
-        builder.setTitle(R.string.issue_filter_by_milestone);
-        builder.setSingleChoiceItems(branchList, 0, new DialogInterface.OnClickListener() {
+        builder.setTitle(R.string.repo_branches);
+        builder.setSingleChoiceItems(branchList, -1, new DialogInterface.OnClickListener() {
             
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 mSelectedRef = mBranches.get(which).getCommit().getSha();
                 mSelectBranchTag = mBranches.get(which).getName();
+            }
+        });
+        
+        builder.setPositiveButton(R.string.ok,
+                new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent().setClass(RepositoryActivity.this, RepositoryActivity.class);
+                intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                intent.putExtra(Constants.Repository.SELECTED_REF, mSelectedRef);
+                intent.putExtra(Constants.Repository.SELECTED_BRANCHTAG_NAME, mSelectBranchTag);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                dialog.dismiss();
+            }
+        })
+        .setNegativeButton(R.string.cancel,
+                new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        })
+       .create();
+        
+        builder.show();
+    }
+    
+    private void showTagsDialog() {
+        String[] tagList = new String[mTags.size()];
+        for (int i = 0; i < mTags.size(); i++) {
+            tagList[i] = mTags.get(i).getName();
+        }
+        
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme));
+        builder.setCancelable(true);
+        builder.setTitle(R.string.repo_tags);
+        builder.setSingleChoiceItems(tagList, -1, new DialogInterface.OnClickListener() {
+            
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mSelectedRef = mTags.get(which).getCommit().getSha();
+                mSelectBranchTag = mTags.get(which).getName();
             }
         });
         
