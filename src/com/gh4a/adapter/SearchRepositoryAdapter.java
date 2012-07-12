@@ -17,7 +17,6 @@ package com.gh4a.adapter;
 
 import java.util.List;
 
-import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.SearchRepository;
 
 import android.content.Context;
@@ -31,41 +30,12 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
-/**
- * The Repository adapter.
- */
 public class SearchRepositoryAdapter extends RootAdapter<SearchRepository> {
 
-    /** The row layout. */
-    protected int mRowLayout;
-
-    /**
-     * Instantiates a new repository adapter.
-     * 
-     * @param context the context
-     * @param objects the objects
-     */
     public SearchRepositoryAdapter(Context context, List<SearchRepository> objects) {
         super(context, objects);
     }
 
-    /**
-     * Instantiates a new repository adapter.
-     * 
-     * @param context the context
-     * @param objects the objects
-     * @param rowLayout the row layout
-     */
-    public SearchRepositoryAdapter(Context context, List<SearchRepository> objects, int rowLayout) {
-        super(context, objects);
-        mRowLayout = rowLayout;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.adapter.RootAdapter#doGetView(int, android.view.View,
-     * android.view.ViewGroup)
-     */
     @Override
     public View doGetView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
@@ -73,7 +43,7 @@ public class SearchRepositoryAdapter extends RootAdapter<SearchRepository> {
 
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(mRowLayout, null);
+            v = vi.inflate(R.layout.row_simple_3, null);
 
             Gh4Application app = (Gh4Application) mContext.getApplicationContext();
             Typeface boldCondensed = app.boldCondensed;
@@ -91,9 +61,8 @@ public class SearchRepositoryAdapter extends RootAdapter<SearchRepository> {
             
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
             if (viewHolder.tvExtra != null) {
-                viewHolder.tvExtra.setTypeface(italic);
+                viewHolder.tvExtra.setTextAppearance(mContext, R.style.default_text_micro);
             }
-            
             v.setTag(viewHolder);
         }
         else {
@@ -119,11 +88,11 @@ public class SearchRepositoryAdapter extends RootAdapter<SearchRepository> {
 
             if (viewHolder.tvExtra != null) {
                 String extraData = (repository.getLanguage() != null ? repository.getLanguage()
-                        + " | " : "")
+                        + "   " : "")
                         + StringUtils.toHumanReadbleFormat(repository.getSize())
-                        + " | "
+                        + "   "
                         + repository.getForks()
-                        + " forks | "
+                        + " forks   "
                         + repository.getWatchers()
                         + " watchers";
                 viewHolder.tvExtra.setText(extraData);
@@ -132,18 +101,9 @@ public class SearchRepositoryAdapter extends RootAdapter<SearchRepository> {
         return v;
     }
 
-    /**
-     * The Class ViewHolder.
-     */
     private static class ViewHolder {
-        
-        /** The tv title. */
         public TextView tvTitle;
-        
-        /** The tv desc. */
         public TextView tvDesc;
-        
-        /** The tv extra. */
         public TextView tvExtra;
     }
 }

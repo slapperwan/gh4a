@@ -54,13 +54,13 @@
                 android:layout_gravity="center_vertical|center_horizontal|center"
                 android:layout_margin="0dp"
                 android:padding="0dp"
-                android:src="@drawable/ic_search">
+                android:src="@drawable/action_search">
             </ImageButton>
         </LinearLayout>
     </RelativeLayout>
     <FrameLayout
         android:id="@id/main_content"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:layout_width="fill_parent"
         android:orientation="vertical"
         android:layout_weight="1">
@@ -70,7 +70,4 @@
             android:layout_height="fill_parent">
         </ListView>
     </FrameLayout>
-    <include
-        layout="@layout/loading"
-        android:id="@+id/loading" />
 </LinearLayout>

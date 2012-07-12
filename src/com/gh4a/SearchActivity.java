@@ -37,8 +37,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
@@ -48,56 +46,28 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.adapter.SearchRepositoryAdapter;
 import com.gh4a.adapter.UserAdapter;
 import com.gh4a.utils.StringUtils;
 
-/**
- * The Search activity.
- */
 public class SearchActivity extends BaseActivity {
 
-    /** The loading dialog. */
-    protected LoadingDialog mLoadingDialog;
-
-    /** The repositories. */
     protected List<SearchRepository> repositories;
-
-    /** The user adapter. */
     protected UserAdapter userAdapter;
-
-    /** The repository adapter. */
     protected SearchRepositoryAdapter repositoryAdapter;
-
-    /** The list view results. */
     protected ListView mListViewResults;
-
-    /** The reloading. */
-    protected boolean mLoading;
-
-    /** The reload. */
-    protected boolean mReload;
-
-    /** The first time search. */
-    protected boolean mFirstTimeSearch;
-
-    /** The page. */
-    protected int mPage = 1;
-
-    /** The search by user. */
     protected boolean mSearchByUser;// flag to search user or repo
 
-    /*
-     * (non-Javadoc)
-     * @see android.app.Activity#onCreate(android.os.Bundle)
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.search);
-        setUpActionBar();
 
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(R.string.search);
+        
         mListViewResults = (ListView) findViewById(R.id.list_search);
         registerForContextMenu(mListViewResults);
 
@@ -111,8 +81,6 @@ public class SearchActivity extends BaseActivity {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    mFirstTimeSearch = true;
-                    mPage = 1;// reset to 1;
                     String searchKey = etSearchKey.getText().toString();
                     String selectedLanguage = (String) languageSpinner.getSelectedItem();
                     if (searchTypeSpinner.getSelectedItemPosition() == 1) {
@@ -137,8 +105,6 @@ public class SearchActivity extends BaseActivity {
 
             @Override
             public void onClick(View v) {
-                mFirstTimeSearch = true;
-                mPage = 1;// reset to 1;
                 String searchKey = etSearchKey.getText().toString();
                 String selectedLanguage = (String) languageSpinner.getSelectedItem();
                 if (searchTypeSpinner.getSelectedItemPosition() == 1) {
@@ -155,29 +121,15 @@ public class SearchActivity extends BaseActivity {
         });
     }
 
-    /**
-     * Search repository.
-     * 
-     * @param searchKey the search key
-     * @param language the language
-     */
     protected void searchRepository(final String searchKey, final String language) {
         mListViewResults.setOnItemClickListener(new OnRepositoryClickListener(this));
 
         repositories = new ArrayList<SearchRepository>();
-        repositoryAdapter = new SearchRepositoryAdapter(this, repositories, R.layout.row_simple_3);
+        repositoryAdapter = new SearchRepositoryAdapter(this, repositories);
         mListViewResults.setAdapter(repositoryAdapter);
-        mListViewResults
-                .setOnScrollListener(new RepositoryScrollListener(this, searchKey, language));
-
         new LoadRepositoryTask(this).execute(new String[] { searchKey, language, "true" });
     }
 
-    /**
-     * Search user.
-     * 
-     * @param searchKey the search key
-     */
     protected void searchUser(final String searchKey) {
         mListViewResults.setOnItemClickListener(new OnUserClickListener(this));
         mListViewResults.setOnScrollListener(null);// reset listener as the API
@@ -190,12 +142,6 @@ public class SearchActivity extends BaseActivity {
         new LoadUserTask(this).execute(new String[] { searchKey });
     }
 
-    /**
-     * Gets the users.
-     * 
-     * @param searchKey the search key
-     * @return the users
-     */
     protected List<User> getUsers(String searchKey) throws IOException {
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(getAuthToken());
@@ -211,29 +157,14 @@ public class SearchActivity extends BaseActivity {
         return users;
     }
 
-    /**
-     * Callback to be invoked when user in the AdapterView has been clicked.
-     */
     private static class OnUserClickListener implements OnItemClickListener {
 
-        /** The target. */
         private WeakReference<SearchActivity> mTarget;
 
-        /**
-         * Instantiates a new on user click listener.
-         *
-         * @param activity the activity
-         */
         public OnUserClickListener(SearchActivity activity) {
             mTarget = new WeakReference<SearchActivity>(activity);
         }
 
-        /*
-         * (non-Javadoc)
-         * @see
-         * android.widget.AdapterView.OnItemClickListener#onItemClick(android
-         * .widget.AdapterView, android.view.View, int, long)
-         */
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
             if (mTarget.get() != null) {
@@ -246,9 +177,6 @@ public class SearchActivity extends BaseActivity {
         }
     }
 
-    /**
-     * Fill repositories data to UI.
-     */
     protected void fillRepositoriesData() {
         if (repositories != null && repositories.size() > 0) {
             repositoryAdapter.notifyDataSetChanged();
@@ -259,11 +187,6 @@ public class SearchActivity extends BaseActivity {
         repositoryAdapter.notifyDataSetChanged();
     }
 
-    /**
-     * Fill users data to UI.
-     * 
-     * @param users the users
-     */
     protected void fillUsersData(List<User> users) {
         if (users != null && users.size() > 0) {
             for (User user : users) {
@@ -273,79 +196,6 @@ public class SearchActivity extends BaseActivity {
         userAdapter.notifyDataSetChanged();
     }
 
-    /**
-     * Callback to be invoked when the list/grid of Repository has been
-     * scrolled.
-     */
-    private static class RepositoryScrollListener implements OnScrollListener {
-
-        /** The search key. */
-        private String searchKey;
-
-        /** The language. */
-        private String language;
-
-        /** The target. */
-        private WeakReference<SearchActivity> mTarget;
-
-        /**
-         * Instantiates a new repository scoll listener.
-         *
-         * @param activity the activity
-         * @param searchKey the search key
-         * @param language the language
-         */
-        public RepositoryScrollListener(SearchActivity activity, String searchKey, String language) {
-            super();
-            this.searchKey = searchKey;
-            this.language = language;
-            mTarget = new WeakReference<SearchActivity>(activity);
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see
-         * android.widget.AbsListView.OnScrollListener#onScrollStateChanged(
-         * android.widget.AbsListView, int)
-         */
-        @Override
-        public void onScrollStateChanged(AbsListView view, int scrollState) {
-            if (mTarget.get() != null) {
-                if (mTarget.get().mReload && scrollState == SCROLL_STATE_IDLE) {
-                    new LoadRepositoryTask(mTarget.get()).execute(new String[] { searchKey, language,
-                            "false" });
-                    mTarget.get().mReload = false;
-                }
-            }
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see
-         * android.widget.AbsListView.OnScrollListener#onScroll(android.widget
-         * .AbsListView, int, int, int)
-         */
-        @Override
-        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
-                int totalItemCount) {
-            if (mTarget.get() != null) {
-                if (!mTarget.get().mLoading && firstVisibleItem != 0
-                        && ((firstVisibleItem + visibleItemCount) == totalItemCount)) {
-                    mTarget.get().mReload = true;
-                    mTarget.get().mLoading = true;
-                }
-            }
-        }
-    }
-
-    /**
-     * Gets the repositories.
-     *
-     * @param searchKey the search key
-     * @param language the language
-     * @return the repositories
-     * @throws GitHubException the git hub exception
-     */
     protected List<SearchRepository> getRepositories(String searchKey, String language)
             throws IOException {
         GitHubClient client = new GitHubClient();
@@ -354,12 +204,11 @@ public class SearchActivity extends BaseActivity {
         
         if (!StringUtils.isBlank(searchKey)) {
             if ("Any Language".equals(language)) {
-                repositories = repoService.searchRepositories(searchKey, mPage);
+                repositories = repoService.searchRepositories(searchKey, 1);
             }
             else {
-                repositories = repoService.searchRepositories(searchKey, language, mPage);
+                repositories = repoService.searchRepositories(searchKey, language, 1);
             }
-            mPage++;
         }
         else {
             // TODO : show dialog
@@ -367,37 +216,18 @@ public class SearchActivity extends BaseActivity {
         return repositories;
     }
 
-    /**
-     * An asynchronous task that runs on a background thread to load repository.
-     */
     private static class LoadRepositoryTask extends AsyncTask<String, Integer, List<SearchRepository>> {
 
-        /** The hide main view. */
-        private boolean mHideMainView;
-        
-        /** The exception. */
         private boolean mException;
-
-        /** The target. */
         private WeakReference<SearchActivity> mTarget;
 
-        /**
-         * Instantiates a new load repository task.
-         *
-         * @param activity the activity
-         */
         public LoadRepositoryTask(SearchActivity activity) {
             mTarget = new WeakReference<SearchActivity>(activity);
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
         @Override
         protected List<SearchRepository> doInBackground(String... params) {
             if (mTarget.get() != null) {
-                this.mHideMainView = Boolean.valueOf(params[2]);
                 try {
                     return mTarget.get().getRepositories(params[0], params[1]);
                 }
@@ -412,28 +242,10 @@ public class SearchActivity extends BaseActivity {
             }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
         @Override
         protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                if (mTarget.get().mPage == 1) {
-                    mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true,
-                            mHideMainView);
-                }
-                else {
-                    TextView loadingView = (TextView) mTarget.get().findViewById(R.id.tv_loading);
-                    loadingView.setVisibility(View.VISIBLE);
-                }
-            }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
         @Override
         protected void onPostExecute(List<SearchRepository> result) {
             if (mTarget.get() != null) {
@@ -444,44 +256,19 @@ public class SearchActivity extends BaseActivity {
                 else {
                     activity.fillRepositoriesData();
                 }
-    
-                if (activity.mLoadingDialog != null && activity.mLoadingDialog.isShowing()) {
-                    activity.mLoadingDialog.dismiss();
-                }
-    
-                TextView loadingView = (TextView) mTarget.get().findViewById(R.id.tv_loading);
-                loadingView.setVisibility(View.GONE);
-    
-                activity.mFirstTimeSearch = false;
-                activity.mLoading = false;
             }
         }
     }
 
-    /**
-     * An asynchronous task that runs on a background thread to load user.
-     */
     private static class LoadUserTask extends AsyncTask<String, Integer, List<User>> {
 
-        /** The target. */
         private WeakReference<SearchActivity> mTarget;
-        
-        /** The exception. */
         private boolean mException;
 
-        /**
-         * Instantiates a new load user task.
-         *
-         * @param activity the activity
-         */
         public LoadUserTask(SearchActivity activity) {
             mTarget = new WeakReference<SearchActivity>(activity);
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
         @Override
         protected List<User> doInBackground(String... params) {
             if (mTarget.get() != null) {
@@ -499,21 +286,10 @@ public class SearchActivity extends BaseActivity {
             }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
         @Override
         protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
-            }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
         @Override
         protected void onPostExecute(List<User> result) {
             if (mTarget.get() != null) {
@@ -524,40 +300,18 @@ public class SearchActivity extends BaseActivity {
                 else {
                     activity.fillUsersData(result);
                 }
-    
-                if (activity.mLoadingDialog != null && activity.mLoadingDialog.isShowing()) {
-                    activity.mLoadingDialog.dismiss();
-                }
-                
-                activity.mFirstTimeSearch = false;
             }
         }
     }
 
-    /**
-     * Callback to be invoked when repository in the AdapterView has been
-     * clicked.
-     */
     private static class OnRepositoryClickListener implements OnItemClickListener {
 
-        /** The target. */
         private WeakReference<SearchActivity> mTarget;
 
-        /**
-         * Instantiates a new on repository click listener.
-         *
-         * @param activity the activity
-         */
         public OnRepositoryClickListener(SearchActivity activity) {
             mTarget = new WeakReference<SearchActivity>(activity);
         }
 
-        /*
-         * (non-Javadoc)
-         * @see
-         * android.widget.AdapterView.OnItemClickListener#onItemClick(android
-         * .widget.AdapterView, android.view.View, int, long)
-         */
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
             if (mTarget.get() != null) {
@@ -568,11 +322,6 @@ public class SearchActivity extends BaseActivity {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see android.app.Activity#onCreateContextMenu(android.view.ContextMenu,
-     * android.view.View, android.view.ContextMenu.ContextMenuInfo)
-     */
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         menu.clear();// clear items
@@ -598,10 +347,6 @@ public class SearchActivity extends BaseActivity {
         super.onCreateContextMenu(menu, v, menuInfo);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see android.app.Activity#onContextItemSelected(android.view.MenuItem)
-     */
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
