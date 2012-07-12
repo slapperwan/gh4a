@@ -37,13 +37,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.TextView;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.adapter.CommonFeedAdapter;
 import com.gh4a.feeds.FeedHandler;
 import com.gh4a.holder.Feed;
@@ -54,9 +52,6 @@ public class WikiListActivity extends BaseActivity {
     private String mRepoName;
     private String mWikiUrl;
     private int page = 1;
-    private LoadingDialog mLoadingDialog;
-    private boolean mLoading;
-    private boolean mReload;
     private ListView mListView;
 
     @Override
@@ -64,15 +59,20 @@ public class WikiListActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.generic_list);
-        setUpActionBar();
 
         mUserLogin = getIntent().getStringExtra(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getStringExtra(Constants.Repository.REPO_NAME);
         mWikiUrl = "https://github.com/" + mUserLogin + "/" + mRepoName + "/wiki.atom?page=";
         
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(R.string.recent_wiki);
+        actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        
         mListView = (ListView) findViewById(R.id.list_view);
         //mListView.setOnScrollListener(new WikiScrollListener(this));
-        CommonFeedAdapter adapter = new CommonFeedAdapter(this, new ArrayList<Feed>(), false, false);
+        CommonFeedAdapter adapter = new CommonFeedAdapter(this, new ArrayList<Feed>(), false, false, R.layout.row_simple_3);
         mListView.setAdapter(adapter);
         mListView.setOnItemClickListener(new OnItemClickListener() {
             @Override
@@ -94,34 +94,17 @@ public class WikiListActivity extends BaseActivity {
     private static class LoadWikiTask extends
             AsyncTask<String, Void, List<Feed>> {
 
-        /** The target. */
         private WeakReference<WikiListActivity> mTarget;
-
-        /** The exception. */
         private boolean mException;
-
-        /** The hide main view. */
-        private boolean mHideMainView;
-        
         private boolean mWikiNotFound;
         
-        /**
-         * Instantiates a new load tree list task.
-         * 
-         * @param activity the activity
-         */
         public LoadWikiTask(WikiListActivity activity) {
             mTarget = new WeakReference<WikiListActivity>(activity);
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
         @Override
         protected List<Feed> doInBackground(String... params) {
             if (mTarget.get() != null) {
-                this.mHideMainView = Boolean.valueOf(params[0]);
                 BufferedInputStream bis = null;
                 try {
                     URL url = new URL(mTarget.get().mWikiUrl + mTarget.get().page);
@@ -184,47 +167,22 @@ public class WikiListActivity extends BaseActivity {
             }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
         @Override
         protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                if (mTarget.get().page == 1) {
-                    mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true,
-                            mHideMainView);
-                }
-                else {
-                    TextView loadingView = (TextView) mTarget.get().findViewById(R.id.tv_loading);
-                    loadingView.setVisibility(View.VISIBLE);
-                }
-            }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
         @Override
         protected void onPostExecute(List<Feed> result) {
             if (mTarget.get() != null) {
                 if (mWikiNotFound) {
                     mTarget.get().getApplicationContext().notFoundMessage(mTarget.get(), "Wiki");
-                    if (mTarget.get().mLoadingDialog != null && mTarget.get().mLoadingDialog.isShowing()) {
-                        mTarget.get().mLoadingDialog.dismiss();
-                    }
                 }
                 else if (mException) {
                     mTarget.get().showError();
                 }
                 else {
-                    if (mTarget.get().mLoadingDialog != null && mTarget.get().mLoadingDialog.isShowing()) {
-                        mTarget.get().mLoadingDialog.dismiss();
-                    }
                     mTarget.get().fillData(result);
                     mTarget.get().page++;
-                    mTarget.get().mLoading = false;
                 }
             }
         }
@@ -235,58 +193,6 @@ public class WikiListActivity extends BaseActivity {
             List<Feed> blogs = ((CommonFeedAdapter) mListView.getAdapter()).getObjects();
             blogs.addAll(result);
             ((CommonFeedAdapter) mListView.getAdapter()).notifyDataSetChanged();
-        }
-    }
-    
-    private static class WikiScrollListener implements OnScrollListener {
-
-        /** The target. */
-        private WeakReference<WikiListActivity> mTarget;
-
-        /**
-         * Instantiates a new repository scoll listener.
-         *
-         * @param activity the activity
-         * @param searchKey the search key
-         * @param language the language
-         */
-        public WikiScrollListener(WikiListActivity activity) {
-            super();
-            mTarget = new WeakReference<WikiListActivity>(activity);
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see
-         * android.widget.AbsListView.OnScrollListener#onScrollStateChanged(
-         * android.widget.AbsListView, int)
-         */
-        @Override
-        public void onScrollStateChanged(AbsListView view, int scrollState) {
-            if (mTarget.get() != null) {
-                if (mTarget.get().mReload && scrollState == SCROLL_STATE_IDLE) {
-                    new LoadWikiTask(mTarget.get()).execute("false");
-                    mTarget.get().mReload = false;
-                }
-            }
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see
-         * android.widget.AbsListView.OnScrollListener#onScroll(android.widget
-         * .AbsListView, int, int, int)
-         */
-        @Override
-        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
-                int totalItemCount) {
-            if (mTarget.get() != null) {
-                if (!mTarget.get().mLoading && firstVisibleItem != 0
-                        && ((firstVisibleItem + visibleItemCount) == totalItemCount)) {
-                    mTarget.get().mReload = true;
-                    mTarget.get().mLoading = true;
-                }
-            }
         }
     }
     

@@ -19,10 +19,11 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -36,6 +37,7 @@ public class CommonFeedAdapter extends RootAdapter<Feed> {
     private static final SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
     private boolean mShowGravatar;
     private boolean mShowExtra;
+    private int mRowLayout;
     
     public CommonFeedAdapter(Context context, List<Feed> objects) {
         super(context, objects);
@@ -49,6 +51,13 @@ public class CommonFeedAdapter extends RootAdapter<Feed> {
         mShowExtra = showExtra;
     }
     
+    public CommonFeedAdapter(Context context, List<Feed> objects, boolean showGravatar, boolean showExtra, int rowLayout) {
+        super(context, objects);
+        mShowGravatar = showGravatar;
+        mShowExtra = showExtra;
+        mRowLayout = rowLayout;
+    }
+    
     @Override
     public View doGetView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
@@ -56,12 +65,29 @@ public class CommonFeedAdapter extends RootAdapter<Feed> {
 
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_gravatar_3, null);
+            if (mRowLayout != 0) {
+                v = vi.inflate(mRowLayout, null);
+            }
+            else {
+                v = vi.inflate(R.layout.row_gravatar_3, null);
+            }
+            
+            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+            Typeface boldCondensed = app.boldCondensed;
+            Typeface regular = app.regular;
+            
             viewHolder = new ViewHolder();
+            
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
+            
             viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
+            viewHolder.tvTitle.setTypeface(boldCondensed);
+            
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+            viewHolder.tvDesc.setTypeface(regular);
+            
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+            viewHolder.tvExtra.setTextAppearance(mContext, R.style.default_text_micro);
             
             v.setTag(viewHolder);
         }
@@ -71,22 +97,24 @@ public class CommonFeedAdapter extends RootAdapter<Feed> {
 
         final Feed feed = mObjects.get(position);
         if (feed != null) {
-            if (mShowGravatar) {
-                ImageDownloader.getInstance().download(feed.getGravatarId(), viewHolder.ivGravatar);
-                viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
-    
-                    @Override
-                    public void onClick(View v) {
-                        /** Open user activity */
-                        Gh4Application context = (Gh4Application) v.getContext()
-                                .getApplicationContext();
-                        context.openUserInfoActivity(v.getContext(), feed.getAuthor(), null);
-                    }
-                });
-                viewHolder.ivGravatar.setVisibility(View.VISIBLE);
-            }
-            else {
-                viewHolder.ivGravatar.setVisibility(View.GONE);
+            if (viewHolder.ivGravatar != null) {
+                if (mShowGravatar) {
+                    ImageDownloader.getInstance().download(feed.getGravatarId(), viewHolder.ivGravatar);
+                    viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
+        
+                        @Override
+                        public void onClick(View v) {
+                            /** Open user activity */
+                            Gh4Application context = (Gh4Application) v.getContext()
+                                    .getApplicationContext();
+                            context.openUserInfoActivity(v.getContext(), feed.getAuthor(), null);
+                        }
+                    });
+                    viewHolder.ivGravatar.setVisibility(View.VISIBLE);
+                }
+                else {
+                    viewHolder.ivGravatar.setVisibility(View.GONE);
+                }
             }
             
             viewHolder.tvTitle.setText(feed.getTitle());

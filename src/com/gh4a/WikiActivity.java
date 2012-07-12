@@ -15,6 +15,8 @@
  */
 package com.gh4a;
 
+import com.actionbarsherlock.app.ActionBar;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,32 +26,29 @@ import android.webkit.WebViewClient;
 
 public class WikiActivity extends BaseActivity {
 
-    private LoadingDialog mLoadingDialog;
     private String mUserLogin;
     private String mRepoName;
     private String mTitle;
     private String mContent;
     private String mLink;
     
-    /**
-     * Called when the activity is first created.
-     * 
-     * @param savedInstanceState the saved instance state
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
         setContentView(R.layout.web_viewer);
-        setUpActionBar();
         
         mUserLogin = getIntent().getStringExtra(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getStringExtra(Constants.Repository.REPO_NAME);
         mTitle = getIntent().getStringExtra(Constants.Blog.TITLE);
         mContent = getIntent().getStringExtra(Constants.Blog.CONTENT);
         mLink = getIntent().getStringExtra(Constants.Blog.LINK);
-        
-        mLoadingDialog = LoadingDialog.show(this, true, true);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(mTitle);
+        actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
         
         fillData();
     }
@@ -79,9 +78,6 @@ public class WikiActivity extends BaseActivity {
 
         @Override
         public void onPageFinished(WebView webView, String url) {
-            if (mLoadingDialog != null && mLoadingDialog.isShowing()) {
-                mLoadingDialog.dismiss();
-            }
         }
         
         @Override
