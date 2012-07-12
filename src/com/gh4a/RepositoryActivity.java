@@ -178,7 +178,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
             }
             
             else if (position == 2) {
-                return CommitListFragment.newInstance(mRepository);
+                return CommitListFragment.newInstance(mRepository, mSelectedRef);
             }
 
             else {

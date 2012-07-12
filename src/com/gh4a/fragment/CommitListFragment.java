@@ -43,20 +43,23 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.loader.PageIteratorLoader;
+import com.gh4a.utils.StringUtils;
 
 public class CommitListFragment extends SherlockFragment 
     implements LoaderManager.LoaderCallbacks<List<RepositoryCommit>>, OnItemClickListener {
 
     private Repository mRepository;
+    private String mRef;
     private ListView mListView;
     private CommitAdapter mAdapter;
     private PageIterator<RepositoryCommit> mDataIterator;
     
-    public static CommitListFragment newInstance(Repository repository) {
+    public static CommitListFragment newInstance(Repository repository, String ref) {
         
         CommitListFragment f = new CommitListFragment();
 
         Bundle args = new Bundle();
+        args.putString(Constants.Object.REF, ref);
         args.putSerializable("REPOSITORY", repository);
         f.setArguments(args);
         
@@ -67,6 +70,10 @@ public class CommitListFragment extends SherlockFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mRepository = (Repository) getArguments().getSerializable("REPOSITORY");
+        mRef = getArguments().getString(Constants.Object.REF);
+        if (StringUtils.isBlank(mRef)) {
+            mRef = mRepository.getMasterBranch();
+        }
     }
 
     @Override
@@ -97,7 +104,7 @@ public class CommitListFragment extends SherlockFragment
         client.setOAuth2Token(app.getAuthToken());
         CommitService commitService = new CommitService(client);
         mDataIterator = commitService.pageCommits(new RepositoryId(mRepository.getOwner().getLogin(), mRepository.getName()), 
-                mRepository.getMasterBranch(), null);
+                mRef, null);
     }
     
     private void fillData(List<RepositoryCommit> commits) {
