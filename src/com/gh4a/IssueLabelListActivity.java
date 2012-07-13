@@ -400,7 +400,7 @@ public class IssueLabelListActivity extends BaseActivity {
                 IssueLabelListActivity activity = mTarget.get();
     
                 if (mException) {
-                    activity.showMessage(activity.getResources().getString(R.string.issue_error_create_label), false);
+                    activity.showMessage(activity.getResources().getString(R.string.issue_error_edit_label), false);
                 }
                 else {
                     new LoadIssueLabelsTask(activity).execute();
@@ -412,14 +412,14 @@ public class IssueLabelListActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
-        inflater.inflate(R.menu.issue_labels, menu);
+        inflater.inflate(R.menu.create_new, menu);
         return super.onCreateOptionsMenu(menu);
     }
     
     @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case R.id.new_label:
+        case R.id.create_new:
             Intent intent = new Intent().setClass(this, IssueLabelCreateActivity.class);
             intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
             intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);

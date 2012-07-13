@@ -20,49 +20,23 @@ import java.util.List;
 import org.eclipse.egit.github.core.Milestone;
 
 import android.content.Context;
+import android.graphics.Typeface;
+import android.text.TextUtils.TruncateAt;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
-/**
- * The Repository adapter.
- */
 public class MilestoneAdapter extends RootAdapter<Milestone> {
 
-    /** The row layout. */
-    protected int mRowLayout;
-
-    /**
-     * Instantiates a new repository adapter.
-     * 
-     * @param context the context
-     * @param objects the objects
-     */
     public MilestoneAdapter(Context context, List<Milestone> objects) {
         super(context, objects);
     }
 
-    /**
-     * Instantiates a new repository adapter.
-     * 
-     * @param context the context
-     * @param objects the objects
-     * @param rowLayout the row layout
-     */
-    public MilestoneAdapter(Context context, List<Milestone> objects, int rowLayout) {
-        super(context, objects);
-        mRowLayout = rowLayout;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.adapter.RootAdapter#doGetView(int, android.view.View,
-     * android.view.ViewGroup)
-     */
     @Override
     public View doGetView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
@@ -72,10 +46,22 @@ public class MilestoneAdapter extends RootAdapter<Milestone> {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
             v = vi.inflate(R.layout.row_simple_3, null);
 
+            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+            Typeface boldCondensed = app.boldCondensed;
+            Typeface regular = app.regular;
+            
             viewHolder = new ViewHolder();
             viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
+            viewHolder.tvTitle.setTypeface(boldCondensed);
+            
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+            viewHolder.tvDesc.setTypeface(regular);
+            viewHolder.tvDesc.setMaxLines(2);
+            viewHolder.tvDesc.setEllipsize(TruncateAt.END);
+            
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+            viewHolder.tvExtra.setTextAppearance(mContext, R.style.default_text_small);
+            
             v.setTag(viewHolder);
         }
         else {
@@ -100,26 +86,18 @@ public class MilestoneAdapter extends RootAdapter<Milestone> {
             }
 
             if (viewHolder.tvExtra != null) {
-                String extraData = "State " + milestone.getState() + " | " + milestone.getClosedIssues() + " closed"
-                        + " | " + milestone.getOpenIssues() + " open ";
+                String extraData = "State " + milestone.getState() + "   " + milestone.getClosedIssues() + " closed"
+                        + "   " + milestone.getOpenIssues() + " open ";
                 viewHolder.tvExtra.setText(extraData);
             }
         }
         return v;
     }
 
-    /**
-     * The Class ViewHolder.
-     */
     private static class ViewHolder {
         
-        /** The tv title. */
         public TextView tvTitle;
-        
-        /** The tv desc. */
         public TextView tvDesc;
-        
-        /** The tv extra. */
         public TextView tvExtra;
     }
 }

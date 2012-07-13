@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/new_label"
+    <item android:id="@+id/create_new"
         android:icon="@drawable/content_new" 
-        android:showAsAction="ifRoom|withText" />
+        android:showAsAction="ifRoom" />
 </menu>

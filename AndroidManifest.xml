@@ -168,6 +168,9 @@
         <activity
             android:name=".IssueLabelCreateActivity"
             android:configChanges="orientation" />
+        <activity
+            android:name=".IssueMilestoneCreateActivity"
+            android:configChanges="orientation" />
         <activity android:name="BrowseFilter">
             <intent-filter>
                 <action
