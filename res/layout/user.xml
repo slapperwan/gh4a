@@ -243,27 +243,5 @@
         <View
             android:layout_width="fill_parent"
             android:layout_height="16dp" />
-        
-        <LinearLayout
-            android:id="@+id/ll_others"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
-            <TextView
-                android:id="@+id/other_info"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/other_info" />
-            <View 
-                android:layout_width="fill_parent"
-                android:layout_height="1dp"
-                android:background="#ff0099cc" />
-            <View
-                android:layout_width="fill_parent"
-                android:layout_height="10dp" />
-        </LinearLayout>
     </LinearLayout>
 </ScrollView>
