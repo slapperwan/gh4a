@@ -59,7 +59,7 @@ public class IssueLabelListActivity extends BaseActivity {
         
         mRepoOwner = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
-        
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.issue_manage_labels);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
@@ -127,7 +127,8 @@ public class IssueLabelListActivity extends BaseActivity {
         for (final Label label : result) {
             final View rowView = getLayoutInflater().inflate(R.layout.row_issue_label, null);
             final View viewColor = (View) rowView.findViewById(R.id.view_color);
-            
+
+            final LinearLayout llEdit = (LinearLayout) rowView.findViewById(R.id.ll_edit);
             final EditText etLabel = (EditText) rowView.findViewById(R.id.et_label);
             final TextView tvLabel = (TextView) rowView.findViewById(R.id.tv_title);
             tvLabel.setTypeface(condensed);
@@ -137,7 +138,6 @@ public class IssueLabelListActivity extends BaseActivity {
             viewColor.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    LinearLayout llEdit = (LinearLayout) rowView.findViewById(R.id.ll_edit);
                     if (llEdit.getVisibility() == View.VISIBLE) {
                         llEdit.setVisibility(View.GONE);
                         
@@ -258,6 +258,17 @@ public class IssueLabelListActivity extends BaseActivity {
                    .create();
                     
                     builder.show();
+                }
+            });
+            
+            Button btnCancel = (Button) rowView.findViewById(R.id.btn_cancel);
+            btnCancel.setOnClickListener(new OnClickListener() {
+                
+                @Override
+                public void onClick(View arg0) {
+                    llEdit.setVisibility(View.GONE);
+                    tvLabel.setTypeface(condensed);
+                    unselectLabel(tvLabel, viewColor, label.getColor());
                 }
             });
             
