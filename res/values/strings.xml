@@ -225,6 +225,8 @@
     <string name="issue_label_add">Add labels</string>
     <string name="issue_error_label_add_delete">Cannot add/remove label</string>
     <string name="issue_labels">Labels</string>
+    <string name="issue_label_name">Label name</string>
+    <string name="issue_label_new">New Label</string>
     <string name="issue_milestone">Milestone</string>
     <string name="issue_assignee">Assignee</string>
     <string name="issues_submitted">Submitted</string>

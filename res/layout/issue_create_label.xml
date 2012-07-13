@@ -1,20 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="200dp"
+    android:id="@id/main_content"
+    android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical">
-    <EditText
-        android:id="@+id/et_title"
-        android:layout_height="wrap_content"
+    android:layout_margin="0dp"
+    android:padding="0dp">
+    <LinearLayout
+        android:id="@+id/ll_edit"
+        android:orientation="vertical"
         android:layout_width="fill_parent"
-        android:hint="@string/issue_create_label" />
-    <Button
-        android:text="@string/issue_label_create"
-        android:id="@+id/btn_create"
-        android:layout_width="wrap_content"
-        android:gravity="center_vertical|center_horizontal"
         android:layout_height="wrap_content"
-        android:layout_gravity="right">
-    </Button>
-</LinearLayout>
+        android:padding="16dp" >
+        <LinearLayout
+            android:id="@+id/ll"
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp" >
+            <View
+                android:id="@+id/view_color"
+                android:layout_width="30dp"
+                android:layout_height="fill_parent" />
+            <EditText 
+                android:id="@+id/et_label"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:hint="@string/issue_label_name" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/ll_color"
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp" >
+            <View
+                android:id="@+id/color_444444"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:tag="444444"
+                android:background="#444444" />
+            <View
+                android:id="@+id/color_DDDDDD"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:tag="DDDDDD"
+                android:background="#DDDDDD" />
+            <View
+                android:id="@+id/color_e10c02"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:tag="e10c02"
+                android:background="#e10c02" />
+            <View
+                android:id="@+id/color_d7e102"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:tag="d7e102"
+                android:background="#d7e102" />
+            <View
+                android:id="@+id/color_02e10c"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:tag="02e10c"
+                android:background="#02e10c" />
+            <View
+                android:id="@+id/color_02d7e1"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:tag="02d7e1"
+                android:background="#02d7e1" />
+            <View
+                android:id="@+id/color_0b02e1"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:tag="0b02e1"
+                android:background="#0b02e1" />
+            <View
+                android:id="@+id/color_e102d8"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:tag="e102d8"
+                android:background="#e102d8" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

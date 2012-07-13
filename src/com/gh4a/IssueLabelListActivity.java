@@ -24,10 +24,9 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.LabelService;
 
-import com.actionbarsherlock.app.ActionBar;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
@@ -41,6 +40,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 
 public class IssueLabelListActivity extends BaseActivity {
 
@@ -391,6 +395,28 @@ public class IssueLabelListActivity extends BaseActivity {
                     new LoadIssueLabelsTask(activity).execute();
                 }
             }
+        }
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getSupportMenuInflater();
+        inflater.inflate(R.menu.issue_labels, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.new_label:
+            Intent intent = new Intent().setClass(this, IssueLabelCreateActivity.class);
+            intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+            intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+            startActivity(intent);
+            return true;
+
+        default:
+            return true;
         }
     }
 }
