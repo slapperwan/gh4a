@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.UserService;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -33,43 +31,16 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.adapter.UserAdapter;
 import com.gh4a.utils.StringUtils;
 
-/**
- * The UserList activity.
- */
 public class UserListActivity extends BaseActivity implements OnItemClickListener {
 
-    /** The search key. */
     protected String mSearchKey;
-
-    /** The title bar. */
-    protected String mTitleBar;
-
-    /** The sub title. */
-    protected String mSubtitle;
-
-    /** The loading dialog. */
-    protected LoadingDialog mLoadingDialog;
-
-    /** The user adapter. */
     protected UserAdapter mUserAdapter;
-
-    /** The list view users. */
     protected ListView mListViewUsers;
-
-    /** The row layout. */
-    protected int mRowLayout;
-
-    /** The show more data. */
-    protected boolean mShowMoreData;
     
-    /**
-     * Called when the activity is first created.
-     * 
-     * @param savedInstanceState the saved instance state
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,45 +48,31 @@ public class UserListActivity extends BaseActivity implements OnItemClickListene
         setContentView(R.layout.generic_list);
 
         setRequestData();
-        setTitleBar();
-        setSubtitle();
-        setRowLayout();
-        setUpActionBar();
-        setBreadCrumbs();
-
+        
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(getTitleBar());
+        actionBar.setSubtitle(getSubTitle());
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        
         mListViewUsers = (ListView) findViewById(R.id.list_view);
         mListViewUsers.setOnItemClickListener(this);
 
-        mUserAdapter = new UserAdapter(this, new ArrayList<User>(), mRowLayout, mShowMoreData);
+        mUserAdapter = new UserAdapter(this, new ArrayList<User>(), getRowLayout(), getShowExtraData());
         mListViewUsers.setAdapter(mUserAdapter);
 
         new LoadUserListTask(this).execute();
     }
 
-    /**
-     * An asynchronous task that runs on a background thread to load user list.
-     */
     private static class LoadUserListTask extends AsyncTask<Void, Integer, List<User>> {
 
-        /** The target. */
         private WeakReference<UserListActivity> mTarget;
-        
-        /** The exception. */
         private boolean mException;
 
-        /**
-         * Instantiates a new load user list task.
-         *
-         * @param activity the activity
-         */
         public LoadUserListTask(UserListActivity activity) {
             mTarget = new WeakReference<UserListActivity>(activity);
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
         @Override
         protected List<User> doInBackground(Void... params) {
             if (mTarget.get() != null) {
@@ -133,25 +90,13 @@ public class UserListActivity extends BaseActivity implements OnItemClickListene
             }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
         @Override
         protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
-            }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
         @Override
         protected void onPostExecute(List<User> result) {
             if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog.dismiss();
                 if (mException) {
                     mTarget.get().showError();
                 }
@@ -162,11 +107,6 @@ public class UserListActivity extends BaseActivity implements OnItemClickListene
         }
     }
 
-    /**
-     * Fill data into UI components.
-     * 
-     * @param users the users
-     */
     protected void fillData(List<User> users) {
         if (users != null && users.size() > 0) {
             mUserAdapter.notifyDataSetChanged();
@@ -177,61 +117,30 @@ public class UserListActivity extends BaseActivity implements OnItemClickListene
         mUserAdapter.notifyDataSetChanged();
     }
 
-    /**
-     * Gets the users.
-     *
-     * @return the users
-     * @throws GitHubException the git hub exception
-     */
     protected List<User> getUsers() throws IOException {
-//        GitHubServiceFactory factory = GitHubServiceFactory.newInstance();
-//        UserService service = factory.createUserService();
-//        return service.searchUsersByName(mSearchKey);
         return new ArrayList<User>();
     }
 
-    /**
-     * Sets the request data.
-     */
     protected void setRequestData() {
         mSearchKey = getIntent().getExtras().getString("searchKey");
-        mShowMoreData = true;
     }
 
-    /**
-     * Sets the title bar.
-     */
-    protected void setTitleBar() {
-        mTitleBar = "User";// default
+    protected int getRowLayout() {
+        return R.layout.row_gravatar_1;
     }
 
-    /**
-     * Sets the subtitle.
-     */
-    protected void setSubtitle() {
-        mSubtitle = "List";// default
+    protected String getTitleBar() {
+        return null;
     }
-
-    /**
-     * Sets the row layout.
-     */
-    protected void setRowLayout() {
-        mRowLayout = R.layout.row_gravatar_1;
+    
+    protected String getSubTitle() {
+        return null;
     }
-
-    /**
-     * Sets the bread crumbs.
-     */
-    protected void setBreadCrumbs() {
-        // no breadcrumbs
+    
+    protected boolean getShowExtraData() {
+        return true;
     }
-
-    /*
-     * (non-Javadoc)
-     * @see
-     * android.widget.AdapterView.OnItemClickListener#onItemClick(android.widget
-     * .AdapterView, android.view.View, int, long)
-     */
+    
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         User user = (User) adapterView.getAdapter().getItem(position);

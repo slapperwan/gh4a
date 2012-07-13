@@ -24,51 +24,28 @@ import org.eclipse.egit.github.core.service.OrganizationService;
 
 public class OrganizationMemberListActivity extends UserListActivity {
 
-    /** The user login. */
     protected String mUserLogin;
-
-    /** The repo name. */
     protected String mRepoName;
 
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.UserListActivity#setRequestData()
-     */
     @Override
     protected void setRequestData() {
         mUserLogin = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
-        mShowMoreData = false;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.UserListActivity#setTitleBar()
-     */
-    protected void setTitleBar() {
-        mTitleBar = mUserLogin;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.UserListActivity#setSubtitle()
-     */
-    protected void setSubtitle() {
-        mSubtitle = "Members";
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.UserListActivity#setRowLayout()
-     */
     @Override
-    protected void setRowLayout() {
-        mRowLayout = R.layout.row_gravatar_1;
+    protected String getTitleBar() {
+        return getResources().getString(R.string.members);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.UserListActivity#getUsers()
-     */
+    protected String getSubtitle() {
+        return mUserLogin;
+    }
+
+    @Override
+    protected int getRowLayout() {
+        return R.layout.row_gravatar_1;
+    }
+
     protected List<User> getUsers() throws IOException {
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(getAuthToken());

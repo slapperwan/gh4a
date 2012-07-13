@@ -32,12 +32,26 @@ public class CollaboratorListActivity extends UserListActivity {
     protected void setRequestData() {
         mUserLogin = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
-        mShowMoreData = false;
     }
 
     @Override
-    protected void setRowLayout() {
-        mRowLayout = R.layout.row_gravatar_1;
+    protected int getRowLayout() {
+        return R.layout.row_gravatar_1;
+    }
+    
+    @Override
+    protected String getTitleBar() {
+        return getResources().getString(R.string.repo_collaborators);
+    }
+    
+    @Override
+    protected String getSubTitle() {
+        return mUserLogin + "/" + mRepoName;
+    }
+    
+    @Override
+    protected boolean getShowExtraData() {
+        return false;
     }
 
     protected List<User> getUsers() throws IOException {

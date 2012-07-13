@@ -114,7 +114,7 @@ public class SearchActivity extends BaseActivity {
 
     protected void searchUser(final String searchKey) {
         mListViewResults.setOnItemClickListener(new OnUserClickListener(this));
-        userAdapter = new UserAdapter(this, new ArrayList<User>(), R.layout.row_gravatar_1, true);
+        userAdapter = new UserAdapter(this, new ArrayList<User>(), R.layout.row_gravatar_1, false);
         mListViewResults.setAdapter(userAdapter);
         new LoadUserTask(this).execute(new String[] { searchKey });
     }

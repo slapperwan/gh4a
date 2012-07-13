@@ -244,10 +244,6 @@ public class UserFragment extends SherlockFragment implements
         tvOrgs.setTypeface(boldCondensed);
         tvOrgs.setTextColor(Color.parseColor("#0099cc"));
         
-        TextView tvOthers = (TextView) v.findViewById(R.id.other_info);
-        tvOthers.setTypeface(boldCondensed);
-        tvOthers.setTextColor(Color.parseColor("#0099cc"));
-        
         getLoaderManager().initLoader(1, null, this);
         getLoaderManager().getLoader(1).forceLoad();
         

@@ -37,16 +37,16 @@ import com.gh4a.utils.StringUtils;
 public class UserAdapter extends RootAdapter<User> {
 
     private int mRowLayout;
-    private boolean mShowMoreData;
-
+    private boolean mShowExtraData;
+    
     public UserAdapter(Context context, List<User> objects) {
         super(context, objects);
     }
 
-    public UserAdapter(Context context, List<User> objects, int rowLayout, boolean showMoreData) {
+    public UserAdapter(Context context, List<User> objects, int rowLayout, boolean showExtraData) {
         super(context, objects);
         mRowLayout = rowLayout;
-        mShowMoreData = showMoreData;
+        mShowExtraData = showExtraData;
     }
     
     @Override
@@ -127,7 +127,7 @@ public class UserAdapter extends RootAdapter<User> {
                 viewHolder.tvDesc.setText(StringUtils.formatName(user.getLogin(), user.getName()));
             }
 
-            if (mShowMoreData && viewHolder.tvExtra != null) {
+            if (mShowExtraData && viewHolder.tvExtra != null) {
                 Resources res = v.getResources();
                 String extraData = String.format(res.getString(R.string.user_extra_data), user
                             .getFollowers(), user.getPublicRepos());
