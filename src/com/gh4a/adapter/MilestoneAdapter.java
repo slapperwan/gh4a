@@ -61,7 +61,7 @@ public class MilestoneAdapter extends RootAdapter<Milestone> {
             viewHolder.tvDesc.setEllipsize(TruncateAt.END);
             
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-            viewHolder.tvExtra.setTextAppearance(mContext, R.style.default_text_small);
+            viewHolder.tvExtra.setTextAppearance(mContext, R.style.default_text_micro);
             
             v.setTag(viewHolder);
         }
@@ -87,7 +87,7 @@ public class MilestoneAdapter extends RootAdapter<Milestone> {
             }
 
             if (viewHolder.tvExtra != null) {
-                String extraData = "State " + milestone.getState() + "   " + milestone.getClosedIssues() + " closed"
+                String extraData = milestone.getClosedIssues() + " closed"
                         + "   " + milestone.getOpenIssues() + " open ";
                 
                 if (milestone.getDueOn() != null) {

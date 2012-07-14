@@ -333,6 +333,7 @@ public interface Constants {
     
     public interface Milestone {
         public static final String NUMBER = "Milestone.number";
+        public static final String STATE = "Milestone.state";
     }
     
     public static String[] SKIP_PRETTIFY_EXT = {

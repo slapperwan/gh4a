@@ -15,128 +15,107 @@
  */
 package com.gh4a;
 
-import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.MilestoneService;
-
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.Tab;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.gh4a.adapter.MilestoneAdapter;
+import com.gh4a.fragment.IssueMilestoneListFragment;
 
-public class IssueMilestoneListActivity extends BaseActivity implements OnItemClickListener {
+public class IssueMilestoneListActivity extends BaseSherlockFragmentActivity {
 
     private String mRepoOwner;
     private String mRepoName;
-    protected ListView mListView;
+    private ViewPager mPager;
+    private ActionBar mActionBar;
+    private ThisPageAdapter mAdapter;
+    private int tabCount;
     
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        setContentView(R.layout.generic_list);
+        setContentView(R.layout.view_pager);
         setUpActionBar();
         
         mRepoOwner = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(R.string.issue_manage_milestones);
-        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        mActionBar = getSupportActionBar();
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        mActionBar.setTitle(R.string.issue_manage_milestones);
+        mActionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
+        mActionBar.setDisplayShowTitleEnabled(true);
+        mActionBar.setDisplayHomeAsUpEnabled(true);
         
-        new LoadIssueMilestonesTask(this).execute();
+        tabCount = 2;
+        
+        mAdapter = new ThisPageAdapter(getSupportFragmentManager());
+        mPager = (ViewPager) findViewById(R.id.pager);
+        mPager.setAdapter(mAdapter);
+        
+        mPager.setOnPageChangeListener(new OnPageChangeListener() {
+
+            @Override
+            public void onPageScrollStateChanged(int arg0) {}
+            
+            @Override
+            public void onPageScrolled(int arg0, float arg1, int arg2) {}
+
+            @Override
+            public void onPageSelected(int position) {
+                mActionBar.setSelectedNavigationItem(position);
+            }
+        });
+        
+        Tab tab = mActionBar
+                .newTab()
+                .setText(R.string.open)
+                .setTabListener(
+                        new TabListener<SherlockFragmentActivity>(this, 0 + "", mPager));
+        mActionBar.addTab(tab);
+        
+        tab = mActionBar
+                .newTab()
+                .setText(R.string.closed)
+                .setTabListener(
+                        new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
+        mActionBar.addTab(tab);
     }
     
-    private static class LoadIssueMilestonesTask extends AsyncTask<Void, Integer, List<Milestone>> {
+    public class ThisPageAdapter extends FragmentStatePagerAdapter {
 
-        private WeakReference<IssueMilestoneListActivity> mTarget;
-        private boolean mException;
-
-        public LoadIssueMilestonesTask(IssueMilestoneListActivity activity) {
-            mTarget = new WeakReference<IssueMilestoneListActivity>(activity);
+        public ThisPageAdapter(FragmentManager fm) {
+            super(fm);
         }
 
         @Override
-        protected List<Milestone> doInBackground(Void... params) {
-            if (mTarget.get() != null) {
-                try {
-                    GitHubClient client = new GitHubClient();
-                    client.setOAuth2Token(mTarget.get().getAuthToken());
-                    MilestoneService milestoneService = new MilestoneService(client);
-                    return milestoneService.getMilestones(mTarget.get().mRepoOwner,
-                            mTarget.get().mRepoName, null);
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
-            }
-            else {
-                return null;
-            }
+        public int getCount() {
+            return tabCount;
         }
 
         @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected void onPostExecute(List<Milestone> result) {
-            if (mTarget.get() != null) {
-                IssueMilestoneListActivity activity = mTarget.get();
-    
-                if (mException) {
-                    activity.showError();
-                }
-                else {
-                    activity.fillData(result);
-                }
+        public android.support.v4.app.Fragment getItem(int position) {
+            if (position == 0) {
+                return IssueMilestoneListFragment.newInstance(mRepoOwner, mRepoName, "open");
             }
+            else if (position == 1) {
+                return IssueMilestoneListFragment.newInstance(mRepoOwner, mRepoName, "closed");
+            }
+            return null;
         }
-    }
-    
-    private void fillData(List<Milestone> result) {
-        mListView = (ListView) findViewById(R.id.list_view);
-        mListView.setOnItemClickListener(this);
-        MilestoneAdapter adapter = new MilestoneAdapter(this, new ArrayList<Milestone>());
-        mListView.setAdapter(adapter);
         
-        if (result != null && result.size() > 0) {
-            adapter.addAll(result);
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
         }
-        else {
-            getApplicationContext().notFoundMessage(this, getResources().getString(R.string.issue_view_milestones));
-        }
-        adapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        MilestoneAdapter adapter = (MilestoneAdapter) adapterView.getAdapter();
-        Milestone milestone = (Milestone) adapter.getItem(position);
-        
-        Intent intent = new Intent().setClass(this, IssueMilestoneEditActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-        intent.putExtra(Constants.Milestone.NUMBER, milestone.getNumber());
-        startActivity(intent);
     }
     
     @Override
