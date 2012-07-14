@@ -31,6 +31,8 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.View;
@@ -45,8 +47,10 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.gh4a.loader.LabelListLoader;
 
-public class IssueLabelListActivity extends BaseActivity {
+public class IssueLabelListActivity extends BaseSherlockFragmentActivity 
+    implements LoaderManager.LoaderCallbacks<List<Label>> {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -66,55 +70,8 @@ public class IssueLabelListActivity extends BaseActivity {
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
-        new LoadIssueLabelsTask(this).execute();
-    }
-    
-    private static class LoadIssueLabelsTask extends AsyncTask<Void, Integer, List<Label>> {
-
-        private WeakReference<IssueLabelListActivity> mTarget;
-        private boolean mException;
-
-        public LoadIssueLabelsTask(IssueLabelListActivity activity) {
-            mTarget = new WeakReference<IssueLabelListActivity>(activity);
-        }
-
-        @Override
-        protected List<Label> doInBackground(Void... params) {
-            if (mTarget.get() != null) {
-                try {
-                    GitHubClient client = new GitHubClient();
-                    client.setOAuth2Token(mTarget.get().getAuthToken());
-                    LabelService labelService = new LabelService(client);
-                    return labelService.getLabels(mTarget.get().mRepoOwner,
-                            mTarget.get().mRepoName);
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
-            }
-            else {
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected void onPostExecute(List<Label> result) {
-            if (mTarget.get() != null) {
-                IssueLabelListActivity activity = mTarget.get();
-                if (mException) {
-                    activity.showError();
-                }
-                else {
-                    activity.fillData(result);
-                }
-            }
-        }
+        getSupportLoaderManager().initLoader(0, null, this);
+        getSupportLoaderManager().getLoader(0).forceLoad();
     }
     
     private void fillData(List<Label> result) {
@@ -422,5 +379,21 @@ public class IssueLabelListActivity extends BaseActivity {
         default:
             return true;
         }
+    }
+
+    @Override
+    public Loader<List<Label>> onCreateLoader(int arg0, Bundle arg1) {
+        return new LabelListLoader(this, mRepoOwner, mRepoName);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<Label>> loader, List<Label> labels) {
+        fillData(labels);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<Label>> arg0) {
+        // TODO Auto-generated method stub
+        
     }
 }
