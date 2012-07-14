@@ -230,7 +230,7 @@ public class IssueLabelListActivity extends BaseActivity {
                     String selectedColor = (String) tvLabel.getTag();
                     String newLabelName = etLabel.getText().toString();
                     new AddIssueLabelsTask(IssueLabelListActivity.this).execute(label.getName(), 
-                            newLabelName, selectedColor, "true");
+                            newLabelName, selectedColor);
                 }
             });
             
@@ -368,19 +368,12 @@ public class IssueLabelListActivity extends BaseActivity {
                     String labelName = params[0];
                     String newLabelName = params[1];
                     String color = params[2];
-                    boolean edit = Boolean.valueOf(params[3]);
-                    //labelName = StringUtils.encodeUrl(labelName);
                     
                     Label label = new Label();
                     label.setName(newLabelName);
                     label.setColor(color);
                     
-                    if (edit) {
-                        labelService.editLabel(new RepositoryId(activity.mRepoOwner, activity.mRepoName), labelName, label);
-                    }
-                    else {
-                        labelService.createLabel(activity.mRepoOwner, activity.mRepoName, label);
-                    }
+                    labelService.editLabel(new RepositoryId(activity.mRepoOwner, activity.mRepoName), labelName, label);
                 }
                 catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);

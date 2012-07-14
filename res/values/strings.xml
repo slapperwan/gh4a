@@ -217,6 +217,7 @@
     <string name="issue_milestone_desc">Description</string>
     <string name="issue_label_create">Create</string>
     <string name="issue_error_create_label">Cannot create label</string>
+    <string name="issue_error_edit_label">Cannot edit label</string>
     <string name="issue_error_delete_label">Cannot delete label</string>
     <string name="issue_error_create_milestone">Cannot create milestone</string>
     <string name="issue_error_delete_milestone">Cannot delete milestone</string>
