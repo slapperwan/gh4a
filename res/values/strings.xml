@@ -231,6 +231,7 @@
     <string name="issue_label_new">New Label</string>
     <string name="issue_milestone">Milestone</string>
     <string name="issue_milestone_new">New Milestone</string>
+    <string name="issue_milestone_edit">Edit Milestone</string>
     <string name="issue_assignee">Assignee</string>
     <string name="issues_submitted">Submitted</string>
     <string name="issues_updated">Updated</string>
@@ -245,6 +246,7 @@
     <string name="issue_open_by_user">by %1$s %2$s</string>
     <string name="issue_manage_labels">Manage Labels</string>
     <string name="issue_manage_milestones">Manage Milestones</string>
+    <string name="issue_milestone_due_date">Due Date</string>
 
     <!-- Issue comment -->
     <plurals name="issue_comment">

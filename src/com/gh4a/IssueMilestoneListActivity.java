@@ -117,15 +117,12 @@ public class IssueMilestoneListActivity extends BaseActivity implements OnItemCl
         mListView.setOnItemClickListener(this);
         MilestoneAdapter adapter = new MilestoneAdapter(this, new ArrayList<Milestone>());
         mListView.setAdapter(adapter);
-        registerForContextMenu(mListView);
         
         if (result != null && result.size() > 0) {
-            for (Milestone milestone : result) {
-                adapter.add(milestone);
-            }
+            adapter.addAll(result);
         }
         else {
-            getApplicationContext().notFoundMessage(this, "Milestones");
+            getApplicationContext().notFoundMessage(this, getResources().getString(R.string.issue_view_milestones));
         }
         adapter.notifyDataSetChanged();
     }
@@ -135,12 +132,11 @@ public class IssueMilestoneListActivity extends BaseActivity implements OnItemCl
         MilestoneAdapter adapter = (MilestoneAdapter) adapterView.getAdapter();
         Milestone milestone = (Milestone) adapter.getItem(position);
         
-//        Intent intent = new Intent().setClass(this, IssueListByMilestoneActivity.class);
-//        intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
-//        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-//        intent.putExtra(Constants.Issue.ISSUE_MILESTONE_NUMBER, milestone.getNumber());
-//        intent.putExtra(Constants.Issue.ISSUE_MILESTONE_TITLE, milestone.getTitle());
-//        startActivity(intent);
+        Intent intent = new Intent().setClass(this, IssueMilestoneEditActivity.class);
+        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        intent.putExtra(Constants.Milestone.NUMBER, milestone.getNumber());
+        startActivity(intent);
     }
     
     @Override
@@ -171,110 +167,6 @@ public class IssueMilestoneListActivity extends BaseActivity implements OnItemCl
                 return true;
             default:
                 return true;
-        }
-    }
-    
-    private static class DeleteIssueMilestoneTask extends AsyncTask<Integer, Void, Void> {
-
-        private WeakReference<IssueMilestoneListActivity> mTarget;
-        private boolean mException;
-        
-        public DeleteIssueMilestoneTask(IssueMilestoneListActivity activity) {
-            mTarget = new WeakReference<IssueMilestoneListActivity>(activity);
-        }
-
-        @Override
-        protected Void doInBackground(Integer... params) {
-            if (mTarget.get() != null) {
-                try {
-                    IssueMilestoneListActivity activity = mTarget.get();
-                    GitHubClient client = new GitHubClient();
-                    client.setOAuth2Token(mTarget.get().getAuthToken());
-                    MilestoneService milestoneService = new MilestoneService(client);
-                    
-                    Milestone milestone = (Milestone) activity.mListView.getItemAtPosition(params[0]);
-                    
-                    milestoneService.deleteMilestone(activity.mRepoOwner, activity.mRepoName, 
-                            milestone.getNumber());
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            if (mTarget.get() != null) {
-                IssueMilestoneListActivity activity = mTarget.get();
-    
-                if (mException) {
-                    activity.showError();
-                }
-                else {
-                    new LoadIssueMilestonesTask(activity).execute();
-                }
-            }
-        }
-    }
-    
-    private static class AddIssueMilestonesTask extends AsyncTask<String, Void, Void> {
-
-        private WeakReference<IssueMilestoneListActivity> mTarget;
-        private boolean mException;
-        
-        public AddIssueMilestonesTask(IssueMilestoneListActivity activity) {
-            mTarget = new WeakReference<IssueMilestoneListActivity>(activity);
-        }
-
-        @Override
-        protected Void doInBackground(String... params) {
-            if (mTarget.get() != null) {
-                try {
-                    IssueMilestoneListActivity activity = mTarget.get();
-                    GitHubClient client = new GitHubClient();
-                    client.setOAuth2Token(mTarget.get().getAuthToken());
-                    MilestoneService milestoneService = new MilestoneService(client);
-                    
-                    String title = params[0];
-                    String desc = params[1];
-                    
-                    Milestone milestone = new Milestone();
-                    milestone.setTitle(title);
-                    milestone.setDescription(desc);
-                    
-                    milestoneService.createMilestone(activity.mRepoOwner, activity.mRepoName, milestone);
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            if (mTarget.get() != null) {
-                IssueMilestoneListActivity activity = mTarget.get();
-    
-                if (mException) {
-                    activity.showMessage(activity.getResources().getString(R.string.issue_error_create_label), false);
-                }
-                else {
-                    new LoadIssueMilestonesTask(activity).execute();
-                }
-            }
         }
     }
 }

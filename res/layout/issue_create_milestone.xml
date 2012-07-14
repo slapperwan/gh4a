@@ -26,5 +26,14 @@
             android:minLines="5"
             android:inputType="textMultiLine|textCapSentences"
             android:hint="@string/issue_milestone_desc" />
+        <EditText 
+            android:id="@+id/et_due_date"
+            android:layout_width="fill_parent" 
+            android:layout_height="wrap_content"
+            android:hint="@string/issue_milestone_due_date"
+            android:cursorVisible="false" 
+            android:focusable="false" 
+            android:focusableInTouchMode="false"             
+            android:onClick="showDatePickerDialog" />
     </LinearLayout>
 </ScrollView>

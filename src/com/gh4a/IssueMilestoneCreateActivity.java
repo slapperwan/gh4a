@@ -17,15 +17,23 @@ package com.gh4a;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.MilestoneService;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.util.Log;
+import android.view.View;
+import android.widget.DatePicker;
 import android.widget.EditText;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -38,6 +46,7 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
 
     private String mRepoOwner;
     private String mRepoName;
+    private Date mDueOn;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -84,6 +93,7 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
                     Milestone milestone = new Milestone();
                     milestone.setTitle(title);
                     milestone.setDescription(desc);
+                    milestone.setDueOn(activity.mDueOn);
                     
                     milestoneService.createMilestone(activity.mRepoOwner, activity.mRepoName, milestone);
                 }
@@ -112,6 +122,52 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
                 }
             }
         }
+    }
+    
+    public void showDatePickerDialog(View v) {
+        DialogFragment newFragment = new DatePickerFragment(this);
+        newFragment.show(getSupportFragmentManager(), "datePicker");
+    }
+    
+    public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+
+        private WeakReference<IssueMilestoneCreateActivity> mTarget;
+        
+        public DatePickerFragment(IssueMilestoneCreateActivity activity) {
+            mTarget = new WeakReference<IssueMilestoneCreateActivity>(activity);
+        }
+        
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+            
+            return new DatePickerDialog(getActivity(), this, year, month, day);
+        }
+        
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+            if (mTarget != null) {
+                mTarget.get().setDueOn(year, month, day);
+            }
+        }
+    }
+    
+    private void setDueOn(int year, int month, int day) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.DAY_OF_MONTH, day);
+        cal.set(Calendar.MONTH, month);
+        cal.set(Calendar.YEAR, year);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        
+        mDueOn = cal.getTime();
+        
+        EditText etDueDate = (EditText) findViewById(R.id.et_due_date);
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
+        etDueDate.setText(sdf.format(mDueOn));
     }
     
     private void openIssueMilestones() {

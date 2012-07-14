@@ -15,6 +15,7 @@
  */
 package com.gh4a.adapter;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Milestone;
@@ -88,6 +89,11 @@ public class MilestoneAdapter extends RootAdapter<Milestone> {
             if (viewHolder.tvExtra != null) {
                 String extraData = "State " + milestone.getState() + "   " + milestone.getClosedIssues() + " closed"
                         + "   " + milestone.getOpenIssues() + " open ";
+                
+                if (milestone.getDueOn() != null) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
+                    extraData += "  Due on " + sdf.format(milestone.getDueOn());
+                }
                 viewHolder.tvExtra.setText(extraData);
             }
         }

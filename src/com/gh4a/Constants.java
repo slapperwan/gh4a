@@ -331,6 +331,10 @@ public interface Constants {
         public static final String HIDE_ADD = "Bookmark.hideAdd";
     }
     
+    public interface Milestone {
+        public static final String NUMBER = "Milestone.number";
+    }
+    
     public static String[] SKIP_PRETTIFY_EXT = {
         "txt", "rdoc", "markdown", "md", "mdown", "mkdn", "mkd", "texttile", "org", "creole", "rst", "asciidoc", "pod", ""
     };

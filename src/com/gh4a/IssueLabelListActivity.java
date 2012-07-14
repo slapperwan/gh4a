@@ -33,6 +33,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.text.Html;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.View;
@@ -186,7 +187,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
                 public void onClick(View arg0) {
                     String selectedColor = (String) tvLabel.getTag();
                     String newLabelName = etLabel.getText().toString();
-                    new AddIssueLabelsTask(IssueLabelListActivity.this).execute(label.getName(), 
+                    new EditIssueLabelsTask(IssueLabelListActivity.this).execute(label.getName(), 
                             newLabelName, selectedColor);
                 }
             });
@@ -298,18 +299,18 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
                     activity.showError();
                 }
                 else {
-                    new LoadIssueLabelsTask(activity).execute();
+                    activity.getSupportLoaderManager().restartLoader(0, null, activity).forceLoad();
                 }
             }
         }
     }
     
-    private static class AddIssueLabelsTask extends AsyncTask<String, Void, Void> {
+    private static class EditIssueLabelsTask extends AsyncTask<String, Void, Void> {
 
         private WeakReference<IssueLabelListActivity> mTarget;
         private boolean mException;
         
-        public AddIssueLabelsTask(IssueLabelListActivity activity) {
+        public EditIssueLabelsTask(IssueLabelListActivity activity) {
             mTarget = new WeakReference<IssueLabelListActivity>(activity);
         }
 
@@ -353,7 +354,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
                     activity.showMessage(activity.getResources().getString(R.string.issue_error_edit_label), false);
                 }
                 else {
-                    new LoadIssueLabelsTask(activity).execute();
+                    activity.getSupportLoaderManager().restartLoader(0, null, activity).forceLoad();
                 }
             }
         }
