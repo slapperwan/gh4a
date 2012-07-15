@@ -18,7 +18,6 @@ package com.gh4a.adapter;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Content;
-import org.eclipse.egit.github.core.TreeEntry;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -28,7 +27,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.R;
-import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.FileUtils;
 
 public class FileAdapter extends RootAdapter<Content> {
 
@@ -46,7 +45,7 @@ public class FileAdapter extends RootAdapter<Content> {
         Content content = mObjects.get(position);
         if (content != null) {
             ImageView ivIcon = (ImageView) v.findViewById(R.id.iv_icon);
-            ivIcon.setBackgroundResource(getIconId(content.getType(), StringUtils
+            ivIcon.setBackgroundResource(getIconId(content.getType(), FileUtils
                     .getFileExtension(content.getName())));
 
             TextView tvFilename = (TextView) v.findViewById(R.id.tv_text);

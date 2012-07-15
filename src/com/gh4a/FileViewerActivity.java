@@ -87,9 +87,14 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
 
         webView.getSettings().setUseWideViewPort(true);
 
-        String highlighted = StringUtils.highlightSyntax(data, highlight, mName);
         webView.setWebViewClient(webViewClient);
-        webView.loadDataWithBaseURL("file:///android_asset/", highlighted, "text/html", "utf-8", "");
+        if (FileUtils.isImage(mName)) {
+            webView.loadUrl("https://github.com/" + mRepoOwner + "/" + mRepoName + "/raw/" + mRef + "/" + mPath);
+        }
+        else {
+            String highlighted = StringUtils.highlightSyntax(data, highlight, mName);
+            webView.loadDataWithBaseURL("file:///android_asset/", highlighted, "text/html", "utf-8", "");
+        }
     }
 
     @Override

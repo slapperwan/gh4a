@@ -15,12 +15,13 @@
  */
 package com.gh4a;
 
-import com.actionbarsherlock.app.ActionBar;
-
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.gh4a.utils.FileUtils;
 
 public class DiffViewerActivity extends BaseActivity {
 
@@ -45,22 +46,33 @@ public class DiffViewerActivity extends BaseActivity {
         mDiff = data.getString(Constants.Commit.DIFF);
         mFilePath = data.getString(Constants.Object.PATH);
 
+        String filename = FileUtils.getFileName(mFilePath);
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(mFilePath);
+        actionBar.setTitle(filename);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
         WebView diffView = (WebView) findViewById(R.id.web_view);
-        String formatted = highlightSyntax();
+        
         WebSettings s = diffView.getSettings();
         s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
+        s.setUseWideViewPort(false);
+        s.setAllowFileAccess(true);
         s.setBuiltInZoomControls(true);
         s.setLightTouchEnabled(true);
         s.setLoadsImagesAutomatically(true);
         s.setPluginsEnabled(false);
         s.setSupportZoom(true);
-        s.setUseWideViewPort(true);
-        diffView.loadDataWithBaseURL("file:///android_asset/", formatted, "text/html", "utf-8", "");
+        s.setSupportMultipleWindows(true);
+        s.setJavaScriptEnabled(true);
+        
+        if (FileUtils.isImage(filename)) {
+            diffView.loadUrl("https://github.com/" + mRepoOwner + "/" + mRepoName + "/raw/" + mSha + "/" + mFilePath);
+        }
+        else {
+            String formatted = highlightSyntax();
+            diffView.loadDataWithBaseURL("file:///android_asset/", formatted, "text/html", "utf-8", "");
+        }
     }
 
     private String highlightSyntax() {

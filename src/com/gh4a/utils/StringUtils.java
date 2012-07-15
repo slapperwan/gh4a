@@ -321,22 +321,6 @@ public class StringUtils {
         }
     }
 
-    /**
-     * Gets the file extension.
-     *
-     * @param filename the filename
-     * @return the file extension
-     */
-    public static String getFileExtension(String filename) {
-        int mid = filename.lastIndexOf(".");
-        if (mid != -1) {
-            return filename.substring(mid + 1, filename.length());
-        }
-        else {
-            return "";
-        }
-    }
-    
     public static String toHumanReadbleFormat(long size) {
         NumberFormat nf = new DecimalFormat("0.#");
         String s;
@@ -357,7 +341,7 @@ public class StringUtils {
     }
     
     public static String highlightSyntax(String data, boolean highlight, String fileName) {
-        String ext = StringUtils.getFileExtension(fileName);
+        String ext = FileUtils.getFileExtension(fileName);
         
         StringBuilder content = new StringBuilder();
         content.append("<html><head><title></title>");
