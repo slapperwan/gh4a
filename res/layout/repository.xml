@@ -69,8 +69,26 @@
         </LinearLayout>
         <View
             android:layout_width="fill_parent"
-            android:layout_height="10dp"
-            />
+            android:layout_height="10dp" />
+        <LinearLayout
+            android:id="@+id/ll_btn_actions"
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp" >
+            <Button
+                android:id="@+id/btn_watch" 
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="0dp"
+                android:text="@string/repo_watch_action"
+                android:background="@drawable/button_blue"
+                style="@style/ButtonText" />
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="5dp" />
+        </LinearLayout>
         <TableLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"

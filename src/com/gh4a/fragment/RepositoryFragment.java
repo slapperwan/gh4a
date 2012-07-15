@@ -38,6 +38,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
@@ -50,18 +51,22 @@ import com.gh4a.ForkListActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.IssueListActivity;
 import com.gh4a.R;
+import com.gh4a.RepositoryActivity;
 import com.gh4a.WatcherListActivity;
 import com.gh4a.WikiListActivity;
+import com.gh4a.loader.IsWatchingLoader;
 import com.gh4a.loader.ReadmeLoader;
+import com.gh4a.loader.WatchLoader;
 import com.gh4a.utils.StringUtils;
 import com.petebevin.markdown.MarkdownProcessor;
 
 public class RepositoryFragment extends SherlockFragment implements 
-    OnClickListener, LoaderManager.LoaderCallbacks<Content> {
+    OnClickListener, LoaderManager.LoaderCallbacks {
 
     private Repository mRepository;
     private String mRepoOwner;
     private String mRepoName;
+    private boolean isWatching;
     
     public static RepositoryFragment newInstance(Repository repository) {
         RepositoryFragment f = new RepositoryFragment();
@@ -94,8 +99,31 @@ public class RepositoryFragment extends SherlockFragment implements
         
         fillData();
         
-        getLoaderManager().initLoader(1, null, this);
-        getLoaderManager().getLoader(1).forceLoad();
+        RepositoryActivity repoActivity = (RepositoryActivity) getSherlockActivity();
+        LinearLayout llBtnActions = (LinearLayout) getView().findViewById(R.id.ll_btn_actions);
+        if (mRepoOwner.equals(repoActivity.getAuthLogin())) {
+            llBtnActions.setVisibility(View.GONE);
+        }
+        else {
+            llBtnActions.setVisibility(View.VISIBLE);
+            
+            Button btnWatch = (Button) getView().findViewById(R.id.btn_watch);
+            btnWatch.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getLoaderManager().restartLoader(2, null, RepositoryFragment.this);
+                    getLoaderManager().getLoader(2).forceLoad();
+                }
+            });
+            
+            getLoaderManager().initLoader(1, null, this);
+            getLoaderManager().getLoader(1).forceLoad();
+        }
+        
+        getLoaderManager().initLoader(0, null, this);
+        getLoaderManager().getLoader(0).forceLoad();
+        
+        getLoaderManager().initLoader(2, null, this);
     }
 
     public void fillData() {
@@ -402,14 +430,44 @@ public class RepositoryFragment extends SherlockFragment implements
         startActivity(intent);
     }
 
+    private void updateWatchBtn() {
+        Button btnFollow = (Button) getView().findViewById(R.id.btn_watch);
+        if (isWatching) {
+            btnFollow.setBackgroundResource(R.drawable.button_red);
+            btnFollow.setText(R.string.repo_unwatch_action);
+        }
+        else {
+            btnFollow.setBackgroundResource(R.drawable.button_blue);
+            btnFollow.setText(R.string.repo_watch_action);
+        }
+    }
+    
     @Override
-    public Loader<Content> onCreateLoader(int id, Bundle bundle) {
-        return new ReadmeLoader(getSherlockActivity(), mRepoOwner, mRepoName);
+    public Loader onCreateLoader(int id, Bundle bundle) {
+        if (id == 1) {
+            return new IsWatchingLoader(getSherlockActivity(), mRepoOwner, mRepoName);
+        }
+        else if (id == 2) {
+            return new WatchLoader(getSherlockActivity(), mRepoOwner, mRepoName, isWatching);
+        }
+        else {
+            return new ReadmeLoader(getSherlockActivity(), mRepoOwner, mRepoName);            
+        }
     }
 
     @Override
-    public void onLoadFinished(Loader<Content> loader, Content content) {
-        fillReadme(content);
+    public void onLoadFinished(Loader loader, Object object) {
+        if (loader.getId() == 1) {
+            isWatching = (Boolean) object;
+            updateWatchBtn();
+        }
+        else if (loader.getId() == 2) {
+            isWatching = (Boolean) object;
+            updateWatchBtn();
+        }
+        else {
+            fillReadme((Content) object);
+        }
     }
 
     @Override
