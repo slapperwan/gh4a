@@ -65,6 +65,7 @@ import com.gh4a.R;
 import com.gh4a.WikiListActivity;
 import com.gh4a.adapter.FeedAdapter;
 import com.gh4a.loader.PageIteratorLoader;
+import com.gh4a.utils.CommitUtils;
 
 public abstract class EventListFragment extends SherlockFragment 
     implements LoaderManager.LoaderCallbacks<List<Event>>, OnItemClickListener {
@@ -184,7 +185,7 @@ public abstract class EventListFragment extends SherlockFragment
             
             if (eventRepo != null) {
                 PushPayload payload = (PushPayload) event.getPayload();
-
+                
                 List<Commit> commits = payload.getCommits();
                 // if commit > 1, then show compare activity
                 
@@ -193,14 +194,16 @@ public abstract class EventListFragment extends SherlockFragment
                     for (Commit commit : commits) {
                         String[] commitInfo = new String[4];
                         commitInfo[0] = commit.getSha();
-                        commitInfo[1] = commit.getAuthor().getEmail();
+                        commitInfo[1] = CommitUtils.getAuthorEmail(commit);
                         commitInfo[2] = commit.getMessage();
-                        commitInfo[3] = commit.getAuthor().getName();
+                        commitInfo[3] = CommitUtils.getAuthorName(commit);
                         intent.putExtra("commit" + commit.getSha(), commitInfo);
                     }
                     
                     intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
                     intent.putExtra(Constants.Repository.REPO_NAME, repoName);
+                    intent.putExtra(Constants.Repository.HEAD, payload.getHead());
+                    intent.putExtra(Constants.Repository.BASE, payload.getRef());
                     startActivity(intent);
                 }
                 // only 1 commit, then show the commit details

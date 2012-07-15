@@ -1,9 +1,11 @@
 package com.gh4a.utils;
 
+import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.RepositoryCommit;
 
 public class CommitUtils {
 
+    //RepositoryCommit
     public static String getAuthorName(RepositoryCommit repositoryCommit) {
         if (repositoryCommit.getAuthor() != null) {
             return repositoryCommit.getAuthor().getLogin();
@@ -66,6 +68,43 @@ public class CommitUtils {
         else if (repositoryCommit.getCommit().getCommitter() != null
                 && repositoryCommit.getCommit().getCommitter().getEmail() != null) {
             return StringUtils.md5Hex(repositoryCommit.getCommit().getCommitter().getEmail());
+        }
+        else {
+            return null;
+        }
+    }
+    
+    //Commit
+    public static String getAuthorName(Commit commit) {
+        if (commit.getAuthor() != null) {
+            return commit.getAuthor().getName();
+        }
+        else {
+            return "unknown";
+        }
+    }
+    
+    public static String getCommitterName(Commit commit) {
+        if (commit.getCommitter() != null) {
+            return commit.getCommitter().getName();
+        }
+        else {
+            return "unknown";
+        }
+    }
+    
+    public static String getAuthorEmail(Commit commit) {
+        if (commit.getAuthor() != null) {
+            return commit.getAuthor().getEmail();
+        }
+        else {
+            return null;
+        }
+    }
+    
+    public static String getCommitterEmail(Commit commit) {
+        if (commit.getCommitter() != null) {
+            return commit.getCommitter().getEmail();
         }
         else {
             return null;
