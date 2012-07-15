@@ -122,17 +122,24 @@
                 android:id="@+id/btn_save" 
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/save" />
+                android:layout_marginLeft="0dp"
+                android:text="@string/save"
+                android:background="@drawable/button_blue"
+                style="@style/ButtonText" />
             <Button
                 android:id="@+id/btn_delete" 
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/delete" />
+                android:text="@string/delete"
+                android:background="@drawable/button_red"
+                style="@style/ButtonText" />
             <Button
                 android:id="@+id/btn_cancel" 
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/cancel" />
+                android:text="@string/cancel"
+                android:background="@drawable/button_black"
+                style="@style/ButtonText" />
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>
