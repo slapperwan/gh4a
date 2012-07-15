@@ -28,17 +28,13 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CommitService;
 
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.SpannableString;
-import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -165,9 +161,6 @@ public class CommitActivity extends BaseActivity {
         tvDeletedTitle.setTypeface(getApplicationContext().boldCondensed);
         tvDeletedTitle.setTextColor(Color.parseColor("#0099cc"));
         
-        Resources res = getResources();
-        String extraDataFormat = res.getString(R.string.more_data);
-
         tvMessage.setText(commit.getCommit().getMessage());
         
         Calendar cal = Calendar.getInstance();
@@ -175,9 +168,7 @@ public class CommitActivity extends BaseActivity {
         int timezoneOffset = (cal.get(Calendar.ZONE_OFFSET) + cal.get(Calendar.DST_OFFSET)) / 3600000;
         cal.add(Calendar.HOUR, timezoneOffset);
         
-        tvExtra.setText(String.format(extraDataFormat,
-                CommitUtils.getAuthorName(commit), 
-                pt.format(cal.getTime())));
+        tvExtra.setText(CommitUtils.getAuthorName(commit) + " " + pt.format(cal.getTime()));
 
         List<CommitFile> addedFiles = new ArrayList<CommitFile>();
         List<CommitFile> removedFiles = new ArrayList<CommitFile>();

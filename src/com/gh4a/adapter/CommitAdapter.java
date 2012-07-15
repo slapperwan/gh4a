@@ -52,17 +52,14 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
             
             Gh4Application app = (Gh4Application) mContext.getApplicationContext();
             Typeface boldCondensed = app.boldCondensed;
-            Typeface italic = app.italic;
             
             viewHolder = new ViewHolder();
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
             viewHolder.tvDesc.setTypeface(boldCondensed);
             
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-            viewHolder.tvExtra.setTypeface(italic);
             
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-            //viewHolder.tvSha = (TextView) v.findViewById(R.id.tv_sha);
 
             v.setTag(viewHolder);
         }
