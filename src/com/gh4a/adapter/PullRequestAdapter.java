@@ -68,25 +68,30 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> {
 
         final PullRequest pullRequest = mObjects.get(position);
         if (pullRequest != null) {
-            ImageDownloader.getInstance().download(pullRequest.getUser().getGravatarId(),
-                    viewHolder.ivGravatar);
-            viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    /** Open user activity */
-                    Gh4Application context = (Gh4Application) v.getContext()
-                            .getApplicationContext();
-                    context.openUserInfoActivity(v.getContext(), pullRequest.getUser()
-                            .getLogin(), null);
-                }
-            });
+            if (pullRequest.getUser() != null) {
+                ImageDownloader.getInstance().download(pullRequest.getUser().getGravatarId(),
+                        viewHolder.ivGravatar);
+                viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
+    
+                    @Override
+                    public void onClick(View v) {
+                        /** Open user activity */
+                        Gh4Application context = (Gh4Application) v.getContext()
+                                .getApplicationContext();
+                        context.openUserInfoActivity(v.getContext(), pullRequest.getUser()
+                                .getLogin(), null);
+                    }
+                });
+            }
+            else {
+                ImageDownloader.getInstance().download(null, viewHolder.ivGravatar);
+            }
 
             viewHolder.tvDesc.setText(pullRequest.getTitle());
             Resources res = v.getResources();
             
             String extraData = res.getString(R.string.more_issue_data, 
-                    pullRequest.getUser().getLogin(),
+                    pullRequest.getUser() != null ? pullRequest.getUser().getLogin() : "",
                     pt.format(pullRequest.getCreatedAt()));
             
             viewHolder.tvExtra.setText(extraData);
