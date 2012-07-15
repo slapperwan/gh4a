@@ -45,6 +45,11 @@ public class OrganizationMemberListActivity extends UserListActivity {
     protected int getRowLayout() {
         return R.layout.row_gravatar_1;
     }
+    
+    @Override
+    protected boolean getShowExtraData() {
+        return false;
+    }
 
     protected List<User> getUsers() throws IOException {
         GitHubClient client = new GitHubClient();
