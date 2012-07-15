@@ -93,18 +93,20 @@ public class PullRequestActivity extends BaseSherlockFragmentActivity
         lvComments.setAdapter(mCommentAdapter);
         
         ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
-        ImageDownloader.getInstance().download(pullRequest.getUser().getGravatarId(),
-                ivGravatar);
-        ivGravatar.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View arg0) {
-                getApplicationContext()
-                        .openUserInfoActivity(PullRequestActivity.this,
-                                pullRequest.getUser().getLogin(),
-                                pullRequest.getUser().getName());
-            }
-        });
+        if (pullRequest.getUser() != null) {
+            ImageDownloader.getInstance().download(pullRequest.getUser().getGravatarId(),
+                    ivGravatar);
+            ivGravatar.setOnClickListener(new OnClickListener() {
+    
+                @Override
+                public void onClick(View arg0) {
+                    getApplicationContext()
+                            .openUserInfoActivity(PullRequestActivity.this,
+                                    pullRequest.getUser().getLogin(),
+                                    pullRequest.getUser().getName());
+                }
+            });
+        }
         
         TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
         TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
@@ -136,7 +138,7 @@ public class PullRequestActivity extends BaseSherlockFragmentActivity
             tvDesc.setTypeface(getApplicationContext().regular);
         }
         tvExtra.setText(getResources().getString(R.string.issue_open_by_user,
-                pullRequest.getUser().getLogin(),
+                pullRequest.getUser() != null ? pullRequest.getUser().getLogin() : "",
                 pt.format(pullRequest.getCreatedAt())));
         
     }
