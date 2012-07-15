@@ -56,7 +56,7 @@ public class DiffViewerActivity extends BaseActivity {
         
         WebSettings s = diffView.getSettings();
         s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
-        s.setUseWideViewPort(false);
+        s.setUseWideViewPort(true);
         s.setAllowFileAccess(true);
         s.setBuiltInZoomControls(true);
         s.setLightTouchEnabled(true);
