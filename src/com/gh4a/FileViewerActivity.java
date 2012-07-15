@@ -21,15 +21,19 @@ import org.eclipse.egit.github.core.util.EncodingUtils;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.loader.ContentLoader;
+import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 
 public class FileViewerActivity extends BaseSherlockFragmentActivity 
@@ -65,8 +69,8 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
         getSupportLoaderManager().getLoader(0).forceLoad();
     }
 
-    private void fillData(Content content, boolean highlight) {
-        String data = new String(EncodingUtils.fromBase64(content.getContent()));
+    private void fillData(boolean highlight) {
+        String data = new String(EncodingUtils.fromBase64(mContent.getContent()));
         WebView webView = (WebView) findViewById(R.id.web_view);
 
         WebSettings s = webView.getSettings();
@@ -88,6 +92,34 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
         webView.loadDataWithBaseURL("file:///android_asset/", highlighted, "text/html", "utf-8", "");
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuInflater inflater = getSupportMenuInflater();
+        inflater.inflate(R.menu.download_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.download:
+                if (mContent != null) {
+                    boolean success = FileUtils.save(mName, new String(EncodingUtils.fromBase64(mContent.getContent())));
+                    if (success) {
+                        showMessage("File saved at "
+                                + Environment.getExternalStorageDirectory().getAbsolutePath() + "/download/" + mName, false);
+                    }
+                    else {
+                        showMessage("Unable to save the file", false);
+                    }
+                }
+                return true;
+
+            default:
+                return true;
+        }
+    }
+    
     private WebViewClient webViewClient = new WebViewClient() {
 
         @Override
@@ -110,7 +142,8 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
     @Override
     public void onLoadFinished(Loader<Content> loader, Content content) {
         if (content != null) {
-            fillData(content, true);
+            mContent = content;
+            fillData(true);
         }
     }
 
