@@ -34,42 +34,57 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
-                <TextView
-                    android:id="@+id/tv_created_at"
-                    android:layout_width="match_parent"
+                <Button 
+                    android:id="@+id/btn_follow"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-                <TextView
-                    android:id="@+id/tv_email"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textColorLink="@color/titletextcolor"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:autoLink="email" />
-                <TextView
-                    android:id="@+id/tv_website"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textColorLink="@color/titletextcolor"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:autoLink="web" />
-                <TextView
-                    android:id="@+id/tv_company"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-                <TextView
-                    android:id="@+id/tv_location"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:autoLink="map" />
+                    android:background="@drawable/button_blue"
+                    style="@style/ButtonText" />
             </LinearLayout>
         </RelativeLayout>
         <View
             android:layout_width="fill_parent"
-            android:layout_height="10dp"
-            />
+            android:layout_height="10dp" />
+        <LinearLayout
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp">
+            <TextView
+                android:id="@+id/tv_created_at"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+            <TextView
+                android:id="@+id/tv_email"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textColorLink="@color/titletextcolor"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:autoLink="email" />
+            <TextView
+                android:id="@+id/tv_website"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textColorLink="@color/titletextcolor"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:autoLink="web" />
+            <TextView
+                android:id="@+id/tv_company"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+            <TextView
+                android:id="@+id/tv_location"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:autoLink="map" />
+        </LinearLayout>
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="10dp" />
         <TableLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"

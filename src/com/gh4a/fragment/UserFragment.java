@@ -34,6 +34,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
@@ -48,6 +49,9 @@ import com.gh4a.GistListActivity;
 import com.gh4a.OrganizationMemberListActivity;
 import com.gh4a.R;
 import com.gh4a.RepositoryListActivity;
+import com.gh4a.UserActivity;
+import com.gh4a.loader.FollowUserLoader;
+import com.gh4a.loader.IsFollowingUserLoader;
 import com.gh4a.loader.OrganizationListLoader;
 import com.gh4a.loader.RepositoryListLoader;
 import com.gh4a.loader.UserLoader;
@@ -60,6 +64,7 @@ public class UserFragment extends SherlockFragment implements
     private String mUserLogin;
     private String mUserName;
     private User mUser;
+    private boolean isFollowing;
 
     public static UserFragment newInstance(String login, String name) {
         UserFragment f = new UserFragment();
@@ -96,13 +101,14 @@ public class UserFragment extends SherlockFragment implements
         
         getLoaderManager().initLoader(0, null, this);
         getLoaderManager().getLoader(0).forceLoad();
+        
+        getLoaderManager().initLoader(4, null, this);
     }
     
     private void fillData() {
         View v = getView();
         Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
         Typeface boldCondensed = app.boldCondensed;
-        Typeface condensed = app.condensed;
         Typeface regular = app.regular;
         
         ImageView ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
@@ -139,7 +145,6 @@ public class UserFragment extends SherlockFragment implements
         //hide following if organization
         TableLayout tlFollowing = (TableLayout) v.findViewById(R.id.cell_following);
         if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
-            TextView tvFollowing = (TextView) v.findViewById(R.id.tv_following_label);
             
             TextView tvFollowingCount = (TextView) v.findViewById(R.id.tv_following_count);
             tvFollowingCount.setTypeface(boldCondensed);
@@ -152,7 +157,6 @@ public class UserFragment extends SherlockFragment implements
         }
         
         TableLayout tlRepos = (TableLayout) v.findViewById(R.id.cell_repos);
-        TextView tvRepos = (TextView) v.findViewById(R.id.tv_repos_label);
         
         TextView tvReposCount = (TextView) v.findViewById(R.id.tv_repos_count);
         tvReposCount.setTypeface(boldCondensed);
@@ -169,7 +173,6 @@ public class UserFragment extends SherlockFragment implements
         //hide gists repos if organization
         TableLayout tlGists = (TableLayout) v.findViewById(R.id.cell_gists);
         if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
-            TextView tvGists = (TextView) v.findViewById(R.id.tv_gists_label);
             
             TextView tvGistsCount = (TextView) v.findViewById(R.id.tv_gists_count);
             tvGistsCount.setTypeface(boldCondensed);
@@ -244,10 +247,30 @@ public class UserFragment extends SherlockFragment implements
         tvOrgs.setTypeface(boldCondensed);
         tvOrgs.setTextColor(Color.parseColor("#0099cc"));
         
-        getLoaderManager().initLoader(1, null, this);
-        getLoaderManager().getLoader(1).forceLoad();
+        UserActivity userActivity = (UserActivity) getSherlockActivity();
+        Button btnFollow = (Button) getView().findViewById(R.id.btn_follow);
+        if (mUserLogin.equals(userActivity.getAuthLogin())) {
+            btnFollow.setVisibility(View.GONE);
+        }
+        else {
+            btnFollow.setVisibility(View.VISIBLE);
+            btnFollow.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getLoaderManager().restartLoader(4, null, UserFragment.this);
+                    getLoaderManager().getLoader(4).forceLoad();
+                }
+            });
+            
+            getLoaderManager().initLoader(3, null, this);
+            getLoaderManager().getLoader(3).forceLoad();
+        }
         
+        getLoaderManager().initLoader(1, null, this);
         getLoaderManager().initLoader(2, null, this);
+        
+        
+        getLoaderManager().getLoader(1).forceLoad();
         getLoaderManager().getLoader(2).forceLoad();
     }
 
@@ -437,33 +460,60 @@ public class UserFragment extends SherlockFragment implements
         }
     }
     
+    private void updateFollowBtn() {
+        Button btnFollow = (Button) getView().findViewById(R.id.btn_follow);
+        if (isFollowing) {
+            btnFollow.setBackgroundResource(R.drawable.button_red);
+            btnFollow.setText(R.string.user_unfollow_action);
+        }
+        else {
+            btnFollow.setBackgroundResource(R.drawable.button_blue);
+            btnFollow.setText(R.string.user_follow_action);
+        }
+    }
+    
     @Override
     public Loader onCreateLoader(int id, Bundle arg1) {
-        if (id == 0) {
-            return new UserLoader(getSherlockActivity(), mUserLogin);
-        }
-        else if (id == 1) {
+        if (id == 1) {
             Map<String, String> filterData = new HashMap<String, String>();
             filterData.put("sort", "pushed");
             return new RepositoryListLoader(getSherlockActivity(), mUserLogin, 
                     mUser.getType(), filterData, 5);
         }
-        else {
+        else if (id == 2) {
             return new OrganizationListLoader(getSherlockActivity(), mUserLogin);
+        }
+        else if (id == 3) {
+            return new IsFollowingUserLoader(getSherlockActivity(), mUserLogin);
+        }
+        else if (id == 4) {
+            return new FollowUserLoader(getSherlockActivity(), mUserLogin, isFollowing);
+        }
+        else {
+            return new UserLoader(getSherlockActivity(), mUserLogin);
+            
         }
     }
 
     @Override
     public void onLoadFinished(Loader loader, Object object) {
-        if (loader.getId() == 0) {
-            mUser = (User) object;
-            fillData();
-        }
-        else if (loader.getId() == 1) {
+        if (loader.getId() == 1) {
             fillTopRepos((List<Repository>) object);
         }
-        else {
+        else if (loader.getId() == 2) {
             fillOrganizations((List<User>) object);
+        }
+        else if (loader.getId() == 3) {
+            isFollowing = (Boolean) object;
+            updateFollowBtn();
+        }
+        else if (loader.getId() == 4) {
+            isFollowing = (Boolean) object;
+            updateFollowBtn();
+        }
+        else {
+            mUser = (User) object;
+            fillData();
         }
     }
 
