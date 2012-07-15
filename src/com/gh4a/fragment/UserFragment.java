@@ -406,13 +406,9 @@ public class UserFragment extends SherlockFragment implements
             i++;
         }
         
-        TextView tvMore = new TextView(getSherlockActivity());
-        tvMore.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-        tvMore.setBackgroundResource(android.R.drawable.list_selector_background);
+        Button btnMore = (Button) getView().findViewById(R.id.btn_repos);
         if (!repos.isEmpty()) {
-            tvMore.setText("View more");
-            tvMore.setOnClickListener(new OnClickListener() {
-                
+            btnMore.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     getPublicRepos(view);
@@ -420,9 +416,11 @@ public class UserFragment extends SherlockFragment implements
             });
         }
         else {
-            tvMore.setText("Repositories not found");
+            btnMore.setVisibility(View.GONE);
+            TextView noRepos = new TextView(getSherlockActivity());
+            noRepos.setText("Repositories not found");
+            ll.addView(noRepos);
         }
-        ll.addView(tvMore);
     }
     
     public void fillOrganizations(List<User> orgs) {
