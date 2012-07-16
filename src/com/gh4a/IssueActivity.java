@@ -53,12 +53,13 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.adapter.CommentAdapter;
+import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.IssueLoader;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
 
 public class IssueActivity extends BaseSherlockFragmentActivity implements 
-    OnClickListener, LoaderManager.LoaderCallbacks<Issue> {
+    OnClickListener, LoaderManager.LoaderCallbacks {
 
     private Issue mIssue;
     private String mRepoOwner;
@@ -66,6 +67,8 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
     private int mIssueNumber;
     private String mIssueState;
     private CommentAdapter mCommentAdapter;
+    private boolean isCollaborator;
+    private boolean isCreator;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -87,6 +90,8 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         
         getSupportLoaderManager().initLoader(0, null, this);
         getSupportLoaderManager().getLoader(0).forceLoad();
+        
+        getSupportLoaderManager().initLoader(1, null, this);
     }
 
     private void fillData() {
@@ -321,8 +326,14 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
             else {
                 menu.removeItem(R.id.issue_reopen);
             }
+            
+            if (!isCollaborator && !isCreator) {
+                menu.removeItem(R.id.issue_close);
+                menu.removeItem(R.id.issue_reopen);
+                menu.removeItem(R.id.issue_edit);
+            }
         }
-        return true;
+        return super.onPrepareOptionsMenu(menu);
     }
     
     @Override
@@ -595,18 +606,31 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
     }
     
     @Override
-    public Loader<Issue> onCreateLoader(int arg0, Bundle arg1) {
-        return new IssueLoader(this, mRepoOwner, mRepoName, mIssueNumber);
+    public Loader onCreateLoader(int id, Bundle arg1) {
+        if (id == 0) {
+            return new IssueLoader(this, mRepoOwner, mRepoName, mIssueNumber);
+        }
+        else {
+            return new IsCollaboratorLoader(this, mRepoOwner, mRepoName);
+        }
     }
 
     @Override
-    public void onLoadFinished(Loader<Issue> loader, Issue issue) {
-        mIssue = issue;
-        fillData();
+    public void onLoadFinished(Loader loader, Object object) {
+        if (loader.getId() == 0) {
+            mIssue = (Issue) object;
+            getSupportLoaderManager().getLoader(1).forceLoad();
+            fillData();
+        }
+        else {
+            isCollaborator = (Boolean) object;
+            isCreator = mIssue.getUser().getLogin().equals(getApplicationContext().getAuthLogin());
+            invalidateOptionsMenu();
+        }
     }
 
     @Override
-    public void onLoaderReset(Loader<Issue> arg0) {
+    public void onLoaderReset(Loader arg0) {
         // TODO Auto-generated method stub
         
     }

@@ -50,6 +50,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.loader.CollaboratorListLoader;
+import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.IssueLoader;
 import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.MilestoneListLoader;
@@ -78,6 +79,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
     private int mIssueNumber;
     private boolean mEditMode; 
     private Issue mEditIssue;
+    private boolean isCollaborator;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -131,13 +133,14 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
         getSupportLoaderManager().initLoader(0, null, this);
         getSupportLoaderManager().initLoader(1, null, this);
         getSupportLoaderManager().initLoader(2, null, this);
+        getSupportLoaderManager().initLoader(4, null, this);
         
         if (mEditMode) {
             getSupportLoaderManager().initLoader(3, null, this);
             getSupportLoaderManager().getLoader(3).forceLoad();
         }
         else {
-            getSupportLoaderManager().getLoader(0).forceLoad();
+            getSupportLoaderManager().getLoader(4).forceLoad();
         }
     }
     
@@ -479,8 +482,6 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
         if (mSelectedAssignee != null) {
             mTvSelectedAssignee.setText(mSelectedAssignee.getLogin());
         }
-        
-        getSupportLoaderManager().getLoader(0).forceLoad();//load labels
     }
     
     @Override
@@ -494,8 +495,11 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
         else if (id == 2) {
             return new CollaboratorListLoader(this, mRepoOwner, mRepoName);
         }
-        else {
+        else if (id == 3) {
             return new IssueLoader(this, mRepoOwner, mRepoName, mIssueNumber);
+        }
+        else {
+            return new IsCollaboratorLoader(this, mRepoOwner, mRepoName);
         }
     }
 
@@ -513,9 +517,18 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
             mAllAssignee = (List<User>) object;
             showAssigneesDialog();
         }
-        else {
+        else if (loader.getId() == 3) {
             mEditIssue = (Issue) object;
+            getSupportLoaderManager().getLoader(4).forceLoad();
             fillIssueData();
+        }
+        else {
+            isCollaborator = (Boolean) object;
+            LinearLayout ll = (LinearLayout) findViewById(R.id.for_collaborator);
+            if (isCollaborator) {
+                ll.setVisibility(View.VISIBLE);
+                getSupportLoaderManager().getLoader(0).forceLoad();
+            }
         }
     }
 

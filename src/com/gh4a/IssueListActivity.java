@@ -52,6 +52,7 @@ import com.gh4a.fragment.IssueListByCommentsFragment;
 import com.gh4a.fragment.IssueListBySubmittedFragment;
 import com.gh4a.fragment.IssueListByUpdatedFragment;
 import com.gh4a.loader.CollaboratorListLoader;
+import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.MilestoneListLoader;
 import com.gh4a.utils.StringUtils;
@@ -71,6 +72,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
     private ImageButton mBtnFilterByLabels;
     private ImageButton mBtnFilterByMilestone;
     private ImageButton mBtnFilterByAssignee;
+    private boolean isCollaborator;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -165,6 +167,8 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         getSupportLoaderManager().initLoader(0, null, this);
         getSupportLoaderManager().initLoader(1, null, this);
         getSupportLoaderManager().initLoader(2, null, this);
+        getSupportLoaderManager().initLoader(3, null, this);
+        getSupportLoaderManager().getLoader(3).forceLoad();
     }
 
     public class ThisPageAdapter extends FragmentStatePagerAdapter {
@@ -200,7 +204,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
     }
     
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onPrepareOptionsMenu(Menu menu) {
         menu.clear();
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.issues_menu, menu);
@@ -210,8 +214,12 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         else {
             menu.removeItem(R.id.view_closed_issues);
         }
+        if (!isCollaborator) {
+            menu.removeItem(R.id.view_labels);
+            menu.removeItem(R.id.view_milestones);
+        }
         
-        return super.onCreateOptionsMenu(menu);
+        return super.onPrepareOptionsMenu(menu);
     }
     
     @Override
@@ -542,8 +550,11 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         else if (id == 1) {
             return new MilestoneListLoader(this, mRepoOwner, mRepoName, "open");
         }
-        else {
+        else if (id == 2) {
             return new CollaboratorListLoader(this, mRepoOwner, mRepoName);
+        }
+        else {
+            return new IsCollaboratorLoader(this, mRepoOwner, mRepoName);            
         }
     }
 
@@ -555,8 +566,12 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         else if (loader.getId() == 1) {
             showMilestonesDialog((List<Milestone>) object);
         }
-        else {
+        else if (loader.getId() == 2) {
             showAssigneesDialog((List<User>) object);
+        }
+        else {
+            isCollaborator = (Boolean) object;
+            invalidateOptionsMenu();
         }
     }
 

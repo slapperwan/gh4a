@@ -20,77 +20,85 @@
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
             android:gravity="top"
-            android:lines="8"
+            android:minLines="5"
+            android:inputType="textMultiLine|textCapSentences"
             android:hint="@string/issue_body" />
         <View
             android:layout_width="fill_parent"
             android:layout_height="10dp" />
         <LinearLayout
+            android:id="@+id/for_collaborator"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
-            <TextView
-                android:id="@+id/tv_issue_label_add"
+            android:visibility="gone" >
+            <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/issue_label_add" />
-            <View 
+                android:orientation="vertical"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
+                <TextView
+                    android:id="@+id/tv_issue_label_add"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/issue_label_add" />
+                <View 
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:background="#ff0099cc" />
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="10dp" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/ll_labels"
                 android:layout_width="fill_parent"
-                android:layout_height="1dp"
-                android:background="#ff0099cc" />
+                android:layout_height="fill_parent"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:orientation="vertical">
+            </LinearLayout>
             <View
                 android:layout_width="fill_parent"
                 android:layout_height="10dp" />
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/ll_labels"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:orientation="vertical">
-        </LinearLayout>
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="10dp" />
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:orientation="horizontal">
-            <Button
-                android:id="@+id/btn_milestone"
-                android:layout_width="120dp"
-                android:layout_height="wrap_content"
-                android:text="@string/issue_milestone"
-                android:drawableLeft="@drawable/collections_view_as_list" />
-            <TextView
-                android:id="@+id/tv_selected_milestone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" 
-                android:textAppearance="?android:attr/textAppearanceMedium" />  
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:orientation="horizontal">
-            <Button
-                android:id="@+id/btn_assignee"
-                android:layout_width="120dp"
-                android:layout_height="wrap_content"
-                android:text="@string/issue_assignee" 
-                android:drawableLeft="@drawable/social_person" />
-            <TextView
-                android:id="@+id/tv_selected_assignee"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" 
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/btn_milestone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/issue_milestone"
+                    android:drawableLeft="@drawable/collections_view_as_list" />
+                <TextView
+                    android:id="@+id/tv_selected_milestone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" 
+                    android:textAppearance="?android:attr/textAppearanceMedium" />  
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/btn_assignee"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/issue_assignee" 
+                    android:drawableLeft="@drawable/social_person" />
+                <TextView
+                    android:id="@+id/tv_selected_assignee"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" 
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
