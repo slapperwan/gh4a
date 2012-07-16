@@ -89,7 +89,8 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
 
         webView.setWebViewClient(webViewClient);
         if (FileUtils.isImage(mName)) {
-            webView.loadUrl("https://github.com/" + mRepoOwner + "/" + mRepoName + "/raw/" + mRef + "/" + mPath);
+            String htmlImage = StringUtils.highlightImage("https://github.com/" + mRepoOwner + "/" + mRepoName + "/raw/" + mRef + "/" + mPath);
+            webView.loadDataWithBaseURL("file:///android_asset/", htmlImage, "text/html", "utf-8", "");
         }
         else {
             String highlighted = StringUtils.highlightSyntax(data, highlight, mName);
@@ -98,26 +99,20 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.download_menu, menu);
+        menu.removeItem(R.id.download);
         return super.onCreateOptionsMenu(menu);
     }
     
     @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.download:
-                if (mContent != null) {
-                    boolean success = FileUtils.save(mName, new String(EncodingUtils.fromBase64(mContent.getContent())));
-                    if (success) {
-                        showMessage("File saved at "
-                                + Environment.getExternalStorageDirectory().getAbsolutePath() + "/download/" + mName, false);
-                    }
-                    else {
-                        showMessage("Unable to save the file", false);
-                    }
-                }
+            case R.id.browser:
+                String blobUrl = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/blob/" + mRef + "/" + mPath + "?raw=true";
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(blobUrl));
+                startActivity(browserIntent);
                 return true;
 
             default:

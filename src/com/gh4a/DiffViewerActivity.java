@@ -15,13 +15,20 @@
  */
 package com.gh4a;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.utils.FileUtils;
+import com.gh4a.utils.StringUtils;
 
 public class DiffViewerActivity extends BaseActivity {
 
@@ -67,14 +74,41 @@ public class DiffViewerActivity extends BaseActivity {
         s.setJavaScriptEnabled(true);
         
         if (FileUtils.isImage(filename)) {
-            diffView.loadUrl("https://github.com/" + mRepoOwner + "/" + mRepoName + "/raw/" + mSha + "/" + mFilePath);
+            String htmlImage = StringUtils.highlightImage("https://github.com/" + mRepoOwner + "/" + mRepoName + "/raw/" + mSha + "/" + mFilePath);
+            diffView.loadDataWithBaseURL("file:///android_asset/", htmlImage, "text/html", "utf-8", "");
         }
         else {
-            String formatted = highlightSyntax();
-            diffView.loadDataWithBaseURL("file:///android_asset/", formatted, "text/html", "utf-8", "");
+            if (mDiff != null) {
+                String formatted = highlightSyntax();
+                diffView.loadDataWithBaseURL("file:///android_asset/", formatted, "text/html", "utf-8", "");
+            }
+            else {
+                Toast.makeText(this, "Unable to view diff.", Toast.LENGTH_SHORT).show();
+            }
         }
     }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getSupportMenuInflater();
+        inflater.inflate(R.menu.download_menu, menu);
+        menu.removeItem(R.id.download);
+        return super.onCreateOptionsMenu(menu);
+    }
 
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.browser:
+                String blobUrl = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/raw/" + mSha + "/" + mFilePath + "?raw=true";
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(blobUrl));
+                startActivity(browserIntent);
+                return true;
+
+            default:
+                return true;
+        }
+    }
     private String highlightSyntax() {
         StringBuilder content = new StringBuilder();
         content.append("<html><head><title></title>");

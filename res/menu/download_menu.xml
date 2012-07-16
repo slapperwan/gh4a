@@ -3,4 +3,7 @@
     <item android:id="@+id/download"
         android:icon="@drawable/download"    
         android:showAsAction="always" />
+    <item android:id="@+id/browser"
+        android:icon="@drawable/web_site"    
+        android:showAsAction="always" />
 </menu>

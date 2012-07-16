@@ -397,6 +397,17 @@ public class StringUtils {
         return content.toString();
     }
     
+    public static String highlightImage(String imageUrl) {
+        StringBuilder content = new StringBuilder();
+        content.append("<html><body style=\"background-color:#dddddd;margin:auto\">");
+        content.append("<span class=\"border:solid 1px #333333;\">");
+        content.append("<img src=\"" + imageUrl + "\" style=\"\"/>");
+        content.append("</span>");
+        content.append("</body></html>");
+        
+        return content.toString();
+    }
+    
     public static String encodeUrl(String s) {
 //        s = s.replaceAll("%", "%25");
 //        s = s.replaceAll(" ", "%20");
