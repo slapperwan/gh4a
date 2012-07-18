@@ -46,7 +46,7 @@ import com.gh4a.R;
 import com.gh4a.adapter.RepositoryIssueAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 
-public class RepositoryIssueListFragment extends SherlockFragment 
+public class RepositoryIssueListFragment extends BaseFragment 
     implements LoaderManager.LoaderCallbacks<List<RepositoryIssue>>, OnItemClickListener {
 
     private Map<String, String> mFilterData;
@@ -134,6 +134,7 @@ public class RepositoryIssueListFragment extends SherlockFragment
 
     @Override
     public void onLoadFinished(Loader<List<RepositoryIssue>> loader, List<RepositoryIssue> issues) {
+        hideLoading();
         fillData(issues);
     }
 

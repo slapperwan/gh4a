@@ -41,7 +41,7 @@ import com.gh4a.R;
 import com.gh4a.adapter.UserAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 
-public class FollowersFollowingListFragment extends SherlockFragment 
+public class FollowersFollowingListFragment extends BaseFragment 
     implements LoaderManager.LoaderCallbacks<List<User>>, OnItemClickListener {
 
     private String mLogin;
@@ -123,6 +123,7 @@ public class FollowersFollowingListFragment extends SherlockFragment
 
     @Override
     public void onLoadFinished(Loader<List<User>> loader, List<User> users) {
+        hideLoading();
         if (users != null) {
             fillData(users);
         }

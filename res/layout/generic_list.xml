@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ListView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/list_view"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
-</ListView>
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+    <ProgressBar
+        android:id="@+id/pb"
+        style="@style/LoadingProgress" />
+    <ListView
+        android:id="@+id/list_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
+    </ListView>
+</LinearLayout>

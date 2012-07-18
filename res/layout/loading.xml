@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge
-    xmlns:android="http://schemas.android.com/apk/res/android">
-    <TextView
-        android:id="@+id/tv_loading"
-        android:layout_height="wrap_content"
-        android:layout_width="fill_parent"
-        android:textAppearance="?attr/textAppearanceSubtitle"
-        android:padding="10dp"
-        android:text="@string/loading_msg"
-        android:visibility="gone"
-        android:gravity="center_horizontal" />
-</merge>
+<ProgressBar
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/pb"
+    style="@style/LoadingProgress" />

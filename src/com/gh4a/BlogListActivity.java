@@ -186,8 +186,6 @@ public class BlogListActivity extends BaseActivity {
                             mHideMainView);
                 }
                 else {
-                    TextView loadingView = (TextView) mTarget.get().findViewById(R.id.tv_loading);
-                    loadingView.setVisibility(View.VISIBLE);
                 }
             }
         }
@@ -207,8 +205,6 @@ public class BlogListActivity extends BaseActivity {
                         mTarget.get().mLoadingDialog.dismiss();
                     }
         
-                    TextView loadingView = (TextView) mTarget.get().findViewById(R.id.tv_loading);
-                    loadingView.setVisibility(View.GONE);
                     mTarget.get().fillData(result);
                     mTarget.get().page++;
                     mTarget.get().mLoading = false;

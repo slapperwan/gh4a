@@ -44,7 +44,7 @@ import com.gh4a.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 
-public class RepositoryListFragment extends SherlockFragment 
+public class RepositoryListFragment extends BaseFragment 
     implements LoaderManager.LoaderCallbacks<List<Repository>>, OnItemClickListener {
 
     private String mLogin;
@@ -135,6 +135,7 @@ public class RepositoryListFragment extends SherlockFragment
 
     @Override
     public void onLoadFinished(Loader<List<Repository>> loader, List<Repository> repositories) {
+        hideLoading();
         fillData(repositories);
     }
 

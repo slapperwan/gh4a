@@ -38,7 +38,7 @@ import com.gh4a.R;
 import com.gh4a.adapter.MilestoneAdapter;
 import com.gh4a.loader.MilestoneListLoader;
 
-public class IssueMilestoneListFragment extends SherlockFragment 
+public class IssueMilestoneListFragment extends BaseFragment 
     implements LoaderManager.LoaderCallbacks<List<Milestone>>, OnItemClickListener {
 
     private String mRepoOwner;
@@ -111,6 +111,7 @@ public class IssueMilestoneListFragment extends SherlockFragment
     @Override
     public void onLoadFinished(Loader<List<Milestone>> loader,
             List<Milestone> milestones) {
+        hideLoading();
         fillData(milestones);
     }
 

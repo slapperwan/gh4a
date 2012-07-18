@@ -100,4 +100,14 @@
         <item name="android:shadowRadius">2</item>
     </style>
     
+    <style name="LoadingProgress">
+        <item name="android:layout_width">30dp</item>
+        <item name="android:layout_height">30dp</item>
+        <item name="android:indeterminateBehavior">repeat</item>
+        <item name="android:indeterminate">true</item>
+        <item name="android:indeterminateOnly">true</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_marginTop">20dp</item>
+    </style>
+    
 </resources>

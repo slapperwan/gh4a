@@ -67,7 +67,7 @@ import com.gh4a.adapter.FeedAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 import com.gh4a.utils.CommitUtils;
 
-public abstract class EventListFragment extends SherlockFragment 
+public abstract class EventListFragment extends BaseFragment 
     implements LoaderManager.LoaderCallbacks<List<Event>>, OnItemClickListener {
 
     static final int MENU_USER = 1;
@@ -149,6 +149,7 @@ public abstract class EventListFragment extends SherlockFragment
 
     @Override
     public void onLoadFinished(Loader<List<Event>> loader, List<Event> events) {
+        hideLoading();
         fillData(events);
     }
 

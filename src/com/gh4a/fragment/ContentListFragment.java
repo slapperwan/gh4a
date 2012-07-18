@@ -39,7 +39,7 @@ import com.gh4a.adapter.FileAdapter;
 import com.gh4a.loader.ContentListLoader;
 import com.gh4a.utils.StringUtils;
 
-public class ContentListFragment extends SherlockFragment 
+public class ContentListFragment extends BaseFragment 
     implements LoaderManager.LoaderCallbacks<List<Content>>, OnItemClickListener {
 
     private Repository mRepository;
@@ -133,6 +133,7 @@ public class ContentListFragment extends SherlockFragment
 
     @Override
     public void onLoadFinished(Loader<List<Content>> loader, List<Content> contents) {
+        hideLoading();
         fillData(contents);
     }
 

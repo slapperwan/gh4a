@@ -40,12 +40,12 @@ import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
 import com.gh4a.FollowerFollowingListActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.GistListActivity;
+import com.gh4a.LoadingDialog;
 import com.gh4a.OrganizationMemberListActivity;
 import com.gh4a.R;
 import com.gh4a.RepositoryListActivity;
@@ -58,13 +58,14 @@ import com.gh4a.loader.UserLoader;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
 
-public class UserFragment extends SherlockFragment implements 
+public class UserFragment extends BaseFragment implements 
     OnClickListener, LoaderManager.LoaderCallbacks<Object> {
 
     private String mUserLogin;
     private String mUserName;
     private User mUser;
     private boolean isFollowing;
+    private LoadingDialog mLoadingDialog;
 
     public static UserFragment newInstance(String login, String name) {
         UserFragment f = new UserFragment();
@@ -98,6 +99,8 @@ public class UserFragment extends SherlockFragment implements
     public void onActivityCreated(Bundle savedInstanceState) {
         Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onActivityCreated UserFragment");
         super.onActivityCreated(savedInstanceState);
+        
+        showLoading();
         
         getLoaderManager().initLoader(0, null, this);
         getLoaderManager().getLoader(0).forceLoad();
@@ -510,6 +513,7 @@ public class UserFragment extends SherlockFragment implements
             updateFollowBtn();
         }
         else {
+            hideLoading();
             mUser = (User) object;
             fillData();
         }

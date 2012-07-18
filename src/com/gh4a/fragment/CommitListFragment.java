@@ -45,7 +45,7 @@ import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 import com.gh4a.utils.StringUtils;
 
-public class CommitListFragment extends SherlockFragment 
+public class CommitListFragment extends BaseFragment 
     implements LoaderManager.LoaderCallbacks<List<RepositoryCommit>>, OnItemClickListener {
 
     private Repository mRepository;
@@ -121,6 +121,7 @@ public class CommitListFragment extends SherlockFragment
 
     @Override
     public void onLoadFinished(Loader<List<RepositoryCommit>> loader, List<RepositoryCommit> commits) {
+        hideLoading();
         fillData(commits);
     }
 

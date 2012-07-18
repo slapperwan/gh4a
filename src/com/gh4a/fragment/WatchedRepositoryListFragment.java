@@ -35,7 +35,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -44,7 +43,7 @@ import com.gh4a.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 
-public class WatchedRepositoryListFragment extends SherlockFragment 
+public class WatchedRepositoryListFragment extends BaseFragment 
     implements LoaderManager.LoaderCallbacks<List<Repository>>, OnItemClickListener {
 
     private String mLogin;
@@ -129,6 +128,7 @@ public class WatchedRepositoryListFragment extends SherlockFragment
 
     @Override
     public void onLoadFinished(Loader<List<Repository>> loader, List<Repository> repositories) {
+        hideLoading();
         fillData(repositories);
     }
 

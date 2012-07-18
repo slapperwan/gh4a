@@ -42,7 +42,7 @@ import com.gh4a.R;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 
-public class ForkListFragment extends SherlockFragment 
+public class ForkListFragment extends BaseFragment 
     implements LoaderManager.LoaderCallbacks<List<Repository>>, OnItemClickListener {
 
     private String mRepoOwner;
@@ -118,6 +118,7 @@ public class ForkListFragment extends SherlockFragment
 
     @Override
     public void onLoadFinished(Loader<List<Repository>> loader, List<Repository> repos) {
+        hideLoading();
         if (repos != null) {
             fillData(repos);
         }

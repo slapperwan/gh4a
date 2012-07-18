@@ -60,7 +60,7 @@ import com.gh4a.loader.WatchLoader;
 import com.gh4a.utils.StringUtils;
 import com.petebevin.markdown.MarkdownProcessor;
 
-public class RepositoryFragment extends SherlockFragment implements 
+public class RepositoryFragment extends BaseFragment implements 
     OnClickListener, LoaderManager.LoaderCallbacks {
 
     private Repository mRepository;

@@ -199,12 +199,10 @@ public class CommitListActivity extends BaseActivity implements OnScrollListener
                             mHideMainView);
                 }
                 else {
-                    TextView loadingView = (TextView) mTarget.get().findViewById(R.id.tv_loading);
                     if (mTarget.get().lastPage) {
                         Toast.makeText(mTarget.get(), "No more result", Toast.LENGTH_SHORT).show();
                     }
                     else {
-                        loadingView.setVisibility(View.VISIBLE);
                     }
                 }
             }
@@ -222,9 +220,6 @@ public class CommitListActivity extends BaseActivity implements OnScrollListener
                 if (activity.mLoadingDialog != null && activity.mLoadingDialog.isShowing()) {
                     activity.mLoadingDialog.dismiss();
                 }
-    
-                TextView loadingView = (TextView) mTarget.get().findViewById(R.id.tv_loading);
-                loadingView.setVisibility(View.GONE);
     
                 if (mException) {
                     activity.showError();
