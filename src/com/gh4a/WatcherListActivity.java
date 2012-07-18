@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.gh4a.fragment.ForkListFragment;
 import com.gh4a.fragment.WatcherListFragment;
 
 public class WatcherListActivity extends BaseSherlockFragmentActivity  {
@@ -35,6 +36,7 @@ public class WatcherListActivity extends BaseSherlockFragmentActivity  {
     private ViewPager mPager;
     private ActionBar mActionBar;
     private int tabCount;
+    private int mPos;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,7 +46,8 @@ public class WatcherListActivity extends BaseSherlockFragmentActivity  {
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
-
+        mPos = data.getInt("pos");
+        
         tabCount = 2;
         
         mActionBar = getSupportActionBar();
@@ -77,14 +80,14 @@ public class WatcherListActivity extends BaseSherlockFragmentActivity  {
                 .setText(R.string.repo_watchers)
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 0 + "", mPager));
-        mActionBar.addTab(tab);
+        mActionBar.addTab(tab, mPos == 0);
         
         tab = mActionBar
                 .newTab()
                 .setText(R.string.repo_forks)
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
-        mActionBar.addTab(tab);
+        mActionBar.addTab(tab, mPos == 1);
     }
 
     public class ThisPageAdapter extends FragmentStatePagerAdapter {
@@ -100,7 +103,14 @@ public class WatcherListActivity extends BaseSherlockFragmentActivity  {
 
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
-            return WatcherListFragment.newInstance(mRepoOwner, mRepoName);
+            if (position == 0) {
+                return WatcherListFragment.newInstance(mRepoOwner, mRepoName);
+            }
+            else if (position == 1) {
+                return ForkListFragment.newInstance(mRepoOwner, mRepoName);
+            }
+            
+            return null;
         }
         
         @Override

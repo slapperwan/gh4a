@@ -398,13 +398,15 @@ public class RepositoryFragment extends SherlockFragment implements
         Intent intent = new Intent().setClass(getActivity(), WatcherListActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        intent.putExtra("pos", 0);
         startActivity(intent);
     }
 
     public void getNetworks(View view) {
-        Intent intent = new Intent().setClass(getActivity(), ForkListActivity.class);
-        intent.putExtra(Constants.User.USER_LOGIN, mRepoOwner);
+        Intent intent = new Intent().setClass(getActivity(), WatcherListActivity.class);
+        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        intent.putExtra("pos", 1);
         startActivity(intent);
     }
 
