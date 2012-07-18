@@ -15,8 +15,6 @@
  */
 package com.gh4a;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.webkit.WebSettings;
@@ -24,9 +22,6 @@ import android.webkit.WebView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 
@@ -37,7 +32,6 @@ public class DiffViewerActivity extends BaseActivity {
     private String mSha;
     private String mDiff;
     private String mFilePath;
-    private String mTreeSha;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,7 +43,6 @@ public class DiffViewerActivity extends BaseActivity {
         mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
         mSha = data.getString(Constants.Object.OBJECT_SHA);
-        mTreeSha = data.getString(Constants.Object.TREE_SHA);
         mDiff = data.getString(Constants.Commit.DIFF);
         mFilePath = data.getString(Constants.Object.PATH);
 
@@ -88,27 +81,6 @@ public class DiffViewerActivity extends BaseActivity {
         }
     }
     
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getSupportMenuInflater();
-        inflater.inflate(R.menu.download_menu, menu);
-        menu.removeItem(R.id.download);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean setMenuOptionItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.browser:
-                String blobUrl = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/raw/" + mSha + "/" + mFilePath + "?raw=true";
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(blobUrl));
-                startActivity(browserIntent);
-                return true;
-
-            default:
-                return true;
-        }
-    }
     private String highlightSyntax() {
         StringBuilder content = new StringBuilder();
         content.append("<html><head><title></title>");
