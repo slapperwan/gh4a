@@ -395,11 +395,9 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
 
         private WeakReference<IssueActivity> mTarget;
         private boolean mException;
-        private boolean mHideMainView;
 
         public CloseIssueTask(IssueActivity activity, boolean hideMainView) {
             mTarget = new WeakReference<IssueActivity>(activity);
-            mHideMainView = hideMainView;
         }
 
         @Override
@@ -447,11 +445,13 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
                             false);
                 }
                 else {
+                    activity.mIssueState = "closed";
                     activity.showMessage(activity.getResources().getString(R.string.issue_success_close),
                             false);
                     TextView tvState = (TextView)activity.findViewById(R.id.tv_state);
                     tvState.setBackgroundResource(R.drawable.default_red_box);
                     tvState.setText("C\nL\nO\nS\nE\nD");
+                    activity.invalidateOptionsMenu();
                 }
             }
         }
@@ -511,11 +511,13 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
                             false);
                 }
                 else {
+                    activity.mIssueState = "open";
                     activity.showMessage(activity.getResources().getString(R.string.issue_success_reopen),
                             false);
                     TextView tvState = (TextView)activity.findViewById(R.id.tv_state);
                     tvState.setBackgroundResource(R.drawable.default_green_box);
                     tvState.setText("O\nP\nE\nN");
+                    activity.invalidateOptionsMenu();
                 }
             }
         }
@@ -525,11 +527,9 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
 
         private WeakReference<IssueActivity> mTarget;
         private boolean mException;
-        private boolean mHideMainView;
 
         public CommentIssueTask(IssueActivity activity, boolean hideMainView) {
             mTarget = new WeakReference<IssueActivity>(activity);
-            mHideMainView = hideMainView;
         }
 
         @Override
@@ -619,6 +619,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
     public void onLoadFinished(Loader loader, Object object) {
         if (loader.getId() == 0) {
             mIssue = (Issue) object;
+            mIssueState = mIssue.getState();
             getSupportLoaderManager().getLoader(1).forceLoad();
             fillData();
         }
