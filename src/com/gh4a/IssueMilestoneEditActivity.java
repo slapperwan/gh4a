@@ -77,6 +77,7 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
+        showLoading();
         getSupportLoaderManager().initLoader(0, null, this);
         getSupportLoaderManager().getLoader(0).forceLoad();
     }
@@ -321,6 +322,7 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
 
     @Override
     public void onLoadFinished(Loader<Milestone> loader, Milestone milestone) {
+        hideLoading();
         mMilestone = milestone;
         fillData();
     }
@@ -328,6 +330,5 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
     @Override
     public void onLoaderReset(Loader<Milestone> loader) {
         // TODO Auto-generated method stub
-        
     }
 }

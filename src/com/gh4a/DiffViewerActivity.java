@@ -53,7 +53,8 @@ public class DiffViewerActivity extends BaseActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         
         WebView diffView = (WebView) findViewById(R.id.web_view);
-        
+        hideLoading();
+
         WebSettings s = diffView.getSettings();
         s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
         s.setUseWideViewPort(true);

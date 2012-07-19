@@ -96,7 +96,7 @@ public class GistActivity extends BaseActivity {
         protected void onPostExecute(Gist result) {
             if (mTarget.get() != null) {
                 GistActivity activity = mTarget.get();
-    
+                activity.hideLoading();
                 if (mException) {
                     activity.showError();
                 }

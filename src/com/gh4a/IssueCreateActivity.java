@@ -136,10 +136,12 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
         getSupportLoaderManager().initLoader(4, null, this);
         
         if (mEditMode) {
+            showLoading();
             getSupportLoaderManager().initLoader(3, null, this);
             getSupportLoaderManager().getLoader(3).forceLoad();
         }
         else {
+            hideLoading();
             getSupportLoaderManager().getLoader(4).forceLoad();
         }
     }
@@ -518,6 +520,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
             showAssigneesDialog();
         }
         else if (loader.getId() == 3) {
+            hideLoading();
             mEditIssue = (Issue) object;
             getSupportLoaderManager().getLoader(4).forceLoad();
             fillIssueData();

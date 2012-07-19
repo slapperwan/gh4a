@@ -51,6 +51,7 @@ public class CompareActivity extends BaseActivity implements OnItemClickListener
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
+        hideLoading();
         fillData();
     }
     

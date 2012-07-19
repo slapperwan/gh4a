@@ -97,7 +97,7 @@ public class GistViewerActivity extends BaseActivity {
         protected void onPostExecute(String result) {
             if (mTarget.get() != null) {
                 GistViewerActivity activity = mTarget.get();
-
+                activity.hideLoading();
                 if (mException) {
                     activity.showError();
                 }

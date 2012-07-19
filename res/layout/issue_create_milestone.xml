@@ -1,39 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@id/main_content"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:layout_margin="0dp"
     android:padding="0dp">
     <LinearLayout
-        android:id="@+id/ll_edit"
-        android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:padding="0dp" >
-        <EditText
-            android:id="@+id/et_title"
-            android:layout_height="wrap_content"
+        android:orientation="vertical" >
+        <ProgressBar
+            android:id="@+id/pb"
+            style="@style/LoadingProgress" />
+        <LinearLayout
+            android:id="@+id/main_content"
+            android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:inputType="textCapSentences"
-            android:hint="@string/issue_milestone_title" />
-        <EditText
-            android:id="@+id/et_desc"
-            android:layout_height="fill_parent"
-            android:layout_width="fill_parent"
-            android:gravity="top"
-            android:minLines="5"
-            android:inputType="textMultiLine|textCapSentences"
-            android:hint="@string/issue_milestone_desc" />
-        <EditText 
-            android:id="@+id/et_due_date"
-            android:layout_width="fill_parent" 
             android:layout_height="wrap_content"
-            android:hint="@string/issue_milestone_due_date"
-            android:cursorVisible="false" 
-            android:focusable="false" 
-            android:focusableInTouchMode="false"             
-            android:onClick="showDatePickerDialog" />
+            android:padding="0dp" >
+            <EditText
+                android:id="@+id/et_title"
+                android:layout_height="wrap_content"
+                android:layout_width="fill_parent"
+                android:inputType="textCapSentences"
+                android:hint="@string/issue_milestone_title" />
+            <EditText
+                android:id="@+id/et_desc"
+                android:layout_height="fill_parent"
+                android:layout_width="fill_parent"
+                android:gravity="top"
+                android:minLines="5"
+                android:inputType="textMultiLine|textCapSentences"
+                android:hint="@string/issue_milestone_desc" />
+            <EditText 
+                android:id="@+id/et_due_date"
+                android:layout_width="fill_parent" 
+                android:layout_height="wrap_content"
+                android:hint="@string/issue_milestone_due_date"
+                android:cursorVisible="false" 
+                android:focusable="false" 
+                android:focusableInTouchMode="false"             
+                android:onClick="showDatePickerDialog" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

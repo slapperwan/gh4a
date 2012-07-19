@@ -93,7 +93,7 @@ public class GistListActivity extends BaseActivity implements OnItemClickListene
         protected void onPostExecute(List<Gist> result) {
             if (mTarget.get() != null) {
                 GistListActivity activity = mTarget.get();
-    
+                activity.hideLoading();
                 if (mException) {
                     activity.showError();
                 }

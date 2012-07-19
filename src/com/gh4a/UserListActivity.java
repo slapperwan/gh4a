@@ -97,6 +97,7 @@ public class UserListActivity extends BaseActivity implements OnItemClickListene
         @Override
         protected void onPostExecute(List<User> result) {
             if (mTarget.get() != null) {
+                mTarget.get().hideLoading();
                 if (mException) {
                     mTarget.get().showError();
                 }

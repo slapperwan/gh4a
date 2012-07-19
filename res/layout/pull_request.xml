@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/main_content"
     android:layout_height="match_parent"
     android:layout_width="fill_parent"
-    android:orientation="vertical"
-    android:layout_weight="1">
+    android:orientation="vertical" >
+    <ProgressBar
+        android:id="@+id/pb"
+        style="@style/LoadingProgress" />
     <ListView
-        android:id="@+id/lv_comments"
+        android:id="@+id/list_view"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:padding="0dp">
     </ListView>
-</FrameLayout>
+</LinearLayout>

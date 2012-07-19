@@ -81,7 +81,7 @@ public class PullRequestActivity extends BaseSherlockFragmentActivity
         getSupportLoaderManager().getLoader(1).forceLoad();
         getSupportLoaderManager().getLoader(2).forceLoad();
         
-        ListView lvComments = (ListView) findViewById(R.id.lv_comments);
+        ListView lvComments = (ListView) findViewById(R.id.list_view);
         
         // set details inside listview header
         LayoutInflater infalter = getLayoutInflater();
@@ -195,6 +195,7 @@ public class PullRequestActivity extends BaseSherlockFragmentActivity
     @Override
     public void onLoadFinished(Loader loader, Object object) {
         if (loader.getId() == 0) {
+            hideLoading();
             fillData((PullRequest) object);
         }
         else if (loader.getId() == 1) {

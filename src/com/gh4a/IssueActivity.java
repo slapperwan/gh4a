@@ -100,7 +100,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         
         Typeface boldCondensed = getApplicationContext().boldCondensed;
         
-        ListView lvComments = (ListView) findViewById(R.id.lv_comments);
+        ListView lvComments = (ListView) findViewById(R.id.list_view);
         // set details inside listview header
         LayoutInflater infalter = getLayoutInflater();
         LinearLayout mHeader = (LinearLayout) infalter.inflate(R.layout.issue_header, lvComments, false);
@@ -618,6 +618,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
     @Override
     public void onLoadFinished(Loader loader, Object object) {
         if (loader.getId() == 0) {
+            hideLoading();
             mIssue = (Issue) object;
             mIssueState = mIssue.getState();
             getSupportLoaderManager().getLoader(1).forceLoad();

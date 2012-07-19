@@ -82,6 +82,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         mActionBar.setDisplayShowTitleEnabled(true);
         mActionBar.setDisplayHomeAsUpEnabled(true);
         
+        showLoading();
         getSupportLoaderManager().initLoader(0, null, this);
         getSupportLoaderManager().getLoader(0).forceLoad();
         
@@ -300,6 +301,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     @Override
     public void onLoadFinished(Loader loader, Object object) {
         if (loader.getId() == 0) {
+            hideLoading();
             this.mRepository = (Repository) object;
             fillTabs();
         }

@@ -144,6 +144,7 @@ public class PullRequestListActivity extends BaseSherlockFragmentActivity
 
     @Override
     public void onLoadFinished(Loader<List<PullRequest>> loader, List<PullRequest> pullRequests) {
+        hideLoading();
         fillData(pullRequests);
     }
 

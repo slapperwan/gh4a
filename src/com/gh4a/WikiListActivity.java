@@ -174,6 +174,7 @@ public class WikiListActivity extends BaseActivity {
         @Override
         protected void onPostExecute(List<Feed> result) {
             if (mTarget.get() != null) {
+                mTarget.get().hideLoading();
                 if (mWikiNotFound) {
                     mTarget.get().getApplicationContext().notFoundMessage(mTarget.get(), "Wiki");
                 }

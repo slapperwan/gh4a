@@ -37,7 +37,8 @@ public class OrganizationMemberListActivity extends UserListActivity {
         return getResources().getString(R.string.members);
     }
 
-    protected String getSubtitle() {
+    @Override
+    protected String getSubTitle() {
         return mUserLogin;
     }
 

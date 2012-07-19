@@ -79,7 +79,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
         final Typeface boldCondensed = getApplicationContext().boldCondensed;
         final Typeface condensed = getApplicationContext().condensed;
         
-        LinearLayout ll = (LinearLayout) findViewById(R.id.ll);
+        LinearLayout ll = (LinearLayout) findViewById(R.id.main_content);
         ll.removeAllViews();
         
         for (final Label label : result) {
@@ -389,6 +389,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
 
     @Override
     public void onLoadFinished(Loader<List<Label>> loader, List<Label> labels) {
+        hideLoading();
         fillData(labels);
     }
 

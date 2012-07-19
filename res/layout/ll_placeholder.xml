@@ -3,9 +3,17 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
     <LinearLayout
-        android:id="@+id/ll"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical" >
+        <ProgressBar
+            android:id="@+id/pb"
+            style="@style/LoadingProgress" />
+        <LinearLayout
+            android:id="@+id/main_content"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

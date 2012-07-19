@@ -66,6 +66,7 @@ public class CommitActivity extends BaseActivity {
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
+        showLoading();
         new LoadCommitInfoTask(this).execute();
     }
 
@@ -107,6 +108,7 @@ public class CommitActivity extends BaseActivity {
         @Override
         protected void onPostExecute(RepositoryCommit result) {
             if (mTarget.get() != null) {
+                mTarget.get().hideLoading();
                 if (mException) {
                     mTarget.get().showError();
                 }

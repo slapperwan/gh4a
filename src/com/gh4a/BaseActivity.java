@@ -429,4 +429,23 @@ public class BaseActivity extends SherlockActivity {
         }
     }
 
+    public void showLoading() {
+        if (findViewById(R.id.main_content) != null) {
+            findViewById(R.id.main_content).setVisibility(View.INVISIBLE);
+        }
+        else if (findViewById(R.id.list_view) != null) {
+            findViewById(R.id.list_view).setVisibility(View.INVISIBLE);
+        }
+        findViewById(R.id.pb).setVisibility(View.VISIBLE);
+    }
+    
+    public void hideLoading() {
+        if (findViewById(R.id.main_content) != null) {
+            findViewById(R.id.main_content).setVisibility(View.VISIBLE);
+        }
+        else if (findViewById(R.id.list_view) != null) {
+            findViewById(R.id.list_view).setVisibility(View.VISIBLE);
+        }
+        findViewById(R.id.pb).setVisibility(View.GONE);
+    }
 }
