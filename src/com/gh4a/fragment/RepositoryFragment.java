@@ -307,7 +307,7 @@ public class RepositoryFragment extends BaseFragment implements
 
         @Override
         protected Spanned doInBackground(Content... params) {
-            if (mTarget.get() != null) {
+            if (mTarget.get() != null && params[0] != null) {
                 String content = new String(EncodingUtils.fromBase64(params[0].getContent()));
                 MarkdownProcessor m = new MarkdownProcessor();
                 String html = m.markdown(content);

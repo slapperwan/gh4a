@@ -1,7 +1,5 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
-
 import org.eclipse.egit.github.core.Content;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
@@ -34,7 +32,7 @@ public class ReadmeLoader extends AsyncTaskLoader<Content> {
         try {
             ContentService contentService = new ContentService(client);
             return contentService.getReadme(new RepositoryId(mRepoOwner, mRepoName));
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.e(Constants.LOG_TAG, e.getMessage(), e);
             return null;
         }
