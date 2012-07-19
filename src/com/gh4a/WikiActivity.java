@@ -44,6 +44,7 @@ public class WikiActivity extends BaseActivity {
         mContent = getIntent().getStringExtra(Constants.Blog.CONTENT);
         mLink = getIntent().getStringExtra(Constants.Blog.LINK);
 
+        hideLoading();
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(mTitle);
         actionBar.setSubtitle(mUserLogin + "/" + mRepoName);

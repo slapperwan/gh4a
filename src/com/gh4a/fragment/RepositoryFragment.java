@@ -17,6 +17,7 @@ package com.gh4a.fragment;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -28,11 +29,13 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.text.Html;
 import android.text.Html.ImageGetter;
+import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,14 +43,13 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.gh4a.CollaboratorListActivity;
 import com.gh4a.Constants;
 import com.gh4a.ContributorListActivity;
-import com.gh4a.ForkListActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.IssueListActivity;
 import com.gh4a.R;
@@ -101,21 +103,21 @@ public class RepositoryFragment extends BaseFragment implements
         
         RepositoryActivity repoActivity = (RepositoryActivity) getSherlockActivity();
         LinearLayout llBtnActions = (LinearLayout) getView().findViewById(R.id.ll_btn_actions);
+        ProgressBar pbActions = (ProgressBar) getView().findViewById(R.id.pb_actions);
+        
+        Gh4Application app = (Gh4Application) getActivity().getApplicationContext();
+        Typeface boldCondensed = app.boldCondensed;
+        
+        TextView tvReadmeTitle = (TextView) getView().findViewById(R.id.readme_title);
+        tvReadmeTitle.setTypeface(boldCondensed);
+        tvReadmeTitle.setTextColor(Color.parseColor("#0099cc"));
+
+        llBtnActions.setVisibility(View.GONE);
         if (mRepoOwner.equals(repoActivity.getAuthLogin())) {
-            llBtnActions.setVisibility(View.GONE);
+            pbActions.setVisibility(View.GONE);
         }
         else {
-            llBtnActions.setVisibility(View.VISIBLE);
-            
-            Button btnWatch = (Button) getView().findViewById(R.id.btn_watch);
-            btnWatch.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    getLoaderManager().restartLoader(2, null, RepositoryFragment.this);
-                    getLoaderManager().getLoader(2).forceLoad();
-                }
-            });
-            
+            pbActions.setVisibility(View.VISIBLE);
             getLoaderManager().initLoader(1, null, this);
             getLoaderManager().getLoader(1).forceLoad();
         }
@@ -294,56 +296,83 @@ public class RepositoryFragment extends BaseFragment implements
         tvOthers.setTextColor(Color.parseColor("#0099cc"));
     }
 
-    public void fillReadme(Content readme) {
-        if (readme != null) {
-            final Gh4Application app = (Gh4Application) getActivity().getApplicationContext();
-            Typeface boldCondensed = app.boldCondensed;
-            Typeface regular = app.regular;
-            
-            TextView tvReadmeTitle = (TextView) getView().findViewById(R.id.readme_title);
-            tvReadmeTitle.setTypeface(boldCondensed);
-            tvReadmeTitle.setTextColor(Color.parseColor("#0099cc"));
-            
-            String content = new String(EncodingUtils.fromBase64(readme.getContent()));
-            MarkdownProcessor m = new MarkdownProcessor();
-            String html = m.markdown(content);
-            TextView tvReadme = (TextView) getView().findViewById(R.id.readme);
-            tvReadme.setTypeface(regular);
-            tvReadme.setText(Html.fromHtml(html, new ImageGetter() {
-                @Override
-                public Drawable getDrawable(String source) {
-                    try {
-                        URL url = new URL(source);
-                        Object content = url.getContent();
-                        InputStream is = (InputStream) content;
-                        Drawable drawable = Drawable.createFromStream(is, null);
-                        if (drawable != null) {
-                            drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable
-                                    .getIntrinsicHeight());
-                            return drawable;
+    private static class FillReadmeTask extends AsyncTask<Content, Void, Spanned> {
+
+        private WeakReference<RepositoryFragment> mTarget;
+        private boolean mException;
+
+        public FillReadmeTask(RepositoryFragment activity) {
+            mTarget = new WeakReference<RepositoryFragment>(activity);
+        }
+
+        @Override
+        protected Spanned doInBackground(Content... params) {
+            if (mTarget.get() != null) {
+                String content = new String(EncodingUtils.fromBase64(params[0].getContent()));
+                MarkdownProcessor m = new MarkdownProcessor();
+                String html = m.markdown(content);
+                Spanned readme = Html.fromHtml(html, new ImageGetter() {
+                    @Override
+                    public Drawable getDrawable(String source) {
+                        try {
+                            URL url = new URL(source);
+                            Object content = url.getContent();
+                            InputStream is = (InputStream) content;
+                            Drawable drawable = Drawable.createFromStream(is, null);
+                            if (drawable != null) {
+                                drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable
+                                        .getIntrinsicHeight());
+                                return drawable;
+                            }
+                            return null;
+                            
+                        } catch (MalformedURLException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
                         }
                         return null;
-                        
-                    } catch (MalformedURLException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
                     }
-                    return null;
-                }
-            }, null));
+                }, null);
+                
+                return readme;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            if (mTarget.get() != null) {
+                mTarget.get().showLoading(R.id.pb_readme, R.id.readme);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Spanned result) {
+            if (mTarget.get() != null) {
+                mTarget.get().hideLoading(R.id.pb_readme, R.id.readme);
+                mTarget.get().fillReadme(result);
+            }
+        }
+    }
+    
+    public void fillReadme(Spanned readme) {
+        if (readme != null) {
+            final Gh4Application app = (Gh4Application) getActivity().getApplicationContext();
+            Typeface regular = app.regular;
+            
+            TextView tvReadme = (TextView) getView().findViewById(R.id.readme);
+            tvReadme.setTypeface(regular);
+            tvReadme.setText(readme);
             
             tvReadme.setMovementMethod(LinkMovementMethod.getInstance());
-            
-            LinearLayout llReadme = (LinearLayout) getView().findViewById(R.id.ll_readme);
-            llReadme.setVisibility(View.VISIBLE);
-            
         }
         else {
-            LinearLayout llReadme = (LinearLayout) getView().findViewById(R.id.ll_readme);
-            llReadme.setVisibility(View.GONE);
+            TextView tvReadme = (TextView) getView().findViewById(R.id.readme);
+            tvReadme.setText("README not found");
+            tvReadme.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
         }
     }
     
@@ -433,6 +462,20 @@ public class RepositoryFragment extends BaseFragment implements
     }
 
     private void updateWatchBtn() {
+        LinearLayout llBtnActions = (LinearLayout) getView().findViewById(R.id.ll_btn_actions);
+        ProgressBar pbActions = (ProgressBar) getView().findViewById(R.id.pb_actions);
+        pbActions.setVisibility(View.GONE);
+        llBtnActions.setVisibility(View.VISIBLE);
+        
+        Button btnWatch = (Button) getView().findViewById(R.id.btn_watch);
+        btnWatch.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getLoaderManager().restartLoader(2, null, RepositoryFragment.this);
+                getLoaderManager().getLoader(2).forceLoad();
+            }
+        });
+        
         Button btnFollow = (Button) getView().findViewById(R.id.btn_watch);
         if (isWatching) {
             btnFollow.setBackgroundResource(R.drawable.button_red);
@@ -468,7 +511,7 @@ public class RepositoryFragment extends BaseFragment implements
             updateWatchBtn();
         }
         else {
-            fillReadme((Content) object);
+            new FillReadmeTask(this).execute((Content) object);
         }
     }
 

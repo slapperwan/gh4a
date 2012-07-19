@@ -41,6 +41,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceLarge" />
+                    <ProgressBar
+                        android:id="@+id/pb_follow"
+                        style="@style/LoadingProgress"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="left"
+                        android:layout_marginTop="0dp" />
                     <Button 
                         android:id="@+id/btn_follow"
                         android:layout_width="wrap_content"
@@ -50,7 +57,8 @@
                         android:layout_marginRight="0dp"
                         android:layout_marginBottom="0dp"
                         android:background="@drawable/button_blue"
-                        style="@style/ButtonText" />
+                        style="@style/ButtonText"
+                        android:visibility="gone" />
                 </LinearLayout>
             </RelativeLayout>
             <View
@@ -241,6 +249,14 @@
                 <View
                     android:layout_width="fill_parent"
                     android:layout_height="10dp" />
+                <ProgressBar
+                    android:id="@+id/pb_top_repos"
+                    style="@style/LoadingProgress"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="left"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginBottom="10dp" />
             </LinearLayout>
             <Button 
                 android:id="@+id/btn_repos"
@@ -262,7 +278,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingLeft="16dp"
-                android:paddingRight="16dp">
+                android:paddingRight="16dp"
+                android:visibility="invisible">
                 <TextView
                     android:id="@+id/tv_orgs"
                     android:layout_width="fill_parent"

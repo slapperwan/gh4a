@@ -27,4 +27,18 @@ public class BaseFragment extends SherlockFragment {
         }
         getView().findViewById(R.id.pb).setVisibility(View.GONE);
     }
+    
+    public void showLoading(int progressBar, int viewToShow) {
+        if (viewToShow != 0 && getView().findViewById(viewToShow) != null) {
+            getView().findViewById(viewToShow).setVisibility(View.INVISIBLE);
+        }
+        getView().findViewById(progressBar).setVisibility(View.VISIBLE);
+    }
+    
+    public void hideLoading(int progressBar, int viewToShow) {
+        if (viewToShow != 0 && getView().findViewById(viewToShow) != null) {
+            getView().findViewById(viewToShow).setVisibility(View.VISIBLE);
+        }
+        getView().findViewById(progressBar).setVisibility(View.GONE);
+    }
 }

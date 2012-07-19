@@ -37,6 +37,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
@@ -252,19 +253,15 @@ public class UserFragment extends BaseFragment implements
         
         UserActivity userActivity = (UserActivity) getSherlockActivity();
         Button btnFollow = (Button) getView().findViewById(R.id.btn_follow);
+        ProgressBar pbFollow = (ProgressBar) getView().findViewById(R.id.pb_follow);
+        
         if (mUserLogin.equals(userActivity.getAuthLogin())) {
             btnFollow.setVisibility(View.GONE);
+            pbFollow.setVisibility(View.GONE);
         }
         else {
-            btnFollow.setVisibility(View.VISIBLE);
-            btnFollow.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    getLoaderManager().restartLoader(4, null, UserFragment.this);
-                    getLoaderManager().getLoader(4).forceLoad();
-                }
-            });
-            
+            //check if is following
+            pbFollow.setVisibility(View.VISIBLE);
             getLoaderManager().initLoader(3, null, this);
             getLoaderManager().getLoader(3).forceLoad();
         }
@@ -434,6 +431,7 @@ public class UserFragment extends BaseFragment implements
         LinearLayout llOrg = (LinearLayout) v.findViewById(R.id.ll_orgs);
         
         if (!orgs.isEmpty()) {
+            llOrg.setVisibility(View.VISIBLE);
             for (final User org : orgs) {
                 View rowView = getLayoutInflater(null).inflate(R.layout.row_simple, null);
                 rowView.setBackgroundResource(android.R.drawable.list_selector_background);
@@ -463,6 +461,17 @@ public class UserFragment extends BaseFragment implements
     
     private void updateFollowBtn() {
         Button btnFollow = (Button) getView().findViewById(R.id.btn_follow);
+        ProgressBar pbFollow = (ProgressBar) getView().findViewById(R.id.pb_follow);
+        pbFollow.setVisibility(View.GONE);
+        btnFollow.setVisibility(View.VISIBLE);
+        btnFollow.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getLoaderManager().restartLoader(4, null, UserFragment.this);
+                getLoaderManager().getLoader(4).forceLoad();
+            }
+        });
+        
         if (isFollowing) {
             btnFollow.setBackgroundResource(R.drawable.button_red);
             btnFollow.setText(R.string.user_unfollow_action);
@@ -499,6 +508,7 @@ public class UserFragment extends BaseFragment implements
     @Override
     public void onLoadFinished(Loader loader, Object object) {
         if (loader.getId() == 1) {
+            hideLoading(R.id.pb_top_repos, 0);
             fillTopRepos((List<Repository>) object);
         }
         else if (loader.getId() == 2) {
