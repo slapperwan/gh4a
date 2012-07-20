@@ -124,22 +124,19 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="0dp"
                 android:text="@string/save"
-                android:background="@drawable/button_blue"
-                style="@style/ButtonText" />
+                android:textAppearance="?android:attr/textAppearanceSmall" />
             <Button
                 android:id="@+id/btn_delete" 
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/delete"
-                android:background="@drawable/button_red"
-                style="@style/ButtonText" />
+                android:textAppearance="?android:attr/textAppearanceSmall" />
             <Button
                 android:id="@+id/btn_cancel" 
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/cancel"
-                android:background="@drawable/button_black"
-                style="@style/ButtonText" />
+                android:textAppearance="?android:attr/textAppearanceSmall" />
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

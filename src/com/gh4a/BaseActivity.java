@@ -436,7 +436,9 @@ public class BaseActivity extends SherlockActivity {
         else if (findViewById(R.id.list_view) != null) {
             findViewById(R.id.list_view).setVisibility(View.INVISIBLE);
         }
-        findViewById(R.id.pb).setVisibility(View.VISIBLE);
+        else if (findViewById(R.id.pb) != null) {
+            findViewById(R.id.pb).setVisibility(View.VISIBLE);
+        }
     }
     
     public void hideLoading() {
@@ -446,6 +448,8 @@ public class BaseActivity extends SherlockActivity {
         else if (findViewById(R.id.list_view) != null) {
             findViewById(R.id.list_view).setVisibility(View.VISIBLE);
         }
-        findViewById(R.id.pb).setVisibility(View.GONE);
+        else if (findViewById(R.id.pb) != null) {
+            findViewById(R.id.pb).setVisibility(View.GONE);
+        }
     }
 }

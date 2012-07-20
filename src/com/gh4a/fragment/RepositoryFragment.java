@@ -210,7 +210,6 @@ public class RepositoryFragment extends BaseFragment implements
         tlWatchers.setOnClickListener(this);
         
         TextView tvWatchers = (TextView) v.findViewById(R.id.tv_watchers_label);
-        tvWatchers.setTypeface(condensed);
         
         TextView tvWatchersCount = (TextView) v.findViewById(R.id.tv_watchers_count);
         tvWatchersCount.setText(String.valueOf(mRepository.getWatchers()));
@@ -220,7 +219,6 @@ public class RepositoryFragment extends BaseFragment implements
         tlForks.setOnClickListener(this);
         
         TextView tvForks = (TextView) v.findViewById(R.id.tv_forks_label);
-        tvForks.setTypeface(condensed);
         
         TextView tvForksCount = (TextView) v.findViewById(R.id.tv_forks_count);
         tvForksCount.setTypeface(boldCondensed);
@@ -234,7 +232,6 @@ public class RepositoryFragment extends BaseFragment implements
             tlIssues.setVisibility(View.VISIBLE);
             tlIssues.setOnClickListener(this);
             
-            tvIssues.setTypeface(condensed);
             tvIssues.setVisibility(View.VISIBLE);
             
             tvIssuesCount.setTypeface(boldCondensed);
@@ -260,7 +257,6 @@ public class RepositoryFragment extends BaseFragment implements
             tlIssues.setVisibility(View.VISIBLE);
             tlIssues.setOnClickListener(this);
             
-            tvIssues.setTypeface(condensed);
             tvIssues.setVisibility(View.VISIBLE);
             
             tvIssuesCount.setTypeface(boldCondensed);
@@ -478,11 +474,9 @@ public class RepositoryFragment extends BaseFragment implements
         
         Button btnFollow = (Button) getView().findViewById(R.id.btn_watch);
         if (isWatching) {
-            btnFollow.setBackgroundResource(R.drawable.button_red);
             btnFollow.setText(R.string.repo_unwatch_action);
         }
         else {
-            btnFollow.setBackgroundResource(R.drawable.button_blue);
             btnFollow.setText(R.string.repo_watch_action);
         }
     }

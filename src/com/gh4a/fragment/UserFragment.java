@@ -473,11 +473,9 @@ public class UserFragment extends BaseFragment implements
         });
         
         if (isFollowing) {
-            btnFollow.setBackgroundResource(R.drawable.button_red);
             btnFollow.setText(R.string.user_unfollow_action);
         }
         else {
-            btnFollow.setBackgroundResource(R.drawable.button_blue);
             btnFollow.setText(R.string.user_follow_action);
         }
     }

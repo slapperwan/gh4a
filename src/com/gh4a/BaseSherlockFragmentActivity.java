@@ -428,7 +428,9 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         else if (findViewById(R.id.main_content) != null) {
             findViewById(R.id.main_content).setVisibility(View.INVISIBLE);
         }
-        findViewById(R.id.pb).setVisibility(View.VISIBLE);
+        if (findViewById(R.id.pb) != null) {
+            findViewById(R.id.pb).setVisibility(View.VISIBLE);
+        }
     }
     
     public void hideLoading() {
@@ -444,6 +446,9 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         else if (findViewById(R.id.main_content) != null) {
             findViewById(R.id.main_content).setVisibility(View.VISIBLE);
         }
-        findViewById(R.id.pb).setVisibility(View.GONE);
+        
+        if (findViewById(R.id.pb) != null) {
+            findViewById(R.id.pb).setVisibility(View.GONE);
+        }
     }
 }

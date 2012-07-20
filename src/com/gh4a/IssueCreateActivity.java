@@ -417,7 +417,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
                         mSelectedLabels.remove(label);
                         
                         tvLabel.setTypeface(condensed);
-                        tvLabel.setBackgroundColor(Color.WHITE);
+                        tvLabel.setBackgroundColor(0);
                         tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_light));
                     }
                     else {
@@ -454,7 +454,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
                 }
                 else {
                     tvLabel.setTypeface(condensed);
-                    tvLabel.setBackgroundColor(Color.WHITE);
+                    tvLabel.setBackgroundColor(0);
                     tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_light));
                 }
             }

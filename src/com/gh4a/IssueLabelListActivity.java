@@ -252,7 +252,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
     
     private void unselectLabel(TextView tvLabel, View viewColor, String color) {
         tvLabel.setTag(color);
-        tvLabel.setBackgroundColor(Color.WHITE);
+        tvLabel.setBackgroundColor(0);
         tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_light));
         viewColor.setBackgroundColor(Color.parseColor("#" + color));
     }

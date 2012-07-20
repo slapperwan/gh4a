@@ -84,8 +84,7 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
         s.setSupportZoom(true);
         s.setSupportMultipleWindows(true);
         s.setJavaScriptEnabled(true);
-
-        webView.getSettings().setUseWideViewPort(true);
+        s.setUseWideViewPort(true);
 
         webView.setWebViewClient(webViewClient);
         if (FileUtils.isImage(mName)) {
@@ -142,9 +141,9 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
     @Override
     public void onLoadFinished(Loader<Content> loader, Content content) {
         if (content != null) {
-            hideLoading();
             mContent = content;
             fillData(true);
+            hideLoading();
         }
     }
 
