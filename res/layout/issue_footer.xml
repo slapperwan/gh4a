@@ -8,21 +8,23 @@
         android:id="@+id/main_content"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
         <EditText
             android:id="@+id/et_desc"
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
             android:gravity="top"
-            android:lines="6"
+            android:minLines="5"
+            android:inputType="textMultiLine|textCapSentences"
             android:hint="@string/issue_comment_title" />
         <Button
             android:text="@string/issue_comment_title"
             android:id="@+id/btn_create"
             android:layout_width="wrap_content"
-            android:gravity="center_vertical|center_horizontal"
             android:layout_height="wrap_content"
-            android:layout_gravity="right">
+            android:textAppearance="?android:attr/textAppearanceSmall">
         </Button>
     </LinearLayout>
 </LinearLayout>

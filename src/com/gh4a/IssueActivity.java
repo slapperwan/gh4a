@@ -550,12 +550,8 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
                 try {
                     IssueActivity activity = mTarget.get();
                     EditText etComment = (EditText) activity.findViewById(R.id.et_desc);
-                    //CheckBox cbSign = (CheckBox) activity.findViewById(R.id.cb_sign);
                     
                     String comment = etComment.getText().toString();
-//                    if (cbSign.isChecked()) {
-//                        comment = comment + "\n\n" + activity.getResources().getString(R.string.sign);
-//                    }
                     GitHubClient client = new GitHubClient();
                     client.setOAuth2Token(mTarget.get().getAuthToken());
                     IssueService issueService = new IssueService(client);
@@ -578,13 +574,18 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
 
         @Override
         protected void onPreExecute() {
+            if (mTarget.get() != null) {
+                IssueActivity activity = mTarget.get();
+                activity.mProgressDialog = activity.showProgressDialog(activity.getString(R.string.loading_msg), false);
+            }
         }
 
         @Override
         protected void onPostExecute(Boolean result) {
             if (mTarget.get() != null) {
                 IssueActivity activity = mTarget.get();
-    
+                activity.stopProgressDialog(activity.mProgressDialog);
+                
                 if (mException) {
                     activity.showMessage(activity.getResources().getString(R.string.issue_error_comment),
                             false);
