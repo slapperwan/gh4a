@@ -356,19 +356,23 @@ public class RepositoryFragment extends BaseFragment implements
     
     public void fillReadme(Spanned readme) {
         if (readme != null) {
-            final Gh4Application app = (Gh4Application) getActivity().getApplicationContext();
-            Typeface regular = app.regular;
-            
-            TextView tvReadme = (TextView) getView().findViewById(R.id.readme);
-            tvReadme.setTypeface(regular);
-            tvReadme.setText(readme);
-            
-            tvReadme.setMovementMethod(LinkMovementMethod.getInstance());
+            if (getActivity() != null) {
+                final Gh4Application app = (Gh4Application) getActivity().getApplicationContext();
+                Typeface regular = app.regular;
+                
+                TextView tvReadme = (TextView) getView().findViewById(R.id.readme);
+                tvReadme.setTypeface(regular);
+                tvReadme.setText(readme);
+                
+                tvReadme.setMovementMethod(LinkMovementMethod.getInstance());
+            }
         }
         else {
-            TextView tvReadme = (TextView) getView().findViewById(R.id.readme);
-            tvReadme.setText("README not found");
-            tvReadme.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
+            if (getView() != null) {
+                TextView tvReadme = (TextView) getView().findViewById(R.id.readme);
+                tvReadme.setText("README not found");
+                tvReadme.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
+            }
         }
     }
     
