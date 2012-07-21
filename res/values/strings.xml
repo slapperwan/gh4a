@@ -14,6 +14,8 @@
     <string name="loading_msg">Loading...</string>
     <string name="saving_msg">Saving...</string>
     <string name="deleting_msg">Deleting...</string>
+    <string name="closing_msg">Closing...</string>
+    <string name="opening_msg">Opening...</string>
     <string name="search">Search</string>
     <string name="activity">Activity</string>
     <string name="logout">Logout</string>

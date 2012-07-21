@@ -27,6 +27,7 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.IssueService;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -69,6 +70,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
     private CommentAdapter mCommentAdapter;
     private boolean isCollaborator;
     private boolean isCreator;
+    private ProgressDialog mProgressDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -436,6 +438,8 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         @Override
         protected void onPreExecute() {
             if (mTarget.get() != null) {
+                IssueActivity activity = mTarget.get();
+                activity.mProgressDialog = activity.showProgressDialog(activity.getString(R.string.closing_msg), false);
             }
         }
 
@@ -443,7 +447,8 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         protected void onPostExecute(Boolean result) {
             if (mTarget.get() != null) {
                 IssueActivity activity = mTarget.get();
-    
+                activity.stopProgressDialog(activity.mProgressDialog);
+                
                 if (mException) {
                     activity.showMessage(activity.getResources().getString(R.string.issue_error_close),
                             false);
@@ -465,11 +470,9 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
 
         private WeakReference<IssueActivity> mTarget;
         private boolean mException;
-        private boolean mHideMainView;
 
         public ReopenIssueTask(IssueActivity activity, boolean hideMainView) {
             mTarget = new WeakReference<IssueActivity>(activity);
-            mHideMainView = hideMainView;
         }
 
         @Override
@@ -503,13 +506,18 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
 
         @Override
         protected void onPreExecute() {
+            if (mTarget.get() != null) {
+                IssueActivity activity = mTarget.get();
+                activity.mProgressDialog = activity.showProgressDialog(activity.getString(R.string.opening_msg), false);
+            }
         }
 
         @Override
         protected void onPostExecute(Boolean result) {
             if (mTarget.get() != null) {
                 IssueActivity activity = mTarget.get();
-    
+                activity.stopProgressDialog(activity.mProgressDialog);
+                
                 if (mException) {
                     activity.showMessage(activity.getResources().getString(R.string.issue_error_reopen),
                             false);
