@@ -135,6 +135,9 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
         getSupportLoaderManager().initLoader(2, null, this);
         getSupportLoaderManager().initLoader(4, null, this);
         
+        LinearLayout ll = (LinearLayout) findViewById(R.id.for_collaborator);
+        ll.setVisibility(View.GONE);
+        
         if (mEditMode) {
             showLoading();
             getSupportLoaderManager().initLoader(3, null, this);
@@ -531,6 +534,9 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
             if (isCollaborator) {
                 ll.setVisibility(View.VISIBLE);
                 getSupportLoaderManager().getLoader(0).forceLoad();
+            }
+            else {
+                ll.setVisibility(View.GONE);
             }
         }
     }

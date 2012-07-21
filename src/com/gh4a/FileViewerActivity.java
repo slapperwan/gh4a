@@ -65,6 +65,7 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
+        showLoading();
         getSupportLoaderManager().initLoader(0, null, this);
         getSupportLoaderManager().getLoader(0).forceLoad();
     }
@@ -75,7 +76,6 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
 
         WebSettings s = webView.getSettings();
         s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
-        s.setUseWideViewPort(false);
         s.setAllowFileAccess(true);
         s.setBuiltInZoomControls(true);
         s.setLightTouchEnabled(true);
@@ -123,6 +123,7 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
 
         @Override
         public void onPageFinished(WebView webView, String url) {
+            hideLoading();
         }
         
         @Override
@@ -143,7 +144,6 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
         if (content != null) {
             mContent = content;
             fillData(true);
-            hideLoading();
         }
     }
 

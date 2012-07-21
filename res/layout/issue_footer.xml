@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res/com.gh4a"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical">
@@ -17,18 +16,6 @@
             android:gravity="top"
             android:lines="6"
             android:hint="@string/issue_comment_title" />
-        <!-- CheckBox
-            android:id="@+id/cb_sign"
-            android:layout_height="wrap_content"
-            android:layout_width="fill_parent"
-            android:text="@string/promote"
-            android:checked="true"
-            />
-        <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="fill_parent"
-            android:text="@string/promote_desc"
-            /-->
         <Button
             android:text="@string/issue_comment_title"
             android:id="@+id/btn_create"

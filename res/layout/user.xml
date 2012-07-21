@@ -5,10 +5,9 @@
     android:layout_height="fill_parent"
     android:layout_margin="0dp"
     android:padding="0dp">
-    <LinearLayout
+    <FrameLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:layout_height="fill_parent" >
         <ProgressBar
             android:id="@+id/pb"
             style="@style/LoadingProgress" />
@@ -18,8 +17,9 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" >
             <RelativeLayout
+                android:orientation="vertical"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:layout_marginTop="16dp" >
@@ -32,13 +32,13 @@
                     android:layout_marginTop="5dp" />
                 <LinearLayout
                     android:id="@+id/ll_user_info"
-                    android:layout_height="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
                     android:orientation="vertical"
-                    android:layout_width="match_parent"
                     android:layout_toRightOf="@id/iv_gravatar">
                     <TextView
                         android:id="@+id/tv_name"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceLarge" />
                     <ProgressBar
@@ -64,9 +64,9 @@
                 android:layout_width="fill_parent"
                 android:layout_height="10dp" />
             <LinearLayout
-                android:layout_height="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
                 android:orientation="vertical"
-                android:layout_width="match_parent"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp">
                 <TextView
@@ -105,7 +105,7 @@
                 android:layout_height="10dp" />
             <TableLayout
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
+                android:layout_height="wrap_content"
                 android:padding="16dp" >
                 <TableRow
                     android:layout_width="wrap_content"
@@ -296,5 +296,5 @@
                 android:layout_width="fill_parent"
                 android:layout_height="16dp" />
         </LinearLayout>
-    </LinearLayout>
+    </FrameLayout>
 </ScrollView>

@@ -55,6 +55,7 @@ public class GistViewerActivity extends BaseActivity {
         mActionBar.setDisplayShowTitleEnabled(true);
         mActionBar.setHomeButtonEnabled(true);
         
+        showLoading();
         new LoadGistTask(this, true).execute(mGistId, mFilename);
     }
     
@@ -97,7 +98,6 @@ public class GistViewerActivity extends BaseActivity {
         protected void onPostExecute(String result) {
             if (mTarget.get() != null) {
                 GistViewerActivity activity = mTarget.get();
-                activity.hideLoading();
                 if (mException) {
                     activity.showError();
                 }
@@ -113,7 +113,6 @@ public class GistViewerActivity extends BaseActivity {
 
         WebSettings s = webView.getSettings();
         s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
-        s.setUseWideViewPort(false);
         s.setAllowFileAccess(true);
         s.setBuiltInZoomControls(true);
         s.setLightTouchEnabled(true);
@@ -122,12 +121,12 @@ public class GistViewerActivity extends BaseActivity {
         s.setSupportZoom(true);
         s.setSupportMultipleWindows(true);
         s.setJavaScriptEnabled(true);
+        s.setUseWideViewPort(true);
 
-        webView.getSettings().setUseWideViewPort(true);
+        webView.setWebViewClient(webViewClient);
 
         mData = data;
         String highlighted = StringUtils.highlightSyntax(mData, highlight, mFilename);
-        webView.setWebViewClient(webViewClient);
         webView.loadDataWithBaseURL("file:///android_asset/", highlighted, "text/html", "utf-8", "");
     }
 
@@ -135,6 +134,7 @@ public class GistViewerActivity extends BaseActivity {
 
         @Override
         public void onPageFinished(WebView webView, String url) {
+            hideLoading();
         }
         
         @Override

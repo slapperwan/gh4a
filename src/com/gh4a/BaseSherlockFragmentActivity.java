@@ -437,14 +437,14 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         if (findViewById(R.id.pager) != null) {
             findViewById(R.id.pager).setVisibility(View.VISIBLE);
         }
-        else if (findViewById(R.id.web_view) != null) {
-            findViewById(R.id.web_view).setVisibility(View.VISIBLE);
-        }
         else if (findViewById(R.id.list_view) != null) {
             findViewById(R.id.list_view).setVisibility(View.VISIBLE);
         }
         else if (findViewById(R.id.main_content) != null) {
             findViewById(R.id.main_content).setVisibility(View.VISIBLE);
+        }
+        else if (findViewById(R.id.web_view) != null) {
+            findViewById(R.id.web_view).setVisibility(View.VISIBLE);
         }
         
         if (findViewById(R.id.pb) != null) {

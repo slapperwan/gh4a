@@ -79,6 +79,7 @@ public class WikiActivity extends BaseActivity {
 
         @Override
         public void onPageFinished(WebView webView, String url) {
+            hideLoading();
         }
         
         @Override

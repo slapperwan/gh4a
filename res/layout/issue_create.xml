@@ -5,17 +5,16 @@
     android:layout_height="fill_parent"
     android:layout_margin="0dp"
     android:padding="0dp">
-    <LinearLayout
+    <FrameLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:layout_height="wrap_content" >
         <ProgressBar
             android:id="@+id/pb"
             style="@style/LoadingProgress" />
         <LinearLayout
             android:id="@+id/main_content"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:orientation="vertical" >
             <EditText
                 android:id="@+id/et_title"
@@ -37,11 +36,10 @@
                 android:id="@+id/for_collaborator"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone" >
+                android:orientation="vertical" >
                 <LinearLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="fill_parent"
                     android:orientation="vertical"
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp">
@@ -62,7 +60,7 @@
                 <LinearLayout
                     android:id="@+id/ll_labels"
                     android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
+                    android:layout_height="wrap_content"
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
                     android:orientation="vertical">
@@ -72,7 +70,7 @@
                     android:layout_height="10dp" />
                 <LinearLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
+                    android:layout_height="wrap_content"
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
                     android:orientation="horizontal">
@@ -90,7 +88,7 @@
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
+                    android:layout_height="wrap_content"
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
                     android:orientation="horizontal">
@@ -108,5 +106,5 @@
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
+    </FrameLayout>
 </ScrollView>

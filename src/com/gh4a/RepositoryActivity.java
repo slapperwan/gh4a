@@ -59,7 +59,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.view_pager);
+        setContentView(R.layout.view_pager_repo);
         
         fileStacks = new ArrayList<ContentListFragment>();
         mContentList = new ArrayList<List<Content>>();
