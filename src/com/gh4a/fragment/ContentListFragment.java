@@ -108,6 +108,7 @@ public class ContentListFragment extends BaseFragment
             getLoaderManager().getLoader(0).forceLoad();
         }
         else {
+            hideLoading();
             mAdapter = new FileAdapter(getSherlockActivity(), mContents);
             mListView.setAdapter(mAdapter);
             mAdapter.notifyDataSetChanged();
