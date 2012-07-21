@@ -9,6 +9,7 @@ import org.eclipse.egit.github.core.RepositoryBranch;
 import org.eclipse.egit.github.core.RepositoryTag;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -55,6 +56,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     private List<RepositoryTag> mTags;
     private String mSelectedRef;
     private String mSelectBranchTag;
+    private ProgressDialog mProgressDialog;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -277,9 +279,11 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
                 getApplicationContext().openUserInfoActivity(this, mRepoOwner, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 return true;     
             case R.id.branches:
+                mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
                 getSupportLoaderManager().getLoader(1).forceLoad();
                 return true;
             case R.id.tags:
+                mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
                 getSupportLoaderManager().getLoader(2).forceLoad();
                 return true;    
             default:
@@ -308,10 +312,12 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
             fillTabs();
         }
         else if (loader.getId() == 1) {
+            stopProgressDialog(mProgressDialog);
             this.mBranches = (List<RepositoryBranch>) object;
             showBranchesDialog();
         }
         else {
+            stopProgressDialog(mProgressDialog);
             this.mTags = (List<RepositoryTag>) object;
             showTagsDialog();
         }

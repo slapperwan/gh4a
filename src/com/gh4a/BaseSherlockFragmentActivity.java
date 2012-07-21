@@ -20,6 +20,7 @@ import java.util.Locale;
 import org.ocpsoft.pretty.time.PrettyTime;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -440,6 +441,16 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         
         if (findViewById(R.id.pb) != null) {
             findViewById(R.id.pb).setVisibility(View.GONE);
+        }
+    }
+    
+    public ProgressDialog showProgressDialog(String message, boolean cancelable) {
+        return ProgressDialog.show(this, "", message, cancelable);
+    }
+    
+    public void stopProgressDialog(ProgressDialog progressDialog) {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
         }
     }
 }

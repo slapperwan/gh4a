@@ -27,6 +27,7 @@ import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -73,6 +74,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
     private ImageButton mBtnFilterByMilestone;
     private ImageButton mBtnFilterByAssignee;
     private boolean isCollaborator;
+    private ProgressDialog mProgressDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -281,6 +283,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
             break;
             
         case R.id.btn_labels:
+            mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
             if (mFilterData.get("labelsPassToNextActivity") == null) {
                 getSupportLoaderManager().getLoader(0).forceLoad();
             }
@@ -297,6 +300,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
             break;
             
         case R.id.btn_milestone:
+            mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
             if (mFilterData.get("milestonesPassToNextActivity") == null) {
                 getSupportLoaderManager().getLoader(1).forceLoad();
             }
@@ -317,6 +321,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
             break;
             
         case R.id.btn_assignee:
+            mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
             if (mFilterData.get("assigneesPassToNextActivity") == null) {
                 getSupportLoaderManager().getLoader(2).forceLoad();
             }
@@ -563,12 +568,15 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
     @Override
     public void onLoadFinished(Loader loader, Object object) {
         if (loader.getId() == 0) {
+            stopProgressDialog(mProgressDialog);
             showLabelsDialog((List<Label>) object);
         }
         else if (loader.getId() == 1) {
+            stopProgressDialog(mProgressDialog);
             showMilestonesDialog((List<Milestone>) object);
         }
         else if (loader.getId() == 2) {
+            stopProgressDialog(mProgressDialog);
             showAssigneesDialog((List<User>) object);
         }
         else {
