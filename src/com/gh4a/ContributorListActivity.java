@@ -25,6 +25,10 @@ import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
+import android.content.Intent;
+
+import com.actionbarsherlock.view.MenuItem;
+
 public class ContributorListActivity extends UserListActivity {
 
     protected String mUserLogin;
@@ -76,5 +80,16 @@ public class ContributorListActivity extends UserListActivity {
             users.add(user);
         }
         return users;
+    }
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                getApplicationContext().openRepositoryInfoActivity(this, mUserLogin, mRepoName, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                return true;     
+            default:
+                return true;
+        }
     }
 }

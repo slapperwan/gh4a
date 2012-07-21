@@ -42,7 +42,7 @@ public class BrowseFilter extends BaseActivity {
                 String user = urlPart[3];
                 String repo = urlPart[4];
                 
-                context.openRepositoryInfoActivity(this, user, repo);
+                context.openRepositoryInfoActivity(this, user, repo, 0);
             }
             else if (urlPart.length == 6) {
                 String user = urlPart[3];

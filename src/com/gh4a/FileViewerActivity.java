@@ -108,6 +108,9 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
     @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                getApplicationContext().openRepositoryInfoActivity(this, mRepoOwner, mRepoName, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                return true;     
             case R.id.browser:
                 String blobUrl = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/blob/" + mRef + "/" + mPath + "?raw=true";
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(blobUrl));

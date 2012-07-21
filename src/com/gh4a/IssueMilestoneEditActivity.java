@@ -156,6 +156,10 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
         final EditText tvDesc = (EditText) findViewById(R.id.et_desc);
         
         switch (item.getItemId()) {
+        case android.R.id.home:
+            getApplicationContext().openIssueListActivity(this, mRepoOwner, mRepoName,
+                    Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            return true;
         case R.id.accept:
             String desc = null;
             

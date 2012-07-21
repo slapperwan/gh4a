@@ -339,6 +339,10 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
     @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                getApplicationContext().openIssueListActivity(this, mRepoOwner, mRepoName, 
+                        Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                return true;     
             case R.id.issue_create:
                 if (isAuthorized()) {
                     Intent intent = new Intent().setClass(this, IssueCreateActivity.class);
@@ -636,4 +640,5 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         // TODO Auto-generated method stub
         
     }
+    
 }

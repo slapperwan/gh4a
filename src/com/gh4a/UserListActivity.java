@@ -32,6 +32,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.adapter.UserAdapter;
 import com.gh4a.utils.StringUtils;
 
@@ -52,7 +53,6 @@ public class UserListActivity extends BaseActivity implements OnItemClickListene
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getTitleBar());
         actionBar.setSubtitle(getSubTitle());
-        actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
         mListViewUsers = (ListView) findViewById(R.id.list_view);
@@ -152,4 +152,5 @@ public class UserListActivity extends BaseActivity implements OnItemClickListene
             startActivity(intent);
         }
     }
+    
 }

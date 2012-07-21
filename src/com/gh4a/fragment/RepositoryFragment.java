@@ -178,7 +178,7 @@ public class RepositoryFragment extends BaseFragment implements
                     public void onClick(View arg0) {
                         app.openRepositoryInfoActivity(getSherlockActivity(),
                                 mRepository.getParent().getOwner().getLogin(),
-                                mRepository.getParent().getName());
+                                mRepository.getParent().getName(), 0);
                     }
                 });
             }

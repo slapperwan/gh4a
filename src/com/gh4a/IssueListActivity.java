@@ -120,8 +120,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         mActionBar.setTitle(R.string.issues);
         mActionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        mActionBar.setDisplayShowTitleEnabled(true);
-        mActionBar.setHomeButtonEnabled(true);
+        mActionBar.setDisplayHomeAsUpEnabled(true);
         
         Tab tab = mActionBar
                 .newTab()
@@ -225,6 +224,9 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
     @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                getApplicationContext().openRepositoryInfoActivity(this, mRepoOwner, mRepoName, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                return true;
             case R.id.view_open_issues:
                 getApplicationContext().openIssueListActivity(this, mRepoOwner, mRepoName, 
                         Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);

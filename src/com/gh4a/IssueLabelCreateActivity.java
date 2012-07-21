@@ -60,7 +60,6 @@ public class IssueLabelCreateActivity extends BaseSherlockFragmentActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.issue_label_new);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
         buildUi();
@@ -212,6 +211,10 @@ public class IssueLabelCreateActivity extends BaseSherlockFragmentActivity {
     @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+        case android.R.id.home:
+            getApplicationContext().openIssueListActivity(this, mRepoOwner, mRepoName, 
+                    Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            return true;
         case R.id.accept:
             EditText etLabel = (EditText) findViewById(R.id.et_label);
             if (etLabel.getText() == null || StringUtils.isBlank(etLabel.getText().toString())) {

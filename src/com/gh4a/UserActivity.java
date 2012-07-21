@@ -3,6 +3,7 @@ package com.gh4a;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -52,6 +53,15 @@ public class UserActivity extends BaseSherlockFragmentActivity {
         }
         
         mActionBar = getSupportActionBar();
+        mActionBar.setTitle(mUserLogin);
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        if (mUserLogin.equals(getAuthLogin())) {
+            mActionBar.setHomeButtonEnabled(false);            
+        }
+        else {
+            mActionBar.setDisplayHomeAsUpEnabled(true);
+        }
+        
         mAdapter = new UserAdapter(getSupportFragmentManager());
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
@@ -71,11 +81,6 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                 invalidateOptionsMenu();
             }
         });
-        
-        mActionBar.setTitle(mUserLogin);
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        mActionBar.setDisplayShowTitleEnabled(true);
-        mActionBar.setHomeButtonEnabled(true);
         
         Tab tab = mActionBar
                 .newTab()
@@ -157,5 +162,16 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                 || newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             //invalidateOptionsMenu();
         } 
+    }
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                getApplicationContext().openUserInfoActivity(this, getAuthLogin(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                return true;     
+            default:
+                return true;
+        }
     }
 }

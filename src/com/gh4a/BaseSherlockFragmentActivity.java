@@ -136,15 +136,6 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         case R.id.bookmarks:
             openBookmarkActivity();
             return true;
-        case android.R.id.home:
-            if (isAuthorized()) {
-                getApplicationContext().openUserInfoActivity(this, getAuthLogin(), null);
-            }
-            else {
-                intent = new Intent().setClass(this, Github4AndroidActivity.class);
-                startActivity(intent);
-            }
-            return true;     
         default:
             return setMenuOptionItemSelected(item);
         }

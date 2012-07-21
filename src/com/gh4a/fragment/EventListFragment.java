@@ -56,7 +56,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.CompareActivity;
 import com.gh4a.Constants;
@@ -210,7 +209,7 @@ public abstract class EventListFragment extends BaseFragment
                 // only 1 commit, then show the commit details
                 else {
                     context.openCommitInfoActivity(getSherlockActivity(), repoOwner, repoName,
-                            payload.getCommits().get(0).getSha());
+                            payload.getCommits().get(0).getSha(), 0);
                 }
             }
             else {
@@ -232,7 +231,7 @@ public abstract class EventListFragment extends BaseFragment
         /** WatchEvent */
         else if (Event.TYPE_WATCH.equals(eventType)) {
             if (eventRepo != null) {
-                context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName);
+                context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
             }
             else {
                 context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
@@ -242,7 +241,7 @@ public abstract class EventListFragment extends BaseFragment
         /** CreateEvent */
         else if (Event.TYPE_CREATE.equals(eventType)) {
             if (eventRepo != null) {
-                context.openRepositoryInfoActivity(this.getSherlockActivity(), repoOwner, repoName);
+                context.openRepositoryInfoActivity(this.getSherlockActivity(), repoOwner, repoName, 0);
             }
             else {
                 context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
@@ -274,7 +273,7 @@ public abstract class EventListFragment extends BaseFragment
             if (eventRepo != null) {
                 CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
                 context.openCommitInfoActivity(getSherlockActivity(), repoOwner, repoName, 
-                        payload.getComment().getCommitId());
+                        payload.getComment().getCommitId(), 0);
             }
             else {
                 context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
@@ -284,7 +283,7 @@ public abstract class EventListFragment extends BaseFragment
         /** DeleteEvent */
         else if (Event.TYPE_DELETE.equals(eventType)) {
             if (eventRepo != null) {
-                context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName);
+                context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
             }
             else {
                 context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
@@ -318,7 +317,7 @@ public abstract class EventListFragment extends BaseFragment
         else if (Event.TYPE_FORK_APPLY.equals(eventType)) {
             if (eventRepo != null) {
                 ForkApplyPayload payload = (ForkApplyPayload) event.getPayload();
-                context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName);
+                context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
             }
             else {
                 context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
@@ -336,7 +335,7 @@ public abstract class EventListFragment extends BaseFragment
         /** PublicEvent */
         else if (Event.TYPE_PUBLIC.equals(eventType)) {
             if (eventRepo != null) {
-                context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName);
+                context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
             }
             else {
                 context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
@@ -347,7 +346,7 @@ public abstract class EventListFragment extends BaseFragment
         else if (Event.TYPE_MEMBER.equals(eventType)) {
             if (eventRepo != null) {
                 MemberPayload payload = (MemberPayload) event.getPayload();
-                context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName);
+                context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
             }
             else {
                 context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
@@ -357,7 +356,8 @@ public abstract class EventListFragment extends BaseFragment
         /** Gist Event **/
         else if (Event.TYPE_GIST.equals(eventType)) {
             GistPayload payload = (GistPayload) event.getPayload();
-            context.openGistActivity(getSherlockActivity(), payload.getGist().getId());
+            context.openGistActivity(getSherlockActivity(), payload.getGist().getUser().getLogin(),
+                    payload.getGist().getId(), 0);
         }
         
         /** IssueCommentEvent */
@@ -381,7 +381,8 @@ public abstract class EventListFragment extends BaseFragment
         /** PullRequestReviewComment */
         else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
             PullRequestReviewCommentPayload payload = (PullRequestReviewCommentPayload) event.getPayload();
-            context.openCommitInfoActivity(getSherlockActivity(), repoOwner, repoName, payload.getComment().getCommitId());
+            context.openCommitInfoActivity(getSherlockActivity(), repoOwner, repoName, 
+                    payload.getComment().getCommitId(), 0);
         }
     }
     
@@ -522,12 +523,12 @@ public abstract class EventListFragment extends BaseFragment
         }
         /** Repo item */
         else if (title.startsWith("Repo")) {
-            context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName);
+            context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
         }
         /** Commit item */
         else if (title.startsWith("Commit")) {
             if (repoOwner != null) {
-                context.openCommitInfoActivity(getSherlockActivity(), repoOwner, repoName, value);
+                context.openCommitInfoActivity(getSherlockActivity(), repoOwner, repoName, value, 0);
             }
             else {
                 context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
@@ -550,7 +551,8 @@ public abstract class EventListFragment extends BaseFragment
         /** Gist item */
         else if (title.startsWith("Gist")) {
             GistPayload payload = (GistPayload) event.getPayload();
-            context.openGistActivity(getSherlockActivity(), payload.getGist().getId());
+            context.openGistActivity(getSherlockActivity(), payload.getGist().getUser().getLogin(),
+                    payload.getGist().getId(), 0);
         }
         /** Download item */
         else if (title.startsWith("File")) {

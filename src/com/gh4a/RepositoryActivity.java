@@ -79,7 +79,6 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         
         mActionBar = getSupportActionBar();
         mActionBar.setTitle(mRepoOwner + "/" + mRepoName);
-        mActionBar.setDisplayShowTitleEnabled(true);
         mActionBar.setDisplayHomeAsUpEnabled(true);
         
         showLoading();
@@ -274,6 +273,9 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                getApplicationContext().openUserInfoActivity(this, mRepoOwner, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                return true;     
             case R.id.branches:
                 getSupportLoaderManager().getLoader(1).forceLoad();
                 return true;

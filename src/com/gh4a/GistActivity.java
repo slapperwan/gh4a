@@ -37,11 +37,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.utils.StringUtils;
 
 public class GistActivity extends BaseActivity {
 
     private String mGistId;
+    private String mUserLogin;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,11 +52,12 @@ public class GistActivity extends BaseActivity {
         setContentView(R.layout.gist);
         
         mGistId = getIntent().getExtras().getString(Constants.Gist.ID);
+        mUserLogin = getIntent().getExtras().getString(Constants.User.USER_LOGIN);
         
         ActionBar mActionBar = getSupportActionBar();
         mActionBar.setTitle(getResources().getQuantityString(R.plurals.gist, 1) + " " + mGistId);
-        mActionBar.setDisplayShowTitleEnabled(true);
-        mActionBar.setHomeButtonEnabled(true);
+        mActionBar.setSubtitle(mUserLogin);
+        mActionBar.setDisplayHomeAsUpEnabled(true);
         
         new LoadGistTask(this).execute(mGistId);
     }
@@ -149,6 +152,20 @@ public class GistActivity extends BaseActivity {
                 });
                 llFiles.addView(tvFilename);
             }
+        }
+    }
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Intent intent = new Intent().setClass(this, GistListActivity.class);
+                intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;     
+            default:
+                return true;
         }
     }
 }

@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -26,6 +27,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.adapter.CompareAdapter;
 
 public class CompareActivity extends BaseActivity implements OnItemClickListener {
@@ -89,6 +91,17 @@ public class CompareActivity extends BaseActivity implements OnItemClickListener
         String[] sha = (String[]) adapter.getItem(position);
         
         getApplicationContext().openCommitInfoActivity(this, mRepoOwner, mRepoName, 
-                sha[0]);        
+                sha[0], 0);        
+    }
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                getApplicationContext().openRepositoryInfoActivity(this, mRepoOwner, mRepoName, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                return true;     
+            default:
+                return true;
+        }
     }
 }

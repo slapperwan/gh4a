@@ -31,6 +31,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.utils.StringUtils;
 
 public class GistViewerActivity extends BaseActivity {
@@ -52,8 +53,7 @@ public class GistViewerActivity extends BaseActivity {
 
         ActionBar mActionBar = getSupportActionBar();
         mActionBar.setTitle(mFilename);
-        mActionBar.setDisplayShowTitleEnabled(true);
-        mActionBar.setHomeButtonEnabled(true);
+        mActionBar.setDisplayHomeAsUpEnabled(true);
         
         showLoading();
         new LoadGistTask(this, true).execute(mGistId, mFilename);
@@ -144,4 +144,15 @@ public class GistViewerActivity extends BaseActivity {
             return true;
         }
     };
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                getApplicationContext().openGistActivity(this, mUserLogin, mGistId, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                return true;     
+            default:
+                return true;
+        }
+    }
 }

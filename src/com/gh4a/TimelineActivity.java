@@ -22,9 +22,8 @@ import org.eclipse.egit.github.core.service.EventService;
 
 
 
-public class TimelineActivity extends UserFeedActivity {
+public class TimelineActivity {
 
-    @Override
     public List getFeeds() {
         EventService eventService = new EventService();
         return (List<Event>) eventService.pagePublicEvents().next();    

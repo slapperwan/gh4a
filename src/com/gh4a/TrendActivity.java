@@ -243,7 +243,7 @@ public class TrendActivity extends BaseActivity {
                     Trend trend = (Trend) adapterView.getAdapter().getItem(position);
                     String[] repos = trend.getTitle().split("/");
                     getApplicationContext().openRepositoryInfoActivity(TrendActivity.this,
-                            repos[0].trim(), repos[1].trim());
+                            repos[0].trim(), repos[1].trim(), 0);
                 }
             });
         }

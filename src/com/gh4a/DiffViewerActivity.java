@@ -15,6 +15,7 @@
  */
 package com.gh4a;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.webkit.WebSettings;
@@ -22,6 +23,7 @@ import android.webkit.WebView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 
@@ -109,5 +111,16 @@ public class DiffViewerActivity extends BaseActivity {
         content.append("</pre></body></html>");
         return content.toString();
 
+    }
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                getApplicationContext().openCommitInfoActivity(this, mRepoOwner, mRepoName, mSha, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                return true;     
+            default:
+                return true;
+        }
     }
 }

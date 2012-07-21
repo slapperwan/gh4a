@@ -25,17 +25,11 @@ import org.eclipse.egit.github.core.service.EventService;
 /**
  * The UserPrivate activity.
  */
-public class UserPrivateActivity extends UserFeedActivity {
+public class UserPrivateActivity {
 
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.UserActivity#getFeeds()
-     */
-    @Override
     public List<Event> getFeeds() throws IOException {
         GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(getAuthToken());
         EventService eventService = new EventService(client);
-        return (List<Event>) eventService.pageUserReceivedEvents(mUserLogin, true).next();    
+        return (List<Event>) eventService.pageUserReceivedEvents(null, true).next();    
     }
 }

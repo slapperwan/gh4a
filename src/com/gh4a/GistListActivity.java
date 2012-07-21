@@ -24,6 +24,7 @@ import org.eclipse.egit.github.core.Gist;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.GistService;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,6 +34,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.adapter.GistAdapter;
 
 public class GistListActivity extends BaseActivity implements OnItemClickListener {
@@ -50,8 +52,7 @@ public class GistListActivity extends BaseActivity implements OnItemClickListene
         ActionBar mActionBar = getSupportActionBar();
         mActionBar.setTitle(getResources().getQuantityString(R.plurals.gist, 0));
         mActionBar.setSubtitle(mUserLogin);
-        mActionBar.setDisplayShowTitleEnabled(true);
-        mActionBar.setHomeButtonEnabled(true);
+        mActionBar.setDisplayHomeAsUpEnabled(true);
         
         new LoadGistTask(this).execute(mUserLogin);
     }
@@ -125,6 +126,17 @@ public class GistListActivity extends BaseActivity implements OnItemClickListene
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         Gist gist = (Gist) adapterView.getAdapter().getItem(position);
-        getApplicationContext().openGistActivity(this, gist.getId());
+        getApplicationContext().openGistActivity(this, mUserLogin, gist.getId(), 0);
+    }
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                getApplicationContext().openUserInfoActivity(this, mUserLogin, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                return true;     
+            default:
+                return true;
+        }
     }
 }

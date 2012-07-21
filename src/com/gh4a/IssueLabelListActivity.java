@@ -33,7 +33,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.text.Html;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.View;
@@ -68,7 +67,6 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.issue_manage_labels);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
         getSupportLoaderManager().initLoader(0, null, this);
@@ -370,6 +368,10 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
     @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+        case android.R.id.home:
+            getApplicationContext().openIssueListActivity(this, mRepoOwner, mRepoName, 
+                    Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            return true;
         case R.id.create_new:
             Intent intent = new Intent().setClass(this, IssueLabelCreateActivity.class);
             intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);

@@ -294,7 +294,7 @@ public class SearchActivity extends BaseActivity {
             if (mTarget.get() != null) {
                 SearchRepository repository = (SearchRepository) adapterView.getAdapter().getItem(position);
                 mTarget.get().getApplicationContext().openRepositoryInfoActivity(mTarget.get(),
-                        repository.getOwner(), repository.getName());
+                        repository.getOwner(), repository.getName(), 0);
             }
         }
     }
@@ -362,7 +362,7 @@ public class SearchActivity extends BaseActivity {
         else if (title.startsWith("Repo")) {
             SearchRepository repository = (SearchRepository) object;
             getApplicationContext().openRepositoryInfoActivity(this,
-                    repository.getOwner(), repository.getName());
+                    repository.getOwner(), repository.getName(), 0);
         }
         return true;
     }

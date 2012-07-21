@@ -42,6 +42,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.adapter.CommonFeedAdapter;
 import com.gh4a.feeds.FeedHandler;
 import com.gh4a.holder.Feed;
@@ -67,7 +68,6 @@ public class WikiListActivity extends BaseActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.recent_wiki);
         actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
-        actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
         mListView = (ListView) findViewById(R.id.list_view);
@@ -202,4 +202,15 @@ public class WikiListActivity extends BaseActivity {
                 return true;
         }
     };
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                getApplicationContext().openRepositoryInfoActivity(this, mUserLogin, mRepoName, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                return true;     
+            default:
+                return true;
+        }
+    }
 }

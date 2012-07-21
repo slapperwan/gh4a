@@ -40,6 +40,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.ImageDownloader;
 
@@ -279,5 +280,16 @@ public class CommitActivity extends BaseActivity {
         
         tvSummary.setText(String.format(getResources().getString(R.string.commit_summary),
                 commit.getFiles().size(), commit.getStats().getAdditions(), commit.getStats().getDeletions()));
+    }
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                getApplicationContext().openRepositoryInfoActivity(this, mRepoOwner, mRepoName, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                return true;     
+            default:
+                return true;
+        }
     }
 }

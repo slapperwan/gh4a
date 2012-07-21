@@ -108,7 +108,7 @@ public class ForkListFragment extends BaseFragment
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         Gh4Application context = ((BaseSherlockFragmentActivity) getActivity()).getApplicationContext();
         Repository repo = (Repository) adapterView.getAdapter().getItem(position);
-        context.openRepositoryInfoActivity(getActivity(), repo.getOwner().getLogin(), repo.getName());
+        context.openRepositoryInfoActivity(getActivity(), repo.getOwner().getLogin(), repo.getName(), 0);
     }
 
     @Override

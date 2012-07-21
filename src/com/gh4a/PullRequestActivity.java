@@ -22,6 +22,7 @@ import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.RepositoryCommit;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -36,6 +37,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.adapter.CommentAdapter;
 import com.gh4a.loader.IssueCommentsLoader;
 import com.gh4a.loader.PullRequestLoader;
@@ -161,7 +163,7 @@ public class PullRequestActivity extends BaseSherlockFragmentActivity
                 @Override
                 public void onClick(View arg0) {
                     getApplicationContext().openCommitInfoActivity(PullRequestActivity.this, mRepoOwner,
-                            mRepoName, commit.getSha());
+                            mRepoName, commit.getSha(), 0);
                 }
             });
             
@@ -209,5 +211,17 @@ public class PullRequestActivity extends BaseSherlockFragmentActivity
     public void onLoaderReset(Loader arg0) {
         // TODO Auto-generated method stub
         
+    }
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case android.R.id.home:
+            getApplicationContext().openPullRequestListActivity(this, mRepoOwner, mRepoName,
+                    Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            return true;
+        default:
+            return true;
+        }
     }
 }

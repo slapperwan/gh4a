@@ -15,6 +15,7 @@
  */
 package com.gh4a;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -25,6 +26,7 @@ import android.view.ViewGroup;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.fragment.FollowersFollowingListFragment;
 
 public class FollowerFollowingListActivity extends BaseSherlockFragmentActivity {
@@ -68,8 +70,7 @@ public class FollowerFollowingListActivity extends BaseSherlockFragmentActivity 
         
         mActionBar.setTitle(mUserLogin);
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        mActionBar.setDisplayShowTitleEnabled(true);
-        mActionBar.setHomeButtonEnabled(true);
+        mActionBar.setDisplayHomeAsUpEnabled(true);
         
         Tab tab = mActionBar
                 .newTab()
@@ -113,6 +114,17 @@ public class FollowerFollowingListActivity extends BaseSherlockFragmentActivity 
         
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
+        }
+    }
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                getApplicationContext().openUserInfoActivity(this, mUserLogin, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                return true;     
+            default:
+                return true;
         }
     }
 }

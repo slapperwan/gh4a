@@ -15,14 +15,15 @@
  */
 package com.gh4a;
 
-import com.actionbarsherlock.app.ActionBar;
-
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.MenuItem;
 
 public class WikiActivity extends BaseActivity {
 
@@ -48,7 +49,6 @@ public class WikiActivity extends BaseActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(mTitle);
         actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
-        actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
         fillData();
@@ -89,5 +89,20 @@ public class WikiActivity extends BaseActivity {
             return true;
         }
     };
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Intent intent = new Intent().setClass(this, WikiListActivity.class);
+                intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;     
+            default:
+                return true;
+        }
+    }
 
 }

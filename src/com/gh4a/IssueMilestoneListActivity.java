@@ -53,7 +53,6 @@ public class IssueMilestoneListActivity extends BaseSherlockFragmentActivity {
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         mActionBar.setTitle(R.string.issue_manage_milestones);
         mActionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        mActionBar.setDisplayShowTitleEnabled(true);
         mActionBar.setDisplayHomeAsUpEnabled(true);
         
         tabCount = 2;
@@ -131,6 +130,10 @@ public class IssueMilestoneListActivity extends BaseSherlockFragmentActivity {
     @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                getApplicationContext().openIssueListActivity(this, mRepoOwner, mRepoName,
+                        Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                return true;
             case R.id.create_new:
                 if (isAuthorized()) {
                     Intent intent = new Intent().setClass(this, IssueMilestoneCreateActivity.class);

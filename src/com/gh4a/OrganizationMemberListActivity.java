@@ -22,10 +22,13 @@ import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.OrganizationService;
 
+import android.content.Intent;
+
+import com.actionbarsherlock.view.MenuItem;
+
 public class OrganizationMemberListActivity extends UserListActivity {
 
     protected String mUserLogin;
-    protected String mRepoName;
 
     @Override
     protected void setRequestData() {
@@ -57,5 +60,16 @@ public class OrganizationMemberListActivity extends UserListActivity {
         client.setOAuth2Token(getAuthToken());
         OrganizationService orgService = new OrganizationService(client);
         return orgService.getPublicMembers(mUserLogin);
+    }
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case android.R.id.home:
+            getApplicationContext().openUserInfoActivity(this, mUserLogin, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            return true;
+        default:
+            return true;
+        }
     }
 }

@@ -67,8 +67,7 @@ public class PullRequestListActivity extends BaseSherlockFragmentActivity
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.pull_requests);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
         
         mPullRequestAdapter = new PullRequestAdapter(this, new ArrayList<PullRequest>());
         listView.setAdapter(mPullRequestAdapter);
@@ -124,6 +123,9 @@ public class PullRequestListActivity extends BaseSherlockFragmentActivity
         mPullRequestAdapter.getObjects().clear();
         
         switch (item.getItemId()) {
+            case android.R.id.home:
+                getApplicationContext().openRepositoryInfoActivity(this, mRepoOwner, mRepoName, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                return true;
             case R.id.view_open_issues:
                 getApplicationContext().openPullRequestListActivity(this, mRepoOwner, mRepoName,
                         Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);

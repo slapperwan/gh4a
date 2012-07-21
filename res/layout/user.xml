@@ -130,7 +130,7 @@
                                 android:id="@+id/tv_members_label"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textAppearance="?attr/textAppearanceSmall"
+                                android:textAppearance="?android:attr/textAppearanceSmall"
                                 android:text="@string/user_members" />
                         </TableRow>
                     </TableLayout>

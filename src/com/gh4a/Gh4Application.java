@@ -230,10 +230,13 @@ public class Gh4Application extends Application {
      * @param repoOwner the repo owner
      * @param repoName the repo name
      */
-    public void openRepositoryInfoActivity(Context context, String repoOwner, String repoName) {
+    public void openRepositoryInfoActivity(Context context, String repoOwner, String repoName, int flags) {
         Intent intent = new Intent().setClass(context, RepositoryActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, repoName);
+        if (flags != 0) {
+            intent.setFlags(flags);
+        }
         context.startActivity(intent);
     }
 
@@ -275,11 +278,14 @@ public class Gh4Application extends Application {
      * @param repoName the repo name
      * @param sha the sha
      */
-    public void openCommitInfoActivity(Context context, String login, String repoName, String sha) {
+    public void openCommitInfoActivity(Context context, String login, String repoName, String sha, int flags) {
         Intent intent = new Intent().setClass(context, CommitActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, login);
         intent.putExtra(Constants.Repository.REPO_NAME, repoName);
         intent.putExtra(Constants.Object.OBJECT_SHA, sha);
+        if (flags != 0) {
+            intent.setFlags(flags);
+        }
         context.startActivity(intent);
     }
 
@@ -392,9 +398,13 @@ public class Gh4Application extends Application {
         context.startActivity(browserIntent);
     }
 
-    public void openGistActivity(Context context, String gistId) {
+    public void openGistActivity(Context context, String userLogin, String gistId, int flags) {
         Intent intent = new Intent().setClass(context, GistActivity.class);
+        intent.putExtra(Constants.User.USER_LOGIN, userLogin);
         intent.putExtra(Constants.Gist.ID, gistId);
+        if (flags != 0) {
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        }
         context.startActivity(intent);
     }
     

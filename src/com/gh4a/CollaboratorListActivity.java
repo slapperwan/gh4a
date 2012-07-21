@@ -23,6 +23,10 @@ import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 
+import android.content.Intent;
+
+import com.actionbarsherlock.view.MenuItem;
+
 public class CollaboratorListActivity extends UserListActivity {
 
     protected String mUserLogin;
@@ -60,5 +64,16 @@ public class CollaboratorListActivity extends UserListActivity {
         CollaboratorService collaboratorService = new CollaboratorService(client);
         return collaboratorService
                 .getCollaborators(new RepositoryId(mUserLogin, mRepoName));
+    }
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                getApplicationContext().openRepositoryInfoActivity(this, mUserLogin, mRepoName, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                return true;     
+            default:
+                return true;
+        }
     }
 }
