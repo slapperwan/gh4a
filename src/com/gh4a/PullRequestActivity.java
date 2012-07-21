@@ -145,7 +145,6 @@ public class PullRequestActivity extends BaseSherlockFragmentActivity
     
     private void fillCommits(List<RepositoryCommit> commits) {
         LinearLayout llCommits = (LinearLayout) findViewById(R.id.ll_commits);
-        llCommits.setBackgroundResource(R.drawable.default_info_box);
         for (final RepositoryCommit commit : commits) {
             TextView tvName = new TextView(getApplicationContext());
             tvName.setText(CommitUtils.getAuthorLogin(commit) + " added a commit");
