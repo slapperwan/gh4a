@@ -28,6 +28,7 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.IssueService;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -62,7 +63,6 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
     private String mRepoOwner;
     private String mRepoName;
     private ActionBar mActionBar;
-    private LoadingDialog mLoadingDialog;
     private List<Label> mSelectedLabels;
     private Milestone mSelectedMilestone;
     private User mSelectedAssignee;
@@ -80,6 +80,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
     private boolean mEditMode; 
     private Issue mEditIssue;
     private boolean isCollaborator;
+    private ProgressDialog mProgressDialog;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -186,6 +187,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
 
         case R.id.btn_milestone:
             if (mAllMilestone == null) {
+                mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
                 getSupportLoaderManager().getLoader(1).forceLoad();
             }
             else {
@@ -195,6 +197,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
             
         case R.id.btn_assignee:
             if (mAllAssignee == null) {
+                mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
                 getSupportLoaderManager().getLoader(2).forceLoad();
             }
             else {
@@ -211,11 +214,9 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
 
         private WeakReference<IssueCreateActivity> mTarget;
         private boolean mException;
-        private boolean mHideMainView;
 
         public SaveIssueTask(IssueCreateActivity activity, boolean hideMainView) {
             mTarget = new WeakReference<IssueCreateActivity>(activity);
-            mHideMainView = hideMainView;
         }
 
         @Override
@@ -264,7 +265,8 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
         @Override
         protected void onPreExecute() {
             if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true, mHideMainView);
+                IssueCreateActivity activity = mTarget.get();
+                activity.mProgressDialog = activity.showProgressDialog(activity.getString(R.string.saving_msg), false);
             }
         }
 
@@ -272,7 +274,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
         protected void onPostExecute(Boolean result) {
             if (mTarget.get() != null) {
                 IssueCreateActivity activity = mTarget.get();
-                activity.mLoadingDialog.dismiss();
+                activity.stopProgressDialog(activity.mProgressDialog);
     
                 if (mException) {
                     activity.showError(false);
@@ -518,10 +520,12 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
             fillLabels();
         }
         else if (loader.getId() == 1) {
+            stopProgressDialog(mProgressDialog);
             mAllMilestone = (List<Milestone>) object;
             showMilestonesDialog();
         }
         else if (loader.getId() == 2) {
+            stopProgressDialog(mProgressDialog);
             mAllAssignee = (List<User>) object;
             showAssigneesDialog();
         }

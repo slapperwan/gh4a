@@ -22,6 +22,7 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.LabelService;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -42,6 +43,7 @@ public class IssueLabelCreateActivity extends BaseSherlockFragmentActivity {
     private String mRepoOwner;
     private String mRepoName;
     private String mSelectectedColor;
+    private ProgressDialog mProgressDialog;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -176,13 +178,17 @@ public class IssueLabelCreateActivity extends BaseSherlockFragmentActivity {
 
         @Override
         protected void onPreExecute() {
+            if (mTarget.get() != null) {
+                IssueLabelCreateActivity activity = mTarget.get();
+                activity.mProgressDialog = activity.showProgressDialog(activity.getString(R.string.saving_msg), false);
+            }
         }
 
         @Override
         protected void onPostExecute(Void result) {
             if (mTarget.get() != null) {
                 IssueLabelCreateActivity activity = mTarget.get();
-    
+                activity.stopProgressDialog(activity.mProgressDialog);
                 if (mException) {
                     activity.showMessage(activity.getResources().getString(R.string.issue_error_create_label), false);
                 }

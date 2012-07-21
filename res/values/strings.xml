@@ -12,6 +12,8 @@
     <string name="more_issue_assignee">Assigned to %1$s</string>
     <string name="more_comment_data">by %1$s %2$s</string>
     <string name="loading_msg">Loading...</string>
+    <string name="saving_msg">Saving...</string>
+    <string name="deleting_msg">Deleting...</string>
     <string name="search">Search</string>
     <string name="activity">Activity</string>
     <string name="logout">Logout</string>

@@ -28,6 +28,7 @@ import org.eclipse.egit.github.core.service.MilestoneService;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -55,6 +56,7 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
     private String mRepoName;
     private int mMilestoneNumber;
     private Milestone mMilestone;
+    private ProgressDialog mProgressDialog;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -118,13 +120,18 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
 
         @Override
         protected void onPreExecute() {
+            if (mTarget.get() != null) {
+                IssueMilestoneEditActivity activity = mTarget.get();
+                activity.mProgressDialog = activity.showProgressDialog(activity.getString(R.string.saving_msg), false);
+            }
         }
 
         @Override
         protected void onPostExecute(Void result) {
             if (mTarget.get() != null) {
                 IssueMilestoneEditActivity activity = mTarget.get();
-    
+                activity.stopProgressDialog(activity.mProgressDialog);
+                
                 if (mException) {
                     activity.showMessage(activity.getResources().getString(R.string.issue_error_create_milestone), false);
                 }
@@ -233,13 +240,18 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
 
         @Override
         protected void onPreExecute() {
+            if (mTarget.get() != null) {
+                IssueMilestoneEditActivity activity = mTarget.get();
+                activity.mProgressDialog = activity.showProgressDialog(activity.getString(R.string.deleting_msg), false);
+            }
         }
 
         @Override
         protected void onPostExecute(Void result) {
             if (mTarget.get() != null) {
                 IssueMilestoneEditActivity activity = mTarget.get();
-    
+                activity.stopProgressDialog(activity.mProgressDialog);
+                
                 if (mException) {
                     activity.showError();
                 }

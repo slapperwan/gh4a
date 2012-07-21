@@ -27,6 +27,7 @@ import org.eclipse.egit.github.core.service.MilestoneService;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -47,6 +48,7 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
     private String mRepoOwner;
     private String mRepoName;
     private Date mDueOn;
+    private ProgressDialog mProgressDialog;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -108,13 +110,18 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
 
         @Override
         protected void onPreExecute() {
+            if (mTarget.get() != null) {
+                IssueMilestoneCreateActivity activity = mTarget.get();
+                activity.mProgressDialog = activity.showProgressDialog(activity.getString(R.string.saving_msg), false);
+            }
         }
 
         @Override
         protected void onPostExecute(Void result) {
             if (mTarget.get() != null) {
                 IssueMilestoneCreateActivity activity = mTarget.get();
-    
+                activity.stopProgressDialog(activity.mProgressDialog);
+                
                 if (mException) {
                     activity.showMessage(activity.getResources().getString(R.string.issue_error_create_milestone), false);
                 }
