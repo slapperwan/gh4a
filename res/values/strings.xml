@@ -52,6 +52,7 @@
     <string name="members">Members</string>
     <string name="open">Open</string>
     <string name="closed">Closed</string>
+    <string name="theme">Theme</string>
     
     <!-- Activity event -->
     <string name="event_push_title">%1$s pushed to %2$s at %3$s</string>

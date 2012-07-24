@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -12,13 +14,14 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.SubMenu;
 import com.gh4a.fragment.PrivateEventListFragment;
 import com.gh4a.fragment.PublicEventListFragment;
 import com.gh4a.fragment.RepositoryIssueListFragment;
@@ -42,7 +45,8 @@ public class UserActivity extends BaseSherlockFragmentActivity {
         Bundle data = getIntent().getExtras();
         mUserLogin = data.getString(Constants.User.USER_LOGIN);
         mUserName = data.getString(Constants.User.USER_NAME);
-
+        int position = data.getInt("position");
+        
         isLoginUserPage = mUserLogin.equals(getAuthLogin());
         
         if (isLoginUserPage) {
@@ -87,14 +91,14 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                 .setText(R.string.about)
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 0 + "", mPager));
-        mActionBar.addTab(tab);
+        mActionBar.addTab(tab, position == 0);
         
         tab = mActionBar
                 .newTab()
                 .setText(isLoginUserPage ? R.string.user_news_feed : R.string.user_public_activity)
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
-        mActionBar.addTab(tab);
+        mActionBar.addTab(tab, position == 1);
         
         if (isLoginUserPage) {
             tab = mActionBar
@@ -102,14 +106,14 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                     .setText(R.string.user_your_actions)
                     .setTabListener(
                             new TabListener<SherlockFragmentActivity>(this, 2 + "", mPager));
-            mActionBar.addTab(tab);
+            mActionBar.addTab(tab, position == 2);
             
             tab = mActionBar
                     .newTab()
                     .setText(R.string.issues)
                     .setTabListener(
                             new TabListener<SherlockFragmentActivity>(this, 3 + "", mPager));
-            mActionBar.addTab(tab);
+            mActionBar.addTab(tab, position == 3);
         }
     }
     
@@ -165,11 +169,47 @@ public class UserActivity extends BaseSherlockFragmentActivity {
     }
     
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getSupportMenuInflater();
+        inflater.inflate(R.menu.user_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    
+    @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 getApplicationContext().openUserInfoActivity(this, getAuthLogin(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                return true;     
+                return true;
+            case R.id.refresh:
+                Intent intent = new Intent().setClass(this, UserActivity.class);
+                intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
+                intent.putExtra(Constants.User.USER_NAME, mUserName);
+                intent.putExtra("position", mPager.getCurrentItem());
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;
+            case R.id.theme:
+                Toast.makeText(this, "Coming soon...", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.logout:
+                SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
+                        Constants.PREF_NAME, MODE_PRIVATE);
+                
+                if (sharedPreferences != null) {
+                    if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
+                            && sharedPreferences.getString(Constants.User.USER_AUTH_TOKEN, null) != null){
+                        Editor editor = sharedPreferences.edit();
+                        editor.clear();
+                        editor.commit();
+                        intent = new Intent().setClass(this, Github4AndroidActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP
+                                |Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        this.finish();
+                    }
+                }
+                return true;
             default:
                 return true;
         }

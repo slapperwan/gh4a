@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/follow_action" 
-        android:title="@string/user_follow_action"
-        android:showAsAction="ifRoom" />
-    <item android:id="@+id/unfollow_action"
-        android:title="@string/user_unfollow_action"
-        android:showAsAction="ifRoom" />
+    <item android:id="@+id/refresh" 
+        android:icon="@drawable/navigation_refresh"
+        android:showAsAction="always" />
+    <item android:id="@+id/theme"
+        android:title="@string/theme"
+        android:showAsAction="never" />
+    <item android:id="@+id/logout"
+        android:title="@string/logout"
+        android:showAsAction="never" />
 </menu>
