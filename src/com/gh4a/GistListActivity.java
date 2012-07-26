@@ -43,6 +43,7 @@ public class GistListActivity extends BaseActivity implements OnItemClickListene
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.generic_list);

@@ -42,6 +42,7 @@ public class Gh4Application extends Application {
     public Typeface condensed;
     public Typeface regular;
     public Typeface italic;
+    public static int THEME;
     
     /*
      * (non-Javadoc)
@@ -55,6 +56,10 @@ public class Gh4Application extends Application {
         condensed = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Condensed.ttf");
         regular = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Regular.ttf");
         italic = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Italic.ttf");
+        
+        SharedPreferences sharedPreferences = getSharedPreferences(
+                Constants.PREF_NAME, MODE_PRIVATE);
+        THEME = sharedPreferences.getInt("THEME", R.style.DefaultTheme);
     }
 
     /** The Constant pt. */

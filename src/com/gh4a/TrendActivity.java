@@ -62,6 +62,7 @@ public class TrendActivity extends BaseActivity {
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.trends);

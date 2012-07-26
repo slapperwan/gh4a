@@ -74,6 +74,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.issue);

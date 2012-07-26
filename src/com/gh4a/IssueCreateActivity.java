@@ -84,6 +84,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
         
         if (!isAuthorized()) {
@@ -426,7 +427,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
                         
                         tvLabel.setTypeface(condensed);
                         tvLabel.setBackgroundColor(0);
-                        tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+                        tvLabel.setTextAppearance(IssueCreateActivity.this, android.R.attr.textAppearanceMedium);
                     }
                     else {
                         mSelectedLabels.add(label);
@@ -463,7 +464,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
                 else {
                     tvLabel.setTypeface(condensed);
                     tvLabel.setBackgroundColor(0);
-                    tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+                    tvLabel.setTextAppearance(this, android.R.attr.textAppearanceMedium);
                 }
             }
             

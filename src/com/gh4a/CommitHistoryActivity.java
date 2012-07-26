@@ -38,6 +38,7 @@ public class CommitHistoryActivity extends BaseActivity implements OnItemClickLi
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.generic_list);

@@ -12,8 +12,7 @@
         android:id="@+id/tv_title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="17sp"
-        android:textColor="#000000" />
+        android:textAppearance="?android:attr/textAppearanceMedium" />
     <ImageView
         android:id="@+id/iv_gravatar"
         android:layout_width="40dp"

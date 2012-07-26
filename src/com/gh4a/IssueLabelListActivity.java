@@ -57,6 +57,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
     protected ListView mListView;
 
     public void onCreate(Bundle savedInstanceState) {
+        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
         
         setContentView(R.layout.ll_placeholder);
@@ -251,7 +252,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
     private void unselectLabel(TextView tvLabel, View viewColor, String color) {
         tvLabel.setTag(color);
         tvLabel.setBackgroundColor(0);
-        tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+        tvLabel.setTextAppearance(this, android.R.attr.textAppearanceMedium);
         viewColor.setBackgroundColor(Color.parseColor("#" + color));
     }
     

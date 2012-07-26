@@ -41,6 +41,7 @@ public class IssueMilestoneListActivity extends BaseSherlockFragmentActivity {
     private int tabCount;
     
     public void onCreate(Bundle savedInstanceState) {
+        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
         
         setContentView(R.layout.view_pager);

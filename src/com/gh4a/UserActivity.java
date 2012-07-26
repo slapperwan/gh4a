@@ -39,6 +39,7 @@ public class UserActivity extends BaseSherlockFragmentActivity {
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.view_pager);
         
@@ -190,7 +191,6 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                 startActivity(intent);
                 return true;
             case R.id.theme:
-                Toast.makeText(this, "Coming soon...", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.logout:
                 SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
@@ -210,8 +210,33 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                     }
                 }
                 return true;
+            case R.id.dark:
+                Gh4Application.THEME = R.style.DarkTheme;
+                saveTheme(R.id.dark);
+                return true;
+            case R.id.light:
+                Gh4Application.THEME = R.style.LightTheme;
+                saveTheme(R.id.light);
+                return true;
+            case R.id.lightDark:
+                Gh4Application.THEME = R.style.DefaultTheme;
+                saveTheme(R.id.lightDark);
+                return true;
             default:
                 return true;
         }
+    }
+    
+    private void saveTheme(int theme) {
+        SharedPreferences sharedPreferences = getSharedPreferences(
+                Constants.PREF_NAME, MODE_PRIVATE);
+        Editor editor = sharedPreferences.edit();
+        editor.putInt("THEME", theme);
+        editor.commit();
+        
+        finish();
+        getApplicationContext().openUserInfoActivity(this, mUserLogin,
+                mUserName, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        
     }
 }

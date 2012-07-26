@@ -23,7 +23,6 @@
     
     <style name="default_text_micro" parent="@android:style/TextAppearance.Small">
         <item name="android:textSize">12sp</item>
-        <item name="android:textColor">#333333</item>
     </style>
     
     <style name="default_text_white_small" parent="@android:style/TextAppearance.Small">

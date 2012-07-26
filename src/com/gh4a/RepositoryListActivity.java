@@ -26,6 +26,7 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity {
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.view_pager);
         

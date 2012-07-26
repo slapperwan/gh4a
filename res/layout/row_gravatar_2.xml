@@ -22,7 +22,7 @@
         android:id="@+id/tv_desc"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="17sp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_toRightOf="@id/iv_gravatar" />
     <TextView
         android:id="@+id/tv_extra"
