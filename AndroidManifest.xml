@@ -15,7 +15,6 @@
     <application
         android:icon="@drawable/octodroid"
         android:label="@string/app_name"
-        android:theme="@style/DefaultTheme"
         android:name="com.gh4a.Gh4Application">
         <activity
             android:name=".Github4AndroidActivity" >
