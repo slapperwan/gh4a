@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.eclipse.egit.github.core.CommitFile;
@@ -32,6 +33,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -171,8 +173,11 @@ public class CommitActivity extends BaseActivity {
         cal.setTime(commit.getCommit().getCommitter().getDate());
         int timezoneOffset = (cal.get(Calendar.ZONE_OFFSET) + cal.get(Calendar.DST_OFFSET)) / 3600000;
         cal.add(Calendar.HOUR, timezoneOffset);
-        
-        tvExtra.setText(CommitUtils.getAuthorName(commit) + " " + pt.format(cal.getTime()));
+        long now = System.currentTimeMillis();
+        tvExtra.setText(CommitUtils.getAuthorName(commit)
+                + " "
+                + DateUtils.getRelativeTimeSpanString(commit.getCommit().getCommitter().getDate().getTime(),
+                        now, DateUtils.MINUTE_IN_MILLIS));
 
         List<CommitFile> addedFiles = new ArrayList<CommitFile>();
         List<CommitFile> removedFiles = new ArrayList<CommitFile>();
@@ -196,10 +201,10 @@ public class CommitActivity extends BaseActivity {
         for (final CommitFile file: addedFiles) {
             TextView tvFilename = new TextView(getApplicationContext());
             tvFilename.setText(file.getFilename());
-            tvFilename.setPadding(0, 5, 0, 5);
             tvFilename.setTypeface(Typeface.MONOSPACE);
             tvFilename.setTextColor(Color.parseColor("#0099cc"));
-            tvFilename.setBackgroundResource(R.drawable.default_link);
+            tvFilename.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
+            tvFilename.setPadding(0, 10, 0, 10);
             tvFilename.setOnClickListener(new OnClickListener() {
 
                 @Override
@@ -222,9 +227,8 @@ public class CommitActivity extends BaseActivity {
         for (final CommitFile file: removedFiles) {
             TextView tvFilename = new TextView(getApplicationContext());
             tvFilename.setText(file.getFilename());
-            tvFilename.setPadding(0, 5, 0, 5);
+            tvFilename.setPadding(0, 10, 0, 10);
             tvFilename.setTypeface(Typeface.MONOSPACE);
-            tvFilename.setTextColor(Color.BLACK);
             
             llDeleted.addView(tvFilename);
         }
@@ -232,10 +236,10 @@ public class CommitActivity extends BaseActivity {
         for (final CommitFile file: modifiedFiles) {
             TextView tvFilename = new TextView(getApplicationContext());
             tvFilename.setText(file.getFilename());
-            tvFilename.setPadding(0, 5, 0, 5);
             tvFilename.setTypeface(Typeface.MONOSPACE);
             tvFilename.setTextColor(Color.parseColor("#0099cc"));
-            tvFilename.setBackgroundResource(R.drawable.default_link);
+            tvFilename.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
+            tvFilename.setPadding(0, 10, 0, 10);
             tvFilename.setOnClickListener(new OnClickListener() {
 
                 @Override
@@ -258,7 +262,6 @@ public class CommitActivity extends BaseActivity {
         if (addedFiles.size() == 0) {
             TextView tvFilename = new TextView(getApplicationContext());
             tvFilename.setTypeface(getApplicationContext().regular);
-            tvFilename.setTextColor(Color.BLACK);
             tvFilename.setText(R.string.commit_no_files);
             llAdded.addView(tvFilename);
         }
@@ -266,7 +269,6 @@ public class CommitActivity extends BaseActivity {
         if (removedFiles.size() == 0) {
             TextView tvFilename = new TextView(getApplicationContext());
             tvFilename.setTypeface(getApplicationContext().regular);
-            tvFilename.setTextColor(Color.BLACK);
             tvFilename.setText(R.string.commit_no_files);
             llDeleted.addView(tvFilename);
         }
@@ -274,7 +276,6 @@ public class CommitActivity extends BaseActivity {
         if (modifiedFiles.size() == 0) {
             TextView tvFilename = new TextView(getApplicationContext());
             tvFilename.setTypeface(getApplicationContext().regular);
-            tvFilename.setTextColor(Color.BLACK);
             tvFilename.setText(R.string.commit_no_files);
             llChanged.addView(tvFilename);
         }

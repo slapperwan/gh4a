@@ -31,8 +31,7 @@
                 android:id="@+id/ll_files"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:orientation="vertical"
-                android:layout_margin="10dp">
+                android:orientation="vertical" >
             </LinearLayout>
         </LinearLayout>
     </FrameLayout>

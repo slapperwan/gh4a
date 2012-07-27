@@ -31,6 +31,7 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -149,17 +150,23 @@ public class PullRequestActivity extends BaseSherlockFragmentActivity
     private void fillCommits(List<RepositoryCommit> commits) {
         LinearLayout llCommits = (LinearLayout) findViewById(R.id.ll_commits);
         for (final RepositoryCommit commit : commits) {
-            TextView tvName = new TextView(getApplicationContext());
+            LinearLayout rowView = new LinearLayout(this);
+            rowView.setOrientation(LinearLayout.VERTICAL);
+            rowView.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
+            rowView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+            rowView.setPadding(0, 10, 0, 10);
+            
+            TextView tvName = new TextView(this);
             tvName.setText(CommitUtils.getAuthorLogin(commit) + " added a commit");
             tvName.setTextAppearance(getApplicationContext(), android.R.attr.textAppearanceMedium);
-            llCommits.addView(tvName);
+            rowView.addView(tvName);
             
-            TextView tvLabel = new TextView(getApplicationContext());
+            TextView tvLabel = new TextView(this);
             tvLabel.setSingleLine(true);
             tvLabel.setText(commit.getSha().subSequence(0, 7) + " " + commit.getCommit().getMessage());
-            tvLabel.setTextAppearance(getApplicationContext(), R.style.default_text_small_url);
-            tvLabel.setBackgroundResource(R.drawable.default_link);
-            tvLabel.setOnClickListener(new OnClickListener() {
+            tvLabel.setTextColor(Color.parseColor("#0099cc"));
+            
+            rowView.setOnClickListener(new OnClickListener() {
                 
                 @Override
                 public void onClick(View arg0) {
@@ -167,8 +174,10 @@ public class PullRequestActivity extends BaseSherlockFragmentActivity
                             mRepoName, commit.getSha(), 0);
                 }
             });
+
+            rowView.addView(tvLabel);
             
-            llCommits.addView(tvLabel);
+            llCommits.addView(rowView);
         }
     }
     private void fillDiscussion(List<Comment> comments) {

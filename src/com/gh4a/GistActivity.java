@@ -139,6 +139,7 @@ public class GistActivity extends BaseActivity {
                 tvFilename.setTextAppearance(getApplicationContext(),
                         R.style.default_text_medium_url);
                 tvFilename.setBackgroundResource(R.drawable.default_link);
+                tvFilename.setPadding(0, 8, 0, 8);
                 tvFilename.setOnClickListener(new OnClickListener() {
 
                     @Override

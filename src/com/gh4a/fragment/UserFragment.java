@@ -129,7 +129,11 @@ public class UserFragment extends BaseFragment implements
         tvFollowersCount.setText(String.valueOf(mUser.getFollowers()));
         
         TableLayout tlOrgMembers = (TableLayout) v.findViewById(R.id.cell_org_members);
+        tlOrgMembers.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
+        
         TableLayout tlFollowers = (TableLayout) v.findViewById(R.id.cell_followers);
+        tlFollowers.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
+        
         if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
             tlFollowers.setOnClickListener(this);
             
@@ -148,6 +152,7 @@ public class UserFragment extends BaseFragment implements
         
         //hide following if organization
         TableLayout tlFollowing = (TableLayout) v.findViewById(R.id.cell_following);
+        tlFollowing.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
         if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
             
             TextView tvFollowingCount = (TextView) v.findViewById(R.id.tv_following_count);
@@ -161,6 +166,7 @@ public class UserFragment extends BaseFragment implements
         }
         
         TableLayout tlRepos = (TableLayout) v.findViewById(R.id.cell_repos);
+        tlRepos.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
         
         TextView tvReposCount = (TextView) v.findViewById(R.id.tv_repos_count);
         tvReposCount.setTypeface(boldCondensed);
@@ -176,6 +182,7 @@ public class UserFragment extends BaseFragment implements
         
         //hide gists repos if organization
         TableLayout tlGists = (TableLayout) v.findViewById(R.id.cell_gists);
+        tlGists.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
         if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
             
             TextView tvGistsCount = (TextView) v.findViewById(R.id.tv_gists_count);
@@ -346,7 +353,6 @@ public class UserFragment extends BaseFragment implements
     public void fillTopRepos(List<Repository> repos) {
         Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
         Typeface boldCondensed = app.boldCondensed;
-        Typeface regular = app.regular;
         
         View v = getView();
         LinearLayout ll = (LinearLayout) v.findViewById(R.id.ll_top_repos);
@@ -354,7 +360,8 @@ public class UserFragment extends BaseFragment implements
         int i = 0;
         for (final Repository repository : repos) {
             View rowView = getLayoutInflater(null).inflate(R.layout.row_simple_3, null);
-            rowView.setBackgroundResource(android.R.drawable.list_selector_background);
+            rowView.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
+            rowView.setPadding(0, 16, 0, 16);
             rowView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -367,7 +374,6 @@ public class UserFragment extends BaseFragment implements
             tvTitle.setTypeface(boldCondensed);
             
             TextView tvDesc = (TextView) rowView.findViewById(R.id.tv_desc);
-            tvDesc.setTypeface(regular);
             tvDesc.setSingleLine(true);
             
             TextView tvExtra = (TextView) rowView.findViewById(R.id.tv_extra);
@@ -377,7 +383,7 @@ public class UserFragment extends BaseFragment implements
             
             if (!StringUtils.isBlank(repository.getDescription())) {
                 tvDesc.setVisibility(View.VISIBLE);
-                tvDesc.setText(StringUtils.doTeaser(repository.getDescription()));
+                tvDesc.setText(repository.getDescription());
             }
             else {
                 tvDesc.setVisibility(View.GONE);
@@ -393,11 +399,7 @@ public class UserFragment extends BaseFragment implements
                     + " watchers";
             tvExtra.setText(extraData);
             
-            View divider = new View(getActivity());
-            divider.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, 20));
-            
             ll.addView(rowView);
-            ll.addView(divider);
             
             //looks like the API ignore the per_page for GET /orgs/:org/repos
             if (i == 4) {
@@ -434,7 +436,8 @@ public class UserFragment extends BaseFragment implements
             llOrg.setVisibility(View.VISIBLE);
             for (final User org : orgs) {
                 View rowView = getLayoutInflater(null).inflate(R.layout.row_simple, null);
-                rowView.setBackgroundResource(android.R.drawable.list_selector_background);
+                rowView.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
+                rowView.setPadding(0, 16, 0, 16);
                 rowView.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -447,11 +450,7 @@ public class UserFragment extends BaseFragment implements
                 tvTitle.setTypeface(boldCondensed);
                 tvTitle.setText(org.getLogin());
                 
-                View divider = new View(getActivity());
-                divider.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, 20));
-                
                 llOrg.addView(rowView);
-                llOrg.addView(divider);
             }
         }
         else {

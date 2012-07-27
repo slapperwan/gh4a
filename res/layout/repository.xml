@@ -104,8 +104,7 @@
                     android:id="@+id/cell_issues"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@android:drawable/list_selector_background" >
+                    android:layout_weight="1" >
                     <TableRow>
                         <TextView
                             android:id="@+id/tv_issues_count"
@@ -127,8 +126,7 @@
                     android:id="@+id/cell_watchers"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@android:drawable/list_selector_background" >
+                    android:layout_weight="1" >
                     <TableRow>
                         <TextView
                             android:id="@+id/tv_watchers_count"
@@ -149,8 +147,7 @@
                     android:id="@+id/cell_forks"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@android:drawable/list_selector_background" >
+                    android:layout_weight="1" >
                     <TableRow>
                         <TextView
                             android:id="@+id/tv_forks_count"
@@ -171,8 +168,7 @@
                     android:id="@+id/cell_pull_requests"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@android:drawable/list_selector_background" >
+                    android:layout_weight="1" >
                     <TableRow>
                         <TextView
                             android:id="@+id/tv_pull_requests_count"
@@ -264,7 +260,6 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:background="@android:drawable/list_selector_background"
                 android:text="@string/repo_contributors"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp" />
@@ -274,7 +269,6 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:background="@android:drawable/list_selector_background"
                 android:text="@string/repo_collaborators"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp" />
@@ -284,7 +278,6 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:background="@android:drawable/list_selector_background"
                 android:text="@string/recent_wiki"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp" />

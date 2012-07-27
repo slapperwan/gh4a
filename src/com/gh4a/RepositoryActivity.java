@@ -244,25 +244,27 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
 
     @Override
     public void onBackPressed() {
-        if (mPager.getCurrentItem() == 1) {
-            backPressed = true;
-            if (mAdapter.mPath != null && mAdapter.mPath.lastIndexOf("/") != -1) {
-                mAdapter.mPath = mAdapter.mPath.substring(0, mAdapter.mPath.lastIndexOf("/"));
-            }
-            else {
-                mAdapter.mPath = null;
-            }
-            
-            if (fileStacks.size() > 1) {
-                mAdapter.notifyDataSetChanged();
-                return;
+        if (mPager != null) {
+            if (mPager.getCurrentItem() == 1) {
+                backPressed = true;
+                if (mAdapter.mPath != null && mAdapter.mPath.lastIndexOf("/") != -1) {
+                    mAdapter.mPath = mAdapter.mPath.substring(0, mAdapter.mPath.lastIndexOf("/"));
+                }
+                else {
+                    mAdapter.mPath = null;
+                }
+                
+                if (fileStacks.size() > 1) {
+                    mAdapter.notifyDataSetChanged();
+                    return;
+                }
+                else {
+                    super.onBackPressed();
+                }
             }
             else {
                 super.onBackPressed();
             }
-        }
-        else {
-            super.onBackPressed();
         }
     }
     

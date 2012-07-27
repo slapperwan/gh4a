@@ -207,24 +207,23 @@ public class RepositoryFragment extends BaseFragment implements
         tvUrl.setText(mRepository.getHtmlUrl());
 
         TableLayout tlWatchers = (TableLayout) v.findViewById(R.id.cell_watchers);
+        tlWatchers.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
         tlWatchers.setOnClickListener(this);
-        
-        TextView tvWatchers = (TextView) v.findViewById(R.id.tv_watchers_label);
         
         TextView tvWatchersCount = (TextView) v.findViewById(R.id.tv_watchers_count);
         tvWatchersCount.setText(String.valueOf(mRepository.getWatchers()));
         tvWatchersCount.setTypeface(boldCondensed);
         
         TableLayout tlForks = (TableLayout) v.findViewById(R.id.cell_forks);
+        tlForks.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
         tlForks.setOnClickListener(this);
-        
-        TextView tvForks = (TextView) v.findViewById(R.id.tv_forks_label);
         
         TextView tvForksCount = (TextView) v.findViewById(R.id.tv_forks_count);
         tvForksCount.setTypeface(boldCondensed);
         tvForksCount.setText(String.valueOf(mRepository.getForks()));
         
         TableLayout tlIssues = (TableLayout) v.findViewById(R.id.cell_issues);
+        tlIssues.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
         TextView tvIssues = (TextView) v.findViewById(R.id.tv_issues_label);
         TextView tvIssuesCount = (TextView) v.findViewById(R.id.tv_issues_count);
         
@@ -245,6 +244,7 @@ public class RepositoryFragment extends BaseFragment implements
         }
         
         TableLayout tlPullRequests = (TableLayout) v.findViewById(R.id.cell_pull_requests);
+        tlPullRequests.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
         tlPullRequests.setOnClickListener(this);
         
         TextView tvPullRequestsCount = (TextView) v.findViewById(R.id.tv_pull_requests_count);
@@ -270,6 +270,8 @@ public class RepositoryFragment extends BaseFragment implements
         }
         
         TextView tvWiki = (TextView) v.findViewById(R.id.tv_wiki_label);
+        tvWiki.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
+        tvWiki.setPadding(0, 16, 0, 16);
         if (mRepository.isHasWiki()) {
             tvWiki.setTypeface(boldCondensed);
             tvWiki.setOnClickListener(this);
@@ -280,10 +282,14 @@ public class RepositoryFragment extends BaseFragment implements
         }
         
         TextView tvContributor = (TextView) v.findViewById(R.id.tv_contributors_label);
+        tvContributor.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
+        tvContributor.setPadding(0, 16, 0, 16);
         tvContributor.setOnClickListener(this);
         tvContributor.setTypeface(boldCondensed);
         
         TextView tvCollaborators = (TextView) v.findViewById(R.id.tv_collaborators_label);
+        tvCollaborators.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
+        tvCollaborators.setPadding(0, 16, 0, 16);
         tvCollaborators.setOnClickListener(this);
         tvCollaborators.setTypeface(boldCondensed);
         
