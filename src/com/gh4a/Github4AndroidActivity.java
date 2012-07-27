@@ -59,6 +59,7 @@ public class Github4AndroidActivity extends BaseActivity {
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         if (isAuthorized()) {
@@ -83,17 +84,6 @@ public class Github4AndroidActivity extends BaseActivity {
                 else {
                     Toast.makeText(Github4AndroidActivity.this, "Please enter username instead of email", Toast.LENGTH_LONG).show();
                 }
-            }
-        });
-
-        TextView tvExplore = (TextView) findViewById(R.id.tv_explore);
-        tvExplore.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View arg0) {
-                Intent intent = new Intent().setClass(Github4AndroidActivity.this,
-                        SearchActivity.class);
-                startActivity(intent);
             }
         });
     }
