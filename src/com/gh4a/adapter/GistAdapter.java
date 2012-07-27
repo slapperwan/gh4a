@@ -55,12 +55,15 @@ public class GistAdapter  extends RootAdapter<Gist> {
 
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_simple_3, null);
+            v = vi.inflate(R.layout.row_gist, null);
 
+            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+            Typeface boldCondensed = app.boldCondensed;
             
             viewHolder = new ViewHolder();
             viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+            viewHolder.tvDesc.setTypeface(boldCondensed);
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
             v.setTag(viewHolder);
         }
@@ -79,9 +82,10 @@ public class GistAdapter  extends RootAdapter<Gist> {
                 viewHolder.tvDesc.setText(gist.getDescription());
                 viewHolder.tvDesc.setVisibility(View.VISIBLE);
             }
-            String extra = v.getResources().getString(R.string.more_data,
-                    pt.format(gist.getCreatedAt()), gist.getFiles().size() + " files");
-            viewHolder.tvExtra.setText(extra);
+            viewHolder.tvExtra.setText(pt.format(gist.getCreatedAt())
+                    + "  "
+                    + gist.getFiles().size()
+                    + " " + v.getResources().getQuantityString(R.plurals.file, gist.getFiles().size()));
         }
         return v;
     }

@@ -54,6 +54,11 @@
     <string name="closed">Closed</string>
     <string name="theme">Theme</string>
     
+    <plurals name="file">
+        <item quantity="one">File</item>
+        <item quantity="other">Files</item>
+    </plurals>
+    
     <!-- Activity event -->
     <string name="event_push_title">%1$s pushed to %2$s at %3$s</string>
     <string name="event_watch_title">%1$s %2$s watching %3$s</string>
