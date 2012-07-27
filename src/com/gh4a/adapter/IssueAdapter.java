@@ -80,7 +80,6 @@ public class IssueAdapter extends RootAdapter<Issue> {
             viewHolder.tvAssignedTo.setTypeface(regular);
             
             viewHolder.tvComments = (TextView) v.findViewById(R.id.tv_comments);
-            viewHolder.tvComments.setTextColor(v.getResources().getColor(android.R.color.primary_text_light));
             
             v.setTag(viewHolder);
         }
@@ -118,6 +117,7 @@ public class IssueAdapter extends RootAdapter<Issue> {
             tvNumber.setSingleLine(true);
             tvNumber.setText(String.valueOf(issue.getNumber()));
             tvNumber.setTypeface(null, Typeface.BOLD);
+            tvNumber.setTextColor(Color.BLACK);
             tvNumber.setBackgroundColor(Color.LTGRAY);
             tvNumber.setPadding(2, 2, 2, 2);
             viewHolder.llLabels.addView(tvNumber);
