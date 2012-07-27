@@ -151,7 +151,7 @@ public class PullRequestActivity extends BaseSherlockFragmentActivity
         for (final RepositoryCommit commit : commits) {
             TextView tvName = new TextView(getApplicationContext());
             tvName.setText(CommitUtils.getAuthorLogin(commit) + " added a commit");
-            tvName.setTextAppearance(getApplicationContext(), R.style.default_text_medium);
+            tvName.setTextAppearance(getApplicationContext(), android.R.attr.textAppearanceMedium);
             llCommits.addView(tvName);
             
             TextView tvLabel = new TextView(getApplicationContext());
