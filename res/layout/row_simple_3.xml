@@ -24,10 +24,10 @@
         android:id="@+id/tv_desc"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/default_text_small" />
+        android:textAppearance="?android:attr/textAppearanceSmall" />
     <TextView
         android:id="@+id/tv_extra"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/default_text_small" />
+        android:textAppearance="@style/default_text_micro" />
 </LinearLayout>
