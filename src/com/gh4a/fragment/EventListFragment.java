@@ -86,7 +86,7 @@ public abstract class EventListFragment extends BaseFragment
     private boolean mIsPrivate;
     private ListView mListView;
     private FeedAdapter mAdapter;
-    private PageIterator<Event> mDataIterator;
+    protected PageIterator<Event> mDataIterator;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
