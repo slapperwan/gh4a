@@ -126,7 +126,7 @@
             android:name=".ExploreActivity"
             android:configChanges="orientation" />
         <activity
-            android:name=".TrendActivity"
+            android:name=".TrendingActivity"
             android:configChanges="orientation" />
         <activity
             android:name=".TimelineActivity"

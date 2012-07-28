@@ -192,8 +192,6 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;
-            case R.id.theme:
-                return true;
             case R.id.logout:
                 SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
                         Constants.PREF_NAME, MODE_PRIVATE);
@@ -223,6 +221,14 @@ public class UserActivity extends BaseSherlockFragmentActivity {
             case R.id.lightDark:
                 Gh4Application.THEME = R.style.DefaultTheme;
                 saveTheme(R.style.DefaultTheme);
+                return true;
+            case R.id.pub_timeline:
+                intent = new Intent().setClass(this, TimelineActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.trend:
+                intent = new Intent().setClass(this, TrendingActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return true;

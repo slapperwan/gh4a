@@ -53,6 +53,7 @@
     <string name="open">Open</string>
     <string name="closed">Closed</string>
     <string name="theme">Theme</string>
+    <string name="pub_timeline">Public Timeline</string>
     
     <plurals name="file">
         <item quantity="one">File</item>

@@ -5,7 +5,7 @@
         android:showAsAction="always" />
     <item android:id="@+id/explore"
         android:title="@string/explore"
-        android:showAsAction="never">
+        android:showAsAction="ifRoom">
         <menu>
             <item android:id="@+id/pub_timeline"
                 android:title="@string/pub_timeline" />
@@ -15,19 +15,4 @@
                 android:title="@string/blog" />
         </menu>
     </item>
-    <item android:id="@+id/theme"
-        android:title="@string/theme"
-        android:showAsAction="never">
-        <menu>
-            <item android:id="@+id/dark"
-                android:title="Dark" />
-            <item android:id="@+id/light"
-                android:title="Light" />
-            <item android:id="@+id/lightDark"
-                android:title="Light and Dark" />
-        </menu>
-    </item>
-    <item android:id="@+id/logout"
-        android:title="@string/logout"
-        android:showAsAction="never" />
 </menu>
