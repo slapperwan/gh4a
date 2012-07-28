@@ -72,7 +72,6 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> {
             viewHolder.tvAssignedTo.setTypeface(regular);
             
             viewHolder.tvComments = (TextView) v.findViewById(R.id.tv_comments);
-            viewHolder.tvComments.setTextColor(v.getResources().getColor(android.R.color.primary_text_light));
             
             viewHolder.tvRepo = (TextView) v.findViewById(R.id.tv_repo);
             viewHolder.tvRepo.setTypeface(regular);
