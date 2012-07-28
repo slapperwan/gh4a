@@ -15,21 +15,23 @@
  */
 package com.gh4a;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.xml.sax.SAXException;
 
 import android.content.Intent;
@@ -37,13 +39,15 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.TextView;
 
+import com.actionbarsherlock.R;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.adapter.CommonFeedAdapter;
 import com.gh4a.feeds.FeedHandler;
 import com.gh4a.holder.Feed;
@@ -53,9 +57,6 @@ public class BlogListActivity extends BaseActivity {
     private static final String BLOG = "https://github.com/blog.atom?page=";
     
     private int page = 1;
-    private LoadingDialog mLoadingDialog;
-    private boolean mLoading;
-    private boolean mReload;
     private ListView mListView;
 
     @Override
@@ -64,10 +65,13 @@ public class BlogListActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.generic_list);
-        setUpActionBar();
+        
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(R.string.blog);
+        actionBar.setSubtitle(R.string.explore);
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         mListView = (ListView) findViewById(R.id.list_view);
-        mListView.setOnScrollListener(new BlogScrollListener(this));
         CommonFeedAdapter adapter = new CommonFeedAdapter(this, new ArrayList<Feed>());
         mListView.setAdapter(adapter);
         mListView.setOnItemClickListener(new OnItemClickListener() {
@@ -82,56 +86,67 @@ public class BlogListActivity extends BaseActivity {
             }
         });
         
-        new LoadBlogsTask(this).execute("true");
+        new LoadBlogsTask(this).execute();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getSupportMenuInflater();
+        inflater.inflate(R.menu.explore_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                if (!isAuthorized()) {
+                    Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                    finish();
+                }
+                else {
+                    getApplicationContext().openUserInfoActivity(this, getAuthLogin(), 
+                            null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    return true;
+                }
+            case R.id.pub_timeline:
+                Intent intent = new Intent().setClass(this, TimelineActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;
+            case R.id.trend:
+                intent = new Intent().setClass(this, TrendingActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;
+            default:
+                return true;
+        }
+    }
+    
     private static class LoadBlogsTask extends
             AsyncTask<String, Void, List<Feed>> {
 
-        /** The target. */
         private WeakReference<BlogListActivity> mTarget;
-
-        /** The exception. */
         private boolean mException;
 
-        /** The hide main view. */
-        private boolean mHideMainView;
-        
-        /**
-         * Instantiates a new load tree list task.
-         * 
-         * @param activity the activity
-         */
         public LoadBlogsTask(BlogListActivity activity) {
             mTarget = new WeakReference<BlogListActivity>(activity);
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
         @Override
         protected List<Feed> doInBackground(String... params) {
             if (mTarget.get() != null) {
-                this.mHideMainView = Boolean.valueOf(params[0]);
-                BufferedInputStream bis = null;
+                InputStream bis = null;
                 try {
                     URL url = new URL(BLOG + mTarget.get().page);
-                    HttpsURLConnection request = (HttpsURLConnection) url.openConnection();
-                    
-                    request.setHostnameVerifier(DO_NOT_VERIFY);
-                    request.setRequestMethod("GET");
-                    request.setDoOutput(true);
-                    
-//                    if (ApplicationConstants.CONNECT_TIMEOUT > -1) {
-//                        request.setConnectTimeout(ApplicationConstants.CONNECT_TIMEOUT);
-//                    }
-//
-//                    if (ApplicationConstants.READ_TIMEOUT > -1) {
-//                        request.setReadTimeout(ApplicationConstants.READ_TIMEOUT);
-//                    }
-                    request.connect();
-                    bis = new BufferedInputStream(request.getInputStream());
+                    HttpClient httpClient = new DefaultHttpClient();
+                    HttpGet pageGet = new HttpGet(url.toURI());
+                    HttpResponse response = httpClient.execute(pageGet);
+
+                    bis = response.getEntity().getContent();
                     
                     SAXParserFactory factory = SAXParserFactory.newInstance();
                     SAXParser parser = factory.newSAXParser();
@@ -158,6 +173,10 @@ public class BlogListActivity extends BaseActivity {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                     mException = true;
                     return null;
+                } catch (URISyntaxException e) {
+                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                    mException = true;
+                    return null;
                 }
                 finally {
                     if (bis != null) {
@@ -175,26 +194,12 @@ public class BlogListActivity extends BaseActivity {
             }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
         @Override
         protected void onPreExecute() {
             if (mTarget.get() != null) {
-                if (mTarget.get().page == 1) {
-                    mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true,
-                            mHideMainView);
-                }
-                else {
-                }
             }
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
         @Override
         protected void onPostExecute(List<Feed> result) {
             if (mTarget.get() != null) {
@@ -202,13 +207,9 @@ public class BlogListActivity extends BaseActivity {
                     mTarget.get().showError();
                 }
                 else {
-                    if (mTarget.get().mLoadingDialog != null && mTarget.get().mLoadingDialog.isShowing()) {
-                        mTarget.get().mLoadingDialog.dismiss();
-                    }
-        
+                    mTarget.get().hideLoading();
                     mTarget.get().fillData(result);
                     mTarget.get().page++;
-                    mTarget.get().mLoading = false;
                 }
             }
         }
@@ -222,61 +223,4 @@ public class BlogListActivity extends BaseActivity {
         }
     }
     
-    private static class BlogScrollListener implements OnScrollListener {
-
-        /** The target. */
-        private WeakReference<BlogListActivity> mTarget;
-
-        /**
-         * Instantiates a new repository scoll listener.
-         *
-         * @param activity the activity
-         * @param searchKey the search key
-         * @param language the language
-         */
-        public BlogScrollListener(BlogListActivity activity) {
-            super();
-            mTarget = new WeakReference<BlogListActivity>(activity);
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see
-         * android.widget.AbsListView.OnScrollListener#onScrollStateChanged(
-         * android.widget.AbsListView, int)
-         */
-        @Override
-        public void onScrollStateChanged(AbsListView view, int scrollState) {
-            if (mTarget.get() != null) {
-                if (mTarget.get().mReload && scrollState == SCROLL_STATE_IDLE) {
-                    new LoadBlogsTask(mTarget.get()).execute("false");
-                    mTarget.get().mReload = false;
-                }
-            }
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see
-         * android.widget.AbsListView.OnScrollListener#onScroll(android.widget
-         * .AbsListView, int, int, int)
-         */
-        @Override
-        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
-                int totalItemCount) {
-            if (mTarget.get() != null) {
-                if (!mTarget.get().mLoading && firstVisibleItem != 0
-                        && ((firstVisibleItem + visibleItemCount) == totalItemCount)) {
-                    mTarget.get().mReload = true;
-                    mTarget.get().mLoading = true;
-                }
-            }
-        }
-    }
-    
-    final static HostnameVerifier DO_NOT_VERIFY = new HostnameVerifier() {
-        public boolean verify(String hostname, SSLSession session) {
-                return true;
-        }
-    };
 }

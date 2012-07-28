@@ -224,10 +224,17 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                 return true;
             case R.id.pub_timeline:
                 intent = new Intent().setClass(this, TimelineActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;
             case R.id.trend:
                 intent = new Intent().setClass(this, TrendingActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;
+            case R.id.blog:
+                intent = new Intent().setClass(this, BlogListActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;
             default:

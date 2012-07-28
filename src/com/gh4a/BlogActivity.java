@@ -22,35 +22,46 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.actionbarsherlock.R;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.MenuItem;
+
 public class BlogActivity extends BaseActivity {
 
-    private LoadingDialog mLoadingDialog;
     private String mTitle;
     private String mContent;
     private String mLink;
     
-    /**
-     * Called when the activity is first created.
-     * 
-     * @param savedInstanceState the saved instance state
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.web_viewer);
-        setUpActionBar();
         
         mTitle = getIntent().getStringExtra(Constants.Blog.TITLE);
         mContent = getIntent().getStringExtra(Constants.Blog.CONTENT);
         mLink = getIntent().getStringExtra(Constants.Blog.LINK);
-
-        mLoadingDialog = LoadingDialog.show(this, true, true);
+        
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(mTitle);
+        actionBar.setSubtitle(R.string.blog);
+        actionBar.setDisplayHomeAsUpEnabled(true);
         
         fillData();
     }
     
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Intent intent = new Intent().setClass(this, BlogListActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            default:
+                return true;
+        }
+    }
     private void fillData() {
         
         WebView webView = (WebView) findViewById(R.id.web_view);
@@ -76,9 +87,6 @@ public class BlogActivity extends BaseActivity {
 
         @Override
         public void onPageFinished(WebView webView, String url) {
-            if (mLoadingDialog != null && mLoadingDialog.isShowing()) {
-                mLoadingDialog.dismiss();
-            }
         }
         
         @Override

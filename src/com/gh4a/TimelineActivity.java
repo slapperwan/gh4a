@@ -126,6 +126,7 @@ public class TimelineActivity extends BaseSherlockFragmentActivity
             case android.R.id.home:
                 if (!isAuthorized()) {
                     Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                     finish();
                 }
@@ -141,6 +142,11 @@ public class TimelineActivity extends BaseSherlockFragmentActivity
                 return true;
             case R.id.trend:
                 intent = new Intent().setClass(this, TrendingActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;
+            case R.id.blog:
+                intent = new Intent().setClass(this, BlogListActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;
