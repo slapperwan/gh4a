@@ -296,6 +296,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
                     l.setName(labelName);
                     labels.add(l);
                 }
+                stopProgressDialog(mProgressDialog);
                 showLabelsDialog(labels);
             }
             break;
@@ -317,6 +318,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
                         milestones.add(m);
                     }
                 }
+                stopProgressDialog(mProgressDialog);
                 showMilestonesDialog(milestones);
             }
             break;
@@ -334,6 +336,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
                     user.setLogin(login);
                     users.add(user);
                 }
+                stopProgressDialog(mProgressDialog);
                 showAssigneesDialog(users);
             }
             break;
