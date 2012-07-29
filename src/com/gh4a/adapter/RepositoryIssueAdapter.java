@@ -113,6 +113,7 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> {
             tvNumber.setSingleLine(true);
             tvNumber.setText(String.valueOf(issue.getNumber()));
             tvNumber.setTypeface(null, Typeface.BOLD);
+            tvNumber.setTextColor(Color.BLACK);
             tvNumber.setBackgroundColor(Color.LTGRAY);
             tvNumber.setPadding(2, 2, 2, 2);
             viewHolder.llLabels.addView(tvNumber);

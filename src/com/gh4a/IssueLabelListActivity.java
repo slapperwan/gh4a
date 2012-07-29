@@ -75,9 +75,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
     }
     
     private void fillData(List<Label> result) {
-        final Typeface boldCondensed = getApplicationContext().boldCondensed;
         final Typeface condensed = getApplicationContext().condensed;
-        
         LinearLayout ll = (LinearLayout) findViewById(R.id.main_content);
         ll.removeAllViews();
         
@@ -98,13 +96,11 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
                     if (llEdit.getVisibility() == View.VISIBLE) {
                         llEdit.setVisibility(View.GONE);
                         
-                        tvLabel.setTypeface(condensed);
                         unselectLabel(tvLabel, viewColor, label.getColor());
                     }
                     else {
                         llEdit.setVisibility(View.VISIBLE);
                         
-                        tvLabel.setTypeface(boldCondensed);
                         selectLabel(tvLabel, viewColor, label.getColor());
                         etLabel.setText(label.getName());
                     }
@@ -118,13 +114,11 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
                     if (llEdit.getVisibility() == View.VISIBLE) {
                         llEdit.setVisibility(View.GONE);
                         
-                        tvLabel.setTypeface(condensed);
                         unselectLabel(tvLabel, viewColor, label.getColor());
                     }
                     else {
                         llEdit.setVisibility(View.VISIBLE);
                         
-                        tvLabel.setTypeface(boldCondensed);
                         selectLabel(tvLabel, viewColor, label.getColor());
                         etLabel.setText(label.getName());
                     }
@@ -224,7 +218,6 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
                 @Override
                 public void onClick(View arg0) {
                     llEdit.setVisibility(View.GONE);
-                    tvLabel.setTypeface(condensed);
                     unselectLabel(tvLabel, viewColor, label.getColor());
                 }
             });
@@ -234,6 +227,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
     }
 
     private void selectLabel(TextView tvLabel, View viewColor, String color) {
+        final Typeface boldCondensed = getApplicationContext().boldCondensed;
         tvLabel.setTag(color);
         
         viewColor.setBackgroundColor(Color.parseColor("#" + color));
@@ -242,17 +236,25 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
         int g = Color.green(Color.parseColor("#" + color));
         int b = Color.blue(Color.parseColor("#" + color));
         if (r + g + b < 383) {
-            tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_dark));
+            tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_dark));
         }
         else {
-            tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_light));
-        }                    
+            tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_light));
+        }
+        tvLabel.setTypeface(boldCondensed);
     }
     
     private void unselectLabel(TextView tvLabel, View viewColor, String color) {
+        final Typeface condensed = getApplicationContext().condensed;
         tvLabel.setTag(color);
         tvLabel.setBackgroundColor(0);
-        tvLabel.setTextAppearance(this, android.R.attr.textAppearanceMedium);
+        if (Gh4Application.THEME == R.style.DarkTheme) {
+            tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_dark));                
+        }
+        else {
+            tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_light));
+        }
+        tvLabel.setTypeface(condensed);
         viewColor.setBackgroundColor(Color.parseColor("#" + color));
     }
     

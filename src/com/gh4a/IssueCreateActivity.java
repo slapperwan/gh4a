@@ -427,7 +427,12 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
                         
                         tvLabel.setTypeface(condensed);
                         tvLabel.setBackgroundColor(0);
-                        tvLabel.setTextAppearance(IssueCreateActivity.this, android.R.attr.textAppearanceMedium);
+                        if (Gh4Application.THEME == R.style.DarkTheme) {
+                            tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_dark));                
+                        }
+                        else {
+                            tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_light));
+                        }
                     }
                     else {
                         mSelectedLabels.add(label);
@@ -438,11 +443,11 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
                         int g = Color.green(Color.parseColor("#" + label.getColor()));
                         int b = Color.blue(Color.parseColor("#" + label.getColor()));
                         if (r + g + b < 383) {
-                            tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_dark));
+                            tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_dark));
                         }
                         else {
-                            tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_light));
-                        }                    
+                            tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_light));
+                        }               
                     }
                 }
             });
@@ -455,16 +460,21 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
                     int g = Color.green(Color.parseColor("#" + label.getColor()));
                     int b = Color.blue(Color.parseColor("#" + label.getColor()));
                     if (r + g + b < 383) {
-                        tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_dark));
+                        tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_dark));
                     }
                     else {
-                        tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_light));
+                        tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_light));
                     }           
                 }
                 else {
                     tvLabel.setTypeface(condensed);
                     tvLabel.setBackgroundColor(0);
-                    tvLabel.setTextAppearance(this, android.R.attr.textAppearanceMedium);
+                    if (Gh4Application.THEME == R.style.DarkTheme) {
+                        tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_dark));                
+                    }
+                    else {
+                        tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_light));
+                    }
                 }
             }
             
