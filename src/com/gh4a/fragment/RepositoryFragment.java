@@ -172,6 +172,7 @@ public class RepositoryFragment extends BaseFragment implements
                         + mRepository.getParent().getOwner().getLogin() 
                         + "/" 
                         + mRepository.getParent().getName());
+                tvParentRepo.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
                 tvParentRepo.setOnClickListener(new OnClickListener() {
 
                     @Override

@@ -26,6 +26,7 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.GistService;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -136,9 +137,9 @@ public class GistActivity extends BaseActivity {
                 SpannableString content = new SpannableString(gistFile.getFilename());
                 content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
                 tvFilename.setText(content);
-                tvFilename.setTextAppearance(getApplicationContext(),
-                        R.style.default_text_medium_url);
-                tvFilename.setBackgroundResource(R.drawable.default_link);
+                tvFilename.setTextColor(Color.parseColor("#0099cc"));
+                tvFilename.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
+                tvFilename.setTextAppearance(this, android.R.attr.textAppearanceMedium);
                 tvFilename.setPadding(0, 8, 0, 8);
                 tvFilename.setOnClickListener(new OnClickListener() {
 

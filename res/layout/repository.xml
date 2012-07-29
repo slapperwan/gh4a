@@ -43,7 +43,7 @@
                 android:id="@+id/tv_parent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColorLink="@color/titletextcolor"
+                android:textColor="@color/titletextcolor"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
             <View
                 android:id="@+id/separator"

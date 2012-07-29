@@ -502,7 +502,7 @@ public class FeedAdapter extends RootAdapter<Event> {
         else if (Event.TYPE_MEMBER.equals(eventType)) {
             MemberPayload payload = (MemberPayload) event.getPayload();
             String text = String.format(res.getString(R.string.event_member_title),
-                    actor.getLogin(), payload.getMember().getLogin(),
+                    actor.getLogin(), payload.getMember() != null ? payload.getMember().getLogin() : "",
                     formatFromRepoName(eventRepo));
             return text;
         }
