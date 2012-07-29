@@ -13,13 +13,20 @@
         android:layout_marginTop="5dp"
         android:paddingRight="5dp"
         android:src="@drawable/comments"
-        android:layout_alignParentRight="true" />
+        android:layout_toLeftOf="@+id/tv_comments" />
     <TextView
-        android:id="@+id/tv_comments"
+        android:id="@id/tv_comments"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingRight="5dp"
-        android:textAppearance="@style/default_text_micro"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_alignParentRight="true" />
+    <ImageView
+        android:id="@+id/iv_assignee"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="5dp"
+        android:paddingRight="5dp"
         android:layout_alignParentRight="true"
         android:layout_below="@id/iv_comments" />
     <LinearLayout
@@ -41,12 +48,21 @@
         android:ellipsize="end" />
     <TextView
         android:id="@+id/tv_repo"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_toRightOf="@id/ll_labels"
         android:layout_toLeftOf="@id/iv_comments"
         android:layout_below="@id/tv_desc"
+        android:visibility="gone" />
+    <TextView
+        android:id="@+id/tv_milestone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_toRightOf="@id/ll_labels"
+        android:layout_toLeftOf="@id/iv_comments"
+        android:layout_below="@id/tv_repo"
         android:visibility="gone" />
     <ImageView
         android:id="@+id/iv_gravatar"
@@ -55,19 +71,12 @@
         android:layout_marginRight="5dp"
         android:layout_marginTop="5dp"
         android:layout_toRightOf="@id/ll_labels"
-        android:layout_below="@id/tv_repo" />
+        android:layout_below="@id/tv_milestone" />
     <TextView
         android:id="@+id/tv_extra"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/default_text_micro"
+        android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_toRightOf="@id/iv_gravatar"
-        android:layout_below="@id/tv_repo" />
-    <TextView
-        android:id="@+id/tv_assignee"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="@style/default_text_micro"
-        android:layout_toRightOf="@id/iv_gravatar"
-        android:layout_below="@id/tv_extra" />
+        android:layout_below="@id/tv_milestone" />
 </RelativeLayout>

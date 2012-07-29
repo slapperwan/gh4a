@@ -15,8 +15,8 @@
             android:layout_marginRight="5dp" />
         <ImageView
             android:id="@+id/iv_gravatar"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_toRightOf="@id/tv_state"
             android:layout_marginRight="5dp"
             android:layout_marginTop="10dp" />
@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:layout_toRightOf="@id/iv_gravatar"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="8dp" />
         <TextView
             android:id="@+id/tv_title"
             android:layout_width="wrap_content"
@@ -57,8 +57,8 @@
             android:textAppearance="?android:attr/textAppearanceSmall" />
         <ImageView
             android:id="@+id/iv_assignee"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_marginRight="5dp"
             android:layout_marginTop="3dp"
             android:layout_below="@id/tv_milestone"

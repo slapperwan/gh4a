@@ -149,9 +149,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         TextView tvMilestone = (TextView) mHeader.findViewById(R.id.tv_milestone);
         Button btnCreateComment = (Button) mFooter.findViewById(R.id.btn_create);
 
-        tvExtra.setText(getResources().getString(R.string.issue_open_by_user,
-                mIssue.getUser().getLogin(),
-                pt.format(mIssue.getCreatedAt())));
+        tvExtra.setText(mIssue.getUser().getLogin() + "\n" + pt.format(mIssue.getCreatedAt()));
         tvState.setTextColor(Color.WHITE);
         if ("closed".equals(mIssue.getState())) {
             tvState.setBackgroundResource(R.drawable.default_red_box);

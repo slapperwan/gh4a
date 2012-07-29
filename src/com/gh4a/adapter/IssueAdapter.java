@@ -21,10 +21,8 @@ import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -76,10 +74,11 @@ public class IssueAdapter extends RootAdapter<Issue> {
             
             viewHolder.tvState = (TextView) v.findViewById(R.id.tv_state);
             
-            viewHolder.tvAssignedTo = (TextView) v.findViewById(R.id.tv_assignee);
-            viewHolder.tvAssignedTo.setTypeface(regular);
+            viewHolder.ivAssignee = (ImageView) v.findViewById(R.id.iv_assignee);
             
             viewHolder.tvComments = (TextView) v.findViewById(R.id.tv_comments);
+            
+            viewHolder.tvMilestone = (TextView) v.findViewById(R.id.tv_milestone);
             
             v.setTag(viewHolder);
         }
@@ -147,24 +146,25 @@ public class IssueAdapter extends RootAdapter<Issue> {
             
             viewHolder.tvDesc.setText(issue.getTitle());
 
-            Resources res = v.getResources();
-            String extraData = res.getString(R.string.more_issue_data, 
-                    issue.getUser().getLogin(),
-                    pt.format(issue.getCreatedAt()));
-
-            viewHolder.tvExtra.setText(Html.fromHtml(extraData));
+            viewHolder.tvExtra.setText(issue.getUser().getLogin() + "\n" + pt.format(issue.getCreatedAt()));
             
             if (issue.getAssignee() != null) {
-                String assignedTo = res.getString(R.string.more_issue_assignee,
-                        issue.getAssignee().getLogin());
-                viewHolder.tvAssignedTo.setText(Html.fromHtml(assignedTo));
-                viewHolder.tvAssignedTo.setVisibility(View.VISIBLE);
+                viewHolder.ivAssignee.setVisibility(View.VISIBLE);
+                ImageDownloader.getInstance().download(issue.getAssignee().getGravatarId(), viewHolder.ivAssignee);
             }
             else {
-                viewHolder.tvAssignedTo.setVisibility(View.GONE);
+                viewHolder.ivAssignee.setVisibility(View.GONE);
             }
             
             viewHolder.tvComments.setText(String.valueOf(issue.getComments()));
+            
+            if (issue.getMilestone() != null) {
+                viewHolder.tvMilestone.setVisibility(View.VISIBLE);
+                viewHolder.tvMilestone.setText("Milestone : " + issue.getMilestone().getTitle());
+            }
+            else {
+                viewHolder.tvMilestone.setVisibility(View.GONE);
+            }
         }
         return v;
     }
@@ -180,7 +180,8 @@ public class IssueAdapter extends RootAdapter<Issue> {
         public TextView tvExtra;
         public LinearLayout llLabels;
         public TextView tvState;
-        public TextView tvAssignedTo;
+        public ImageView ivAssignee;
         public TextView tvComments;
+        public TextView tvMilestone;
     }
 }

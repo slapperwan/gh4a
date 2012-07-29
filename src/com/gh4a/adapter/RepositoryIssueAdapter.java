@@ -21,10 +21,8 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.RepositoryIssue;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -54,7 +52,6 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> {
             
             Gh4Application app = (Gh4Application) mContext.getApplicationContext();
             Typeface boldCondensed = app.boldCondensed;
-            Typeface regular = app.regular;
             
             viewHolder = new ViewHolder();
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
@@ -63,19 +60,17 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> {
             viewHolder.tvDesc.setTypeface(boldCondensed);
             
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-            viewHolder.tvExtra.setTypeface(regular);
             
             viewHolder.llLabels = (LinearLayout) v.findViewById(R.id.ll_labels);
             viewHolder.tvState = (TextView) v.findViewById(R.id.tv_state);
             
-            viewHolder.tvAssignedTo = (TextView) v.findViewById(R.id.tv_assignee);
-            viewHolder.tvAssignedTo.setTypeface(regular);
-            
+            viewHolder.ivAssignee = (ImageView) v.findViewById(R.id.iv_assignee);
             viewHolder.tvComments = (TextView) v.findViewById(R.id.tv_comments);
             
             viewHolder.tvRepo = (TextView) v.findViewById(R.id.tv_repo);
-            viewHolder.tvRepo.setTypeface(regular);
             viewHolder.tvRepo.setVisibility(View.VISIBLE);
+            
+            viewHolder.tvMilestone = (TextView) v.findViewById(R.id.tv_milestone);
             
             v.setTag(viewHolder);
         }
@@ -143,26 +138,27 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> {
             
             viewHolder.tvDesc.setText(issue.getTitle());
 
-            Resources res = v.getResources();
-            String extraData = res.getString(R.string.more_issue_data, 
-                    issue.getUser().getLogin(),
-                    pt.format(issue.getCreatedAt()));
-
-            viewHolder.tvExtra.setText(Html.fromHtml(extraData));
+            viewHolder.tvExtra.setText(issue.getUser().getLogin() + "\n" + pt.format(issue.getCreatedAt()));
             
             if (issue.getAssignee() != null) {
-                String assignedTo = res.getString(R.string.more_issue_assignee,
-                        issue.getAssignee().getLogin());
-                viewHolder.tvAssignedTo.setText(Html.fromHtml(assignedTo));
-                viewHolder.tvAssignedTo.setVisibility(View.VISIBLE);
+                viewHolder.ivAssignee.setVisibility(View.VISIBLE);
+                ImageDownloader.getInstance().download(issue.getAssignee().getGravatarId(), viewHolder.ivAssignee);
             }
             else {
-                viewHolder.tvAssignedTo.setVisibility(View.GONE);
+                viewHolder.ivAssignee.setVisibility(View.GONE);
             }
             
             viewHolder.tvComments.setText(String.valueOf(issue.getComments()));
             
             viewHolder.tvRepo.setText("on " + issue.getRepository().getOwner().getLogin() + "/" + issue.getRepository().getName());
+            
+            if (issue.getMilestone() != null) {
+                viewHolder.tvMilestone.setVisibility(View.VISIBLE);
+                viewHolder.tvMilestone.setText("Milestone : " + issue.getMilestone().getTitle());
+            }
+            else {
+                viewHolder.tvMilestone.setVisibility(View.GONE);
+            }
         }
         return v;
     }
@@ -177,8 +173,9 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> {
         public TextView tvExtra;
         public LinearLayout llLabels;
         public TextView tvState;
-        public TextView tvAssignedTo;
+        public ImageView ivAssignee;
         public TextView tvComments;
         public TextView tvRepo;
+        public TextView tvMilestone;
     }
 }
