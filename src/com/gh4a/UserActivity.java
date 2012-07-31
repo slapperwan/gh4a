@@ -38,6 +38,10 @@ public class UserActivity extends BaseSherlockFragmentActivity {
     private ActionBar mActionBar;
     private boolean isLoginUserPage;
     private int tabCount;
+    private UserFragment mUserFragment;
+    private PrivateEventListFragment mPrivateEventListFragment;
+    private PublicEventListFragment mPublicEventListFragment;
+    private RepositoryIssueListFragment mRepositoryIssueListFragment;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -85,7 +89,6 @@ public class UserActivity extends BaseSherlockFragmentActivity {
             public void onPageSelected(int position) {
                 Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onPageSelected " + position);
                 mActionBar.setSelectedNavigationItem(position);
-                invalidateOptionsMenu();
             }
         });
         
@@ -135,20 +138,26 @@ public class UserActivity extends BaseSherlockFragmentActivity {
         public android.support.v4.app.Fragment getItem(int position) {
             Log.i(Constants.LOG_TAG, ">>>>>>>>>>> getItem " + position);
             if (position == 0) {
-                return UserFragment.newInstance(UserActivity.this.mUserLogin,
+                mUserFragment = UserFragment.newInstance(UserActivity.this.mUserLogin,
                         UserActivity.this.mUserName);
+                return mUserFragment;
             }
             else if (position == 1) {
-                return PrivateEventListFragment.newInstance(UserActivity.this.mUserLogin, 
+                mPrivateEventListFragment = (PrivateEventListFragment) PrivateEventListFragment
+                        .newInstance(UserActivity.this.mUserLogin, 
                         UserActivity.this.isLoginUserPage);
+                return mPrivateEventListFragment;
             }
             else if (position == 2 && isLoginUserPage) {
-                return PublicEventListFragment.newInstance(UserActivity.this.mUserLogin, false);
+                mPublicEventListFragment = (PublicEventListFragment) PublicEventListFragment
+                        .newInstance(UserActivity.this.mUserLogin, false);
+                return mPublicEventListFragment;
             }
             else if (position == 3 && isLoginUserPage) {
                 Map<String, String> filterData = new HashMap<String, String>();
                 filterData.put("filter", "subscribed");
-                return RepositoryIssueListFragment.newInstance(filterData);
+                mRepositoryIssueListFragment = RepositoryIssueListFragment.newInstance(filterData);
+                return mRepositoryIssueListFragment;
             }
             else {
                 return UserFragment.newInstance(UserActivity.this.mUserLogin,
@@ -172,10 +181,11 @@ public class UserActivity extends BaseSherlockFragmentActivity {
     }
     
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.user_menu, menu);
-        return super.onCreateOptionsMenu(menu);
+        return super.onPrepareOptionsMenu(menu);
     }
     
     @Override
@@ -185,12 +195,21 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                 getApplicationContext().openUserInfoActivity(this, getAuthLogin(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 return true;
             case R.id.refresh:
-                Intent intent = new Intent().setClass(this, UserActivity.class);
-                intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
-                intent.putExtra(Constants.User.USER_NAME, mUserName);
-                intent.putExtra("position", mPager.getCurrentItem());
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                item.setActionView(R.layout.ab_loading);
+                item.expandActionView();
+                int currentTab = mPager.getCurrentItem();
+                if (currentTab == 0) {
+                    mUserFragment.refresh();
+                } 
+                else if (currentTab == 1) {
+                    mPrivateEventListFragment.refresh();
+                }
+                else if (currentTab == 2) {
+                    mPublicEventListFragment.refresh();
+                }
+                else {
+                    mRepositoryIssueListFragment.refresh();
+                }
                 return true;
             case R.id.logout:
                 SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
@@ -202,7 +221,7 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                         Editor editor = sharedPreferences.edit();
                         editor.clear();
                         editor.commit();
-                        intent = new Intent().setClass(this, Github4AndroidActivity.class);
+                        Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP
                                 |Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
@@ -223,7 +242,7 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                 saveTheme(R.style.DefaultTheme);
                 return true;
             case R.id.pub_timeline:
-                intent = new Intent().setClass(this, TimelineActivity.class);
+                Intent intent = new Intent().setClass(this, TimelineActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;
@@ -233,7 +252,7 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                 startActivity(intent);
                 return true;
             case R.id.blog:
-                intent = new Intent().setClass(this, BlogListActivity.class);
+                intent = new Intent().setClass(this, TestActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;

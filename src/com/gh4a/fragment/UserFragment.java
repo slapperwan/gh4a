@@ -109,7 +109,13 @@ public class UserFragment extends BaseFragment implements
         getLoaderManager().initLoader(4, null, this);
     }
     
+    public void refresh() {
+        getLoaderManager().getLoader(0).forceLoad();
+    }
+    
     private void fillData() {
+        UserActivity activity = (UserActivity) getSherlockActivity();
+        activity.invalidateOptionsMenu();
         View v = getView();
         Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
         Typeface boldCondensed = app.boldCondensed;

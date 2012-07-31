@@ -43,6 +43,7 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.IssueActivity;
 import com.gh4a.R;
+import com.gh4a.UserActivity;
 import com.gh4a.adapter.RepositoryIssueAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 
@@ -112,6 +113,12 @@ public class RepositoryIssueListFragment extends BaseFragment
         getLoaderManager().getLoader(0).forceLoad();
     }
     
+    public void refresh() {
+        loadData();
+        getLoaderManager().restartLoader(0, null, this);
+        getLoaderManager().getLoader(0).forceLoad();
+    }
+    
     public void loadData() {
         Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
         GitHubClient client = new GitHubClient();
@@ -121,7 +128,10 @@ public class RepositoryIssueListFragment extends BaseFragment
     }
     
     private void fillData(List<RepositoryIssue> issues) {
+        UserActivity activity = (UserActivity) getSherlockActivity();
+        activity.invalidateOptionsMenu();
         if (issues != null && issues.size() > 0) {
+            mAdapter.clear();
             mAdapter.addAll(issues);
             mAdapter.notifyDataSetChanged();
         }

@@ -61,6 +61,7 @@ import com.gh4a.CompareActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.UserActivity;
 import com.gh4a.WikiListActivity;
 import com.gh4a.adapter.FeedAdapter;
 import com.gh4a.loader.PageIteratorLoader;
@@ -134,8 +135,17 @@ public abstract class EventListFragment extends BaseFragment
         }
     }
     
+    public void refresh() {
+        loadData();
+        getLoaderManager().restartLoader(0, null, this);
+        getLoaderManager().getLoader(0).forceLoad();
+    }
+    
     private void fillData(List<Event> events) {
+        UserActivity activity = (UserActivity) getSherlockActivity();
+        activity.invalidateOptionsMenu();
         if (events != null && events.size() > 0) {
+            mAdapter.clear();
             mAdapter.addAll(events);
         }
         mAdapter.notifyDataSetChanged();
