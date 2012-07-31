@@ -93,6 +93,7 @@ public class TrendingActivity extends BaseSherlockFragmentActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.explore_menu, menu);
+        menu.removeItem(R.id.refresh);
         return super.onCreateOptionsMenu(menu);
     }
     

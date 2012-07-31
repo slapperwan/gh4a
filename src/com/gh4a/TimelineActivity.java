@@ -93,6 +93,8 @@ public class TimelineActivity extends BaseSherlockFragmentActivity
     }
 
     private void fillData(List<Event> events) {
+        invalidateOptionsMenu();
+        mFeedAdapter.clear();
         mFeedAdapter.addAll(events);
         mFeedAdapter.notifyDataSetChanged();
     }
@@ -114,10 +116,10 @@ public class TimelineActivity extends BaseSherlockFragmentActivity
     }
     
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onPrepareOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.explore_menu, menu);
-        return super.onCreateOptionsMenu(menu);
+        return super.onPrepareOptionsMenu(menu);
     }
     
     @Override
@@ -149,6 +151,13 @@ public class TimelineActivity extends BaseSherlockFragmentActivity
                 intent = new Intent().setClass(this, BlogListActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
+                return true;
+            case R.id.refresh:
+                item.setActionView(R.layout.ab_loading);
+                item.expandActionView();
+                loadData();
+                getSupportLoaderManager().restartLoader(0, null, this);
+                getSupportLoaderManager().getLoader(0).forceLoad();
                 return true;
             default:
                 return true;

@@ -31,7 +31,7 @@ import android.widget.ListView;
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.TrendActivity;
+import com.gh4a.TrendingActivity;
 import com.gh4a.adapter.TrendAdapter;
 import com.gh4a.holder.Trend;
 import com.gh4a.loader.TrendLoader;
@@ -79,10 +79,12 @@ public class TrendingFragment extends BaseFragment
     }
     
     private void fillData(List<Trend> trends) {
+        TrendingActivity activity = (TrendingActivity) getSherlockActivity();
+        activity.invalidateOptionsMenu();
+        mAdapter.clear();
         mAdapter.addAll(trends);
         mAdapter.notifyDataSetChanged();
     }
-    
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
