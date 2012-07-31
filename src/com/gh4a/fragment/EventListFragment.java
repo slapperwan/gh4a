@@ -66,6 +66,7 @@ import com.gh4a.WikiListActivity;
 import com.gh4a.adapter.FeedAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 import com.gh4a.utils.CommitUtils;
+import com.gh4a.utils.StringUtils;
 
 public abstract class EventListFragment extends BaseFragment 
     implements LoaderManager.LoaderCallbacks<List<Event>>, OnItemClickListener {
@@ -366,8 +367,15 @@ public abstract class EventListFragment extends BaseFragment
         /** Gist Event **/
         else if (Event.TYPE_GIST.equals(eventType)) {
             GistPayload payload = (GistPayload) event.getPayload();
-            context.openGistActivity(getSherlockActivity(), payload.getGist().getUser().getLogin(),
-                    payload.getGist().getId(), 0);
+            String login = event.getActor().getLogin();
+            if (StringUtils.isBlank(login) && payload.getGist() != null
+                    && payload.getGist().getUser() != null) {
+                login = payload.getGist().getUser().getLogin(); 
+            }
+            if (!StringUtils.isBlank(login)) {
+                context.openGistActivity(getSherlockActivity(), login,
+                        payload.getGist().getId(), 0);
+            }
         }
         
         /** IssueCommentEvent */

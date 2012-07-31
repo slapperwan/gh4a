@@ -422,8 +422,14 @@ public class FeedAdapter extends RootAdapter<Event> {
         /** GistEvent */
         else if (Event.TYPE_GIST.equals(eventType)) {
             GistPayload payload = (GistPayload) event.getPayload();
+            String login = actor.getLogin();
+            if (StringUtils.isBlank(login) && payload.getGist() != null
+                    && payload.getGist().getUser() != null) {
+                login = payload.getGist().getUser().getLogin(); 
+            }
+            
             String text = String.format(res.getString(R.string.event_gist_title),
-                    actor.getLogin(),
+                    !StringUtils.isBlank(login) ? login : "Unknown",
                     payload.getAction(), 
                     payload.getGist() != null ? payload.getGist().getId() : "(deleted)");
             return text;
