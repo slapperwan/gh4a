@@ -3,6 +3,8 @@
     <item android:id="@+id/refresh" 
         android:icon="@drawable/navigation_refresh"
         android:showAsAction="always" />
+    <item android:id="@+id/follow" 
+        android:showAsAction="always" />
     <item android:id="@+id/explore"
         android:title="@string/explore"
         android:showAsAction="never">

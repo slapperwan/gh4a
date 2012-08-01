@@ -67,33 +67,6 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
         </LinearLayout>
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="10dp" />
-        <ProgressBar
-            android:id="@+id/pb_actions"
-            style="@style/LoadingProgress"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_gravity="left"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="0dp"
-            android:layout_marginBottom="5dp" />
-        <LinearLayout
-            android:id="@+id/ll_btn_actions"
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp" >
-            <Button
-                android:id="@+id/btn_watch" 
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="0dp"
-                android:text="@string/repo_watch_action"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-        </LinearLayout>
         <TableLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"

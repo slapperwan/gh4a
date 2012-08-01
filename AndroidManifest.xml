@@ -32,12 +32,14 @@
             android:name=".RepositoryListActivity" />
         <activity
             android:name=".RepositoryActivity"
-            android:configChanges="orientation" />
+            android:configChanges="orientation"
+            android:uiOptions="splitActionBarWhenNarrow" />
         <activity
             android:name=".UserListActivity"
             android:configChanges="orientation" />
         <activity
-            android:name=".UserActivity" />
+            android:name=".UserActivity"
+            android:uiOptions="splitActionBarWhenNarrow" />
         <activity
             android:name=".CommitListActivity"
             android:configChanges="orientation" />

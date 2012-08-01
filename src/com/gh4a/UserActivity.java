@@ -42,6 +42,8 @@ public class UserActivity extends BaseSherlockFragmentActivity {
     private PrivateEventListFragment mPrivateEventListFragment;
     private PublicEventListFragment mPublicEventListFragment;
     private RepositoryIssueListFragment mRepositoryIssueListFragment;
+    public boolean isFinishLoadingFollowing;
+    public boolean isFollowing;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,13 +66,14 @@ public class UserActivity extends BaseSherlockFragmentActivity {
         }
         
         mActionBar = getSupportActionBar();
-        mActionBar.setTitle(mUserLogin);
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        if (mUserLogin.equals(getAuthLogin())) {
-            mActionBar.setHomeButtonEnabled(false);            
+        if (isLoginUserPage) {
+            mActionBar.setDisplayShowHomeEnabled(false);
+            mActionBar.setDisplayShowTitleEnabled(false);
         }
         else {
-            mActionBar.setDisplayHomeAsUpEnabled(true);
+            mActionBar.setTitle(mUserLogin);
+            mActionBar.setDisplayHomeAsUpEnabled(true);            
         }
         
         mAdapter = new UserAdapter(getSupportFragmentManager());
@@ -185,6 +188,27 @@ public class UserActivity extends BaseSherlockFragmentActivity {
         menu.clear();
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.user_menu, menu);
+        
+        MenuItem followAction = menu.getItem(1);
+        
+        if (mUserLogin.equals(getAuthLogin())) {
+            menu.getItem(2).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            menu.removeItem(R.id.follow);
+        }
+        else {
+            if (!isFinishLoadingFollowing) {
+                followAction.setActionView(R.layout.ab_loading);
+                followAction.expandActionView();
+            }
+            else {
+                if (isFollowing) {
+                    followAction.setTitle(R.string.user_unfollow_action);
+                }
+                else {
+                    followAction.setTitle(R.string.user_follow_action);
+                }
+            }
+        }
         return super.onPrepareOptionsMenu(menu);
     }
     
@@ -198,17 +222,19 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                 item.setActionView(R.layout.ab_loading);
                 item.expandActionView();
                 int currentTab = mPager.getCurrentItem();
-                if (currentTab == 0) {
+                if (currentTab == 0 && mUserFragment != null) {
                     mUserFragment.refresh();
                 } 
-                else if (currentTab == 1) {
+                else if (currentTab == 1 && mPrivateEventListFragment != null) {
                     mPrivateEventListFragment.refresh();
                 }
-                else if (currentTab == 2) {
+                else if (currentTab == 2 && mPublicEventListFragment != null) {
                     mPublicEventListFragment.refresh();
                 }
                 else {
-                    mRepositoryIssueListFragment.refresh();
+                    if (mRepositoryIssueListFragment != null) {
+                        mRepositoryIssueListFragment.refresh();
+                    }
                 }
                 return true;
             case R.id.logout:
@@ -252,9 +278,14 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                 startActivity(intent);
                 return true;
             case R.id.blog:
-                intent = new Intent().setClass(this, TestActivity.class);
+                intent = new Intent().setClass(this, BlogListActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
+                return true;
+            case R.id.follow:
+                item.setActionView(R.layout.ab_loading);
+                item.expandActionView();
+                mUserFragment.followUser(mUserLogin);
                 return true;
             default:
                 return true;
@@ -306,5 +337,10 @@ public class UserActivity extends BaseSherlockFragmentActivity {
             activity.overridePendingTransition(0, 0);
         }
     }
-
+    
+    public void updateFollowingAction(boolean isFollowing) {
+        this.isFollowing = isFollowing;
+        this.isFinishLoadingFollowing = true;
+        invalidateOptionsMenu();
+    }
 }

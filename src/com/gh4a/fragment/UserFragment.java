@@ -33,11 +33,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
@@ -46,7 +44,6 @@ import com.gh4a.Constants;
 import com.gh4a.FollowerFollowingListActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.GistListActivity;
-import com.gh4a.LoadingDialog;
 import com.gh4a.OrganizationMemberListActivity;
 import com.gh4a.R;
 import com.gh4a.RepositoryListActivity;
@@ -66,7 +63,7 @@ public class UserFragment extends BaseFragment implements
     private String mUserName;
     private User mUser;
     private boolean isFollowing;
-    private LoadingDialog mLoadingDialog;
+    private int mFollowersCount;
 
     public static UserFragment newInstance(String login, String name) {
         UserFragment f = new UserFragment();
@@ -106,6 +103,9 @@ public class UserFragment extends BaseFragment implements
         getLoaderManager().initLoader(0, null, this);
         getLoaderManager().getLoader(0).forceLoad();
         
+        getLoaderManager().initLoader(3, null, this);
+        getLoaderManager().getLoader(3).forceLoad();
+        
         getLoaderManager().initLoader(4, null, this);
     }
     
@@ -131,8 +131,9 @@ public class UserFragment extends BaseFragment implements
         tvCreated.setTypeface(regular);
         
         TextView tvFollowersCount = (TextView) v.findViewById(R.id.tv_followers_count);
+        mFollowersCount = mUser.getFollowers();
         tvFollowersCount.setTypeface(boldCondensed);
-        tvFollowersCount.setText(String.valueOf(mUser.getFollowers()));
+        tvFollowersCount.setText(String.valueOf(mFollowersCount));
         
         TableLayout tlOrgMembers = (TableLayout) v.findViewById(R.id.cell_org_members);
         tlOrgMembers.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
@@ -265,23 +266,9 @@ public class UserFragment extends BaseFragment implements
         tvOrgs.setTextColor(Color.parseColor("#0099cc"));
         
         UserActivity userActivity = (UserActivity) getSherlockActivity();
-        Button btnFollow = (Button) getView().findViewById(R.id.btn_follow);
-        ProgressBar pbFollow = (ProgressBar) getView().findViewById(R.id.pb_follow);
-        
-        if (mUserLogin.equals(userActivity.getAuthLogin())) {
-            btnFollow.setVisibility(View.GONE);
-            pbFollow.setVisibility(View.GONE);
-        }
-        else {
-            //check if is following
-            pbFollow.setVisibility(View.VISIBLE);
-            getLoaderManager().initLoader(3, null, this);
-            getLoaderManager().getLoader(3).forceLoad();
-        }
         
         getLoaderManager().initLoader(1, null, this);
         getLoaderManager().initLoader(2, null, this);
-        
         
         getLoaderManager().getLoader(1).forceLoad();
         getLoaderManager().getLoader(2).forceLoad();
@@ -362,7 +349,7 @@ public class UserFragment extends BaseFragment implements
         
         View v = getView();
         LinearLayout ll = (LinearLayout) v.findViewById(R.id.ll_top_repos);
-        
+        ll.removeAllViews();
         int i = 0;
         for (final Repository repository : repos) {
             View rowView = getLayoutInflater(null).inflate(R.layout.row_simple_3, null);
@@ -436,10 +423,13 @@ public class UserFragment extends BaseFragment implements
         Typeface boldCondensed = app.boldCondensed;
         
         View v = getView();
-        LinearLayout llOrg = (LinearLayout) v.findViewById(R.id.ll_orgs);
+        LinearLayout llOrgs = (LinearLayout) v.findViewById(R.id.ll_orgs);
+        
+        LinearLayout llOrg = (LinearLayout) v.findViewById(R.id.ll_org);
+        llOrg.removeAllViews();
         
         if (!orgs.isEmpty()) {
-            llOrg.setVisibility(View.VISIBLE);
+            llOrgs.setVisibility(View.VISIBLE);
             for (final User org : orgs) {
                 View rowView = getLayoutInflater(null).inflate(R.layout.row_simple, null);
                 rowView.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
@@ -460,29 +450,13 @@ public class UserFragment extends BaseFragment implements
             }
         }
         else {
-            llOrg.setVisibility(View.GONE);
+            llOrgs.setVisibility(View.GONE);
         }
     }
     
-    private void updateFollowBtn() {
-        Button btnFollow = (Button) getView().findViewById(R.id.btn_follow);
-        ProgressBar pbFollow = (ProgressBar) getView().findViewById(R.id.pb_follow);
-        pbFollow.setVisibility(View.GONE);
-        btnFollow.setVisibility(View.VISIBLE);
-        btnFollow.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getLoaderManager().restartLoader(4, null, UserFragment.this);
-                getLoaderManager().getLoader(4).forceLoad();
-            }
-        });
-        
-        if (isFollowing) {
-            btnFollow.setText(R.string.user_unfollow_action);
-        }
-        else {
-            btnFollow.setText(R.string.user_follow_action);
-        }
+    public void followUser(String userLogin) {
+        getLoaderManager().restartLoader(4, null, UserFragment.this);
+        getLoaderManager().getLoader(4).forceLoad();
     }
     
     @Override
@@ -510,6 +484,8 @@ public class UserFragment extends BaseFragment implements
 
     @Override
     public void onLoadFinished(Loader loader, Object object) {
+        UserActivity userActivity = (UserActivity) getSherlockActivity();
+        
         if (loader.getId() == 1) {
             hideLoading(R.id.pb_top_repos, 0);
             fillTopRepos((List<Repository>) object);
@@ -519,11 +495,18 @@ public class UserFragment extends BaseFragment implements
         }
         else if (loader.getId() == 3) {
             isFollowing = (Boolean) object;
-            updateFollowBtn();
+            userActivity.updateFollowingAction(isFollowing);
         }
         else if (loader.getId() == 4) {
             isFollowing = (Boolean) object;
-            updateFollowBtn();
+            userActivity.updateFollowingAction(isFollowing);
+            TextView tvFollowersCount = (TextView) getView().findViewById(R.id.tv_followers_count);
+            if (isFollowing) {
+                tvFollowersCount.setText(String.valueOf(++mFollowersCount));
+            }
+            else {
+                tvFollowersCount.setText(String.valueOf(--mFollowersCount));
+            }
         }
         else {
             hideLoading();

@@ -41,9 +41,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
@@ -56,9 +53,7 @@ import com.gh4a.R;
 import com.gh4a.RepositoryActivity;
 import com.gh4a.WatcherListActivity;
 import com.gh4a.WikiListActivity;
-import com.gh4a.loader.IsWatchingLoader;
 import com.gh4a.loader.ReadmeLoader;
-import com.gh4a.loader.WatchLoader;
 import com.gh4a.utils.StringUtils;
 import com.petebevin.markdown.MarkdownProcessor;
 
@@ -68,7 +63,7 @@ public class RepositoryFragment extends BaseFragment implements
     private Repository mRepository;
     private String mRepoOwner;
     private String mRepoName;
-    private boolean isWatching;
+    private int mWatcherCount;
     
     public static RepositoryFragment newInstance(Repository repository) {
         RepositoryFragment f = new RepositoryFragment();
@@ -102,8 +97,6 @@ public class RepositoryFragment extends BaseFragment implements
         fillData();
         
         RepositoryActivity repoActivity = (RepositoryActivity) getSherlockActivity();
-        LinearLayout llBtnActions = (LinearLayout) getView().findViewById(R.id.ll_btn_actions);
-        ProgressBar pbActions = (ProgressBar) getView().findViewById(R.id.pb_actions);
         
         Gh4Application app = (Gh4Application) getActivity().getApplicationContext();
         Typeface boldCondensed = app.boldCondensed;
@@ -112,20 +105,8 @@ public class RepositoryFragment extends BaseFragment implements
         tvReadmeTitle.setTypeface(boldCondensed);
         tvReadmeTitle.setTextColor(Color.parseColor("#0099cc"));
 
-        llBtnActions.setVisibility(View.GONE);
-        if (mRepoOwner.equals(repoActivity.getAuthLogin())) {
-            pbActions.setVisibility(View.GONE);
-        }
-        else {
-            pbActions.setVisibility(View.VISIBLE);
-            getLoaderManager().initLoader(1, null, this);
-            getLoaderManager().getLoader(1).forceLoad();
-        }
-        
         getLoaderManager().initLoader(0, null, this);
         getLoaderManager().getLoader(0).forceLoad();
-        
-        getLoaderManager().initLoader(2, null, this);
     }
 
     public void fillData() {
@@ -212,7 +193,8 @@ public class RepositoryFragment extends BaseFragment implements
         tlWatchers.setOnClickListener(this);
         
         TextView tvWatchersCount = (TextView) v.findViewById(R.id.tv_watchers_count);
-        tvWatchersCount.setText(String.valueOf(mRepository.getWatchers()));
+        mWatcherCount = mRepository.getWatchers();
+        tvWatchersCount.setText(String.valueOf(mWatcherCount));
         tvWatchersCount.setTypeface(boldCondensed);
         
         TableLayout tlForks = (TableLayout) v.findViewById(R.id.cell_forks);
@@ -299,6 +281,16 @@ public class RepositoryFragment extends BaseFragment implements
         tvOthers.setTextColor(Color.parseColor("#0099cc"));
     }
 
+    public void updateWatcherCount(boolean watching) {
+        TextView tvWatchersCount = (TextView) getView().findViewById(R.id.tv_watchers_count);
+        if (watching) {
+            tvWatchersCount.setText(String.valueOf(++mWatcherCount));
+        }
+        else {
+            tvWatchersCount.setText(String.valueOf(--mWatcherCount));
+        }
+    }
+    
     private static class FillReadmeTask extends AsyncTask<Content, Void, Spanned> {
 
         private WeakReference<RepositoryFragment> mTarget;
@@ -468,56 +460,14 @@ public class RepositoryFragment extends BaseFragment implements
         startActivity(intent);
     }
 
-    private void updateWatchBtn() {
-        LinearLayout llBtnActions = (LinearLayout) getView().findViewById(R.id.ll_btn_actions);
-        ProgressBar pbActions = (ProgressBar) getView().findViewById(R.id.pb_actions);
-        pbActions.setVisibility(View.GONE);
-        llBtnActions.setVisibility(View.VISIBLE);
-        
-        Button btnWatch = (Button) getView().findViewById(R.id.btn_watch);
-        btnWatch.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getLoaderManager().restartLoader(2, null, RepositoryFragment.this);
-                getLoaderManager().getLoader(2).forceLoad();
-            }
-        });
-        
-        Button btnFollow = (Button) getView().findViewById(R.id.btn_watch);
-        if (isWatching) {
-            btnFollow.setText(R.string.repo_unwatch_action);
-        }
-        else {
-            btnFollow.setText(R.string.repo_watch_action);
-        }
-    }
-    
     @Override
     public Loader onCreateLoader(int id, Bundle bundle) {
-        if (id == 1) {
-            return new IsWatchingLoader(getSherlockActivity(), mRepoOwner, mRepoName);
-        }
-        else if (id == 2) {
-            return new WatchLoader(getSherlockActivity(), mRepoOwner, mRepoName, isWatching);
-        }
-        else {
-            return new ReadmeLoader(getSherlockActivity(), mRepoOwner, mRepoName);            
-        }
+        return new ReadmeLoader(getSherlockActivity(), mRepoOwner, mRepoName);            
     }
 
     @Override
     public void onLoadFinished(Loader loader, Object object) {
-        if (loader.getId() == 1) {
-            isWatching = (Boolean) object;
-            updateWatchBtn();
-        }
-        else if (loader.getId() == 2) {
-            isWatching = (Boolean) object;
-            updateWatchBtn();
-        }
-        else {
-            new FillReadmeTask(this).execute((Content) object);
-        }
+        new FillReadmeTask(this).execute((Content) object);
     }
 
     @Override

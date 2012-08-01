@@ -41,65 +41,38 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceLarge" />
-                    <ProgressBar
-                        android:id="@+id/pb_follow"
-                        style="@style/LoadingProgress"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_gravity="left"
-                        android:layout_marginTop="0dp" />
-                    <Button 
-                        android:id="@+id/btn_follow"
+                    <TextView
+                        android:id="@+id/tv_created_at"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="0dp"
-                        android:layout_marginTop="0dp"
-                        android:layout_marginRight="0dp"
-                        android:layout_marginBottom="0dp"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
+                    <TextView
+                        android:id="@+id/tv_email"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColorLink="@color/titletextcolor"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:visibility="gone" />
+                        android:autoLink="email" />
+                    <TextView
+                        android:id="@+id/tv_website"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColorLink="@color/titletextcolor"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:autoLink="web" />
+                    <TextView
+                        android:id="@+id/tv_company"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
+                    <TextView
+                        android:id="@+id/tv_location"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:autoLink="map" />
                 </LinearLayout>
             </RelativeLayout>
-            <View
-                android:layout_width="fill_parent"
-                android:layout_height="10dp" />
-            <LinearLayout
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp">
-                <TextView
-                    android:id="@+id/tv_created_at"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-                <TextView
-                    android:id="@+id/tv_email"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textColorLink="@color/titletextcolor"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:autoLink="email" />
-                <TextView
-                    android:id="@+id/tv_website"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textColorLink="@color/titletextcolor"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:autoLink="web" />
-                <TextView
-                    android:id="@+id/tv_company"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-                <TextView
-                    android:id="@+id/tv_location"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:autoLink="map" />
-            </LinearLayout>
             <View
                 android:layout_width="fill_parent"
                 android:layout_height="10dp" />
@@ -223,7 +196,6 @@
                 android:layout_width="fill_parent"
                 android:layout_height="10dp" />
             <LinearLayout
-                android:id="@+id/ll_top_repos"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -251,6 +223,12 @@
                     android:layout_gravity="left"
                     android:layout_marginTop="0dp"
                     android:layout_marginBottom="10dp" />
+                <LinearLayout
+                    android:id="@+id/ll_top_repos"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                </LinearLayout>
             </LinearLayout>
             <Button 
                 android:id="@+id/btn_repos"
@@ -286,6 +264,12 @@
                 <View
                     android:layout_width="fill_parent"
                     android:layout_height="10dp" />
+                <LinearLayout
+                    android:id="@+id/ll_org"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                </LinearLayout>
             </LinearLayout>
             <View
                 android:layout_width="fill_parent"

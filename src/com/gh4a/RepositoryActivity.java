@@ -24,6 +24,7 @@ import android.view.KeyEvent;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
+import com.actionbarsherlock.R;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -35,8 +36,10 @@ import com.gh4a.fragment.ContentListFragment;
 import com.gh4a.fragment.ContentListFragment.OnTreeSelectedListener;
 import com.gh4a.fragment.RepositoryFragment;
 import com.gh4a.loader.BranchListLoader;
+import com.gh4a.loader.IsWatchingLoader;
 import com.gh4a.loader.RepositoryLoader;
 import com.gh4a.loader.TagListLoader;
+import com.gh4a.loader.WatchLoader;
 import com.gh4a.utils.StringUtils;
 
 public class RepositoryActivity extends BaseSherlockFragmentActivity
@@ -57,6 +60,9 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     private String mSelectedRef;
     private String mSelectBranchTag;
     private ProgressDialog mProgressDialog;
+    private boolean isFinishLoadingWatching;
+    private boolean isWatching;
+    private RepositoryFragment mRepositoryFragment;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -91,6 +97,10 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         getSupportLoaderManager().initLoader(1, null, this);
         getSupportLoaderManager().initLoader(2, null, this);
         
+        getSupportLoaderManager().initLoader(3, null, this);
+        getSupportLoaderManager().getLoader(3).forceLoad();
+        
+        getSupportLoaderManager().initLoader(4, null, this);
     }
     
     private void fillTabs() {
@@ -156,7 +166,8 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
             if (position == 0) {
-                return RepositoryFragment.newInstance(mRepository);
+                mRepositoryFragment = RepositoryFragment.newInstance(mRepository);
+                return mRepositoryFragment;
             }
             
             else if (position == 1) {
@@ -186,7 +197,8 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
             }
 
             else {
-                return RepositoryFragment.newInstance(mRepository);
+                mRepositoryFragment = RepositoryFragment.newInstance(mRepository);
+                return mRepositoryFragment;
             }
         }
         
@@ -269,10 +281,26 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     }
     
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.repo_menu, menu);
-        return super.onCreateOptionsMenu(menu);
+        
+        MenuItem watchAction = menu.getItem(1);
+        if (!isFinishLoadingWatching) {
+            watchAction.setActionView(R.layout.ab_loading);
+            watchAction.expandActionView();
+        }
+        else {
+            if (isWatching) {
+                watchAction.setTitle(R.string.repo_unwatch_action);
+            }
+            else {
+                watchAction.setTitle(R.string.repo_watch_action);
+            }
+        }
+
+        return super.onPrepareOptionsMenu(menu);
     }
     
     @Override
@@ -280,7 +308,13 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         switch (item.getItemId()) {
             case android.R.id.home:
                 getApplicationContext().openUserInfoActivity(this, mRepoOwner, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                return true;     
+                return true;
+            case R.id.watch:
+                item.setActionView(R.layout.ab_loading);
+                item.expandActionView();
+                getSupportLoaderManager().restartLoader(4, null, this);
+                getSupportLoaderManager().getLoader(4).forceLoad();
+                return true;
             case R.id.branches:
                 mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
                 getSupportLoaderManager().getLoader(1).forceLoad();
@@ -302,8 +336,14 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         else if (id == 1) {
             return new BranchListLoader(this, mRepoOwner, mRepoName);
         }
-        else {
+        else if (id == 2) {
             return new TagListLoader(this, mRepoOwner, mRepoName);
+        }
+        else if (id == 3) {
+            return new IsWatchingLoader(this, mRepoOwner, mRepoName);
+        }
+        else {
+            return new WatchLoader(this, mRepoOwner, mRepoName, isWatching);
         }
     }
 
@@ -319,10 +359,23 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
             this.mBranches = (List<RepositoryBranch>) object;
             showBranchesDialog();
         }
-        else {
+        else if (loader.getId() == 2) {
             stopProgressDialog(mProgressDialog);
             this.mTags = (List<RepositoryTag>) object;
             showTagsDialog();
+        }
+        else if (loader.getId() == 3) {
+            isWatching = (Boolean) object;
+            isFinishLoadingWatching = true;
+            invalidateOptionsMenu();
+        }
+        else {
+            isWatching = (Boolean) object;
+            isFinishLoadingWatching = true;
+            invalidateOptionsMenu();
+            if (mRepositoryFragment != null) {
+                mRepositoryFragment.updateWatcherCount(isWatching);
+            }
         }
     }
 
