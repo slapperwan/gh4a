@@ -145,6 +145,7 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
 
     @Override
     public void onLoadFinished(Loader<Content> loader, Content content) {
+        hideLoading();
         if (content != null) {
             mContent = content;
             fillData(true);
