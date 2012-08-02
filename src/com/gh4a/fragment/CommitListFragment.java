@@ -36,11 +36,11 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.gh4a.CommitActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.RepositoryActivity;
 import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 import com.gh4a.utils.StringUtils;
@@ -108,7 +108,10 @@ public class CommitListFragment extends BaseFragment
     }
     
     private void fillData(List<RepositoryCommit> commits) {
+        RepositoryActivity activity = (RepositoryActivity) getSherlockActivity();
+        activity.hideLoading();
         if (commits != null && commits.size() > 0) {
+            mAdapter.clear();
             mAdapter.addAll(commits);
             mAdapter.notifyDataSetChanged();
         }

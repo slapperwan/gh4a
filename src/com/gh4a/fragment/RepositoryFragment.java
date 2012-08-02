@@ -294,7 +294,6 @@ public class RepositoryFragment extends BaseFragment implements
     private static class FillReadmeTask extends AsyncTask<Content, Void, Spanned> {
 
         private WeakReference<RepositoryFragment> mTarget;
-        private boolean mException;
 
         public FillReadmeTask(RepositoryFragment activity) {
             mTarget = new WeakReference<RepositoryFragment>(activity);
@@ -356,13 +355,8 @@ public class RepositoryFragment extends BaseFragment implements
     public void fillReadme(Spanned readme) {
         if (readme != null) {
             if (getActivity() != null) {
-                final Gh4Application app = (Gh4Application) getActivity().getApplicationContext();
-                Typeface regular = app.regular;
-                
                 TextView tvReadme = (TextView) getView().findViewById(R.id.readme);
-                tvReadme.setTypeface(regular);
                 tvReadme.setText(readme);
-                
                 tvReadme.setMovementMethod(LinkMovementMethod.getInstance());
             }
         }

@@ -63,6 +63,10 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     private boolean isFinishLoadingWatching;
     private boolean isWatching;
     private RepositoryFragment mRepositoryFragment;
+    private ContentListFragment mContentListFragment;
+    private CommitListFragment mCommitListFragment;
+    private String mPath;
+    private int mCurrentTab;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -104,6 +108,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     }
     
     private void fillTabs() {
+        mActionBar.removeAllTabs();
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         mActionBar.setSubtitle(StringUtils.isBlank(mSelectBranchTag) ?
                 mRepository.getMasterBranch() : mSelectBranchTag);
@@ -131,28 +136,28 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
                 .setText(R.string.about)
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 0 + "", mPager));
-        mActionBar.addTab(tab);
+        mActionBar.addTab(tab, mCurrentTab == 0);
         
         tab = mActionBar
                 .newTab()
                 .setText(R.string.repo_files)
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
-        mActionBar.addTab(tab);
+        mActionBar.addTab(tab, mCurrentTab == 1);
         
         tab = mActionBar
                 .newTab()
                 .setText(getResources().getQuantityString(R.plurals.commit, 2))
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 2 + "", mPager));
-        mActionBar.addTab(tab);
+        mActionBar.addTab(tab, mCurrentTab == 2);
+        
+        invalidateOptionsMenu();
     }
     
     public class RepositoryAdapter extends FragmentStatePagerAdapter {
 
-        public ContentListFragment mFragmentFiles;
         public Content mContent;
-        public String mPath;
         
         public RepositoryAdapter(FragmentManager fm) {
             super(fm);
@@ -171,29 +176,30 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
             }
             
             else if (position == 1) {
-                if (mFragmentFiles == null) {
-                    mFragmentFiles = ContentListFragment.newInstance(mRepository, null, mSelectedRef);
-                    fileStacks.add(mFragmentFiles);
+                if (mContentListFragment == null) {
+                    mContentListFragment = ContentListFragment.newInstance(mRepository, null, mSelectedRef);
+                    fileStacks.add(mContentListFragment);
                 }
                 
                 else if (backPressed) {
-                    fileStacks.remove(mFragmentFiles);
-                    getSupportFragmentManager().beginTransaction().remove(mFragmentFiles).commit();
-                    mFragmentFiles = fileStacks.get(fileStacks.size() - 1);
-                    mFragmentFiles.setTreeEntryList(mContentList.get(fileStacks.size() - 1));
+                    fileStacks.remove(mContentListFragment);
+                    getSupportFragmentManager().beginTransaction().remove(mContentListFragment).commit();
+                    mContentListFragment = fileStacks.get(fileStacks.size() - 1);
+                    mContentListFragment.setTreeEntryList(mContentList.get(fileStacks.size() - 1));
                 }
                 
                 else {
-                    getSupportFragmentManager().beginTransaction().remove(mAdapter.mFragmentFiles).commit();
-                    mFragmentFiles = ContentListFragment.newInstance(mRepository, 
+                    getSupportFragmentManager().beginTransaction().remove(mContentListFragment).commit();
+                    mContentListFragment = ContentListFragment.newInstance(mRepository, 
                             mPath, mSelectedRef);
-                    fileStacks.add(mFragmentFiles);
+                    fileStacks.add(mContentListFragment);
                 }
-                return mFragmentFiles;
+                return mContentListFragment;
             }
             
             else if (position == 2) {
-                return CommitListFragment.newInstance(mRepository, mSelectedRef);
+                mCommitListFragment = CommitListFragment.newInstance(mRepository, mSelectedRef);
+                return mCommitListFragment;
             }
 
             else {
@@ -225,7 +231,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
             backPressed = false;
             mAdapter.mContent = content;
             mSelectedRef = ref;
-            mAdapter.mPath = mAdapter.mPath != null ? mAdapter.mPath + "/" + content.getPath() : content.getPath();
+            mPath = mPath != null ? mPath + "/" + content.getPath() : content.getPath();
             mContentList.add(contents);
             mAdapter.notifyDataSetChanged();
         }
@@ -234,7 +240,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
             intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
             intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
             intent.putExtra(Constants.Object.PATH, 
-                    mAdapter.mPath != null ? mAdapter.mPath + "/" + content.getName()
+                    mPath != null ? mPath + "/" + content.getName()
                             : content.getName());
             intent.putExtra(Constants.Object.REF, ref);
             intent.putExtra(Constants.Object.NAME, content.getName());
@@ -259,11 +265,11 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         if (mPager != null) {
             if (mPager.getCurrentItem() == 1) {
                 backPressed = true;
-                if (mAdapter.mPath != null && mAdapter.mPath.lastIndexOf("/") != -1) {
-                    mAdapter.mPath = mAdapter.mPath.substring(0, mAdapter.mPath.lastIndexOf("/"));
+                if (mPath != null && mPath.lastIndexOf("/") != -1) {
+                    mPath = mPath.substring(0, mPath.lastIndexOf("/"));
                 }
                 else {
-                    mAdapter.mPath = null;
+                    mPath = null;
                 }
                 
                 if (fileStacks.size() > 1) {
@@ -316,13 +322,28 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
                 getSupportLoaderManager().getLoader(4).forceLoad();
                 return true;
             case R.id.branches:
-                mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-                getSupportLoaderManager().getLoader(1).forceLoad();
+                if (mBranches == null) {
+                    mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+                    getSupportLoaderManager().getLoader(1).forceLoad();
+                }
+                else {
+                    showBranchesDialog();
+                }
                 return true;
             case R.id.tags:
-                mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-                getSupportLoaderManager().getLoader(2).forceLoad();
-                return true;    
+                if (mTags == null) {
+                    mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+                    getSupportLoaderManager().getLoader(2).forceLoad();
+                }
+                else {
+                    showTagsDialog();
+                }
+                return true;
+            case R.id.refresh:
+                item.setActionView(R.layout.ab_loading);
+                item.expandActionView();
+                refreshFragment();
+                return true;
             default:
                 return true;
         }
@@ -406,13 +427,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         builder.setPositiveButton(R.string.ok,
                 new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                Intent intent = new Intent().setClass(RepositoryActivity.this, RepositoryActivity.class);
-                intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                intent.putExtra(Constants.Repository.SELECTED_REF, mSelectedRef);
-                intent.putExtra(Constants.Repository.SELECTED_BRANCHTAG_NAME, mSelectBranchTag);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                refreshFragment();
                 dialog.dismiss();
             }
         })
@@ -448,13 +463,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         builder.setPositiveButton(R.string.ok,
                 new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                Intent intent = new Intent().setClass(RepositoryActivity.this, RepositoryActivity.class);
-                intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                intent.putExtra(Constants.Repository.SELECTED_REF, mSelectedRef);
-                intent.putExtra(Constants.Repository.SELECTED_BRANCHTAG_NAME, mSelectBranchTag);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                refreshFragment();
                 dialog.dismiss();
             }
         })
@@ -467,5 +476,17 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
        .create();
         
         builder.show();
+    }
+    
+    private void refreshFragment() {
+        mCurrentTab = mPager.getCurrentItem();
+        mRepositoryFragment = null;
+        mContentListFragment = null;
+        mCommitListFragment = null;
+        fileStacks.clear();
+        mPath = null;
+        showLoading();
+        getSupportLoaderManager().restartLoader(0, null, this);
+        getSupportLoaderManager().getLoader(0).forceLoad();
     }
 }

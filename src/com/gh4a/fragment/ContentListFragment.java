@@ -32,9 +32,9 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.gh4a.Constants;
 import com.gh4a.R;
+import com.gh4a.RepositoryActivity;
 import com.gh4a.adapter.FileAdapter;
 import com.gh4a.loader.ContentListLoader;
 import com.gh4a.utils.StringUtils;
@@ -120,7 +120,10 @@ public class ContentListFragment extends BaseFragment
     }
     
     private void fillData(List<Content> entries) {
+        RepositoryActivity activity = (RepositoryActivity) getSherlockActivity();
+        activity.hideLoading();
         if (entries != null && entries.size() > 0) {
+            mAdapter.clear();
             mAdapter.addAll(entries);
         }
         mAdapter.notifyDataSetChanged();
