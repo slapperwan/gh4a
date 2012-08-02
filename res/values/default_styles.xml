@@ -105,21 +105,7 @@
         <item name="android:indeterminateBehavior">repeat</item>
         <item name="android:indeterminate">true</item>
         <item name="android:indeterminateOnly">true</item>
-        <item name="android:layout_gravity">center_vertical|center_horizontal</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:layout_marginTop">20dp</item>
     </style>
-    
-    <style name="AbLoadingProgress">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:minWidth">30dip</item>
-        <item name="android:maxWidth">30dip</item>
-        <item name="android:minHeight">30dip</item>
-        <item name="android:maxHeight">30dip</item>
-        <item name="android:indeterminateBehavior">repeat</item>
-        <item name="android:indeterminate">true</item>
-        <item name="android:indeterminateOnly">true</item>
-        <item name="android:layout_gravity">center</item>
-        <item name="android:padding">8dip</item>
-    </style>
-    
 </resources>
