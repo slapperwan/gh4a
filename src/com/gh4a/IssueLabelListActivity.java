@@ -248,11 +248,11 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
         final Typeface condensed = getApplicationContext().condensed;
         tvLabel.setTag(color);
         tvLabel.setBackgroundColor(0);
-        if (Gh4Application.THEME == R.style.DarkTheme) {
-            tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_dark));                
+        if (Gh4Application.THEME == R.style.LightTheme) {
+            tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_light));                            
         }
         else {
-            tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_light));
+            tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_dark));
         }
         tvLabel.setTypeface(condensed);
         viewColor.setBackgroundColor(Color.parseColor("#" + color));

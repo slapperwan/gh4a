@@ -256,16 +256,16 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                 }
                 return true;
             case R.id.dark:
-                Gh4Application.THEME = R.style.DarkTheme;
-                saveTheme(R.style.DarkTheme);
+                Gh4Application.THEME = R.style.DefaultTheme;
+                saveTheme(R.style.DefaultTheme);
                 return true;
             case R.id.light:
                 Gh4Application.THEME = R.style.LightTheme;
                 saveTheme(R.style.LightTheme);
                 return true;
             case R.id.lightDark:
-                Gh4Application.THEME = R.style.DefaultTheme;
-                saveTheme(R.style.DefaultTheme);
+                Gh4Application.THEME = R.style.LightDarkTheme;
+                saveTheme(R.style.LightDarkTheme);
                 return true;
             case R.id.pub_timeline:
                 Intent intent = new Intent().setClass(this, TimelineActivity.class);

@@ -15,10 +15,8 @@
  */
 package com.gh4a;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +39,6 @@ import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
@@ -56,7 +53,6 @@ import com.gh4a.loader.CollaboratorListLoader;
 import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.MilestoneListLoader;
-import com.gh4a.utils.StringUtils;
 
 public class IssueListActivity extends BaseSherlockFragmentActivity
     implements OnClickListener, LoaderManager.LoaderCallbacks {
@@ -69,39 +65,42 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
     private ActionBar mActionBar;
     private int tabCount;
     private Map<String, String> mFilterData;
-    private ImageButton mBtnSort;
-    private ImageButton mBtnFilterByLabels;
-    private ImageButton mBtnFilterByMilestone;
-    private ImageButton mBtnFilterByAssignee;
     private boolean isCollaborator;
     private ProgressDialog mProgressDialog;
+    private int mCurrentTab;
+    private List<Label> mLabels;
+    private List<Milestone> mMilestones;
+    private List<User> mAssignees;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.issue_list_view_pager);
+        setContentView(R.layout.view_pager);
         
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
         mState = data.getString(Constants.Issue.ISSUE_STATE);
-        int position = data.getInt("position");
         
         mFilterData = new HashMap<String, String>();
-        Iterator<String> filter = data.keySet().iterator();
-        while (filter.hasNext()) {
-            String key = filter.next();
-            if (!Constants.Repository.REPO_OWNER.equals(key)
-                    && !Constants.Repository.REPO_NAME.equals(key)
-                    && !"position".equals(key)) {
-                mFilterData.put(key, data.getString(key));
-            }
-        }
-        
-        tabCount = 3;
+        mFilterData.put("state", mState);
         
         mActionBar = getSupportActionBar();
+        
+        fillTabs();
+        
+        getSupportLoaderManager().initLoader(0, null, this);
+        getSupportLoaderManager().initLoader(1, null, this);
+        getSupportLoaderManager().initLoader(2, null, this);
+        getSupportLoaderManager().initLoader(3, null, this);
+        getSupportLoaderManager().getLoader(3).forceLoad();
+    }
+
+    private void fillTabs() {
+        mActionBar.removeAllTabs();
+        tabCount = 3;
+        
         mAdapter = new ThisPageAdapter(getSupportFragmentManager());
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
@@ -120,7 +119,13 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
             }
         });
         
-        mActionBar.setTitle(R.string.issues);
+        if (mState == null || "open".equals(mState)) {
+            mActionBar.setTitle(R.string.issue_open);
+        }
+        else {
+            mActionBar.setTitle(R.string.issue_closed);
+        }
+        
         mActionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         mActionBar.setDisplayHomeAsUpEnabled(true);
@@ -130,49 +135,23 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
                 .setText(R.string.issues_submitted)
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 0 + "", mPager));
-        mActionBar.addTab(tab, position == 0);
+        mActionBar.addTab(tab, mCurrentTab == 0);
         
         tab = mActionBar
                 .newTab()
                 .setText(R.string.issues_updated)
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
-        mActionBar.addTab(tab, position == 1);
+        mActionBar.addTab(tab, mCurrentTab == 1);
         
         tab = mActionBar
                 .newTab()
                 .setText(R.string.issues_comments)
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 2 + "", mPager));
-        mActionBar.addTab(tab, position == 2);
-        
-        mBtnSort = (ImageButton) findViewById(R.id.btn_sort);
-        mBtnSort.setOnClickListener(this);
-        
-        String direction = mFilterData.get("direction");
-        if ("desc".equals(direction) || direction == null) {
-            mBtnSort.setImageDrawable(getResources().getDrawable(R.drawable.navigation_expand));
-        }
-        else {
-            mBtnSort.setImageDrawable(getResources().getDrawable(R.drawable.navigation_collapse));
-        }
-        
-        mBtnFilterByLabels = (ImageButton) findViewById(R.id.btn_labels);
-        mBtnFilterByLabels.setOnClickListener(this);
-        
-        mBtnFilterByMilestone = (ImageButton) findViewById(R.id.btn_milestone);
-        mBtnFilterByMilestone.setOnClickListener(this);
-        
-        mBtnFilterByAssignee = (ImageButton) findViewById(R.id.btn_assignee);
-        mBtnFilterByAssignee.setOnClickListener(this);
-        
-        getSupportLoaderManager().initLoader(0, null, this);
-        getSupportLoaderManager().initLoader(1, null, this);
-        getSupportLoaderManager().initLoader(2, null, this);
-        getSupportLoaderManager().initLoader(3, null, this);
-        getSupportLoaderManager().getLoader(3).forceLoad();
+        mActionBar.addTab(tab, mCurrentTab == 2);
     }
-
+    
     public class ThisPageAdapter extends FragmentStatePagerAdapter {
 
         public ThisPageAdapter(FragmentManager fm) {
@@ -211,14 +190,21 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.issues_menu, menu);
         if ("open".equals(mState)) {
-            menu.removeItem(R.id.view_open_issues);
+            menu.getItem(4).setTitle(R.string.issue_view_closed_issues);
         }
         else {
-            menu.removeItem(R.id.view_closed_issues);
+            menu.getItem(4).setTitle(R.string.issue_view_open_issues);
         }
         if (!isCollaborator) {
             menu.removeItem(R.id.view_labels);
             menu.removeItem(R.id.view_milestones);
+        }
+        
+        if (Gh4Application.THEME != R.style.LightTheme) {
+            menu.getItem(0).setIcon(R.drawable.navigation_expand_dark);
+            menu.getItem(1).setIcon(R.drawable.collections_labels_dark);
+            menu.getItem(2).setIcon(R.drawable.collections_view_as_list_dark);
+            menu.getItem(3).setIcon(R.drawable.social_person_dark);
         }
         
         return super.onPrepareOptionsMenu(menu);
@@ -230,13 +216,19 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
             case android.R.id.home:
                 getApplicationContext().openRepositoryInfoActivity(this, mRepoOwner, mRepoName, Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 return true;
-            case R.id.view_open_issues:
-                getApplicationContext().openIssueListActivity(this, mRepoOwner, mRepoName, 
-                        Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                return true;
-            case R.id.view_closed_issues:
-                getApplicationContext().openIssueListActivity(this, mRepoOwner, mRepoName,
-                        Constants.Issue.ISSUE_STATE_CLOSED, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            case R.id.view_open_closed:
+                if ("open".equals(mState)) {
+                    mState = Constants.Issue.ISSUE_STATE_CLOSED;
+                    mFilterData.put("state", Constants.Issue.ISSUE_STATE_CLOSED);
+                    item.setTitle(R.string.issue_view_open_issues);
+                }
+                else {
+                    mState = Constants.Issue.ISSUE_STATE_OPEN;
+                    mFilterData.put("state", Constants.Issue.ISSUE_STATE_OPEN);
+                    item.setTitle(R.string.issue_view_closed_issues);
+                }
+                
+                reloadIssueList();
                 return true;
             case R.id.create_issue:
                 if (isAuthorized()) {
@@ -263,7 +255,55 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
                 intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                 startActivity(intent);
                 return true;    
-                
+            case R.id.sort:
+                String direction = mFilterData.get("direction");
+                if ("desc".equals(direction) || direction == null) {
+                    if (Gh4Application.THEME == R.style.LightTheme) {
+                        item.setIcon(R.drawable.navigation_collapse);
+                    }
+                    else {
+                        item.setIcon(R.drawable.navigation_collapse_dark);
+                    }
+                    mFilterData.put("direction", "asc");
+                }
+                else {
+                    if (Gh4Application.THEME == R.style.LightTheme) {
+                        item.setIcon(R.drawable.navigation_expand);
+                    }
+                    else {
+                        item.setIcon(R.drawable.navigation_expand_dark);
+                    }
+                    mFilterData.put("direction", "desc");
+                }
+                reloadIssueList();
+                return true;
+            case R.id.labels:
+                if (mLabels == null) {
+                    mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+                    getSupportLoaderManager().getLoader(0).forceLoad();
+                }
+                else {
+                    showLabelsDialog();
+                }
+                return true;
+            case R.id.milestones:
+                if (mMilestones == null) {
+                    mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+                    getSupportLoaderManager().getLoader(1).forceLoad();
+                }
+                else {
+                    showMilestonesDialog();
+                }
+                return true;
+            case R.id.assignees:
+                if (mAssignees == null) {
+                    mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+                    getSupportLoaderManager().getLoader(2).forceLoad();
+                }
+                else {
+                    showAssigneesDialog();
+                }
+                return true;
             default:
                 return true;
         }
@@ -272,105 +312,17 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-        case R.id.btn_sort:
-            String direction = mFilterData.get("direction");
-            if ("desc".equals(direction) || direction == null) {
-                mFilterData.put("direction", "asc");
-            }
-            else {
-                mFilterData.put("direction", "desc");
-            }
-            reloadIssueList();
-            break;
-            
-        case R.id.btn_labels:
-            mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-            if (mFilterData.get("labelsPassToNextActivity") == null) {
-                getSupportLoaderManager().getLoader(0).forceLoad();
-            }
-            else {
-                String[] labelString = mFilterData.get("labelsPassToNextActivity").split(",");
-                List<Label> labels = new ArrayList<Label>();
-                for (String labelName : labelString) {
-                    Label l = new Label();
-                    l.setName(labelName);
-                    labels.add(l);
-                }
-                stopProgressDialog(mProgressDialog);
-                showLabelsDialog(labels);
-            }
-            break;
-            
-        case R.id.btn_milestone:
-            mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-            if (mFilterData.get("milestonesPassToNextActivity") == null) {
-                getSupportLoaderManager().getLoader(1).forceLoad();
-            }
-            else {
-                String[] milestoneString = mFilterData.get("milestonesPassToNextActivity").split(",");
-                String[] milestoneIdString = mFilterData.get("milestonesIdPassToNextActivity").split(",");
-                List<Milestone> milestones = new ArrayList<Milestone>();
-                for (int i = 0; i < milestoneString.length; i++) {
-                    if (!StringUtils.isBlank(milestoneIdString[i])) {
-                        Milestone m = new Milestone();
-                        m.setTitle(milestoneString[i]);
-                        m.setNumber(Integer.parseInt(milestoneIdString[i]));
-                        milestones.add(m);
-                    }
-                }
-                stopProgressDialog(mProgressDialog);
-                showMilestonesDialog(milestones);
-            }
-            break;
-            
-        case R.id.btn_assignee:
-            mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-            if (mFilterData.get("assigneesPassToNextActivity") == null) {
-                getSupportLoaderManager().getLoader(2).forceLoad();
-            }
-            else {
-                String[] assigneeString = mFilterData.get("assigneesPassToNextActivity").split(",");
-                List<User> users = new ArrayList<User>();
-                for (String login : assigneeString) {
-                    User user = new User();
-                    user.setLogin(login);
-                    users.add(user);
-                }
-                stopProgressDialog(mProgressDialog);
-                showAssigneesDialog(users);
-            }
-            break;
-
         default:
             break;
         }
     }
     
     private void reloadIssueList() {
-        Intent intent = new Intent().setClass(this, IssueListActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-        intent.putExtra(Constants.Issue.ISSUE_STATE, mState);
-        intent.putExtra("position", mPager.getCurrentItem());
-        intent.putExtra("direction", mFilterData.get("direction"));
-        intent.putExtra("labels", mFilterData.get("labels"));
-        if (mFilterData.get("milestone") != null) {
-            intent.putExtra("milestone", mFilterData.get("milestone"));
-        }
-        if (mFilterData.get("assignee") != null) {
-            intent.putExtra("assignee", mFilterData.get("assignee"));
-        }
-        
-        intent.putExtra("labelsPassToNextActivity", mFilterData.get("labelsPassToNextActivity"));
-        intent.putExtra("milestonesPassToNextActivity", mFilterData.get("milestonesPassToNextActivity"));
-        intent.putExtra("milestonesIdPassToNextActivity", mFilterData.get("milestonesIdPassToNextActivity"));
-        intent.putExtra("assigneesPassToNextActivity", mFilterData.get("assigneesPassToNextActivity"));
-        
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+        mCurrentTab = mPager.getCurrentItem();
+        fillTabs();
     }
     
-    private void showLabelsDialog(List<Label> allLabels) {
+    private void showLabelsDialog() {
         String selectedLabels = mFilterData.get("labels");
         String[] checkedLabels = new String[] {};
         
@@ -378,14 +330,12 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
             checkedLabels = selectedLabels.split(",");
         }
         List<String> checkLabelStringList = Arrays.asList(checkedLabels);
-        final boolean[] checkedItems = new boolean[allLabels.size()];
+        final boolean[] checkedItems = new boolean[mLabels.size()];
 
-        final String[] allLabelArray = new String[allLabels.size()];
+        final String[] allLabelArray = new String[mLabels.size()];
         
-        String labelsPassToNextActivity = "";
-        
-        for (int i = 0; i < allLabels.size(); i++) {
-            Label l = allLabels.get(i);
+        for (int i = 0; i < mLabels.size(); i++) {
+            Label l = mLabels.get(i);
             allLabelArray[i] = l.getName();
             if(checkLabelStringList.contains(l.getName())) {
                 checkedItems[i] = true;
@@ -393,10 +343,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
             else {
                 checkedItems[i] = false;
             }
-            labelsPassToNextActivity += l.getName() + ",";
         }
-        
-        mFilterData.put("labelsPassToNextActivity", labelsPassToNextActivity);
         
         AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme));
         builder.setCancelable(true);
@@ -437,9 +384,9 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         builder.show();
     }
     
-    private void showMilestonesDialog(List<Milestone> allMilestones) {
-        String[] milestones = new String[allMilestones.size() + 1];
-        final int[] milestoneIds = new int[allMilestones.size() + 1];
+    private void showMilestonesDialog() {
+        String[] milestones = new String[mMilestones.size() + 1];
+        final int[] milestoneIds = new int[mMilestones.size() + 1];
         
         milestones[0] = getResources().getString(R.string.issue_filter_by_any_milestone);
         milestoneIds[0] = 0;
@@ -448,22 +395,14 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         int checkedItem = checkedMilestoneNumber != null && !"".equals(checkedMilestoneNumber) ? 
                  Integer.parseInt(checkedMilestoneNumber) : 0;
         
-        String milestonesPassToNextActivity = "";
-        String milestonesIdPassToNextActivity = "";
-        
-        for (int i = 1; i <= allMilestones.size(); i++) {
-            Milestone m = allMilestones.get(i - 1);
+        for (int i = 1; i <= mMilestones.size(); i++) {
+            Milestone m = mMilestones.get(i - 1);
             milestones[i] = m.getTitle();
             milestoneIds[i] = m.getNumber();
             if (m.getNumber() == checkedItem) {
                 checkedItem = i;
             }
-            milestonesPassToNextActivity += m.getTitle() + ",";
-            milestonesIdPassToNextActivity += m.getNumber() + ",";
         }
-        
-        mFilterData.put("milestonesPassToNextActivity", milestonesPassToNextActivity);
-        mFilterData.put("milestonesIdPassToNextActivity", milestonesIdPassToNextActivity);
         
         AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme));
         builder.setCancelable(true);
@@ -499,25 +438,21 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         builder.show();
     }
     
-    private void showAssigneesDialog(List<User> allAssignees) {
-        final String[] assignees = new String[allAssignees.size() + 1];
+    private void showAssigneesDialog() {
+        final String[] assignees = new String[mAssignees.size() + 1];
         
         assignees[0] = getResources().getString(R.string.issue_filter_by_any_assignee);
         
         String checkedAssignee = mFilterData.get("assignee");
         int checkedItem = 0;
         
-        String assigneesPassToNextActivity = "";
-        for (int i = 1; i <= allAssignees.size(); i++) {
-            User u = allAssignees.get(i - 1);
+        for (int i = 1; i <= mAssignees.size(); i++) {
+            User u = mAssignees.get(i - 1);
             assignees[i] = u.getLogin();
             if (u.getLogin().equalsIgnoreCase(checkedAssignee)) {
                 checkedItem = i;
             }
-            assigneesPassToNextActivity += u.getLogin() + ",";
         }
-        
-        mFilterData.put("assigneesPassToNextActivity", assigneesPassToNextActivity);
         
         AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme));
         builder.setCancelable(true);
@@ -573,15 +508,18 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
     public void onLoadFinished(Loader loader, Object object) {
         if (loader.getId() == 0) {
             stopProgressDialog(mProgressDialog);
-            showLabelsDialog((List<Label>) object);
+            mLabels = (List<Label>) object;
+            showLabelsDialog();
         }
         else if (loader.getId() == 1) {
             stopProgressDialog(mProgressDialog);
-            showMilestonesDialog((List<Milestone>) object);
+            mMilestones = (List<Milestone>) object;
+            showMilestonesDialog();
         }
         else if (loader.getId() == 2) {
             stopProgressDialog(mProgressDialog);
-            showAssigneesDialog((List<User>) object);
+            mAssignees = (List<User>) object;
+            showAssigneesDialog();
         }
         else {
             isCollaborator = (Boolean) object;

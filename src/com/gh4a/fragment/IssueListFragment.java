@@ -38,7 +38,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.IssueActivity;
@@ -95,13 +94,6 @@ public class IssueListFragment extends BaseFragment
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         
-        if (mState == null || "open".equals(mState)) {
-            getSherlockActivity().getSupportActionBar().setTitle(R.string.issue_open);
-        }
-        else {
-            getSherlockActivity().getSupportActionBar().setTitle(R.string.issue_closed);
-        }
-        
         loadData();
         
         getLoaderManager().initLoader(0, null, this);
@@ -118,6 +110,7 @@ public class IssueListFragment extends BaseFragment
     
     private void fillData(List<Issue> issues) {
         if (issues != null && issues.size() > 0) {
+            mAdapter.clear();
             mAdapter.addAll(issues);
             mAdapter.notifyDataSetChanged();
         }

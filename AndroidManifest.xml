@@ -57,7 +57,8 @@
             android:configChanges="orientation" />
         <activity
             android:name=".IssueListActivity"
-            android:configChanges="orientation" />
+            android:configChanges="orientation"
+            android:uiOptions="splitActionBarWhenNarrow" />
         <activity
             android:name=".IssueActivity"
             android:configChanges="orientation" />

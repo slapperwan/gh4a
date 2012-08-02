@@ -1,19 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/view_open_issues" 
-        android:title="@string/issue_view_open_issues"
-        android:showAsAction="ifRoom|withText" />
+    <item android:id="@+id/sort"
+        android:icon="@drawable/navigation_expand" 
+        android:showAsAction="always" />
     
-    <item android:id="@+id/view_closed_issues"
+    <item android:id="@+id/labels"
+        android:icon="@drawable/collections_labels" 
+        android:showAsAction="always" />
+    
+    <item android:id="@+id/milestones"
+        android:icon="@drawable/collections_view_as_list" 
+        android:showAsAction="always" />
+    
+    <item android:id="@+id/assignees"
+        android:icon="@drawable/social_person" 
+        android:showAsAction="always" />
+    
+    <item android:id="@+id/view_open_closed" 
         android:title="@string/issue_view_closed_issues"
-        android:showAsAction="ifRoom|withText" />
+        android:showAsAction="never" />
     
     <item android:id="@+id/view_labels"
-        android:title="@string/issue_view_labels"
+        android:title="@string/issue_manage_labels"
         android:showAsAction="never" />
     
     <item android:id="@+id/view_milestones"
-         android:title="@string/issue_view_milestones"
+         android:title="@string/issue_manage_milestones"
          android:showAsAction="never" />
     
     <item android:id="@+id/create_issue"

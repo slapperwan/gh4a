@@ -221,7 +221,9 @@
     <string name="issue_success_reopen">Successful reopen issue</string>
     <string name="issue_error_reopen">Cannot reopen issue</string>
     <string name="issue_view_labels">Labels</string>
+    <string name="issue_manage_labels">Manage Labels</string>
     <string name="issue_view_milestones">Milestones</string>
+    <string name="issue_manage_milestones">Manage Milestones</string>
     <string name="issue_success_comment">Successful create comment</string>
     <string name="issue_error_comment">Cannot create comment</string>
     <string name="issue_create_label">New Label</string>
