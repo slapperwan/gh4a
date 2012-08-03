@@ -19,6 +19,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.KeyEvent;
 import android.view.ViewGroup;
@@ -189,6 +190,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
                 }
                 
                 else {
+                    Log.i("", "++++++++++++++++++++ " + mPath + ", " + mSelectedRef);
                     getSupportFragmentManager().beginTransaction().remove(mContentListFragment).commit();
                     mContentListFragment = ContentListFragment.newInstance(mRepository, 
                             mPath, mSelectedRef);
@@ -231,7 +233,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
             backPressed = false;
             mAdapter.mContent = content;
             mSelectedRef = ref;
-            mPath = mPath != null ? mPath + "/" + content.getPath() : content.getPath();
+            mPath = content.getPath();
             mContentList.add(contents);
             mAdapter.notifyDataSetChanged();
         }
@@ -239,9 +241,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
             Intent intent = new Intent().setClass(this, FileViewerActivity.class);
             intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
             intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-            intent.putExtra(Constants.Object.PATH, 
-                    mPath != null ? mPath + "/" + content.getName()
-                            : content.getName());
+            intent.putExtra(Constants.Object.PATH, content.getPath());
             intent.putExtra(Constants.Object.REF, ref);
             intent.putExtra(Constants.Object.NAME, content.getName());
             intent.putExtra(Constants.Object.OBJECT_SHA, content.getSha());
