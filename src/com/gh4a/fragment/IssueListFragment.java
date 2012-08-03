@@ -28,15 +28,19 @@ import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.IssueService;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -46,7 +50,7 @@ import com.gh4a.adapter.IssueAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 
 public class IssueListFragment extends BaseFragment 
-    implements LoaderManager.LoaderCallbacks<List<Issue>>, OnItemClickListener {
+    implements LoaderManager.LoaderCallbacks<List<Issue>>, OnItemClickListener, OnScrollListener {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -55,6 +59,9 @@ public class IssueListFragment extends BaseFragment
     private ListView mListView;
     private IssueAdapter mAdapter;
     private PageIterator<Issue> mDataIterator;
+    private boolean isLoadMore;
+    private boolean isLoadCompleted;
+    private TextView mLoadingView;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -90,9 +97,15 @@ public class IssueListFragment extends BaseFragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
+        LayoutInflater vi = getSherlockActivity().getLayoutInflater();
+        mLoadingView = (TextView) vi.inflate(R.layout.row_simple, null);
+        mLoadingView.setText("Loading...");
+        mLoadingView.setTextColor(Color.parseColor("#0099cc"));
+        
         mAdapter = new IssueAdapter(getSherlockActivity(), new ArrayList<Issue>());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
+        mListView.setOnScrollListener(this);
         
         loadData();
         
@@ -109,13 +122,45 @@ public class IssueListFragment extends BaseFragment
     }
     
     private void fillData(List<Issue> issues) {
-        if (issues != null && issues.size() > 0) {
-            mAdapter.clear();
-            mAdapter.addAll(issues);
-            mAdapter.notifyDataSetChanged();
+        if (issues != null && !issues.isEmpty()) {
+            if (mListView.getFooterViewsCount() == 0) {
+                mListView.addFooterView(mLoadingView);
+                mListView.setAdapter(mAdapter);
+            }
+            if (isLoadMore) {
+                mAdapter.addAll(mAdapter.getCount(), issues);
+                mAdapter.notifyDataSetChanged();
+            }
+            else {
+                mAdapter.clear();
+                mAdapter.addAll(issues);
+                mAdapter.notifyDataSetChanged();
+                mListView.setSelection(0);
+            }
+        }
+        else {
+            mListView.removeFooterView(mLoadingView);
         }
     }
 
+    @Override
+    public void onScroll(AbsListView view, int firstVisible, int visibleCount, int totalCount) {
+
+        boolean loadMore = firstVisible + visibleCount >= totalCount;
+
+        if(loadMore) {
+            if (getLoaderManager().getLoader(0) != null
+                    && isLoadCompleted) {
+                isLoadMore = true;
+                isLoadCompleted = false;
+                getLoaderManager().getLoader(0).forceLoad();
+            }
+        }
+    }
+    
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {}
+    
     @Override
     public Loader<List<Issue>> onCreateLoader(int id, Bundle args) {
         return new PageIteratorLoader<Issue>(getSherlockActivity(), mDataIterator);
@@ -123,6 +168,7 @@ public class IssueListFragment extends BaseFragment
 
     @Override
     public void onLoadFinished(Loader<List<Issue>> loader, List<Issue> issues) {
+        isLoadCompleted = true;
         hideLoading();
         fillData(issues);
     }

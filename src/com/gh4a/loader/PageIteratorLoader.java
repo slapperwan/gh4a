@@ -18,7 +18,12 @@ public class PageIteratorLoader<T> extends AsyncTaskLoader<List<T>> {
     
     @Override
     public List<T> loadInBackground() {
-        return (List<T>) mPageIterator.next();
+        if (mPageIterator.hasNext()) {
+            return (List<T>) mPageIterator.next();
+        }
+        else {
+            return null;
+        }
     }
 
 }

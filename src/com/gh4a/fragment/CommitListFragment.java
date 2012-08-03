@@ -26,15 +26,19 @@ import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.CommitService;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.gh4a.CommitActivity;
 import com.gh4a.Constants;
@@ -46,13 +50,16 @@ import com.gh4a.loader.PageIteratorLoader;
 import com.gh4a.utils.StringUtils;
 
 public class CommitListFragment extends BaseFragment 
-    implements LoaderManager.LoaderCallbacks<List<RepositoryCommit>>, OnItemClickListener {
+    implements LoaderManager.LoaderCallbacks<List<RepositoryCommit>>, OnItemClickListener, OnScrollListener {
 
     private Repository mRepository;
     private String mRef;
     private ListView mListView;
     private CommitAdapter mAdapter;
     private PageIterator<RepositoryCommit> mDataIterator;
+    private boolean isLoadMore;
+    private boolean isLoadCompleted;
+    private TextView mLoadingView;
     
     public static CommitListFragment newInstance(Repository repository, String ref) {
         
@@ -80,6 +87,7 @@ public class CommitListFragment extends BaseFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.generic_list, container, false);
+        mListView = (ListView) v.findViewById(R.id.list_view);
         return v;
     }
     
@@ -87,10 +95,15 @@ public class CommitListFragment extends BaseFragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        mListView = (ListView) getView().findViewById(R.id.list_view);
+        LayoutInflater vi = getSherlockActivity().getLayoutInflater();
+        mLoadingView = (TextView) vi.inflate(R.layout.row_simple, null);
+        mLoadingView.setText("Loading...");
+        mLoadingView.setTextColor(Color.parseColor("#0099cc"));
+        
         mAdapter = new CommitAdapter(getSherlockActivity(), new ArrayList<RepositoryCommit>());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
+        mListView.setOnScrollListener(this);
         
         loadData();
         
@@ -110,13 +123,45 @@ public class CommitListFragment extends BaseFragment
     private void fillData(List<RepositoryCommit> commits) {
         RepositoryActivity activity = (RepositoryActivity) getSherlockActivity();
         activity.hideLoading();
-        if (commits != null && commits.size() > 0) {
-            mAdapter.clear();
-            mAdapter.addAll(commits);
-            mAdapter.notifyDataSetChanged();
+        if (commits != null && !commits.isEmpty()) {
+            if (mListView.getFooterViewsCount() == 0) {
+                mListView.addFooterView(mLoadingView);
+                mListView.setAdapter(mAdapter);
+            }
+            if (isLoadMore) {
+                mAdapter.addAll(mAdapter.getCount(), commits);
+                mAdapter.notifyDataSetChanged();
+            }
+            else {
+                mAdapter.clear();
+                mAdapter.addAll(commits);
+                mAdapter.notifyDataSetChanged();
+                mListView.setSelection(0);
+            }
+        }
+        else {
+            mListView.removeFooterView(mLoadingView);
         }
     }
 
+    @Override
+    public void onScroll(AbsListView view, int firstVisible, int visibleCount, int totalCount) {
+
+        boolean loadMore = firstVisible + visibleCount >= totalCount;
+
+        if(loadMore) {
+            if (getLoaderManager().getLoader(0) != null
+                    && isLoadCompleted) {
+                isLoadMore = true;
+                isLoadCompleted = false;
+                getLoaderManager().getLoader(0).forceLoad();
+            }
+        }
+    }
+    
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {}
+    
     @Override
     public Loader<List<RepositoryCommit>> onCreateLoader(int id, Bundle args) {
         return new PageIteratorLoader<RepositoryCommit>(getSherlockActivity(), mDataIterator);
@@ -124,6 +169,7 @@ public class CommitListFragment extends BaseFragment
 
     @Override
     public void onLoadFinished(Loader<List<RepositoryCommit>> loader, List<RepositoryCommit> commits) {
+        isLoadCompleted = true;
         hideLoading();
         fillData(commits);
     }

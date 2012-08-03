@@ -25,17 +25,20 @@ import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -45,13 +48,16 @@ import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 
 public class RepositoryListFragment extends BaseFragment 
-    implements LoaderManager.LoaderCallbacks<List<Repository>>, OnItemClickListener {
+    implements LoaderManager.LoaderCallbacks<List<Repository>>, OnItemClickListener, OnScrollListener {
 
     private String mLogin;
     private String mUserType;
     private ListView mListView;
     private RepositoryAdapter mAdapter;
     private PageIterator<Repository> mDataIterator;
+    private boolean isLoadMore;
+    private boolean isLoadCompleted;
+    private TextView mLoadingView;
     
     public static RepositoryListFragment newInstance(String login, String userType) {
         RepositoryListFragment f = new RepositoryListFragment();
@@ -83,9 +89,15 @@ public class RepositoryListFragment extends BaseFragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
+        LayoutInflater vi = getSherlockActivity().getLayoutInflater();
+        mLoadingView = (TextView) vi.inflate(R.layout.row_simple, null);
+        mLoadingView.setText("Loading...");
+        mLoadingView.setTextColor(Color.parseColor("#0099cc"));
+        
         mAdapter = new RepositoryAdapter(getSherlockActivity(), new ArrayList<Repository>());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
+        mListView.setOnScrollListener(this);
         
         loadData();
         
@@ -110,10 +122,25 @@ public class RepositoryListFragment extends BaseFragment
     }
     
     private void fillData(List<Repository> repositories) {
-        if (repositories != null && repositories.size() > 0) {
-            mAdapter.addAll(repositories);
+        if (repositories != null && !repositories.isEmpty()) {
+            if (mListView.getFooterViewsCount() == 0) {
+                mListView.addFooterView(mLoadingView);
+                mListView.setAdapter(mAdapter);
+            }
+            if (isLoadMore) {
+                mAdapter.addAll(mAdapter.getCount(), repositories);
+                mAdapter.notifyDataSetChanged();
+            }
+            else {
+                mAdapter.clear();
+                mAdapter.addAll(repositories);
+                mAdapter.notifyDataSetChanged();
+                mListView.setSelection(0);
+            }
         }
-        mAdapter.notifyDataSetChanged();
+        else {
+            mListView.removeFooterView(mLoadingView);
+        }
     }
 
     @Override
@@ -129,12 +156,31 @@ public class RepositoryListFragment extends BaseFragment
     }
 
     @Override
+    public void onScroll(AbsListView view, int firstVisible, int visibleCount, int totalCount) {
+
+        boolean loadMore = firstVisible + visibleCount >= totalCount;
+
+        if(loadMore) {
+            if (getLoaderManager().getLoader(0) != null
+                    && isLoadCompleted) {
+                isLoadMore = true;
+                isLoadCompleted = false;
+                getLoaderManager().getLoader(0).forceLoad();
+            }
+        }
+    }
+    
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {}
+    
+    @Override
     public Loader<List<Repository>> onCreateLoader(int id, Bundle args) {
         return new PageIteratorLoader<Repository>(getSherlockActivity(), mDataIterator);
     }
 
     @Override
     public void onLoadFinished(Loader<List<Repository>> loader, List<Repository> repositories) {
+        isLoadCompleted = true;
         hideLoading();
         fillData(repositories);
     }

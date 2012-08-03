@@ -41,6 +41,7 @@ import org.eclipse.egit.github.core.event.PushPayload;
 import org.eclipse.egit.github.core.service.EventService;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -52,9 +53,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.CompareActivity;
@@ -69,7 +73,7 @@ import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.StringUtils;
 
 public abstract class EventListFragment extends BaseFragment 
-    implements LoaderManager.LoaderCallbacks<List<Event>>, OnItemClickListener {
+    implements LoaderManager.LoaderCallbacks<List<Event>>, OnItemClickListener, OnScrollListener {
 
     static final int MENU_USER = 1;
     static final int MENU_REPO = 2;
@@ -89,6 +93,9 @@ public abstract class EventListFragment extends BaseFragment
     private ListView mListView;
     private FeedAdapter mAdapter;
     protected PageIterator<Event> mDataIterator;
+    private boolean isLoadMore;
+    private boolean isLoadCompleted;
+    private TextView mLoadingView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -112,9 +119,15 @@ public abstract class EventListFragment extends BaseFragment
         Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onActivityCreated EventListFragment");
         super.onActivityCreated(savedInstanceState);
         
+        LayoutInflater vi = getSherlockActivity().getLayoutInflater();
+        mLoadingView = (TextView) vi.inflate(R.layout.row_simple, null);
+        mLoadingView.setText("Loading...");
+        mLoadingView.setTextColor(Color.parseColor("#0099cc"));
+        
         mAdapter = new FeedAdapter(getSherlockActivity(), new ArrayList<Event>());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
+        mListView.setOnScrollListener(this);
         registerForContextMenu(mListView);
         
         loadData();
@@ -137,6 +150,7 @@ public abstract class EventListFragment extends BaseFragment
     }
     
     public void refresh() {
+        isLoadMore = false;
         loadData();
         getLoaderManager().restartLoader(0, null, this);
         getLoaderManager().getLoader(0).forceLoad();
@@ -145,11 +159,25 @@ public abstract class EventListFragment extends BaseFragment
     private void fillData(List<Event> events) {
         UserActivity activity = (UserActivity) getSherlockActivity();
         activity.invalidateOptionsMenu();
-        if (events != null && events.size() > 0) {
-            mAdapter.clear();
-            mAdapter.addAll(events);
+        if (events != null && !events.isEmpty()) {
+            if (mListView.getFooterViewsCount() == 0) {
+                mListView.addFooterView(mLoadingView);
+                mListView.setAdapter(mAdapter);
+            }
+            if (isLoadMore) {
+                mAdapter.addAll(mAdapter.getCount(), events);
+                mAdapter.notifyDataSetChanged();
+            }
+            else {
+                mAdapter.clear();
+                mAdapter.addAll(events);
+                mAdapter.notifyDataSetChanged();
+                mListView.setSelection(0);
+            }
         }
-        mAdapter.notifyDataSetChanged();
+        else {
+            mListView.removeFooterView(mLoadingView);
+        }
     }
     
     @Override
@@ -159,6 +187,7 @@ public abstract class EventListFragment extends BaseFragment
 
     @Override
     public void onLoadFinished(Loader<List<Event>> loader, List<Event> events) {
+        isLoadCompleted = true;
         hideLoading();
         fillData(events);
     }
@@ -168,6 +197,24 @@ public abstract class EventListFragment extends BaseFragment
         // TODO Auto-generated method stub
         
     }
+    
+    @Override
+    public void onScroll(AbsListView view, int firstVisible, int visibleCount, int totalCount) {
+
+        boolean loadMore = firstVisible + visibleCount >= totalCount;
+
+        if(loadMore) {
+            if (getLoaderManager().getLoader(0) != null
+                    && isLoadCompleted) {
+                isLoadMore = true;
+                isLoadCompleted = false;
+                getLoaderManager().getLoader(0).forceLoad();
+            }
+        }
+    }
+    
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {}
     
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
