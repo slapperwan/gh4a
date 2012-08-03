@@ -72,8 +72,7 @@ public class WatcherListActivity extends BaseSherlockFragmentActivity  {
             }
         });
         
-        mActionBar.setTitle(mRepoName);
-        mActionBar.setSubtitle(mRepoOwner);
+        mActionBar.setTitle(mRepoOwner + "/" + mRepoName);
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         mActionBar.setDisplayHomeAsUpEnabled(true);
         
