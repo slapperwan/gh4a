@@ -19,7 +19,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.KeyEvent;
 import android.view.ViewGroup;
@@ -190,7 +189,6 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
                 }
                 
                 else {
-                    Log.i("", "++++++++++++++++++++ " + mPath + ", " + mSelectedRef);
                     getSupportFragmentManager().beginTransaction().remove(mContentListFragment).commit();
                     mContentListFragment = ContentListFragment.newInstance(mRepository, 
                             mPath, mSelectedRef);
