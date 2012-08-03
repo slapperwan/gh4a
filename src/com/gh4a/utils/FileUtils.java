@@ -91,6 +91,9 @@ public class FileUtils {
             if (mid != -1) {
                 return path.substring(mid + 1, path.length());
             }
+            else {
+                return path;
+            }
         }
         return "";
     }
