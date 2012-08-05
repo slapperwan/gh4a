@@ -60,12 +60,12 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.CompareActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.UserActivity;
 import com.gh4a.WikiListActivity;
 import com.gh4a.adapter.FeedAdapter;
 import com.gh4a.loader.PageIteratorLoader;
@@ -157,7 +157,7 @@ public abstract class EventListFragment extends BaseFragment
     }
     
     private void fillData(List<Event> events) {
-        UserActivity activity = (UserActivity) getSherlockActivity();
+        SherlockFragmentActivity activity = getSherlockActivity();
         activity.invalidateOptionsMenu();
         if (events != null && !events.isEmpty()) {
             if (mListView.getFooterViewsCount() == 0) {

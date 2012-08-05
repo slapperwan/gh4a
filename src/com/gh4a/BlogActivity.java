@@ -46,7 +46,7 @@ public class BlogActivity extends BaseActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(mTitle);
         actionBar.setSubtitle(R.string.blog);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(false);
         
         fillData();
     }

@@ -268,18 +268,18 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                 saveTheme(R.style.LightDarkTheme);
                 return true;
             case R.id.pub_timeline:
-                Intent intent = new Intent().setClass(this, TimelineActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                Intent intent = new Intent().setClass(this, ExploreActivity.class);
+                intent.putExtra("exploreItem", 0);
                 startActivity(intent);
                 return true;
             case R.id.trend:
-                intent = new Intent().setClass(this, TrendingActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent = new Intent().setClass(this, ExploreActivity.class);
+                intent.putExtra("exploreItem", 1);
                 startActivity(intent);
                 return true;
             case R.id.blog:
-                intent = new Intent().setClass(this, BlogListActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent = new Intent().setClass(this, ExploreActivity.class);
+                intent.putExtra("exploreItem", 2);
                 startActivity(intent);
                 return true;
             case R.id.follow:
