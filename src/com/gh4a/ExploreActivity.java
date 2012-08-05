@@ -85,6 +85,13 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
         mPager.invalidate();
         
         mIndicator = (TitlePageIndicator)findViewById(R.id.indicator);
+        
+        if (Gh4Application.THEME != R.style.DefaultTheme) {
+            mIndicator.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_light));
+            mIndicator.setSelectedColor(getResources().getColor(R.color.abs__primary_text_holo_light));
+            mIndicator.setSelectedBold(true);
+        }
+        
         if (mExploreItem == 1) {//trending
             mIndicator.setVisibility(View.VISIBLE);
         }
