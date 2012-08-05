@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true" >
     <ProgressBar
         android:id="@+id/pb"
         style="@style/LoadingProgress" />
@@ -10,6 +12,38 @@
         android:id="@+id/list_view"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:padding="0dp" >
+        android:padding="0dp"
+        android:layout_above="@+id/rl_comment" >
     </ListView>
-</FrameLayout>
+    <RelativeLayout 
+        android:id="@id/rl_comment"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:paddingBottom="5dp">
+        <View 
+            android:id="@+id/divider"
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="#ff0099cc"
+            android:layout_marginBottom="5dp" />
+        <EditText
+            android:id="@+id/et_comment"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/iv_comment"
+            android:layout_below="@id/divider"
+            android:inputType="textMultiLine|textCapSentences"
+            android:hint="Comment on this issue" />
+        <ImageView
+            android:id="@id/iv_comment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/social_send_now"
+            android:padding="10dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:layout_below="@id/divider" />
+    </RelativeLayout>
+</RelativeLayout>

@@ -41,7 +41,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -78,7 +77,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.issue);
-
+        
         Bundle data = getIntent().getExtras();
 
         mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
@@ -98,7 +97,6 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
     }
 
     private void fillData() {
-        
         new LoadCommentsTask(this).execute();
         
         Typeface boldCondensed = getApplicationContext().boldCondensed;
@@ -109,13 +107,11 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         LinearLayout mHeader = (LinearLayout) infalter.inflate(R.layout.issue_header, lvComments, false);
         mHeader.setClickable(false);
         
-        // comment form at footer
-        LinearLayout mFooter = (LinearLayout) infalter.inflate(R.layout.issue_footer, lvComments, false);
-
         lvComments.addHeaderView(mHeader, null, false);
         
-        if (isAuthorized()) {
-            lvComments.addFooterView(mFooter, null, false);
+        RelativeLayout rlComment = (RelativeLayout) findViewById(R.id.rl_comment);
+        if (!isAuthorized()) {
+            rlComment.setVisibility(View.GONE);
         }
 
         mCommentAdapter = new CommentAdapter(IssueActivity.this, new ArrayList<Comment>());
@@ -147,7 +143,10 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         
         TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
         TextView tvMilestone = (TextView) mHeader.findViewById(R.id.tv_milestone);
-        Button btnCreateComment = (Button) mFooter.findViewById(R.id.btn_create);
+        ImageView ivComment = (ImageView) findViewById(R.id.iv_comment);
+        ivComment.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
+        ivComment.setOnClickListener(this);
+        ivComment.setPadding(10, 10, 10, 10);
 
         tvExtra.setText(mIssue.getUser().getLogin() + "\n" + pt.format(mIssue.getCreatedAt()));
         tvState.setTextColor(Color.WHITE);
@@ -204,7 +203,6 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
             tvDesc.setText(Html.fromHtml(body));
             tvDesc.setTypeface(getApplicationContext().regular);
         }
-        btnCreateComment.setOnClickListener(this);
         
         LinearLayout llLabels = (LinearLayout) findViewById(R.id.ll_labels);
         List<Label> labels = mIssue.getLabels();
@@ -548,17 +546,22 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
             if (mTarget.get() != null) {
                 try {
                     IssueActivity activity = mTarget.get();
-                    EditText etComment = (EditText) activity.findViewById(R.id.et_desc);
+                    EditText etComment = (EditText) activity.findViewById(R.id.et_comment);
                     
-                    String comment = etComment.getText().toString();
-                    GitHubClient client = new GitHubClient();
-                    client.setOAuth2Token(mTarget.get().getAuthToken());
-                    IssueService issueService = new IssueService(client);
-                    issueService.createComment(activity.mRepoOwner, 
-                            activity.mRepoName,
-                            activity.mIssueNumber,
-                            comment);
-                    return true;
+                    if (etComment.getText() != null && !StringUtils.isBlank(etComment.getText().toString())) {  
+                        String comment = etComment.getText().toString();
+                        GitHubClient client = new GitHubClient();
+                        client.setOAuth2Token(mTarget.get().getAuthToken());
+                        IssueService issueService = new IssueService(client);
+                        issueService.createComment(activity.mRepoOwner, 
+                                activity.mRepoName,
+                                activity.mIssueNumber,
+                                comment);
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
                 }
                 catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
@@ -590,11 +593,13 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
                             false);
                 }
                 else {
-                    activity.showMessage(activity.getResources().getString(R.string.issue_success_comment),
-                            false);
-                    //reload comments
-                    new LoadCommentsTask(activity).execute(false);
-                    EditText etComment = (EditText) activity.findViewById(R.id.et_desc);
+                    if (result) {
+                        activity.showMessage(activity.getResources().getString(R.string.issue_success_comment),
+                                false);
+                        //reload comments
+                        new LoadCommentsTask(activity).execute(false);
+                    }
+                    EditText etComment = (EditText) activity.findViewById(R.id.et_comment);
                     etComment.setText(null);
                     etComment.clearFocus();
                 }
@@ -605,8 +610,14 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-        case R.id.btn_create:
-            new CommentIssueTask(this, false).execute();
+        case R.id.iv_comment:
+            EditText etComment = (EditText) findViewById(R.id.et_comment);
+            if (etComment.getText() != null && !StringUtils.isBlank(etComment.getText().toString())) {
+                new CommentIssueTask(this, false).execute();
+            }
+            if (getCurrentFocus() != null) {
+                hideKeyboard(getCurrentFocus().getWindowToken());
+            }
             break;
         case R.id.tv_pull:
             getApplicationContext().openPullRequestActivity(this,
