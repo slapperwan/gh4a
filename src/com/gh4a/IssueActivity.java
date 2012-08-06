@@ -145,6 +145,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         TextView tvMilestone = (TextView) mHeader.findViewById(R.id.tv_milestone);
         ImageView ivComment = (ImageView) findViewById(R.id.iv_comment);
         ivComment.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
+        ivComment.setPadding(5, 2, 5, 2);
         ivComment.setOnClickListener(this);
 
         tvExtra.setText(mIssue.getUser().getLogin() + "\n" + pt.format(mIssue.getCreatedAt()));
@@ -250,6 +251,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
     }
 
     protected void fillComments(List<Comment> comments) {
+        stopProgressDialog(mProgressDialog);
         mCommentAdapter.clear();
         if (comments != null && comments.size() > 0) {
             mCommentAdapter.notifyDataSetChanged();
@@ -585,9 +587,9 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         protected void onPostExecute(Boolean result) {
             if (mTarget.get() != null) {
                 IssueActivity activity = mTarget.get();
-                activity.stopProgressDialog(activity.mProgressDialog);
                 
                 if (mException) {
+                    activity.stopProgressDialog(activity.mProgressDialog);
                     activity.showMessage(activity.getResources().getString(R.string.issue_error_comment),
                             false);
                 }

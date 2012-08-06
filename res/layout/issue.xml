@@ -16,12 +16,15 @@
         android:padding="0dp"
         android:layout_above="@+id/rl_comment" >
     </ListView>
-    <RelativeLayout 
+
+    <RelativeLayout
         android:id="@id/rl_comment"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:paddingBottom="5dp">
+        android:layout_centerInParent="true"
+        android:paddingBottom="5dp" >
+
         <View 
             android:id="@+id/divider"
             android:layout_width="fill_parent"
@@ -37,13 +40,18 @@
             android:layout_below="@id/divider"
             android:inputType="textMultiLine|textCapSentences"
             android:hint="Comment on this issue" />
+
         <ImageView
             android:id="@id/iv_comment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/social_send_now"
             android:layout_alignParentRight="true"
-            android:layout_centerInParent="true"
-            android:layout_below="@id/divider" />
+            android:layout_below="@id/divider"
+            android:src="@drawable/social_send_now"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp" />
+
     </RelativeLayout>
 </RelativeLayout>
