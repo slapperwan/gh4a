@@ -34,7 +34,7 @@
                     android:id="@+id/tv_extra"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/default_text_micro"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
                     android:layout_toRightOf="@id/iv_gravatar" />
                 <TextView
                     android:id="@+id/tv_message"

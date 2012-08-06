@@ -15,273 +15,111 @@
  */
 package com.gh4a;
 
-import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import org.eclipse.egit.github.core.CommitFile;
-import org.eclipse.egit.github.core.RepositoryCommit;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.CommitService;
-
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.format.DateUtils;
-import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.Tab;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
-import com.gh4a.utils.CommitUtils;
-import com.gh4a.utils.ImageDownloader;
+import com.gh4a.fragment.CommitFragment;
+import com.gh4a.fragment.CommitNoteFragment;
 
-public class CommitActivity extends BaseActivity {
+public class CommitActivity extends BaseSherlockFragmentActivity {
 
     private String mRepoOwner;
     private String mRepoName;
     private String mObjectSha;
+    private ThisPageAdapter mAdapter;
+    private ActionBar mActionBar;
+    private ViewPager mPager;
+    private int tabCount;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.commit);
-        setUpActionBar();
+        setContentView(R.layout.view_pager);
 
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
         mObjectSha = data.getString(Constants.Object.OBJECT_SHA);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(getResources().getQuantityString(R.plurals.commit, 1) + " " + mObjectSha.substring(0, 7));
-        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        mActionBar = getSupportActionBar();
+        mActionBar.setTitle(getResources().getQuantityString(R.plurals.commit, 1) + " " + mObjectSha.substring(0, 7));
+        mActionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
+        mActionBar.setDisplayHomeAsUpEnabled(true);
         
-        showLoading();
-        new LoadCommitInfoTask(this).execute();
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        
+        mAdapter = new ThisPageAdapter(getSupportFragmentManager());
+        mPager = (ViewPager) findViewById(R.id.pager);
+        mPager.setAdapter(mAdapter);
+        
+        mPager.setOnPageChangeListener(new OnPageChangeListener() {
+
+            @Override
+            public void onPageScrollStateChanged(int arg0) {}
+            
+            @Override
+            public void onPageScrolled(int arg0, float arg1, int arg2) {}
+
+            @Override
+            public void onPageSelected(int position) {
+                mActionBar.setSelectedNavigationItem(position);
+            }
+        });
+        
+        tabCount = 2;
+        
+        Tab tab = mActionBar
+                .newTab()
+                .setText(R.string.commits)
+                .setTabListener(
+                        new TabListener<SherlockFragmentActivity>(this, 0 + "", mPager));
+        mActionBar.addTab(tab);
+        
+        if (tabCount == 2) {
+            tab = mActionBar
+                    .newTab()
+                    .setText(R.string.issue_comments)
+                    .setTabListener(
+                            new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
+            mActionBar.addTab(tab);
+        }
     }
 
-    private static class LoadCommitInfoTask extends AsyncTask<Void, Integer, RepositoryCommit> {
+    public class ThisPageAdapter extends FragmentStatePagerAdapter {
 
-        private WeakReference<CommitActivity> mTarget;
-        private boolean mException;
-
-        public LoadCommitInfoTask(CommitActivity activity) {
-            mTarget = new WeakReference<CommitActivity>(activity);
+        public ThisPageAdapter(FragmentManager fm) {
+            super(fm);
         }
 
         @Override
-        protected RepositoryCommit doInBackground(Void... params) {
-            if (mTarget.get() != null) {
-                try {
-                    CommitActivity activity = mTarget.get();
-                    GitHubClient client = new GitHubClient();
-                    client.setOAuth2Token(mTarget.get().getAuthToken());
-                    CommitService commitService = new CommitService(client);
-                    return commitService.getCommit(new RepositoryId(activity.mRepoOwner, activity.mRepoName),
-                            activity.mObjectSha);
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
+        public int getCount() {
+            return tabCount;
+        }
+
+        @Override
+        public android.support.v4.app.Fragment getItem(int position) {
+            if (position == 1) {
+                return CommitNoteFragment.newInstance(mRepoOwner, mRepoName, mObjectSha);
             }
             else {
-                return null;
+                return CommitFragment.newInstance(mRepoOwner, mRepoName, mObjectSha);
             }
         }
-
+        
         @Override
-        protected void onPreExecute() {
+        public void destroyItem(ViewGroup container, int position, Object object) {
         }
-
-        @Override
-        protected void onPostExecute(RepositoryCommit result) {
-            if (mTarget.get() != null) {
-                mTarget.get().hideLoading();
-                if (mException) {
-                    mTarget.get().showError();
-                }
-                else {
-                    mTarget.get().fillData(result);
-                }
-            }
-        }
-
-    }
-
-    private void fillData(final RepositoryCommit commit) {
-        LinearLayout llChanged = (LinearLayout) findViewById(R.id.ll_changed);
-        LinearLayout llAdded = (LinearLayout) findViewById(R.id.ll_added);
-        LinearLayout llDeleted = (LinearLayout) findViewById(R.id.ll_deleted);
-
-        ImageView ivGravatar = (ImageView) findViewById(R.id.iv_gravatar);
-        
-        ImageDownloader.getInstance().download(CommitUtils.getAuthorGravatarId(commit),
-                ivGravatar);
-        
-        if (CommitUtils.getAuthorLogin(commit) != null) {
-            ivGravatar.setOnClickListener(new OnClickListener() {
-    
-                @Override
-                public void onClick(View v) {
-                    /** Open user activity */
-                    getApplicationContext().openUserInfoActivity(CommitActivity.this,
-                            CommitUtils.getAuthorLogin(commit), null);
-                }
-            });
-        }
-        
-        TextView tvMessage = (TextView) findViewById(R.id.tv_message);
-        tvMessage.setTypeface(getApplicationContext().regular);
-        
-        TextView tvExtra = (TextView) findViewById(R.id.tv_extra);
-        tvExtra.setTypeface(getApplicationContext().regular);
-        
-        TextView tvSummary = (TextView) findViewById(R.id.tv_desc);
-        tvSummary.setTypeface(getApplicationContext().regular);
-        
-        TextView tvChangeTitle = (TextView) findViewById(R.id.commit_changed);
-        tvChangeTitle.setTypeface(getApplicationContext().boldCondensed);
-        tvChangeTitle.setTextColor(Color.parseColor("#0099cc"));
-        
-        TextView tvAddedTitle = (TextView) findViewById(R.id.commit_added);
-        tvAddedTitle.setTypeface(getApplicationContext().boldCondensed);
-        tvAddedTitle.setTextColor(Color.parseColor("#0099cc"));
-        
-        TextView tvDeletedTitle = (TextView) findViewById(R.id.commit_deleted);
-        tvDeletedTitle.setTypeface(getApplicationContext().boldCondensed);
-        tvDeletedTitle.setTextColor(Color.parseColor("#0099cc"));
-        
-        tvMessage.setText(commit.getCommit().getMessage());
-        
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(commit.getCommit().getCommitter().getDate());
-        int timezoneOffset = (cal.get(Calendar.ZONE_OFFSET) + cal.get(Calendar.DST_OFFSET)) / 3600000;
-        cal.add(Calendar.HOUR, timezoneOffset);
-        long now = System.currentTimeMillis();
-        tvExtra.setText(CommitUtils.getAuthorName(commit)
-                + " "
-                + DateUtils.getRelativeTimeSpanString(commit.getCommit().getCommitter().getDate().getTime(),
-                        now, DateUtils.MINUTE_IN_MILLIS));
-
-        List<CommitFile> addedFiles = new ArrayList<CommitFile>();
-        List<CommitFile> removedFiles = new ArrayList<CommitFile>();
-        List<CommitFile> modifiedFiles = new ArrayList<CommitFile>();
-        
-        //List<String> addedList = commit.getAdded();
-        List<CommitFile> commitFiles = commit.getFiles();
-        for (CommitFile commitFile : commitFiles) {
-            String status = commitFile.getStatus();
-            if ("added".equals(status)) {
-                addedFiles.add(commitFile);
-            }
-            else if ("modified".equals(status)) {
-                modifiedFiles.add(commitFile);
-            }
-            else if ("removed".equals(status)) {
-                removedFiles.add(commitFile);
-            }
-        }
-        
-        for (final CommitFile file: addedFiles) {
-            TextView tvFilename = new TextView(getApplicationContext());
-            tvFilename.setText(file.getFilename());
-            tvFilename.setTypeface(Typeface.MONOSPACE);
-            tvFilename.setTextColor(Color.parseColor("#0099cc"));
-            tvFilename.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-            tvFilename.setPadding(0, 10, 0, 10);
-            tvFilename.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(View arg0) {
-                    Intent intent = new Intent().setClass(CommitActivity.this,
-                            DiffViewerActivity.class);
-                    intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-                    intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                    intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
-                    intent.putExtra(Constants.Commit.DIFF, file.getPatch());
-                    intent.putExtra(Constants.Object.PATH, file.getFilename());
-                    intent.putExtra(Constants.Object.TREE_SHA, commit.getCommit().getTree().getSha());
-                    startActivity(intent);
-                }
-            });
-            
-            llAdded.addView(tvFilename);
-        }
-        
-        for (final CommitFile file: removedFiles) {
-            TextView tvFilename = new TextView(getApplicationContext());
-            tvFilename.setText(file.getFilename());
-            tvFilename.setPadding(0, 10, 0, 10);
-            tvFilename.setTypeface(Typeface.MONOSPACE);
-            
-            llDeleted.addView(tvFilename);
-        }
-
-        for (final CommitFile file: modifiedFiles) {
-            TextView tvFilename = new TextView(getApplicationContext());
-            tvFilename.setText(file.getFilename());
-            tvFilename.setTypeface(Typeface.MONOSPACE);
-            tvFilename.setTextColor(Color.parseColor("#0099cc"));
-            tvFilename.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-            tvFilename.setPadding(0, 10, 0, 10);
-            tvFilename.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(View arg0) {
-                    Intent intent = new Intent().setClass(CommitActivity.this,
-                            DiffViewerActivity.class);
-                    intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-                    intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                    intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
-                    intent.putExtra(Constants.Commit.DIFF, file.getPatch());
-                    intent.putExtra(Constants.Object.PATH, file.getFilename());
-                    intent.putExtra(Constants.Object.TREE_SHA, commit.getCommit().getTree().getSha());
-                    startActivity(intent);
-                }
-            });
-            
-            llChanged.addView(tvFilename);
-        }
-
-        if (addedFiles.size() == 0) {
-            TextView tvFilename = new TextView(getApplicationContext());
-            tvFilename.setTypeface(getApplicationContext().regular);
-            tvFilename.setText(R.string.commit_no_files);
-            llAdded.addView(tvFilename);
-        }
-        
-        if (removedFiles.size() == 0) {
-            TextView tvFilename = new TextView(getApplicationContext());
-            tvFilename.setTypeface(getApplicationContext().regular);
-            tvFilename.setText(R.string.commit_no_files);
-            llDeleted.addView(tvFilename);
-        }
-        
-        if (modifiedFiles.size() == 0) {
-            TextView tvFilename = new TextView(getApplicationContext());
-            tvFilename.setTypeface(getApplicationContext().regular);
-            tvFilename.setText(R.string.commit_no_files);
-            llChanged.addView(tvFilename);
-        }
-        
-        tvSummary.setText(String.format(getResources().getString(R.string.commit_summary),
-                commit.getFiles().size(), commit.getStats().getAdditions(), commit.getStats().getDeletions()));
     }
     
     @Override
