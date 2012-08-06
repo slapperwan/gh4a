@@ -146,7 +146,6 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         ImageView ivComment = (ImageView) findViewById(R.id.iv_comment);
         ivComment.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
         ivComment.setOnClickListener(this);
-        ivComment.setPadding(10, 10, 10, 10);
 
         tvExtra.setText(mIssue.getUser().getLogin() + "\n" + pt.format(mIssue.getCreatedAt()));
         tvState.setTextColor(Color.WHITE);

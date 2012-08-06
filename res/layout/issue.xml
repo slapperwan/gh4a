@@ -42,7 +42,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/social_send_now"
-            android:padding="10dp"
             android:layout_alignParentRight="true"
             android:layout_centerInParent="true"
             android:layout_below="@id/divider" />
