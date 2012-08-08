@@ -429,4 +429,10 @@ public class StringUtils {
             text.replace(len - 1, len, "");
         }
     }
+    
+    public static String replaceToSupportedHtmlTag(String string) {
+        string = string.replace("pre", "tt");
+        string = string.replace("code", "tt");
+        return string;
+    }
 }

@@ -51,6 +51,7 @@ import com.gh4a.WatcherListActivity;
 import com.gh4a.WikiListActivity;
 import com.gh4a.loader.ReadmeLoader;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.TagHandlerEx;
 
 public class RepositoryFragment extends BaseFragment implements 
     OnClickListener, LoaderManager.LoaderCallbacks {
@@ -330,7 +331,8 @@ public class RepositoryFragment extends BaseFragment implements
                 tvReadme.setMovementMethod(LinkMovementMethod.getInstance());
                 HtmlImageGetter p = new HtmlImageGetter(tvReadme, this.getSherlockActivity());
                 
-                Spanned htmlSpan = Html.fromHtml(readme, p, null);
+                readme = StringUtils.replaceToSupportedHtmlTag(readme);
+                Spanned htmlSpan = Html.fromHtml(readme, p, new TagHandlerEx());
                 StringUtils.removeLastNewline((SpannableStringBuilder) htmlSpan);
                 tvReadme.setText(htmlSpan);
                 tvReadme.setMovementMethod(LinkMovementMethod.getInstance());

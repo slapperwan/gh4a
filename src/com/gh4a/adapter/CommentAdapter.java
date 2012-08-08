@@ -35,6 +35,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.TagHandlerEx;
 
 public class CommentAdapter extends RootAdapter<Comment> {
 
@@ -77,7 +78,8 @@ public class CommentAdapter extends RootAdapter<Comment> {
             viewHolder.tvExtra.setText(comment.getUser().getLogin() + "\n" + pt.format(comment.getCreatedAt()));
             
             String body = comment.getBodyHtml();
-            Spanned htmlSpan = Html.fromHtml(body);
+            body = StringUtils.replaceToSupportedHtmlTag(body);
+            Spanned htmlSpan = Html.fromHtml(body, null, new TagHandlerEx());
             StringUtils.removeLastNewline((SpannableStringBuilder) htmlSpan);
             viewHolder.tvDesc.setText(htmlSpan);
         }
