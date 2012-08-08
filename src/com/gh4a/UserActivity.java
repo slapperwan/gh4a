@@ -49,12 +49,18 @@ public class UserActivity extends BaseSherlockFragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.view_pager);
         
         Bundle data = getIntent().getExtras();
         mUserLogin = data.getString(Constants.User.USER_LOGIN);
         mUserName = data.getString(Constants.User.USER_NAME);
         int position = data.getInt("position");
+        
+        if (!isOnline()) {
+            setErrorView();
+            return;
+        }
+
+        setContentView(R.layout.view_pager);
         
         isLoginUserPage = mUserLogin.equals(getAuthLogin());
         

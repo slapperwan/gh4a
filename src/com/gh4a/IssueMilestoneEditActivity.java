@@ -63,16 +63,21 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
         
+        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
+        mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
+        mMilestoneNumber = getIntent().getExtras().getInt(Constants.Milestone.NUMBER);
+        
+        if (!isOnline()) {
+            setErrorView();
+            return;
+        }
+        
         if (!isAuthorized()) {
             Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
             startActivity(intent);
             finish();
         }
         setContentView(R.layout.issue_create_milestone);
-        
-        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
-        mMilestoneNumber = getIntent().getExtras().getInt(Constants.Milestone.NUMBER);
         
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.issue_milestone_edit);

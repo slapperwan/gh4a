@@ -42,12 +42,18 @@ public class FollowerFollowingListActivity extends BaseSherlockFragmentActivity 
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.view_pager);
-        
+
         Bundle data = getIntent().getExtras();
         mUserLogin = data.getString(Constants.User.USER_LOGIN);
         mFindFollowers = data.getBoolean("FIND_FOLLOWERS");
-
+        
+        if (!isOnline()) {
+            setErrorView();
+            return;
+        }
+        
+        setContentView(R.layout.view_pager);
+        
         tabCount = 2;
         
         mActionBar = getSupportActionBar();

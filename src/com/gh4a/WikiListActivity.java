@@ -47,7 +47,7 @@ import com.gh4a.adapter.CommonFeedAdapter;
 import com.gh4a.feeds.FeedHandler;
 import com.gh4a.holder.Feed;
 
-public class WikiListActivity extends BaseActivity {
+public class WikiListActivity extends BaseSherlockFragmentActivity {
     
     private String mUserLogin;
     private String mRepoName;
@@ -60,12 +60,17 @@ public class WikiListActivity extends BaseActivity {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.generic_list);
-
         mUserLogin = getIntent().getStringExtra(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getStringExtra(Constants.Repository.REPO_NAME);
         mWikiUrl = "https://github.com/" + mUserLogin + "/" + mRepoName + "/wiki.atom?page=";
         
+        if (!isOnline()) {
+            setErrorView();
+            return;
+        }
+        
+        setContentView(R.layout.generic_list);
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.recent_wiki);
         actionBar.setSubtitle(mUserLogin + "/" + mRepoName);

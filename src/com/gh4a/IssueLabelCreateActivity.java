@@ -50,15 +50,20 @@ public class IssueLabelCreateActivity extends BaseSherlockFragmentActivity {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
         
+        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
+        mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
+        
+        if (!isOnline()) {
+            setErrorView();
+            return;
+        }
+        
         if (!isAuthorized()) {
             Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
             startActivity(intent);
             finish();
         }
         setContentView(R.layout.issue_create_label);
-        
-        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
         
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.issue_label_new);

@@ -15,6 +15,8 @@
  */
 package com.gh4a;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import org.ocpsoft.pretty.time.PrettyTime;
@@ -27,20 +29,28 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.actionbarsherlock.R;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.internal.widget.IcsAdapterView;
+import com.actionbarsherlock.internal.widget.IcsAdapterView.OnItemSelectedListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.Window;
+import com.gh4a.adapter.NavigationSpinnerAdapter;
+import com.gh4a.utils.StringUtils;
 
 /**
  * The Base activity.
@@ -234,7 +244,7 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         dialog.show();
     }
     
-    public void openDonateDialog() {
+    public void connectionErrorDialog() {
         Dialog dialog = new Dialog(this);
         dialog.setTitle(getResources().getString(R.string.donate));
         dialog.setContentView(R.layout.donate_dialog);
@@ -452,5 +462,37 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
+    }
+    
+    public boolean isOnline() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm.getActiveNetworkInfo() != null
+                && cm.getActiveNetworkInfo().isAvailable()
+                && cm.getActiveNetworkInfo().isConnected()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    public void setErrorView() {
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.error);
+        Button btnHome = (Button) findViewById(R.id.btn_home);
+        btnHome.setOnClickListener(new OnClickListener() {
+            
+            @Override
+            public void onClick(View v) {
+                if (isAuthorized()) {
+                    getApplicationContext().openUserInfoActivity(BaseSherlockFragmentActivity.this, 
+                            getAuthLogin(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
+                }
+                else {
+                    Intent intent = new Intent().setClass(BaseSherlockFragmentActivity.this, Github4AndroidActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
+            }
+        });
     }
 }

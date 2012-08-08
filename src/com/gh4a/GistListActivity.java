@@ -37,7 +37,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.adapter.GistAdapter;
 
-public class GistListActivity extends BaseActivity implements OnItemClickListener {
+public class GistListActivity extends BaseSherlockFragmentActivity implements OnItemClickListener {
 
     private String mUserLogin;
 
@@ -46,9 +46,14 @@ public class GistListActivity extends BaseActivity implements OnItemClickListene
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.generic_list);
-        
         mUserLogin = getIntent().getExtras().getString(Constants.User.USER_LOGIN);
+        
+        if (!isOnline()) {
+            setErrorView();
+            return;
+        }
+        
+        setContentView(R.layout.generic_list);
         
         ActionBar mActionBar = getSupportActionBar();
         mActionBar.setTitle(getResources().getQuantityString(R.plurals.gist, 0));

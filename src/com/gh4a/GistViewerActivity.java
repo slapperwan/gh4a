@@ -34,7 +34,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.utils.StringUtils;
 
-public class GistViewerActivity extends BaseActivity {
+public class GistViewerActivity extends BaseSherlockFragmentActivity {
 
     private String mUserLogin;
     private String mFilename;
@@ -46,12 +46,17 @@ public class GistViewerActivity extends BaseActivity {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.web_viewer);
-        
         mUserLogin = getIntent().getExtras().getString(Constants.User.USER_LOGIN);
         mFilename = getIntent().getExtras().getString(Constants.Gist.FILENAME);
         mGistId = getIntent().getExtras().getString(Constants.Gist.ID);
-
+        
+        if (!isOnline()) {
+            setErrorView();
+            return;
+        }
+        
+        setContentView(R.layout.web_viewer);
+        
         ActionBar mActionBar = getSupportActionBar();
         mActionBar.setTitle(mFilename);
         mActionBar.setDisplayHomeAsUpEnabled(true);

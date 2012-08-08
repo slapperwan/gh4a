@@ -45,12 +45,17 @@ public class CommitActivity extends BaseSherlockFragmentActivity {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.view_pager);
-
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
         mObjectSha = data.getString(Constants.Object.OBJECT_SHA);
+        
+        if (!isOnline()) {
+            setErrorView();
+            return;
+        }
+        
+        setContentView(R.layout.view_pager);
 
         mActionBar = getSupportActionBar();
         mActionBar.setTitle(getResources().getQuantityString(R.plurals.commit, 1) + " " + mObjectSha.substring(0, 7));

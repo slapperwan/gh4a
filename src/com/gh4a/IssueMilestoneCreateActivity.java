@@ -55,6 +55,15 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
         
+        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
+        mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
+        hideLoading();
+        
+        if (!isOnline()) {
+            setErrorView();
+            return;
+        }
+        
         if (!isAuthorized()) {
             Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
             startActivity(intent);
@@ -62,10 +71,6 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
         }
         setContentView(R.layout.issue_create_milestone);
         
-        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
-
-        hideLoading();
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.issue_milestone_new);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);

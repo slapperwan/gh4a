@@ -52,9 +52,15 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.explore);
-        
+
         mExploreItem = getIntent().getExtras().getInt("exploreItem");
+        
+        if (!isOnline()) {
+            setErrorView();
+            return;
+        }
+        
+        setContentView(R.layout.explore);
         
         mActionBar = getSupportActionBar();
         mActionBar.setDisplayShowTitleEnabled(false);

@@ -86,13 +86,6 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
-        
-        if (!isAuthorized()) {
-            Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
-            startActivity(intent);
-            finish();
-        }
-        setContentView(R.layout.issue_create);
 
         mSelectedLabels = new ArrayList<Label>();
         Bundle data = getIntent().getExtras();
@@ -103,6 +96,18 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
         if (mIssueNumber != 0) {
             mEditMode = true;
         }
+        
+        if (!isOnline()) {
+            setErrorView();
+            return;
+        }
+        
+        if (!isAuthorized()) {
+            Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+            startActivity(intent);
+            finish();
+        }
+        setContentView(R.layout.issue_create);
 
         mActionBar = getSupportActionBar();
         mActionBar.setTitle(mEditMode ? 

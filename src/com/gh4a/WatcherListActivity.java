@@ -44,12 +44,18 @@ public class WatcherListActivity extends BaseSherlockFragmentActivity  {
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.view_pager);
-        
+
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
         mPos = data.getInt("pos");
+        
+        if (!isOnline()) {
+            setErrorView();
+            return;
+        }
+        
+        setContentView(R.layout.view_pager);
         
         tabCount = 2;
         

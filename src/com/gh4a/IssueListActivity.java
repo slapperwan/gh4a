@@ -76,7 +76,6 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.view_pager);
         
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
@@ -86,8 +85,14 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         mFilterData = new HashMap<String, String>();
         mFilterData.put("state", mState);
         
-        mActionBar = getSupportActionBar();
+        if (!isOnline()) {
+            setErrorView();
+            return;
+        }
         
+        setContentView(R.layout.view_pager);
+
+        mActionBar = getSupportActionBar();
         fillTabs();
         
         getSupportLoaderManager().initLoader(0, null, this);

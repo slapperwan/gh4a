@@ -42,10 +42,16 @@ public class PullRequestListActivity extends BaseSherlockFragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.view_pager);
-
+        
         mRepoOwner = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
+        
+        if (!isOnline()) {
+            setErrorView();
+            return;
+        }
+        
+        setContentView(R.layout.view_pager);
 
         mActionBar = getSupportActionBar();
         mActionBar.setTitle(R.string.pull_requests);

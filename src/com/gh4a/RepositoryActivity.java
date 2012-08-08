@@ -72,7 +72,6 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.view_pager_repo);
         
         fileStacks = new ArrayList<ContentListFragment>();
         mContentList = new ArrayList<List<Content>>();
@@ -89,6 +88,13 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
             mSelectedRef = bundle.getString(Constants.Repository.SELECTED_REF);
             mSelectBranchTag = bundle.getString(Constants.Repository.SELECTED_BRANCHTAG_NAME);
         }
+        
+        if (!isOnline()) {
+            setErrorView();
+            return;
+        }
+        
+        setContentView(R.layout.view_pager_repo);
         
         mActionBar = getSupportActionBar();
         mActionBar.setTitle(mRepoOwner + "/" + mRepoName);

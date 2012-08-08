@@ -32,11 +32,10 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.adapter.UserAdapter;
 import com.gh4a.utils.StringUtils;
 
-public class UserListActivity extends BaseActivity implements OnItemClickListener {
+public class UserListActivity extends BaseSherlockFragmentActivity implements OnItemClickListener {
 
     protected String mSearchKey;
     protected UserAdapter mUserAdapter;
@@ -47,6 +46,11 @@ public class UserListActivity extends BaseActivity implements OnItemClickListene
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
+        if (!isOnline()) {
+            setErrorView();
+            return;
+        }
+        
         setContentView(R.layout.generic_list);
 
         setRequestData();

@@ -52,8 +52,6 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.web_viewer);
-
         mRepoOwner = getIntent().getStringExtra(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getStringExtra(Constants.Repository.REPO_NAME);
         mPath = getIntent().getStringExtra(Constants.Object.PATH);
@@ -61,6 +59,13 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
         mSha = getIntent().getStringExtra(Constants.Object.OBJECT_SHA);
         mName = getIntent().getStringExtra(Constants.Object.NAME);
         
+        if (!isOnline()) {
+            setErrorView();
+            return;
+        }
+        
+        setContentView(R.layout.web_viewer);
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(mName);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);

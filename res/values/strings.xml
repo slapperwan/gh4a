@@ -54,6 +54,8 @@
     <string name="closed">Closed</string>
     <string name="theme">Theme</string>
     <string name="pub_timeline">Public Timeline</string>
+    <string name="error_connection">Connection error</string>
+    <string name="home">Home</string>
     
     <plurals name="file">
         <item quantity="one">File</item>

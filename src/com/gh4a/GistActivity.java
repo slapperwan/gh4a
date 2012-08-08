@@ -41,7 +41,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.utils.StringUtils;
 
-public class GistActivity extends BaseActivity {
+public class GistActivity extends BaseSherlockFragmentActivity {
 
     private String mGistId;
     private String mUserLogin;
@@ -51,10 +51,15 @@ public class GistActivity extends BaseActivity {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.gist);
-        
         mGistId = getIntent().getExtras().getString(Constants.Gist.ID);
         mUserLogin = getIntent().getExtras().getString(Constants.User.USER_LOGIN);
+        
+        if (!isOnline()) {
+            setErrorView();
+            return;
+        }
+        
+        setContentView(R.layout.gist);
         
         ActionBar mActionBar = getSupportActionBar();
         mActionBar.setTitle(getResources().getQuantityString(R.plurals.gist, 1) + " " + mGistId);

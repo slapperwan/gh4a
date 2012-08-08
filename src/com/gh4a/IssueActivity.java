@@ -78,14 +78,18 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.issue);
-        
         Bundle data = getIntent().getExtras();
-
         mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
         mIssueNumber = data.getInt(Constants.Issue.ISSUE_NUMBER);
         mIssueState = data.getString(Constants.Issue.ISSUE_STATE);
+        
+        if (!isOnline()) {
+            setErrorView();
+            return;
+        }
+        
+        setContentView(R.layout.issue);
         
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getResources().getString(R.string.Issue) + " #" + mIssueNumber);

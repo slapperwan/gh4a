@@ -60,11 +60,16 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
         
-        setContentView(R.layout.ll_placeholder);
-        
         mRepoOwner = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
-
+        
+        if (!isOnline()) {
+            setErrorView();
+            return;
+        }
+        
+        setContentView(R.layout.ll_placeholder);
+        
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.issue_manage_labels);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
