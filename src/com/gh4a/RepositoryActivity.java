@@ -157,8 +157,6 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 2 + "", mPager));
         mActionBar.addTab(tab, mCurrentTab == 2);
-        
-        invalidateOptionsMenu();
     }
     
     public class RepositoryAdapter extends FragmentStatePagerAdapter {
@@ -376,31 +374,42 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     public void onLoadFinished(Loader loader, Object object) {
         if (loader.getId() == 0) {
             hideLoading();
-            this.mRepository = (Repository) object;
-            fillTabs();
+            if (object != null) {
+                this.mRepository = (Repository) object;
+                fillTabs();
+            }
+            invalidateOptionsMenu();
         }
         else if (loader.getId() == 1) {
             stopProgressDialog(mProgressDialog);
-            this.mBranches = (List<RepositoryBranch>) object;
-            showBranchesDialog();
+            if (object != null) {
+                this.mBranches = (List<RepositoryBranch>) object;
+                showBranchesDialog();
+            }
         }
         else if (loader.getId() == 2) {
             stopProgressDialog(mProgressDialog);
-            this.mTags = (List<RepositoryTag>) object;
-            showTagsDialog();
+            if (object != null) {
+                this.mTags = (List<RepositoryTag>) object;
+                showTagsDialog();
+            }
         }
         else if (loader.getId() == 3) {
-            isWatching = (Boolean) object;
-            isFinishLoadingWatching = true;
+            if (object != null) {
+                isWatching = (Boolean) object;
+                isFinishLoadingWatching = true;
+            }
             invalidateOptionsMenu();
         }
         else {
-            isWatching = (Boolean) object;
-            isFinishLoadingWatching = true;
-            invalidateOptionsMenu();
-            if (mRepositoryFragment != null) {
-                mRepositoryFragment.updateWatcherCount(isWatching);
+            if (object != null) {
+                isWatching = (Boolean) object;
+                isFinishLoadingWatching = true;
+                if (mRepositoryFragment != null) {
+                    mRepositoryFragment.updateWatcherCount(isWatching);
+                }
             }
+            invalidateOptionsMenu();
         }
     }
 

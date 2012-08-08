@@ -6,6 +6,9 @@ import org.eclipse.egit.github.core.client.PageIterator;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
+import android.util.Log;
+
+import com.gh4a.Constants;
 
 public class PageIteratorLoader<T> extends AsyncTaskLoader<List<T>> {
 
@@ -19,7 +22,13 @@ public class PageIteratorLoader<T> extends AsyncTaskLoader<List<T>> {
     @Override
     public List<T> loadInBackground() {
         if (mPageIterator.hasNext()) {
-            return (List<T>) mPageIterator.next();
+            try {
+                return (List<T>) mPageIterator.next();
+            }
+            catch (Exception e) {
+                Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                return null;
+            }
         }
         else {
             return null;
