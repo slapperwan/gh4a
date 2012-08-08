@@ -34,7 +34,6 @@ import java.util.regex.Pattern;
 
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.gh4a.Constants;
 
@@ -426,8 +425,6 @@ public class StringUtils {
 
     public static void removeLastNewline(SpannableStringBuilder text) {
         int len = text.length();
-        Log.i("", "+++++++++++++ " + (text.charAt(len - 1) == '\n'));
-        Log.i("", "+++++++++++++ " + (text.charAt(len - 2) == '\n'));
         if (text.charAt(len - 1) == '\n') {
             text.replace(len - 1, len, "");
         }
