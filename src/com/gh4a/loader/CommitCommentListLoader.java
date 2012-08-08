@@ -13,6 +13,7 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
 import com.gh4a.Constants;
+import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
 
 public class CommitCommentListLoader extends AsyncTaskLoader<List<CommitComment>> {
@@ -31,7 +32,7 @@ public class CommitCommentListLoader extends AsyncTaskLoader<List<CommitComment>
     @Override
     public List<CommitComment> loadInBackground() {
         Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new GitHubClient();
+        GitHubClient client = new DefaultClient();
         client.setOAuth2Token(app.getAuthToken());
         CommitService commitService = new CommitService(client);
         try {

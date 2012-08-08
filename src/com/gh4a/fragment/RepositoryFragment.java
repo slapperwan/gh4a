@@ -18,23 +18,18 @@ package com.gh4a.fragment;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
-import java.net.MalformedURLException;
-import java.net.URL;
 
-import org.eclipse.egit.github.core.Content;
 import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.util.EncodingUtils;
 
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.text.Html;
-import android.text.Html.ImageGetter;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
@@ -48,6 +43,7 @@ import com.gh4a.CollaboratorListActivity;
 import com.gh4a.Constants;
 import com.gh4a.ContributorListActivity;
 import com.gh4a.Gh4Application;
+import com.gh4a.HtmlImageGetter;
 import com.gh4a.IssueListActivity;
 import com.gh4a.R;
 import com.gh4a.RepositoryActivity;
@@ -55,7 +51,6 @@ import com.gh4a.WatcherListActivity;
 import com.gh4a.WikiListActivity;
 import com.gh4a.loader.ReadmeLoader;
 import com.gh4a.utils.StringUtils;
-import com.petebevin.markdown.MarkdownProcessor;
 
 public class RepositoryFragment extends BaseFragment implements 
     OnClickListener, LoaderManager.LoaderCallbacks {
@@ -291,7 +286,7 @@ public class RepositoryFragment extends BaseFragment implements
         }
     }
     
-    private static class FillReadmeTask extends AsyncTask<Content, Void, Spanned> {
+    private static class FillReadmeTask extends AsyncTask<InputStream, Void, String> {
 
         private WeakReference<RepositoryFragment> mTarget;
 
@@ -300,38 +295,14 @@ public class RepositoryFragment extends BaseFragment implements
         }
 
         @Override
-        protected Spanned doInBackground(Content... params) {
+        protected String doInBackground(InputStream... params) {
             if (mTarget.get() != null && params[0] != null) {
-                String content = new String(EncodingUtils.fromBase64(params[0].getContent()));
-                MarkdownProcessor m = new MarkdownProcessor();
-                String html = m.markdown(content);
-                Spanned readme = Html.fromHtml(html, new ImageGetter() {
-                    @Override
-                    public Drawable getDrawable(String source) {
-                        try {
-                            URL url = new URL(source);
-                            Object content = url.getContent();
-                            InputStream is = (InputStream) content;
-                            Drawable drawable = Drawable.createFromStream(is, null);
-                            if (drawable != null) {
-                                drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable
-                                        .getIntrinsicHeight());
-                                return drawable;
-                            }
-                            return null;
-                            
-                        } catch (MalformedURLException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                        return null;
-                    }
-                }, null);
-                
-                return readme;
+                try {
+                    return StringUtils.convertStreamToString(params[0]);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
             return null;
         }
@@ -344,7 +315,7 @@ public class RepositoryFragment extends BaseFragment implements
         }
 
         @Override
-        protected void onPostExecute(Spanned result) {
+        protected void onPostExecute(String result) {
             if (mTarget.get() != null) {
                 mTarget.get().hideLoading(R.id.pb_readme, R.id.readme);
                 mTarget.get().fillReadme(result);
@@ -352,11 +323,16 @@ public class RepositoryFragment extends BaseFragment implements
         }
     }
     
-    public void fillReadme(Spanned readme) {
+    public void fillReadme(String readme) {
         if (readme != null) {
             if (getActivity() != null) {
                 TextView tvReadme = (TextView) getView().findViewById(R.id.readme);
-                tvReadme.setText(readme);
+                tvReadme.setMovementMethod(LinkMovementMethod.getInstance());
+                HtmlImageGetter p = new HtmlImageGetter(tvReadme, this.getSherlockActivity());
+                
+                Spanned htmlSpan = Html.fromHtml(readme, p, null);
+                StringUtils.removeLastNewline((SpannableStringBuilder) htmlSpan);
+                tvReadme.setText(htmlSpan);
                 tvReadme.setMovementMethod(LinkMovementMethod.getInstance());
             }
         }
@@ -461,7 +437,7 @@ public class RepositoryFragment extends BaseFragment implements
 
     @Override
     public void onLoadFinished(Loader loader, Object object) {
-        new FillReadmeTask(this).execute((Content) object);
+        new FillReadmeTask(this).execute((InputStream) object);
     }
 
     @Override

@@ -36,6 +36,8 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.text.Html;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -197,11 +199,12 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
             tvMilestone.setVisibility(View.GONE);
         }
         
-        String body = mIssue.getBody();
+        String body = mIssue.getBodyHtml();
         if (!StringUtils.isBlank(body)) {
-            body = body.replaceAll("\n", "<br/>");
-            tvDesc.setText(Html.fromHtml(body));
-            tvDesc.setTypeface(getApplicationContext().regular);
+            HtmlImageGetter p = new HtmlImageGetter(tvDesc, this);
+            Spanned htmlSpan = Html.fromHtml(body, p, null);
+            StringUtils.removeLastNewline((SpannableStringBuilder) htmlSpan);
+            tvDesc.setText(htmlSpan);
         }
         
         LinearLayout llLabels = (LinearLayout) findViewById(R.id.ll_labels);
@@ -263,7 +266,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
     }
 
     private List<Comment> getComments() throws IOException {
-        GitHubClient client = new GitHubClient();
+        GitHubClient client = new DefaultClient();
         client.setOAuth2Token(getAuthToken());
         IssueService issueService = new IssueService(client);
         return issueService.getComments(mRepoOwner, mRepoName, mIssueNumber);

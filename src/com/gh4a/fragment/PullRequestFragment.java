@@ -31,6 +31,8 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.text.Html;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,6 +48,7 @@ import android.widget.TextView;
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.HtmlImageGetter;
 import com.gh4a.PullRequestActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.CommentAdapter;
@@ -157,11 +160,12 @@ public class PullRequestFragment extends BaseFragment
         tvTitle.setText(pullRequest.getTitle());
         tvTitle.setTypeface(context.boldCondensed);
         
-        String body = pullRequest.getBody();
+        String body = pullRequest.getBodyHtml();
         if (!StringUtils.isBlank(body)) {
-            body = body.replaceAll("\n", "<br/>");
-            tvDesc.setText(Html.fromHtml(body));
-            tvDesc.setTypeface(context.regular);
+            HtmlImageGetter p = new HtmlImageGetter(tvDesc, getSherlockActivity());
+            Spanned htmlSpan = Html.fromHtml(body, p, null);
+            StringUtils.removeLastNewline((SpannableStringBuilder) htmlSpan);
+            tvDesc.setText(htmlSpan);
         }
         tvExtra.setText(getResources().getString(R.string.issue_open_by_user,
                 pullRequest.getUser() != null ? pullRequest.getUser().getLogin() : "",

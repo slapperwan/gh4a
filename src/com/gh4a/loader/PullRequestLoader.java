@@ -12,6 +12,7 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
 import com.gh4a.Constants;
+import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
 
 public class PullRequestLoader extends AsyncTaskLoader<PullRequest> {
@@ -30,7 +31,7 @@ public class PullRequestLoader extends AsyncTaskLoader<PullRequest> {
     @Override
     public PullRequest loadInBackground() {
         Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new GitHubClient();
+        GitHubClient client = new DefaultClient();
         client.setOAuth2Token(app.getAuthToken());
         PullRequestService pullRequestService = new PullRequestService(client);
         try {
