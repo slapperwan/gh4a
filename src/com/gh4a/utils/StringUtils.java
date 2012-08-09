@@ -422,17 +422,4 @@ public class StringUtils {
     public static boolean checkEmail(String email) {
         return EMAIL_ADDRESS_PATTERN.matcher(email).matches();
     }
-
-    public static void removeLastNewline(SpannableStringBuilder text) {
-        int len = text.length();
-        if (text.charAt(len - 1) == '\n') {
-            text.replace(len - 1, len, "");
-        }
-    }
-    
-    public static String replaceToSupportedHtmlTag(String string) {
-        string = string.replace("pre", "tt");
-        string = string.replace("code", "tt");
-        return string;
-    }
 }
