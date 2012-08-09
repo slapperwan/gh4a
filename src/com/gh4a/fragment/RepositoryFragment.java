@@ -28,9 +28,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.text.Html;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,7 +40,6 @@ import com.gh4a.CollaboratorListActivity;
 import com.gh4a.Constants;
 import com.gh4a.ContributorListActivity;
 import com.gh4a.Gh4Application;
-import com.gh4a.HtmlImageGetter;
 import com.gh4a.IssueListActivity;
 import com.gh4a.R;
 import com.gh4a.RepositoryActivity;
@@ -51,7 +47,8 @@ import com.gh4a.WatcherListActivity;
 import com.gh4a.WikiListActivity;
 import com.gh4a.loader.ReadmeLoader;
 import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.TagHandlerEx;
+import com.github.mobile.util.HtmlUtils;
+import com.github.mobile.util.HttpImageGetter;
 
 public class RepositoryFragment extends BaseFragment implements 
     OnClickListener, LoaderManager.LoaderCallbacks {
@@ -329,13 +326,10 @@ public class RepositoryFragment extends BaseFragment implements
             if (getActivity() != null) {
                 TextView tvReadme = (TextView) getView().findViewById(R.id.readme);
                 tvReadme.setMovementMethod(LinkMovementMethod.getInstance());
-                HtmlImageGetter p = new HtmlImageGetter(tvReadme, this.getSherlockActivity());
                 
-                readme = StringUtils.replaceToSupportedHtmlTag(readme);
-                Spanned htmlSpan = Html.fromHtml(readme, p, new TagHandlerEx());
-                StringUtils.removeLastNewline((SpannableStringBuilder) htmlSpan);
-                tvReadme.setText(htmlSpan);
-                tvReadme.setMovementMethod(LinkMovementMethod.getInstance());
+                readme = HtmlUtils.format(readme).toString();
+                HttpImageGetter imageGetter = new HttpImageGetter(getSherlockActivity());
+                imageGetter.bind(tvReadme, readme, mRepository.getId());
             }
         }
         else {

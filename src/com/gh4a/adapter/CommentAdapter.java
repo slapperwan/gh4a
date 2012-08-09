@@ -20,9 +20,6 @@ import java.util.List;
 import org.eclipse.egit.github.core.Comment;
 
 import android.content.Context;
-import android.text.Html;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,8 +31,8 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.ImageDownloader;
-import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.TagHandlerEx;
+import com.github.mobile.util.HtmlUtils;
+import com.github.mobile.util.HttpImageGetter;
 
 public class CommentAdapter extends RootAdapter<Comment> {
 
@@ -78,10 +75,9 @@ public class CommentAdapter extends RootAdapter<Comment> {
             viewHolder.tvExtra.setText(comment.getUser().getLogin() + "\n" + pt.format(comment.getCreatedAt()));
             
             String body = comment.getBodyHtml();
-            body = StringUtils.replaceToSupportedHtmlTag(body);
-            Spanned htmlSpan = Html.fromHtml(body, null, new TagHandlerEx());
-            StringUtils.removeLastNewline((SpannableStringBuilder) htmlSpan);
-            viewHolder.tvDesc.setText(htmlSpan);
+            body = HtmlUtils.format(body).toString();
+            HttpImageGetter imageGetter = new HttpImageGetter(mContext);
+            imageGetter.bind(viewHolder.tvDesc, body, comment.getId());
         }
         return v;
     }

@@ -2,8 +2,12 @@ package com.gh4a.utils;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,6 +76,38 @@ public class FileUtils {
         }
         else {
             return false;
+        }
+    }
+    
+    public static boolean save(File file, InputStream inputStream) {
+        OutputStream out = null;
+        try {
+            out = new FileOutputStream(file);
+            int read = 0;
+            byte[] bytes = new byte[1024];
+         
+            while ((read = inputStream.read(bytes)) != -1) {
+                out.write(bytes, 0, read);
+            }
+            return true;
+        } catch (FileNotFoundException e) {
+            Log.e(Constants.LOG_TAG, e.getMessage(), e);
+            return false;
+        } catch (IOException e) {
+            Log.e(Constants.LOG_TAG, e.getMessage(), e);
+            return false;
+        }
+        finally {
+            try {
+                inputStream.close();
+                if (out != null) {
+                    out.flush();
+                    out.close();
+                }
+            } catch (IOException e) {
+                Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                return false;
+            }
         }
     }
     

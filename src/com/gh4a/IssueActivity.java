@@ -35,9 +35,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.text.Html;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,6 +56,8 @@ import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.IssueLoader;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
+import com.github.mobile.util.HtmlUtils;
+import com.github.mobile.util.HttpImageGetter;
 
 public class IssueActivity extends BaseSherlockFragmentActivity implements 
     OnClickListener, LoaderManager.LoaderCallbacks {
@@ -205,10 +204,9 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         
         String body = mIssue.getBodyHtml();
         if (!StringUtils.isBlank(body)) {
-            HtmlImageGetter p = new HtmlImageGetter(tvDesc, this);
-            Spanned htmlSpan = Html.fromHtml(body, p, null);
-            StringUtils.removeLastNewline((SpannableStringBuilder) htmlSpan);
-            tvDesc.setText(htmlSpan);
+            HttpImageGetter imageGetter = new HttpImageGetter(this);
+            body = HtmlUtils.format(body).toString();
+            imageGetter.bind(tvDesc, body, mIssue.getNumber());
         }
         
         LinearLayout llLabels = (LinearLayout) findViewById(R.id.ll_labels);

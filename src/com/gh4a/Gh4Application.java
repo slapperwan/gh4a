@@ -42,7 +42,7 @@ public class Gh4Application extends Application {
     public Typeface condensed;
     public Typeface regular;
     public Typeface italic;
-    public static int THEME;
+    public static int THEME = R.style.DefaultTheme;
     
     /*
      * (non-Javadoc)

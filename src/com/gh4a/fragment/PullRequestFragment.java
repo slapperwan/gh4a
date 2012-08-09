@@ -30,9 +30,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.text.Html;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,7 +45,6 @@ import android.widget.TextView;
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
-import com.gh4a.HtmlImageGetter;
 import com.gh4a.PullRequestActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.CommentAdapter;
@@ -56,6 +52,8 @@ import com.gh4a.loader.IssueCommentsLoader;
 import com.gh4a.loader.PullRequestLoader;
 import com.gh4a.utils.ImageDownloader;
 import com.gh4a.utils.StringUtils;
+import com.github.mobile.util.HtmlUtils;
+import com.github.mobile.util.HttpImageGetter;
 
 public class PullRequestFragment extends BaseFragment 
     implements LoaderManager.LoaderCallbacks<Object> {
@@ -162,10 +160,9 @@ public class PullRequestFragment extends BaseFragment
         
         String body = pullRequest.getBodyHtml();
         if (!StringUtils.isBlank(body)) {
-            HtmlImageGetter p = new HtmlImageGetter(tvDesc, getSherlockActivity());
-            Spanned htmlSpan = Html.fromHtml(body, p, null);
-            StringUtils.removeLastNewline((SpannableStringBuilder) htmlSpan);
-            tvDesc.setText(htmlSpan);
+            HttpImageGetter imageGetter = new HttpImageGetter(getSherlockActivity());
+            body = HtmlUtils.format(body).toString();
+            imageGetter.bind(tvDesc, body, pullRequest.getId());
         }
         tvExtra.setText(getResources().getString(R.string.issue_open_by_user,
                 pullRequest.getUser() != null ? pullRequest.getUser().getLogin() : "",
