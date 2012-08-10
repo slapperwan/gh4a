@@ -15,8 +15,7 @@
  */
 package com.gh4a;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Locale;
 
 import org.ocpsoft.pretty.time.PrettyTime;
@@ -33,7 +32,6 @@ import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
@@ -43,14 +41,11 @@ import android.widget.Toast;
 import com.actionbarsherlock.R;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.internal.widget.IcsAdapterView;
-import com.actionbarsherlock.internal.widget.IcsAdapterView.OnItemSelectedListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
-import com.gh4a.adapter.NavigationSpinnerAdapter;
-import com.gh4a.utils.StringUtils;
+import com.gh4a.Constants.LoaderResult;
 
 /**
  * The Base activity.
@@ -116,23 +111,7 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         // Handle item selection
         switch (item.getItemId()) {
         case R.id.logout:
-            SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
-                    Constants.PREF_NAME, MODE_PRIVATE);
-            
-            if (sharedPreferences != null) {
-                if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
-                        && sharedPreferences.getString(Constants.User.USER_AUTH_TOKEN, null) != null){
-                    Editor editor = sharedPreferences.edit();
-                    editor.clear();
-                    editor.commit();
-                    Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP
-                            |Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    Toast.makeText(this, getResources().getString(R.string.success_logout), Toast.LENGTH_SHORT).show();
-                    this.finish();
-                }
-            }
+            logout();
             return true;
         case R.id.login:
             Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
@@ -152,6 +131,26 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         }
     }
 
+    public void logout() {
+        SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
+                Constants.PREF_NAME, MODE_PRIVATE);
+        
+        if (sharedPreferences != null) {
+            if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
+                    && sharedPreferences.getString(Constants.User.USER_AUTH_TOKEN, null) != null){
+                Editor editor = sharedPreferences.edit();
+                editor.clear();
+                editor.commit();
+                Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP
+                        |Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                Toast.makeText(this, getResources().getString(R.string.success_logout), Toast.LENGTH_SHORT).show();
+                this.finish();
+            }
+        }
+    }
+    
     public void openBookmarkActivity() {
         //should be override at sub class
     }
@@ -494,5 +493,20 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
                 }
             }
         });
+    }
+    
+    public boolean isLoaderError(HashMap<Integer, Object> result) {
+        if (result.get(LoaderResult.ERROR) != null
+                && (Boolean) result.get(LoaderResult.ERROR)) {
+            if (result.get(LoaderResult.AUTH_ERROR) != null
+                    && (Boolean) result.get(LoaderResult.AUTH_ERROR)) {
+                logout();
+            }
+            Toast.makeText(this, (String) result.get(LoaderResult.ERROR_MSG), Toast.LENGTH_SHORT);
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }

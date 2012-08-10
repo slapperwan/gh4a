@@ -18,6 +18,7 @@ package com.gh4a;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Issue;
@@ -50,6 +51,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.gh4a.Constants.LoaderResult;
 import com.gh4a.loader.CollaboratorListLoader;
 import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.IssueLoader;
@@ -531,36 +533,46 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
 
     @Override
     public void onLoadFinished(Loader loader, Object object) {
-        if (loader.getId() == 0) {
-            mAllLabel = (List<Label>) object;
-            fillLabels();
-        }
-        else if (loader.getId() == 1) {
-            stopProgressDialog(mProgressDialog);
-            mAllMilestone = (List<Milestone>) object;
-            showMilestonesDialog();
-        }
-        else if (loader.getId() == 2) {
-            stopProgressDialog(mProgressDialog);
-            mAllAssignee = (List<User>) object;
-            showAssigneesDialog();
-        }
-        else if (loader.getId() == 3) {
-            hideLoading();
-            mEditIssue = (Issue) object;
-            getSupportLoaderManager().getLoader(4).forceLoad();
-            fillIssueData();
-        }
-        else {
-            isCollaborator = (Boolean) object;
-            LinearLayout ll = (LinearLayout) findViewById(R.id.for_collaborator);
-            if (isCollaborator) {
-                ll.setVisibility(View.VISIBLE);
-                getSupportLoaderManager().getLoader(0).forceLoad();
+        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
+        
+        if (!isLoaderError(result)) {
+            Object data = result.get(LoaderResult.DATA); 
+        
+            if (loader.getId() == 0) {
+                mAllLabel = (List<Label>) data;
+                fillLabels();
+            }
+            else if (loader.getId() == 1) {
+                stopProgressDialog(mProgressDialog);
+                mAllMilestone = (List<Milestone>) data;
+                showMilestonesDialog();
+            }
+            else if (loader.getId() == 2) {
+                stopProgressDialog(mProgressDialog);
+                mAllAssignee = (List<User>) data;
+                showAssigneesDialog();
+            }
+            else if (loader.getId() == 3) {
+                hideLoading();
+                mEditIssue = (Issue) data;
+                getSupportLoaderManager().getLoader(4).forceLoad();
+                fillIssueData();
             }
             else {
-                ll.setVisibility(View.GONE);
+                isCollaborator = (Boolean) data;
+                LinearLayout ll = (LinearLayout) findViewById(R.id.for_collaborator);
+                if (isCollaborator) {
+                    ll.setVisibility(View.VISIBLE);
+                    getSupportLoaderManager().getLoader(0).forceLoad();
+                }
+                else {
+                    ll.setVisibility(View.GONE);
+                }
             }
+        }
+        else {
+            hideLoading();
+            stopProgressDialog(mProgressDialog);
         }
     }
 

@@ -1,22 +1,19 @@
 package com.gh4a.loader;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.HashMap;
 
-import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CommitService;
 
 import android.content.Context;
-import android.support.v4.content.AsyncTaskLoader;
-import android.util.Log;
 
-import com.gh4a.Constants;
+import com.gh4a.Constants.LoaderResult;
 import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
 
-public class CommitCommentListLoader extends AsyncTaskLoader<List<CommitComment>> {
+public class CommitCommentListLoader extends BaseLoader {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -30,18 +27,13 @@ public class CommitCommentListLoader extends AsyncTaskLoader<List<CommitComment>
     }
 
     @Override
-    public List<CommitComment> loadInBackground() {
+    public void doLoadInBackground(HashMap<Integer, Object> result) throws IOException {
         Gh4Application app = (Gh4Application) getContext().getApplicationContext();
         GitHubClient client = new DefaultClient();
         client.setOAuth2Token(app.getAuthToken());
         CommitService commitService = new CommitService(client);
-        try {
-            return commitService.getComments(new RepositoryId(mRepoOwner, mRepoName),
-                    mSha);
-        } catch (IOException e) {
-            Log.e(Constants.LOG_TAG, e.getMessage(), e);
-            return null;
-        }
+        result.put(LoaderResult.DATA, 
+                commitService.getComments(new RepositoryId(mRepoOwner, mRepoName),mSha));
     }
 
 }

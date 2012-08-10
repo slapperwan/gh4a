@@ -1,6 +1,7 @@
 package com.gh4a;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Content;
@@ -31,6 +32,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.gh4a.Constants.LoaderResult;
 import com.gh4a.fragment.CommitListFragment;
 import com.gh4a.fragment.ContentListFragment;
 import com.gh4a.fragment.ContentListFragment.OnTreeSelectedListener;
@@ -372,43 +374,54 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
 
     @Override
     public void onLoadFinished(Loader loader, Object object) {
-        if (loader.getId() == 0) {
-            hideLoading();
-            if (object != null) {
-                this.mRepository = (Repository) object;
-                fillTabs();
+        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
+        
+        if (!isLoaderError(result)) {
+            Object data = result.get(LoaderResult.DATA); 
+            
+            if (loader.getId() == 0) {
+                hideLoading();
+                if (object != null) {
+                    this.mRepository = (Repository) data;
+                    fillTabs();
+                }
+                invalidateOptionsMenu();
             }
-            invalidateOptionsMenu();
-        }
-        else if (loader.getId() == 1) {
-            stopProgressDialog(mProgressDialog);
-            if (object != null) {
-                this.mBranches = (List<RepositoryBranch>) object;
-                showBranchesDialog();
-            }
-        }
-        else if (loader.getId() == 2) {
-            stopProgressDialog(mProgressDialog);
-            if (object != null) {
-                this.mTags = (List<RepositoryTag>) object;
-                showTagsDialog();
-            }
-        }
-        else if (loader.getId() == 3) {
-            if (object != null) {
-                isWatching = (Boolean) object;
-                isFinishLoadingWatching = true;
-            }
-            invalidateOptionsMenu();
-        }
-        else {
-            if (object != null) {
-                isWatching = (Boolean) object;
-                isFinishLoadingWatching = true;
-                if (mRepositoryFragment != null) {
-                    mRepositoryFragment.updateWatcherCount(isWatching);
+            else if (loader.getId() == 1) {
+                stopProgressDialog(mProgressDialog);
+                if (object != null) {
+                    this.mBranches = (List<RepositoryBranch>) data;
+                    showBranchesDialog();
                 }
             }
+            else if (loader.getId() == 2) {
+                stopProgressDialog(mProgressDialog);
+                if (object != null) {
+                    this.mTags = (List<RepositoryTag>) data;
+                    showTagsDialog();
+                }
+            }
+            else if (loader.getId() == 3) {
+                if (object != null) {
+                    isWatching = (Boolean) data;
+                    isFinishLoadingWatching = true;
+                }
+                invalidateOptionsMenu();
+            }
+            else {
+                if (object != null) {
+                    isWatching = (Boolean) data;
+                    isFinishLoadingWatching = true;
+                    if (mRepositoryFragment != null) {
+                        mRepositoryFragment.updateWatcherCount(isWatching);
+                    }
+                }
+                invalidateOptionsMenu();
+            }
+        }
+        else {
+            hideLoading();
+            stopProgressDialog(mProgressDialog);
             invalidateOptionsMenu();
         }
     }

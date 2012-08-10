@@ -16,6 +16,7 @@
 package com.gh4a.fragment;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryCommit;
@@ -35,12 +36,13 @@ import android.widget.ListView;
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.CommitActivity;
 import com.gh4a.Constants;
+import com.gh4a.Constants.LoaderResult;
 import com.gh4a.R;
 import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.loader.RepositoryCommitsLoader;
 
 public class PullRequestCommitListFragment extends BaseFragment 
-    implements LoaderManager.LoaderCallbacks<List<RepositoryCommit>>, OnItemClickListener {
+    implements LoaderManager.LoaderCallbacks<Object>, OnItemClickListener {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -102,18 +104,22 @@ public class PullRequestCommitListFragment extends BaseFragment
     }
 
     @Override
-    public Loader<List<RepositoryCommit>> onCreateLoader(int id, Bundle args) {
+    public Loader onCreateLoader(int id, Bundle args) {
         return new RepositoryCommitsLoader(getSherlockActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<RepositoryCommit>> loader, List<RepositoryCommit> commits) {
+    public void onLoadFinished(Loader loader, Object object) {
         hideLoading();
-        fillData(commits);
+        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
+        
+        if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
+            fillData((List<RepositoryCommit>) result.get(LoaderResult.DATA));
+        }
     }
 
     @Override
-    public void onLoaderReset(Loader<List<RepositoryCommit>> arg0) {
+    public void onLoaderReset(Loader arg0) {
         // TODO Auto-generated method stub
     }
     

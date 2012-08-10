@@ -35,9 +35,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bugsense.trace.BugSenseHandler;
 import com.gh4a.utils.StringUtils;
 
 /**
@@ -68,7 +68,9 @@ public class Github4AndroidActivity extends BaseActivity {
             return;
         }
         setContentView(R.layout.main);
-
+        
+        BugSenseHandler.setup(this, "6e1b031");
+        
         mEtUserLogin = (EditText) findViewById(R.id.et_username_main);
         mEtPassword = (EditText) findViewById(R.id.et_password_main);
 

@@ -24,6 +24,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.bugsense.trace.BugSenseHandler;
 import com.gh4a.fragment.PrivateEventListFragment;
 import com.gh4a.fragment.PublicEventListFragment;
 import com.gh4a.fragment.RepositoryIssueListFragment;
@@ -61,6 +62,8 @@ public class UserActivity extends BaseSherlockFragmentActivity {
         }
 
         setContentView(R.layout.view_pager);
+
+        BugSenseHandler.setup(this, "6e1b031");
         
         isLoginUserPage = mUserLogin.equals(getAuthLogin());
         

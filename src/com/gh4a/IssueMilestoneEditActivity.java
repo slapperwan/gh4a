@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -46,11 +47,12 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.gh4a.Constants.LoaderResult;
 import com.gh4a.loader.MilestoneLoader;
 import com.gh4a.utils.StringUtils;
 
 public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
-    implements LoaderManager.LoaderCallbacks<Milestone> {
+    implements LoaderManager.LoaderCallbacks<Object> {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -338,19 +340,24 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
     }
     
     @Override
-    public Loader<Milestone> onCreateLoader(int arg0, Bundle arg1) {
+    public Loader onCreateLoader(int arg0, Bundle arg1) {
         return new MilestoneLoader(this, mRepoOwner, mRepoName, mMilestoneNumber);
     }
 
     @Override
-    public void onLoadFinished(Loader<Milestone> loader, Milestone milestone) {
+    public void onLoadFinished(Loader loader, Object object) {
         hideLoading();
-        mMilestone = milestone;
-        fillData();
+        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
+        
+        if (!isLoaderError(result)) {
+            Object data = result.get(LoaderResult.DATA);
+            mMilestone = (Milestone) data;
+            fillData();
+        }
     }
 
     @Override
-    public void onLoaderReset(Loader<Milestone> loader) {
+    public void onLoaderReset(Loader loader) {
         // TODO Auto-generated method stub
     }
 }

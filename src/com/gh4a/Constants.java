@@ -347,4 +347,11 @@ public interface Constants {
     public interface Event {
         public static final String IS_PRIVATE = "Event.isPrivate";
     }
+    
+    public interface LoaderResult {
+        public static final int DATA = 0;
+        public static final int ERROR = 1;
+        public static final int AUTH_ERROR = 2;
+        public static final int ERROR_MSG = 3;
+    }
 }

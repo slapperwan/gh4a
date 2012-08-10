@@ -17,6 +17,7 @@ package com.gh4a;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Label;
@@ -47,10 +48,11 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.gh4a.Constants.LoaderResult;
 import com.gh4a.loader.LabelListLoader;
 
 public class IssueLabelListActivity extends BaseSherlockFragmentActivity 
-    implements LoaderManager.LoaderCallbacks<List<Label>> {
+    implements LoaderManager.LoaderCallbacks<Object> {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -393,18 +395,22 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
     }
 
     @Override
-    public Loader<List<Label>> onCreateLoader(int arg0, Bundle arg1) {
+    public Loader onCreateLoader(int arg0, Bundle arg1) {
         return new LabelListLoader(this, mRepoOwner, mRepoName);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Label>> loader, List<Label> labels) {
+    public void onLoadFinished(Loader loader, Object object) {
+        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
         hideLoading();
-        fillData(labels);
+        
+        if (!isLoaderError(result)) {
+            fillData((List<Label>) result.get(LoaderResult.DATA));
+        }
     }
 
     @Override
-    public void onLoaderReset(Loader<List<Label>> arg0) {
+    public void onLoaderReset(Loader arg0) {
         // TODO Auto-generated method stub
         
     }

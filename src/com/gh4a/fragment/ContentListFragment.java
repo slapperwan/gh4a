@@ -16,6 +16,7 @@
 package com.gh4a.fragment;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Content;
@@ -32,7 +33,9 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
+import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
+import com.gh4a.Constants.LoaderResult;
 import com.gh4a.R;
 import com.gh4a.RepositoryActivity;
 import com.gh4a.adapter.FileAdapter;
@@ -40,7 +43,7 @@ import com.gh4a.loader.ContentListLoader;
 import com.gh4a.utils.StringUtils;
 
 public class ContentListFragment extends BaseFragment 
-    implements LoaderManager.LoaderCallbacks<List<Content>>, OnItemClickListener {
+    implements LoaderManager.LoaderCallbacks<Object>, OnItemClickListener {
 
     private Repository mRepository;
     public String mPath;
@@ -130,15 +133,20 @@ public class ContentListFragment extends BaseFragment
     }
     
     @Override
-    public Loader<List<Content>> onCreateLoader(int id, Bundle args) {
+    public Loader onCreateLoader(int id, Bundle args) {
         return new ContentListLoader(getSherlockActivity(), mRepository.getOwner().getLogin(),
                 mRepository.getName(), mPath, mRef);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Content>> loader, List<Content> contents) {
+    public void onLoadFinished(Loader loader, Object object) {
+        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
+        
         hideLoading();
-        fillData(contents);
+        
+        if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
+            fillData((List<Content>) result.get(LoaderResult.DATA));            
+        }
     }
 
     @Override

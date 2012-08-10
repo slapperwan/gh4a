@@ -57,7 +57,6 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
         
         mRepoOwner = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
-        hideLoading();
         
         if (!isOnline()) {
             setErrorView();
@@ -70,7 +69,8 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
             finish();
         }
         setContentView(R.layout.issue_create_milestone);
-        
+
+        hideLoading();
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.issue_milestone_new);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);

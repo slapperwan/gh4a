@@ -41,6 +41,7 @@ import android.widget.TextView;
 import com.androidquery.AQuery;
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
+import com.gh4a.Constants.LoaderResult;
 import com.gh4a.FollowerFollowingListActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.GistListActivity;
@@ -486,33 +487,42 @@ public class UserFragment extends BaseFragment implements
     @Override
     public void onLoadFinished(Loader loader, Object object) {
         UserActivity userActivity = (UserActivity) getSherlockActivity();
+        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
         
-        if (loader.getId() == 1) {
-            hideLoading(R.id.pb_top_repos, 0);
-            fillTopRepos((List<Repository>) object);
-        }
-        else if (loader.getId() == 2) {
-            fillOrganizations((List<User>) object);
-        }
-        else if (loader.getId() == 3) {
-            isFollowing = (Boolean) object;
-            userActivity.updateFollowingAction(isFollowing);
-        }
-        else if (loader.getId() == 4) {
-            isFollowing = (Boolean) object;
-            userActivity.updateFollowingAction(isFollowing);
-            TextView tvFollowersCount = (TextView) getView().findViewById(R.id.tv_followers_count);
-            if (isFollowing) {
-                tvFollowersCount.setText(String.valueOf(++mFollowersCount));
+        if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
+            Object data = result.get(LoaderResult.DATA); 
+            
+            if (loader.getId() == 1) {
+                hideLoading(R.id.pb_top_repos, 0);
+                fillTopRepos((List<Repository>) data);
+            }
+            else if (loader.getId() == 2) {
+                fillOrganizations((List<User>) data);
+            }
+            else if (loader.getId() == 3) {
+                isFollowing = (Boolean) data;
+                userActivity.updateFollowingAction(isFollowing);
+            }
+            else if (loader.getId() == 4) {
+                isFollowing = (Boolean) data;
+                userActivity.updateFollowingAction(isFollowing);
+                TextView tvFollowersCount = (TextView) getView().findViewById(R.id.tv_followers_count);
+                if (isFollowing) {
+                    tvFollowersCount.setText(String.valueOf(++mFollowersCount));
+                }
+                else {
+                    tvFollowersCount.setText(String.valueOf(--mFollowersCount));
+                }
             }
             else {
-                tvFollowersCount.setText(String.valueOf(--mFollowersCount));
+                hideLoading();
+                mUser = (User) result.get(LoaderResult.DATA);
+                fillData();
             }
         }
         else {
+            hideLoading(R.id.pb_top_repos, 0);
             hideLoading();
-            mUser = (User) object;
-            fillData();
         }
     }
 

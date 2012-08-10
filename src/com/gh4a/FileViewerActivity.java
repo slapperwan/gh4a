@@ -15,13 +15,14 @@
  */
 package com.gh4a;
 
+import java.util.HashMap;
+
 import org.eclipse.egit.github.core.Content;
 import org.eclipse.egit.github.core.util.EncodingUtils;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.webkit.WebSettings;
@@ -32,12 +33,13 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.gh4a.Constants.LoaderResult;
 import com.gh4a.loader.ContentLoader;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 
 public class FileViewerActivity extends BaseSherlockFragmentActivity 
-    implements LoaderManager.LoaderCallbacks<Content> {
+    implements LoaderManager.LoaderCallbacks<Object> {
 
     protected String mRepoOwner;
     protected String mRepoName;
@@ -144,21 +146,25 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
     };
 
     @Override
-    public Loader<Content> onCreateLoader(int arg0, Bundle arg1) {
+    public Loader onCreateLoader(int arg0, Bundle arg1) {
         return new ContentLoader(this, mRepoOwner, mRepoName, mPath, mRef);
     }
 
     @Override
-    public void onLoadFinished(Loader<Content> loader, Content content) {
+    public void onLoadFinished(Loader loader, Object object) {
+        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
         hideLoading();
-        if (content != null) {
-            mContent = content;
-            fillData(true);
+        
+        if (!isLoaderError(result)) {
+            if (object != null) {
+                mContent = (Content) result.get(LoaderResult.DATA);
+                fillData(true);
+            }    
         }
     }
 
     @Override
-    public void onLoaderReset(Loader<Content> arg0) {
+    public void onLoaderReset(Loader arg0) {
         // TODO Auto-generated method stub
         
     }

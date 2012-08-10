@@ -46,6 +46,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.gh4a.Constants.LoaderResult;
 import com.gh4a.fragment.IssueListByCommentsFragment;
 import com.gh4a.fragment.IssueListBySubmittedFragment;
 import com.gh4a.fragment.IssueListByUpdatedFragment;
@@ -511,23 +512,33 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
 
     @Override
     public void onLoadFinished(Loader loader, Object object) {
-        if (loader.getId() == 0) {
-            stopProgressDialog(mProgressDialog);
-            mLabels = (List<Label>) object;
-            showLabelsDialog();
-        }
-        else if (loader.getId() == 1) {
-            stopProgressDialog(mProgressDialog);
-            mMilestones = (List<Milestone>) object;
-            showMilestonesDialog();
-        }
-        else if (loader.getId() == 2) {
-            stopProgressDialog(mProgressDialog);
-            mAssignees = (List<User>) object;
-            showAssigneesDialog();
+        
+        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
+        
+        if (!isLoaderError(result)) {
+            Object data = result.get(LoaderResult.DATA); 
+            
+            if (loader.getId() == 0) {
+                stopProgressDialog(mProgressDialog);
+                mLabels = (List<Label>) data;
+                showLabelsDialog();
+            }
+            else if (loader.getId() == 1) {
+                stopProgressDialog(mProgressDialog);
+                mMilestones = (List<Milestone>) data;
+                showMilestonesDialog();
+            }
+            else if (loader.getId() == 2) {
+                stopProgressDialog(mProgressDialog);
+                mAssignees = (List<User>) data;
+                showAssigneesDialog();
+            }
+            else {
+                isCollaborator = (Boolean) data;
+            }
         }
         else {
-            isCollaborator = (Boolean) object;
+            stopProgressDialog(mProgressDialog);
             invalidateOptionsMenu();
         }
     }

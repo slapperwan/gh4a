@@ -1,21 +1,18 @@
 package com.gh4a.loader;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.HashMap;
 
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 
 import android.content.Context;
-import android.support.v4.content.AsyncTaskLoader;
-import android.util.Log;
 
-import com.gh4a.Constants;
+import com.gh4a.Constants.LoaderResult;
 import com.gh4a.Gh4Application;
 
-public class CollaboratorListLoader extends AsyncTaskLoader<List<User>> {
+public class CollaboratorListLoader extends BaseLoader {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -27,17 +24,11 @@ public class CollaboratorListLoader extends AsyncTaskLoader<List<User>> {
     }
     
     @Override
-    public List<User> loadInBackground() {
+    public void doLoadInBackground(HashMap<Integer, Object> result) throws IOException {
         Gh4Application app = (Gh4Application) getContext().getApplicationContext();
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(app.getAuthToken());
-        try {
-            CollaboratorService collabService = new CollaboratorService(client);
-            return collabService.getCollaborators(new RepositoryId(mRepoOwner, mRepoName));
-        } catch (IOException e) {
-            Log.e(Constants.LOG_TAG, e.getMessage(), e);
-            return null;
-        }
+        CollaboratorService collabService = new CollaboratorService(client);
+        result.put(LoaderResult.DATA, collabService.getCollaborators(new RepositoryId(mRepoOwner, mRepoName)));
     }
-
 }

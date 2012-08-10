@@ -1,6 +1,7 @@
 package com.gh4a.fragment;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.CommitComment;
@@ -14,13 +15,15 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
+import com.gh4a.Constants.LoaderResult;
 import com.gh4a.R;
 import com.gh4a.adapter.CommitNoteAdapter;
 import com.gh4a.loader.CommitCommentListLoader;
 
 public class CommitNoteFragment extends BaseFragment
-    implements LoaderManager.LoaderCallbacks<List<CommitComment>>{
+    implements LoaderManager.LoaderCallbacks<Object>{
 
     private String mRepoOwner;
     private String mRepoName;
@@ -81,19 +84,22 @@ public class CommitNoteFragment extends BaseFragment
     }
 
     @Override
-    public Loader<List<CommitComment>> onCreateLoader(int id, Bundle args) {
+    public Loader onCreateLoader(int id, Bundle args) {
         return new CommitCommentListLoader(getSherlockActivity(), mRepoOwner, mRepoName, mObjectSha);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<CommitComment>> loader,
-            List<CommitComment> comments) {
+    public void onLoadFinished(Loader loader, Object object) {
+        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
         hideLoading();
-        fillData(comments);
+        if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
+            Object data = result.get(LoaderResult.DATA);
+            fillData((List<CommitComment>) data);
+        }
     }
 
     @Override
-    public void onLoaderReset(Loader<List<CommitComment>> loader) {
+    public void onLoaderReset(Loader loader) {
         // TODO Auto-generated method stub
         
     }

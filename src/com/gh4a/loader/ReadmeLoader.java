@@ -13,8 +13,9 @@ import android.util.Log;
 import com.gh4a.Constants;
 import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
+import com.gh4a.utils.StringUtils;
 
-public class ReadmeLoader extends AsyncTaskLoader<InputStream> {
+public class ReadmeLoader extends AsyncTaskLoader<String> {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -26,14 +27,17 @@ public class ReadmeLoader extends AsyncTaskLoader<InputStream> {
     }
     
     @Override
-    public InputStream loadInBackground() {
-        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
+    public String loadInBackground() {
         GitHubClient client = new DefaultClient("application/vnd.github.beta.html");
-        client.setOAuth2Token(app.getAuthToken());
-        
         try {
             ContentService contentService = new ContentService(client);
-            return contentService.getHtmlReadme(new RepositoryId(mRepoOwner, mRepoName));
+            InputStream is = contentService.getHtmlReadme(new RepositoryId(mRepoOwner, mRepoName));
+            if (is != null) {
+                return StringUtils.convertStreamToString(is);
+            }
+            else {
+                return null;
+            }
         } catch (Exception e) {
             Log.e(Constants.LOG_TAG, e.getMessage(), e);
             return null;

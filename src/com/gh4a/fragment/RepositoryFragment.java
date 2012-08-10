@@ -51,7 +51,7 @@ import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 public class RepositoryFragment extends BaseFragment implements 
-    OnClickListener, LoaderManager.LoaderCallbacks {
+    OnClickListener, LoaderManager.LoaderCallbacks<String> {
 
     private Repository mRepository;
     private String mRepoOwner;
@@ -98,6 +98,8 @@ public class RepositoryFragment extends BaseFragment implements
         tvReadmeTitle.setTypeface(boldCondensed);
         tvReadmeTitle.setTextColor(Color.parseColor("#0099cc"));
 
+        showLoading(R.id.pb_readme, R.id.readme);
+        
         getLoaderManager().initLoader(0, null, this);
         getLoaderManager().getLoader(0).forceLoad();
     }
@@ -427,17 +429,20 @@ public class RepositoryFragment extends BaseFragment implements
     }
 
     @Override
-    public Loader onCreateLoader(int id, Bundle bundle) {
+    public Loader<String> onCreateLoader(int id, Bundle bundle) {
         return new ReadmeLoader(getSherlockActivity(), mRepoOwner, mRepoName);            
     }
 
     @Override
-    public void onLoadFinished(Loader loader, Object object) {
-        new FillReadmeTask(this).execute((InputStream) object);
+    public void onLoadFinished(Loader<String> loader, String readme) {
+        hideLoading(R.id.pb_readme, R.id.readme);
+        if (readme != null) {
+            fillReadme(readme);
+        }
     }
 
     @Override
-    public void onLoaderReset(Loader arg0) {
+    public void onLoaderReset(Loader<String> arg0) {
         // TODO Auto-generated method stub
         
     }

@@ -18,6 +18,7 @@ package com.gh4a.fragment;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Comment;
@@ -45,6 +46,7 @@ import android.widget.TextView;
 import com.androidquery.AQuery;
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
+import com.gh4a.Constants.LoaderResult;
 import com.gh4a.Gh4Application;
 import com.gh4a.PullRequestActivity;
 import com.gh4a.R;
@@ -292,16 +294,25 @@ public class PullRequestFragment extends BaseFragment
     }
 
     @Override
-    public void onLoadFinished(Loader<Object> loader, Object result) {
-        hideLoading();
-        if (loader.getId() == 0) {
-            hideLoading();
-            fillData((PullRequest) result);
+    public void onLoadFinished(Loader<Object> loader, Object object) {
+        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
+        PullRequestActivity activity = (PullRequestActivity) getSherlockActivity();
+        
+        if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
+            Object data = result.get(LoaderResult.DATA);
+            
+            if (loader.getId() == 0) {
+                hideLoading();
+                fillData((PullRequest) data);
+            }
+            else if (loader.getId() == 1) {
+                activity.stopProgressDialog(activity.mProgressDialog);
+                fillDiscussion((List<Comment>) data);
+            }
         }
-        else if (loader.getId() == 1) {
-            PullRequestActivity activity = (PullRequestActivity) getSherlockActivity();
+        else {
+            hideLoading();
             activity.stopProgressDialog(activity.mProgressDialog);
-            fillDiscussion((List<Comment>) result);
         }
     }
 

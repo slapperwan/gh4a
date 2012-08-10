@@ -16,6 +16,7 @@
 package com.gh4a.fragment;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Milestone;
@@ -31,15 +32,16 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.actionbarsherlock.app.SherlockFragment;
+import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
+import com.gh4a.Constants.LoaderResult;
 import com.gh4a.IssueMilestoneEditActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.MilestoneAdapter;
 import com.gh4a.loader.MilestoneListLoader;
 
 public class IssueMilestoneListFragment extends BaseFragment 
-    implements LoaderManager.LoaderCallbacks<List<Milestone>>, OnItemClickListener {
+    implements LoaderManager.LoaderCallbacks<Object>, OnItemClickListener {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -104,19 +106,21 @@ public class IssueMilestoneListFragment extends BaseFragment
     }
     
     @Override
-    public Loader<List<Milestone>> onCreateLoader(int arg0, Bundle arg1) {
+    public Loader onCreateLoader(int arg0, Bundle arg1) {
         return new MilestoneListLoader(getSherlockActivity(), mRepoOwner, mRepoName, mState);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Milestone>> loader,
-            List<Milestone> milestones) {
+    public void onLoadFinished(Loader loader, Object object) {
+        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
         hideLoading();
-        fillData(milestones);
+        if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
+            fillData((List<Milestone>) result.get(LoaderResult.DATA));
+        }
     }
 
     @Override
-    public void onLoaderReset(Loader<List<Milestone>> arg0) {
+    public void onLoaderReset(Loader arg0) {
         // TODO Auto-generated method stub
         
     }

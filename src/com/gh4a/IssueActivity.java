@@ -18,6 +18,7 @@ package com.gh4a;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Comment;
@@ -52,6 +53,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.androidquery.AQuery;
+import com.gh4a.Constants.LoaderResult;
 import com.gh4a.adapter.CommentAdapter;
 import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.IssueLoader;
@@ -654,16 +656,26 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
 
     @Override
     public void onLoadFinished(Loader loader, Object object) {
-        if (loader.getId() == 0) {
-            hideLoading();
-            mIssue = (Issue) object;
-            mIssueState = mIssue.getState();
-            getSupportLoaderManager().getLoader(1).forceLoad();
-            fillData();
+        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
+        
+        if (!isLoaderError(result)) {
+            Object data = result.get(LoaderResult.DATA); 
+            
+            if (loader.getId() == 0) {
+                hideLoading();
+                mIssue = (Issue) data;
+                mIssueState = mIssue.getState();
+                getSupportLoaderManager().getLoader(1).forceLoad();
+                fillData();
+            }
+            else {
+                isCollaborator = (Boolean) data;
+                isCreator = mIssue.getUser().getLogin().equals(getApplicationContext().getAuthLogin());
+                invalidateOptionsMenu();
+            }
         }
         else {
-            isCollaborator = (Boolean) object;
-            isCreator = mIssue.getUser().getLogin().equals(getApplicationContext().getAuthLogin());
+            hideLoading();
             invalidateOptionsMenu();
         }
     }
