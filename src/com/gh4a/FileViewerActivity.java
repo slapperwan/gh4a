@@ -109,6 +109,12 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.download_menu, menu);
+        
+        if (Gh4Application.THEME != R.style.LightTheme) {
+            menu.getItem(0).setIcon(R.drawable.download_dark);
+            menu.getItem(1).setIcon(R.drawable.web_site_dark);
+        }
+        
         menu.removeItem(R.id.download);
         return super.onCreateOptionsMenu(menu);
     }

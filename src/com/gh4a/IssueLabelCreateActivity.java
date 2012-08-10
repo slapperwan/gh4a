@@ -217,6 +217,10 @@ public class IssueLabelCreateActivity extends BaseSherlockFragmentActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.accept_cancel, menu);
+        if (Gh4Application.THEME != R.style.LightTheme) {
+            menu.getItem(0).setIcon(R.drawable.navigation_cancel_dark);
+            menu.getItem(1).setIcon(R.drawable.navigation_accept_dark);
+        }
         return super.onCreateOptionsMenu(menu);
     }
     

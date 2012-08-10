@@ -198,6 +198,10 @@ public class UserActivity extends BaseSherlockFragmentActivity {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.user_menu, menu);
         
+        if (Gh4Application.THEME != R.style.LightTheme) {
+            menu.getItem(0).setIcon(R.drawable.navigation_refresh_dark);
+        }
+        
         MenuItem followAction = menu.getItem(1);
         
         if (mUserLogin.equals(getAuthLogin())) {

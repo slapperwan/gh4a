@@ -335,6 +335,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
             menu.clear();
             MenuInflater inflater = getSupportMenuInflater();
             inflater.inflate(R.menu.issue_menu, menu);
+
             if ("closed".equals(mIssueState)) {
                 menu.removeItem(R.id.issue_close);
             }

@@ -296,6 +296,10 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.repo_menu, menu);
         
+        if (Gh4Application.THEME != R.style.LightTheme) {
+            menu.getItem(0).setIcon(R.drawable.navigation_refresh_dark);
+        }
+        
         MenuItem watchAction = menu.getItem(1);
         if (!isFinishLoadingWatching) {
             watchAction.setActionView(R.layout.ab_loading);
