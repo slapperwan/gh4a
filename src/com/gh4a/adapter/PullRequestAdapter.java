@@ -29,9 +29,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.androidquery.AQuery;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.ImageDownloader;
+import com.gh4a.utils.GravatarUtils;
 
 public class PullRequestAdapter extends RootAdapter<PullRequest> {
 
@@ -68,9 +69,11 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> {
 
         final PullRequest pullRequest = mObjects.get(position);
         if (pullRequest != null) {
+            AQuery aq = new AQuery(convertView);
             if (pullRequest.getUser() != null) {
-                ImageDownloader.getInstance().download(pullRequest.getUser().getGravatarId(),
-                        viewHolder.ivGravatar);
+                aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(pullRequest.getUser().getGravatarId()), 
+                        true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
+                
                 viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
     
                     @Override
@@ -84,7 +87,7 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> {
                 });
             }
             else {
-                ImageDownloader.getInstance().download(null, viewHolder.ivGravatar);
+                aq.id(viewHolder.ivGravatar).image(R.drawable.default_avatar);
             }
 
             viewHolder.tvDesc.setText(pullRequest.getTitle());

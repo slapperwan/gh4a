@@ -30,10 +30,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.androidquery.AQuery;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.CommitUtils;
-import com.gh4a.utils.ImageDownloader;
+import com.gh4a.utils.GravatarUtils;
 
 public class CommitAdapter extends RootAdapter<RepositoryCommit> {
 
@@ -69,8 +70,10 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
 
         final RepositoryCommit commit = mObjects.get(position);
         if (commit != null) {
-            ImageDownloader.getInstance().download(
-                    CommitUtils.getAuthorGravatarId(commit), viewHolder.ivGravatar);
+            AQuery aq = new AQuery(convertView);
+            aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(CommitUtils.getAuthorGravatarId(commit)), 
+                    true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
+            
             viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
 
                 @Override

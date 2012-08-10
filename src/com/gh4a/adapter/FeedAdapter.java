@@ -56,31 +56,19 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.androidquery.AQuery;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.ImageDownloader;
+import com.gh4a.utils.GravatarUtils;
 import com.gh4a.utils.StringUtils;
 
-/**
- * The Feed adapter.
- */
 public class FeedAdapter extends RootAdapter<Event> {
 
-    /**
-     * Instantiates a new feed adapter.
-     * 
-     * @param context the context
-     * @param objects the objects
-     */
     public FeedAdapter(Context context, List<Event> objects) {
         super(context, objects);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.adapter.RootAdapter#doGetView(int, android.view.View,
-     * android.view.ViewGroup)
-     */
     @Override
     public View doGetView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
@@ -103,9 +91,6 @@ public class FeedAdapter extends RootAdapter<Event> {
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
             viewHolder.tvDesc.setTypeface(regular);
             
-//            viewHolder.tvCreatedAt = (TextView) v.findViewById(R.id.tv_created_at);
-//            viewHolder.tvCreatedAt.setTypeface(italic);
-            
             v.setTag(viewHolder);
         }
         else {
@@ -116,8 +101,11 @@ public class FeedAdapter extends RootAdapter<Event> {
         final User actor = event.getActor();
         
         if (event != null) {
-            ImageDownloader.getInstance().download(actor.getGravatarId(),
-                    viewHolder.ivGravatar);
+            
+            AQuery aq = new AQuery((SherlockFragmentActivity) mContext, convertView);
+            aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(actor.getGravatarId()), 
+                    true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
+
             viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
 
                 @Override
@@ -129,8 +117,6 @@ public class FeedAdapter extends RootAdapter<Event> {
                             .getLogin(), actor.getName());
                 }
             });
-//            viewHolder.tvTitle.setText(formatTitle(event));
-            
             SpannableString createdAt = new SpannableString(pt.format(event.getCreatedAt()));
             createdAt.setSpan(new TextAppearanceSpan(v.getContext(), R.style.default_text_small_italic),
                     0, createdAt.length(), 0);
@@ -150,8 +136,6 @@ public class FeedAdapter extends RootAdapter<Event> {
                 viewHolder.tvDesc.setText(null);
                 viewHolder.tvDesc.setVisibility(View.GONE);
             }
-
-            //viewHolder.tvCreatedAt.setText(pt.format(event.getCreatedAt()));
         }
         return v;
     }
@@ -540,7 +524,12 @@ public class FeedAdapter extends RootAdapter<Event> {
         /** IssueCommentEvent */
         else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
             IssueCommentPayload payload = (IssueCommentPayload) event.getPayload();
-            String type = payload.getIssue().getPullRequest().getDiffUrl() != null ? "pull request" : "issue";
+            String type = mContext.getResources().getString(R.string.issue).toLowerCase();
+            if (payload.getIssue().getPullRequest() != null) {
+                if (payload.getIssue().getPullRequest().getDiffUrl() != null) {
+                    type = mContext.getResources().getString(R.string.pull_request_title).toLowerCase();
+                }
+            }
             String text = String.format(res.getString(R.string.event_issue_comment),
                     actor.getLogin(), type, payload.getIssue().getNumber(), formatFromRepoName(eventRepo));
             return text;

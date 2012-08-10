@@ -26,13 +26,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.androidquery.AQuery;
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
 import com.gh4a.DiffViewerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.CommitUtils;
-import com.gh4a.utils.ImageDownloader;
+import com.gh4a.utils.GravatarUtils;
 
 public class CommitFragment extends BaseFragment {
 
@@ -137,8 +138,9 @@ public class CommitFragment extends BaseFragment {
 
         ImageView ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
         
-        ImageDownloader.getInstance().download(CommitUtils.getAuthorGravatarId(commit),
-                ivGravatar);
+        AQuery aq = new AQuery(getSherlockActivity());
+        aq.id(R.id.iv_gravatar).image(GravatarUtils.getGravatarUrl(CommitUtils.getAuthorGravatarId(commit)), 
+                true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
         
         if (CommitUtils.getAuthorLogin(commit) != null) {
             ivGravatar.setOnClickListener(new OnClickListener() {

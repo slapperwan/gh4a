@@ -34,11 +34,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import com.androidquery.AQuery;
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
 import com.gh4a.FollowerFollowingListActivity;
@@ -53,7 +53,7 @@ import com.gh4a.loader.IsFollowingUserLoader;
 import com.gh4a.loader.OrganizationListLoader;
 import com.gh4a.loader.RepositoryListLoader;
 import com.gh4a.loader.UserLoader;
-import com.gh4a.utils.ImageDownloader;
+import com.gh4a.utils.GravatarUtils;
 import com.gh4a.utils.StringUtils;
 
 public class UserFragment extends BaseFragment implements 
@@ -121,8 +121,9 @@ public class UserFragment extends BaseFragment implements
         Typeface boldCondensed = app.boldCondensed;
         Typeface regular = app.regular;
         
-        ImageView ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-        ImageDownloader.getInstance().download(mUser.getGravatarId(), ivGravatar, 80);
+        AQuery aq = new AQuery(getSherlockActivity());
+        aq.id(R.id.iv_gravatar).image(GravatarUtils.getGravatarUrl(mUser.getGravatarId()), 
+                true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), AQuery.FADE_IN);
 
         TextView tvName = (TextView) v.findViewById(R.id.tv_name);
         tvName.setTypeface(boldCondensed);

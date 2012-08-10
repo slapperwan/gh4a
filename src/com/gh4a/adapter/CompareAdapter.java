@@ -26,9 +26,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.androidquery.AQuery;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.ImageDownloader;
+import com.gh4a.utils.GravatarUtils;
 import com.gh4a.utils.StringUtils;
 
 public class CompareAdapter extends RootAdapter<String[]> {
@@ -65,8 +66,10 @@ public class CompareAdapter extends RootAdapter<String[]> {
 
         final String[] commitInfo = mObjects.get(position);
         if (commitInfo != null) {
-            ImageDownloader.getInstance().download(
-                    StringUtils.md5Hex(commitInfo[1]), viewHolder.ivGravatar);
+            AQuery aq = new AQuery(convertView);
+            aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(StringUtils.md5Hex(commitInfo[1])), 
+                    true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
+            
 //            if (!StringUtils.isBlank(commitInfo[3])) {
 //                viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
 //

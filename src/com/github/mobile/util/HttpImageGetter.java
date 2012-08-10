@@ -25,10 +25,6 @@ import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -39,6 +35,8 @@ import android.text.TextUtils;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.androidquery.AQuery;
+import com.androidquery.callback.AjaxCallback;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.FileUtils;
@@ -63,6 +61,7 @@ public class HttpImageGetter implements ImageGetter {
             else {
                 image = context.getResources().getDrawable(R.drawable.content_picture);
             }
+            
             image.setBounds(0, 0, imageSize, imageSize);
         }
 
@@ -205,10 +204,14 @@ public class HttpImageGetter implements ImageGetter {
     }
 
     private InputStream fetch(String urlString) throws MalformedURLException, IOException {
-        DefaultHttpClient httpClient = new DefaultHttpClient();
-        HttpGet request = new HttpGet(urlString);
-        HttpResponse response = httpClient.execute(request);
-        return response.getEntity().getContent();
+        AQuery aq = new AQuery(context);
+        
+        AjaxCallback<InputStream> cb = new AjaxCallback<InputStream>();           
+        cb.url(urlString).type(InputStream.class);             
+        aq.sync(cb);
+                
+        InputStream is = cb.getResult();
+        return is;
     }
 
     public Drawable getDrawable(String source) {
@@ -216,16 +219,21 @@ public class HttpImageGetter implements ImageGetter {
         try {
             output = File.createTempFile("image", ".jpg", dir);
             InputStream is = fetch(source);
-            boolean success = FileUtils.save(output, is);
-            if (success) {
-                Bitmap bitmap = ImageUtils.getBitmap(output, width, Integer.MAX_VALUE);
-                if (bitmap == null) {
+            if (is != null) {
+                boolean success = FileUtils.save(output, is);
+                if (success) {
+                    Bitmap bitmap = ImageUtils.getBitmap(output, width, Integer.MAX_VALUE);
+                    if (bitmap == null) {
+                        return loading.getDrawable(source);
+                    }
+                    BitmapDrawable drawable = new BitmapDrawable(
+                            context.getResources(), bitmap);
+                    drawable.setBounds(0, 0, bitmap.getWidth(), bitmap.getHeight());
+                    return drawable;
+                }
+                else {
                     return loading.getDrawable(source);
                 }
-                BitmapDrawable drawable = new BitmapDrawable(
-                        context.getResources(), bitmap);
-                drawable.setBounds(0, 0, bitmap.getWidth(), bitmap.getHeight());
-                return drawable;
             }
             else {
                 return loading.getDrawable(source);

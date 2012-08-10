@@ -20,7 +20,6 @@ import java.util.List;
 import org.eclipse.egit.github.core.CommitComment;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,9 +28,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.androidquery.AQuery;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.ImageDownloader;
+import com.gh4a.utils.GravatarUtils;
 
 public class CommitNoteAdapter extends RootAdapter<CommitComment> {
 
@@ -59,7 +59,9 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> {
 
         final CommitComment comment = mObjects.get(position);
         if (comment != null) {
-            ImageDownloader.getInstance().download(comment.getUser().getGravatarId(), viewHolder.ivGravatar);
+            AQuery aq = new AQuery(convertView);
+            aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(comment.getUser().getGravatarId()), 
+                    true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
             viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
 
                 @Override

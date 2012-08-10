@@ -195,7 +195,7 @@
         <item quantity="other">Issues</item>
     </plurals>
     <string name="issues">Issues</string>
-    <string name="Issue">Issue</string>
+    <string name="issue">Issue</string>
     <string name="issue_user">User</string>
     <string name="issue_updated_at">Updated at</string>
     <string name="issue_number">Number</string>

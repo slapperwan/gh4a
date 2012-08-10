@@ -29,9 +29,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.androidquery.AQuery;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.ImageDownloader;
+import com.gh4a.utils.GravatarUtils;
 import com.gh4a.utils.StringUtils;
 
 public class UserAdapter extends RootAdapter<User> {
@@ -89,19 +90,22 @@ public class UserAdapter extends RootAdapter<User> {
         final User user = mObjects.get(position);
 
         if (user != null) {
-
+            AQuery aq = new AQuery(convertView);
             if (viewHolder.ivGravatar != null) {
                 if (!StringUtils.isBlank(user.getGravatarId())) {
-                    ImageDownloader.getInstance().download(user.getGravatarId(), viewHolder.ivGravatar);    
+                    aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(user.getGravatarId()), 
+                            true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
                 }
                 else if (!StringUtils.isBlank(user.getEmail())) {
-                    ImageDownloader.getInstance().download(StringUtils.md5Hex(user.getEmail()), viewHolder.ivGravatar);
+                    aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(StringUtils.md5Hex(user.getEmail())), 
+                            true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
                 }
                 else if (!StringUtils.isBlank(user.getAvatarUrl())) { 
-                    ImageDownloader.getInstance().downloadByUrl(user.getAvatarUrl(), viewHolder.ivGravatar);
+                    aq.id(viewHolder.ivGravatar).image(user.getAvatarUrl(), 
+                            true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
                 }
                 else {
-                    ImageDownloader.getInstance().download(null, viewHolder.ivGravatar);
+                    aq.id(viewHolder.ivGravatar).image(R.drawable.default_avatar);
                 }
                 
                 viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {

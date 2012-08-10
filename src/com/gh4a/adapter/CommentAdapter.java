@@ -20,6 +20,7 @@ import java.util.List;
 import org.eclipse.egit.github.core.Comment;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,16 +29,19 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.androidquery.AQuery;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.ImageDownloader;
+import com.gh4a.utils.GravatarUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 public class CommentAdapter extends RootAdapter<Comment> {
 
+    HttpImageGetter imageGetter;
     public CommentAdapter(Context context, List<Comment> objects) {
         super(context, objects);
+        imageGetter = new HttpImageGetter(mContext);
     }
 
     @Override
@@ -61,7 +65,11 @@ public class CommentAdapter extends RootAdapter<Comment> {
         
         final Comment comment = mObjects.get(position);
         if (comment != null) {
-            ImageDownloader.getInstance().download(comment.getUser().getGravatarId(), viewHolder.ivGravatar);
+            
+            AQuery aq = new AQuery(convertView);
+            aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(comment.getUser().getGravatarId()), 
+                    true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
+
             viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
 
                 @Override
@@ -76,7 +84,6 @@ public class CommentAdapter extends RootAdapter<Comment> {
             
             String body = comment.getBodyHtml();
             body = HtmlUtils.format(body).toString();
-            HttpImageGetter imageGetter = new HttpImageGetter(mContext);
             imageGetter.bind(viewHolder.tvDesc, body, comment.getId());
         }
         return v;

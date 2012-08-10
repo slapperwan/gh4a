@@ -42,6 +42,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.androidquery.AQuery;
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -50,7 +51,7 @@ import com.gh4a.R;
 import com.gh4a.adapter.CommentAdapter;
 import com.gh4a.loader.IssueCommentsLoader;
 import com.gh4a.loader.PullRequestLoader;
-import com.gh4a.utils.ImageDownloader;
+import com.gh4a.utils.GravatarUtils;
 import com.gh4a.utils.StringUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
@@ -122,8 +123,10 @@ public class PullRequestFragment extends BaseFragment
         
         ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
         if (pullRequest.getUser() != null) {
-            ImageDownloader.getInstance().download(pullRequest.getUser().getGravatarId(),
-                    ivGravatar);
+            AQuery aq = new AQuery(getSherlockActivity());
+            aq.id(R.id.iv_gravatar).image(GravatarUtils.getGravatarUrl(pullRequest.getUser().getGravatarId()), 
+                    true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
+            
             ivGravatar.setOnClickListener(new OnClickListener() {
     
                 @Override

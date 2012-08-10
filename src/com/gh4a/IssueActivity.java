@@ -51,10 +51,11 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.androidquery.AQuery;
 import com.gh4a.adapter.CommentAdapter;
 import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.IssueLoader;
-import com.gh4a.utils.ImageDownloader;
+import com.gh4a.utils.GravatarUtils;
 import com.gh4a.utils.StringUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
@@ -71,6 +72,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
     private boolean isCollaborator;
     private boolean isCreator;
     private ProgressDialog mProgressDialog;
+    private AQuery aq;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -89,9 +91,11 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         }
         
         setContentView(R.layout.issue);
+
+        aq = new AQuery(this);
         
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(getResources().getString(R.string.Issue) + " #" + mIssueNumber);
+        actionBar.setTitle(getResources().getString(R.string.issue) + " #" + mIssueNumber);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
@@ -123,8 +127,9 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         lvComments.setAdapter(mCommentAdapter);
 
         ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
-        ImageDownloader imageDownloader = new ImageDownloader();
-        imageDownloader.download(mIssue.getUser().getGravatarId(), ivGravatar);
+        aq.id(R.id.iv_gravatar).image(GravatarUtils.getGravatarUrl(mIssue.getUser().getGravatarId()),
+                true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), AQuery.FADE_IN);
+        
         ivGravatar.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -182,8 +187,11 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
             });
             
             ImageView ivAssignee = (ImageView) mHeader.findViewById(R.id.iv_assignee);
+            
+            aq.id(R.id.iv_assignee).image(GravatarUtils.getGravatarUrl(mIssue.getAssignee().getGravatarId()),
+                    true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), AQuery.FADE_IN);
+            
             ivAssignee.setVisibility(View.VISIBLE);
-            imageDownloader.download(mIssue.getAssignee().getGravatarId(), ivAssignee);
             ivAssignee.setOnClickListener(new OnClickListener() {
 
                 @Override

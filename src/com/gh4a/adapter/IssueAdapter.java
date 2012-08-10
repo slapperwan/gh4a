@@ -31,9 +31,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.androidquery.AQuery;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.ImageDownloader;
+import com.gh4a.utils.GravatarUtils;
 
 public class IssueAdapter extends RootAdapter<Issue> {
 
@@ -88,7 +89,11 @@ public class IssueAdapter extends RootAdapter<Issue> {
 
         final Issue issue = mObjects.get(position);
         if (issue != null) {
-            ImageDownloader.getInstance().download(issue.getUser().getGravatarId(), viewHolder.ivGravatar);
+            
+            AQuery aq = new AQuery(convertView);
+            aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(issue.getUser().getGravatarId()), 
+                    true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
+            
             viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
 
                 @Override
@@ -147,10 +152,10 @@ public class IssueAdapter extends RootAdapter<Issue> {
             viewHolder.tvDesc.setText(issue.getTitle());
 
             viewHolder.tvExtra.setText(issue.getUser().getLogin() + "\n" + pt.format(issue.getCreatedAt()));
-            
             if (issue.getAssignee() != null) {
                 viewHolder.ivAssignee.setVisibility(View.VISIBLE);
-                ImageDownloader.getInstance().download(issue.getAssignee().getGravatarId(), viewHolder.ivAssignee);
+                aq.id(viewHolder.ivAssignee).image(GravatarUtils.getGravatarUrl(issue.getAssignee().getGravatarId()),
+                        true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), AQuery.FADE_IN);
             }
             else {
                 viewHolder.ivAssignee.setVisibility(View.GONE);

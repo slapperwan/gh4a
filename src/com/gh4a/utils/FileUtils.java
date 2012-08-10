@@ -99,7 +99,9 @@ public class FileUtils {
         }
         finally {
             try {
-                inputStream.close();
+                if (inputStream != null) {
+                    inputStream.close();
+                }
                 if (out != null) {
                     out.flush();
                     out.close();

@@ -27,10 +27,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.androidquery.AQuery;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.holder.Feed;
-import com.gh4a.utils.ImageDownloader;
+import com.gh4a.utils.GravatarUtils;
 
 public class CommonFeedAdapter extends RootAdapter<Feed> {
 
@@ -99,7 +100,9 @@ public class CommonFeedAdapter extends RootAdapter<Feed> {
         if (feed != null) {
             if (viewHolder.ivGravatar != null) {
                 if (mShowGravatar) {
-                    ImageDownloader.getInstance().download(feed.getGravatarId(), viewHolder.ivGravatar);
+                    AQuery aq = new AQuery(convertView);
+                    aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(feed.getGravatarId()), 
+                            true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
                     viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
         
                         @Override
