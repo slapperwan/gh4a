@@ -113,7 +113,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="?android:attr/textAppearanceSmall"
-                            android:text="@string/repo_watchers" />
+                            android:text="@string/repo_stargazers" />
                     </TableRow>
                 </TableLayout>
                 <TableLayout

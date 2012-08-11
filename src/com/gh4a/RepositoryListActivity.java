@@ -80,7 +80,7 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity {
         if (tabCount == 2) {
             tab = mActionBar
                     .newTab()
-                    .setText(R.string.user_watched_repos)
+                    .setText(R.string.user_starred_repos)
                     .setTabListener(
                             new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
             mActionBar.addTab(tab);

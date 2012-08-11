@@ -389,9 +389,9 @@ public class UserFragment extends BaseFragment implements
                     + StringUtils.toHumanReadbleFormat(repository.getSize())
                     + "   "
                     + repository.getForks()
-                    + " forks   "
+                    + " " + getResources().getString(R.string.repo_forks).toLowerCase() + "   "
                     + repository.getWatchers()
-                    + " watchers";
+                    + " " + getResources().getString(R.string.repo_stargazers).toLowerCase();
             tvExtra.setText(extraData);
             
             ll.addView(rowView);

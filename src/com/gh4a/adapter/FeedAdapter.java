@@ -397,8 +397,11 @@ public class FeedAdapter extends RootAdapter<Event> {
         /** WatchEvent */
         else if (Event.TYPE_WATCH.equals(eventType)) {
             WatchPayload payload = (WatchPayload) event.getPayload();
+//            String text = String.format(res.getString(R.string.event_watch_title),
+//                    actor.getLogin(), payload.getAction(),
+//                    formatFromRepoName(eventRepo));
             String text = String.format(res.getString(R.string.event_watch_title),
-                    actor.getLogin(), payload.getAction(),
+                    actor.getLogin(),
                     formatFromRepoName(eventRepo));
             return text;
         }

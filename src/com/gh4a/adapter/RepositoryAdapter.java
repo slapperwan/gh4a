@@ -88,9 +88,9 @@ public class RepositoryAdapter extends RootAdapter<Repository> {
                         + StringUtils.toHumanReadbleFormat(repository.getSize())
                         + "   "
                         + repository.getForks()
-                        + " forks   "
+                        + " " + mContext.getResources().getString(R.string.repo_forks).toLowerCase() + "   "
                         + repository.getWatchers()
-                        + " watchers";
+                        + " " + mContext.getResources().getString(R.string.repo_stargazers).toLowerCase();
                 viewHolder.tvExtra.setText(extraData);
             }
         }
