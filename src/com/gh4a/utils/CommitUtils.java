@@ -1,5 +1,8 @@
 package com.gh4a.utils;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.RepositoryCommit;
 
@@ -109,5 +112,13 @@ public class CommitUtils {
         else {
             return null;
         }
+    }
+    
+    public static Date convertCommitDateTime(Date date) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        //int offset = (c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET)) / (60000 * 60);
+        c.add(Calendar.HOUR_OF_DAY, 7);
+        return c.getTime();
     }
 }

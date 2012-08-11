@@ -16,7 +16,6 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -173,11 +172,10 @@ public class CommitFragment extends BaseFragment {
         tvMessage.setText(commit.getCommit().getMessage());
         
         long now = System.currentTimeMillis();
+        
         tvExtra.setText(CommitUtils.getAuthorName(commit)
                 + " "
-                + DateUtils.getRelativeTimeSpanString(commit.getCommit().getAuthor() != null ?
-                        commit.getCommit().getAuthor().getDate().getTime() : null,
-                        now, DateUtils.MINUTE_IN_MILLIS));
+                + context.pt.format(CommitUtils.convertCommitDateTime(commit.getCommit().getAuthor().getDate())));
 
         List<CommitFile> addedFiles = new ArrayList<CommitFile>();
         List<CommitFile> removedFiles = new ArrayList<CommitFile>();

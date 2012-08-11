@@ -46,12 +46,11 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
     public View doGetView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
         ViewHolder viewHolder;
-
+        Gh4Application app = (Gh4Application) mContext.getApplicationContext();
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
             v = vi.inflate(R.layout.row_commit, null);
             
-            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
             Typeface boldCondensed = app.boldCondensed;
             
             viewHolder = new ViewHolder();
@@ -96,10 +95,12 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
             int timezoneOffset = (cal.get(Calendar.ZONE_OFFSET) + cal.get(Calendar.DST_OFFSET)) / 3600000;
             cal.add(Calendar.HOUR, timezoneOffset);
 
+            long now = System.currentTimeMillis();
+
             Resources res = v.getResources();
             String extraData = String.format(res.getString(R.string.more_commit_data),
                     CommitUtils.getAuthorName(commit), 
-                    pt.format(cal.getTime()));
+                    app.pt.format(CommitUtils.convertCommitDateTime(commit.getCommit().getAuthor().getDate())));
 
             viewHolder.tvExtra.setText(extraData);
         }
