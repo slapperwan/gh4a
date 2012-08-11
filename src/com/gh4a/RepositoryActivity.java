@@ -422,7 +422,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
                     isWatching = (Boolean) data;
                     isFinishLoadingWatching = true;
                     if (mRepositoryFragment != null) {
-                        mRepositoryFragment.updateWatcherCount(isWatching);
+                        //mRepositoryFragment.updateWatcherCount(isWatching);
                     }
                 }
                 invalidateOptionsMenu();
