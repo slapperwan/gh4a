@@ -20,7 +20,7 @@ import java.util.List;
 import org.eclipse.egit.github.core.CommitComment;
 
 import android.content.Context;
-import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,11 +32,16 @@ import com.androidquery.AQuery;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarUtils;
+import com.github.mobile.util.HtmlUtils;
+import com.github.mobile.util.HttpImageGetter;
 
 public class CommitNoteAdapter extends RootAdapter<CommitComment> {
 
+    private HttpImageGetter imageGetter;
+    
     public CommitNoteAdapter(Context context, List<CommitComment> objects) {
         super(context, objects);
+        imageGetter = new HttpImageGetter(context);
     }
 
     @Override
@@ -45,10 +50,11 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> {
         ViewHolder viewHolder;
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_commit_note, null);
+            v = vi.inflate(R.layout.row_gravatar_comment, null);
             viewHolder = new ViewHolder();
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+            viewHolder.tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
 
             v.setTag(viewHolder);
@@ -73,11 +79,11 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> {
                 }
             });
 
-            viewHolder.tvExtra.setText(comment.getUser().getLogin() + " " + pt.format(comment.getCreatedAt()));
+            viewHolder.tvExtra.setText(comment.getUser().getLogin() + "\n" + pt.format(comment.getCreatedAt()));
             
-            String body = comment.getBody();
-            body = body.replaceAll("\n", "<br/>");
-            viewHolder.tvDesc.setText(Html.fromHtml(body));
+            String body = comment.getBodyHtml();
+            body = HtmlUtils.format(body).toString();
+            imageGetter.bind(viewHolder.tvDesc, body, comment.getId());
         }
         return v;
     }
