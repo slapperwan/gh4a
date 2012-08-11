@@ -156,6 +156,9 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
         TextView tvMilestone = (TextView) mHeader.findViewById(R.id.tv_milestone);
         ImageView ivComment = (ImageView) findViewById(R.id.iv_comment);
+        if (Gh4Application.THEME != R.style.LightTheme) {
+            ivComment.setImageResource(R.drawable.social_send_now_dark);
+        }
         ivComment.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
         ivComment.setPadding(5, 2, 5, 2);
         ivComment.setOnClickListener(this);

@@ -179,6 +179,9 @@ public class PullRequestFragment extends BaseFragment
         }
         
         ImageView ivComment = (ImageView) v.findViewById(R.id.iv_comment);
+        if (Gh4Application.THEME != R.style.LightTheme) {
+            ivComment.setImageResource(R.drawable.social_send_now_dark);
+        }
         ivComment.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
         ivComment.setPadding(5, 2, 5, 2);
         ivComment.setOnClickListener(new OnClickListener() {

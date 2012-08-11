@@ -27,6 +27,7 @@ import android.widget.ListView;
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.CommitActivity;
 import com.gh4a.Constants;
+import com.gh4a.Gh4Application;
 import com.gh4a.Constants.LoaderResult;
 import com.gh4a.R;
 import com.gh4a.adapter.CommitNoteAdapter;
@@ -80,6 +81,9 @@ public class CommitNoteFragment extends BaseFragment
         showLoading();
         
         ImageView ivComment = (ImageView) getView().findViewById(R.id.iv_comment);
+        if (Gh4Application.THEME != R.style.LightTheme) {
+            ivComment.setImageResource(R.drawable.social_send_now_dark);
+        }
         ivComment.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
         ivComment.setPadding(5, 2, 5, 2);
         ivComment.setOnClickListener(this);
