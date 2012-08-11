@@ -15,6 +15,7 @@
  */
 package com.gh4a;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -36,6 +37,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.R;
@@ -163,6 +165,9 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         Dialog dialog = new Dialog(this);
 
         dialog.setContentView(R.layout.about_dialog);
+        
+        TextView tvCopyright = (TextView) dialog.findViewById(R.id.copyright);
+        tvCopyright.setText("Copyright " + Calendar.getInstance().get(Calendar.YEAR) + " Azwan Adli");
         
         try {
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);

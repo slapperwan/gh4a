@@ -300,6 +300,9 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                 item.expandActionView();
                 mUserFragment.followUser(mUserLogin);
                 return true;
+            case R.id.about:
+                openAboutDialog();
+                return true;
             default:
                 return true;
         }

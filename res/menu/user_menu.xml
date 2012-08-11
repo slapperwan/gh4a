@@ -32,4 +32,7 @@
     <item android:id="@+id/logout"
         android:title="@string/logout"
         android:showAsAction="never" />
+    <item android:id="@+id/about" 
+        android:title="@string/about"
+        android:showAsAction="never" />
 </menu>
