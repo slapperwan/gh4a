@@ -84,7 +84,7 @@ public class WatcherListActivity extends BaseSherlockFragmentActivity  {
         
         Tab tab = mActionBar
                 .newTab()
-                .setText(R.string.repo_watchers)
+                .setText(R.string.repo_stargazers)
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 0 + "", mPager));
         mActionBar.addTab(tab, mPos == 0);
