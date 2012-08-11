@@ -101,6 +101,11 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
+        RelativeLayout tlComment = (RelativeLayout) findViewById(R.id.rl_comment);
+        if (!isAuthorized()) {
+            tlComment.setVisibility(View.GONE);
+        }
+        
         getSupportLoaderManager().initLoader(0, null, this);
         getSupportLoaderManager().getLoader(0).forceLoad();
         
@@ -155,6 +160,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         
         TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
         TextView tvMilestone = (TextView) mHeader.findViewById(R.id.tv_milestone);
+        
         ImageView ivComment = (ImageView) findViewById(R.id.iv_comment);
         if (Gh4Application.THEME != R.style.LightTheme) {
             ivComment.setImageResource(R.drawable.social_send_now_dark);

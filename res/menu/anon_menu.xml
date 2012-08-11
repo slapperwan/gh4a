@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/login" android:title="@string/login" />
+    <item android:id="@+id/explore" android:title="@string/explore" />
     <item android:id="@+id/about" android:title="@string/about" />
-    <item android:id="@+id/feedback" android:title="@string/feedback" />
 </menu>

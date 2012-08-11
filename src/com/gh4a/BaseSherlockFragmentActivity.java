@@ -113,17 +113,24 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         // Handle item selection
         switch (item.getItemId()) {
         case R.id.logout:
-            logout();
+            if (isAuthorized()) {
+                logout();
+            }
+            else {
+                Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP
+                        |Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
             return true;
         case R.id.login:
             Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    |Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             return true;
         case R.id.about:
             openAboutDialog();
-            return true;
-        case R.id.feedback:
-            openFeedbackDialog();
             return true;
         case R.id.bookmarks:
             openBookmarkActivity();

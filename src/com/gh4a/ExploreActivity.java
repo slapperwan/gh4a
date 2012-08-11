@@ -204,8 +204,8 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
                 }
                 else {
                     getApplicationContext().openUserInfoActivity(this, getAuthLogin(), null);
-                    return true;
                 }
+                return true;
             case R.id.refresh:
                 item.setActionView(R.layout.ab_loading);
                 item.expandActionView();

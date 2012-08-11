@@ -202,24 +202,34 @@ public class UserActivity extends BaseSherlockFragmentActivity {
             menu.getItem(0).setIcon(R.drawable.navigation_refresh_dark);
         }
         
-        MenuItem followAction = menu.getItem(1);
+        MenuItem logoutAction = menu.getItem(4);
+        if (!isAuthorized()) {
+            logoutAction.setTitle(R.string.login);
+        }
         
+        MenuItem followAction = menu.getItem(1);
         if (mUserLogin.equals(getAuthLogin())) {
             menu.getItem(2).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             menu.removeItem(R.id.follow);
         }
         else {
-            if (!isFinishLoadingFollowing) {
-                followAction.setActionView(R.layout.ab_loading);
-                followAction.expandActionView();
-            }
-            else {
-                if (isFollowing) {
-                    followAction.setTitle(R.string.user_unfollow_action);
+            if (isAuthorized()) {
+                if (!isFinishLoadingFollowing) {
+                    followAction.setActionView(R.layout.ab_loading);
+                    followAction.expandActionView();
                 }
                 else {
-                    followAction.setTitle(R.string.user_follow_action);
+                    if (isFollowing) {
+                        followAction.setTitle(R.string.user_unfollow_action);
+                    }
+                    else {
+                        followAction.setTitle(R.string.user_follow_action);
+                    }
                 }
+            }
+            else {
+                menu.getItem(2).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                menu.removeItem(R.id.follow);
             }
         }
         return super.onPrepareOptionsMenu(menu);
@@ -229,7 +239,15 @@ public class UserActivity extends BaseSherlockFragmentActivity {
     public boolean setMenuOptionItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                getApplicationContext().openUserInfoActivity(this, getAuthLogin(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                if (isAuthorized()) {
+                    getApplicationContext().openUserInfoActivity(this, getAuthLogin(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                }
+                else {
+                    Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP
+                            |Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
                 return true;
             case R.id.refresh:
                 item.setActionView(R.layout.ab_loading);
@@ -251,21 +269,30 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                 }
                 return true;
             case R.id.logout:
-                SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
-                        Constants.PREF_NAME, MODE_PRIVATE);
-                
-                if (sharedPreferences != null) {
-                    if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
-                            && sharedPreferences.getString(Constants.User.USER_AUTH_TOKEN, null) != null){
-                        Editor editor = sharedPreferences.edit();
-                        editor.clear();
-                        editor.commit();
-                        Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP
-                                |Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                        this.finish();
+                if (isAuthorized()) {
+                    SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
+                            Constants.PREF_NAME, MODE_PRIVATE);
+                    
+                    if (sharedPreferences != null) {
+                        if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
+                                && sharedPreferences.getString(Constants.User.USER_AUTH_TOKEN, null) != null){
+                            Editor editor = sharedPreferences.edit();
+                            editor.clear();
+                            editor.commit();
+                            Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP
+                                    |Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                            this.finish();
+                        }
                     }
+                }
+                else {
+                    Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP
+                            |Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    this.finish();
                 }
                 return true;
             case R.id.dark:

@@ -98,6 +98,13 @@ public class PullRequestFragment extends BaseFragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
+        BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) getSherlockActivity();
+        
+        RelativeLayout rlComment = (RelativeLayout) getView().findViewById(R.id.rl_comment);
+        if (!activity.isAuthorized()) {
+            rlComment.setVisibility(View.GONE);
+        }
+        
         getLoaderManager().initLoader(0, null, this);
         getLoaderManager().getLoader(0).forceLoad();
         
@@ -172,11 +179,6 @@ public class PullRequestFragment extends BaseFragment
         tvExtra.setText(getResources().getString(R.string.issue_open_by_user,
                 pullRequest.getUser() != null ? pullRequest.getUser().getLogin() : "",
                 context.pt.format(pullRequest.getCreatedAt())));
-        
-        RelativeLayout rlComment = (RelativeLayout) v.findViewById(R.id.rl_comment);
-        if (!activity.isAuthorized()) {
-            rlComment.setVisibility(View.GONE);
-        }
         
         ImageView ivComment = (ImageView) v.findViewById(R.id.iv_comment);
         if (Gh4Application.THEME != R.style.LightTheme) {

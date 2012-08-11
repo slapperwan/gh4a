@@ -23,12 +23,13 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.CommitActivity;
 import com.gh4a.Constants;
-import com.gh4a.Gh4Application;
 import com.gh4a.Constants.LoaderResult;
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.adapter.CommitNoteAdapter;
 import com.gh4a.loader.CommitCommentListLoader;
@@ -79,6 +80,13 @@ public class CommitNoteFragment extends BaseFragment
         mListView.setAdapter(mAdapter);
         
         showLoading();
+        
+        BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) getSherlockActivity();
+        
+        RelativeLayout rlComment = (RelativeLayout) getView().findViewById(R.id.rl_comment);
+        if (!activity.isAuthorized()) {
+            rlComment.setVisibility(View.GONE);
+        }
         
         ImageView ivComment = (ImageView) getView().findViewById(R.id.iv_comment);
         if (Gh4Application.THEME != R.style.LightTheme) {

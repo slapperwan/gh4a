@@ -130,11 +130,13 @@ public class BaseActivity extends SherlockActivity {
         case R.id.about:
             openAboutDialog();
             return true;
-        case R.id.feedback:
-            openFeedbackDialog();
-            return true;
         case R.id.bookmarks:
             openBookmarkActivity();
+            return true;
+        case R.id.explore:
+            intent = new Intent().setClass(this, ExploreActivity.class);
+            intent.putExtra("exploreItem", 0);
+            startActivity(intent);
             return true;
         default:
             return setMenuOptionItemSelected(item);

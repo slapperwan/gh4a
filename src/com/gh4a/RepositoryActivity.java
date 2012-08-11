@@ -301,17 +301,22 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         }
         
         MenuItem watchAction = menu.getItem(1);
-        if (!isFinishLoadingWatching) {
-            watchAction.setActionView(R.layout.ab_loading);
-            watchAction.expandActionView();
-        }
-        else {
-            if (isWatching) {
-                watchAction.setTitle(R.string.repo_unwatch_action);
+        if (isAuthorized()) {
+            if (!isFinishLoadingWatching) {
+                watchAction.setActionView(R.layout.ab_loading);
+                watchAction.expandActionView();
             }
             else {
-                watchAction.setTitle(R.string.repo_watch_action);
+                if (isWatching) {
+                    watchAction.setTitle(R.string.repo_unwatch_action);
+                }
+                else {
+                    watchAction.setTitle(R.string.repo_watch_action);
+                }
             }
+        }
+        else {
+            menu.removeItem(R.id.watch);
         }
 
         return super.onPrepareOptionsMenu(menu);
