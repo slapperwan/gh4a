@@ -32,7 +32,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
+import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Gh4Application;
+import com.gh4a.IssueListActivity;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarUtils;
 
@@ -90,7 +92,7 @@ public class IssueAdapter extends RootAdapter<Issue> {
         final Issue issue = mObjects.get(position);
         if (issue != null) {
             
-            AQuery aq = new AQuery(convertView);
+            AQuery aq = new AQuery((BaseSherlockFragmentActivity) mContext, convertView);
             aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(issue.getUser().getGravatarId()), 
                     true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
             

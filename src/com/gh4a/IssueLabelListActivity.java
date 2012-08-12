@@ -17,8 +17,10 @@ package com.gh4a;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -26,6 +28,7 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.LabelService;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -38,18 +41,19 @@ import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants.LoaderResult;
 import com.gh4a.loader.LabelListLoader;
+import com.gh4a.utils.StringUtils;
 
 public class IssueLabelListActivity extends BaseSherlockFragmentActivity 
     implements LoaderManager.LoaderCallbacks<Object> {
@@ -57,6 +61,12 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
     private String mRepoOwner;
     private String mRepoName;
     protected ListView mListView;
+    private ActionMode mActionMode;
+    private String mSelectedColor;
+    private List<Map<String, Object>> mAllLabelLayout;
+    private String mSelectedLabel;
+    private ProgressDialog mProgressDialog;
+    private List<Label> mLabels;
 
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
@@ -81,34 +91,47 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
         getSupportLoaderManager().getLoader(0).forceLoad();
     }
     
-    private void fillData(List<Label> result) {
+    private void fillData() {
         final Typeface condensed = getApplicationContext().condensed;
         LinearLayout ll = (LinearLayout) findViewById(R.id.main_content);
         ll.removeAllViews();
         
-        for (final Label label : result) {
+        mAllLabelLayout = new ArrayList<Map<String, Object>>();
+        for (final Label label : mLabels) {
+            Map<String, Object> selectedLabelItems = new HashMap<String, Object>();
+            selectedLabelItems.put("label", label);
+            
             final View rowView = getLayoutInflater().inflate(R.layout.row_issue_label, null);
             final View viewColor = (View) rowView.findViewById(R.id.view_color);
 
             final LinearLayout llEdit = (LinearLayout) rowView.findViewById(R.id.ll_edit);
+            selectedLabelItems.put("llEdit", llEdit);
+            
             final EditText etLabel = (EditText) rowView.findViewById(R.id.et_label);
+            selectedLabelItems.put("etLabel", etLabel);
+            
             final TextView tvLabel = (TextView) rowView.findViewById(R.id.tv_title);
+            selectedLabelItems.put("tvLabel", tvLabel);
+            
             tvLabel.setTypeface(condensed);
             tvLabel.setText(label.getName());
             
             viewColor.setBackgroundColor(Color.parseColor("#" + label.getColor()));
+            selectedLabelItems.put("viewColor", viewColor);
+            mAllLabelLayout.add(selectedLabelItems);
+            
             viewColor.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (llEdit.getVisibility() == View.VISIBLE) {
                         llEdit.setVisibility(View.GONE);
-                        
                         unselectLabel(tvLabel, viewColor, label.getColor());
                     }
                     else {
                         llEdit.setVisibility(View.VISIBLE);
-                        
-                        selectLabel(tvLabel, viewColor, label.getColor());
+                        selectLabel(tvLabel, viewColor, label.getColor(), true);
+                        mActionMode = startActionMode(
+                                new EditActionMode(label.getName(), etLabel));
                         etLabel.setText(label.getName());
                     }
                 }
@@ -120,120 +143,78 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
                     LinearLayout llEdit = (LinearLayout) rowView.findViewById(R.id.ll_edit);
                     if (llEdit.getVisibility() == View.VISIBLE) {
                         llEdit.setVisibility(View.GONE);
-                        
                         unselectLabel(tvLabel, viewColor, label.getColor());
                     }
                     else {
                         llEdit.setVisibility(View.VISIBLE);
-                        
-                        selectLabel(tvLabel, viewColor, label.getColor());
+                        selectLabel(tvLabel, viewColor, label.getColor(), true);
+                        mActionMode = startActionMode(
+                                new EditActionMode(label.getName(), etLabel));
                         etLabel.setText(label.getName());
                     }
                 }
             });
             
+            if (!StringUtils.isBlank(mSelectedLabel)
+                    && mSelectedLabel.equals(label.getName())) {
+                selectLabel(tvLabel, viewColor, label.getColor(), false);
+                llEdit.setVisibility(View.VISIBLE);
+                etLabel.setText(label.getName());
+            }
+            
             final View color1 = (View) rowView.findViewById(R.id.color_444444);
             color1.setOnClickListener(new OnClickListener() {
                 @Override
-                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color1.getTag());}
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color1.getTag(), false); }
             });
             
             final View color2 = (View) rowView.findViewById(R.id.color_02d7e1);
             color2.setOnClickListener(new OnClickListener() {
                 @Override
-                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color2.getTag());}
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color2.getTag(), false); }
             });
             
             final View color3 = (View) rowView.findViewById(R.id.color_02e10c);
             color3.setOnClickListener(new OnClickListener() {
                 @Override
-                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color3.getTag());}
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color3.getTag(), false); }
             });
             
             final View color4 = (View) rowView.findViewById(R.id.color_0b02e1);
             color4.setOnClickListener(new OnClickListener() {
                 @Override
-                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color4.getTag());}
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color4.getTag(), false); }
             });
             
             final View color5 = (View) rowView.findViewById(R.id.color_d7e102);
             color5.setOnClickListener(new OnClickListener() {
                 @Override
-                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color5.getTag());}
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color5.getTag(), false); }
             });
             
             final View color6 = (View) rowView.findViewById(R.id.color_DDDDDD);
             color6.setOnClickListener(new OnClickListener() {
                 @Override
-                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color6.getTag());}
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color6.getTag(), false); }
             });
             
             final View color7 = (View) rowView.findViewById(R.id.color_e102d8);
             color7.setOnClickListener(new OnClickListener() {
                 @Override
-                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color7.getTag());}
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color7.getTag(), false); }
             });
             
             final View color8 = (View) rowView.findViewById(R.id.color_e10c02);
             color8.setOnClickListener(new OnClickListener() {
                 @Override
-                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color8.getTag());}
-            });
-            
-            Button btnSave = (Button) rowView.findViewById(R.id.btn_save);
-            btnSave.setOnClickListener(new OnClickListener() {
-                
-                @Override
-                public void onClick(View arg0) {
-                    String selectedColor = (String) tvLabel.getTag();
-                    String newLabelName = etLabel.getText().toString();
-                    new EditIssueLabelsTask(IssueLabelListActivity.this).execute(label.getName(), 
-                            newLabelName, selectedColor);
-                }
-            });
-            
-            Button btnDelete = (Button) rowView.findViewById(R.id.btn_delete);
-            btnDelete.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View arg0) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(IssueLabelListActivity.this,
-                            android.R.style.Theme));
-                    builder.setTitle("Delete " + label.getName() + "?");
-                    builder.setMessage("Are you sure?");
-                    builder.setPositiveButton(R.string.ok,
-                            new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            dialog.dismiss();
-                            new DeleteIssueLabelsTask(IssueLabelListActivity.this).execute(label.getName());
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel,
-                            new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            dialog.dismiss();
-                        }
-                    })
-                   .create();
-                    
-                    builder.show();
-                }
-            });
-            
-            Button btnCancel = (Button) rowView.findViewById(R.id.btn_cancel);
-            btnCancel.setOnClickListener(new OnClickListener() {
-                
-                @Override
-                public void onClick(View arg0) {
-                    llEdit.setVisibility(View.GONE);
-                    unselectLabel(tvLabel, viewColor, label.getColor());
-                }
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color8.getTag(), false); }
             });
             
             ll.addView(rowView);
         }
     }
 
-    private void selectLabel(TextView tvLabel, View viewColor, String color) {
+    private void selectLabel(TextView tvLabel, View viewColor, String color, boolean clearOtherSelected) {
         final Typeface boldCondensed = getApplicationContext().boldCondensed;
         tvLabel.setTag(color);
         
@@ -249,6 +230,13 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
             tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_light));
         }
         tvLabel.setTypeface(boldCondensed);
+        
+        mSelectedColor = color;
+        mSelectedLabel = tvLabel.getText().toString();
+        Log.i("", "++++++++++++ " + mSelectedLabel);
+        if (clearOtherSelected) {
+            clearOtherSelected(false);
+        }
     }
     
     private void unselectLabel(TextView tvLabel, View viewColor, String color) {
@@ -263,6 +251,108 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
         }
         tvLabel.setTypeface(condensed);
         viewColor.setBackgroundColor(Color.parseColor("#" + color));
+    }
+    
+    private void clearOtherSelected(boolean all) {
+        for (Map<String, Object> m : mAllLabelLayout) {
+            LinearLayout llEdit2 = (LinearLayout) m.get("llEdit");
+            TextView tvLabel2 = (TextView) m.get("tvLabel");
+            View viewColor2 = (View) m.get("viewColor");
+            Label label2 = (Label) m.get("label");
+            Log.i("", "++++++++++++ clearOtherSelected " + mSelectedLabel + " " + tvLabel2.getText().toString());
+            if (all) {
+                unselectLabel(tvLabel2, viewColor2, label2.getColor());
+                llEdit2.setVisibility(View.GONE);
+            }
+            else {
+                if (!tvLabel2.getText().toString().equals(mSelectedLabel)) {
+                    Log.i("", "+++++++++ dok sama");
+                    unselectLabel(tvLabel2, viewColor2, label2.getColor());
+                    llEdit2.setVisibility(View.GONE);
+                }
+                else {
+                    llEdit2.setVisibility(View.VISIBLE);
+                }
+            }
+        }
+        if (mActionMode != null) {
+            mActionMode.finish();
+        }
+        mSelectedLabel = null;
+    }
+    
+    private final class EditActionMode implements ActionMode.Callback {
+
+        private String mCurrentLabelName;
+        private EditText mNewLabelText;
+        
+        public EditActionMode(String currentLabelName, EditText newLabelText) {
+            mCurrentLabelName = currentLabelName;
+            mNewLabelText = newLabelText;
+        }
+        
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            boolean isLight = Gh4Application.THEME == R.style.LightTheme;
+            menu.add(0, 0, 0, R.string.save)
+                .setIcon(isLight ? R.drawable.content_save : R.drawable.content_save_dark)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+            menu.add(0, 1, 1, R.string.delete)
+                .setIcon(isLight ? R.drawable.content_discard: R.drawable.content_discard_dark)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+            case 0:
+                mProgressDialog = showProgressDialog(getResources().getString(R.string.saving_msg), true);
+                new EditIssueLabelsTask(IssueLabelListActivity.this).execute(mCurrentLabelName, 
+                        mNewLabelText.getText().toString(), IssueLabelListActivity.this.mSelectedColor);
+                break;
+            case 1:
+                AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(IssueLabelListActivity.this,
+                        android.R.style.Theme));
+                builder.setTitle("Delete " + mCurrentLabelName + "?");
+                builder.setMessage("Are you sure?");
+                builder.setPositiveButton(R.string.ok,
+                        new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        dialog.dismiss();
+                        new DeleteIssueLabelsTask(IssueLabelListActivity.this).execute(mCurrentLabelName);
+                    }
+                })
+                .setNegativeButton(R.string.cancel,
+                        new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        dialog.dismiss();
+                    }
+                })
+               .create();
+                
+                builder.show();
+                break;
+            default:
+                break;
+            }
+            
+            mode.finish();
+            return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            fillData();
+        }
+        
     }
     
     private static class DeleteIssueLabelsTask extends AsyncTask<String, Void, Void> {
@@ -296,6 +386,10 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
 
         @Override
         protected void onPreExecute() {
+            if (mTarget.get() != null) {
+                mTarget.get().mProgressDialog =
+                        mTarget.get().showProgressDialog(mTarget.get().getResources().getString(R.string.deleting_msg), true);
+            }
         }
 
         @Override
@@ -304,6 +398,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
                 IssueLabelListActivity activity = mTarget.get();
     
                 if (mException) {
+                    activity.stopProgressDialog(activity.mProgressDialog);
                     activity.showError();
                 }
                 else {
@@ -357,8 +452,9 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
         protected void onPostExecute(Void result) {
             if (mTarget.get() != null) {
                 IssueLabelListActivity activity = mTarget.get();
-    
+                
                 if (mException) {
+                    activity.stopProgressDialog(activity.mProgressDialog);
                     activity.showMessage(activity.getResources().getString(R.string.issue_error_edit_label), false);
                 }
                 else {
@@ -406,9 +502,13 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
     public void onLoadFinished(Loader loader, Object object) {
         HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
         hideLoading();
-        
+        stopProgressDialog(mProgressDialog);
+        if (getCurrentFocus() != null) {
+            hideKeyboard(getCurrentFocus().getWindowToken());
+        }
         if (!isLoaderError(result)) {
-            fillData((List<Label>) result.get(LoaderResult.DATA));
+            mLabels = (List<Label>) result.get(LoaderResult.DATA);
+            fillData();
         }
     }
 

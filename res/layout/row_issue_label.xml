@@ -114,29 +114,5 @@
                 android:tag="e102d8"
                 android:background="#e102d8" />
         </LinearLayout>
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
-            <Button
-                android:id="@+id/btn_save" 
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="0dp"
-                android:text="@string/save"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-            <Button
-                android:id="@+id/btn_delete" 
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/delete"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-            <Button
-                android:id="@+id/btn_cancel" 
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/cancel"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>
