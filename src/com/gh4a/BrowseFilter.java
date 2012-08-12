@@ -62,7 +62,7 @@ public class BrowseFilter extends BaseActivity {
                     startActivity(intent);
                 }
             }
-            else if (urlPart.length == 7) {
+            else if (urlPart.length >= 7) {
                 String user = urlPart[3];
                 String repo = urlPart[4];
                 String action = urlPart[5];
@@ -82,6 +82,16 @@ public class BrowseFilter extends BaseActivity {
                     if (!StringUtils.isBlank(id)) {
                         try {
                             context.openPullRequestActivity(this, user, repo, Integer.parseInt(id));
+                        }
+                        catch (NumberFormatException e) {
+                            // Ignore non-numeric ids
+                        }
+                    }
+                }
+                else if ("commit".equals(action)) {
+                    if (!StringUtils.isBlank(id)) {
+                        try {
+                            context.openCommitInfoActivity(this, user, repo, id, 0);
                         }
                         catch (NumberFormatException e) {
                             // Ignore non-numeric ids
