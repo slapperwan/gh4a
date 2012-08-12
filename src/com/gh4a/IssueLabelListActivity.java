@@ -311,7 +311,6 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            Log.i("", "++++++++++++ " + mSelectedEtLabel.getText().toString());
             switch (item.getItemId()) {
             case 0:
                 mProgressDialog = showProgressDialog(getResources().getString(R.string.saving_msg), true);

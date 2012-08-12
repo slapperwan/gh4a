@@ -71,7 +71,6 @@ public class CommentAdapter extends RootAdapter<Comment> {
         final Comment comment = mObjects.get(position);
         if (comment != null) {
             
-            Log.i("", "+++++++++++++++++ " + mContext);
             aq.recycle(convertView);
             aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(comment.getUser().getGravatarId()), 
                     true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
