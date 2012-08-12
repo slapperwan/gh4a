@@ -36,6 +36,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -159,6 +160,8 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         tvCommentTitle.setText(getResources().getString(R.string.issue_comments) + " (" + mIssue.getComments() + ")");
         
         TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
+        tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
+        
         TextView tvMilestone = (TextView) mHeader.findViewById(R.id.tv_milestone);
         
         ImageView ivComment = (ImageView) findViewById(R.id.iv_comment);
