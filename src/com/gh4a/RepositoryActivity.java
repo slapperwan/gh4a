@@ -3,6 +3,7 @@ package com.gh4a;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.egit.github.core.Content;
 import org.eclipse.egit.github.core.Repository;
@@ -69,6 +70,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     private CommitListFragment mCommitListFragment;
     private String mPath;
     private int mCurrentTab;
+    private Map<String, String> mGitModuleMap;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -242,15 +244,34 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
             mAdapter.notifyDataSetChanged();
         }
         else {
-            Intent intent = new Intent().setClass(this, FileViewerActivity.class);
-            intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-            intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-            intent.putExtra(Constants.Object.PATH, content.getPath());
-            intent.putExtra(Constants.Object.REF, ref);
-            intent.putExtra(Constants.Object.NAME, content.getName());
-            intent.putExtra(Constants.Object.OBJECT_SHA, content.getSha());
-            startActivity(intent);
+            if (mGitModuleMap != null) {
+                if (!StringUtils.isBlank(mGitModuleMap.get(content.getPath()))) {
+                    String[] userRepo = mGitModuleMap.get(content.getPath()).split("/");
+                    getApplicationContext().openRepositoryInfoActivity(this, userRepo[0], userRepo[1], 0);
+                }
+                else {
+                   openFileViewer(content, ref);
+                }
+            }
+            else {
+                openFileViewer(content, ref);
+            }
         }
+    }
+    
+    public void setGitModuleMap(Map<String, String> gitModuleMap) {
+        mGitModuleMap = gitModuleMap;
+    }
+    
+    private void openFileViewer(Content content, String ref) {
+        Intent intent = new Intent().setClass(this, FileViewerActivity.class);
+        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        intent.putExtra(Constants.Object.PATH, content.getPath());
+        intent.putExtra(Constants.Object.REF, ref);
+        intent.putExtra(Constants.Object.NAME, content.getName());
+        intent.putExtra(Constants.Object.OBJECT_SHA, content.getSha());
+        startActivity(intent);
     }
     
     @Override
@@ -527,4 +548,5 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         getSupportLoaderManager().restartLoader(0, null, this);
         getSupportLoaderManager().getLoader(0).forceLoad();
     }
+
 }

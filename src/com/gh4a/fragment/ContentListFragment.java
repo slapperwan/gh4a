@@ -18,6 +18,7 @@ package com.gh4a.fragment;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.egit.github.core.Content;
 import org.eclipse.egit.github.core.Repository;
@@ -40,6 +41,7 @@ import com.gh4a.R;
 import com.gh4a.RepositoryActivity;
 import com.gh4a.adapter.FileAdapter;
 import com.gh4a.loader.ContentListLoader;
+import com.gh4a.loader.GitModuleParserLoader;
 import com.gh4a.utils.StringUtils;
 
 public class ContentListFragment extends BaseFragment 
@@ -52,6 +54,7 @@ public class ContentListFragment extends BaseFragment
     public FileAdapter mAdapter;
     private OnTreeSelectedListener mCallback;
     private List<Content> mContents;
+    private Map<String, String> mGitModuleMap;
 
     public static ContentListFragment newInstance(Repository repository,
             String path, String ref) {
@@ -109,6 +112,12 @@ public class ContentListFragment extends BaseFragment
             
             getLoaderManager().initLoader(0, null, this);
             getLoaderManager().getLoader(0).forceLoad();
+            
+            //get .gitmodules to be parsed
+            if (StringUtils.isBlank(mPath)) {
+                getLoaderManager().initLoader(1, null, this);
+                getLoaderManager().getLoader(1).forceLoad();
+            }
         }
         else {
             hideLoading();
@@ -134,18 +143,27 @@ public class ContentListFragment extends BaseFragment
     
     @Override
     public Loader onCreateLoader(int id, Bundle args) {
-        return new ContentListLoader(getSherlockActivity(), mRepository.getOwner().getLogin(),
-                mRepository.getName(), mPath, mRef);
+        if (id == 1) {
+            return new GitModuleParserLoader(getSherlockActivity(), mRepository.getOwner().getLogin(),
+                    mRepository.getName(), ".gitmodules", mRef);
+        }
+        else {
+            return new ContentListLoader(getSherlockActivity(), mRepository.getOwner().getLogin(),
+                    mRepository.getName(), mPath, mRef);
+        }
     }
 
     @Override
     public void onLoadFinished(Loader loader, Object object) {
         HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
-        
         hideLoading();
-        
-        if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
-            fillData((List<Content>) result.get(LoaderResult.DATA));            
+        if (loader.getId() == 1) {
+            mCallback.setGitModuleMap((Map<String, String>) result.get(LoaderResult.DATA));
+        }
+        else {
+            if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
+                fillData((List<Content>) result.get(LoaderResult.DATA));            
+            }
         }
     }
 
@@ -160,6 +178,8 @@ public class ContentListFragment extends BaseFragment
                 Content content,
                 List<Content> contents,
                 String ref);
+        
+        public void setGitModuleMap(Map<String, String> gitModuleMap);
     }
 
     @Override
