@@ -35,6 +35,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.actionbarsherlock.R;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
@@ -136,6 +137,10 @@ public class BaseActivity extends SherlockActivity {
         case R.id.explore:
             intent = new Intent().setClass(this, ExploreActivity.class);
             intent.putExtra("exploreItem", 0);
+            startActivity(intent);
+            return true;
+        case R.id.search:
+            intent = new Intent().setClass(getApplication(), SearchActivity.class);
             startActivity(intent);
             return true;
         default:

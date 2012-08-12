@@ -17,6 +17,9 @@
                 android:title="@string/blog" />
         </menu>
     </item>
+    <item android:id="@+id/search"
+        android:title="@string/search" 
+        android:showAsAction="never" />
     <item android:id="@+id/theme"
         android:title="@string/theme"
         android:showAsAction="never">

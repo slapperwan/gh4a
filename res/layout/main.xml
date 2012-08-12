@@ -8,8 +8,7 @@
         android:id="@+id/main_content"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="?attr/comment_box">
+        android:orientation="vertical" >
         <EditText
             android:id="@+id/et_username_main"
             android:layout_height="wrap_content"
@@ -34,7 +33,7 @@
             android:layout_gravity="center_vertical|center_horizontal|center">
         </Button>
     </LinearLayout>
-    <LinearLayout
+    <!-- LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical"
@@ -48,5 +47,5 @@
             android:textAppearance="?attr/textAppearanceUrl"
             android:background="?attr/textAppearanceLink"
             android:text="Explore Gh4a" />
-    </LinearLayout>
+    </LinearLayout-->
 </LinearLayout>

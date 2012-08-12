@@ -26,6 +26,7 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.egit.github.core.service.UserService;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -51,13 +52,14 @@ import com.gh4a.adapter.SearchRepositoryAdapter;
 import com.gh4a.adapter.UserAdapter;
 import com.gh4a.utils.StringUtils;
 
-public class SearchActivity extends BaseActivity {
+public class SearchActivity extends BaseSherlockFragmentActivity {
 
     protected List<SearchRepository> repositories;
     protected UserAdapter userAdapter;
     protected SearchRepositoryAdapter repositoryAdapter;
     protected ListView mListViewResults;
     protected boolean mSearchByUser;// flag to search user or repo
+    private ProgressDialog mProgressDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -75,6 +77,9 @@ public class SearchActivity extends BaseActivity {
         final Spinner languageSpinner = (Spinner) findViewById(R.id.spinner_language);
         final EditText etSearchKey = (EditText) findViewById(R.id.et_search);
         ImageButton btnSearch = (ImageButton) findViewById(R.id.btn_search);
+        if (Gh4Application.THEME == R.style.DefaultTheme) {
+            btnSearch.setImageResource(R.drawable.action_search_dark);
+        }
 
         /** event when user press enter button at soft keyboard */
         etSearchKey.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -83,9 +88,10 @@ public class SearchActivity extends BaseActivity {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     String searchKey = etSearchKey.getText().toString();
                     String selectedLanguage = (String) languageSpinner.getSelectedItem();
+                    mProgressDialog = SearchActivity.this.showProgressDialog(
+                            SearchActivity.this.getResources().getString(R.string.loading_msg), true);
                     searchRepository(searchKey, selectedLanguage);
                     hideKeyboard(etSearchKey.getWindowToken());
-
                     return true;
                 }
                 return false;
@@ -99,6 +105,8 @@ public class SearchActivity extends BaseActivity {
             public void onClick(View v) {
                 String searchKey = etSearchKey.getText().toString();
                 String selectedLanguage = (String) languageSpinner.getSelectedItem();
+                mProgressDialog = SearchActivity.this.showProgressDialog(
+                        SearchActivity.this.getResources().getString(R.string.loading_msg), true);
                 searchRepository(searchKey, selectedLanguage);
                 hideKeyboard(etSearchKey.getWindowToken());
             }
@@ -228,6 +236,7 @@ public class SearchActivity extends BaseActivity {
         protected void onPostExecute(List<SearchRepository> result) {
             if (mTarget.get() != null) {
                 SearchActivity activity = mTarget.get();
+                activity.stopProgressDialog(activity.mProgressDialog);
                 if (mException) {
                     mTarget.get().showError(false);
                 }

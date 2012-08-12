@@ -202,7 +202,7 @@ public class UserActivity extends BaseSherlockFragmentActivity {
             menu.getItem(0).setIcon(R.drawable.navigation_refresh_dark);
         }
         
-        MenuItem logoutAction = menu.getItem(4);
+        MenuItem logoutAction = menu.getItem(5);
         if (!isAuthorized()) {
             logoutAction.setTitle(R.string.login);
         }
@@ -329,6 +329,10 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                 return true;
             case R.id.about:
                 openAboutDialog();
+                return true;
+            case R.id.search:
+                intent = new Intent().setClass(getApplication(), SearchActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return true;
