@@ -30,7 +30,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.adapter.CompareAdapter;
 
-public class CompareActivity extends BaseActivity implements OnItemClickListener {
+public class CompareActivity extends BaseSherlockFragmentActivity implements OnItemClickListener {
 
     private String mRepoOwner;
     private String mRepoName;
