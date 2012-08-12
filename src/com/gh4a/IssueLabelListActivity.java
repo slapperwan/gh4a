@@ -67,6 +67,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
     private String mSelectedLabel;
     private ProgressDialog mProgressDialog;
     private List<Label> mLabels;
+    private EditText mSelectedEtLabel;
 
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
@@ -129,10 +130,10 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
                     }
                     else {
                         llEdit.setVisibility(View.VISIBLE);
-                        selectLabel(tvLabel, viewColor, label.getColor(), true);
+                        selectLabel(tvLabel, viewColor, label.getColor(), true, etLabel);
+                        etLabel.setText(label.getName());
                         mActionMode = startActionMode(
                                 new EditActionMode(label.getName(), etLabel));
-                        etLabel.setText(label.getName());
                     }
                 }
             });
@@ -147,17 +148,17 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
                     }
                     else {
                         llEdit.setVisibility(View.VISIBLE);
-                        selectLabel(tvLabel, viewColor, label.getColor(), true);
+                        selectLabel(tvLabel, viewColor, label.getColor(), true, etLabel);
+                        etLabel.setText(label.getName());
                         mActionMode = startActionMode(
                                 new EditActionMode(label.getName(), etLabel));
-                        etLabel.setText(label.getName());
                     }
                 }
             });
             
             if (!StringUtils.isBlank(mSelectedLabel)
                     && mSelectedLabel.equals(label.getName())) {
-                selectLabel(tvLabel, viewColor, label.getColor(), false);
+                selectLabel(tvLabel, viewColor, label.getColor(), false, etLabel);
                 llEdit.setVisibility(View.VISIBLE);
                 etLabel.setText(label.getName());
             }
@@ -165,56 +166,57 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
             final View color1 = (View) rowView.findViewById(R.id.color_444444);
             color1.setOnClickListener(new OnClickListener() {
                 @Override
-                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color1.getTag(), false); }
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color1.getTag(), false, etLabel); }
             });
             
             final View color2 = (View) rowView.findViewById(R.id.color_02d7e1);
             color2.setOnClickListener(new OnClickListener() {
                 @Override
-                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color2.getTag(), false); }
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color2.getTag(), false, etLabel); }
             });
             
             final View color3 = (View) rowView.findViewById(R.id.color_02e10c);
             color3.setOnClickListener(new OnClickListener() {
                 @Override
-                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color3.getTag(), false); }
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color3.getTag(), false, etLabel); }
             });
             
             final View color4 = (View) rowView.findViewById(R.id.color_0b02e1);
             color4.setOnClickListener(new OnClickListener() {
                 @Override
-                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color4.getTag(), false); }
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color4.getTag(), false, etLabel); }
             });
             
             final View color5 = (View) rowView.findViewById(R.id.color_d7e102);
             color5.setOnClickListener(new OnClickListener() {
                 @Override
-                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color5.getTag(), false); }
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color5.getTag(), false, etLabel); }
             });
             
             final View color6 = (View) rowView.findViewById(R.id.color_DDDDDD);
             color6.setOnClickListener(new OnClickListener() {
                 @Override
-                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color6.getTag(), false); }
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color6.getTag(), false, etLabel); }
             });
             
             final View color7 = (View) rowView.findViewById(R.id.color_e102d8);
             color7.setOnClickListener(new OnClickListener() {
                 @Override
-                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color7.getTag(), false); }
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color7.getTag(), false, etLabel); }
             });
             
             final View color8 = (View) rowView.findViewById(R.id.color_e10c02);
             color8.setOnClickListener(new OnClickListener() {
                 @Override
-                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color8.getTag(), false); }
+                public void onClick(View v) { selectLabel(tvLabel, viewColor, (String) color8.getTag(), false, etLabel); }
             });
             
             ll.addView(rowView);
         }
     }
 
-    private void selectLabel(TextView tvLabel, View viewColor, String color, boolean clearOtherSelected) {
+    private void selectLabel(TextView tvLabel, View viewColor, String color, 
+            boolean clearOtherSelected, EditText etLabel) {
         final Typeface boldCondensed = getApplicationContext().boldCondensed;
         tvLabel.setTag(color);
         
@@ -232,8 +234,8 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
         tvLabel.setTypeface(boldCondensed);
         
         mSelectedColor = color;
+        mSelectedEtLabel = etLabel;
         mSelectedLabel = tvLabel.getText().toString();
-        Log.i("", "++++++++++++ " + mSelectedLabel);
         if (clearOtherSelected) {
             clearOtherSelected(false);
         }
@@ -259,14 +261,12 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
             TextView tvLabel2 = (TextView) m.get("tvLabel");
             View viewColor2 = (View) m.get("viewColor");
             Label label2 = (Label) m.get("label");
-            Log.i("", "++++++++++++ clearOtherSelected " + mSelectedLabel + " " + tvLabel2.getText().toString());
             if (all) {
                 unselectLabel(tvLabel2, viewColor2, label2.getColor());
                 llEdit2.setVisibility(View.GONE);
             }
             else {
                 if (!tvLabel2.getText().toString().equals(mSelectedLabel)) {
-                    Log.i("", "+++++++++ dok sama");
                     unselectLabel(tvLabel2, viewColor2, label2.getColor());
                     llEdit2.setVisibility(View.GONE);
                 }
@@ -288,7 +288,6 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
         
         public EditActionMode(String currentLabelName, EditText newLabelText) {
             mCurrentLabelName = currentLabelName;
-            mNewLabelText = newLabelText;
         }
         
         @Override
@@ -312,11 +311,12 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            Log.i("", "++++++++++++ " + mSelectedEtLabel.getText().toString());
             switch (item.getItemId()) {
             case 0:
                 mProgressDialog = showProgressDialog(getResources().getString(R.string.saving_msg), true);
                 new EditIssueLabelsTask(IssueLabelListActivity.this).execute(mCurrentLabelName, 
-                        mNewLabelText.getText().toString(), IssueLabelListActivity.this.mSelectedColor);
+                        mSelectedEtLabel.getText().toString(), IssueLabelListActivity.this.mSelectedColor);
                 break;
             case 1:
                 AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(IssueLabelListActivity.this,
