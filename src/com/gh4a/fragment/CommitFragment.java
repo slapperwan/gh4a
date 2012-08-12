@@ -128,6 +128,9 @@ public class CommitFragment extends BaseFragment {
     }
 
     private void fillData(final RepositoryCommit commit) {
+        if (getSherlockActivity() == null) {
+            return;
+        }
         View v = getView();
         final BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) getSherlockActivity();
         final Gh4Application context = activity.getApplicationContext();
