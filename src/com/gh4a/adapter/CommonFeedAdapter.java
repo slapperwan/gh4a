@@ -28,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
+import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.holder.Feed;
@@ -39,17 +40,20 @@ public class CommonFeedAdapter extends RootAdapter<Feed> {
     private boolean mShowGravatar;
     private boolean mShowExtra;
     private int mRowLayout;
+    private AQuery aq;
     
     public CommonFeedAdapter(Context context, List<Feed> objects) {
         super(context, objects);
         mShowGravatar = true;//default true
         mShowExtra = true;//default true
+        aq = new AQuery((BaseSherlockFragmentActivity) context);
     }
     
     public CommonFeedAdapter(Context context, List<Feed> objects, boolean showGravatar, boolean showExtra) {
         super(context, objects);
         mShowGravatar = showGravatar;
         mShowExtra = showExtra;
+        aq = new AQuery(context);
     }
     
     public CommonFeedAdapter(Context context, List<Feed> objects, boolean showGravatar, boolean showExtra, int rowLayout) {
@@ -57,6 +61,7 @@ public class CommonFeedAdapter extends RootAdapter<Feed> {
         mShowGravatar = showGravatar;
         mShowExtra = showExtra;
         mRowLayout = rowLayout;
+        aq = new AQuery(context);
     }
     
     @Override
@@ -98,9 +103,12 @@ public class CommonFeedAdapter extends RootAdapter<Feed> {
 
         final Feed feed = mObjects.get(position);
         if (feed != null) {
+            
+            aq.recycle(convertView);
+            
             if (viewHolder.ivGravatar != null) {
                 if (mShowGravatar) {
-                    AQuery aq = new AQuery(convertView);
+                    
                     aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(feed.getGravatarId()), 
                             true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
                     viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {

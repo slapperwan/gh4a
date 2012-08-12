@@ -22,6 +22,7 @@ import org.eclipse.egit.github.core.Comment;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -30,6 +31,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
+import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarUtils;
@@ -38,10 +40,13 @@ import com.github.mobile.util.HttpImageGetter;
 
 public class CommentAdapter extends RootAdapter<Comment> {
 
-    HttpImageGetter imageGetter;
+    private HttpImageGetter imageGetter;
+    private AQuery aq;
+    
     public CommentAdapter(Context context, List<Comment> objects) {
         super(context, objects);
         imageGetter = new HttpImageGetter(mContext);
+        aq = new AQuery((BaseSherlockFragmentActivity) context);
     }
 
     @Override
@@ -66,7 +71,8 @@ public class CommentAdapter extends RootAdapter<Comment> {
         final Comment comment = mObjects.get(position);
         if (comment != null) {
             
-            AQuery aq = new AQuery(convertView);
+            Log.i("", "+++++++++++++++++ " + mContext);
+            aq.recycle(convertView);
             aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(comment.getUser().getGravatarId()), 
                     true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
 

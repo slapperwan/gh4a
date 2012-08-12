@@ -40,17 +40,13 @@ import com.gh4a.utils.GravatarUtils;
 
 public class IssueAdapter extends RootAdapter<Issue> {
 
-    private int mRowLayout;
-
+    private AQuery aq;
+    
     public IssueAdapter(Context context, List<Issue> objects) {
         super(context, objects);
+        aq = new AQuery((BaseSherlockFragmentActivity) context);
     }
     
-    public IssueAdapter(Context context, List<Issue> objects, int rowLayout) {
-        super(context, objects);
-        mRowLayout = rowLayout;
-    }
-
     @Override
     public View doGetView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
@@ -92,7 +88,7 @@ public class IssueAdapter extends RootAdapter<Issue> {
         final Issue issue = mObjects.get(position);
         if (issue != null) {
             
-            AQuery aq = new AQuery((BaseSherlockFragmentActivity) mContext, convertView);
+            aq.recycle(convertView);
             aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(issue.getUser().getGravatarId()), 
                     true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
             

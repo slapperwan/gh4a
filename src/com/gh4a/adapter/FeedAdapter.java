@@ -58,6 +58,7 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.androidquery.AQuery;
+import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarUtils;
@@ -65,8 +66,11 @@ import com.gh4a.utils.StringUtils;
 
 public class FeedAdapter extends RootAdapter<Event> {
 
+    private AQuery aq;
+    
     public FeedAdapter(Context context, List<Event> objects) {
         super(context, objects);
+        aq = new AQuery((BaseSherlockFragmentActivity) context);
     }
 
     @Override
@@ -102,7 +106,7 @@ public class FeedAdapter extends RootAdapter<Event> {
         
         if (event != null) {
             
-            AQuery aq = new AQuery((SherlockFragmentActivity) mContext, convertView);
+            aq.recycle(convertView);
             aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(actor.getGravatarId()), 
                     true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
 

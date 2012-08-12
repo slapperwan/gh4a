@@ -27,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
+import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarUtils;
@@ -34,8 +35,11 @@ import com.gh4a.utils.StringUtils;
 
 public class CompareAdapter extends RootAdapter<String[]> {
 
+    private AQuery aq;
+    
     public CompareAdapter(Context context, List<String[]> objects) {
         super(context, objects);
+        aq = new AQuery((BaseSherlockFragmentActivity) context);
     }
 
     @Override
@@ -66,7 +70,7 @@ public class CompareAdapter extends RootAdapter<String[]> {
 
         final String[] commitInfo = mObjects.get(position);
         if (commitInfo != null) {
-            AQuery aq = new AQuery(convertView);
+            aq.recycle(convertView);
             aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(StringUtils.md5Hex(commitInfo[1])), 
                     true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
             

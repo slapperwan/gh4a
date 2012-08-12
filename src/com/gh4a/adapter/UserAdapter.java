@@ -30,6 +30,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
+import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarUtils;
@@ -39,15 +40,18 @@ public class UserAdapter extends RootAdapter<User> {
 
     private int mRowLayout;
     private boolean mShowExtraData;
+    private AQuery aq;
     
     public UserAdapter(Context context, List<User> objects) {
         super(context, objects);
+        aq = new AQuery((BaseSherlockFragmentActivity) context);
     }
 
     public UserAdapter(Context context, List<User> objects, int rowLayout, boolean showExtraData) {
         super(context, objects);
         mRowLayout = rowLayout;
         mShowExtraData = showExtraData;
+        aq = new AQuery(context);
     }
     
     @Override
@@ -90,7 +94,7 @@ public class UserAdapter extends RootAdapter<User> {
         final User user = mObjects.get(position);
 
         if (user != null) {
-            AQuery aq = new AQuery(convertView);
+            aq.recycle(convertView);
             if (viewHolder.ivGravatar != null) {
                 if (!StringUtils.isBlank(user.getGravatarId())) {
                     aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(user.getGravatarId()), 

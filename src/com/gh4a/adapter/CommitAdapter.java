@@ -31,15 +31,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
+import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.GravatarUtils;
 
 public class CommitAdapter extends RootAdapter<RepositoryCommit> {
-
+    
+    private AQuery aq;
+    
     public CommitAdapter(Context context, List<RepositoryCommit> objects) {
         super(context, objects);
+        aq = new AQuery((BaseSherlockFragmentActivity) context);
     }
 
     @Override
@@ -69,7 +73,8 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
 
         final RepositoryCommit commit = mObjects.get(position);
         if (commit != null) {
-            AQuery aq = new AQuery(convertView);
+            
+            aq.recycle(convertView);
             aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(CommitUtils.getAuthorGravatarId(commit)), 
                     true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
             
