@@ -514,7 +514,10 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     }
     
     private void refreshFragment() {
-        mCurrentTab = mPager.getCurrentItem();
+        mCurrentTab = 0;
+        if (mPager != null) {
+            mCurrentTab = mPager.getCurrentItem();
+        }
         mRepositoryFragment = null;
         mContentListFragment = null;
         mCommitListFragment = null;
