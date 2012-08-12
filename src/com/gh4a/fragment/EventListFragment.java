@@ -247,27 +247,35 @@ public abstract class EventListFragment extends BaseFragment
                 List<Commit> commits = payload.getCommits();
                 // if commit > 1, then show compare activity
                 
-                if (commits != null && commits.size() > 1) {
-                    Intent intent = new Intent().setClass(context, CompareActivity.class);
-                    for (Commit commit : commits) {
-                        String[] commitInfo = new String[4];
-                        commitInfo[0] = commit.getSha();
-                        commitInfo[1] = CommitUtils.getAuthorEmail(commit);
-                        commitInfo[2] = commit.getMessage();
-                        commitInfo[3] = CommitUtils.getAuthorName(commit);
-                        intent.putExtra("commit" + commit.getSha(), commitInfo);
+                if (commits != null) {
+                    if (commits.size() > 1) {
+                        Intent intent = new Intent().setClass(context, CompareActivity.class);
+                        for (Commit commit : commits) {
+                            String[] commitInfo = new String[4];
+                            commitInfo[0] = commit.getSha();
+                            commitInfo[1] = CommitUtils.getAuthorEmail(commit);
+                            commitInfo[2] = commit.getMessage();
+                            commitInfo[3] = CommitUtils.getAuthorName(commit);
+                            intent.putExtra("commit" + commit.getSha(), commitInfo);
+                        }
+                        
+                        intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
+                        intent.putExtra(Constants.Repository.REPO_NAME, repoName);
+                        intent.putExtra(Constants.Repository.HEAD, payload.getHead());
+                        intent.putExtra(Constants.Repository.BASE, payload.getRef());
+                        startActivity(intent);
                     }
-                    
-                    intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
-                    intent.putExtra(Constants.Repository.REPO_NAME, repoName);
-                    intent.putExtra(Constants.Repository.HEAD, payload.getHead());
-                    intent.putExtra(Constants.Repository.BASE, payload.getRef());
-                    startActivity(intent);
+                    // only 1 commit, then show the commit details
+                    else if (commits.size() == 1) {
+                        context.openCommitInfoActivity(getSherlockActivity(), repoOwner, repoName,
+                                payload.getCommits().get(0).getSha(), 0);
+                    }
+                    else {
+                        context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
+                    }
                 }
-                // only 1 commit, then show the commit details
                 else {
-                    context.openCommitInfoActivity(getSherlockActivity(), repoOwner, repoName,
-                            payload.getCommits().get(0).getSha(), 0);
+                    context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
                 }
             }
             else {
