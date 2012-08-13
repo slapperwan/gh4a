@@ -2,6 +2,7 @@ package com.gh4a;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 
 import com.gh4a.utils.StringUtils;
 
@@ -74,7 +75,14 @@ public class BrowseFilter extends BaseActivity {
                             context.openIssueActivity(this, user, repo, Integer.parseInt(id));
                         }
                         catch (NumberFormatException e) {
-                            // Ignore non-numeric ids
+                            // try issue with fragment url
+                            // https://github.com/slapperwan/gh4a/issues/87#issuecomment-7680638
+                            if (id.indexOf("#") != -1) {
+                                id = id.substring(0, id.indexOf("#"));
+                                if (TextUtils.isDigitsOnly(id)) {
+                                    context.openIssueActivity(this, user, repo, Integer.parseInt(id));
+                                }
+                            }
                         }
                     }
                 }
@@ -84,7 +92,14 @@ public class BrowseFilter extends BaseActivity {
                             context.openPullRequestActivity(this, user, repo, Integer.parseInt(id));
                         }
                         catch (NumberFormatException e) {
-                            // Ignore non-numeric ids
+                            // try issue with fragment url
+                            // https://github.com/slapperwan/gh4a/pull/50#issuecomment-2342877
+                            if (id.indexOf("#") != -1) {
+                                id = id.substring(0, id.indexOf("#"));
+                                if (TextUtils.isDigitsOnly(id)) {
+                                    context.openPullRequestActivity(this, user, repo, Integer.parseInt(id));
+                                }
+                            }
                         }
                     }
                 }
