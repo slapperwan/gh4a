@@ -42,7 +42,6 @@ import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -60,7 +59,7 @@ import com.gh4a.loader.MilestoneListLoader;
 import com.gh4a.utils.StringUtils;
 
 public class IssueCreateActivity extends BaseSherlockFragmentActivity 
-    implements OnClickListener, LoaderManager.LoaderCallbacks {
+    implements LoaderManager.LoaderCallbacks {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -70,8 +69,6 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
     private User mSelectedAssignee;
     private EditText mEtTitle;
     private EditText mEtDesc;
-    private Button mBtnMilestone;
-    private Button mBtnAssignee;
     private TextView mTvSelectedMilestone;
     private TextView mTvSelectedAssignee;
     private List<Label> mAllLabel;
@@ -121,18 +118,10 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
         mEtTitle = (EditText) findViewById(R.id.et_title);
         mEtDesc = (EditText) findViewById(R.id.et_desc);
         
-        mBtnMilestone = (Button) findViewById(R.id.btn_milestone);
-        mBtnMilestone.setOnClickListener(this);
-        
-        mBtnAssignee = (Button) findViewById(R.id.btn_assignee);
-        mBtnAssignee.setOnClickListener(this);
-        
         mLinearLayoutLabels = (LinearLayout) findViewById(R.id.ll_labels);
-        mTvSelectedMilestone = (TextView) findViewById(R.id.tv_selected_milestone);
-        mTvSelectedMilestone.setTypeface(getApplicationContext().boldCondensed);
+        mTvSelectedMilestone = (EditText) findViewById(R.id.et_milestone);
         
-        mTvSelectedAssignee = (TextView) findViewById(R.id.tv_selected_assignee);
-        mTvSelectedAssignee.setTypeface(getApplicationContext().boldCondensed);
+        mTvSelectedAssignee = (EditText) findViewById(R.id.et_assignee);
         
         TextView tvIssueLabelAdd = (TextView) findViewById(R.id.tv_issue_label_add);
         tvIssueLabelAdd.setTypeface(getApplicationContext().boldCondensed);
@@ -193,35 +182,26 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
         }
     }
     
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-
-        case R.id.btn_milestone:
-            if (mAllMilestone == null) {
-                mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-                getSupportLoaderManager().getLoader(1).forceLoad();
-            }
-            else {
-                showMilestonesDialog();
-            }
-            break;
-            
-        case R.id.btn_assignee:
-            if (mAllAssignee == null) {
-                mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-                getSupportLoaderManager().getLoader(2).forceLoad();
-            }
-            else {
-                showAssigneesDialog();
-            }
-            break;
-
-        default:
-            break;
+    public void showMilestonesDialog(View v) {
+        if (mAllMilestone == null) {
+            mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+            getSupportLoaderManager().getLoader(1).forceLoad();
+        }
+        else {
+            showMilestonesDialog();
         }
     }
-
+    
+    public void showAssigneesDialog(View v) {
+        if (mAllAssignee == null) {
+            mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+            getSupportLoaderManager().getLoader(2).forceLoad();
+        }
+        else {
+            showAssigneesDialog();
+        }
+    }
+    
     private static class SaveIssueTask extends AsyncTask<String, Void, Boolean> {
 
         private WeakReference<IssueCreateActivity> mTarget;
@@ -323,7 +303,9 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
             }
         }
         
-        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme));
+        int dialogTheme = Gh4Application.THEME == R.style.DefaultTheme ? 
+                R.style.Theme_Sherlock_Dialog : R.style.Theme_Sherlock_Light_Dialog;
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, dialogTheme));
         builder.setCancelable(true);
         builder.setTitle(R.string.issue_milestone);
         builder.setSingleChoiceItems(milestones, checkedItem, new DialogInterface.OnClickListener() {
@@ -343,7 +325,9 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
                 new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 if (mSelectedMilestone != null) {
-                    mTvSelectedMilestone.setText(mSelectedMilestone.getTitle());
+                    mTvSelectedMilestone.setText(IssueCreateActivity.this.getResources().getString(R.string.issue_milestone)
+                            + " : "
+                            + mSelectedMilestone.getTitle());
                 }
                 else {
                     mTvSelectedMilestone.setText(null);
@@ -377,7 +361,9 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
             }
         }
         
-        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme));
+        int dialogTheme = Gh4Application.THEME == R.style.DefaultTheme ? 
+                R.style.Theme_Sherlock_Dialog : R.style.Theme_Sherlock_Light_Dialog;
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, dialogTheme));
         builder.setCancelable(true);
         builder.setTitle(R.string.issue_assignee);
         builder.setSingleChoiceItems(assignees, checkedItem, new DialogInterface.OnClickListener() {
@@ -397,7 +383,9 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
                 new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 if (mSelectedAssignee != null) {
-                    mTvSelectedAssignee.setText(mSelectedAssignee.getLogin());
+                    mTvSelectedAssignee.setText(IssueCreateActivity.this.getResources().getString(R.string.issue_assignee)
+                            + " : "
+                            + mSelectedAssignee.getLogin());
                 }
                 else {
                     mTvSelectedAssignee.setText(null);
@@ -508,11 +496,15 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
         mSelectedAssignee = mEditIssue.getAssignee();
         
         if (mSelectedMilestone != null) {
-            mTvSelectedMilestone.setText(mEditIssue.getMilestone().getTitle());
+            mTvSelectedMilestone.setText(IssueCreateActivity.this.getResources().getString(R.string.issue_milestone)
+                    + " : "
+                    + mEditIssue.getMilestone().getTitle());
         }
         
         if (mSelectedAssignee != null) {
-            mTvSelectedAssignee.setText(mSelectedAssignee.getLogin());
+            mTvSelectedAssignee.setText(IssueCreateActivity.this.getResources().getString(R.string.issue_assignee)
+                    + " : "
+                    + mSelectedAssignee.getLogin());
         }
     }
     
