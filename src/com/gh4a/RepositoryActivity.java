@@ -468,7 +468,9 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
             branchList[i] = mBranches.get(i).getName();
         }
         
-        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme));
+        int dialogTheme = Gh4Application.THEME == R.style.DefaultTheme ? 
+                R.style.Theme_Sherlock_Dialog : R.style.Theme_Sherlock_Light_Dialog;
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, dialogTheme));
         builder.setCancelable(true);
         builder.setTitle(R.string.repo_branches);
         builder.setSingleChoiceItems(branchList, -1, new DialogInterface.OnClickListener() {
@@ -504,7 +506,9 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
             tagList[i] = mTags.get(i).getName();
         }
         
-        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme));
+        int dialogTheme = Gh4Application.THEME == R.style.DefaultTheme ? 
+                R.style.Theme_Sherlock_Dialog : R.style.Theme_Sherlock_Light_Dialog;
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, dialogTheme));
         builder.setCancelable(true);
         builder.setTitle(R.string.repo_tags);
         builder.setSingleChoiceItems(tagList, -1, new DialogInterface.OnClickListener() {
