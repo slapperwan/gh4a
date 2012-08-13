@@ -326,8 +326,12 @@ public class FeedAdapter extends RootAdapter<Event> {
         else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
             PullRequestReviewCommentPayload payload = (PullRequestReviewCommentPayload) event.getPayload();
             
-            String text = String.format(res.getString(R.string.event_pull_request_review_comment_desc),
-                    payload.getComment().getPath(), payload.getComment().getId());
+//            String text = String.format(res.getString(R.string.event_pull_request_review_comment_desc),
+//                    payload.getComment().getPath(), payload.getComment().getId());
+            
+            String text = res.getString(R.string.event_commit_comment_desc) + " ";
+            text += payload.getComment().getCommitId().substring(0, 7) 
+                    + " - " + payload.getComment().getBody();
             
             return text;
         }
