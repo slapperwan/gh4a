@@ -43,8 +43,11 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity {
         if (Constants.User.USER_TYPE_ORG.equals(mUserType)) {
             tabCount = 1;
         }
+        else if (mUserLogin.equals(getAuthLogin())) {
+            tabCount = 7;
+        }
         else {
-            tabCount = 2;
+            tabCount = 5;
         }
         
         mActionBar = getSupportActionBar();
@@ -67,25 +70,62 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity {
         });
         
         mActionBar.setTitle(mUserLogin);
+        mActionBar.setSubtitle(R.string.user_pub_repos);
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         mActionBar.setDisplayHomeAsUpEnabled(true);
         
         Tab tab = mActionBar
                 .newTab()
-                .setText(R.string.user_pub_repos)
+                .setText(R.string.user_all_repos)
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 0 + "", mPager));
         mActionBar.addTab(tab);
         
-        if (tabCount == 2) {
+        if (!Constants.User.USER_TYPE_ORG.equals(mUserType)) {
             tab = mActionBar
                     .newTab()
-                    .setText(R.string.user_starred_repos)
+                    .setText(R.string.user_stars_repos)
                     .setTabListener(
                             new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
             mActionBar.addTab(tab);
+            
+            if (mUserLogin.equals(getAuthLogin())) {
+                tab = mActionBar
+                        .newTab()
+                        .setText(R.string.user_public_repos)
+                        .setTabListener(
+                                new TabListener<SherlockFragmentActivity>(this, 2 + "", mPager));
+                mActionBar.addTab(tab);
+                
+                tab = mActionBar
+                        .newTab()
+                        .setText(R.string.user_private_repos)
+                        .setTabListener(
+                                new TabListener<SherlockFragmentActivity>(this, 3 + "", mPager));
+                mActionBar.addTab(tab);
+            }
+            
+            tab = mActionBar
+                    .newTab()
+                    .setText(R.string.user_sources_repos)
+                    .setTabListener(
+                            new TabListener<SherlockFragmentActivity>(this, (tabCount - 3) + "", mPager));
+            mActionBar.addTab(tab);
+            
+            tab = mActionBar
+                    .newTab()
+                    .setText(R.string.user_forks_repos)
+                    .setTabListener(
+                            new TabListener<SherlockFragmentActivity>(this, (tabCount - 2) + "", mPager));
+            mActionBar.addTab(tab);
+            
+            tab = mActionBar
+                    .newTab()
+                    .setText(R.string.user_member_repos)
+                    .setTabListener(
+                            new TabListener<SherlockFragmentActivity>(this, (tabCount - 1) + "", mPager));
+            mActionBar.addTab(tab);
         }
-        
     }
     
     public class ThisPageAdapter extends FragmentStatePagerAdapter {
@@ -101,16 +141,45 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity {
 
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
+            //Repo type all, owner, public, private, member
             if (position == 0) {
-                return RepositoryListFragment.newInstance(RepositoryListActivity.this.mUserLogin,
-                        RepositoryListActivity.this.mUserType);
+                return RepositoryListFragment.newInstance(mUserLogin, mUserType, "all");
             }
             else if (position == 1) {
-                return WatchedRepositoryListFragment.newInstance(RepositoryListActivity.this.mUserLogin);
+                return WatchedRepositoryListFragment.newInstance(mUserLogin);
+            }
+            else if (position == 2) {
+                if (mUserLogin.equals(getAuthLogin())) {
+                    return RepositoryListFragment.newInstance(mUserLogin, mUserType, "public");
+                }
+                else {
+                    return RepositoryListFragment.newInstance(mUserLogin, mUserType, "sources");
+                }
+            }
+            else if (position == 3) {
+                if (mUserLogin.equals(getAuthLogin())) {
+                    return RepositoryListFragment.newInstance(mUserLogin, mUserType, "private");
+                }
+                else {
+                    return RepositoryListFragment.newInstance(mUserLogin, mUserType, "forks");
+                }
+            }
+            else if (position == 4) {
+                if (mUserLogin.equals(getAuthLogin())) {
+                    return RepositoryListFragment.newInstance(mUserLogin, mUserType, "sources");
+                }
+                else {
+                    return RepositoryListFragment.newInstance(mUserLogin, mUserType, "member");
+                }
+            }
+            else if (position == 5) {
+                return RepositoryListFragment.newInstance(mUserLogin, mUserType, "forks");
+            }
+            else if (position == 6) {
+                return RepositoryListFragment.newInstance(mUserLogin, mUserType, "member");
             }
             else {
-                return RepositoryListFragment.newInstance(RepositoryListActivity.this.mUserLogin,
-                        RepositoryListActivity.this.mUserType);
+                return RepositoryListFragment.newInstance(mUserLogin, mUserType, "all");
             }
         }
         

@@ -114,6 +114,14 @@
     <string name="user_pub_repos">Repositories</string>
     <string name="user_watched_repos">Watched</string>
     <string name="user_starred_repos">Starred</string>
+    <string name="user_stars_repos">Stars</string>
+    <string name="user_all_repos">All</string>
+    <string name="user_owner_repos">Owner</string>
+    <string name="user_public_repos">Public</string>
+    <string name="user_private_repos">Private</string>
+    <string name="user_member_repos">Member</string>
+    <string name="user_sources_repos">Sources</string>
+    <string name="user_forks_repos">Forks</string>
     <string name="user_pushable_repos">Pushable Repositories</string>
     <string name="user_extra_data">%1$d followers | %2$d repos</string>
     <string name="user_news_feed">News Feed</string>

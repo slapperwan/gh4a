@@ -18,6 +18,7 @@ package com.gh4a.fragment;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.client.GitHubClient;
@@ -52,6 +53,7 @@ public class RepositoryListFragment extends BaseFragment
 
     private String mLogin;
     private String mUserType;
+    private String mRepoType;
     private ListView mListView;
     private RepositoryAdapter mAdapter;
     private PageIterator<Repository> mDataIterator;
@@ -59,12 +61,13 @@ public class RepositoryListFragment extends BaseFragment
     private boolean isLoadCompleted;
     private TextView mLoadingView;
     
-    public static RepositoryListFragment newInstance(String login, String userType) {
+    public static RepositoryListFragment newInstance(String login, String userType, String repoType) {
         RepositoryListFragment f = new RepositoryListFragment();
 
         Bundle args = new Bundle();
         args.putString(Constants.User.USER_LOGIN, login);
         args.putString(Constants.User.USER_TYPE, userType);
+        args.putString(Constants.Repository.REPO_TYPE, repoType);
         f.setArguments(args);
         
         return f;
@@ -75,6 +78,7 @@ public class RepositoryListFragment extends BaseFragment
         super.onCreate(savedInstanceState);
         mLogin = getArguments().getString(Constants.User.USER_LOGIN);
         mUserType = getArguments().getString(Constants.User.USER_TYPE);
+        mRepoType = getArguments().getString(Constants.Repository.REPO_TYPE);
     }
     
     @Override
@@ -110,14 +114,23 @@ public class RepositoryListFragment extends BaseFragment
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(app.getAuthToken());
         RepositoryService repoService = new RepositoryService(client);
+        
+        Map<String, String> filterData = new HashMap<String, String>();
+        if ("sources".equals(mRepoType) || "forks".equals(mRepoType)) {
+            filterData.put("type", "all");
+        }
+        else {
+            filterData.put("type", mRepoType);
+        }
+        
         if (mLogin.equals(app.getAuthLogin())) {
-            mDataIterator = repoService.pageRepositories(new HashMap<String, String>());
+            mDataIterator = repoService.pageRepositories(filterData, 100);
         }
         else if (Constants.User.USER_TYPE_ORG.equals(mUserType)) {
             mDataIterator = repoService.pageOrgRepositories(mLogin, new HashMap<String, String>());
         }
         else {
-            mDataIterator = repoService.pageRepositories(mLogin, new HashMap<String, String>(), 100);
+            mDataIterator = repoService.pageRepositories(mLogin, filterData, 100);
         }
     }
     
@@ -128,12 +141,36 @@ public class RepositoryListFragment extends BaseFragment
                 mListView.setAdapter(mAdapter);
             }
             if (isLoadMore) {
-                mAdapter.addAll(mAdapter.getCount(), repositories);
+                if ("sources".equals(mRepoType) || "forks".equals(mRepoType)) {
+                    for (Repository repository : repositories) {
+                        if ("sources".equals(mRepoType) && !repository.isFork()) {
+                            mAdapter.add(repository);
+                        }
+                        else if ("forks".equals(mRepoType) && repository.isFork()) {
+                            mAdapter.add(repository);
+                        }
+                    }
+                }
+                else {
+                    mAdapter.addAll(mAdapter.getCount(), repositories);  
+                }
                 mAdapter.notifyDataSetChanged();
             }
             else {
                 mAdapter.clear();
-                mAdapter.addAll(repositories);
+                if ("sources".equals(mRepoType) || "forks".equals(mRepoType)) {
+                    for (Repository repository : repositories) {
+                        if ("sources".equals(mRepoType) && !repository.isFork()) {
+                            mAdapter.add(repository);
+                        }
+                        else if ("forks".equals(mRepoType) && repository.isFork()) {
+                            mAdapter.add(repository);
+                        }
+                    }
+                }
+                else {
+                    mAdapter.addAll(repositories);
+                }
                 mAdapter.notifyDataSetChanged();
                 mListView.setSelection(0);
             }

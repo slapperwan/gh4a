@@ -148,6 +148,8 @@ public interface Constants {
         public static final String SELECTED_REF = "SELECTED_REF";
         
         public static final String SELECTED_BRANCHTAG_NAME = "SELECTED_BRANCHTAG_NAME";
+        
+        public static final String REPO_TYPE = "REPO_TYPE";
     }
 
     /**
