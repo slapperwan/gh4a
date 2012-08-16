@@ -57,6 +57,7 @@ public class RepositoryFragment extends BaseFragment implements
     private String mRepoOwner;
     private String mRepoName;
     private int mWatcherCount;
+    private boolean mDataLoaded;
     
     public static RepositoryFragment newInstance(Repository repository) {
         RepositoryFragment f = new RepositoryFragment();
@@ -99,11 +100,22 @@ public class RepositoryFragment extends BaseFragment implements
         tvReadmeTitle.setTextColor(Color.parseColor("#0099cc"));
 
         showLoading(R.id.pb_readme, R.id.readme);
-        
-        getLoaderManager().initLoader(0, null, this);
-        getLoaderManager().getLoader(0).forceLoad();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!mDataLoaded) {
+            if (getLoaderManager().getLoader(0) == null) {
+                getLoaderManager().initLoader(0, null, this);
+            }
+            else {
+                getLoaderManager().restartLoader(0, null, this);
+            }
+            getLoaderManager().getLoader(0).forceLoad();
+        }
+    }
+    
     public void fillData() {
         View v = getView();
         final Gh4Application app = (Gh4Application) getActivity().getApplicationContext();
@@ -435,6 +447,7 @@ public class RepositoryFragment extends BaseFragment implements
 
     @Override
     public void onLoadFinished(Loader<String> loader, String readme) {
+        mDataLoaded = true;
         hideLoading(R.id.pb_readme, R.id.readme);
         if (readme != null) {
             fillReadme(readme);

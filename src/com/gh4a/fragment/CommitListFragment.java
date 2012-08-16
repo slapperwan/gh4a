@@ -60,6 +60,7 @@ public class CommitListFragment extends BaseFragment
     private boolean isLoadMore;
     private boolean isLoadCompleted;
     private TextView mLoadingView;
+    private boolean mDataLoaded;
     
     public static CommitListFragment newInstance(Repository repository, String ref) {
         
@@ -104,13 +105,24 @@ public class CommitListFragment extends BaseFragment
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         mListView.setOnScrollListener(this);
-        
-        loadData();
-        
-        getLoaderManager().initLoader(0, null, this);
-        getLoaderManager().getLoader(0).forceLoad();
     }
     
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!mDataLoaded) {
+            loadData();
+            
+            if (getLoaderManager().getLoader(0) == null) {
+                getLoaderManager().initLoader(0, null, this);    
+            }
+            else {
+                getLoaderManager().restartLoader(0, null, this);
+            }
+            getLoaderManager().getLoader(0).forceLoad();
+        }
+        
+    }
     public void loadData() {
         Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
         GitHubClient client = new GitHubClient();
@@ -170,6 +182,7 @@ public class CommitListFragment extends BaseFragment
     @Override
     public void onLoadFinished(Loader<List<RepositoryCommit>> loader, List<RepositoryCommit> commits) {
         isLoadCompleted = true;
+        mDataLoaded = true;
         hideLoading();
         fillData(commits);
     }

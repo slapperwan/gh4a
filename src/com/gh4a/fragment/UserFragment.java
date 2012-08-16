@@ -63,8 +63,11 @@ public class UserFragment extends BaseFragment implements
     private String mUserLogin;
     private String mUserName;
     private User mUser;
-    private boolean isFollowing;
+    private Boolean isFollowing;
     private int mFollowersCount;
+    private boolean mDataLoaded;
+    private List<Repository> mTopRepos;
+    private List<User> mOrgs;
 
     public static UserFragment newInstance(String login, String name) {
         UserFragment f = new UserFragment();
@@ -90,7 +93,6 @@ public class UserFragment extends BaseFragment implements
             Bundle savedInstanceState) {
         Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onCreateView UserFragment");
         View v = inflater.inflate(R.layout.user, container, false);
-        setRetainInstance(true);
         return v;
     }
     
@@ -100,18 +102,30 @@ public class UserFragment extends BaseFragment implements
         super.onActivityCreated(savedInstanceState);
         
         showLoading();
-        
-        getLoaderManager().initLoader(0, null, this);
-        getLoaderManager().getLoader(0).forceLoad();
-        
-        getLoaderManager().initLoader(3, null, this);
-        getLoaderManager().getLoader(3).forceLoad();
-        
-        getLoaderManager().initLoader(4, null, this);
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!mDataLoaded) {
+            refresh();
+        }
     }
     
     public void refresh() {
+        if (getLoaderManager().getLoader(0) == null) {
+            getLoaderManager().initLoader(0, null, this);
+            getLoaderManager().initLoader(3, null, this);
+            getLoaderManager().initLoader(4, null, this);
+        }
+        else {
+            getLoaderManager().restartLoader(0, null, this);
+            getLoaderManager().restartLoader(3, null, this);
+            getLoaderManager().restartLoader(4, null, this);
+        }
+        
         getLoaderManager().getLoader(0).forceLoad();
+        getLoaderManager().getLoader(3).forceLoad();
     }
     
     private void fillData() {
@@ -267,8 +281,6 @@ public class UserFragment extends BaseFragment implements
         tvOrgs.setTypeface(boldCondensed);
         tvOrgs.setTextColor(Color.parseColor("#0099cc"));
         
-        UserActivity userActivity = (UserActivity) getSherlockActivity();
-        
         getLoaderManager().initLoader(1, null, this);
         getLoaderManager().initLoader(2, null, this);
         
@@ -345,72 +357,82 @@ public class UserFragment extends BaseFragment implements
         startActivity(intent);
     }
 
-    public void fillTopRepos(List<Repository> repos) {
+    public void fillTopRepos() {
         Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
         Typeface boldCondensed = app.boldCondensed;
         
         View v = getView();
         LinearLayout ll = (LinearLayout) v.findViewById(R.id.ll_top_repos);
         ll.removeAllViews();
-        int i = 0;
-        for (final Repository repository : repos) {
-            View rowView = getLayoutInflater(null).inflate(R.layout.row_simple_3, null);
-            rowView.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-            rowView.setPadding(0, 16, 0, 16);
-            rowView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
-                    app.openRepositoryInfoActivity(getSherlockActivity(), repository);
-                }
-            });
-            
-            TextView tvTitle = (TextView) rowView.findViewById(R.id.tv_title);
-            tvTitle.setTypeface(boldCondensed);
-            
-            TextView tvDesc = (TextView) rowView.findViewById(R.id.tv_desc);
-            tvDesc.setSingleLine(true);
-            
-            TextView tvExtra = (TextView) rowView.findViewById(R.id.tv_extra);
-            tvExtra.setTextAppearance(getSherlockActivity(), R.style.default_text_micro);
-            
-            tvTitle.setText(repository.getOwner().getLogin() + " / " + repository.getName());
-            
-            if (!StringUtils.isBlank(repository.getDescription())) {
-                tvDesc.setVisibility(View.VISIBLE);
-                tvDesc.setText(repository.getDescription());
-            }
-            else {
-                tvDesc.setVisibility(View.GONE);
-            }
-            
-            String extraData = (repository.getLanguage() != null ? repository.getLanguage()
-                    + "   " : "")
-                    + StringUtils.toHumanReadbleFormat(repository.getSize())
-                    + "   "
-                    + repository.getForks()
-                    + " " + getResources().getString(R.string.repo_forks).toLowerCase() + "   "
-                    + repository.getWatchers()
-                    + " " + getResources().getString(R.string.repo_stargazers).toLowerCase();
-            tvExtra.setText(extraData);
-            
-            ll.addView(rowView);
-            
-            //looks like the API ignore the per_page for GET /orgs/:org/repos
-            if (i == 4) {
-                break;
-            }
-            i++;
-        }
         
         Button btnMore = (Button) getView().findViewById(R.id.btn_repos);
-        if (!repos.isEmpty()) {
-            btnMore.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    getPublicRepos(view);
+        
+        int i = 0;
+        if (mTopRepos != null) {
+            for (final Repository repository : mTopRepos) {
+                View rowView = getLayoutInflater(null).inflate(R.layout.row_simple_3, null);
+                rowView.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
+                rowView.setPadding(0, 16, 0, 16);
+                rowView.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
+                        app.openRepositoryInfoActivity(getSherlockActivity(), repository);
+                    }
+                });
+                
+                TextView tvTitle = (TextView) rowView.findViewById(R.id.tv_title);
+                tvTitle.setTypeface(boldCondensed);
+                
+                TextView tvDesc = (TextView) rowView.findViewById(R.id.tv_desc);
+                tvDesc.setSingleLine(true);
+                
+                TextView tvExtra = (TextView) rowView.findViewById(R.id.tv_extra);
+                tvExtra.setTextAppearance(getSherlockActivity(), R.style.default_text_micro);
+                
+                tvTitle.setText(repository.getOwner().getLogin() + " / " + repository.getName());
+                
+                if (!StringUtils.isBlank(repository.getDescription())) {
+                    tvDesc.setVisibility(View.VISIBLE);
+                    tvDesc.setText(repository.getDescription());
                 }
-            });
+                else {
+                    tvDesc.setVisibility(View.GONE);
+                }
+                
+                String extraData = (repository.getLanguage() != null ? repository.getLanguage()
+                        + "   " : "")
+                        + StringUtils.toHumanReadbleFormat(repository.getSize())
+                        + "   "
+                        + repository.getForks()
+                        + " " + getResources().getString(R.string.repo_forks).toLowerCase() + "   "
+                        + repository.getWatchers()
+                        + " " + getResources().getString(R.string.repo_stargazers).toLowerCase();
+                tvExtra.setText(extraData);
+                
+                ll.addView(rowView);
+                
+                //looks like the API ignore the per_page for GET /orgs/:org/repos
+                if (i == 4) {
+                    break;
+                }
+                i++;
+            }
+            
+            if (!mTopRepos.isEmpty()) {
+                btnMore.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        getPublicRepos(view);
+                    }
+                });
+            }
+            else {
+                btnMore.setVisibility(View.GONE);
+                TextView noRepos = new TextView(getSherlockActivity());
+                noRepos.setText("Repositories not found");
+                ll.addView(noRepos);
+            }
         }
         else {
             btnMore.setVisibility(View.GONE);
@@ -420,7 +442,7 @@ public class UserFragment extends BaseFragment implements
         }
     }
     
-    public void fillOrganizations(List<User> orgs) {
+    public void fillOrganizations() {
         Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
         Typeface boldCondensed = app.boldCondensed;
         
@@ -430,9 +452,9 @@ public class UserFragment extends BaseFragment implements
         LinearLayout llOrg = (LinearLayout) v.findViewById(R.id.ll_org);
         llOrg.removeAllViews();
         
-        if (!orgs.isEmpty()) {
+        if (mOrgs != null && !mOrgs.isEmpty()) {
             llOrgs.setVisibility(View.VISIBLE);
-            for (final User org : orgs) {
+            for (final User org : mOrgs) {
                 View rowView = getLayoutInflater(null).inflate(R.layout.row_simple, null);
                 rowView.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
                 rowView.setPadding(0, 16, 0, 16);
@@ -489,15 +511,24 @@ public class UserFragment extends BaseFragment implements
         UserActivity userActivity = (UserActivity) getSherlockActivity();
         HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
         
+        if (mUser != null 
+                && mTopRepos != null 
+                && mOrgs != null 
+                && isFollowing != null) {
+            mDataLoaded = true;
+        }
+        
         if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
             Object data = result.get(LoaderResult.DATA); 
             
             if (loader.getId() == 1) {
                 hideLoading(R.id.pb_top_repos, 0);
-                fillTopRepos((List<Repository>) data);
+                mTopRepos = (List<Repository>) data;
+                fillTopRepos();
             }
             else if (loader.getId() == 2) {
-                fillOrganizations((List<User>) data);
+                mOrgs = (List<User>) data;
+                fillOrganizations();
             }
             else if (loader.getId() == 3) {
                 isFollowing = (Boolean) data;

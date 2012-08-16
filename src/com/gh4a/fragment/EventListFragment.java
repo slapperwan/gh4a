@@ -130,10 +130,14 @@ public abstract class EventListFragment extends BaseFragment
         mListView.setOnScrollListener(this);
         registerForContextMenu(mListView);
         
-        loadData();
-        
-        getLoaderManager().initLoader(0, null, this);
-        getLoaderManager().getLoader(0).forceLoad();
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!isLoadCompleted) {
+            refresh();
+        }
     }
     
     public void loadData() {
@@ -152,7 +156,12 @@ public abstract class EventListFragment extends BaseFragment
     public void refresh() {
         isLoadMore = false;
         loadData();
-        getLoaderManager().restartLoader(0, null, this);
+        if (getLoaderManager().getLoader(0) == null) {
+            getLoaderManager().initLoader(0, null, this);
+        }
+        else {
+            getLoaderManager().restartLoader(0, null, this);
+        }
         getLoaderManager().getLoader(0).forceLoad();
     }
     

@@ -38,7 +38,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.IssueActivity;
@@ -54,6 +53,7 @@ public class RepositoryIssueListFragment extends BaseFragment
     private ListView mListView;
     private RepositoryIssueAdapter mAdapter;
     private PageIterator<RepositoryIssue> mDataIterator;
+    private boolean mDataLoaded; 
     
     public static RepositoryIssueListFragment newInstance(Map<String, String> filterData) {
         
@@ -106,16 +106,24 @@ public class RepositoryIssueListFragment extends BaseFragment
         mAdapter = new RepositoryIssueAdapter(getSherlockActivity(), new ArrayList<RepositoryIssue>());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
-        
-        loadData();
-        
-        getLoaderManager().initLoader(0, null, this);
-        getLoaderManager().getLoader(0).forceLoad();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!mDataLoaded) {
+            refresh();
+        }
     }
     
     public void refresh() {
         loadData();
-        getLoaderManager().restartLoader(0, null, this);
+        if (getLoaderManager().getLoader(0) == null) {
+            getLoaderManager().initLoader(0, null, this);
+        }
+        else {
+            getLoaderManager().restartLoader(0, null, this);
+        }
         getLoaderManager().getLoader(0).forceLoad();
     }
     
@@ -144,14 +152,13 @@ public class RepositoryIssueListFragment extends BaseFragment
 
     @Override
     public void onLoadFinished(Loader<List<RepositoryIssue>> loader, List<RepositoryIssue> issues) {
+        mDataLoaded = true;
         hideLoading();
         fillData(issues);
     }
 
     @Override
     public void onLoaderReset(Loader<List<RepositoryIssue>> arg0) {
-        // TODO Auto-generated method stub
-        
     }
 
     @Override

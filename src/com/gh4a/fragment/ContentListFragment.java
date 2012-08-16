@@ -54,7 +54,7 @@ public class ContentListFragment extends BaseFragment
     public FileAdapter mAdapter;
     private OnTreeSelectedListener mCallback;
     private List<Content> mContents;
-    private Map<String, String> mGitModuleMap;
+    private boolean mDataLoaded;
 
     public static ContentListFragment newInstance(Repository repository,
             String path, String ref) {
@@ -109,21 +109,38 @@ public class ContentListFragment extends BaseFragment
             mContents = new ArrayList<Content>();
             mAdapter = new FileAdapter(getSherlockActivity(), mContents);
             mListView.setAdapter(mAdapter);
-            
-            getLoaderManager().initLoader(0, null, this);
-            getLoaderManager().getLoader(0).forceLoad();
-            
-            //get .gitmodules to be parsed
-            if (StringUtils.isBlank(mPath)) {
-                getLoaderManager().initLoader(1, null, this);
-                getLoaderManager().getLoader(1).forceLoad();
-            }
         }
         else {
             hideLoading();
             mAdapter = new FileAdapter(getSherlockActivity(), mContents);
             mListView.setAdapter(mAdapter);
             mAdapter.notifyDataSetChanged();
+        }
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!mDataLoaded) {
+            if (getLoaderManager().getLoader(0) == null) {
+                getLoaderManager().initLoader(0, null, this);
+            }
+            else {
+                getLoaderManager().restartLoader(0, null, this);
+            }
+            getLoaderManager().getLoader(0).forceLoad();
+            
+            //get .gitmodules to be parsed
+            if (StringUtils.isBlank(mPath)) {
+                if (getLoaderManager().getLoader(1) == null) {
+                    getLoaderManager().initLoader(1, null, this);
+                }
+                else {
+                    getLoaderManager().restartLoader(1, null, this);
+                }
+                getLoaderManager().getLoader(1).forceLoad();
+            }
+           
         }
     }
     
@@ -156,13 +173,16 @@ public class ContentListFragment extends BaseFragment
     @Override
     public void onLoadFinished(Loader loader, Object object) {
         HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
+        Object data = result.get(LoaderResult.DATA);
+        
         hideLoading();
         if (loader.getId() == 1) {
-            mCallback.setGitModuleMap((Map<String, String>) result.get(LoaderResult.DATA));
+            mCallback.setGitModuleMap((Map<String, String>) data);
         }
         else {
+            mDataLoaded = true;
             if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
-                fillData((List<Content>) result.get(LoaderResult.DATA));            
+                fillData((List<Content>) data);            
             }
         }
     }

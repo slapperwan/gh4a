@@ -16,7 +16,7 @@ public class FollowUserLoader extends BaseLoader {
     private String mLogin;
     private Boolean mIsFollowing;
     
-    public FollowUserLoader(Context context, String login, boolean isFollowing) {
+    public FollowUserLoader(Context context, String login, Boolean isFollowing) {
         super(context);
         mLogin = login;
         mIsFollowing = isFollowing;
@@ -28,7 +28,7 @@ public class FollowUserLoader extends BaseLoader {
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(app.getAuthToken());
         UserService userService = new UserService(client);
-        if (mIsFollowing) {
+        if (mIsFollowing != null && mIsFollowing) {
             userService.unfollow(mLogin);
             result.put(LoaderResult.DATA, false);
         }
