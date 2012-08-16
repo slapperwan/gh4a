@@ -29,7 +29,6 @@ public abstract class BaseLoader extends AsyncTaskLoader<HashMap<Integer, Object
                 result.put(LoaderResult.AUTH_ERROR, true);
             }
             Log.e(Constants.LOG_TAG, e.getMessage(), e);
-            BugSenseHandler.log(e.getMessage(), e);
             return result;
         }
     }
