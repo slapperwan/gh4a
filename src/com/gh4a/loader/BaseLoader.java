@@ -6,7 +6,6 @@ import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
-import com.bugsense.trace.BugSenseHandler;
 import com.gh4a.Constants;
 import com.gh4a.Constants.LoaderResult;
 
@@ -25,7 +24,8 @@ public abstract class BaseLoader extends AsyncTaskLoader<HashMap<Integer, Object
         } catch (Exception e) {
             result.put(LoaderResult.ERROR, true);
             result.put(LoaderResult.ERROR_MSG, e.getMessage());
-            if ("Received authentication challenge is null".equalsIgnoreCase(e.getMessage())) {
+            if ("Received authentication challenge is null".equalsIgnoreCase(e.getMessage())
+                    || "No authentication challenges found".equalsIgnoreCase(e.getMessage())) {
                 result.put(LoaderResult.AUTH_ERROR, true);
             }
             Log.e(Constants.LOG_TAG, e.getMessage(), e);
