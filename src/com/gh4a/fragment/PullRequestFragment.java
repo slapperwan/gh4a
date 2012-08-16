@@ -184,7 +184,7 @@ public class PullRequestFragment extends BaseFragment
                 context.pt.format(pullRequest.getCreatedAt())));
         
         ImageView ivComment = (ImageView) v.findViewById(R.id.iv_comment);
-        if (Gh4Application.THEME != R.style.LightTheme) {
+        if (Gh4Application.THEME == R.style.DefaultTheme) {
             ivComment.setImageResource(R.drawable.social_send_now_dark);
         }
         ivComment.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
