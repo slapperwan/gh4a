@@ -31,6 +31,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -152,6 +153,8 @@ public class PullRequestFragment extends BaseFragment
         TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
         
         TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
+        tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
+        
         TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
         tvCommentTitle.setTypeface(activity.getApplicationContext().boldCondensed);
         tvCommentTitle.setTextColor(Color.parseColor("#0099cc"));
