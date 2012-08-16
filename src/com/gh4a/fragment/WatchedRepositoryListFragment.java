@@ -95,11 +95,22 @@ public class WatchedRepositoryListFragment extends BaseFragment
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         mListView.setOnScrollListener(this);
-        
-        loadData();
-        
-        getLoaderManager().initLoader(0, null, this);
-        getLoaderManager().getLoader(0).forceLoad();
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!isLoadCompleted) {
+            loadData();
+            
+            if (getLoaderManager().getLoader(0) == null) {
+                getLoaderManager().initLoader(0, null, this);
+            }
+            else {
+                getLoaderManager().restartLoader(0, null, this);
+            }
+            getLoaderManager().getLoader(0).forceLoad();
+        }
     }
 
     public void loadData() {
