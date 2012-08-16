@@ -437,13 +437,20 @@ public abstract class EventListFragment extends BaseFragment
         else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
             if (eventRepo != null) {
                 IssueCommentPayload payload = (IssueCommentPayload) event.getPayload();
-                String type = payload.getIssue().getPullRequest().getDiffUrl() != null ? "pullrequest" : "issue";
-                if ("pullrequest".equals(type)) {
-                    context.openPullRequestActivity(getSherlockActivity(), repoOwner, repoName, payload.getIssue().getNumber());   
-                }
-                else {
-                    context.openIssueActivity(getSherlockActivity(), repoOwner, repoName, payload.getIssue().getNumber(),
-                            payload.getIssue().getState()); 
+                if (payload.getIssue() != null) {
+                    if (payload.getIssue().getPullRequest() != null) {
+                        if (payload.getIssue().getPullRequest().getHtmlUrl() != null) {
+                            context.openPullRequestActivity(getSherlockActivity(), repoOwner, repoName, payload.getIssue().getNumber());
+                        }
+                        else {
+                            context.openIssueActivity(getSherlockActivity(), repoOwner, repoName, payload.getIssue().getNumber(),
+                                    payload.getIssue().getState()); 
+                        }
+                    }
+                    else {
+                        context.openIssueActivity(getSherlockActivity(), repoOwner, repoName, payload.getIssue().getNumber(),
+                                payload.getIssue().getState()); 
+                    }
                 }
             }
             else {

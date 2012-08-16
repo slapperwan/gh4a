@@ -56,7 +56,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.androidquery.AQuery;
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Gh4Application;
@@ -536,8 +535,8 @@ public class FeedAdapter extends RootAdapter<Event> {
         else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
             IssueCommentPayload payload = (IssueCommentPayload) event.getPayload();
             String type = mContext.getResources().getString(R.string.issue).toLowerCase();
-            if (payload.getIssue().getPullRequest() != null) {
-                if (payload.getIssue().getPullRequest().getDiffUrl() != null) {
+            if (payload.getIssue() != null && payload.getIssue().getPullRequest() != null) {
+                if (payload.getIssue().getPullRequest().getHtmlUrl() != null) {
                     type = mContext.getResources().getString(R.string.pull_request_title).toLowerCase();
                 }
             }
