@@ -1,3 +1,11 @@
+v3.0 (Aug 16, 2012)
+- rebranding on the app, now known as OctoDroid
+- major UI overhaul
+- new features added:
+- light/dark theme
+- comment on pull request
+- comment on commit
+
 v2.2 (Jun 21, 2012)
 - Show organization private repositories
 - Handle Download and PullRequestReviewComment event.
