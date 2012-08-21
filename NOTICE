@@ -1,11 +1,14 @@
 Gh4a - GitHub Client for Android
-Copyright 2011, Azwan Adli Abdullah
+Copyright 2012, Azwan Adli Abdullah
 
-GiHub Java sdk provided by github-java-sdk
-https://github.com/nabeelmukhtar/github-java-sdk
+GitHub Java API (org.eclipse.egit.github.core)
+https://github.com/eclipse/egit-github/tree/master/org.eclipse.egit.github.core
 
-Android action bar provided by android-actionbar
-https://github.com/johannilsson/android-actionbar
+ActionBarSherlock
+https://github.com/JakeWharton/ActionBarSherlock
+
+ViewPagerIndicator
+https://github.com/JakeWharton/Android-ViewPagerIndicator
 
 JSON (de)serialization provided by gson
 http://code.google.com/p/google-gson/
@@ -19,9 +22,6 @@ http://www.famfamfam.com/lab/icons/silk/
 Pretty time formatting provided by PrettyTime
 http://ocpsoft.com/prettytime/
 
-ACRA - Application Crash Report for Android
-http://code.google.com/p/acra/
-
 GiHub trends provided by http://github-trends.oscardelben.com/
 https://github.com/oscardelben/github-trends
 
@@ -32,3 +32,6 @@ Original Markdown Copyright (c) 2004-2005 John Gruber
 
 GitHub Flavored Markdown modifications by Tekkub
 http://github.github.com/github-flavored-markdown/
+
+com.github.mobile.util.HtmlUtils, com.github.mobile.util.HttpImageGetter, com.github.mobile.util.ImageUtils
+https://github.com/github/android/tree/master/app/src/main/java/com/github/mobile/util

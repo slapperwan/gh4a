@@ -1,25 +1,23 @@
-Gh4a - GitHub Client for Android
+OctoDroid (formerly known as Gh4a)
 ================================
-This application provides access to github.com informations and stay connected with your networks.
+This application provides access to github.com information and stay connected with your networks.
+
+<a href="https://play.google.com/store/apps/details?id=com.gh4a" alt="Download from Google Play">
+  <img src="http://www.android.com/images/brand/android_app_on_play_large.png">
+</a>
 
 Main features
 -------------
-*Key Highlights*
-
-* Easy navigation
-* Breadcrumbs
-* Clean and simple UI
-* Parse README (currently only support Markdown)
 
 *Repository*
 
 * List repositories
-* Fork/watch/unwatch repository
+* Watch/unwatch repository
 * View branches/tags
 * View pull requests
 * View collaborators/contributors
 * View watchers/networks
-* View issues (view open/closed and by labels)
+* View issues
 
 *User*
 
@@ -33,11 +31,12 @@ Main features
 
 *Issue*
 
-* List issues by closed/open and by label
+* List issues
+* Filter by label, assignee or milestone
 * Create/edit/close/reopen issue
 * Comment on issue
-* List/add/delete label
-* Tag/untag label to issue
+* Manage labels
+* Manage milestones
 
 *Commit*
 
@@ -50,7 +49,7 @@ Main features
 * Browse source codes
 * File viewer with code syntax hightlighted
 
-*Gist (note: current Github API for gist is limited and only support public gist)*
+*Gist*
 
 * List public gists
 * View gist content
@@ -60,15 +59,19 @@ Main features
 * Public timeline
 * Trending repos (today, week, month, forever)
 * GitHub blog
-* Public discussion (view only)
-* GitHub Jobs
 
 <i>..and many more</i>
 
-Visit [Gh4a page](http://slapperwan.github.com/gh4a/) for more info and screenshots.
+Open Source Libraries
+=====================
+
+* [GitHub Java API](https://github.com/eclipse/egit-github/tree/master/org.eclipse.egit.github.core)
+* [ActionBarSherlock](https://github.com/JakeWharton/ActionBarSherlock)
+* [ViewPagerIndicator](https://github.com/JakeWharton/Android-ViewPagerIndicator)
 
 Contributions
 =============
 
+* [extremis (Steven Mautone)](https://github.com/extremis)  He gave the OctoDroid name and the new icon.  Thanks a lot.
 * [zquestz](https://github.com/zquestz)  Thanks for the application icon.
 * [cketti](https://github.com/cketti)
