@@ -117,7 +117,9 @@ public class CommitFragment extends BaseFragment {
                 fragment.hideLoading();
                 BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) fragment.getSherlockActivity();
                 if (mException) {
-                    activity.showError();
+                    if (activity != null) {
+                        activity.showError();
+                    }
                 }
                 else {
                     mTarget.get().fillData(result);

@@ -230,6 +230,10 @@ public abstract class EventListFragment extends BaseFragment
         Event event = (Event) adapterView.getAdapter().getItem(position);
         Gh4Application context = ((BaseSherlockFragmentActivity) getActivity()).getApplicationContext();
         
+        if (event == null || event.getPayload() == null) {
+            return;
+        }
+        
         //if payload is a base class, return void.  Think that it is an old event which not supported
         //by API v3.
         if (event.getPayload().getClass().getSimpleName().equals("EventPayload")) {

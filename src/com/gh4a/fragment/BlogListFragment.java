@@ -166,9 +166,11 @@ public class BlogListFragment extends BaseFragment {
 
         @Override
         protected void onPostExecute(List<Feed> result) {
-            mTarget.get().hideLoading();
-            if (mTarget.get() != null && result != null) {
-                mTarget.get().fillData(result);
+            if (mTarget.get() != null) {
+                mTarget.get().hideLoading();
+                if (mTarget.get() != null && result != null) {
+                    mTarget.get().fillData(result);
+                }
             }
         }
     }

@@ -47,6 +47,7 @@ import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
 import android.text.style.TextAppearanceSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -318,7 +319,12 @@ public class FeedAdapter extends RootAdapter<Event> {
         /** IssueCommentEvent */
         else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
             IssueCommentPayload payload = (IssueCommentPayload) event.getPayload();
-            return payload.getComment().getBody();
+            if (payload != null && payload.getComment() != null) {
+                return payload.getComment().getBody();
+            }
+            else {
+                return eventType;
+            }
         }
 
         /** PullRequestReviewComment */
@@ -535,14 +541,19 @@ public class FeedAdapter extends RootAdapter<Event> {
         else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
             IssueCommentPayload payload = (IssueCommentPayload) event.getPayload();
             String type = mContext.getResources().getString(R.string.issue).toLowerCase();
-            if (payload.getIssue() != null && payload.getIssue().getPullRequest() != null) {
-                if (payload.getIssue().getPullRequest().getHtmlUrl() != null) {
+            if (payload.getIssue() != null) {
+                if (payload.getIssue().getPullRequest() != null
+                        && payload.getIssue().getPullRequest().getHtmlUrl() != null) {
                     type = mContext.getResources().getString(R.string.pull_request_title).toLowerCase();
                 }
+                
+                String text = String.format(res.getString(R.string.event_issue_comment),
+                        actor.getLogin(), type, payload.getIssue().getNumber(), formatFromRepoName(eventRepo));
+                return text;
             }
-            String text = String.format(res.getString(R.string.event_issue_comment),
-                    actor.getLogin(), type, payload.getIssue().getNumber(), formatFromRepoName(eventRepo));
-            return text;
+            else {
+                return "";
+            }
         }
 
         /** PullRequestReviewComment */
