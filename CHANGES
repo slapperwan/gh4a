@@ -1,3 +1,13 @@
+v3.1 (Aug 24, 2012)
+- share function on:
+  - user
+  - repo
+  - commit
+  - diff
+  - file
+  - issue
+- bug fixes
+
 v3.0 (Aug 16, 2012)
 - rebranding on the app, now known as OctoDroid
 - major UI overhaul
