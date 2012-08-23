@@ -11,4 +11,7 @@
     <item android:id="@+id/tags"
         android:title="@string/repo_tags"
         android:showAsAction="never" />
+    <item android:id="@+id/share"
+        android:title="@string/share"
+        android:showAsAction="never" />
 </menu>

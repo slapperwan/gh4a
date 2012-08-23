@@ -29,6 +29,7 @@ import com.gh4a.fragment.PrivateEventListFragment;
 import com.gh4a.fragment.PublicEventListFragment;
 import com.gh4a.fragment.RepositoryIssueListFragment;
 import com.gh4a.fragment.UserFragment;
+import com.gh4a.utils.StringUtils;
 
 public class UserActivity extends BaseSherlockFragmentActivity {
 
@@ -333,6 +334,15 @@ public class UserActivity extends BaseSherlockFragmentActivity {
             case R.id.search:
                 intent = new Intent().setClass(getApplication(), SearchActivity.class);
                 startActivity(intent);
+                return true;
+            case R.id.share:
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, mUserLogin + " " + (!StringUtils.isBlank(mUserName) ? "(" + mUserName + ")" : ""));
+                shareIntent.putExtra(Intent.EXTRA_TEXT,  mUserLogin + " " + (!StringUtils.isBlank(mUserName) ? "(" + mUserName + ")" : "")
+                        + " https://github.com/" + mUserLogin);
+                shareIntent = Intent.createChooser(shareIntent, "Share");
+                startActivity(shareIntent);
                 return true;
             default:
                 return true;

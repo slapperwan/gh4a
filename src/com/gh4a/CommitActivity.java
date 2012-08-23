@@ -17,6 +17,7 @@ package com.gh4a;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -24,9 +25,12 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.ViewGroup;
 
+import com.actionbarsherlock.R;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.fragment.CommitFragment;
 import com.gh4a.fragment.CommitNoteFragment;
@@ -130,11 +134,40 @@ public class CommitActivity extends BaseSherlockFragmentActivity {
     }
     
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getSupportMenuInflater();
+        inflater.inflate(R.menu.download_menu, menu);
+        
+        if (Gh4Application.THEME != R.style.LightTheme) {
+            menu.getItem(0).setIcon(R.drawable.download_dark);
+            menu.getItem(1).setIcon(R.drawable.web_site_dark);
+            menu.getItem(2).setIcon(R.drawable.social_share_dark);
+        }
+        
+        menu.removeItem(R.id.download);
+        return super.onCreateOptionsMenu(menu);
+    }
+    
+    @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
+        String diffUrl = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/commit/" + mObjectSha;
         switch (item.getItemId()) {
             case android.R.id.home:
                 getApplicationContext().openRepositoryInfoActivity(this, mRepoOwner, mRepoName, Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                return true;     
+                return true;   
+            case R.id.browser:
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(diffUrl));
+                startActivity(browserIntent);
+                return true;
+            case R.id.share:
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Commit #" + mObjectSha.substring(0, 7) + " at " + mRepoOwner + "/" + mRepoName);
+                shareIntent.putExtra(Intent.EXTRA_TEXT,  "Commit #" + mObjectSha.substring(0, 7) 
+                        + " at " + mRepoOwner + "/" + mRepoName + " " + diffUrl);
+                shareIntent = Intent.createChooser(shareIntent, "Share");
+                startActivity(shareIntent);
+                return true;
             default:
                 return true;
         }

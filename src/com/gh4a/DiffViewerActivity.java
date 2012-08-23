@@ -16,13 +16,17 @@
 package com.gh4a;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.R;
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
@@ -115,11 +119,40 @@ public class DiffViewerActivity extends BaseActivity {
     }
     
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getSupportMenuInflater();
+        inflater.inflate(R.menu.download_menu, menu);
+        
+        if (Gh4Application.THEME != R.style.LightTheme) {
+            menu.getItem(0).setIcon(R.drawable.download_dark);
+            menu.getItem(1).setIcon(R.drawable.web_site_dark);
+            menu.getItem(2).setIcon(R.drawable.social_share_dark);
+        }
+        
+        menu.removeItem(R.id.download);
+        return super.onCreateOptionsMenu(menu);
+    }
+    
+    @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
+        String diffUrl = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/commit/" + mSha;
         switch (item.getItemId()) {
             case android.R.id.home:
                 getApplicationContext().openCommitInfoActivity(this, mRepoOwner, mRepoName, mSha, Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 return true;     
+            case R.id.browser:
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(diffUrl));
+                startActivity(browserIntent);
+                return true;
+            case R.id.share:
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Commit #" + mSha.substring(0, 7) + " at " + mRepoOwner + "/" + mRepoName);
+                shareIntent.putExtra(Intent.EXTRA_TEXT,  "Commit #" + mSha.substring(0, 7) 
+                        + " at " + mRepoOwner + "/" + mRepoName + " " + diffUrl);
+                shareIntent = Intent.createChooser(shareIntent, "Share");
+                startActivity(shareIntent);
+                return true;
             default:
                 return true;
         }

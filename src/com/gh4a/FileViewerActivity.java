@@ -29,6 +29,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.actionbarsherlock.R;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -113,6 +114,7 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
         if (Gh4Application.THEME != R.style.LightTheme) {
             menu.getItem(0).setIcon(R.drawable.download_dark);
             menu.getItem(1).setIcon(R.drawable.web_site_dark);
+            menu.getItem(2).setIcon(R.drawable.social_share_dark);
         }
         
         menu.removeItem(R.id.download);
@@ -121,16 +123,23 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
     
     @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
+        String blobUrl = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/blob/" + mRef + "/" + mPath;
         switch (item.getItemId()) {
             case android.R.id.home:
                 getApplicationContext().openRepositoryInfoActivity(this, mRepoOwner, mRepoName, Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 return true;     
             case R.id.browser:
-                String blobUrl = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/blob/" + mRef + "/" + mPath + "?raw=true";
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(blobUrl));
                 startActivity(browserIntent);
                 return true;
-
+            case R.id.share:
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, mName + " at " + mRepoOwner + "/" + mRepoName);
+                shareIntent.putExtra(Intent.EXTRA_TEXT,  mName + " at " + mRepoOwner + "/" + mRepoName + " " + blobUrl);
+                shareIntent = Intent.createChooser(shareIntent, "Share");
+                startActivity(shareIntent);
+                return true;
             default:
                 return true;
         }

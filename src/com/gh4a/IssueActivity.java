@@ -49,6 +49,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.actionbarsherlock.R;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -417,6 +418,14 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
                     startActivity(intent);
                     finish();
                 }
+                return true;
+            case R.id.share:
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Issue #" + mIssueNumber + " at " + mRepoOwner + "/" + mRepoName);
+                shareIntent.putExtra(Intent.EXTRA_TEXT,  "Issue #" + mIssueNumber + ":" + mIssue.getTitle() + " " + mIssue.getHtmlUrl());
+                shareIntent = Intent.createChooser(shareIntent, "Share");
+                startActivity(shareIntent);
                 return true;
             default:
                 return true;
