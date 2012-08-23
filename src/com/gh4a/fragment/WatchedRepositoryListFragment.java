@@ -56,6 +56,7 @@ public class WatchedRepositoryListFragment extends BaseFragment
     private PageIterator<Repository> mDataIterator;
     private boolean isLoadMore;
     private boolean isLoadCompleted;
+    private boolean isFirstTimeLoad;
     private TextView mLoadingView;
     
     public static WatchedRepositoryListFragment newInstance(String login) {
@@ -100,7 +101,7 @@ public class WatchedRepositoryListFragment extends BaseFragment
     @Override
     public void onResume() {
         super.onResume();
-        if (!isLoadCompleted) {
+        if (!isFirstTimeLoad) {
             loadData();
             
             if (getLoaderManager().getLoader(0) == null) {
@@ -186,6 +187,7 @@ public class WatchedRepositoryListFragment extends BaseFragment
     @Override
     public void onLoadFinished(Loader<List<Repository>> loader, List<Repository> repositories) {
         isLoadCompleted = true;
+        isFirstTimeLoad = true;
         hideLoading();
         fillData(repositories);
     }

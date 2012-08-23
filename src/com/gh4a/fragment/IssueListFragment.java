@@ -61,6 +61,7 @@ public class IssueListFragment extends BaseFragment
     private PageIterator<Issue> mDataIterator;
     private boolean isLoadMore;
     private boolean isLoadCompleted;
+    private boolean isFirstTimeLoad;
     private TextView mLoadingView;
     
     @Override
@@ -112,7 +113,7 @@ public class IssueListFragment extends BaseFragment
     @Override
     public void onResume() {
         super.onResume();
-        if (!isLoadCompleted) {
+        if (!isFirstTimeLoad) {
             loadData();
             
             if (getLoaderManager().getLoader(0) == null) {
@@ -181,6 +182,7 @@ public class IssueListFragment extends BaseFragment
     @Override
     public void onLoadFinished(Loader<List<Issue>> loader, List<Issue> issues) {
         isLoadCompleted = true;
+        isFirstTimeLoad = true;
         hideLoading();
         fillData(issues);
     }

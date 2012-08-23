@@ -30,6 +30,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,6 +60,7 @@ public class RepositoryListFragment extends BaseFragment
     private PageIterator<Repository> mDataIterator;
     private boolean isLoadMore;
     private boolean isLoadCompleted;
+    private boolean isFirstTimeLoad;
     private TextView mLoadingView;
     
     public static RepositoryListFragment newInstance(String login, String userType, String repoType) {
@@ -107,7 +109,7 @@ public class RepositoryListFragment extends BaseFragment
     @Override
     public void onResume() {
         super.onResume();
-        if (!isLoadCompleted) {
+        if (!isFirstTimeLoad) {
             loadData();
             
             if (getLoaderManager().getLoader(0) == null) {
@@ -208,7 +210,7 @@ public class RepositoryListFragment extends BaseFragment
 
         boolean loadMore = firstVisible + visibleCount >= totalCount;
 
-        if(loadMore) {
+        if (loadMore) {
             if (getLoaderManager().getLoader(0) != null
                     && isLoadCompleted) {
                 isLoadMore = true;
@@ -229,6 +231,7 @@ public class RepositoryListFragment extends BaseFragment
     @Override
     public void onLoadFinished(Loader<List<Repository>> loader, List<Repository> repositories) {
         isLoadCompleted = true;
+        isFirstTimeLoad = true;
         hideLoading();
         fillData(repositories);
     }
