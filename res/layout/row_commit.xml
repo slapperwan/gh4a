@@ -20,21 +20,20 @@
         android:layout_marginRight="5dp"
         android:layout_marginTop="5dp" />
     <TextView
+        android:id="@+id/tv_sha"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_toRightOf="@id/iv_gravatar"/>
+    <TextView
         android:id="@+id/tv_desc"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:maxLines="2"
         android:ellipsize="end"
-        android:layout_toRightOf="@id/iv_gravatar" />
-    <!-- TextView
-        android:id="@+id/tv_sha"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="@style/default_text_micro"
         android:layout_toRightOf="@id/iv_gravatar"
-        android:layout_below="@id/tv_desc"
-        android:background="@drawable/default_grey_box" /-->
+        android:layout_below="@id/tv_sha"  />
     <TextView
         android:id="@+id/tv_extra"
         android:layout_width="fill_parent"

@@ -15,7 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import java.util.Calendar;
 import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryCommit;
@@ -61,6 +60,9 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
             viewHolder.tvDesc.setTypeface(boldCondensed);
             
+            viewHolder.tvSha = (TextView) v.findViewById(R.id.tv_sha);
+            viewHolder.tvSha.setTypeface(Typeface.MONOSPACE);
+            
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
             
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
@@ -92,15 +94,8 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
                 }
             });
 
-            //viewHolder.tvSha.setText(commit.getSha().substring(0, 7));
+            viewHolder.tvSha.setText(commit.getSha().substring(0, 10));
             viewHolder.tvDesc.setText(commit.getCommit().getMessage());
-
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(commit.getCommit().getCommitter().getDate());
-            int timezoneOffset = (cal.get(Calendar.ZONE_OFFSET) + cal.get(Calendar.DST_OFFSET)) / 3600000;
-            cal.add(Calendar.HOUR, timezoneOffset);
-
-            long now = System.currentTimeMillis();
 
             Resources res = v.getResources();
             String extraData = String.format(res.getString(R.string.more_commit_data),
@@ -116,6 +111,6 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
         public ImageView ivGravatar;
         public TextView tvDesc;
         public TextView tvExtra;
-        //public TextView tvSha;
+        public TextView tvSha;
     }
 }

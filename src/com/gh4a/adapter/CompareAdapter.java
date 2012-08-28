@@ -59,6 +59,8 @@ public class CompareAdapter extends RootAdapter<String[]> {
             viewHolder.tvDesc.setTypeface(boldCondensed);
             
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+            viewHolder.tvSha = (TextView) v.findViewById(R.id.tv_sha);
+            viewHolder.tvSha.setVisibility(View.GONE);
             
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
 
