@@ -91,6 +91,8 @@ public class IssueListFragment extends BaseFragment
         View v = inflater.inflate(R.layout.generic_list, container, false);
         
         mListView = (ListView) v.findViewById(R.id.list_view);
+        mListView.setFastScrollEnabled(true);
+        
         return v;
     }
     
