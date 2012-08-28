@@ -68,6 +68,7 @@ Open Source Libraries
 * [GitHub Java API](https://github.com/eclipse/egit-github/tree/master/org.eclipse.egit.github.core)
 * [ActionBarSherlock](https://github.com/JakeWharton/ActionBarSherlock)
 * [ViewPagerIndicator](https://github.com/JakeWharton/Android-ViewPagerIndicator)
+* [Android Query](http://code.google.com/p/android-query/)
 
 Contributions
 =============
