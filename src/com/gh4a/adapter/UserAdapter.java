@@ -51,7 +51,7 @@ public class UserAdapter extends RootAdapter<User> {
         super(context, objects);
         mRowLayout = rowLayout;
         mShowExtraData = showExtraData;
-        aq = new AQuery(context);
+        aq = new AQuery((BaseSherlockFragmentActivity) context);
     }
     
     @Override
