@@ -69,7 +69,6 @@ import com.gh4a.R;
 import com.gh4a.WikiListActivity;
 import com.gh4a.adapter.FeedAdapter;
 import com.gh4a.loader.PageIteratorLoader;
-import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.StringUtils;
 
 public abstract class EventListFragment extends BaseFragment 
@@ -263,19 +262,10 @@ public abstract class EventListFragment extends BaseFragment
                 if (commits != null) {
                     if (commits.size() > 1) {
                         Intent intent = new Intent().setClass(context, CompareActivity.class);
-                        for (Commit commit : commits) {
-                            String[] commitInfo = new String[4];
-                            commitInfo[0] = commit.getSha();
-                            commitInfo[1] = CommitUtils.getAuthorEmail(commit);
-                            commitInfo[2] = commit.getMessage();
-                            commitInfo[3] = CommitUtils.getAuthorName(commit);
-                            intent.putExtra("commit" + commit.getSha(), commitInfo);
-                        }
-                        
                         intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
                         intent.putExtra(Constants.Repository.REPO_NAME, repoName);
                         intent.putExtra(Constants.Repository.HEAD, payload.getHead());
-                        intent.putExtra(Constants.Repository.BASE, payload.getRef());
+                        intent.putExtra(Constants.Repository.BASE, payload.getBefore());
                         startActivity(intent);
                     }
                     // only 1 commit, then show the commit details
@@ -686,15 +676,11 @@ public abstract class EventListFragment extends BaseFragment
             if (repoOwner != null) {
                 PushPayload payload = (PushPayload) event.getPayload();
                 
-                List<Commit> commits = payload.getCommits();
                 Intent intent = new Intent().setClass(context, CompareActivity.class);
-                for (Commit commit : commits) {
-                    intent.putExtra("sha" + commit.getSha(), commit.getSha());
-                }
-                
                 intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
                 intent.putExtra(Constants.Repository.REPO_NAME, repoName);
-                intent.putExtra(Constants.Repository.REPO_URL, event.getRepo().getUrl());
+                intent.putExtra(Constants.Repository.HEAD, payload.getHead());
+                intent.putExtra(Constants.Repository.BASE, payload.getBefore());
                 startActivity(intent);
             }
         }
