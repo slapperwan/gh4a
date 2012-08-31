@@ -14,7 +14,8 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:padding="0dp"
-        android:layout_above="@+id/rl_comment" >
+        android:layout_above="@+id/rl_comment"
+        android:fastScrollEnabled="true" >
     </ListView>
     <RelativeLayout 
         android:id="@id/rl_comment"
