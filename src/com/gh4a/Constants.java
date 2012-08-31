@@ -338,6 +338,11 @@ public interface Constants {
         public static final String STATE = "Milestone.state";
     }
     
+    public interface Comment {
+        public static final String ID = "Comment.id";
+        public static final String BODY = "Comment.body";
+    }
+    
     public static String[] SKIP_PRETTIFY_EXT = {
         "txt", "rdoc", "markdown", "md", "mdown", "mkdn", "mkd", "texttile", "org", "creole", "rst", "asciidoc", "pod", ""
     };

@@ -132,7 +132,9 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
             rlComment.setVisibility(View.GONE);
         }
 
-        mCommentAdapter = new CommentAdapter(IssueActivity.this, new ArrayList<Comment>());
+        TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
+        mCommentAdapter = new CommentAdapter(IssueActivity.this, new ArrayList<Comment>(), 
+                tvCommentTitle, mIssue.getComments());
         lvComments.setAdapter(mCommentAdapter);
 
         ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
@@ -155,7 +157,6 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         tvDescTitle.setTypeface(getApplicationContext().boldCondensed);
         tvDescTitle.setTextColor(Color.parseColor("#0099cc"));
         
-        TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
         tvCommentTitle.setTypeface(getApplicationContext().boldCondensed);
         tvCommentTitle.setTextColor(Color.parseColor("#0099cc"));
         tvCommentTitle.setText(getResources().getString(R.string.issue_comments) + " (" + mIssue.getComments() + ")");

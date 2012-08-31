@@ -19,10 +19,12 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.Comment;
 
+import android.app.AlertDialog;
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,6 +34,8 @@ import android.widget.TextView;
 
 import com.androidquery.AQuery;
 import com.gh4a.BaseSherlockFragmentActivity;
+import com.gh4a.Constants;
+import com.gh4a.EditCommentActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarUtils;
@@ -42,11 +46,21 @@ public class CommentAdapter extends RootAdapter<Comment> {
 
     private HttpImageGetter imageGetter;
     private AQuery aq;
+    private TextView tvCommentTitle;
+    private int totalComment;
     
     public CommentAdapter(Context context, List<Comment> objects) {
         super(context, objects);
         imageGetter = new HttpImageGetter(mContext);
         aq = new AQuery((BaseSherlockFragmentActivity) context);
+    }
+    
+    public CommentAdapter(Context context, List<Comment> objects, TextView tvCommentTitle, int totalComment) {
+        super(context, objects);
+        imageGetter = new HttpImageGetter(mContext);
+        aq = new AQuery((BaseSherlockFragmentActivity) context);
+        this.tvCommentTitle = tvCommentTitle;
+        this.totalComment = totalComment;
     }
 
     @Override
@@ -61,7 +75,21 @@ public class CommentAdapter extends RootAdapter<Comment> {
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
             viewHolder.tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-
+            
+            viewHolder.ivEdit = (ImageView) v.findViewById(R.id.iv_edit);
+            viewHolder.ivEdit.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
+            viewHolder.ivEdit.setPadding(10, 5, 10, 5);
+            if (Gh4Application.THEME != R.style.DefaultTheme) {
+                viewHolder.ivEdit.setImageResource(R.drawable.content_edit);  
+            }
+            
+            viewHolder.ivDelete = (ImageView) v.findViewById(R.id.iv_delete);
+            viewHolder.ivDelete.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
+            viewHolder.ivDelete.setPadding(10, 5, 10, 5);
+            if (Gh4Application.THEME != R.style.DefaultTheme) {
+                viewHolder.ivDelete.setImageResource(R.drawable.content_discard);    
+            }
+            
             v.setTag(viewHolder);
         }
         else {
@@ -71,6 +99,8 @@ public class CommentAdapter extends RootAdapter<Comment> {
         final Comment comment = mObjects.get(position);
         if (comment != null) {
             
+            final Gh4Application appContext = (Gh4Application) v.getContext().getApplicationContext();
+            
             aq.recycle(convertView);
             aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(comment.getUser().getGravatarId()), 
                     true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
@@ -79,9 +109,7 @@ public class CommentAdapter extends RootAdapter<Comment> {
 
                 @Override
                 public void onClick(View v) {
-                    Gh4Application context = (Gh4Application) v.getContext()
-                            .getApplicationContext();
-                    context.openUserInfoActivity(v.getContext(), comment.getUser().getLogin(), null);
+                    appContext.openUserInfoActivity(v.getContext(), comment.getUser().getLogin(), null);
                 }
             });
 
@@ -90,6 +118,47 @@ public class CommentAdapter extends RootAdapter<Comment> {
             String body = comment.getBodyHtml();
             body = HtmlUtils.format(body).toString();
             imageGetter.bind(viewHolder.tvDesc, body, comment.getId());
+            
+            viewHolder.ivEdit.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View arg0) {
+                    Intent intent = new Intent().setClass(mContext, EditCommentActivity.class);
+                    intent.putExtra(Constants.Comment.ID, comment.getId());
+                    intent.putExtra(Constants.Comment.BODY, comment.getBody());
+                    mContext.startActivity(intent);
+                }
+            });
+            
+            final int positionToRemove = position;
+            viewHolder.ivDelete.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View arg0) {
+                    int dialogTheme = Gh4Application.THEME == R.style.DefaultTheme ? 
+                            R.style.Theme_Sherlock_Dialog : R.style.Theme_Sherlock_Light_Dialog;
+                    AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper((BaseSherlockFragmentActivity) mContext,
+                            dialogTheme));
+                    builder.setMessage("Delete this comment?");
+                    builder.setPositiveButton(R.string.ok,
+                            new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            dialog.dismiss();
+                            mObjects.remove(positionToRemove);
+                            CommentAdapter.this.notifyDataSetChanged();
+                            tvCommentTitle.setText(mContext.getResources().getString(R.string.issue_comments)
+                                    + " (" + (--totalComment) + ")");
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel,
+                            new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            dialog.dismiss();
+                        }
+                    })
+                   .create();
+                    
+                    builder.show();
+                }
+            });
         }
         return v;
     }
@@ -99,6 +168,8 @@ public class CommentAdapter extends RootAdapter<Comment> {
         public ImageView ivGravatar;
         public TextView tvDesc;
         public TextView tvExtra;
+        public ImageView ivDelete;
+        public ImageView ivEdit;
         
     }
 }

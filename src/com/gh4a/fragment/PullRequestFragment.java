@@ -128,7 +128,9 @@ public class PullRequestFragment extends BaseFragment
         mHeader.setClickable(false);
         lvComments.addHeaderView(mHeader, null, true);
 
-        mCommentAdapter = new CommentAdapter(getSherlockActivity(), new ArrayList<Comment>());
+        TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
+        mCommentAdapter = new CommentAdapter(getSherlockActivity(), new ArrayList<Comment>(), 
+                tvCommentTitle, pullRequest.getComments());
         lvComments.setAdapter(mCommentAdapter);
         
         ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
@@ -155,7 +157,6 @@ public class PullRequestFragment extends BaseFragment
         TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
         tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
         
-        TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
         tvCommentTitle.setTypeface(activity.getApplicationContext().boldCondensed);
         tvCommentTitle.setTextColor(Color.parseColor("#0099cc"));
         tvCommentTitle.setText(getResources().getString(R.string.issue_comment_title) + " (" + pullRequest.getComments() + ")");

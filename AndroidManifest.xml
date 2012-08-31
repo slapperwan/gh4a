@@ -179,6 +179,9 @@
         <activity
             android:name=".IssueMilestoneEditActivity"
             android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".EditCommentActivity"
+            android:configChanges="orientation|screenSize" />
         <activity android:name="BrowseFilter">
             <intent-filter>
                 <action
