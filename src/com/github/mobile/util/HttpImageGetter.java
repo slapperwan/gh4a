@@ -32,6 +32,7 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.text.Html.ImageGetter;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.WindowManager;
 import android.widget.TextView;
 
@@ -104,7 +105,11 @@ public class HttpImageGetter implements ImageGetter {
         if (TextUtils.isEmpty(html))
             return hide(view);
 
-        view.setText(html);
+        try {
+            view.setText(html);
+        }
+        catch (Exception e) {
+        }
         view.setVisibility(VISIBLE);
         view.setTag(null);
         return this;
