@@ -114,11 +114,13 @@ public class FeedAdapter extends RootAdapter<Event> {
 
                 @Override
                 public void onClick(View v) {
-                    /** Open user activity */
-                    Gh4Application context = (Gh4Application) v.getContext()
-                            .getApplicationContext();
-                    context.openUserInfoActivity(v.getContext(), actor
-                            .getLogin(), actor.getName());
+                    if (!StringUtils.isBlank(actor.getLogin())) {
+                        /** Open user activity */
+                        Gh4Application context = (Gh4Application) v.getContext()
+                                .getApplicationContext();
+                        context.openUserInfoActivity(v.getContext(), actor
+                                .getLogin(), actor.getName());
+                    }
                 }
             });
             SpannableString createdAt = new SpannableString(pt.format(event.getCreatedAt()));

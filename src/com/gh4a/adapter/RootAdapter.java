@@ -99,11 +99,15 @@ public abstract class RootAdapter<T> extends BaseAdapter {
     }
     
     public void addAll(List<T> objects) {
-        mObjects.addAll(objects);
+        if (objects != null) {
+            mObjects.addAll(objects);
+        }
     }
     
     public void addAll(int position, List<T> objects) {
-        mObjects.addAll(position, objects);
+        if (objects != null) {
+            mObjects.addAll(position, objects);
+        }
     }
 
     public List<T> getObjects() {
