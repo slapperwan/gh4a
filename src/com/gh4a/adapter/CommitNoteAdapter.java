@@ -59,7 +59,8 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> {
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
             viewHolder.tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-
+            viewHolder.ivEdit = (ImageView) v.findViewById(R.id.iv_edit);
+            viewHolder.ivEdit.setVisibility(View.GONE);
             v.setTag(viewHolder);
         }
         else {
@@ -101,5 +102,6 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> {
         public ImageView ivGravatar;
         public TextView tvDesc;
         public TextView tvExtra;
+        public ImageView ivEdit;
     }
 }

@@ -129,8 +129,9 @@ public class PullRequestFragment extends BaseFragment
         lvComments.addHeaderView(mHeader, null, true);
 
         TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
-        mCommentAdapter = new CommentAdapter(getSherlockActivity(), new ArrayList<Comment>(), 
-                tvCommentTitle, pullRequest.getComments());
+        mCommentAdapter = new CommentAdapter((PullRequestActivity) getSherlockActivity(), new ArrayList<Comment>(), 
+                pullRequest.getNumber(), pullRequest.getState(),
+                mRepoOwner, mRepoName);
         lvComments.setAdapter(mCommentAdapter);
         
         ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);

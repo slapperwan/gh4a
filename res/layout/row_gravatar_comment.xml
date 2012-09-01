@@ -38,11 +38,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/content_edit_dark"
-        android:layout_toLeftOf="@+id/iv_delete" />
-    <ImageView
-        android:id="@id/iv_delete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/content_discard_dark"
         android:layout_alignParentRight="true" />
 </RelativeLayout>

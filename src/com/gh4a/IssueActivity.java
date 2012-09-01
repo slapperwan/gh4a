@@ -134,7 +134,8 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
 
         TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
         mCommentAdapter = new CommentAdapter(IssueActivity.this, new ArrayList<Comment>(), 
-                tvCommentTitle, mIssue.getComments());
+                mIssue.getNumber(), mIssue.getState(),
+                mRepoOwner, mRepoName);
         lvComments.setAdapter(mCommentAdapter);
 
         ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
