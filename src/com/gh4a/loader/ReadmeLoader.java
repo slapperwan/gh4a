@@ -28,7 +28,9 @@ public class ReadmeLoader extends AsyncTaskLoader<String> {
     
     @Override
     public String loadInBackground() {
+        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
         GitHubClient client = new DefaultClient("application/vnd.github.beta.html");
+        client.setOAuth2Token(app.getAuthToken());
         try {
             ContentService contentService = new ContentService(client);
             InputStream is = contentService.getHtmlReadme(new RepositoryId(mRepoOwner, mRepoName));
