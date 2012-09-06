@@ -57,6 +57,8 @@
     <string name="error_connection">Connection error</string>
     <string name="home">Home</string>
     <string name="share">Share</string>
+    <string name="downloads">Downloads</string>
+    <string name="packages">Packages</string>
     
     <plurals name="file">
         <item quantity="one">File</item>

@@ -39,6 +39,7 @@ import android.widget.TextView;
 import com.gh4a.CollaboratorListActivity;
 import com.gh4a.Constants;
 import com.gh4a.ContributorListActivity;
+import com.gh4a.DownloadsActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.IssueListActivity;
 import com.gh4a.R;
@@ -286,6 +287,12 @@ public class RepositoryFragment extends BaseFragment implements
         TextView tvOthers = (TextView) v.findViewById(R.id.other_info);
         tvOthers.setTypeface(boldCondensed);
         tvOthers.setTextColor(Color.parseColor("#0099cc"));
+        
+        TextView tvDownloads = (TextView) v.findViewById(R.id.tv_downloads_label);
+        tvDownloads.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
+        tvDownloads.setPadding(0, 16, 0, 16);
+        tvDownloads.setOnClickListener(this);
+        tvDownloads.setTypeface(boldCondensed);
     }
 
     public void updateWatcherCount(boolean watching) {
@@ -390,6 +397,9 @@ public class RepositoryFragment extends BaseFragment implements
         case R.id.tv_wiki_label:
             getWiki(view);
             break;
+        case R.id.tv_downloads_label:
+            getDownloads(view);
+            break;
         default:
             break;
         }
@@ -435,6 +445,13 @@ public class RepositoryFragment extends BaseFragment implements
     
     public void getCollaborators(View view) {
         Intent intent = new Intent().setClass(getActivity(), CollaboratorListActivity.class);
+        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        startActivity(intent);
+    }
+    
+    public void getDownloads(View view) {
+        Intent intent = new Intent().setClass(getActivity(), DownloadsActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
         startActivity(intent);

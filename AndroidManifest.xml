@@ -182,6 +182,9 @@
         <activity
             android:name=".EditCommentActivity"
             android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".DownloadsActivity"
+            android:configChanges="orientation|screenSize" />
         <activity android:name="BrowseFilter">
             <intent-filter>
                 <action
