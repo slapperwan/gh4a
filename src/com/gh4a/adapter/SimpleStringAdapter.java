@@ -50,11 +50,11 @@ public class SimpleStringAdapter extends RootAdapter<String> {
             viewHolder.tvTitle.setTypeface(boldCondensed);
         }
         
-        String username = mObjects.get(position);
+        String string = mObjects.get(position);
         
-        if (username != null) {
+        if (string != null) {
             TextView tvFormattedName = (TextView) v.findViewById(R.id.tv_title);
-            tvFormattedName.setText(username);
+            tvFormattedName.setText(string);
         }
         
         return v;

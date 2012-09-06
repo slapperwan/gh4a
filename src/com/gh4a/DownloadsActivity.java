@@ -11,6 +11,9 @@ import com.actionbarsherlock.R;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.MenuItem;
+import com.gh4a.fragment.DownloadBranchesFragment;
+import com.gh4a.fragment.DownloadTagsFragment;
 import com.gh4a.fragment.DownloadsFragment;
 
 public class DownloadsActivity extends BaseSherlockFragmentActivity {
@@ -38,7 +41,7 @@ public class DownloadsActivity extends BaseSherlockFragmentActivity {
         
         setContentView(R.layout.view_pager);
         
-        tabCount = 2;
+        tabCount = 3;
         
         mActionBar = getSupportActionBar();
         mAdapter = new ThisPageAdapter(getSupportFragmentManager());
@@ -73,9 +76,16 @@ public class DownloadsActivity extends BaseSherlockFragmentActivity {
         
         tab = mActionBar
                 .newTab()
-                .setText(R.string.repo_tags)
+                .setText(R.string.repo_branches)
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
+        mActionBar.addTab(tab);
+        
+        tab = mActionBar
+                .newTab()
+                .setText(R.string.repo_tags)
+                .setTabListener(
+                        new TabListener<SherlockFragmentActivity>(this, 2 + "", mPager));
         mActionBar.addTab(tab);
     }
     
@@ -96,13 +106,27 @@ public class DownloadsActivity extends BaseSherlockFragmentActivity {
                 return DownloadsFragment.newInstance(mRepoOwner, mRepoName);
             }
             else if (position == 1) {
-                return DownloadsFragment.newInstance(mRepoOwner, mRepoName);
+                return DownloadBranchesFragment.newInstance(mRepoOwner, mRepoName);
+            }
+            else if (position == 2) {
+                return DownloadTagsFragment.newInstance(mRepoOwner, mRepoName);
             }
             return null;
         }
         
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
+        }
+    }
+    
+    @Override
+    public boolean setMenuOptionItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;     
+            default:
+                return true;
         }
     }
 }

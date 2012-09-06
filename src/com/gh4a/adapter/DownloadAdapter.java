@@ -1,11 +1,17 @@
 package com.gh4a.adapter;
 
+import static android.text.format.DateUtils.FORMAT_NUMERIC_DATE;
+import static android.text.format.DateUtils.FORMAT_SHOW_DATE;
+import static android.text.format.DateUtils.FORMAT_SHOW_YEAR;
+import static android.text.format.DateUtils.MINUTE_IN_MILLIS;
+
 import java.util.List;
 
 import org.eclipse.egit.github.core.Download;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.text.format.DateUtils;
 import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,8 +67,12 @@ public class DownloadAdapter extends RootAdapter<Download> {
                 viewHolder.tvDesc.setVisibility(View.GONE);
             }
 
+            long now = System.currentTimeMillis();
+            
             String extraData = Formatter.formatFileSize(mContext, download.getSize())
-                    + "  " + download.getDownloadCount() + " downloads";
+                    + "  " + download.getDownloadCount() + " downloads"
+                    + "  " + DateUtils.getRelativeTimeSpanString(download.getCreatedAt().getTime(), now,
+                                MINUTE_IN_MILLIS, FORMAT_SHOW_DATE | FORMAT_SHOW_YEAR | FORMAT_NUMERIC_DATE);
             viewHolder.tvExtra.setText(extraData);
         }
         return v;

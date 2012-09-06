@@ -20,108 +20,49 @@ import java.util.List;
 import org.eclipse.egit.github.core.RepositoryTag;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 
-/**
- * The BranchTag adapter.
- */
 public class TagAdapter extends RootAdapter<RepositoryTag> {
 
-    /** The user login. */
-    protected String mUserLogin;
-    
-    /** The repo name. */
-    protected String mRepoName;
-
-    /**
-     * Instantiates a new branch tag adapter.
-     * 
-     * @param context the context
-     * @param objects the objects
-     */
     public TagAdapter(Context context, List<RepositoryTag> objects) {
         super(context, objects);
     }
-
-    /**
-     * Instantiates a new branch tag adapter.
-     *
-     * @param context the context
-     * @param objects the objects
-     * @param userLogin the user login
-     * @param repoName the repo name
-     */
-    public TagAdapter(Context context, List<RepositoryTag> objects, String userLogin,
-            String repoName) {
-        super(context, objects);
-        mUserLogin = userLogin;
-        mRepoName = repoName;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see android.widget.BaseAdapter#areAllItemsEnabled()
-     */
-    @Override
-    public boolean areAllItemsEnabled() {
-        return false;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see android.widget.BaseAdapter#isEnabled(int)
-     */
-    @Override
-    public boolean isEnabled(int position) {
-        return false;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see com.gh4a.adapter.RootAdapter#doGetView(int, android.view.View,
-     * android.view.ViewGroup)
-     */
+    
     @Override
     public View doGetView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
+        ViewHolder viewHolder = null;
+        
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_branch_tag, null);
+            v = vi.inflate(R.layout.row_simple, null);
+            
+            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+            Typeface boldCondensed = app.boldCondensed;
+            
+            viewHolder = new ViewHolder();
+            viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
+            viewHolder.tvTitle.setTypeface(boldCondensed);
         }
-
-        final RepositoryTag branchTag = mObjects.get(position);
-        if (branchTag != null) {
-            TextView tvText = (TextView) v.findViewById(R.id.tv_title);
-            tvText.setText(branchTag.getName());
-
-            Button btnTree = (Button) v.findViewById(R.id.btn_tree);
-            Button btnCommits = (Button) v.findViewById(R.id.btn_commits);
-            btnCommits.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    int viewId = 0;
-//                    if (v.getContext() instanceof BranchListActivity) {
-//                        viewId = R.id.btn_branches;
-//                    }
-//                    else {
-//                        viewId = R.id.btn_tags;
-//                    }
-
-                    ((Gh4Application) v.getContext().getApplicationContext())
-                            .openCommitListActivity(v.getContext(), mUserLogin, mRepoName,
-                                    branchTag.getName(), branchTag.getCommit().getSha(), viewId);
-                }
-            });
+        
+        RepositoryTag tag = mObjects.get(position);
+        
+        if (tag != null) {
+            TextView tvFormattedName = (TextView) v.findViewById(R.id.tv_title);
+            tvFormattedName.setText(tag.getName());
         }
+        
         return v;
+    }
+    
+    private static class ViewHolder {
+        public TextView tvTitle;
     }
 }

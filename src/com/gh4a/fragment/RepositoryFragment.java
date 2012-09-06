@@ -368,10 +368,6 @@ public class RepositoryFragment extends BaseFragment implements
         Gh4Application app = (Gh4Application) getActivity().getApplicationContext();
         
         switch (id) {
-        case R.id.btn_commits:
-            app.openBranchListActivity(getActivity(),
-                    mRepoOwner, mRepoName, R.id.btn_commits);
-            break;
         case R.id.cell_pull_requests:
             app.openPullRequestListActivity(getActivity(),
                     mRepoOwner, mRepoName,
