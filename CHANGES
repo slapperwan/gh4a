@@ -1,3 +1,9 @@
+v3.3 (Upcoming release)
+- Download package files and branch/tag archive
+- View file commit history
+- View file at specific commit
+- Sort repositories (created, updated, pushed, full_name)
+
 v3.2 (Sep 2, 2012)
 - Edit and delete comment on issue/pull request
 - bug fixes
