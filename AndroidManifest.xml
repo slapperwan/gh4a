@@ -69,12 +69,6 @@
             android:name=".DiffViewerActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".BranchListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".TagListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
             android:name=".PullRequestListActivity"
             android:configChanges="orientation|screenSize" />
         <activity

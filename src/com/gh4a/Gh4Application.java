@@ -358,41 +358,6 @@ public class Gh4Application extends Application {
     }
 
     /**
-     * Open branch list activity.
-     *
-     * @param context the context
-     * @param repoOwner the repo owner
-     * @param repoName the repo name
-     * @param buttonId the button id
-     */
-    public void openBranchListActivity(Context context, String repoOwner, String repoName,
-            int buttonId) {
-        Intent intent = new Intent().setClass(context, BranchListActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, repoName);
-        intent.putExtra(Constants.VIEW_ID, buttonId);
-
-        context.startActivity(intent);
-    }
-
-    /**
-     * Open tag list activity.
-     *
-     * @param context the context
-     * @param repoOwner the repo owner
-     * @param repoName the repo name
-     * @param buttonId the button id
-     */
-    public void openTagListActivity(Context context, String repoOwner, String repoName, int buttonId) {
-        Intent intent = new Intent().setClass(context, TagListActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, repoName);
-        intent.putExtra(Constants.VIEW_ID, buttonId);
-
-        context.startActivity(intent);
-    }
-
-    /**
      * Open browser.
      * 
      * @param context the context
