@@ -3,6 +3,8 @@
     <item android:id="@+id/refresh" 
         android:icon="@drawable/navigation_refresh"
         android:showAsAction="always" />
+    <item android:id="@+id/star" 
+        android:showAsAction="always" />
     <item android:id="@+id/watch" 
         android:showAsAction="always" />
     <item android:id="@+id/branches" 

@@ -28,6 +28,7 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.fragment.ForkListFragment;
+import com.gh4a.fragment.StargazerListFragment;
 import com.gh4a.fragment.WatcherListFragment;
 
 public class WatcherListActivity extends BaseSherlockFragmentActivity  {
@@ -57,7 +58,7 @@ public class WatcherListActivity extends BaseSherlockFragmentActivity  {
         
         setContentView(R.layout.view_pager);
         
-        tabCount = 2;
+        tabCount = 3;
         
         mActionBar = getSupportActionBar();
         mAdapter = new ThisPageAdapter(getSupportFragmentManager());
@@ -91,10 +92,17 @@ public class WatcherListActivity extends BaseSherlockFragmentActivity  {
         
         tab = mActionBar
                 .newTab()
-                .setText(R.string.repo_forks)
+                .setText(R.string.repo_watchers)
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
         mActionBar.addTab(tab, mPos == 1);
+        
+        tab = mActionBar
+                .newTab()
+                .setText(R.string.repo_forks)
+                .setTabListener(
+                        new TabListener<SherlockFragmentActivity>(this, 2 + "", mPager));
+        mActionBar.addTab(tab, mPos == 2);
     }
 
     public class ThisPageAdapter extends FragmentStatePagerAdapter {
@@ -111,9 +119,12 @@ public class WatcherListActivity extends BaseSherlockFragmentActivity  {
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
             if (position == 0) {
-                return WatcherListFragment.newInstance(mRepoOwner, mRepoName);
+                return StargazerListFragment.newInstance(mRepoOwner, mRepoName);
             }
             else if (position == 1) {
+                return WatcherListFragment.newInstance(mRepoOwner, mRepoName);
+            }
+            else if (position == 2) {
                 return ForkListFragment.newInstance(mRepoOwner, mRepoName);
             }
             
@@ -129,7 +140,7 @@ public class WatcherListActivity extends BaseSherlockFragmentActivity  {
     public boolean setMenuOptionItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                getApplicationContext().openRepositoryInfoActivity(this, mRepoOwner, mRepoName, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                finish();
                 return true;     
             default:
                 return true;

@@ -39,8 +39,10 @@ import com.gh4a.fragment.ContentListFragment;
 import com.gh4a.fragment.ContentListFragment.OnTreeSelectedListener;
 import com.gh4a.fragment.RepositoryFragment;
 import com.gh4a.loader.BranchListLoader;
+import com.gh4a.loader.IsStarringLoader;
 import com.gh4a.loader.IsWatchingLoader;
 import com.gh4a.loader.RepositoryLoader;
+import com.gh4a.loader.StarLoader;
 import com.gh4a.loader.TagListLoader;
 import com.gh4a.loader.WatchLoader;
 import com.gh4a.utils.StringUtils;
@@ -65,6 +67,8 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     private ProgressDialog mProgressDialog;
     private boolean isFinishLoadingWatching;
     private boolean isWatching;
+    private boolean isFinishLoadingStarring;
+    private boolean isStarring;
     private RepositoryFragment mRepositoryFragment;
     private ContentListFragment mContentListFragment;
     private CommitListFragment mCommitListFragment;
@@ -115,6 +119,11 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         getSupportLoaderManager().getLoader(3).forceLoad();
         
         getSupportLoaderManager().initLoader(4, null, this);
+        
+        getSupportLoaderManager().initLoader(5, null, this);
+        getSupportLoaderManager().getLoader(5).forceLoad();
+        
+        getSupportLoaderManager().initLoader(6, null, this);
     }
     
     private void fillTabs() {
@@ -321,7 +330,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
             menu.getItem(0).setIcon(R.drawable.navigation_refresh_dark);
         }
         
-        MenuItem watchAction = menu.getItem(1);
+        MenuItem watchAction = menu.getItem(2);
         if (isAuthorized()) {
             if (!isFinishLoadingWatching) {
                 watchAction.setActionView(R.layout.ab_loading);
@@ -339,6 +348,25 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         else {
             menu.removeItem(R.id.watch);
         }
+        
+        MenuItem starAction = menu.getItem(1);
+        if (isAuthorized()) {
+            if (!isFinishLoadingStarring) {
+                starAction.setActionView(R.layout.ab_loading);
+                starAction.expandActionView();
+            }
+            else {
+                if (isStarring) {
+                    starAction.setTitle(R.string.repo_unstar_action);
+                }
+                else {
+                    starAction.setTitle(R.string.repo_star_action);
+                }
+            }
+        }
+        else {
+            menu.removeItem(R.id.star);
+        }
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -354,6 +382,12 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
                 item.expandActionView();
                 getSupportLoaderManager().restartLoader(4, null, this);
                 getSupportLoaderManager().getLoader(4).forceLoad();
+                return true;
+            case R.id.star:
+                item.setActionView(R.layout.ab_loading);
+                item.expandActionView();
+                getSupportLoaderManager().restartLoader(6, null, this);
+                getSupportLoaderManager().getLoader(6).forceLoad();
                 return true;
             case R.id.branches:
                 if (mBranches == null) {
@@ -405,8 +439,14 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         else if (id == 3) {
             return new IsWatchingLoader(this, mRepoOwner, mRepoName);
         }
-        else {
+        else if (id == 4){
             return new WatchLoader(this, mRepoOwner, mRepoName, isWatching);
+        }
+        else if (id == 5) {
+            return new IsStarringLoader(this, mRepoOwner, mRepoName);
+        }
+        else {
+            return new StarLoader(this, mRepoOwner, mRepoName, isStarring);
         }
     }
 
@@ -446,12 +486,29 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
                 }
                 invalidateOptionsMenu();
             }
-            else {
+            else if (loader.getId() == 4){
                 if (object != null) {
                     isWatching = (Boolean) data;
                     isFinishLoadingWatching = true;
                     if (mRepositoryFragment != null) {
                         //mRepositoryFragment.updateWatcherCount(isWatching);
+                    }
+                }
+                invalidateOptionsMenu();
+            }
+            else if (loader.getId() == 5) {
+                if (object != null) {
+                    isStarring = (Boolean) data;
+                    isFinishLoadingStarring = true;
+                }
+                invalidateOptionsMenu();
+            }
+            else {
+                if (object != null) {
+                    isStarring = (Boolean) data;
+                    isFinishLoadingStarring = true;
+                    if (mRepositoryFragment != null) {
+                        mRepositoryFragment.updateStargazerCount(isStarring);
                     }
                 }
                 invalidateOptionsMenu();

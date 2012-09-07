@@ -57,7 +57,7 @@ public class RepositoryFragment extends BaseFragment implements
     private Repository mRepository;
     private String mRepoOwner;
     private String mRepoName;
-    private int mWatcherCount;
+    private int mStargazerCount;
     private boolean mDataLoaded;
     
     public static RepositoryFragment newInstance(Repository repository) {
@@ -196,14 +196,14 @@ public class RepositoryFragment extends BaseFragment implements
         
         tvUrl.setText(mRepository.getHtmlUrl());
 
-        TableLayout tlWatchers = (TableLayout) v.findViewById(R.id.cell_watchers);
-        tlWatchers.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-        tlWatchers.setOnClickListener(this);
+        TableLayout tlStargazers = (TableLayout) v.findViewById(R.id.cell_stargazers);
+        tlStargazers.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
+        tlStargazers.setOnClickListener(this);
         
-        TextView tvWatchersCount = (TextView) v.findViewById(R.id.tv_watchers_count);
-        mWatcherCount = mRepository.getWatchers();
-        tvWatchersCount.setText(String.valueOf(mWatcherCount));
-        tvWatchersCount.setTypeface(boldCondensed);
+        TextView tvStargazersCount = (TextView) v.findViewById(R.id.tv_stargazers_count);
+        mStargazerCount = mRepository.getWatchers();
+        tvStargazersCount.setText(String.valueOf(mStargazerCount));
+        tvStargazersCount.setTypeface(boldCondensed);
         
         TableLayout tlForks = (TableLayout) v.findViewById(R.id.cell_forks);
         tlForks.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
@@ -295,13 +295,13 @@ public class RepositoryFragment extends BaseFragment implements
         tvDownloads.setTypeface(boldCondensed);
     }
 
-    public void updateWatcherCount(boolean watching) {
-        TextView tvWatchersCount = (TextView) getView().findViewById(R.id.tv_watchers_count);
-        if (watching) {
-            tvWatchersCount.setText(String.valueOf(++mWatcherCount));
+    public void updateStargazerCount(boolean starring) {
+        TextView tvStargazersCount = (TextView) getView().findViewById(R.id.tv_stargazers_count);
+        if (starring) {
+            tvStargazersCount.setText(String.valueOf(++mStargazerCount));
         }
         else {
-            tvWatchersCount.setText(String.valueOf(--mWatcherCount));
+            tvStargazersCount.setText(String.valueOf(--mStargazerCount));
         }
     }
     
@@ -384,8 +384,8 @@ public class RepositoryFragment extends BaseFragment implements
                     mRepoOwner, mRepoName,
                     Constants.Issue.ISSUE_STATE_OPEN);
             break;
-        case R.id.cell_watchers:
-            getWatchers(view);
+        case R.id.cell_stargazers:
+            getStargazers(view);
             break;
         case R.id.cell_forks:
             getNetworks(view);
@@ -408,7 +408,7 @@ public class RepositoryFragment extends BaseFragment implements
         startActivity(intent);
     }
     
-    public void getWatchers(View view) {
+    public void getStargazers(View view) {
         Intent intent = new Intent().setClass(getActivity(), WatcherListActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);

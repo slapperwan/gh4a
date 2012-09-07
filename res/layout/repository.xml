@@ -96,20 +96,20 @@
                 </TableLayout>
                 
                 <TableLayout
-                    android:id="@+id/cell_watchers"
+                    android:id="@+id/cell_stargazers"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" >
                     <TableRow>
                         <TextView
-                            android:id="@+id/tv_watchers_count"
+                            android:id="@+id/tv_stargazers_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="?android:attr/textAppearanceLarge" />
                     </TableRow>
                     <TableRow>
                         <TextView
-                            android:id="@+id/tv_watchers_label"
+                            android:id="@+id/tv_stargazers_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="?android:attr/textAppearanceSmall"
