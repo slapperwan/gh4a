@@ -1,28 +1,24 @@
 package com.gh4a;
 
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.view.ViewGroup;
+import android.support.v4.app.FragmentTransaction;
+import android.widget.ArrayAdapter;
 
+import com.actionbarsherlock.R;
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.Tab;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
+import com.gh4a.fragment.BaseFragment;
 import com.gh4a.fragment.RepositoryListFragment;
+import com.gh4a.fragment.StarredRepositoryListFragment;
 import com.gh4a.fragment.WatchedRepositoryListFragment;
 
-public class RepositoryListActivity extends BaseSherlockFragmentActivity {
+public class RepositoryListActivity extends BaseSherlockFragmentActivity implements ActionBar.OnNavigationListener {
 
     public String mUserLogin;
     public String mUserType;
-    private ThisPageAdapter mAdapter;
-    private ViewPager mPager;
     private ActionBar mActionBar;
-    private int tabCount;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -38,161 +34,105 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity {
             return;
         }
         
-        setContentView(R.layout.view_pager);
-        
-        if (Constants.User.USER_TYPE_ORG.equals(mUserType)) {
-            tabCount = 1;
-        }
-        else if (mUserLogin.equals(getAuthLogin())) {
-            tabCount = 7;
-        }
-        else {
-            tabCount = 5;
-        }
-        
+        setContentView(R.layout.frame_layout);
+
         mActionBar = getSupportActionBar();
-        mAdapter = new ThisPageAdapter(getSupportFragmentManager());
-        mPager = (ViewPager) findViewById(R.id.pager);
-        mPager.setAdapter(mAdapter);
-        
-        mPager.setOnPageChangeListener(new OnPageChangeListener() {
-
-            @Override
-            public void onPageScrollStateChanged(int arg0) {}
-            
-            @Override
-            public void onPageScrolled(int arg0, float arg1, int arg2) {}
-
-            @Override
-            public void onPageSelected(int position) {
-                mActionBar.setSelectedNavigationItem(position);
-            }
-        });
-        
         mActionBar.setTitle(mUserLogin);
         mActionBar.setSubtitle(R.string.user_pub_repos);
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         mActionBar.setDisplayHomeAsUpEnabled(true);
         
-        Tab tab = mActionBar
-                .newTab()
-                .setText(R.string.user_all_repos)
-                .setTabListener(
-                        new TabListener<SherlockFragmentActivity>(this, 0 + "", mPager));
-        mActionBar.addTab(tab);
-        
+        Context context = mActionBar.getThemedContext();
+        ArrayAdapter<CharSequence> list = new ArrayAdapter<CharSequence>(context, R.layout.sherlock_spinner_item);
         if (!Constants.User.USER_TYPE_ORG.equals(mUserType)) {
-            tab = mActionBar
-                    .newTab()
-                    .setText(R.string.user_stars_repos)
-                    .setTabListener(
-                            new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
-            mActionBar.addTab(tab);
-            
             if (mUserLogin.equals(getAuthLogin())) {
-                tab = mActionBar
-                        .newTab()
-                        .setText(R.string.user_public_repos)
-                        .setTabListener(
-                                new TabListener<SherlockFragmentActivity>(this, 2 + "", mPager));
-                mActionBar.addTab(tab);
-                
-                tab = mActionBar
-                        .newTab()
-                        .setText(R.string.user_private_repos)
-                        .setTabListener(
-                                new TabListener<SherlockFragmentActivity>(this, 3 + "", mPager));
-                mActionBar.addTab(tab);
+                list.addAll(getResources().getStringArray(R.array.repo_login_item));
             }
+            else {
+                list.addAll(getResources().getStringArray(R.array.repo_user_item));
+            }
+            list.setDropDownViewResource(R.layout.row_simple);
+
+            mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+            mActionBar.setListNavigationCallbacks(list, this);
+        }
+        else {
             
-            tab = mActionBar
-                    .newTab()
-                    .setText(R.string.user_sources_repos)
-                    .setTabListener(
-                            new TabListener<SherlockFragmentActivity>(this, (tabCount - 3) + "", mPager));
-            mActionBar.addTab(tab);
-            
-            tab = mActionBar
-                    .newTab()
-                    .setText(R.string.user_forks_repos)
-                    .setTabListener(
-                            new TabListener<SherlockFragmentActivity>(this, (tabCount - 2) + "", mPager));
-            mActionBar.addTab(tab);
-            
-            tab = mActionBar
-                    .newTab()
-                    .setText(R.string.user_member_repos)
-                    .setTabListener(
-                            new TabListener<SherlockFragmentActivity>(this, (tabCount - 1) + "", mPager));
-            mActionBar.addTab(tab);
         }
     }
     
-    public class ThisPageAdapter extends FragmentStatePagerAdapter {
-
-        public ThisPageAdapter(FragmentManager fm) {
-            super(fm);
+    @Override
+    public boolean onNavigationItemSelected(int position, long itemId) {
+        BaseFragment fragment = null;
+        if (mUserLogin.equals(getAuthLogin())) {
+            switch (position) {
+            case 0:
+                fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "all");
+                break;
+            case 1:
+                fragment = WatchedRepositoryListFragment.newInstance(mUserLogin);
+                break;
+            case 2:
+                fragment = StarredRepositoryListFragment.newInstance(mUserLogin);
+                break;
+            case 3:
+                fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "public");
+                break;
+            case 4:
+                fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "private");
+                break;
+            case 5:
+                fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "sources");
+                break;
+            case 6:
+                fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "forks");
+                break;
+            case 7:
+                fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "member");
+                break;
+            default:
+                break;
+            }
         }
-
-        @Override
-        public int getCount() {
-            return tabCount;
-        }
-
-        @Override
-        public android.support.v4.app.Fragment getItem(int position) {
-            //Repo type all, owner, public, private, member
-            if (position == 0) {
-                return RepositoryListFragment.newInstance(mUserLogin, mUserType, "all");
-            }
-            else if (position == 1) {
-                return WatchedRepositoryListFragment.newInstance(mUserLogin);
-            }
-            else if (position == 2) {
-                if (mUserLogin.equals(getAuthLogin())) {
-                    return RepositoryListFragment.newInstance(mUserLogin, mUserType, "public");
-                }
-                else {
-                    return RepositoryListFragment.newInstance(mUserLogin, mUserType, "sources");
-                }
-            }
-            else if (position == 3) {
-                if (mUserLogin.equals(getAuthLogin())) {
-                    return RepositoryListFragment.newInstance(mUserLogin, mUserType, "private");
-                }
-                else {
-                    return RepositoryListFragment.newInstance(mUserLogin, mUserType, "forks");
-                }
-            }
-            else if (position == 4) {
-                if (mUserLogin.equals(getAuthLogin())) {
-                    return RepositoryListFragment.newInstance(mUserLogin, mUserType, "sources");
-                }
-                else {
-                    return RepositoryListFragment.newInstance(mUserLogin, mUserType, "member");
-                }
-            }
-            else if (position == 5) {
-                return RepositoryListFragment.newInstance(mUserLogin, mUserType, "forks");
-            }
-            else if (position == 6) {
-                return RepositoryListFragment.newInstance(mUserLogin, mUserType, "member");
-            }
-            else {
-                return RepositoryListFragment.newInstance(mUserLogin, mUserType, "all");
+        else {
+            switch (position) {
+            case 0:
+                fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "all");
+                break;
+            case 1:
+                fragment = WatchedRepositoryListFragment.newInstance(mUserLogin);
+                break;
+            case 2:
+                fragment = StarredRepositoryListFragment.newInstance(mUserLogin);
+                break;
+            case 3:
+                fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "sources");
+                break;
+            case 4:
+                fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "forks");
+                break;
+            case 5:
+                fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "member");
+                break;
+            default:
+                break;
             }
         }
         
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
+        if (fragment != null) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            
+            fragmentTransaction.replace(R.id.details, fragment);
+            fragmentTransaction.commit();
         }
+        return true;
     }
     
     @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                getApplicationContext().openUserInfoActivity(this, mUserLogin, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                finish();
                 return true;     
             default:
                 return true;

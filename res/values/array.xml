@@ -46,4 +46,28 @@
         <item>Updated</item>
         <item>Comments</item>
     </string-array>
+    <string-array 
+        name="repo_login_item">
+        <item>All</item>
+        <item>Watched</item>
+        <item>Starred</item>
+        <item>Public</item>
+        <item>Private</item>
+        <item>Sources</item>
+        <item>Forks</item>
+        <item>Member</item>
+    </string-array>
+    <string-array 
+        name="repo_user_item">
+        <item>All</item>
+        <item>Watched</item>
+        <item>Starred</item>
+        <item>Sources</item>
+        <item>Forks</item>
+        <item>Member</item>
+    </string-array>
+    <string-array 
+        name="repo_org_item">
+        <item>All</item>
+    </string-array>
 </resources>
