@@ -118,6 +118,10 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
         }
         
         menu.removeItem(R.id.download);
+        
+        menu.add(0, 10, Menu.NONE, "History")
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        
         return super.onCreateOptionsMenu(menu);
     }
     
@@ -140,6 +144,14 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
                 shareIntent = Intent.createChooser(shareIntent, "Share");
                 startActivity(shareIntent);
                 return true;
+            case 10:
+                Intent intent = new Intent().setClass(FileViewerActivity.this, CommitHistoryActivity.class);
+                intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                intent.putExtra(Constants.Object.PATH, mPath);
+                intent.putExtra(Constants.Object.REF, mRef);
+                intent.putExtra(Constants.Object.OBJECT_SHA, mSha);
+                startActivity(intent);
             default:
                 return true;
         }
