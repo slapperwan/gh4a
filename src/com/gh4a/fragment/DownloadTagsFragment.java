@@ -4,13 +4,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.egit.github.core.RepositoryBranch;
 import org.eclipse.egit.github.core.RepositoryTag;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,10 +81,28 @@ public class DownloadTagsFragment extends BaseFragment implements OnItemClickLis
     }
     
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        RepositoryTag tag = (RepositoryTag) mAdapter.getItem(position);
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(tag.getZipballUrl()));
-        startActivity(browserIntent);
+    public void onItemClick(AdapterView<?> adapterView, View view, final int position, long id) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(getSherlockActivity(),
+                android.R.style.Theme));
+        builder.setTitle("Download this file?");
+        builder.setMessage("Complete this action using a browser.");
+        builder.setPositiveButton(R.string.ok,
+                new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.dismiss();
+                RepositoryTag tag = (RepositoryTag) mAdapter.getItem(position);
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(tag.getZipballUrl()));
+                startActivity(browserIntent);
+            }
+        })
+        .setNegativeButton(R.string.cancel,
+                new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.dismiss();
+            }
+        })
+       .create();
+        builder.show();
     }
 
     @Override

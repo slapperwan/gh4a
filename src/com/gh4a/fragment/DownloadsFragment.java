@@ -6,11 +6,14 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.Download;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,10 +80,28 @@ public class DownloadsFragment extends BaseFragment implements OnItemClickListen
     }
     
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        Download download = (Download) mAdapter.getItem(position);
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(download.getHtmlUrl()));
-        startActivity(browserIntent);
+    public void onItemClick(AdapterView<?> adapterView, View view, final int position, long id) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(getSherlockActivity(),
+                android.R.style.Theme));
+        builder.setTitle("Download this file?");
+        builder.setMessage("Complete this action using a browser.");
+        builder.setPositiveButton(R.string.ok,
+                new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.dismiss();
+                Download download = (Download) mAdapter.getItem(position);
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(download.getHtmlUrl()));
+                startActivity(browserIntent);
+            }
+        })
+        .setNegativeButton(R.string.cancel,
+                new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.dismiss();
+            }
+        })
+       .create();
+        builder.show();
     }
 
     @Override
