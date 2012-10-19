@@ -38,7 +38,8 @@ public class DiffViewerActivity extends BaseActivity {
     private String mSha;
     private String mDiff;
     private String mFilePath;
-
+    private String mFilename;
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
@@ -53,9 +54,9 @@ public class DiffViewerActivity extends BaseActivity {
         mDiff = data.getString(Constants.Commit.DIFF);
         mFilePath = data.getString(Constants.Object.PATH);
 
-        String filename = FileUtils.getFileName(mFilePath);
+        mFilename = FileUtils.getFileName(mFilePath);
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(filename);
+        actionBar.setTitle(mFilename);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
@@ -74,7 +75,7 @@ public class DiffViewerActivity extends BaseActivity {
         s.setSupportMultipleWindows(true);
         s.setJavaScriptEnabled(true);
         
-        if (FileUtils.isImage(filename)) {
+        if (FileUtils.isImage(mFilename)) {
             String htmlImage = StringUtils.highlightImage("https://github.com/" + mRepoOwner + "/" + mRepoName + "/raw/" + mSha + "/" + mFilePath);
             diffView.loadDataWithBaseURL("file:///android_asset/", htmlImage, "text/html", "utf-8", "");
         }
@@ -130,6 +131,10 @@ public class DiffViewerActivity extends BaseActivity {
         }
         
         menu.removeItem(R.id.download);
+        
+        menu.add(0, 10, Menu.NONE, "View file @" + mSha.substring(0, 7))
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        
         return super.onCreateOptionsMenu(menu);
     }
     
@@ -152,6 +157,17 @@ public class DiffViewerActivity extends BaseActivity {
                         + " at " + mRepoOwner + "/" + mRepoName + " " + diffUrl);
                 shareIntent = Intent.createChooser(shareIntent, "Share");
                 startActivity(shareIntent);
+                return true;
+            case 10:
+                Intent intent = new Intent().setClass(this, FileViewerActivity.class);
+                intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                intent.putExtra(Constants.Object.PATH, mFilePath);
+                intent.putExtra(Constants.Object.REF, mSha);
+                intent.putExtra(Constants.Object.NAME, mFilename);
+                intent.putExtra(Constants.Object.OBJECT_SHA, mSha);
+                startActivity(intent);
+                
                 return true;
             default:
                 return true;
