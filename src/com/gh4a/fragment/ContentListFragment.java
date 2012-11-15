@@ -16,24 +16,29 @@
 package com.gh4a.fragment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.egit.github.core.Content;
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.util.EncodingUtils;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.TextView;
 
+import com.androidquery.callback.AjaxStatus;
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
 import com.gh4a.Constants.LoaderResult;
@@ -41,8 +46,13 @@ import com.gh4a.R;
 import com.gh4a.RepositoryActivity;
 import com.gh4a.adapter.FileAdapter;
 import com.gh4a.loader.ContentListLoader;
+import com.gh4a.loader.ContentLoader;
 import com.gh4a.loader.GitModuleParserLoader;
+import com.gh4a.loader.MarkdownLoader;
+import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
+import com.github.mobile.util.HtmlUtils;
+import com.github.mobile.util.HttpImageGetter;
 
 public class ContentListFragment extends BaseFragment 
     implements LoaderManager.LoaderCallbacks<Object>, OnItemClickListener {
@@ -55,7 +65,10 @@ public class ContentListFragment extends BaseFragment
     private OnTreeSelectedListener mCallback;
     private List<Content> mContents;
     private boolean mDataLoaded;
-
+    private String mPathReadme;
+    private TextView mFooter;
+    private String mMarkdownText; 
+    
     public static ContentListFragment newInstance(Repository repository,
             String path, String ref) {
         ContentListFragment f = new ContentListFragment();
@@ -72,7 +85,6 @@ public class ContentListFragment extends BaseFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
         mRepository = (Repository) getArguments().getSerializable("REPOSITORY");
         mPath = getArguments().getString(Constants.Object.PATH);
         mRef = getArguments().getString(Constants.Object.REF);
@@ -87,6 +99,13 @@ public class ContentListFragment extends BaseFragment
         View v = inflater.inflate(R.layout.generic_list, container, false);
         mListView = (ListView) v.findViewById(R.id.list_view);
         mListView.setOnItemClickListener(this);
+        
+        mFooter = (TextView) inflater.inflate(R.layout.row_simple, mListView, false);
+        mFooter.setMovementMethod(LinkMovementMethod.getInstance());
+        
+        mFooter.setTextAppearance(getSherlockActivity(), android.R.style.TextAppearance_Small);
+        mListView.addFooterView(mFooter, null, false);
+        
         return v;
     }
     
@@ -115,6 +134,8 @@ public class ContentListFragment extends BaseFragment
             mAdapter = new FileAdapter(getSherlockActivity(), mContents);
             mListView.setAdapter(mAdapter);
             mAdapter.notifyDataSetChanged();
+            
+            readmeExists(mContents);
         }
     }
     
@@ -160,13 +181,20 @@ public class ContentListFragment extends BaseFragment
     
     @Override
     public Loader onCreateLoader(int id, Bundle args) {
-        if (id == 1) {
-            return new GitModuleParserLoader(getSherlockActivity(), mRepository.getOwner().getLogin(),
-                    mRepository.getName(), ".gitmodules", mRef);
-        }
-        else {
+        if (id == 0) {
             return new ContentListLoader(getSherlockActivity(), mRepository.getOwner().getLogin(),
                     mRepository.getName(), mPath, mRef);
+        }
+        else if (id == 1) {
+            return new GitModuleParserLoader(getSherlockActivity(), mRepository.getOwner().getLogin(),
+                    mRepository.getName(), ".gitmodules", mRef);            
+        }
+        else if (id == 2) {
+            return new ContentLoader(getSherlockActivity(), mRepository.getOwner().getLogin(), 
+                    mRepository.getName(), mPathReadme, mRef);
+        }
+        else {
+            return new MarkdownLoader(getSherlockActivity(), mMarkdownText, "markdown");
         }
     }
 
@@ -179,14 +207,92 @@ public class ContentListFragment extends BaseFragment
         if (loader.getId() == 1) {
             mCallback.setGitModuleMap((Map<String, String>) data);
         }
-        else {
+        else if (loader.getId() == 0) {
             mDataLoaded = true;
             if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
-                fillData((List<Content>) data);            
+                List<Content> files = (List<Content>) data;
+                fillData(files);
+                
+                readmeExists(files);
+            }
+        }
+        else if (loader.getId() == 2) {
+            if (data != null) {
+                loadMarkdown((Content) data);
+            }
+        }
+        else if (loader.getId() == 3) {
+            if (data != null) {
+                String readme = HtmlUtils.format((String) data).toString();
+                HttpImageGetter imageGetter = new HttpImageGetter(getSherlockActivity());
+                imageGetter.bind(mFooter, readme, mRepository.getId());
+                mAdapter.notifyDataSetChanged();    
             }
         }
     }
-
+    
+    public void readmeExists(List<Content> files) {
+        for (Content content : files) {
+            if ("file".equals(content.getType())) {
+                String nameWithoutExt = null;
+                String filename = content.getName();
+                        
+                int mid = filename.lastIndexOf(".");
+                
+                if (mid != -1) {
+                    nameWithoutExt = filename.substring(0, mid);
+                }
+                
+                if (nameWithoutExt != null && nameWithoutExt.equalsIgnoreCase("readme")) {
+                    if (mPath != null) {
+                        mPathReadme = mPath + "/" + filename;
+                    }
+                    else {
+                        mPathReadme = filename;
+                    }
+                    
+                    if (getLoaderManager().getLoader(2) == null) {
+                        getLoaderManager().initLoader(2, null, this);
+                    }
+                    else {
+                        getLoaderManager().restartLoader(2, null, this);
+                    }
+                    getLoaderManager().getLoader(2).forceLoad();
+                    
+                    break;
+                }
+            }
+        }
+    }
+    
+    public void loadMarkdown(Content content) {
+        String ext = FileUtils.getFileExtension(content.getName());
+        mMarkdownText = content.getContent();
+        if (Arrays.asList(Constants.MARKDOWN_EXT).contains(ext)) {
+            mMarkdownText = new String(EncodingUtils.fromBase64(mMarkdownText));
+            
+            if (getLoaderManager().getLoader(3) == null) {
+                getLoaderManager().initLoader(3, null, this);
+            }
+            else {
+                getLoaderManager().restartLoader(3, null, this);
+            }
+            getLoaderManager().getLoader(3).forceLoad();
+        }
+        else {
+            mFooter.setText(mMarkdownText);
+            mAdapter.notifyDataSetChanged();    
+        }
+    }
+    
+    public void markdown(String url, String readme, AjaxStatus status) {
+        if (readme != null) {
+            readme = HtmlUtils.format(readme).toString();
+            HttpImageGetter imageGetter = new HttpImageGetter(getSherlockActivity());
+            imageGetter.bind(mFooter, readme, mRepository.getId());
+        }
+    }
+    
     @Override
     public void onLoaderReset(Loader loader) {
         // TODO Auto-generated method stub
