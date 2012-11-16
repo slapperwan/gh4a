@@ -6,6 +6,9 @@ This application provides access to github.com information and stay connected wi
   <img src="http://www.android.com/images/brand/android_app_on_play_large.png">
 </a>
 
+
+[OctoDroid on F-Droid.org](http://f-droid.org/repository/browse/?fdfilter=octodroid&fdid=com.gh4a)
+
 Main features
 -------------
 
