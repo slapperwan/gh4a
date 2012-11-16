@@ -348,7 +348,7 @@ public class StringUtils {
         content.append("<html><head><title></title>");
         if (highlight) {
             if (!Arrays.asList(Constants.SKIP_PRETTIFY_EXT).contains(ext)) {
-                data = TextUtils.htmlEncode(data).replace("\n", "<br>");
+                data = TextUtils.htmlEncode(data).replace("\r\n", "<br>").replace("\n", "<br>");
                 content.append("<link href='file:///android_asset/prettify.css' rel='stylesheet' type='text/css'/>");
                 content.append("<script src='file:///android_asset/prettify.js' type='text/javascript'></script>");
                 content.append("</head>");
@@ -363,14 +363,14 @@ public class StringUtils {
                 content.append("<div id='content'>");
             }
             else {
-                data = TextUtils.htmlEncode(data).replace("\n", "<br>");
+                data = TextUtils.htmlEncode(data).replace("\r\n", "<br>").replace("\n", "<br>");
                 content.append("</head>");
                 content.append("<body>");
                 content.append("<pre>");
             }
         }
         else {
-            data = TextUtils.htmlEncode(data).replace("\n", "<br>");
+            data = TextUtils.htmlEncode(data).replace("\r\n", "<br>").replace("\n", "<br>");
             content.append("</head>");
             content.append("<body>");
             content.append("<pre>");
