@@ -285,14 +285,6 @@ public class ContentListFragment extends BaseFragment
         }
     }
     
-    public void markdown(String url, String readme, AjaxStatus status) {
-        if (readme != null) {
-            readme = HtmlUtils.format(readme).toString();
-            HttpImageGetter imageGetter = new HttpImageGetter(getSherlockActivity());
-            imageGetter.bind(mFooter, readme, mRepository.getId());
-        }
-    }
-    
     @Override
     public void onLoaderReset(Loader loader) {
         // TODO Auto-generated method stub
