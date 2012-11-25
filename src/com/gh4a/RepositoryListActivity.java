@@ -50,14 +50,15 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
             else {
                 list.addAll(getResources().getStringArray(R.array.repo_user_item));
             }
-            list.setDropDownViewResource(R.layout.row_simple);
-
-            mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-            mActionBar.setListNavigationCallbacks(list, this);
         }
         else {
-            
+            list.addAll(getResources().getStringArray(R.array.repo_org_item));
         }
+        
+        list.setDropDownViewResource(R.layout.row_simple);
+
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        mActionBar.setListNavigationCallbacks(list, this);
     }
     
     @Override
