@@ -112,7 +112,6 @@ public class CommentAdapter extends RootAdapter<Comment> {
             viewHolder.tvExtra.setText(comment.getUser().getLogin() + "\n" + pt.format(comment.getCreatedAt()));
             
             String body = comment.getBodyHtml();
-            body = HtmlUtils.format(body).toString();
             imageGetter.bind(viewHolder.tvDesc, body, comment.getId());
             
             if (comment.getUser().getLogin().equals(appContext.getAuthLogin())
