@@ -1,5 +1,7 @@
 package com.gh4a;
 
+import org.eclipse.egit.github.core.service.PullRequestService;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -45,14 +47,20 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
         ArrayAdapter<CharSequence> list = new ArrayAdapter<CharSequence>(context, R.layout.sherlock_spinner_item);
         if (!Constants.User.USER_TYPE_ORG.equals(mUserType)) {
             if (mUserLogin.equals(getAuthLogin())) {
-                list.addAll(getResources().getStringArray(R.array.repo_login_item));
+                for (String item : getResources().getStringArray(R.array.repo_login_item)) {
+                    list.add(item);    
+                }
             }
             else {
-                list.addAll(getResources().getStringArray(R.array.repo_user_item));
+                for (String item : getResources().getStringArray(R.array.repo_user_item)) {
+                    list.add(item);    
+                }
             }
         }
         else {
-            list.addAll(getResources().getStringArray(R.array.repo_org_item));
+            for (String item : getResources().getStringArray(R.array.repo_org_item)) {
+                list.add(item);    
+            }
         }
         
         list.setDropDownViewResource(R.layout.row_simple);
