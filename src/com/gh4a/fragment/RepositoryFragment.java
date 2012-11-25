@@ -420,7 +420,7 @@ public class RepositoryFragment extends BaseFragment implements
         Intent intent = new Intent().setClass(getActivity(), WatcherListActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-        intent.putExtra("pos", 1);
+        intent.putExtra("pos", 2);
         startActivity(intent);
     }
 
