@@ -1,8 +1,7 @@
-v3.3 (Upcoming release)
+v3.3 (Nov 25, 2012)
 - Download package files and branch/tag archive
 - View file commit history
 - View file at specific commit
-- Sort repositories (created, updated, pushed, full_name)
 - Starred and watched repos
 
 v3.2 (Sep 2, 2012)
