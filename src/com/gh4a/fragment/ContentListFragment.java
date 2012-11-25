@@ -268,9 +268,8 @@ public class ContentListFragment extends BaseFragment
     public void loadMarkdown(Content content) {
         String ext = FileUtils.getFileExtension(content.getName());
         mMarkdownText = content.getContent();
+        mMarkdownText = new String(EncodingUtils.fromBase64(mMarkdownText));
         if (Arrays.asList(Constants.MARKDOWN_EXT).contains(ext)) {
-            mMarkdownText = new String(EncodingUtils.fromBase64(mMarkdownText));
-            
             if (getLoaderManager().getLoader(3) == null) {
                 getLoaderManager().initLoader(3, null, this);
             }
