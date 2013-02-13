@@ -226,12 +226,11 @@ public class IssueLabelCreateActivity extends BaseSherlockFragmentActivity {
     
     @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case android.R.id.home:
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
             getApplicationContext().openIssueListActivity(this, mRepoOwner, mRepoName, 
                     Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            return true;
-        case R.id.accept:
+        } else if (itemId == R.id.accept) {
             EditText etLabel = (EditText) findViewById(R.id.et_label);
             if (etLabel.getText() == null || StringUtils.isBlank(etLabel.getText().toString())) {
                 showMessage(getResources().getString(R.string.issue_error_label), false);
@@ -239,14 +238,9 @@ public class IssueLabelCreateActivity extends BaseSherlockFragmentActivity {
             else {
                 new AddIssueLabelsTask(IssueLabelCreateActivity.this).execute(etLabel.getText().toString());
             }
-            return true;
-
-        case R.id.cancel:
+        } else if (itemId == R.id.cancel) {
             finish();
-            return true;
-        
-        default:
-            return true;
         }
+        return true;
     }
 }

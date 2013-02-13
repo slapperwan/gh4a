@@ -26,7 +26,6 @@ import android.view.KeyEvent;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
-import com.actionbarsherlock.R;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockFragmentActivity;

@@ -475,21 +475,17 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
     
     @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case android.R.id.home:
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
             getApplicationContext().openIssueListActivity(this, mRepoOwner, mRepoName, 
                     Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            return true;
-        case R.id.create_new:
+        } else if (itemId == R.id.create_new) {
             Intent intent = new Intent().setClass(this, IssueLabelCreateActivity.class);
             intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
             intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
             startActivity(intent);
-            return true;
-
-        default:
-            return true;
         }
+        return true;
     }
 
     @Override

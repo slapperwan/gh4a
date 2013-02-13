@@ -1,14 +1,11 @@
 package com.gh4a;
 
-import org.eclipse.egit.github.core.service.PullRequestService;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.widget.ArrayAdapter;
 
-import com.actionbarsherlock.R;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.fragment.BaseFragment;

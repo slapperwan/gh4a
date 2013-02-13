@@ -218,101 +218,90 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
     
     @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                getApplicationContext().openRepositoryInfoActivity(this, mRepoOwner, mRepoName, Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                return true;
-            case R.id.view_open_closed:
-                if ("open".equals(mState)) {
-                    mState = Constants.Issue.ISSUE_STATE_CLOSED;
-                    mFilterData.put("state", Constants.Issue.ISSUE_STATE_CLOSED);
-                    item.setTitle(R.string.issue_view_open_issues);
-                }
-                else {
-                    mState = Constants.Issue.ISSUE_STATE_OPEN;
-                    mFilterData.put("state", Constants.Issue.ISSUE_STATE_OPEN);
-                    item.setTitle(R.string.issue_view_closed_issues);
-                }
-                
-                reloadIssueList();
-                return true;
-            case R.id.create_issue:
-                if (isAuthorized()) {
-                    Intent intent = new Intent().setClass(this, IssueCreateActivity.class);
-                    intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-                    intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                    startActivity(intent);
-                }
-                else {
-                    Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-                return true;
-            case R.id.view_labels:
-                Intent intent = new Intent().setClass(IssueListActivity.this, IssueLabelListActivity.class);
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
+            getApplicationContext().openRepositoryInfoActivity(this, mRepoOwner, mRepoName, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        } else if (itemId == R.id.view_open_closed) {
+            if ("open".equals(mState)) {
+                mState = Constants.Issue.ISSUE_STATE_CLOSED;
+                mFilterData.put("state", Constants.Issue.ISSUE_STATE_CLOSED);
+                item.setTitle(R.string.issue_view_open_issues);
+            }
+            else {
+                mState = Constants.Issue.ISSUE_STATE_OPEN;
+                mFilterData.put("state", Constants.Issue.ISSUE_STATE_OPEN);
+                item.setTitle(R.string.issue_view_closed_issues);
+            }
+            reloadIssueList();
+        } else if (itemId == R.id.create_issue) {
+            if (isAuthorized()) {
+                Intent intent = new Intent().setClass(this, IssueCreateActivity.class);
                 intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
                 intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                 startActivity(intent);
-                return true;
-            case R.id.view_milestones:
-                intent = new Intent().setClass(IssueListActivity.this, IssueMilestoneListActivity.class);
-                intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+            }
+            else {
+                Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
                 startActivity(intent);
-                return true;    
-            case R.id.sort:
-                String direction = mFilterData.get("direction");
-                if ("desc".equals(direction) || direction == null) {
-                    if (Gh4Application.THEME == R.style.LightTheme) {
-                        item.setIcon(R.drawable.navigation_collapse);
-                    }
-                    else {
-                        item.setIcon(R.drawable.navigation_collapse_dark);
-                    }
-                    mFilterData.put("direction", "asc");
+                finish();
+            }
+        } else if (itemId == R.id.view_labels) {
+            Intent intent = new Intent().setClass(IssueListActivity.this, IssueLabelListActivity.class);
+            intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+            intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+            startActivity(intent);
+        } else if (itemId == R.id.view_milestones) {
+            Intent intent = new Intent().setClass(IssueListActivity.this, IssueMilestoneListActivity.class);
+            intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+            intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+            startActivity(intent);
+        } else if (itemId == R.id.sort) {
+            String direction = mFilterData.get("direction");
+            if ("desc".equals(direction) || direction == null) {
+                if (Gh4Application.THEME == R.style.LightTheme) {
+                    item.setIcon(R.drawable.navigation_collapse);
                 }
                 else {
-                    if (Gh4Application.THEME == R.style.LightTheme) {
-                        item.setIcon(R.drawable.navigation_expand);
-                    }
-                    else {
-                        item.setIcon(R.drawable.navigation_expand_dark);
-                    }
-                    mFilterData.put("direction", "desc");
+                    item.setIcon(R.drawable.navigation_collapse_dark);
                 }
-                reloadIssueList();
-                return true;
-            case R.id.labels:
-                if (mLabels == null) {
-                    mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-                    getSupportLoaderManager().getLoader(0).forceLoad();
+                mFilterData.put("direction", "asc");
+            }
+            else {
+                if (Gh4Application.THEME == R.style.LightTheme) {
+                    item.setIcon(R.drawable.navigation_expand);
                 }
                 else {
-                    showLabelsDialog();
+                    item.setIcon(R.drawable.navigation_expand_dark);
                 }
-                return true;
-            case R.id.milestones:
-                if (mMilestones == null) {
-                    mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-                    getSupportLoaderManager().getLoader(1).forceLoad();
-                }
-                else {
-                    showMilestonesDialog();
-                }
-                return true;
-            case R.id.assignees:
-                if (mAssignees == null) {
-                    mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-                    getSupportLoaderManager().getLoader(2).forceLoad();
-                }
-                else {
-                    showAssigneesDialog();
-                }
-                return true;
-            default:
-                return true;
+                mFilterData.put("direction", "desc");
+            }
+            reloadIssueList();
+        } else if (itemId == R.id.labels) {
+            if (mLabels == null) {
+                mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+                getSupportLoaderManager().getLoader(0).forceLoad();
+            }
+            else {
+                showLabelsDialog();
+            }
+        } else if (itemId == R.id.milestones) {
+            if (mMilestones == null) {
+                mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+                getSupportLoaderManager().getLoader(1).forceLoad();
+            }
+            else {
+                showMilestonesDialog();
+            }
+        } else if (itemId == R.id.assignees) {
+            if (mAssignees == null) {
+                mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+                getSupportLoaderManager().getLoader(2).forceLoad();
+            }
+            else {
+                showAssigneesDialog();
+            }
         }
+        return true;
     }
 
     @Override
