@@ -14,7 +14,6 @@ import android.view.ContextThemeWrapper;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.actionbarsherlock.R;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;

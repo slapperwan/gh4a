@@ -137,26 +137,24 @@ public class IssueMilestoneListActivity extends BaseSherlockFragmentActivity {
     
     @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                getApplicationContext().openIssueListActivity(this, mRepoOwner, mRepoName,
-                        Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                return true;
-            case R.id.create_new:
-                if (isAuthorized()) {
-                    Intent intent = new Intent().setClass(this, IssueMilestoneCreateActivity.class);
-                    intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-                    intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                    startActivity(intent);
-                }
-                else {
-                    Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-                return true;
-            default:
-                return true;
+        int itemId = item.getItemId();
+
+        if (itemId == android.R.id.home) {
+            getApplicationContext().openIssueListActivity(this, mRepoOwner, mRepoName,
+                    Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        } else if (itemId == R.id.create_new) {
+            if (isAuthorized()) {
+                Intent intent = new Intent().setClass(this, IssueMilestoneCreateActivity.class);
+                intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                startActivity(intent);
+            }
+            else {
+                Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+                startActivity(intent);
+                finish();
+            }
         }
+        return true;
     }
 }
