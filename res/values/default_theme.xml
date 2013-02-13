@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="DefaultTheme" parent="Theme.Sherlock.ForceOverflow">
+    <style name="DefaultTheme" parent="Theme.Sherlock">
     </style>
     
-    <style name="LightTheme" parent="Theme.Sherlock.Light.ForceOverflow">
+    <style name="LightTheme" parent="Theme.Sherlock.Light">
     </style>
     
-    <style name="LightDarkTheme" parent="Theme.Sherlock.Light.DarkActionBar.ForceOverflow">
+    <style name="LightDarkTheme" parent="Theme.Sherlock.Light.DarkActionBar">
     </style>
     
 </resources>

@@ -159,27 +159,21 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
     
     @Override
     public boolean setMenuOptionItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case android.R.id.home:
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
             getApplicationContext().openIssueListActivity(this, mRepoOwner, mRepoName, 
                     Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            return true;
-        case R.id.accept:
+        } else if (itemId == R.id.accept) {
             if (mEtTitle.getText() == null || StringUtils.isBlank(mEtTitle.getText().toString())) {
                 showMessage(getResources().getString(R.string.issue_error_title), false);
             }
             else {
                 new SaveIssueTask(this, false).execute();
             }
-            return true;
-
-        case R.id.cancel:
+        } else if (itemId == R.id.cancel) {
             finish();
-            return true;
-        
-        default:
-            return true;
         }
+        return true;
     }
     
     public void showMilestonesDialog(View v) {

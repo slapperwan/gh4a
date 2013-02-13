@@ -367,37 +367,26 @@ public class RepositoryFragment extends BaseFragment implements
         int id = view.getId();
         Gh4Application app = (Gh4Application) getActivity().getApplicationContext();
         
-        switch (id) {
-        case R.id.cell_pull_requests:
+        if (id == R.id.cell_pull_requests) {
             app.openPullRequestListActivity(getActivity(),
                     mRepoOwner, mRepoName,
                     Constants.Issue.ISSUE_STATE_OPEN);
-            break;
-        case R.id.tv_contributors_label:
+        } else if (id == R.id.tv_contributors_label) {
             getContributors(view);
-            break;
-        case R.id.tv_collaborators_label:
+        } else if (id == R.id.tv_collaborators_label) {
             getCollaborators(view);
-            break;
-        case R.id.cell_issues:
+        } else if (id == R.id.cell_issues) {
             app.openIssueListActivity(getActivity(),
                     mRepoOwner, mRepoName,
                     Constants.Issue.ISSUE_STATE_OPEN);
-            break;
-        case R.id.cell_stargazers:
+        } else if (id == R.id.cell_stargazers) {
             getStargazers(view);
-            break;
-        case R.id.cell_forks:
+        } else if (id == R.id.cell_forks) {
             getNetworks(view);
-            break;
-        case R.id.tv_wiki_label:
+        } else if (id == R.id.tv_wiki_label) {
             getWiki(view);
-            break;
-        case R.id.tv_downloads_label:
+        } else if (id == R.id.tv_downloads_label) {
             getDownloads(view);
-            break;
-        default:
-            break;
         }
     }
 

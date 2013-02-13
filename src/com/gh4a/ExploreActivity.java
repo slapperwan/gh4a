@@ -24,7 +24,6 @@ import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.widget.ArrayAdapter;
 
-import com.actionbarsherlock.R;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;

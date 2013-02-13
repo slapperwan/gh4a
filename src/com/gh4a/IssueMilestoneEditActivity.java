@@ -173,28 +173,23 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
     public boolean setMenuOptionItemSelected(MenuItem item) {
         final EditText tvTitle = (EditText) findViewById(R.id.et_title);
         final EditText tvDesc = (EditText) findViewById(R.id.et_desc);
-        
-        switch (item.getItemId()) {
-        case android.R.id.home:
+        int itemId = item.getItemId();
+
+        if (itemId == android.R.id.home) {
             getApplicationContext().openIssueListActivity(this, mRepoOwner, mRepoName,
                     Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            return true;
-        case R.id.accept:
+        } else if (itemId == R.id.accept) {
             String desc = null;
-            
             if (tvDesc.getText() != null) {
                 desc = tvDesc.getText().toString();    
             }
-            
             if (tvTitle.getText() == null || StringUtils.isBlank(tvTitle.getText().toString())) {
                 showMessage(getResources().getString(R.string.issue_error_milestone_title), false);
             }
             else {
                 new EditIssueMilestonesTask(IssueMilestoneEditActivity.this).execute(tvTitle.getText().toString(), desc);
             }
-            return true;
-
-        case R.id.delete:
+        } else if (itemId == R.id.delete) {
             AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(IssueMilestoneEditActivity.this,
                     android.R.style.Theme));
             builder.setTitle("Delete " + mMilestone.getTitle() + "?");
@@ -213,13 +208,9 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
                 }
             })
            .create();
-            
             builder.show();
-            return true;
-        
-        default:
-            return true;
         }
+        return true;
     }
     
     private static class DeleteIssueMilestoneTask extends AsyncTask<Integer, Void, Void> {

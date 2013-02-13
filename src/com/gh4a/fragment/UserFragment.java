@@ -295,24 +295,16 @@ public class UserFragment extends BaseFragment implements
     public void onClick(View view) {
         int id = view.getId();
 
-        switch (id) {
-        case R.id.cell_followers:
+        if (id == R.id.cell_followers) {
             getFollowers(view);
-            break;
-        case R.id.cell_following:
+        } else if (id == R.id.cell_following) {
             getFollowing(view);
-            break;
-        case R.id.cell_repos:
+        } else if (id == R.id.cell_repos) {
             getPublicRepos(view);
-            break;
-        case R.id.cell_gists:
+        } else if (id == R.id.cell_gists) {
             getGists(view);
-            break;
-        case R.id.cell_org_members:
+        } else if (id == R.id.cell_org_members) {
             getOrgMembers(view);
-            break;
-        default:
-            break;
         }
     }
 
