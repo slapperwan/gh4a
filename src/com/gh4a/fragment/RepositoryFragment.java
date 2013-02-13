@@ -15,16 +15,11 @@
  */
 package com.gh4a.fragment;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.ref.WeakReference;
-
 import org.eclipse.egit.github.core.Repository;
 
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -43,7 +38,6 @@ import com.gh4a.DownloadsActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.IssueListActivity;
 import com.gh4a.R;
-import com.gh4a.RepositoryActivity;
 import com.gh4a.WatcherListActivity;
 import com.gh4a.WikiListActivity;
 import com.gh4a.loader.ReadmeLoader;
@@ -90,8 +84,6 @@ public class RepositoryFragment extends BaseFragment implements
         super.onActivityCreated(savedInstanceState);
         
         fillData();
-        
-        RepositoryActivity repoActivity = (RepositoryActivity) getSherlockActivity();
         
         Gh4Application app = (Gh4Application) getActivity().getApplicationContext();
         Typeface boldCondensed = app.boldCondensed;
@@ -302,43 +294,6 @@ public class RepositoryFragment extends BaseFragment implements
         }
         else {
             tvStargazersCount.setText(String.valueOf(--mStargazerCount));
-        }
-    }
-    
-    private static class FillReadmeTask extends AsyncTask<InputStream, Void, String> {
-
-        private WeakReference<RepositoryFragment> mTarget;
-
-        public FillReadmeTask(RepositoryFragment activity) {
-            mTarget = new WeakReference<RepositoryFragment>(activity);
-        }
-
-        @Override
-        protected String doInBackground(InputStream... params) {
-            if (mTarget.get() != null && params[0] != null) {
-                try {
-                    return StringUtils.convertStreamToString(params[0]);
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().showLoading(R.id.pb_readme, R.id.readme);
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            if (mTarget.get() != null) {
-                mTarget.get().hideLoading(R.id.pb_readme, R.id.readme);
-                mTarget.get().fillReadme(result);
-            }
         }
     }
     

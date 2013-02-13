@@ -48,7 +48,6 @@ public class SearchRepositoryAdapter extends RootAdapter<SearchRepository> {
             Gh4Application app = (Gh4Application) mContext.getApplicationContext();
             Typeface boldCondensed = app.boldCondensed;
             Typeface regular = app.regular;
-            Typeface italic = app.italic;
             
             viewHolder = new ViewHolder();
             viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);

@@ -100,7 +100,7 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
             Resources res = v.getResources();
             String extraData = String.format(res.getString(R.string.more_commit_data),
                     CommitUtils.getAuthorName(commit), 
-                    app.pt.format(commit.getCommit().getAuthor().getDate()));
+                    Gh4Application.pt.format(commit.getCommit().getAuthor().getDate()));
 
             viewHolder.tvExtra.setText(extraData);
         }

@@ -17,7 +17,6 @@ package com.gh4a;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryCommit;
@@ -36,7 +35,6 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants.LoaderResult;
 import com.gh4a.adapter.CommitAdapter;
-import com.gh4a.adapter.CompareAdapter;
 import com.gh4a.loader.CommitCompareLoader;
 
 public class CompareActivity extends BaseSherlockFragmentActivity implements OnItemClickListener,
@@ -84,34 +82,6 @@ public class CompareActivity extends BaseSherlockFragmentActivity implements OnI
         }
     }
     
-    private void fillData2() {
-        ListView listView = (ListView) findViewById(R.id.list_view);
-        
-        CompareAdapter compareAdapter = new CompareAdapter(this, new ArrayList<String[]>());
-        listView.setAdapter(compareAdapter);
-        listView.setOnItemClickListener(this);
-        
-        Bundle extra = getIntent().getExtras();
-        Iterator<String> iter = extra.keySet().iterator();
-
-        List<String[]> commits = new ArrayList<String[]>();
-        while (iter.hasNext()) {
-            String key = iter.next();
-            if (key.startsWith("commit")) {
-                String[] commitInfo = extra.getStringArray(key);
-                commits.add(commitInfo);    
-            }
-            
-        }
-        
-        if (commits != null && commits.size() > 0) {
-            for (String[] commitInfo : commits) {
-                compareAdapter.add(commitInfo);
-            }
-        }
-        compareAdapter.notifyDataSetChanged();
-    }
-
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         RepositoryCommit commit = (RepositoryCommit) mAdapter.getItem(position);

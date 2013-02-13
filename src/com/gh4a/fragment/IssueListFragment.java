@@ -54,7 +54,6 @@ public class IssueListFragment extends BaseFragment
 
     private String mRepoOwner;
     private String mRepoName;
-    private String mState;
     private Map<String, String> mFilterData;
     private ListView mListView;
     private IssueAdapter mAdapter;
@@ -70,7 +69,6 @@ public class IssueListFragment extends BaseFragment
 
         mRepoOwner = getArguments().getString(Constants.Repository.REPO_OWNER);
         mRepoName = getArguments().getString(Constants.Repository.REPO_NAME);
-        mState = getArguments().getString("state");
         
         mFilterData = new HashMap<String, String>();
         

@@ -64,7 +64,7 @@ import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 public class IssueActivity extends BaseSherlockFragmentActivity implements 
-    OnClickListener, LoaderManager.LoaderCallbacks {
+    OnClickListener, LoaderManager.LoaderCallbacks<HashMap<Integer, Object>> {
 
     private Issue mIssue;
     private String mRepoOwner;
@@ -668,7 +668,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
     }
     
     @Override
-    public Loader onCreateLoader(int id, Bundle arg1) {
+    public Loader<HashMap<Integer, Object>> onCreateLoader(int id, Bundle arg1) {
         if (id == 0) {
             return new IssueLoader(this, mRepoOwner, mRepoName, mIssueNumber);
         }
@@ -678,9 +678,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
     }
 
     @Override
-    public void onLoadFinished(Loader loader, Object object) {
-        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
-        
+    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
         if (!isLoaderError(result)) {
             Object data = result.get(LoaderResult.DATA); 
             
@@ -704,9 +702,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
     }
 
     @Override
-    public void onLoaderReset(Loader arg0) {
-        // TODO Auto-generated method stub
-        
+    public void onLoaderReset(Loader<HashMap<Integer, Object>> loader) {
     }
     
 }

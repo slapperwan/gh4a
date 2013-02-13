@@ -15,11 +15,8 @@
  */
 package com.gh4a;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.view.ContextThemeWrapper;
-import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ProgressBar;
 

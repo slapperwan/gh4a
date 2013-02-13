@@ -35,7 +35,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -257,13 +256,6 @@ public class BaseActivity extends SherlockActivity {
         dialog.show();
     }
     
-    /**
-     * Sets the up action bar.
-     */
-    public void setUpActionBar() {
-        ActionBar actionBar = getSupportActionBar();
-    }
-
     /**
      * Checks if is authenticated.
      *

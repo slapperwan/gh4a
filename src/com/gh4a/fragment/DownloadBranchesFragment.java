@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.eclipse.egit.github.core.Download;
 import org.eclipse.egit.github.core.RepositoryBranch;
 
 import android.app.AlertDialog;

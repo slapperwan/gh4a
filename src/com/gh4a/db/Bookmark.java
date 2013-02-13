@@ -3,6 +3,7 @@ package com.gh4a.db;
 import java.io.Serializable;
 
 public class Bookmark implements Serializable {
+    private static final long serialVersionUID = -4036634467101997032L;
 
     private long id;
     private String name;

@@ -3,6 +3,7 @@ package com.gh4a.db;
 import java.io.Serializable;
 
 public class BookmarkParam implements Serializable {
+    private static final long serialVersionUID = 5763193653718215401L;
 
     private long id;
     private long bookmarkId;

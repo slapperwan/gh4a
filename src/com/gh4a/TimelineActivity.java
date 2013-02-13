@@ -26,12 +26,10 @@ import org.eclipse.egit.github.core.event.DownloadPayload;
 import org.eclipse.egit.github.core.event.Event;
 import org.eclipse.egit.github.core.event.EventRepository;
 import org.eclipse.egit.github.core.event.FollowPayload;
-import org.eclipse.egit.github.core.event.ForkApplyPayload;
 import org.eclipse.egit.github.core.event.ForkPayload;
 import org.eclipse.egit.github.core.event.GistPayload;
 import org.eclipse.egit.github.core.event.IssueCommentPayload;
 import org.eclipse.egit.github.core.event.IssuesPayload;
-import org.eclipse.egit.github.core.event.MemberPayload;
 import org.eclipse.egit.github.core.event.PullRequestPayload;
 import org.eclipse.egit.github.core.event.PullRequestReviewCommentPayload;
 import org.eclipse.egit.github.core.event.PushPayload;
@@ -176,14 +174,16 @@ public class TimelineActivity extends BaseSherlockFragmentActivity
         
         String eventType = event.getType();
         EventRepository eventRepo = event.getRepo();
-        String[] repoNamePart = eventRepo.getName().split("/");
         String repoOwner = "";
         String repoName = "";
-        if (repoNamePart.length == 2) {
-            repoOwner = repoNamePart[0];
-            repoName = repoNamePart[1];
+
+        if (eventRepo != null) {
+            String[] repoNamePart = eventRepo.getName().split("/");
+            if (repoNamePart.length == 2) {
+                repoOwner = repoNamePart[0];
+                repoName = repoNamePart[1];
+            }
         }
-        String repoUrl = eventRepo.getUrl();
         
         /** PushEvent */
         if (Event.TYPE_PUSH.equals(eventType)) {
@@ -321,7 +321,6 @@ public class TimelineActivity extends BaseSherlockFragmentActivity
         /** ForkEvent */
         else if (Event.TYPE_FORK_APPLY.equals(eventType)) {
             if (eventRepo != null) {
-                ForkApplyPayload payload = (ForkApplyPayload) event.getPayload();
                 context.openRepositoryInfoActivity(this, repoOwner, repoName, 0);
             }
             else {
@@ -350,7 +349,6 @@ public class TimelineActivity extends BaseSherlockFragmentActivity
         /** MemberEvent */
         else if (Event.TYPE_MEMBER.equals(eventType)) {
             if (eventRepo != null) {
-                MemberPayload payload = (MemberPayload) event.getPayload();
                 context.openRepositoryInfoActivity(this, repoOwner, repoName, 0);
             }
             else {

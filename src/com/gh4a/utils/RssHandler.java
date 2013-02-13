@@ -108,7 +108,6 @@ public class RssHandler extends DefaultHandler {
     }
     
     private String formatContent(String content) {
-        String event = mYourActionFeed.getEvent();
         content = content.replaceAll("\\<.*?>","");
         content = content.replaceAll("[\\n]{2,}", "")
                 .replaceAll("[\r\n]{2,}", "")

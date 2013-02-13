@@ -16,14 +16,10 @@ import com.gh4a.holder.YourActionFeed;
 public class RssParser {
     
     final URL feedUrl;
-    private String username;
-    private String password;
     
     public RssParser(String feedUrl, String username, String password){
         try {
             this.feedUrl = new URL(feedUrl);
-            this.username = username;
-            this.password = password;
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }

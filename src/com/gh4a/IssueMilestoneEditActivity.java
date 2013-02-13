@@ -52,7 +52,7 @@ import com.gh4a.loader.MilestoneLoader;
 import com.gh4a.utils.StringUtils;
 
 public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
-    implements LoaderManager.LoaderCallbacks<Object> {
+    implements LoaderManager.LoaderCallbacks<HashMap<Integer, Object>> {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -335,14 +335,13 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
     }
     
     @Override
-    public Loader onCreateLoader(int arg0, Bundle arg1) {
+    public Loader<HashMap<Integer, Object>> onCreateLoader(int arg0, Bundle arg1) {
         return new MilestoneLoader(this, mRepoOwner, mRepoName, mMilestoneNumber);
     }
 
     @Override
-    public void onLoadFinished(Loader loader, Object object) {
+    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
         hideLoading();
-        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
         
         if (!isLoaderError(result)) {
             Object data = result.get(LoaderResult.DATA);
@@ -352,7 +351,6 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
     }
 
     @Override
-    public void onLoaderReset(Loader loader) {
-        // TODO Auto-generated method stub
+    public void onLoaderReset(Loader<HashMap<Integer, Object>> loader) {
     }
 }

@@ -32,7 +32,6 @@ public class BookmarkListActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.generic_list);
-        setUpActionBar();
         
         mName = getIntent().getStringExtra(Constants.Bookmark.NAME);
         mObjectType = getIntent().getStringExtra(Constants.Bookmark.OBJECT_TYPE);

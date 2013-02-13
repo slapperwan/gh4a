@@ -40,7 +40,6 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.gh4a.adapter.CommonFeedAdapter;
 import com.gh4a.feeds.DiscussionHandler;
@@ -61,7 +60,6 @@ public class DiscussionListActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.generic_list);
-        setUpActionBar();
 
         mUrl = getIntent().getStringExtra(Constants.Discussion.URL);
         mTitle = getIntent().getStringExtra(Constants.Discussion.TITLE);

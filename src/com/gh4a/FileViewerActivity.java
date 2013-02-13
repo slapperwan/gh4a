@@ -39,7 +39,7 @@ import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 
 public class FileViewerActivity extends BaseSherlockFragmentActivity 
-    implements LoaderManager.LoaderCallbacks<Object> {
+    implements LoaderManager.LoaderCallbacks<HashMap<Integer, Object>> {
 
     protected String mRepoOwner;
     protected String mRepoName;
@@ -172,17 +172,16 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
     };
 
     @Override
-    public Loader onCreateLoader(int arg0, Bundle arg1) {
+    public Loader<HashMap<Integer, Object>> onCreateLoader(int arg0, Bundle arg1) {
         return new ContentLoader(this, mRepoOwner, mRepoName, mPath, mRef);
     }
 
     @Override
-    public void onLoadFinished(Loader loader, Object object) {
-        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
+    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
         hideLoading();
         
         if (!isLoaderError(result)) {
-            if (object != null) {
+            if (result != null) {
                 mContent = (Content) result.get(LoaderResult.DATA);
                 fillData(true);
             }    
@@ -190,9 +189,7 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
     }
 
     @Override
-    public void onLoaderReset(Loader arg0) {
-        // TODO Auto-generated method stub
-        
+    public void onLoaderReset(Loader<HashMap<Integer, Object>> loader) {
     }
 
 }

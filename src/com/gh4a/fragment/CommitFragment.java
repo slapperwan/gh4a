@@ -178,7 +178,7 @@ public class CommitFragment extends BaseFragment {
         
         tvExtra.setText(CommitUtils.getAuthorName(commit)
                 + " "
-                + context.pt.format(commit.getCommit().getAuthor().getDate()));
+                + Gh4Application.pt.format(commit.getCommit().getAuthor().getDate()));
 
         List<CommitFile> addedFiles = new ArrayList<CommitFile>();
         List<CommitFile> removedFiles = new ArrayList<CommitFile>();

@@ -38,7 +38,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.androidquery.callback.AjaxStatus;
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
 import com.gh4a.Constants.LoaderResult;
@@ -55,7 +54,7 @@ import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 public class ContentListFragment extends BaseFragment 
-    implements LoaderManager.LoaderCallbacks<Object>, OnItemClickListener {
+    implements LoaderManager.LoaderCallbacks<HashMap<Integer, Object>>, OnItemClickListener {
 
     private Repository mRepository;
     public String mPath;
@@ -180,7 +179,7 @@ public class ContentListFragment extends BaseFragment
     }
     
     @Override
-    public Loader onCreateLoader(int id, Bundle args) {
+    public Loader<HashMap<Integer, Object>> onCreateLoader(int id, Bundle args) {
         if (id == 0) {
             return new ContentListLoader(getSherlockActivity(), mRepository.getOwner().getLogin(),
                     mRepository.getName(), mPath, mRef);
@@ -199,8 +198,7 @@ public class ContentListFragment extends BaseFragment
     }
 
     @Override
-    public void onLoadFinished(Loader loader, Object object) {
-        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
+    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
         Object data = result.get(LoaderResult.DATA);
         
         hideLoading();
@@ -285,8 +283,7 @@ public class ContentListFragment extends BaseFragment
     }
     
     @Override
-    public void onLoaderReset(Loader loader) {
-        // TODO Auto-generated method stub
+    public void onLoaderReset(Loader<HashMap<Integer, Object>> loader) {
     }
     
     public interface OnTreeSelectedListener {

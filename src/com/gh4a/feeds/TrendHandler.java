@@ -23,7 +23,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.gh4a.holder.Trend;
-import com.gh4a.holder.YourActionFeed;
 
 /**
  * Github trending repos RSS provided by http://github-trends.oscardelben.com/ 

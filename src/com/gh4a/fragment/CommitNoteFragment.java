@@ -36,7 +36,7 @@ import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.utils.StringUtils;
 
 public class CommitNoteFragment extends BaseFragment
-    implements LoaderManager.LoaderCallbacks<Object>, OnClickListener{
+    implements LoaderManager.LoaderCallbacks<HashMap<Integer, Object>>, OnClickListener{
 
     private String mRepoOwner;
     private String mRepoName;
@@ -109,14 +109,13 @@ public class CommitNoteFragment extends BaseFragment
     }
 
     @Override
-    public Loader onCreateLoader(int id, Bundle args) {
+    public Loader<HashMap<Integer, Object>> onCreateLoader(int id, Bundle args) {
         return new CommitCommentListLoader(getSherlockActivity(), mRepoOwner, mRepoName, mObjectSha);
     }
 
     @Override
-    public void onLoadFinished(Loader loader, Object object) {
+    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
         CommitActivity activity = (CommitActivity) getSherlockActivity();
-        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
         hideLoading();
         activity.stopProgressDialog(activity.mProgressDialog);
         if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
@@ -126,9 +125,7 @@ public class CommitNoteFragment extends BaseFragment
     }
 
     @Override
-    public void onLoaderReset(Loader loader) {
-        // TODO Auto-generated method stub
-        
+    public void onLoaderReset(Loader<HashMap<Integer, Object>> loader) {
     }
     
     @Override

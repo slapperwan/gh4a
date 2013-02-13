@@ -20,10 +20,6 @@ import org.eclipse.egit.github.core.service.EventService;
 import android.os.Bundle;
 import android.view.MenuItem;
 
-import com.actionbarsherlock.R;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-
 public class PublicTimelineFragment extends EventListFragment {
 
     public static PublicTimelineFragment newInstance() {

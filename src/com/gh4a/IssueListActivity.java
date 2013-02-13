@@ -56,7 +56,7 @@ import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.MilestoneListLoader;
 
 public class IssueListActivity extends BaseSherlockFragmentActivity
-    implements OnClickListener, LoaderManager.LoaderCallbacks {
+    implements OnClickListener, LoaderManager.LoaderCallbacks<HashMap<Integer, Object>> {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -490,7 +490,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
     }
 
     @Override
-    public Loader onCreateLoader(int id, Bundle args) {
+    public Loader<HashMap<Integer, Object>> onCreateLoader(int id, Bundle args) {
         if (id == 0) {
             return new LabelListLoader(this, mRepoOwner, mRepoName);
         }
@@ -506,10 +506,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
     }
 
     @Override
-    public void onLoadFinished(Loader loader, Object object) {
-        
-        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
-        
+    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
         if (!isLoaderError(result)) {
             Object data = result.get(LoaderResult.DATA); 
             
@@ -539,8 +536,6 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
     }
 
     @Override
-    public void onLoaderReset(Loader loader) {
-        // TODO Auto-generated method stub
-        
+    public void onLoaderReset(Loader<HashMap<Integer, Object>> loader) {
     }
 }

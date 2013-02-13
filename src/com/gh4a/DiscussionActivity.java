@@ -47,12 +47,8 @@ import com.gh4a.holder.Feed;
 
 public class DiscussionActivity extends BaseActivity {
     
-    private int page = 1;
     private LoadingDialog mLoadingDialog;
     private String mUrl;
-    private String mTitle;
-    private String mFromUrl;
-    private String mFromTitle;
     private LinearLayout mHeader;
 
     @Override
@@ -60,12 +56,8 @@ public class DiscussionActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.discussion);
-        setUpActionBar();
 
         mUrl = getIntent().getStringExtra(Constants.Discussion.URL);
-        mFromUrl = getIntent().getStringExtra(Constants.Discussion.FROM_URL);
-        mFromTitle = getIntent().getStringExtra(Constants.Discussion.FROM_TITLE);
-        mTitle = getIntent().getStringExtra(Constants.Discussion.TITLE);
         
 //        mListView = (ListView) findViewById(R.id.list_view);
 //        CommonFeedAdapter adapter = new CommonFeedAdapter(this, new ArrayList<Feed>(), false, true);

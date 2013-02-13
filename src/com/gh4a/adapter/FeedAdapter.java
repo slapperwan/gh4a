@@ -38,7 +38,6 @@ import org.eclipse.egit.github.core.event.MemberPayload;
 import org.eclipse.egit.github.core.event.PullRequestPayload;
 import org.eclipse.egit.github.core.event.PullRequestReviewCommentPayload;
 import org.eclipse.egit.github.core.event.PushPayload;
-import org.eclipse.egit.github.core.event.WatchPayload;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -47,7 +46,6 @@ import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
 import android.text.style.TextAppearanceSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -159,7 +157,6 @@ public class FeedAdapter extends RootAdapter<Event> {
         
         String eventType = event.getType();
         EventRepository eventRepo = event.getRepo();
-        User actor = event.getActor();
         
         //if payload is a base class, return default eventtype.  Think that it is an old event which not supported
         //by API v3.
@@ -411,7 +408,6 @@ public class FeedAdapter extends RootAdapter<Event> {
 
         /** WatchEvent */
         else if (Event.TYPE_WATCH.equals(eventType)) {
-            WatchPayload payload = (WatchPayload) event.getPayload();
 //            String text = String.format(res.getString(R.string.event_watch_title),
 //                    actor.getLogin(), payload.getAction(),
 //                    formatFromRepoName(eventRepo));
@@ -525,7 +521,6 @@ public class FeedAdapter extends RootAdapter<Event> {
 
         /** GollumEvent */
         else if (Event.TYPE_GOLLUM.equals(eventType)) {
-            GollumPayload payload = (GollumPayload) event.getPayload();
             String text = String.format(res.getString(R.string.event_gollum_title),
                     actor.getLogin(), "edited", "page",
                     formatFromRepoName(eventRepo));
@@ -560,7 +555,6 @@ public class FeedAdapter extends RootAdapter<Event> {
 
         /** PullRequestReviewComment */
         else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
-            PullRequestReviewCommentPayload payload = (PullRequestReviewCommentPayload) event.getPayload();
             String text = String.format(res.getString(R.string.event_commit_comment_title),
                     actor.getLogin(),
                     formatFromRepoName(eventRepo));
@@ -626,8 +620,5 @@ public class FeedAdapter extends RootAdapter<Event> {
         
         /** The tv desc. */
         public TextView tvDesc;
-        
-        /** The tv created at. */
-        public TextView tvCreatedAt;
     }
 }

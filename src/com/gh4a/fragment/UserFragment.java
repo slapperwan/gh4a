@@ -58,7 +58,7 @@ import com.gh4a.utils.GravatarUtils;
 import com.gh4a.utils.StringUtils;
 
 public class UserFragment extends BaseFragment implements 
-    OnClickListener, LoaderManager.LoaderCallbacks<Object> {
+    OnClickListener, LoaderManager.LoaderCallbacks<HashMap<Integer, Object>> {
 
     private String mUserLogin;
     private String mUserName;
@@ -476,7 +476,7 @@ public class UserFragment extends BaseFragment implements
     }
     
     @Override
-    public Loader onCreateLoader(int id, Bundle arg1) {
+    public Loader<HashMap<Integer, Object>> onCreateLoader(int id, Bundle arg1) {
         if (id == 1) {
             Map<String, String> filterData = new HashMap<String, String>();
             filterData.put("sort", "pushed");
@@ -499,9 +499,8 @@ public class UserFragment extends BaseFragment implements
     }
 
     @Override
-    public void onLoadFinished(Loader loader, Object object) {
+    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
         UserActivity userActivity = (UserActivity) getSherlockActivity();
-        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
         
         if (mUser != null 
                 && mTopRepos != null 
@@ -550,9 +549,7 @@ public class UserFragment extends BaseFragment implements
     }
 
     @Override
-    public void onLoaderReset(Loader<Object> arg0) {
-        // TODO Auto-generated method stub
-        
+    public void onLoaderReset(Loader<HashMap<Integer, Object>> loader) {
     }
     
 }

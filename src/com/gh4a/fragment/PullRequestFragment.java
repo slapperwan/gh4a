@@ -60,7 +60,7 @@ import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 public class PullRequestFragment extends BaseFragment 
-    implements LoaderManager.LoaderCallbacks<Object> {
+    implements LoaderManager.LoaderCallbacks<HashMap<Integer, Object>> {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -183,7 +183,7 @@ public class PullRequestFragment extends BaseFragment
         }
         tvExtra.setText(getResources().getString(R.string.issue_open_by_user,
                 pullRequest.getUser() != null ? pullRequest.getUser().getLogin() : "",
-                context.pt.format(pullRequest.getCreatedAt())));
+                Gh4Application.pt.format(pullRequest.getCreatedAt())));
         
         ImageView ivComment = (ImageView) v.findViewById(R.id.iv_comment);
         if (Gh4Application.THEME == R.style.DefaultTheme) {
@@ -294,7 +294,7 @@ public class PullRequestFragment extends BaseFragment
     }
     
     @Override
-    public Loader onCreateLoader(int id, Bundle args) {
+    public Loader<HashMap<Integer, Object>> onCreateLoader(int id, Bundle args) {
         if (id == 0) {
             return new PullRequestLoader(getSherlockActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
         }
@@ -304,8 +304,7 @@ public class PullRequestFragment extends BaseFragment
     }
 
     @Override
-    public void onLoadFinished(Loader<Object> loader, Object object) {
-        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
+    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
         PullRequestActivity activity = (PullRequestActivity) getSherlockActivity();
         
         if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
@@ -327,9 +326,7 @@ public class PullRequestFragment extends BaseFragment
     }
 
     @Override
-    public void onLoaderReset(Loader<Object> arg0) {
-        // TODO Auto-generated method stub
-        
+    public void onLoaderReset(Loader<HashMap<Integer, Object>> loader) {
     }
 
 }

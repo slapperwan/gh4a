@@ -35,7 +35,6 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gh4a.adapter.CommitAdapter;
@@ -94,7 +93,6 @@ public class CommitListActivity extends BaseActivity implements OnScrollListener
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.generic_list);
-        setUpActionBar();
 
         mListViewCommits = (ListView) findViewById(R.id.list_view);
 
@@ -126,9 +124,6 @@ public class CommitListActivity extends BaseActivity implements OnScrollListener
         /** The hide main view. */
         private boolean mHideMainView;
         
-        /** The last page. */
-        private boolean mLastPage;
-
         /**
          * Instantiates a new load commit list task.
          *

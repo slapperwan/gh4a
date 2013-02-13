@@ -24,7 +24,6 @@ import org.eclipse.egit.github.core.SearchRepository;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.RepositoryService;
-import org.eclipse.egit.github.core.service.UserService;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -131,7 +130,6 @@ public class SearchActivity extends BaseSherlockFragmentActivity {
     protected List<User> getUsers(String searchKey) throws IOException {
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(getAuthToken());
-        UserService userService = new UserService();
         
         List<User> users = new ArrayList<User>();
 //        if (!StringUtils.isBlank(searchKey)) {

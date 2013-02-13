@@ -66,7 +66,6 @@ public class TrendActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.trends);
-        setUpActionBar();
 
         setUpBottomButtons();
         setEnableButtons(new boolean[] {false, true, true, true});

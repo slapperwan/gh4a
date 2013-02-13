@@ -14,8 +14,6 @@ public class BrowseFilter extends BaseActivity {
         
         String[] urlPart = url.split("/");
         
-        String host = urlPart[2];
-        
         String first = urlPart[3];
         if ("languages".equals(first)
                 || "training".equals(first)

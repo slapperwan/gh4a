@@ -56,7 +56,7 @@ import com.gh4a.loader.LabelListLoader;
 import com.gh4a.utils.StringUtils;
 
 public class IssueLabelListActivity extends BaseSherlockFragmentActivity 
-    implements LoaderManager.LoaderCallbacks<Object> {
+    implements LoaderManager.LoaderCallbacks<HashMap<Integer, Object>> {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -284,7 +284,6 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
     private final class EditActionMode implements ActionMode.Callback {
 
         private String mCurrentLabelName;
-        private EditText mNewLabelText;
         
         public EditActionMode(String currentLabelName, EditText newLabelText) {
             mCurrentLabelName = currentLabelName;
@@ -489,13 +488,12 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
     }
 
     @Override
-    public Loader onCreateLoader(int arg0, Bundle arg1) {
+    public Loader<HashMap<Integer, Object>> onCreateLoader(int arg0, Bundle arg1) {
         return new LabelListLoader(this, mRepoOwner, mRepoName);
     }
 
     @Override
-    public void onLoadFinished(Loader loader, Object object) {
-        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
+    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
         hideLoading();
         stopProgressDialog(mProgressDialog);
         if (getCurrentFocus() != null) {
@@ -508,7 +506,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
     }
 
     @Override
-    public void onLoaderReset(Loader arg0) {
+    public void onLoaderReset(Loader<HashMap<Integer, Object>> arg0) {
         // TODO Auto-generated method stub
         
     }

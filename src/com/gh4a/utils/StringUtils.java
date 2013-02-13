@@ -30,9 +30,9 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
-import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 
 import com.gh4a.Constants;
@@ -314,7 +314,7 @@ public class StringUtils {
      */
     public static String formatDate(Date date) {
         if (date != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat(StringUtils.DATE_FORMAT);
+            SimpleDateFormat sdf = new SimpleDateFormat(StringUtils.DATE_FORMAT, Locale.US);
             return sdf.format(date);
         }
         else {

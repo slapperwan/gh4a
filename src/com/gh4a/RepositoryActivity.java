@@ -47,7 +47,7 @@ import com.gh4a.loader.WatchLoader;
 import com.gh4a.utils.StringUtils;
 
 public class RepositoryActivity extends BaseSherlockFragmentActivity
-    implements OnTreeSelectedListener, LoaderManager.LoaderCallbacks {
+    implements OnTreeSelectedListener, LoaderManager.LoaderCallbacks<HashMap<Integer, Object>> {
 
     private static final int NUM_ITEMS = 3;
     private String mRepoOwner;
@@ -425,7 +425,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     }
     
     @Override
-    public Loader onCreateLoader(int id, Bundle bundle) {
+    public Loader<HashMap<Integer, Object>> onCreateLoader(int id, Bundle bundle) {
         if (id == 0) {
             return new RepositoryLoader(this, mRepoOwner, mRepoName);
         }
@@ -450,65 +450,49 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     }
 
     @Override
-    public void onLoadFinished(Loader loader, Object object) {
-        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
-        
+    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
         if (!isLoaderError(result)) {
             Object data = result.get(LoaderResult.DATA); 
             
             if (loader.getId() == 0) {
                 hideLoading();
-                if (object != null) {
-                    this.mRepository = (Repository) data;
-                    fillTabs();
-                }
+                this.mRepository = (Repository) data;
+                fillTabs();
                 invalidateOptionsMenu();
             }
             else if (loader.getId() == 1) {
                 stopProgressDialog(mProgressDialog);
-                if (object != null) {
-                    this.mBranches = (List<RepositoryBranch>) data;
-                    showBranchesDialog();
-                }
+                this.mBranches = (List<RepositoryBranch>) data;
+                showBranchesDialog();
             }
             else if (loader.getId() == 2) {
                 stopProgressDialog(mProgressDialog);
-                if (object != null) {
-                    this.mTags = (List<RepositoryTag>) data;
-                    showTagsDialog();
-                }
+                this.mTags = (List<RepositoryTag>) data;
+                showTagsDialog();
             }
             else if (loader.getId() == 3) {
-                if (object != null) {
-                    isWatching = (Boolean) data;
-                    isFinishLoadingWatching = true;
-                }
+                isWatching = (Boolean) data;
+                isFinishLoadingWatching = true;
                 invalidateOptionsMenu();
             }
             else if (loader.getId() == 4){
-                if (object != null) {
-                    isWatching = (Boolean) data;
-                    isFinishLoadingWatching = true;
-                    if (mRepositoryFragment != null) {
-                        //mRepositoryFragment.updateWatcherCount(isWatching);
-                    }
+                isWatching = (Boolean) data;
+                isFinishLoadingWatching = true;
+                if (mRepositoryFragment != null) {
+                    //mRepositoryFragment.updateWatcherCount(isWatching);
                 }
                 invalidateOptionsMenu();
             }
             else if (loader.getId() == 5) {
-                if (object != null) {
-                    isStarring = (Boolean) data;
-                    isFinishLoadingStarring = true;
-                }
+                isStarring = (Boolean) data;
+                isFinishLoadingStarring = true;
                 invalidateOptionsMenu();
             }
             else {
-                if (object != null) {
-                    isStarring = (Boolean) data;
-                    isFinishLoadingStarring = true;
-                    if (mRepositoryFragment != null) {
-                        mRepositoryFragment.updateStargazerCount(isStarring);
-                    }
+                isStarring = (Boolean) data;
+                isFinishLoadingStarring = true;
+                if (mRepositoryFragment != null) {
+                    mRepositoryFragment.updateStargazerCount(isStarring);
                 }
                 invalidateOptionsMenu();
             }
@@ -521,9 +505,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     }
 
     @Override
-    public void onLoaderReset(Loader arg0) {
-        // TODO Auto-generated method stub
-        
+    public void onLoaderReset(Loader<HashMap<Integer, Object>> arg0) {
     }
     
     private void showBranchesDialog() {

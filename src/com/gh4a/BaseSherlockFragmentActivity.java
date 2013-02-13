@@ -40,7 +40,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -271,13 +270,6 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         dialog.show();
     }
     
-    /**
-     * Sets the up action bar.
-     */
-    public void setUpActionBar() {
-        ActionBar actionBar = getSupportActionBar();
-    }
-
     /**
      * Checks if is authenticated.
      *
@@ -512,7 +504,7 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
                     && (Boolean) result.get(LoaderResult.AUTH_ERROR)) {
                 logout();
             }
-            Toast.makeText(this, (String) result.get(LoaderResult.ERROR_MSG), Toast.LENGTH_SHORT);
+            Toast.makeText(this, (String) result.get(LoaderResult.ERROR_MSG), Toast.LENGTH_SHORT).show();
             return true;
         }
         else {

@@ -28,7 +28,6 @@ public class DiscussionCategoryListActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.generic_list);
-        setUpActionBar();
 
         try {
             fillData();

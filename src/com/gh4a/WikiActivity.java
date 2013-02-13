@@ -31,7 +31,6 @@ public class WikiActivity extends BaseActivity {
     private String mRepoName;
     private String mTitle;
     private String mContent;
-    private String mLink;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,7 +43,6 @@ public class WikiActivity extends BaseActivity {
         mRepoName = getIntent().getStringExtra(Constants.Repository.REPO_NAME);
         mTitle = getIntent().getStringExtra(Constants.Blog.TITLE);
         mContent = getIntent().getStringExtra(Constants.Blog.CONTENT);
-        mLink = getIntent().getStringExtra(Constants.Blog.LINK);
 
         hideLoading();
         ActionBar actionBar = getSupportActionBar();

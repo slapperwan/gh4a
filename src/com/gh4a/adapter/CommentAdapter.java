@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.Comment;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.text.method.LinkMovementMethod;
@@ -37,7 +36,6 @@ import com.gh4a.EditCommentActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarUtils;
-import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 public class CommentAdapter extends RootAdapter<Comment> {
@@ -48,7 +46,6 @@ public class CommentAdapter extends RootAdapter<Comment> {
     private String issueState;
     private String repoOwner;
     private String repoName;
-    private ProgressDialog progressDialog;
     
     public CommentAdapter(Context context, List<Comment> objects) {
         super(context, objects);

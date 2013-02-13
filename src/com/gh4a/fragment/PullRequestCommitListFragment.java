@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryCommit;
-import org.eclipse.egit.github.core.client.PageIterator;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -42,14 +41,13 @@ import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.loader.RepositoryCommitsLoader;
 
 public class PullRequestCommitListFragment extends BaseFragment 
-    implements LoaderManager.LoaderCallbacks<Object>, OnItemClickListener {
+    implements LoaderManager.LoaderCallbacks<HashMap<Integer, Object>>, OnItemClickListener {
 
     private String mRepoOwner;
     private String mRepoName;
     private int mPullRequestNumber;
     private ListView mListView;
     private CommitAdapter mAdapter;
-    private PageIterator<RepositoryCommit> mDataIterator;
     
     public static PullRequestCommitListFragment newInstance(String repoOwner, String repoName, int pullRequestNumber) {
         
@@ -104,14 +102,13 @@ public class PullRequestCommitListFragment extends BaseFragment
     }
 
     @Override
-    public Loader onCreateLoader(int id, Bundle args) {
+    public Loader<HashMap<Integer, Object>> onCreateLoader(int id, Bundle args) {
         return new RepositoryCommitsLoader(getSherlockActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
     }
 
     @Override
-    public void onLoadFinished(Loader loader, Object object) {
+    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
         hideLoading();
-        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
         
         if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
             fillData((List<RepositoryCommit>) result.get(LoaderResult.DATA));
@@ -119,8 +116,7 @@ public class PullRequestCommitListFragment extends BaseFragment
     }
 
     @Override
-    public void onLoaderReset(Loader arg0) {
-        // TODO Auto-generated method stub
+    public void onLoaderReset(Loader<HashMap<Integer, Object>> loader) {
     }
     
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
