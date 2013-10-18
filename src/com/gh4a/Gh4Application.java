@@ -294,6 +294,18 @@ public class Gh4Application extends Application {
         context.startActivity(intent);
     }
 
+    public void openFileViewerActivity(Context context, String login, String repoName, String sha,
+            String fullPath, String fileName) {
+        Intent intent = new Intent().setClass(this, FileViewerActivity.class);
+        intent.putExtra(Constants.Repository.REPO_OWNER, login);
+        intent.putExtra(Constants.Repository.REPO_NAME, repoName);
+        intent.putExtra(Constants.Object.PATH, fullPath);
+        intent.putExtra(Constants.Object.REF, sha);
+        intent.putExtra(Constants.Object.NAME, fileName);
+        intent.putExtra(Constants.Object.OBJECT_SHA, sha);
+        context.startActivity(intent);
+    }
+
     /**
      * Open commit list activity.
      *

@@ -1,6 +1,9 @@
 package com.gh4a;
 
+import java.util.List;
+
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 
@@ -10,12 +13,12 @@ public class BrowseFilter extends BaseActivity {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String url = getIntent().getDataString();
+        Uri uri = getIntent().getData();
+        List<String> parts = uri.getPathSegments();
         
-        String[] urlPart = url.split("/");
-        
-        String first = urlPart[3];
-        if ("languages".equals(first)
+        String first = parts.isEmpty() ? null : parts.get(0);
+        if (first == null
+                || "languages".equals(first)
                 || "training".equals(first)
                 || "login".equals(first)
                 || "contact".equals(first)
@@ -32,87 +35,57 @@ public class BrowseFilter extends BaseActivity {
         }
         else {
             Gh4Application context = getApplicationContext();
-            if (urlPart.length == 4) {
-                String user = urlPart[3];
-                
+            String user = first;
+            String repo = parts.size() >= 2 ? parts.get(1) : null;
+            String action = parts.size() >= 3 ? parts.get(2) : null;
+            String id = parts.size() >= 4 ? parts.get(3) : null;
+
+            if (repo == null && action == null) {
                 context.openUserInfoActivity(this, user, null);
             }
-            else if (urlPart.length == 5) {
-                String user = urlPart[3];
-                String repo = urlPart[4];
-                
+            else if (action == null) {
                 context.openRepositoryInfoActivity(this, user, repo, 0);
             }
-            else if (urlPart.length == 6) {
-                String user = urlPart[3];
-                String repo = urlPart[4];
-                String action = urlPart[5];
-                
-                if ("issues".equals(action)) {
+            else if ("issues".equals(action)) {
+                if (!StringUtils.isBlank(id)) {
+                    try {
+                        context.openIssueActivity(this, user, repo, Integer.parseInt(stripExtraData(id)));
+                    }
+                    catch (NumberFormatException e) {
+                    }
+                } else {
                     context.openIssueListActivity(this, user, repo, Constants.Issue.ISSUE_STATE_OPEN);
                 }
-                else if ("pulls".equals(action)) {
-                    context.openPullRequestListActivity(this, user, repo, Constants.Issue.ISSUE_STATE_OPEN);
+            }
+            else if ("pulls".equals(action)) {
+                context.openPullRequestListActivity(this, user, repo, Constants.Issue.ISSUE_STATE_OPEN);
+            }
+            else if ("wiki".equals(action)) {
+                Intent intent = new Intent().setClass(this, WikiListActivity.class);
+                intent.putExtra(Constants.Repository.REPO_OWNER, user);
+                intent.putExtra(Constants.Repository.REPO_NAME, repo);
+                startActivity(intent);
+            }
+            else if ("pull".equals(action) && !StringUtils.isBlank(id)) {
+                try {
+                    context.openPullRequestActivity(this, user, repo, Integer.parseInt(stripExtraData(id)));
                 }
-                else if ("wiki".equals(action)) {
-                    Intent intent = new Intent().setClass(this, WikiListActivity.class);
-                    intent.putExtra(Constants.Repository.REPO_OWNER, user);
-                    intent.putExtra(Constants.Repository.REPO_NAME, repo);
-                    startActivity(intent);
+                catch (NumberFormatException e) {
                 }
             }
-            else if (urlPart.length >= 7) {
-                String user = urlPart[3];
-                String repo = urlPart[4];
-                String action = urlPart[5];
-                String id = urlPart[6];
-                
-                if ("issues".equals(action)) {
-                    if (!StringUtils.isBlank(id)) {
-                        try {
-                            context.openIssueActivity(this, user, repo, Integer.parseInt(id));
-                        }
-                        catch (NumberFormatException e) {
-                            // try issue with fragment url
-                            // https://github.com/slapperwan/gh4a/issues/87#issuecomment-7680638
-                            if (id.indexOf("#") != -1) {
-                                id = id.substring(0, id.indexOf("#"));
-                                if (TextUtils.isDigitsOnly(id)) {
-                                    context.openIssueActivity(this, user, repo, Integer.parseInt(id));
-                                }
-                            }
-                        }
-                    }
-                }
-                else if ("pull".equals(action)) {
-                    if (!StringUtils.isBlank(id)) {
-                        try {
-                            context.openPullRequestActivity(this, user, repo, Integer.parseInt(id));
-                        }
-                        catch (NumberFormatException e) {
-                            // try issue with fragment url
-                            // https://github.com/slapperwan/gh4a/pull/50#issuecomment-2342877
-                            if (id.indexOf("#") != -1) {
-                                id = id.substring(0, id.indexOf("#"));
-                                if (TextUtils.isDigitsOnly(id)) {
-                                    context.openPullRequestActivity(this, user, repo, Integer.parseInt(id));
-                                }
-                            }
-                        }
-                    }
-                }
-                else if ("commit".equals(action)) {
-                    if (!StringUtils.isBlank(id)) {
-                        try {
-                            context.openCommitInfoActivity(this, user, repo, id, 0);
-                        }
-                        catch (NumberFormatException e) {
-                            // Ignore non-numeric ids
-                        }
-                    }
-                }
+            else if ("commit".equals(action) && !StringUtils.isBlank(id)) {
+                context.openCommitInfoActivity(this, user, repo, stripExtraData(id), 0);
+            }
+            else if ("blob".equals(action) && !StringUtils.isBlank(id) && parts.size() >= 5) {
+                String fullPath = TextUtils.join("/", parts.subList(4, parts.size()));
+                context.openFileViewerActivity(this, user, repo, id, fullPath, uri.getLastPathSegment());
             }
         }
         finish();
+    }
+
+    private static String stripExtraData(String token) {
+        int pos = token.indexOf('#');
+        return pos >= 0 ? token.substring(0, pos) : token;
     }
 }
