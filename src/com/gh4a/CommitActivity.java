@@ -140,7 +140,8 @@ public class CommitActivity extends BaseSherlockFragmentActivity {
         if (Gh4Application.THEME != R.style.LightTheme) {
             menu.getItem(0).setIcon(R.drawable.download_dark);
             menu.getItem(1).setIcon(R.drawable.web_site_dark);
-            menu.getItem(2).setIcon(R.drawable.social_share_dark);
+            menu.getItem(2).setIcon(R.drawable.action_search_dark);
+            menu.getItem(3).setIcon(R.drawable.social_share_dark);
         }
         
         menu.removeItem(R.id.download);
