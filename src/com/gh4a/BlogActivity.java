@@ -22,7 +22,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.actionbarsherlock.R;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.MenuItem;
 
@@ -30,7 +29,6 @@ public class BlogActivity extends BaseActivity {
 
     private String mTitle;
     private String mContent;
-    private String mLink;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,7 +39,6 @@ public class BlogActivity extends BaseActivity {
         
         mTitle = getIntent().getStringExtra(Constants.Blog.TITLE);
         mContent = getIntent().getStringExtra(Constants.Blog.CONTENT);
-        mLink = getIntent().getStringExtra(Constants.Blog.LINK);
         
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(mTitle);
