@@ -97,7 +97,7 @@ public class BlogListActivity extends BaseActivity {
     }
     
     @Override
-    public boolean setMenuOptionItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 if (!isAuthorized()) {
@@ -121,9 +121,8 @@ public class BlogListActivity extends BaseActivity {
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;
-            default:
-                return true;
         }
+        return super.onOptionsItemSelected(item);
     }
     
     private static class LoadBlogsTask extends

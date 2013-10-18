@@ -49,16 +49,16 @@ public class BlogActivity extends BaseActivity {
     }
     
     @Override
-    public boolean setMenuOptionItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 Intent intent = new Intent().setClass(this, BlogListActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
-            default:
-                return true;
         }
+        return super.onOptionsItemSelected(item);
     }
+
     private void fillData() {
         
         WebView webView = (WebView) findViewById(R.id.web_view);

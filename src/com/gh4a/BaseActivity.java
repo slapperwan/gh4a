@@ -142,16 +142,12 @@ public class BaseActivity extends SherlockActivity {
             startActivity(intent);
             return true;
         default:
-            return setMenuOptionItemSelected(item);
+            return super.onOptionsItemSelected(item);
         }
     }
 
     public void openBookmarkActivity() {
         //should be override at sub class
-    }
-    
-    public boolean setMenuOptionItemSelected(MenuItem item) {
-        return true;
     }
     
     public void openAboutDialog() {

@@ -146,7 +146,7 @@ public class DiffViewerActivity extends BaseActivity {
     }
     
     @Override
-    public boolean setMenuOptionItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         String diffUrl = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/commit/" + mSha;
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -179,9 +179,8 @@ public class DiffViewerActivity extends BaseActivity {
                 startActivity(intent);
                 
                 return true;
-            default:
-                return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @TargetApi(11)

@@ -90,7 +90,7 @@ public class WikiActivity extends BaseActivity {
     };
     
     @Override
-    public boolean setMenuOptionItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 Intent intent = new Intent().setClass(this, WikiListActivity.class);
@@ -99,9 +99,8 @@ public class WikiActivity extends BaseActivity {
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;     
-            default:
-                return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
 }
