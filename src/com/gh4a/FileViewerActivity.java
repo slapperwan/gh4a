@@ -20,8 +20,10 @@ import java.util.HashMap;
 import org.eclipse.egit.github.core.Content;
 import org.eclipse.egit.github.core.util.EncodingUtils;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -48,6 +50,8 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
     private String mSha;
     private String mName;
     private Content mContent;
+
+    private WebView mWebView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -80,9 +84,9 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
 
     private void fillData(boolean highlight) {
         String data = new String(EncodingUtils.fromBase64(mContent.getContent()));
-        WebView webView = (WebView) findViewById(R.id.web_view);
+        mWebView = (WebView) findViewById(R.id.web_view);
 
-        WebSettings s = webView.getSettings();
+        WebSettings s = mWebView.getSettings();
         s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
         s.setAllowFileAccess(true);
         s.setBuiltInZoomControls(true);
@@ -94,14 +98,14 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
         s.setJavaScriptEnabled(true);
         s.setUseWideViewPort(true);
 
-        webView.setWebViewClient(webViewClient);
+        mWebView.setWebViewClient(webViewClient);
         if (FileUtils.isImage(mName)) {
             String htmlImage = StringUtils.highlightImage("https://github.com/" + mRepoOwner + "/" + mRepoName + "/raw/" + mRef + "/" + mPath);
-            webView.loadDataWithBaseURL("file:///android_asset/", htmlImage, "text/html", "utf-8", "");
+            mWebView.loadDataWithBaseURL("file:///android_asset/", htmlImage, "text/html", "utf-8", "");
         }
         else {
             String highlighted = StringUtils.highlightSyntax(data, highlight, mName);
-            webView.loadDataWithBaseURL("file:///android_asset/", highlighted, "text/html", "utf-8", "");
+            mWebView.loadDataWithBaseURL("file:///android_asset/", highlighted, "text/html", "utf-8", "");
         }
     }
 
@@ -113,11 +117,15 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
         if (Gh4Application.THEME != R.style.LightTheme) {
             menu.getItem(0).setIcon(R.drawable.download_dark);
             menu.getItem(1).setIcon(R.drawable.web_site_dark);
-            menu.getItem(2).setIcon(R.drawable.social_share_dark);
+            menu.getItem(2).setIcon(R.drawable.action_search_dark);
+            menu.getItem(3).setIcon(R.drawable.social_share_dark);
         }
         
         menu.removeItem(R.id.download);
-        
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+            menu.removeItem(R.id.search);
+        }
+
         menu.add(0, 10, Menu.NONE, "History")
             .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
         
@@ -143,6 +151,9 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
                 shareIntent = Intent.createChooser(shareIntent, "Share");
                 startActivity(shareIntent);
                 return true;
+            case R.id.search:
+                doSearch();
+                return true;
             case 10:
                 Intent intent = new Intent().setClass(FileViewerActivity.this, CommitHistoryActivity.class);
                 intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
@@ -155,7 +166,14 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
                 return true;
         }
     }
-    
+
+    @TargetApi(11)
+    private void doSearch() {
+        if (mWebView != null) {
+            mWebView.showFindDialog(null, true);
+        }
+    }
+
     private WebViewClient webViewClient = new WebViewClient() {
 
         @Override

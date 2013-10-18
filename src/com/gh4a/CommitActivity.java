@@ -144,6 +144,8 @@ public class CommitActivity extends BaseSherlockFragmentActivity {
         }
         
         menu.removeItem(R.id.download);
+        menu.removeItem(R.id.search);
+
         return super.onCreateOptionsMenu(menu);
     }
     

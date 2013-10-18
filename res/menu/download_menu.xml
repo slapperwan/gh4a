@@ -6,7 +6,12 @@
     <item android:id="@+id/browser"
         android:icon="@drawable/web_site"    
         android:showAsAction="always" />
+    <item android:id="@+id/search"
+        android:icon="@drawable/action_search"
+        android:title="@string/search"
+        android:showAsAction="ifRoom" />
     <item android:id="@+id/share"
-        android:icon="@drawable/social_share"    
-        android:showAsAction="always" />
+        android:icon="@drawable/social_share"
+        android:title="@string/share"
+        android:showAsAction="ifRoom" />
 </menu>

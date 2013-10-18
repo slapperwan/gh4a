@@ -15,8 +15,10 @@
  */
 package com.gh4a;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.webkit.WebSettings;
@@ -38,7 +40,9 @@ public class DiffViewerActivity extends BaseActivity {
     private String mDiff;
     private String mFilePath;
     private String mFilename;
-    
+
+    private WebView mWebView;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
@@ -126,10 +130,14 @@ public class DiffViewerActivity extends BaseActivity {
         if (Gh4Application.THEME != R.style.LightTheme) {
             menu.getItem(0).setIcon(R.drawable.download_dark);
             menu.getItem(1).setIcon(R.drawable.web_site_dark);
-            menu.getItem(2).setIcon(R.drawable.social_share_dark);
+            menu.getItem(2).setIcon(R.drawable.action_search_dark);
+            menu.getItem(3).setIcon(R.drawable.social_share_dark);
         }
         
         menu.removeItem(R.id.download);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+            menu.removeItem(R.id.search);
+        }
         
         menu.add(0, 10, Menu.NONE, "View file @" + mSha.substring(0, 7))
             .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
@@ -157,6 +165,9 @@ public class DiffViewerActivity extends BaseActivity {
                 shareIntent = Intent.createChooser(shareIntent, "Share");
                 startActivity(shareIntent);
                 return true;
+            case R.id.search:
+                doSearch();
+                return true;
             case 10:
                 Intent intent = new Intent().setClass(this, FileViewerActivity.class);
                 intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
@@ -171,5 +182,10 @@ public class DiffViewerActivity extends BaseActivity {
             default:
                 return true;
         }
+    }
+
+    @TargetApi(11)
+    private void doSearch() {
+        mWebView.showFindDialog(null, true);
     }
 }
