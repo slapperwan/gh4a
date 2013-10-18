@@ -45,6 +45,7 @@ public class RepositoryListLoader extends BaseLoader {
                 result.put(LoaderResult.DATA, repoService.getRepositories(mFilterData));
             }
         }
+        /*
         else if (Constants.User.USER_TYPE_ORG.equals(mType)) {
             if (mSize > 0) {
                 result.put(LoaderResult.DATA, (List<Repository>) repoService.pageOrgRepositories(mLogin, mFilterData, mSize).next());
@@ -52,7 +53,7 @@ public class RepositoryListLoader extends BaseLoader {
             else {
                 result.put(LoaderResult.DATA, repoService.getOrgRepositories(mLogin, mFilterData));
             }
-        }
+        }*/
         else {
             if (mSize > 0) {
                 result.put(LoaderResult.DATA, (List<Repository>) repoService.pageRepositories(mLogin, mFilterData, mSize).next());

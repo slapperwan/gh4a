@@ -138,9 +138,10 @@ public class RepositoryListFragment extends BaseFragment
         if (mLogin.equals(app.getAuthLogin())) {
             mDataIterator = repoService.pageRepositories(filterData, 100);
         }
+        /*
         else if (Constants.User.USER_TYPE_ORG.equals(mUserType)) {
             mDataIterator = repoService.pageOrgRepositories(mLogin, new HashMap<String, String>());
-        }
+        }*/
         else {
             mDataIterator = repoService.pageRepositories(mLogin, filterData, 100);
         }
