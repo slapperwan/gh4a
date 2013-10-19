@@ -15,7 +15,7 @@ public class BrowseFilter extends BaseActivity {
         super.onCreate(savedInstanceState);
         Uri uri = getIntent().getData();
         List<String> parts = uri.getPathSegments();
-        
+
         String first = parts.isEmpty() ? null : parts.get(0);
         if (first == null
                 || "languages".equals(first)
@@ -35,6 +35,14 @@ public class BrowseFilter extends BaseActivity {
         }
         else {
             Gh4Application context = getApplicationContext();
+
+            // strip off extra data like line numbers etc.
+            String last = parts.get(parts.size() - 1);
+            int pos = last.indexOf('#');
+            if (pos >= 0) {
+                parts.set(parts.size() - 1, last.substring(0, pos));
+            }
+
             String user = first;
             String repo = parts.size() >= 2 ? parts.get(1) : null;
             String action = parts.size() >= 3 ? parts.get(2) : null;
@@ -49,7 +57,7 @@ public class BrowseFilter extends BaseActivity {
             else if ("issues".equals(action)) {
                 if (!StringUtils.isBlank(id)) {
                     try {
-                        context.openIssueActivity(this, user, repo, Integer.parseInt(stripExtraData(id)));
+                        context.openIssueActivity(this, user, repo, Integer.parseInt(id));
                     }
                     catch (NumberFormatException e) {
                     }
@@ -68,13 +76,13 @@ public class BrowseFilter extends BaseActivity {
             }
             else if ("pull".equals(action) && !StringUtils.isBlank(id)) {
                 try {
-                    context.openPullRequestActivity(this, user, repo, Integer.parseInt(stripExtraData(id)));
+                    context.openPullRequestActivity(this, user, repo, Integer.parseInt(id));
                 }
                 catch (NumberFormatException e) {
                 }
             }
             else if ("commit".equals(action) && !StringUtils.isBlank(id)) {
-                context.openCommitInfoActivity(this, user, repo, stripExtraData(id), 0);
+                context.openCommitInfoActivity(this, user, repo, id, 0);
             }
             else if ("blob".equals(action) && !StringUtils.isBlank(id) && parts.size() >= 5) {
                 String fullPath = TextUtils.join("/", parts.subList(4, parts.size()));
@@ -82,10 +90,5 @@ public class BrowseFilter extends BaseActivity {
             }
         }
         finish();
-    }
-
-    private static String stripExtraData(String token) {
-        int pos = token.indexOf('#');
-        return pos >= 0 ? token.substring(0, pos) : token;
     }
 }
