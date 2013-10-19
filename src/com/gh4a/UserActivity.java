@@ -211,6 +211,7 @@ public class UserActivity extends BaseSherlockFragmentActivity {
         if (mUserLogin.equals(getAuthLogin())) {
             menu.findItem(R.id.explore).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             menu.removeItem(R.id.follow);
+            menu.removeItem(R.id.share);
         }
         else if (isAuthorized()) {
             if (!isFinishLoadingFollowing) {

@@ -20,6 +20,9 @@
                 android:title="@string/blog" />
         </menu>
     </item>
+    <item android:id="@+id/share"
+        android:title="@string/share"
+        android:showAsAction="never" />
     <item android:id="@+id/theme"
         android:title="@string/theme"
         android:showAsAction="never">
@@ -37,8 +40,5 @@
         android:showAsAction="never" />
     <item android:id="@+id/about" 
         android:title="@string/about"
-        android:showAsAction="never" />
-    <item android:id="@+id/share"
-        android:title="@string/share"
         android:showAsAction="never" />
 </menu>
