@@ -164,10 +164,10 @@ public class CommitActivity extends BaseSherlockFragmentActivity {
             case R.id.share:
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
                 shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Commit #" + mObjectSha.substring(0, 7) + " at " + mRepoOwner + "/" + mRepoName);
-                shareIntent.putExtra(Intent.EXTRA_TEXT,  "Commit #" + mObjectSha.substring(0, 7) 
-                        + " at " + mRepoOwner + "/" + mRepoName + " " + diffUrl);
-                shareIntent = Intent.createChooser(shareIntent, "Share");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_commit_subject,
+                        mObjectSha.substring(0, 7), mRepoOwner + "/" + mRepoName));
+                shareIntent.putExtra(Intent.EXTRA_TEXT, diffUrl);
+                shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
                 return true;
             default:

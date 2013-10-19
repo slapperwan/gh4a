@@ -332,11 +332,12 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                 return true;
             case R.id.share:
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                int subjectId = StringUtils.isBlank(mUserName)
+                        ? R.string.share_user_subject_loginonly : R.string.share_user_subject;
                 shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_SUBJECT, mUserLogin + " " + (!StringUtils.isBlank(mUserName) ? "(" + mUserName + ")" : ""));
-                shareIntent.putExtra(Intent.EXTRA_TEXT,  mUserLogin + " " + (!StringUtils.isBlank(mUserName) ? "(" + mUserName + ")" : "")
-                        + " https://github.com/" + mUserLogin);
-                shareIntent = Intent.createChooser(shareIntent, "Share");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(subjectId, mUserLogin, mUserName));
+                shareIntent.putExtra(Intent.EXTRA_TEXT,  "https://github.com/" + mUserLogin);
+                shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
                 return true;
             default:

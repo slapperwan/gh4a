@@ -187,10 +187,7 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
             
             @Override
             public void onClick(View arg0) {
-                Intent sendIntent = new Intent(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{getResources().getString(R.string.my_email)});
-                sendIntent.setType("message/rfc822");
-                startActivity(Intent.createChooser(sendIntent, "Select email application."));
+                sendEmail();
             }
         });
         
@@ -213,7 +210,14 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         
         dialog.show();
     }
-    
+
+    private void sendEmail() {
+        Intent sendIntent = new Intent(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[] { getString(R.string.my_email) });
+        sendIntent.setType("message/rfc822");
+        startActivity(Intent.createChooser(sendIntent, getString(R.string.send_email_title)));
+    }
+
     public void openFeedbackDialog() {
         Dialog dialog = new Dialog(this);
 
@@ -225,10 +229,7 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
             
             @Override
             public void onClick(View arg0) {
-                Intent sendIntent = new Intent(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{getResources().getString(R.string.my_email)});
-                sendIntent.setType("message/rfc822");
-                startActivity(Intent.createChooser(sendIntent, "Select email application."));
+                sendEmail();
             }
         });
         

@@ -335,4 +335,13 @@
     <string name="remove_bookmark">Remove bookmark</string>
     <string name="remove_bookmark_confirm">Do you really want to remove this bookmark?</string>
     <string name="bookmark_saved">Bookmark saved</string>
+
+    <!-- Sharing -->
+    <string name="send_email_title">Select email application</string>
+    <string name="share_title">Share via</string>
+    <string name="share_file_subject">%1$s at %2$s</string>
+    <string name="share_issue_subject">Issue # %1$d (%2$s) at %3$s</string>
+    <string name="share_commit_subject">Commit #%1$s at %2$s</string>
+    <string name="share_user_subject">User %1$s (%2$s)</string>
+    <string name="share_user_subject_loginonly">User %1$s</string>
 </resources>

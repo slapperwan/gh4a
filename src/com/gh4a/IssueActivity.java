@@ -423,9 +423,10 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
             case R.id.share:
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
                 shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Issue #" + mIssueNumber + " at " + mRepoOwner + "/" + mRepoName);
-                shareIntent.putExtra(Intent.EXTRA_TEXT,  "Issue #" + mIssueNumber + ":" + mIssue.getTitle() + " " + mIssue.getHtmlUrl());
-                shareIntent = Intent.createChooser(shareIntent, "Share");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_issue_subject,
+                        mIssueNumber, mIssue.getTitle(), mRepoOwner + "/" + mRepoName));
+                shareIntent.putExtra(Intent.EXTRA_TEXT,  mIssue.getHtmlUrl());
+                shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
                 return true;
             default:

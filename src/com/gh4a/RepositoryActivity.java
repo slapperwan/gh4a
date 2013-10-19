@@ -415,8 +415,8 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
                 shareIntent.setType("text/plain");
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, mRepoOwner + "/" + mRepoName);
-                shareIntent.putExtra(Intent.EXTRA_TEXT,  mRepoOwner + "/" + mRepoName + " " + mRepository.getHtmlUrl());
-                shareIntent = Intent.createChooser(shareIntent, "Share");
+                shareIntent.putExtra(Intent.EXTRA_TEXT,  mRepository.getHtmlUrl());
+                shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
                 return true;
             default:
