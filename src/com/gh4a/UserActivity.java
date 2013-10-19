@@ -199,38 +199,34 @@ public class UserActivity extends BaseSherlockFragmentActivity {
         inflater.inflate(R.menu.user_menu, menu);
         
         if (Gh4Application.THEME != R.style.LightTheme) {
-            menu.getItem(0).setIcon(R.drawable.navigation_refresh_dark);
+            menu.findItem(R.id.refresh).setIcon(R.drawable.navigation_refresh_dark);
         }
         
-        MenuItem logoutAction = menu.getItem(5);
+        MenuItem logoutAction = menu.findItem(R.id.logout);
         if (!isAuthorized()) {
             logoutAction.setTitle(R.string.login);
         }
         
-        MenuItem followAction = menu.getItem(1);
+        MenuItem followAction = menu.findItem(R.id.follow);
         if (mUserLogin.equals(getAuthLogin())) {
-            menu.getItem(2).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            menu.findItem(R.id.explore).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             menu.removeItem(R.id.follow);
         }
-        else {
-            if (isAuthorized()) {
-                if (!isFinishLoadingFollowing) {
-                    followAction.setActionView(R.layout.ab_loading);
-                    followAction.expandActionView();
-                }
-                else {
-                    if (isFollowing) {
-                        followAction.setTitle(R.string.user_unfollow_action);
-                    }
-                    else {
-                        followAction.setTitle(R.string.user_follow_action);
-                    }
-                }
+        else if (isAuthorized()) {
+            if (!isFinishLoadingFollowing) {
+                followAction.setActionView(R.layout.ab_loading);
+                followAction.expandActionView();
+            }
+            else if (isFollowing) {
+                followAction.setTitle(R.string.user_unfollow_action);
             }
             else {
-                menu.getItem(2).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-                menu.removeItem(R.id.follow);
+                followAction.setTitle(R.string.user_follow_action);
             }
+        }
+        else {
+            menu.getItem(2).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            menu.removeItem(R.id.follow);
         }
         return super.onPrepareOptionsMenu(menu);
     }
