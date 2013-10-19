@@ -63,10 +63,10 @@ public class DiffViewerActivity extends BaseActivity {
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
-        WebView diffView = (WebView) findViewById(R.id.web_view);
+        mWebView = (WebView) findViewById(R.id.web_view);
         hideLoading();
 
-        WebSettings s = diffView.getSettings();
+        WebSettings s = mWebView.getSettings();
         s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
         s.setUseWideViewPort(true);
         s.setAllowFileAccess(true);
@@ -80,12 +80,12 @@ public class DiffViewerActivity extends BaseActivity {
         
         if (FileUtils.isImage(mFilename)) {
             String htmlImage = StringUtils.highlightImage("https://github.com/" + mRepoOwner + "/" + mRepoName + "/raw/" + mSha + "/" + mFilePath);
-            diffView.loadDataWithBaseURL("file:///android_asset/", htmlImage, "text/html", "utf-8", "");
+            mWebView.loadDataWithBaseURL("file:///android_asset/", htmlImage, "text/html", "utf-8", "");
         }
         else {
             if (mDiff != null) {
                 String formatted = highlightSyntax();
-                diffView.loadDataWithBaseURL("file:///android_asset/", formatted, "text/html", "utf-8", "");
+                mWebView.loadDataWithBaseURL("file:///android_asset/", formatted, "text/html", "utf-8", "");
             }
             else {
                 Toast.makeText(this, "Unable to view diff.", Toast.LENGTH_SHORT).show();
