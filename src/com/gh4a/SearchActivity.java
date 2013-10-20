@@ -27,43 +27,43 @@ import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.egit.github.core.service.UserService;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.EditText;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.widget.SearchView;
 import com.gh4a.adapter.SearchRepositoryAdapter;
 import com.gh4a.adapter.SearchUserAdapter;
 import com.gh4a.utils.StringUtils;
 
-public class SearchActivity extends BaseSherlockFragmentActivity {
+public class SearchActivity extends BaseSherlockFragmentActivity implements
+        SearchView.OnQueryTextListener, SearchView.OnCloseListener,
+        AdapterView.OnItemSelectedListener, AdapterView.OnItemClickListener {
 
-    protected List<SearchRepository> repositories;
-    protected List<SearchUser> users;
-    protected SearchUserAdapter userAdapter;
-    protected SearchRepositoryAdapter repositoryAdapter;
+    protected SearchUserAdapter mUserAdapter;
+    protected SearchRepositoryAdapter mRepoAdapter;
     protected ListView mListViewResults;
     private ProgressDialog mProgressDialog;
 
-    private Spinner mTypeSpinner;
-    private EditText mQueryField;
-
-    private static final int MENU_ID_SEARCH = 1;
+    private Spinner mSearchType;
+    private SearchView mSearch;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -74,72 +74,42 @@ public class SearchActivity extends BaseSherlockFragmentActivity {
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.search);
-        
+
+        LinearLayout searchLayout = (LinearLayout) getLayoutInflater().inflate(
+                R.layout.search_action_bar, null);
+        actionBar.setCustomView(searchLayout);
+        actionBar.setDisplayShowCustomEnabled(true);
+
+        mSearchType = (Spinner) searchLayout.findViewById(R.id.search_type);
+        mSearchType.setAdapter(new SearchTypeAdapter(this,
+                Gh4Application.THEME == R.style.LightTheme));
+        mSearchType.setOnItemSelectedListener(this);
+
+        mSearch = (SearchView) searchLayout.findViewById(R.id.search_view);
+        mSearch.setIconifiedByDefault(true);
+        mSearch.requestFocus();
+        mSearch.setIconified(false);
+        mSearch.setOnQueryTextListener(this);
+        mSearch.setOnCloseListener(this);
+        mSearch.onActionViewExpanded();
+
+        updateSearchTypeHint();
+
         mListViewResults = (ListView) findViewById(R.id.list_search);
+        mListViewResults.setOnItemClickListener(this);
         registerForContextMenu(mListViewResults);
-
-        mTypeSpinner = (Spinner) findViewById(R.id.spinner_type);
-        mQueryField = (EditText) findViewById(R.id.et_search);
-
-        /** event when user press enter button at soft keyboard */
-        mQueryField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    doSearch();
-                    return true;
-                }
-                return false;
-            }
-        });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuItem item = menu.add(Menu.NONE, MENU_ID_SEARCH, 0, R.string.search);
-        item.setIcon(Gh4Application.THEME == R.style.DefaultTheme
-                ? R.drawable.action_search_dark : R.drawable.action_search);
-        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == MENU_ID_SEARCH) {
-            doSearch();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void doSearch() {
-        String searchKey = mQueryField.getText().toString();
-        boolean searchUser = mTypeSpinner.getSelectedItemPosition() == 1;
-        mProgressDialog = SearchActivity.this.showProgressDialog(
-                getResources().getString(R.string.loading_msg), true);
-        if (searchUser) {
-            searchUser(searchKey);
-        } else {
-            searchRepository(searchKey, null);
-        }
-        hideKeyboard(mQueryField.getWindowToken());
     }
 
     protected void searchRepository(final String searchKey, final String language) {
-        mListViewResults.setOnItemClickListener(new OnRepositoryClickListener(this));
-        repositories = new ArrayList<SearchRepository>();
-        repositoryAdapter = new SearchRepositoryAdapter(this, repositories);
-        mListViewResults.setAdapter(repositoryAdapter);
+        mRepoAdapter = new SearchRepositoryAdapter(this, new ArrayList<SearchRepository>());
+        mListViewResults.setAdapter(mRepoAdapter);
         new LoadRepositoryTask(this).execute(new String[] { searchKey, language, "true" });
     }
 
     protected void searchUser(final String searchKey) {
-        mListViewResults.setOnItemClickListener(new OnUserClickListener(this));
-        users = new ArrayList<SearchUser>();
-        userAdapter = new SearchUserAdapter(this, users, R.layout.row_gravatar_1);
-        mListViewResults.setAdapter(userAdapter);
+        mUserAdapter = new SearchUserAdapter(this,
+                new ArrayList<SearchUser>(), R.layout.row_gravatar_1);
+        mListViewResults.setAdapter(mUserAdapter);
         new LoadUserTask(this).execute(new String[] { searchKey });
     }
 
@@ -148,52 +118,90 @@ public class SearchActivity extends BaseSherlockFragmentActivity {
         client.setOAuth2Token(getAuthToken());
         UserService userService = new UserService();
         
-        if (!StringUtils.isBlank(searchKey)) {
-            users = userService.searchUsers(searchKey);
+        if (StringUtils.isBlank(searchKey)) {
+            return null;
         }
-        else {
-            // TODO : show dialog
-        }
-        return users;
+
+        return userService.searchUsers(searchKey);
     }
 
-    private static class OnUserClickListener implements OnItemClickListener {
+    private static class SearchTypeAdapter extends BaseAdapter implements SpinnerAdapter {
+        private Context mContext;
+        private boolean mLightTheme;
 
-        private WeakReference<SearchActivity> mTarget;
+        private static final int[][] RESOURCES = new int[][] {
+            { R.string.search_type_repo, R.drawable.search_repos, R.drawable.search_repos_dark },
+            { R.string.search_type_user, R.drawable.search_users, R.drawable.search_users_dark }
+        };
 
-        public OnUserClickListener(SearchActivity activity) {
-            mTarget = new WeakReference<SearchActivity>(activity);
+        SearchTypeAdapter(Context context, boolean lightTheme) {
+            mContext = context;
+            mLightTheme = lightTheme;
         }
 
         @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-            if (mTarget.get() != null) {
-                SearchUser user = (SearchUser) adapterView.getAdapter().getItem(position);
-                Intent intent = new Intent().setClass(mTarget.get(), UserActivity.class);
-                intent.putExtra(Constants.User.USER_LOGIN, (String) user.getLogin());
-                intent.putExtra(Constants.User.USER_NAME, (String) user.getName());
-                mTarget.get().startActivity(intent);
+        public int getCount() {
+            return RESOURCES.length;
+        }
+
+        @Override
+        public CharSequence getItem(int position) {
+            return mContext.getString(RESOURCES[position][0]);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                LayoutInflater inflater = LayoutInflater.from(mContext);
+                convertView = inflater.inflate(R.layout.search_type_small, null);
             }
+
+            ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
+            icon.setImageResource(RESOURCES[position][mLightTheme ? 1 : 2]);
+
+            return convertView;
+        }
+
+        @Override
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                LayoutInflater inflater = LayoutInflater.from(mContext);
+                convertView = inflater.inflate(R.layout.search_type_popup, null);
+            }
+
+            ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
+            icon.setImageResource(RESOURCES[position][mLightTheme ? 1 : 2]);
+
+            TextView label = (TextView) convertView.findViewById(R.id.label);
+            label.setText(RESOURCES[position][0]);
+
+            return convertView;
         }
     }
 
-    protected void fillRepositoriesData() {
-        if (repositories != null && repositories.size() > 0) {
-            repositoryAdapter.notifyDataSetChanged();
-            for (SearchRepository repository : repositories) {
-                repositoryAdapter.add(repository);
+    protected void fillRepositoriesData(List<SearchRepository> repos) {
+        if (mRepoAdapter != null) {
+            mRepoAdapter.clear();
+            if (repos != null) {
+                mRepoAdapter.addAll(repos);
             }
+            mRepoAdapter.notifyDataSetChanged();
         }
-        repositoryAdapter.notifyDataSetChanged();
     }
 
     protected void fillUsersData(List<SearchUser> users) {
-        if (users != null && users.size() > 0) {
-            for (SearchUser user : users) {
-                userAdapter.add(user);
+        if (mUserAdapter != null) {
+            mUserAdapter.clear();
+            if (users != null) {
+                mUserAdapter.addAll(users);
             }
+            mUserAdapter.notifyDataSetChanged();
         }
-        userAdapter.notifyDataSetChanged();
     }
 
     protected List<SearchRepository> getRepositories(String searchKey, String language)
@@ -202,18 +210,16 @@ public class SearchActivity extends BaseSherlockFragmentActivity {
         client.setOAuth2Token(getAuthToken());
         RepositoryService repoService = new RepositoryService();
         
-        if (!StringUtils.isBlank(searchKey)) {
-            if (language == null || "Any Language".equals(language)) {
-                repositories = repoService.searchRepositories(searchKey, 1);
-            }
-            else {
-                repositories = repoService.searchRepositories(searchKey, language, 1);
-            }
+        if (StringUtils.isBlank(searchKey)) {
+            return null;
+        }
+
+        if (language == null || "Any Language".equals(language)) {
+            return repoService.searchRepositories(searchKey, 1);
         }
         else {
-            // TODO : show dialog
+            return repoService.searchRepositories(searchKey, language, 1);
         }
-        return repositories;
     }
 
     private static class LoadRepositoryTask extends AsyncTask<String, Integer, List<SearchRepository>> {
@@ -255,7 +261,7 @@ public class SearchActivity extends BaseSherlockFragmentActivity {
                     mTarget.get().showError(false);
                 }
                 else {
-                    activity.fillRepositoriesData();
+                    activity.fillRepositoriesData(result);
                 }
             }
         }
@@ -306,24 +312,6 @@ public class SearchActivity extends BaseSherlockFragmentActivity {
         }
     }
 
-    private static class OnRepositoryClickListener implements OnItemClickListener {
-
-        private WeakReference<SearchActivity> mTarget;
-
-        public OnRepositoryClickListener(SearchActivity activity) {
-            mTarget = new WeakReference<SearchActivity>(activity);
-        }
-
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-            if (mTarget.get() != null) {
-                SearchRepository repository = (SearchRepository) adapterView.getAdapter().getItem(position);
-                mTarget.get().getApplicationContext().openRepositoryInfoActivity(mTarget.get(),
-                        repository.getOwner(), repository.getName(), 0);
-            }
-        }
-    }
-
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         menu.clear();// clear items
@@ -358,7 +346,6 @@ public class SearchActivity extends BaseSherlockFragmentActivity {
 
         ListAdapter listAdapter = mListViewResults.getAdapter();
         Object object = listAdapter.getItem(info.position);
-        String title = item.getTitle().toString();
 
         /** User item */
         if (object instanceof SearchUser) {
@@ -369,11 +356,77 @@ public class SearchActivity extends BaseSherlockFragmentActivity {
             startActivity(intent);
         }
         /** Repo item */
-        else if (title.startsWith("Repo")) {
+        else {
             SearchRepository repository = (SearchRepository) object;
             getApplicationContext().openRepositoryInfoActivity(this,
                     repository.getOwner(), repository.getName(), 0);
         }
         return true;
+    }
+
+    private void updateSearchTypeHint() {
+        switch (mSearchType.getSelectedItemPosition()) {
+            case 0: mSearch.setQueryHint(getString(R.string.search_hint_repo)); break;
+            case 1: mSearch.setQueryHint(getString(R.string.search_hint_user)); break;
+            default: mSearch.setQueryHint(null); break;
+        }
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        boolean searchUser = mSearchType.getSelectedItemPosition() == 1;
+        mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+        if (searchUser) {
+            searchUser(query);
+        } else {
+            searchRepository(query, null);
+        }
+        mSearch.clearFocus();
+        return true;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        return false;
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        updateSearchTypeHint();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        updateSearchTypeHint();
+    }
+
+    @Override
+    public boolean onClose() {
+        if (mUserAdapter != null) {
+            mUserAdapter.clear();
+            mUserAdapter.notifyDataSetChanged();
+        }
+        if (mRepoAdapter != null) {
+            mRepoAdapter.clear();
+            mRepoAdapter.notifyDataSetChanged();
+        }
+        return true;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Object object = parent.getAdapter().getItem(position);
+
+        if (object instanceof SearchUser) {
+            SearchUser user = (SearchUser) object;
+            Intent intent = new Intent(this, UserActivity.class);
+            intent.putExtra(Constants.User.USER_LOGIN, (String) user.getLogin());
+            intent.putExtra(Constants.User.USER_NAME, (String) user.getName());
+            startActivity(intent);
+        } else if (object instanceof SearchRepository) {
+            SearchRepository repository = (SearchRepository) object;
+            getApplicationContext().openRepositoryInfoActivity(this,
+                    repository.getOwner(), repository.getName(), 0);
+        }
     }
 }

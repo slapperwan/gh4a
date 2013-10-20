@@ -336,6 +336,12 @@
     <string name="remove_bookmark_confirm">Do you really want to remove this bookmark?</string>
     <string name="bookmark_saved">Bookmark saved</string>
 
+    <!-- Search -->
+    <string name="search_type_repo">Repository</string>
+    <string name="search_type_user">User</string>
+    <string name="search_hint_repo">Search for repositories</string>
+    <string name="search_hint_user">Search for users</string>
+
     <!-- Sharing -->
     <string name="send_email_title">Select email application</string>
     <string name="share_title">Share via</string>
