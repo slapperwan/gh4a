@@ -82,7 +82,6 @@ public class UserFragment extends BaseFragment implements
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onCreate UserFragment");
         super.onCreate(savedInstanceState);
         mUserLogin = getArguments().getString(Constants.User.USER_LOGIN);
         mUserName = getArguments().getString(Constants.User.USER_NAME);
@@ -91,14 +90,12 @@ public class UserFragment extends BaseFragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onCreateView UserFragment");
         View v = inflater.inflate(R.layout.user, container, false);
         return v;
     }
     
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onActivityCreated UserFragment");
         super.onActivityCreated(savedInstanceState);
         
         showLoading();

@@ -73,7 +73,6 @@ public class RepositoryIssueListFragment extends BaseFragment
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onCreate RepositoryIssueListFragment");
         super.onCreate(savedInstanceState);
 
         mFilterData = new HashMap<String, String>();
@@ -92,7 +91,6 @@ public class RepositoryIssueListFragment extends BaseFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onCreateView RepositoryIssueListFragment");
         View v = inflater.inflate(R.layout.generic_list, container, false);
         mListView = (ListView) v.findViewById(R.id.list_view);
         return v;
@@ -100,7 +98,6 @@ public class RepositoryIssueListFragment extends BaseFragment
     
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onActivityCreated RepositoryIssueListFragment");
         super.onActivityCreated(savedInstanceState);
         
         mAdapter = new RepositoryIssueAdapter(getSherlockActivity(), new ArrayList<RepositoryIssue>());

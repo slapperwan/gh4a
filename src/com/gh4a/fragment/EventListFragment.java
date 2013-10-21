@@ -96,7 +96,6 @@ public abstract class EventListFragment extends BaseFragment
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onCreate EventListFragment");
         super.onCreate(savedInstanceState);
         mLogin = getArguments().getString(Constants.User.USER_LOGIN);
         mIsPrivate = getArguments().getBoolean(Constants.Event.IS_PRIVATE);
@@ -105,7 +104,6 @@ public abstract class EventListFragment extends BaseFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onCreateView EventListFragment");
         View v = inflater.inflate(R.layout.generic_list, container, false);
         mListView = (ListView) v.findViewById(R.id.list_view);
         return v;
@@ -113,7 +111,6 @@ public abstract class EventListFragment extends BaseFragment
     
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onActivityCreated EventListFragment");
         super.onActivityCreated(savedInstanceState);
         
         LayoutInflater vi = getSherlockActivity().getLayoutInflater();
