@@ -123,18 +123,18 @@ public class OrganizationListActivity extends BaseSherlockFragmentActivity {
          */
         @Override
         protected void onPostExecute(List<User> result) {
-            if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog.dismiss();
+            OrganizationListActivity activity = mTarget.get();
+            if (activity != null) {
+                activity.mLoadingDialog.dismiss();
                 if (mException && isAuthError) {
-                    Toast.makeText(mTarget.get(),
-                            "Your API token maybe invalid.",
+                    Toast.makeText(activity, activity.getString(R.string.auth_err_toast),
                             Toast.LENGTH_LONG).show();
                 }
                 else if (mException) {
-                    mTarget.get().showError();
+                    activity.showError();
                 }
                 else {
-                    mTarget.get().fillData(result);
+                    activity.fillData(result);
                 }
             }
         }

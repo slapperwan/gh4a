@@ -23,12 +23,10 @@ import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.User;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -272,11 +270,11 @@ public class UserFragment extends BaseFragment implements
         
         TextView tvPubRepo = (TextView) v.findViewById(R.id.tv_pub_repos_label);
         tvPubRepo.setTypeface(boldCondensed);
-        tvPubRepo.setTextColor(Color.parseColor("#0099cc"));
+        tvPubRepo.setTextColor(getResources().getColor(R.color.highlight));
         
         TextView tvOrgs = (TextView) v.findViewById(R.id.tv_orgs);
         tvOrgs.setTypeface(boldCondensed);
-        tvOrgs.setTextColor(Color.parseColor("#0099cc"));
+        tvOrgs.setTextColor(getResources().getColor(R.color.highlight));
         
         getLoaderManager().initLoader(1, null, this);
         getLoaderManager().initLoader(2, null, this);
@@ -379,7 +377,7 @@ public class UserFragment extends BaseFragment implements
                 TextView tvExtra = (TextView) rowView.findViewById(R.id.tv_extra);
                 tvExtra.setTextAppearance(getSherlockActivity(), R.style.default_text_micro);
                 
-                tvTitle.setText(repository.getOwner().getLogin() + " / " + repository.getName());
+                tvTitle.setText(repository.getOwner().getLogin() + "/" + repository.getName());
                 
                 if (!StringUtils.isBlank(repository.getDescription())) {
                     tvDesc.setVisibility(View.VISIBLE);
@@ -388,15 +386,12 @@ public class UserFragment extends BaseFragment implements
                 else {
                     tvDesc.setVisibility(View.GONE);
                 }
-                
-                String extraData = (repository.getLanguage() != null ? repository.getLanguage()
-                        + "   " : "")
-                        + StringUtils.toHumanReadbleFormat(repository.getSize())
-                        + "   "
-                        + repository.getForks()
-                        + " " + getResources().getString(R.string.repo_forks).toLowerCase() + "   "
-                        + repository.getWatchers()
-                        + " " + getResources().getString(R.string.repo_stargazers).toLowerCase();
+
+                String language = repository.getLanguage() != null
+                        ? repository.getLanguage() : getString(R.string.unknown);
+                String extraData = getString(R.string.repo_search_extradata, language,
+                        StringUtils.toHumanReadbleFormat(repository.getSize()),
+                        repository.getForks(), repository.getWatchers());
                 tvExtra.setText(extraData);
                 
                 ll.addView(rowView);
@@ -416,17 +411,11 @@ public class UserFragment extends BaseFragment implements
                     }
                 });
             }
-            else {
-                btnMore.setVisibility(View.GONE);
-                TextView noRepos = new TextView(getSherlockActivity());
-                noRepos.setText("Repositories not found");
-                ll.addView(noRepos);
-            }
         }
-        else {
+        if (mTopRepos == null || mTopRepos.isEmpty()) {
             btnMore.setVisibility(View.GONE);
             TextView noRepos = new TextView(getSherlockActivity());
-            noRepos.setText("Repositories not found");
+            noRepos.setText(R.string.no_repos_found);
             ll.addView(noRepos);
         }
     }

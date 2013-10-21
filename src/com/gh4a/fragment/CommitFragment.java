@@ -12,7 +12,6 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CommitService;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -143,17 +142,18 @@ public class CommitFragment extends BaseFragment {
         ImageView ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
         
         AQuery aq = new AQuery(getSherlockActivity());
-        aq.id(R.id.iv_gravatar).image(GravatarUtils.getGravatarUrl(CommitUtils.getAuthorGravatarId(commit)), 
+        aq.id(R.id.iv_gravatar).image(
+                GravatarUtils.getGravatarUrl(CommitUtils.getAuthorGravatarId(context, commit)), 
                 true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
         
-        if (CommitUtils.getAuthorLogin(commit) != null) {
+        if (CommitUtils.getAuthorLogin(context, commit) != null) {
             ivGravatar.setOnClickListener(new OnClickListener() {
     
                 @Override
                 public void onClick(View v) {
                     /** Open user activity */
                     context.openUserInfoActivity(activity,
-                            CommitUtils.getAuthorLogin(commit), null);
+                            CommitUtils.getAuthorLogin(context, commit), null);
                 }
             });
         }
@@ -164,19 +164,19 @@ public class CommitFragment extends BaseFragment {
         
         TextView tvChangeTitle = (TextView) v.findViewById(R.id.commit_changed);
         tvChangeTitle.setTypeface(context.boldCondensed);
-        tvChangeTitle.setTextColor(Color.parseColor("#0099cc"));
+        tvChangeTitle.setTextColor(getResources().getColor(R.color.highlight));
         
         TextView tvAddedTitle = (TextView) v.findViewById(R.id.commit_added);
         tvAddedTitle.setTypeface(context.boldCondensed);
-        tvAddedTitle.setTextColor(Color.parseColor("#0099cc"));
+        tvAddedTitle.setTextColor(getResources().getColor(R.color.highlight));
         
         TextView tvDeletedTitle = (TextView) v.findViewById(R.id.commit_deleted);
         tvDeletedTitle.setTypeface(context.boldCondensed);
-        tvDeletedTitle.setTextColor(Color.parseColor("#0099cc"));
+        tvDeletedTitle.setTextColor(getResources().getColor(R.color.highlight));
         
         tvMessage.setText(commit.getCommit().getMessage());
         
-        tvExtra.setText(CommitUtils.getAuthorName(commit)
+        tvExtra.setText(CommitUtils.getAuthorName(context, commit)
                 + " "
                 + Gh4Application.pt.format(commit.getCommit().getAuthor().getDate()));
 
@@ -203,7 +203,7 @@ public class CommitFragment extends BaseFragment {
             TextView tvFilename = new TextView(context);
             tvFilename.setText(file.getFilename());
             tvFilename.setTypeface(Typeface.MONOSPACE);
-            tvFilename.setTextColor(Color.parseColor("#0099cc"));
+            tvFilename.setTextColor(getResources().getColor(R.color.highlight));
             tvFilename.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
             tvFilename.setPadding(0, 10, 0, 10);
             tvFilename.setOnClickListener(new OnClickListener() {
@@ -238,7 +238,7 @@ public class CommitFragment extends BaseFragment {
             TextView tvFilename = new TextView(context);
             tvFilename.setText(file.getFilename());
             tvFilename.setTypeface(Typeface.MONOSPACE);
-            tvFilename.setTextColor(Color.parseColor("#0099cc"));
+            tvFilename.setTextColor(getResources().getColor(R.color.highlight));
             tvFilename.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
             tvFilename.setPadding(0, 10, 0, 10);
             tvFilename.setOnClickListener(new OnClickListener() {

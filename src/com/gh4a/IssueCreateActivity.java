@@ -109,9 +109,8 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
         setContentView(R.layout.issue_create);
 
         mActionBar = getSupportActionBar();
-        mActionBar.setTitle(mEditMode ? 
-                getResources().getString(R.string.issue_edit)  + " #" + mIssueNumber 
-                : getResources().getString(R.string.issue_create));
+        mActionBar.setTitle(mEditMode ? getString(R.string.issue_edit_title, mIssueNumber)
+                : getString(R.string.issue_create));
         mActionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         mActionBar.setDisplayHomeAsUpEnabled(true);
         
@@ -125,7 +124,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
         
         TextView tvIssueLabelAdd = (TextView) findViewById(R.id.tv_issue_label_add);
         tvIssueLabelAdd.setTypeface(getApplicationContext().boldCondensed);
-        tvIssueLabelAdd.setTextColor(Color.parseColor("#0099cc"));
+        tvIssueLabelAdd.setTextColor(getResources().getColor(R.color.highlight));
         
         getSupportLoaderManager().initLoader(0, null, this);
         getSupportLoaderManager().initLoader(1, null, this);
@@ -319,9 +318,8 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
                 new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 if (mSelectedMilestone != null) {
-                    mTvSelectedMilestone.setText(IssueCreateActivity.this.getResources().getString(R.string.issue_milestone)
-                            + " : "
-                            + mSelectedMilestone.getTitle());
+                    mTvSelectedMilestone.setText(getString(
+                            R.string.issue_milestone, mSelectedMilestone.getTitle()));
                 }
                 else {
                     mTvSelectedMilestone.setText(null);
@@ -377,9 +375,8 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
                 new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 if (mSelectedAssignee != null) {
-                    mTvSelectedAssignee.setText(IssueCreateActivity.this.getResources().getString(R.string.issue_assignee)
-                            + " : "
-                            + mSelectedAssignee.getLogin());
+                    mTvSelectedAssignee.setText(getString(
+                            R.string.issue_assignee, mSelectedAssignee.getLogin()));
                 }
                 else {
                     mTvSelectedAssignee.setText(null);
@@ -490,15 +487,13 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
         mSelectedAssignee = mEditIssue.getAssignee();
         
         if (mSelectedMilestone != null) {
-            mTvSelectedMilestone.setText(IssueCreateActivity.this.getResources().getString(R.string.issue_milestone)
-                    + " : "
-                    + mEditIssue.getMilestone().getTitle());
+            mTvSelectedMilestone.setText(getString(
+                    R.string.issue_milestone, mEditIssue.getMilestone().getTitle()));
         }
         
         if (mSelectedAssignee != null) {
-            mTvSelectedAssignee.setText(IssueCreateActivity.this.getResources().getString(R.string.issue_assignee)
-                    + " : "
-                    + mSelectedAssignee.getLogin());
+            mTvSelectedAssignee.setText(getString(
+                    R.string.issue_assignee, mSelectedAssignee.getLogin()));
         }
     }
     

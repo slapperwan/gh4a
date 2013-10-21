@@ -18,7 +18,6 @@ package com.gh4a.fragment;
 import org.eclipse.egit.github.core.Repository;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -90,7 +89,7 @@ public class RepositoryFragment extends BaseFragment implements
         
         TextView tvReadmeTitle = (TextView) getView().findViewById(R.id.readme_title);
         tvReadmeTitle.setTypeface(boldCondensed);
-        tvReadmeTitle.setTextColor(Color.parseColor("#0099cc"));
+        tvReadmeTitle.setTextColor(getResources().getColor(R.color.highlight));
 
         showLoading(R.id.pb_readme, R.id.readme);
     }
@@ -119,7 +118,7 @@ public class RepositoryFragment extends BaseFragment implements
         
         TextView tvOwner = (TextView) v.findViewById(R.id.tv_login);
         tvOwner.setText(mRepoOwner);
-        tvOwner.setTextColor(Color.parseColor("#0099cc"));
+        tvOwner.setTextColor(getResources().getColor(R.color.highlight));
         tvOwner.setTypeface(boldCondensed);
         tvOwner.setOnClickListener(new OnClickListener() {
 
@@ -149,10 +148,9 @@ public class RepositoryFragment extends BaseFragment implements
             tvParentRepo.setTypeface(italic);
 
             if (mRepository.getParent() != null) {
-                tvParentRepo.setText("forked from "
-                        + mRepository.getParent().getOwner().getLogin() 
-                        + "/" 
-                        + mRepository.getParent().getName());
+                tvParentRepo.setText(app.getString(R.string.forked_from,
+                        mRepository.getParent().getOwner().getLogin() + "/" +
+                        mRepository.getParent().getName()));
                 tvParentRepo.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
                 tvParentRepo.setOnClickListener(new OnClickListener() {
 
@@ -178,8 +176,7 @@ public class RepositoryFragment extends BaseFragment implements
         }
         
         if (!StringUtils.isBlank(mRepository.getLanguage())) {
-            tvLanguage.setText(getResources().getString(R.string.repo_language) 
-                    + " " + mRepository.getLanguage());
+            tvLanguage.setText(getString(R.string.repo_language, mRepository.getLanguage()));
             tvLanguage.setVisibility(View.VISIBLE);
         }
         else {
@@ -278,7 +275,7 @@ public class RepositoryFragment extends BaseFragment implements
         
         TextView tvOthers = (TextView) v.findViewById(R.id.other_info);
         tvOthers.setTypeface(boldCondensed);
-        tvOthers.setTextColor(Color.parseColor("#0099cc"));
+        tvOthers.setTextColor(getResources().getColor(R.color.highlight));
         
         TextView tvDownloads = (TextView) v.findViewById(R.id.tv_downloads_label);
         tvDownloads.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
@@ -311,7 +308,7 @@ public class RepositoryFragment extends BaseFragment implements
         else {
             if (getView() != null) {
                 TextView tvReadme = (TextView) getView().findViewById(R.id.readme);
-                tvReadme.setText("README not found");
+                tvReadme.setText(R.string.repo_no_readme);
                 tvReadme.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
             }
         }

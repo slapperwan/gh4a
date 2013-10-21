@@ -199,9 +199,9 @@ public class TimelineActivity extends BaseSherlockFragmentActivity
                     for (Commit commit : commits) {
                         String[] commitInfo = new String[4];
                         commitInfo[0] = commit.getSha();
-                        commitInfo[1] = CommitUtils.getAuthorEmail(commit);
+                        commitInfo[1] = CommitUtils.getAuthorEmail(this, commit);
                         commitInfo[2] = commit.getMessage();
-                        commitInfo[3] = CommitUtils.getAuthorName(commit);
+                        commitInfo[3] = CommitUtils.getAuthorName(this, commit);
                         intent.putExtra("commit" + commit.getSha(), commitInfo);
                     }
                     

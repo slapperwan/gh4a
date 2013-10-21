@@ -188,17 +188,15 @@ public class CommitListActivity extends BaseActivity implements OnScrollListener
          */
         @Override
         protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                if (mTarget.get().mPage == 1) {
-                    mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true,
+            CommitListActivity activity = mTarget.get();
+            if (activity != null) {
+                if (activity.mPage == 1) {
+                    activity.mLoadingDialog = LoadingDialog.show(activity, true, true,
                             mHideMainView);
                 }
-                else {
-                    if (mTarget.get().lastPage) {
-                        Toast.makeText(mTarget.get(), "No more result", Toast.LENGTH_SHORT).show();
-                    }
-                    else {
-                    }
+                else if (activity.lastPage) {
+                    Toast.makeText(activity, activity.getString(R.string.no_more_results),
+                            Toast.LENGTH_SHORT).show();
                 }
             }
         }

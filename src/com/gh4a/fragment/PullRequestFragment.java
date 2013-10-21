@@ -20,6 +20,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.PullRequest;
@@ -159,18 +160,18 @@ public class PullRequestFragment extends BaseFragment
         tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
         
         tvCommentTitle.setTypeface(activity.getApplicationContext().boldCondensed);
-        tvCommentTitle.setTextColor(Color.parseColor("#0099cc"));
+        tvCommentTitle.setTextColor(getResources().getColor(R.color.highlight));
         tvCommentTitle.setText(getResources().getString(R.string.issue_comment_title) + " (" + pullRequest.getComments() + ")");
         
         tvState.setText(pullRequest.getState());
         tvState.setTextColor(Color.WHITE);
         if ("closed".equals(pullRequest.getState())) {
             tvState.setBackgroundResource(R.drawable.default_red_box);
-            tvState.setText("C\nL\nO\nS\nE\nD");
+            tvState.setText(getString(R.string.closed).toUpperCase(Locale.getDefault()));
         }
         else {
             tvState.setBackgroundResource(R.drawable.default_green_box);
-            tvState.setText("O\nP\nE\nN");
+            tvState.setText(getString(R.string.open).toUpperCase(Locale.getDefault()));
         }
         tvTitle.setText(pullRequest.getTitle());
         tvTitle.setTypeface(context.boldCondensed);

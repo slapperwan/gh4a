@@ -124,7 +124,8 @@ public class GistListActivity extends BaseSherlockFragmentActivity implements On
             }
         }
         else {
-            getApplicationContext().notFoundMessage(this, "Gist");
+            getApplicationContext().notFoundMessage(this,
+                    getResources().getQuantityString(R.plurals.gist, 1));
         }
         adapter.notifyDataSetChanged();
     }

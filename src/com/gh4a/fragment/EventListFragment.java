@@ -39,11 +39,9 @@ import org.eclipse.egit.github.core.event.PushPayload;
 import org.eclipse.egit.github.core.service.EventService;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -74,7 +72,6 @@ public abstract class EventListFragment extends BaseFragment
 
     static final int MENU_USER = 1;
     static final int MENU_REPO = 2;
-    static final int MENU_COMMIT = 3;
     static final int MENU_OPEN_ISSUES = 4;
     static final int MENU_ISSUE = 5;
     static final int MENU_COMMENT_IN_BROWSER = 6;
@@ -84,6 +81,9 @@ public abstract class EventListFragment extends BaseFragment
     static final int MENU_WIKI_IN_BROWSER = 10;
     static final int MENU_PULL_REQ = 11;
     static final int MENU_COMPARE = 12;
+    static final int MENU_COMMENT_COMMIT = 99;
+    static final int MENU_PUSH_COMMIT_START = 100;
+    static final int MENU_PUSH_COMMIT_END = 300;
     
     private String mLogin;
     private boolean mIsPrivate;
@@ -115,8 +115,8 @@ public abstract class EventListFragment extends BaseFragment
         
         LayoutInflater vi = getSherlockActivity().getLayoutInflater();
         mLoadingView = (TextView) vi.inflate(R.layout.row_simple, null);
-        mLoadingView.setText("Loading...");
-        mLoadingView.setTextColor(Color.parseColor("#0099cc"));
+        mLoadingView.setText(R.string.loading_msg);
+        mLoadingView.setTextColor(getResources().getColor(R.color.highlight));
         
         mAdapter = new FeedAdapter(getSherlockActivity(), new ArrayList<Event>());
         mListView.setAdapter(mAdapter);
@@ -490,24 +490,26 @@ public abstract class EventListFragment extends BaseFragment
                 repoOwner = repoNamePart[0];
                 repoName = repoNamePart[1];
             }
-            
-            menu.setHeaderTitle("Go to");
+
+            menu.setHeaderTitle(R.string.go_to);
 
             /** Common menu */
-            menu.add(groupId, MENU_USER, Menu.NONE, "User " + event.getActor().getLogin());
+            menu.add(groupId, MENU_USER, Menu.NONE, getString(R.string.menu_user, event.getActor().getLogin()));
             if (repoOwner != null) {
-                menu.add(groupId, MENU_REPO, Menu.NONE, "Repo " + repoOwner + "/" + repoName);
+                menu.add(groupId, MENU_REPO, Menu.NONE, getString(R.string.menu_repo, repoOwner + "/" + repoName));
             }
 
             /** PushEvent extra menu for commits */
             if (Event.TYPE_PUSH.equals(eventType)) {
                 if (repoOwner != null) {
                     PushPayload payload = (PushPayload) event.getPayload();
-                    menu.add(groupId, MENU_COMPARE, Menu.NONE, "Compare " + payload.getHead());
+                    menu.add(groupId, MENU_COMPARE, Menu.NONE,
+                            getString(R.string.menu_compare, payload.getHead()));
                     
                     List<Commit> commits = payload.getCommits();
-                    for (Commit commit : commits) {
-                        menu.add(groupId, MENU_COMMIT, Menu.NONE, "Commit " + commit.getSha());
+                    for (int i = 0; i < commits.size(); i++) {
+                        menu.add(groupId, MENU_PUSH_COMMIT_START + i, Menu.NONE,
+                                getString(R.string.menu_commit, commits.get(i).getSha()));
                     }
                 }
             }
@@ -515,14 +517,16 @@ public abstract class EventListFragment extends BaseFragment
             /** IssueEvent extra menu for commits */
             else if (Event.TYPE_ISSUES.equals(eventType)) {
                 IssuesPayload payload = (IssuesPayload) event.getPayload();
-                menu.add(groupId, MENU_ISSUE, Menu.NONE, "Issue " + payload.getIssue().getNumber());
+                MenuItem item = menu.add(groupId, MENU_ISSUE, Menu.NONE,
+                        getString(R.string.menu_issue, payload.getIssue().getNumber()));
             }
 
             /** FollowEvent */
             else if (Event.TYPE_FOLLOW.equals(eventType)) {
                 FollowPayload payload = (FollowPayload) event.getPayload();
                 if (payload.getTarget() != null) {
-                    menu.add(groupId, MENU_USER, Menu.NONE, "User " + payload.getTarget().getLogin());
+                    menu.add(groupId, MENU_USER, Menu.NONE,
+                            getString(R.string.menu_user, payload.getTarget().getLogin()));
                 }
             }
 
@@ -530,21 +534,23 @@ public abstract class EventListFragment extends BaseFragment
             else if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
                 if (repoOwner != null) {
                     CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
-                    menu.add(groupId, MENU_COMMIT, Menu.NONE, "Commit " + payload.getComment().getCommitId().substring(0, 7));
-                    //menu.add("Comment in browser");
+                    menu.add(groupId, MENU_COMMENT_COMMIT, Menu.NONE,
+                            getString(R.string.menu_commit, payload.getComment().getCommitId().substring(0, 7)));
                 }
             }
 
             /** GistEvent */
             else if (Event.TYPE_GIST.equals(eventType)) {
                 GistPayload payload = (GistPayload) event.getPayload();
-                menu.add(groupId, MENU_GIST, Menu.NONE, "Gist " + payload.getGist().getId());
+                menu.add(groupId, MENU_GIST, Menu.NONE,
+                        getString(R.string.menu_gist, payload.getGist().getId()));
             }
 
             /** DownloadEvent */
             else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
                 DownloadPayload payload = (DownloadPayload) event.getPayload();
-                menu.add(groupId, MENU_FILE, Menu.NONE, "File " + payload.getDownload().getName());
+                menu.add(groupId, MENU_FILE, Menu.NONE,
+                        getString(R.string.menu_file, payload.getDownload().getName()));
             }
 
             /** ForkEvent */
@@ -552,24 +558,25 @@ public abstract class EventListFragment extends BaseFragment
                 ForkPayload payload = (ForkPayload) event.getPayload();
                 Repository forkee = payload.getForkee();
                 if (forkee != null) {
-                    menu.add(groupId, MENU_FORKED_REPO, Menu.NONE, "Forked repo " + forkee.getOwner().getLogin() + "/" + forkee.getName());
+                    menu.add(groupId, MENU_FORKED_REPO, Menu.NONE,
+                            getString(R.string.menu_fork, forkee.getOwner().getLogin() + "/" + forkee.getName()));
                 }
             }
 
             /** GollumEvent */
             else if (Event.TYPE_GOLLUM.equals(eventType)) {
-                menu.add(groupId, MENU_WIKI_IN_BROWSER, Menu.NONE, "Wiki in browser");
+                menu.add(groupId, MENU_WIKI_IN_BROWSER, Menu.NONE, getString(R.string.menu_wiki));
             }
             
             /** PullRequestEvent */
             else if (Event.TYPE_PULL_REQUEST.equals(eventType)) {
                 PullRequestPayload payload = (PullRequestPayload) event.getPayload();
-                menu.add(groupId, MENU_PULL_REQ, Menu.NONE, "Pull request " + payload.getNumber());
+                menu.add(groupId, MENU_PULL_REQ, Menu.NONE, getString(R.string.menu_pull, payload.getNumber()));
             }
             
             /** IssueCommentEvent */
             else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
-                menu.add(groupId, MENU_OPEN_ISSUES, Menu.NONE, "Open issues");
+                menu.add(groupId, MENU_OPEN_ISSUES, Menu.NONE, getString(R.string.menu_issues));
             }
         }
     }
@@ -588,51 +595,53 @@ public abstract class EventListFragment extends BaseFragment
             repoName = repoNamePart[1];
         }
         
-        String title = item.getTitle().toString();
-        String value = title.split(" ")[1];
-
         Gh4Application context = ((BaseSherlockFragmentActivity) getActivity()).getApplicationContext();
+        int id = item.getItemId();
 
         /** User item */
-        if (title.startsWith("User")) {
-            context
-                    .openUserInfoActivity(getSherlockActivity(), value, null);
+        if (id == MENU_USER) {
+            context.openUserInfoActivity(getSherlockActivity(), repoOwner, null);
         }
         /** Repo item */
-        else if (title.startsWith("Repo")) {
+        else if (id == MENU_REPO) {
             context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
         }
         /** Commit item */
-        else if (title.startsWith("Commit")) {
+        else if (id >= MENU_PUSH_COMMIT_START && id <= MENU_PUSH_COMMIT_END || id == MENU_COMMENT_COMMIT) {
             if (repoOwner != null) {
-                context.openCommitInfoActivity(getSherlockActivity(), repoOwner, repoName, value, 0);
+                String sha = null;
+                if (Event.TYPE_PUSH.equals(event.getType())) {
+                    int offset = id - MENU_PUSH_COMMIT_START;
+                    sha = ((PushPayload) event.getPayload()).getCommits().get(offset).getSha();
+                } else if (Event.TYPE_COMMIT_COMMENT.equals(event.getType())) {
+                    sha = ((CommitCommentPayload) event.getPayload()).getComment().getCommitId();
+                }
+                if (sha != null) {
+                    context.openCommitInfoActivity(getSherlockActivity(), repoOwner, repoName, sha, 0);
+                }
             }
             else {
                 context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
             }
         }
-        /** Issue comment item */
-        else if (title.startsWith("Open issues")) {
-            context.openIssueListActivity(getSherlockActivity(), repoOwner, repoName, Constants.Issue.ISSUE_STATE_OPEN);
+        /** Open issues item */
+        else if (id == MENU_OPEN_ISSUES) {
+            context.openIssueListActivity(getSherlockActivity(), repoOwner, repoName,
+                    Constants.Issue.ISSUE_STATE_OPEN);
         }
         /** Issue item */
-        else if (title.startsWith("Issue")) {
+        else if (id == MENU_ISSUE) {
             IssuesPayload payload = (IssuesPayload) event.getPayload();
             context.openIssueActivity(getSherlockActivity(), repoOwner, repoName, payload.getIssue().getNumber());
         }
-        /** Commit comment item */
-        else if (title.startsWith("Comment in browser")) {
-            CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
-            context.openBrowser(getSherlockActivity(), payload.getComment().getUrl());
-        }
         /** Gist item */
-        else if (title.startsWith("Gist")) {
+        else if (id == MENU_GIST) {
             GistPayload payload = (GistPayload) event.getPayload();
             context.openGistActivity(getSherlockActivity(), payload.getGist().getUser().getLogin(),
                     payload.getGist().getId(), 0);
         }
         /** Download item */
-        else if (title.startsWith("File")) {
+        else if (id == MENU_FILE) {
             if (repoOwner != null) {
                 DownloadPayload payload = (DownloadPayload) event.getPayload();
                 context.openBrowser(getSherlockActivity(), payload.getDownload().getHtmlUrl());
@@ -642,7 +651,7 @@ public abstract class EventListFragment extends BaseFragment
             }
         }
         /** Fork item */
-        else if (title.startsWith("Forked repo")) {
+        else if (id == MENU_FORKED_REPO) {
             ForkPayload payload = (ForkPayload) event.getPayload();
             Repository forkee = payload.getForkee();
             if (forkee != null) {
@@ -653,7 +662,7 @@ public abstract class EventListFragment extends BaseFragment
             }
         }
         /** Wiki item */
-        else if (title.startsWith("Wiki in browser")) {
+        else if (id == MENU_WIKI_IN_BROWSER) {
             GollumPayload payload = (GollumPayload) event.getPayload();
             List<GollumPage> pages = payload.getPages();
             if (pages != null && !pages.isEmpty()) {//TODO: now just open the first page
@@ -661,12 +670,12 @@ public abstract class EventListFragment extends BaseFragment
             }
         }
         /** Pull Request item */
-        else if (title.startsWith("Pull request")) {
+        else if (id == MENU_PULL_REQ) {
             PullRequestPayload payload = (PullRequestPayload) event.getPayload();
             context.openPullRequestActivity(getSherlockActivity(), repoOwner, repoName, payload.getNumber());
         }
         
-        else if (title.startsWith("Compare")) {
+        else if (id == MENU_COMPARE) {
             if (repoOwner != null) {
                 PushPayload payload = (PushPayload) event.getPayload();
                 

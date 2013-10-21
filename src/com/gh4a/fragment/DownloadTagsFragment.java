@@ -81,26 +81,18 @@ public class DownloadTagsFragment extends BaseFragment implements OnItemClickLis
     
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, final int position, long id) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(getSherlockActivity(),
-                android.R.style.Theme));
-        builder.setTitle("Download this file?");
-        builder.setMessage("Complete this action using a browser.");
-        builder.setPositiveButton(R.string.ok,
-                new DialogInterface.OnClickListener() {
+        final RepositoryTag tag = (RepositoryTag) mAdapter.getItem(position);
+        AlertDialog.Builder builder = new AlertDialog.Builder(
+                new ContextThemeWrapper(getSherlockActivity(),android.R.style.Theme));
+        builder.setTitle(R.string.download_file_title);
+        builder.setMessage(getString(R.string.download_file_message, tag.getName()));
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.dismiss();
-                RepositoryTag tag = (RepositoryTag) mAdapter.getItem(position);
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(tag.getZipballUrl()));
                 startActivity(browserIntent);
             }
-        })
-        .setNegativeButton(R.string.cancel,
-                new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.dismiss();
-            }
-        })
-       .create();
+        });
+        builder.setNegativeButton(R.string.cancel, null);
         builder.show();
     }
 

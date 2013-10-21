@@ -100,8 +100,8 @@ public class IssueListFragment extends BaseFragment
         
         LayoutInflater vi = getSherlockActivity().getLayoutInflater();
         mLoadingView = (TextView) vi.inflate(R.layout.row_simple, null);
-        mLoadingView.setText("Loading...");
-        mLoadingView.setTextColor(Color.parseColor("#0099cc"));
+        mLoadingView.setText(R.string.loading_msg);
+        mLoadingView.setTextColor(getResources().getColor(R.color.highlight));
         
         mAdapter = new IssueAdapter(getSherlockActivity(), new ArrayList<Issue>());
         mListView.setAdapter(mAdapter);

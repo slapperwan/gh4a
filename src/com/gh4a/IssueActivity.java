@@ -20,6 +20,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Issue;
@@ -155,10 +156,10 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
         TextView tvDescTitle = (TextView) mHeader.findViewById(R.id.desc_title);
         tvDescTitle.setTypeface(getApplicationContext().boldCondensed);
-        tvDescTitle.setTextColor(Color.parseColor("#0099cc"));
+        tvDescTitle.setTextColor(getResources().getColor(R.color.highlight));
         
         tvCommentTitle.setTypeface(getApplicationContext().boldCondensed);
-        tvCommentTitle.setTextColor(Color.parseColor("#0099cc"));
+        tvCommentTitle.setTextColor(getResources().getColor(R.color.highlight));
         tvCommentTitle.setText(getResources().getString(R.string.issue_comments) + " (" + mIssue.getComments() + ")");
         
         TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
@@ -178,11 +179,11 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         tvState.setTextColor(Color.WHITE);
         if ("closed".equals(mIssue.getState())) {
             tvState.setBackgroundResource(R.drawable.default_red_box);
-            tvState.setText("C\nL\nO\nS\nE\nD");
+            tvState.setText(getString(R.string.closed).toUpperCase(Locale.getDefault()));
         }
         else {
             tvState.setBackgroundResource(R.drawable.default_green_box);
-            tvState.setText("O\nP\nE\nN");
+            tvState.setText(getString(R.string.open).toUpperCase(Locale.getDefault()));
         }
         tvTitle.setText(mIssue.getTitle());
         tvTitle.setTypeface(boldCondensed);
@@ -191,7 +192,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         if (mIssue.getAssignee() != null) {
             showInfoBox = true;
             TextView tvAssignee = (TextView) mHeader.findViewById(R.id.tv_assignee);
-            tvAssignee.setText(mIssue.getAssignee().getLogin() + " is assigned");
+            tvAssignee.setText(getString(R.string.issue_assignee, mIssue.getAssignee().getLogin()));
             tvAssignee.setVisibility(View.VISIBLE);
             tvAssignee.setOnClickListener(new OnClickListener() {
                 
@@ -220,7 +221,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         
         if (mIssue.getMilestone() != null) {
             showInfoBox = true;
-            tvMilestone.setText(getResources().getString(R.string.issue_milestone) + ": " + mIssue.getMilestone().getTitle());
+            tvMilestone.setText(getString(R.string.issue_milestone, mIssue.getMilestone().getTitle()));
         }
         else {
             tvMilestone.setVisibility(View.GONE);
@@ -496,7 +497,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
                             false);
                     TextView tvState = (TextView)activity.findViewById(R.id.tv_state);
                     tvState.setBackgroundResource(R.drawable.default_red_box);
-                    tvState.setText("C\nL\nO\nS\nE\nD");
+                    tvState.setText(activity.getString(R.string.closed).toUpperCase(Locale.getDefault()));
                     activity.invalidateOptionsMenu();
                 }
             }
@@ -565,7 +566,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
                             false);
                     TextView tvState = (TextView)activity.findViewById(R.id.tv_state);
                     tvState.setBackgroundResource(R.drawable.default_green_box);
-                    tvState.setText("O\nP\nE\nN");
+                    tvState.setText(activity.getString(R.string.open).toUpperCase(Locale.getDefault()));
                     activity.invalidateOptionsMenu();
                 }
             }

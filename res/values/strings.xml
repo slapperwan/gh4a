@@ -11,11 +11,12 @@
     <string name="more_issue_data">%1$s %2$s</string>
     <string name="more_issue_assignee">Assigned to %1$s</string>
     <string name="more_comment_data">by %1$s %2$s</string>
-    <string name="loading_msg">Loading...</string>
-    <string name="saving_msg">Saving...</string>
-    <string name="deleting_msg">Deleting...</string>
-    <string name="closing_msg">Closing...</string>
-    <string name="opening_msg">Opening...</string>
+    <string name="loading_msg">Loading\u2026</string>
+    <string name="saving_msg">Saving\u2026</string>
+    <string name="deleting_msg">Deleting\u2026</string>
+    <string name="closing_msg">Closing\u2026</string>
+    <string name="opening_msg">Opening\u2026</string>
+    <string name="authenticating">Authenticating\u2026</string>
     <string name="search">Search</string>
     <string name="activity">Activity</string>
     <string name="logout">Logout</string>
@@ -46,6 +47,8 @@
     <string name="view">View</string>
     <string name="readme">Readme</string>
     <string name="ok">@android:string/ok</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
     <string name="sort">Sort</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>
@@ -59,7 +62,42 @@
     <string name="share">Share</string>
     <string name="downloads">Downloads</string>
     <string name="packages">Packages</string>
-    
+    <string name="need_profile_reload">Please reload your profile page by pressing \'Home\' button at the top left for the changes to take effect</string>
+    <string name="login_prompt">Please login</string>
+    <string name="error_toast">An error occured while fetching data</string>
+    <string name="unknown">unknown</string>
+    <string name="history">History</string>
+    <string name="deleted">(deleted)</string>
+    <string name="repo_search_extradata">%1$s  %2$s  %3$d forks  %4$d watchers</string>
+    <string name="milestone_extradata">%1$d open  %2$d closed</string>
+    <string name="milestone_extradata_due">%1$d open  %2$d closed, due on %3$s</string>
+    <string name="download_extradata">%1$s  %2$d downloads  created %3$s</string>
+    <string name="gist_extradata">%1$s  %2$s</string>
+    <string name="go_to">Go to</string>
+    <string name="no_repos_found">No repositories found.</string>
+    <string name="fail_view_diff">Unable to view diff</string>
+    <string name="forked_from">forked from %1$s</string>
+    <string name="enter_username_toast">Please enter your user name instead of your email address</string>
+    <string name="download_file_title">Download this file?</string>
+    <string name="download_file_message">The download of %1$s will be completed using the browser.</string>
+    <string name="menu_user">User %1$s</string>
+    <string name="menu_repo">Repo %1$s</string>
+    <string name="menu_compare">Compare %1$s</string>
+    <string name="menu_commit">Commit %1$s</string>
+    <string name="menu_issue">Issue %1$d</string>
+    <string name="menu_gist">Gist %1$s</string>
+    <string name="menu_file">File %1$s</string>
+    <string name="menu_fork">Forked repo %1$s</string>
+    <string name="menu_wiki">Wiki in browser</string>
+    <string name="menu_pull">Pull request %1$d</string>
+    <string name="menu_issues">Open issues</string>
+    <string name="refresh">Refresh</string>
+    <string name="delete_comment_message">Delete this comment?</string>
+    <string name="please_wait">Please wait</string>
+    <string name="no_more_results">No more results</string>
+    <string name="auth_err_toast">Your API token may be invalid</string>
+    <string name="bookmark_add">Add %1$s</string>
+
     <plurals name="file">
         <item quantity="one">File</item>
         <item quantity="other">Files</item>
@@ -82,7 +120,7 @@
     <string name="event_pull_request_title">%1$s %2$s pull request %3$s on %4$s</string>
     <string name="event_member_title">%1$s added %2$s to %3$s</string>
     <string name="event_download_title">%1$s uploaded a file to %2$s</string>
-    <string name="event_gollum_title">%1$s %2$s %3$s in the %4$s wiki</string>
+    <string name="event_gollum_title">%1$s edited page in the %4$s wiki</string>
     <string name="event_public_title">%1$s open sourced %2$s</string>
     <string name="event_issue_comment">%1$s commented on %2$s %3$s on %4$s</string>
     
@@ -152,7 +190,7 @@
     <string name="repo_homepage">Homepage</string>
     <string name="repo_forks">Forks</string>
     <string name="repo_size">Size</string>
-    <string name="repo_language">Language</string>
+    <string name="repo_language">Language %1$s</string>
     <string name="repo_followers">Followers</string>
     <string name="repo_created_at">Created at</string>
     <string name="repo_pushed_at">Pushed at</string>
@@ -183,7 +221,9 @@
     <string name="repo_collaborators">Collaborators</string>
     <string name="repo_files">Files</string>
     <string name="repo_short">Repos</string>
-    
+    <string name="repo_no_readme">No README file found</string>
+    <string name="repo_issue_on">on %1$s</string>
+
     <!-- Commit -->
     <plurals name="commit">
         <item quantity="one">Commit</item>
@@ -229,6 +269,7 @@
     <string name="issue_error_title">Please enter a title</string>
     <string name="issue_success_create">Successful create issue</string>
     <string name="issue_edit">Edit Issue</string>
+    <string name="issue_edit_title">Edit Issue #%1$d</string>
     <string name="issue_success_edit">Successful edit issue</string>
     <string name="issue_error_edit">Cannot edit issue</string>
     <string name="issue_reopen">Reopen Issue</string>
@@ -243,6 +284,8 @@
     <string name="issue_manage_labels">Manage Labels</string>
     <string name="issue_view_milestones">Milestones</string>
     <string name="issue_manage_milestones">Manage Milestones</string>
+    <string name="issue_milestone_delete_title">Delete %1$s?</string>
+    <string name="issue_milestone_delete_message">Are you sure?</string>
     <string name="issue_success_comment">Successful create comment</string>
     <string name="issue_error_comment">Cannot create comment</string>
     <string name="issue_create_label">New Label</string>
@@ -263,10 +306,10 @@
     <string name="issue_labels">Labels</string>
     <string name="issue_label_name">Label name</string>
     <string name="issue_label_new">New Label</string>
-    <string name="issue_milestone">Milestone</string>
+    <string name="issue_milestone">Milestone: %1$s</string>
     <string name="issue_milestone_new">New Milestone</string>
     <string name="issue_milestone_edit">Edit Milestone</string>
-    <string name="issue_assignee">Assignee</string>
+    <string name="issue_assignee">Assignee: %1$s</string>
     <string name="issues_submitted">Submitted</string>
     <string name="issues_updated">Updated</string>
     <string name="issues_comments">Comments</string>
@@ -281,6 +324,7 @@
     <string name="issue_manage_labels">Manage Labels</string>
     <string name="issue_manage_milestones">Manage Milestones</string>
     <string name="issue_milestone_due_date">Due Date</string>
+    <string name="issue_assignee">%1$s is assigned</string>
 
     <!-- Issue comment -->
     <plurals name="issue_comment">
@@ -310,8 +354,8 @@
     </plurals>
     <string name="gists">Gists</string>
     <string name="gist_public">Public Gist</string>
-    <string name="gist_filename">Gist - %1$s</string>
-    
+    <string name="gist_title">Gist %1$s</string>
+
     <!-- Explore -->
     <string name="explore">Explore</string>
     

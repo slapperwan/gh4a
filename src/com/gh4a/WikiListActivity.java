@@ -179,17 +179,19 @@ public class WikiListActivity extends BaseSherlockFragmentActivity {
 
         @Override
         protected void onPostExecute(List<Feed> result) {
-            if (mTarget.get() != null) {
-                mTarget.get().hideLoading();
+            WikiListActivity activity = mTarget.get();
+            if (activity != null) {
+                activity.hideLoading();
                 if (mWikiNotFound) {
-                    mTarget.get().getApplicationContext().notFoundMessage(mTarget.get(), "Wiki");
+                    activity.getApplicationContext().notFoundMessage(activity,
+                            activity.getString(R.string.recent_wiki));
                 }
                 else if (mException) {
-                    mTarget.get().showError();
+                    activity.showError();
                 }
                 else {
-                    mTarget.get().fillData(result);
-                    mTarget.get().page++;
+                    activity.fillData(result);
+                    activity.page++;
                 }
             }
         }

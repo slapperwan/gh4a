@@ -48,7 +48,7 @@ public class CommitHistoryActivity extends BaseSherlockFragmentActivity
         mRef = getIntent().getExtras().getString(Constants.Object.REF);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("History");
+        actionBar.setTitle(R.string.history);
         actionBar.setSubtitle(mFilePath);
         
         ListView listView = (ListView) findViewById(R.id.list_view);

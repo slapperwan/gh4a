@@ -86,22 +86,15 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity
                     R.style.Theme_Sherlock_Dialog : R.style.Theme_Sherlock_Light_Dialog;
             AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this,
                     dialogTheme));
-            builder.setMessage("Delete this comment?");
-            builder.setPositiveButton(R.string.ok,
-                    new DialogInterface.OnClickListener() {
+            builder.setMessage(R.string.delete_comment_message);
+            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
                     mProgressDialog = showProgressDialog(getResources().getString(R.string.deleting_msg), true);
                     getSupportLoaderManager().initLoader(0, null, EditCommentActivity.this);
                     getSupportLoaderManager().getLoader(0).forceLoad();
                 }
-            })
-            .setNegativeButton(R.string.cancel,
-                    new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    dialog.dismiss();
-                }
-            })
-           .create();
+            });
+            builder.setNegativeButton(R.string.cancel, null);
             
             builder.show();
             return true;

@@ -84,7 +84,8 @@ public class Github4AndroidActivity extends BaseActivity {
                     new LoginTask(Github4AndroidActivity.this).execute();    
                 }
                 else {
-                    Toast.makeText(Github4AndroidActivity.this, "Please enter username instead of email", Toast.LENGTH_LONG).show();
+                    Toast.makeText(Github4AndroidActivity.this,
+                            getString(R.string.enter_username_toast), Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -179,9 +180,11 @@ public class Github4AndroidActivity extends BaseActivity {
          */
         @Override
         protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().mProgressDialog = ProgressDialog.show(mTarget.get(), "Please wait",
-                        "Authenticating...", false, false);
+            Github4AndroidActivity activity = mTarget.get();
+            if (activity != null) {
+                activity.mProgressDialog = ProgressDialog.show(activity,
+                        activity.getString(R.string.please_wait),
+                        activity.getString(R.string.authenticating), false, false);
             }
         }
 

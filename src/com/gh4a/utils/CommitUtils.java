@@ -3,10 +3,14 @@ package com.gh4a.utils;
 import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.RepositoryCommit;
 
+import com.gh4a.R;
+
+import android.content.Context;
+
 public class CommitUtils {
 
     //RepositoryCommit
-    public static String getAuthorName(RepositoryCommit repositoryCommit) {
+    public static String getAuthorName(Context context, RepositoryCommit repositoryCommit) {
         if (repositoryCommit.getAuthor() != null) {
             return repositoryCommit.getAuthor().getLogin();
         }
@@ -14,11 +18,11 @@ public class CommitUtils {
             return repositoryCommit.getCommit().getAuthor().getName();
         }
         else {
-            return "unknown";
+            return context.getString(R.string.unknown);
         }
     }
     
-    public static String getAuthorLogin(RepositoryCommit repositoryCommit) {
+    public static String getAuthorLogin(Context context, RepositoryCommit repositoryCommit) {
         if (repositoryCommit.getAuthor() != null) {
             return repositoryCommit.getAuthor().getLogin();
         }
@@ -27,7 +31,7 @@ public class CommitUtils {
         }
     }
     
-    public static String getCommitterName(RepositoryCommit repositoryCommit) {
+    public static String getCommitterName(Context context, RepositoryCommit repositoryCommit) {
         if (repositoryCommit.getCommitter() != null) {
             return repositoryCommit.getCommitter().getLogin();
         }
@@ -35,11 +39,11 @@ public class CommitUtils {
             return repositoryCommit.getCommit().getCommitter().getName();
         }
         else {
-            return "unknown";
+            return context.getString(R.string.unknown);
         }
     }
     
-    public static String getCommitterLogin(RepositoryCommit repositoryCommit) {
+    public static String getCommitterLogin(Context context, RepositoryCommit repositoryCommit) {
         if (repositoryCommit.getCommitter() != null) {
             return repositoryCommit.getCommitter().getLogin();
         }
@@ -48,7 +52,7 @@ public class CommitUtils {
         }
     }
     
-    public static String getAuthorGravatarId(RepositoryCommit repositoryCommit) {
+    public static String getAuthorGravatarId(Context context, RepositoryCommit repositoryCommit) {
         if (repositoryCommit.getAuthor() != null) {
             return repositoryCommit.getAuthor().getGravatarId();
         }
@@ -61,7 +65,7 @@ public class CommitUtils {
         }
     }
     
-    public static String getCommitterGravatarId(RepositoryCommit repositoryCommit) {
+    public static String getCommitterGravatarId(Context context, RepositoryCommit repositoryCommit) {
         if (repositoryCommit.getCommitter() != null) {
             return repositoryCommit.getCommitter().getGravatarId();
         }
@@ -75,25 +79,25 @@ public class CommitUtils {
     }
     
     //Commit
-    public static String getAuthorName(Commit commit) {
+    public static String getAuthorName(Context context, Commit commit) {
         if (commit.getAuthor() != null) {
             return commit.getAuthor().getName();
         }
         else {
-            return "unknown";
+            return context.getString(R.string.unknown);
         }
     }
     
-    public static String getCommitterName(Commit commit) {
+    public static String getCommitterName(Context context, Commit commit) {
         if (commit.getCommitter() != null) {
             return commit.getCommitter().getName();
         }
         else {
-            return "unknown";
+            return context.getString(R.string.unknown);
         }
     }
     
-    public static String getAuthorEmail(Commit commit) {
+    public static String getAuthorEmail(Context context, Commit commit) {
         if (commit.getAuthor() != null) {
             return commit.getAuthor().getEmail();
         }
@@ -102,7 +106,7 @@ public class CommitUtils {
         }
     }
     
-    public static String getCommitterEmail(Commit commit) {
+    public static String getCommitterEmail(Context context, Commit commit) {
         if (commit.getCommitter() != null) {
             return commit.getCommitter().getEmail();
         }

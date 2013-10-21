@@ -69,7 +69,7 @@ public class RepositoryAdapter extends RootAdapter<Repository> {
         if (repository != null) {
 
             if (viewHolder.tvTitle != null) {
-                viewHolder.tvTitle.setText(repository.getOwner().getLogin() + " / " + repository.getName());
+                viewHolder.tvTitle.setText(repository.getOwner().getLogin() + "/" + repository.getName());
             }
 
             if (viewHolder.tvDesc != null) {
@@ -83,14 +83,11 @@ public class RepositoryAdapter extends RootAdapter<Repository> {
             }
 
             if (viewHolder.tvExtra != null) {
-                String extraData = (repository.getLanguage() != null ? repository.getLanguage()
-                        + "   " : "")
-                        + StringUtils.toHumanReadbleFormat(repository.getSize())
-                        + "   "
-                        + repository.getForks()
-                        + " " + mContext.getResources().getString(R.string.repo_forks).toLowerCase() + "   "
-                        + repository.getWatchers()
-                        + " " + mContext.getResources().getString(R.string.repo_stargazers).toLowerCase();
+                String language = repository.getLanguage() != null
+                        ? repository.getLanguage() : mContext.getString(R.string.unknown);
+                String extraData = mContext.getString(R.string.repo_search_extradata, language,
+                        StringUtils.toHumanReadbleFormat(repository.getSize()),
+                        repository.getForks(), repository.getWatchers());
                 viewHolder.tvExtra.setText(extraData);
             }
         }

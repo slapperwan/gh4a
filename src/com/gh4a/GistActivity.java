@@ -26,7 +26,6 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.GistService;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -62,7 +61,7 @@ public class GistActivity extends BaseSherlockFragmentActivity {
         setContentView(R.layout.gist);
         
         ActionBar mActionBar = getSupportActionBar();
-        mActionBar.setTitle(getResources().getQuantityString(R.plurals.gist, 1) + " " + mGistId);
+        mActionBar.setTitle(getString(R.string.gist_title, mGistId));
         mActionBar.setSubtitle(mUserLogin);
         mActionBar.setDisplayHomeAsUpEnabled(true);
         
@@ -142,7 +141,7 @@ public class GistActivity extends BaseSherlockFragmentActivity {
                 SpannableString content = new SpannableString(gistFile.getFilename());
                 content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
                 tvFilename.setText(content);
-                tvFilename.setTextColor(Color.parseColor("#0099cc"));
+                tvFilename.setTextColor(getResources().getColor(R.color.highlight));
                 tvFilename.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
                 tvFilename.setTextAppearance(this, android.R.attr.textAppearanceMedium);
                 tvFilename.setPadding(0, 8, 0, 8);

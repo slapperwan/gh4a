@@ -16,7 +16,7 @@ public class AppPreferenceActivity extends PreferenceActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event)  {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-            Toast.makeText(this, "Please reload your profile page by pressing \'Home\' button at the top left for the changes to take effect", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.need_profile_reload), Toast.LENGTH_LONG).show();
             finish();
             return true;
         }

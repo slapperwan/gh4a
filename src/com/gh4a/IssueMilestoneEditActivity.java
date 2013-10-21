@@ -192,8 +192,8 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
         } else if (itemId == R.id.delete) {
             AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(IssueMilestoneEditActivity.this,
                     android.R.style.Theme));
-            builder.setTitle("Delete " + mMilestone.getTitle() + "?");
-            builder.setMessage("Are you sure?");
+            builder.setTitle(getString(R.string.issue_milestone_delete_title, mMilestone.getTitle()));
+            builder.setMessage(R.string.issue_milestone_delete_message);
             builder.setPositiveButton(R.string.ok,
                     new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
@@ -280,41 +280,32 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
     }
 
     public void showDatePickerDialog(View v) {
-        DialogFragment newFragment = new DatePickerFragment(this);
+        DialogFragment newFragment = new DatePickerFragment();
         newFragment.show(getSupportFragmentManager(), "datePicker");
     }
     
     public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
-
-        private WeakReference<IssueMilestoneEditActivity> mTarget;
-        
-        public DatePickerFragment(IssueMilestoneEditActivity activity) {
-            mTarget = new WeakReference<IssueMilestoneEditActivity>(activity);
-        }
-        
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final IssueMilestoneEditActivity activity = (IssueMilestoneEditActivity) getActivity();
             final Calendar c = Calendar.getInstance();
             
             int year = c.get(Calendar.YEAR);
             int month = c.get(Calendar.MONTH);
             int day = c.get(Calendar.DAY_OF_MONTH);
             
-            if (mTarget != null) {
-                if (mTarget.get().mMilestone.getDueOn() != null) {
-                    c.setTime(mTarget.get().mMilestone.getDueOn());
-                    year = c.get(Calendar.YEAR);
-                    month = c.get(Calendar.MONTH);
-                    day = c.get(Calendar.DAY_OF_MONTH);
-                }
+            if (activity.mMilestone.getDueOn() != null) {
+                c.setTime(activity.mMilestone.getDueOn());
+                year = c.get(Calendar.YEAR);
+                month = c.get(Calendar.MONTH);
+                day = c.get(Calendar.DAY_OF_MONTH);
             }
-            return new DatePickerDialog(getActivity(), this, year, month, day);
+            return new DatePickerDialog(activity, this, year, month, day);
         }
         
         public void onDateSet(DatePicker view, int year, int month, int day) {
-            if (mTarget != null) {
-                mTarget.get().setDueOn(year, month, day);
-            }
+            final IssueMilestoneEditActivity activity = (IssueMilestoneEditActivity) getActivity();
+            activity.setDueOn(year, month, day);
         }
     }
     

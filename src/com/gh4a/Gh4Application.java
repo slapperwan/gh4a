@@ -412,7 +412,7 @@ public class Gh4Application extends Application {
      */
     public void notFoundMessage(Context context, String object) {
         Resources res = context.getResources();
-        Toast.makeText(context, String.format(res.getString(R.string.record_not_found), object),
+        Toast.makeText(context, res.getString(R.string.record_not_found, object),
                 Toast.LENGTH_SHORT).show();
     }
     

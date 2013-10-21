@@ -81,27 +81,19 @@ public class DownloadBranchesFragment extends BaseFragment implements OnItemClic
     
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, final int position, long id) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(getSherlockActivity(),
-                android.R.style.Theme));
-        builder.setTitle("Download this file?");
-        builder.setMessage("Complete this action using a browser.");
-        builder.setPositiveButton(R.string.ok,
-                new DialogInterface.OnClickListener() {
+        final RepositoryBranch branch = (RepositoryBranch) mAdapter.getItem(position);
+        AlertDialog.Builder builder = new AlertDialog.Builder(
+                new ContextThemeWrapper(getSherlockActivity(), android.R.style.Theme));
+        builder.setTitle(R.string.download_file_title);
+        builder.setMessage(getString(R.string.download_file_message, branch.getName()));
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.dismiss();
-                RepositoryBranch branch = (RepositoryBranch) mAdapter.getItem(position);
                 String url = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/zipball/" + branch.getName();
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 startActivity(browserIntent);
             }
-        })
-        .setNegativeButton(R.string.cancel,
-                new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.dismiss();
-            }
-        })
-       .create();
+        });
+        builder.setNegativeButton(R.string.cancel, null);
         builder.show();
     }
 

@@ -68,11 +68,11 @@ public class DownloadAdapter extends RootAdapter<Download> {
             }
 
             long now = System.currentTimeMillis();
-            
-            String extraData = Formatter.formatFileSize(mContext, download.getSize())
-                    + "  " + download.getDownloadCount() + " downloads"
-                    + "  " + DateUtils.getRelativeTimeSpanString(download.getCreatedAt().getTime(), now,
-                                MINUTE_IN_MILLIS, FORMAT_SHOW_DATE | FORMAT_SHOW_YEAR | FORMAT_NUMERIC_DATE);
+            String extraData = mContext.getString(R.string.download_extradata,
+                    Formatter.formatFileSize(mContext, download.getSize()),
+                    download.getDownloadCount(),
+                    DateUtils.getRelativeTimeSpanString(download.getCreatedAt().getTime(), now,
+                            MINUTE_IN_MILLIS, FORMAT_SHOW_DATE | FORMAT_SHOW_YEAR | FORMAT_NUMERIC_DATE));
             viewHolder.tvExtra.setText(extraData);
         }
         return v;

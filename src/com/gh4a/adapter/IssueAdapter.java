@@ -162,7 +162,8 @@ public class IssueAdapter extends RootAdapter<Issue> {
             
             if (issue.getMilestone() != null) {
                 viewHolder.tvMilestone.setVisibility(View.VISIBLE);
-                viewHolder.tvMilestone.setText("Milestone : " + issue.getMilestone().getTitle());
+                viewHolder.tvMilestone.setText(mContext.getString(R.string.issue_milestone,
+                        issue.getMilestone().getTitle()));
             }
             else {
                 viewHolder.tvMilestone.setVisibility(View.GONE);

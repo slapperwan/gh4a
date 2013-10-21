@@ -206,7 +206,7 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
                     startActivity(intent);
                 }
                 else {
-                    showMessage("Please login", false);
+                    showMessage(getString(R.string.login_prompt), false);
                 }
             }
         });
@@ -248,7 +248,7 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
                     startActivity(intent);
                 }
                 else {
-                    showMessage("Please login", false);
+                    showMessage(getString(R.string.login_prompt), false);
                 }
             }
         });
@@ -358,10 +358,7 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
      * Show error.
      */
     public void showError() {
-        Toast
-                .makeText(getApplication(), "An error occured while fetching data",
-                        Toast.LENGTH_SHORT).show();
-        //super.finish();
+        showError(false);
     }
 
     /**
@@ -370,18 +367,11 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
      * @param finishThisActivity the finish this activity
      */
     public void showError(boolean finishThisActivity) {
-        Toast
-                .makeText(getApplication(), "An error occured while fetching data",
-                        Toast.LENGTH_SHORT).show();
-        if (finishThisActivity) {
-            super.finish();
-        }
+        showMessage(getString(R.string.error_toast), finishThisActivity);
     }
     
     public void showMessage(String message, boolean finishThisActivity) {
-        Toast
-                .makeText(getApplication(), message,
-                        Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplication(), message, Toast.LENGTH_SHORT).show();
         if (finishThisActivity) {
             super.finish();
         }

@@ -39,7 +39,7 @@ public class BookmarkAdapter extends RootAdapter<Bookmark> {
             ImageView buttonAdd = (ImageView) v.findViewById(R.id.iv_add);
             if (position == 0) {
                 if (!mHideAdd) {
-                    tvFormattedName.setText("Add " + bookmark.getName());
+                    tvFormattedName.setText(mContext.getString(R.string.bookmark_add, bookmark.getName()));
                     tvFormattedName.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
                     tvFormattedName.setTypeface(Typeface.DEFAULT_BOLD);
                     LinearLayout.LayoutParams para = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT );

@@ -169,7 +169,10 @@ public class BaseActivity extends SherlockActivity {
             
             @Override
             public void onClick(View arg0) {
-                sendEmail();
+                Intent sendIntent = new Intent(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[] { getString(R.string.my_email) });
+                sendIntent.setType("message/rfc822");
+                startActivity(Intent.createChooser(sendIntent, getString(R.string.send_email_title)));
             }
         });
         
@@ -185,7 +188,7 @@ public class BaseActivity extends SherlockActivity {
                     startActivity(intent);
                 }
                 else {
-                    showMessage("Please login", false);
+                    showMessage(getString(R.string.login_prompt), false);
                 }
             }
         });
@@ -193,48 +196,6 @@ public class BaseActivity extends SherlockActivity {
         dialog.show();
     }
     
-    public void openFeedbackDialog() {
-        Dialog dialog = new Dialog(this);
-
-        dialog.setContentView(R.layout.feedback_dialog);
-        dialog.setTitle(getResources().getString(R.string.feedback));
-        
-        Button btnByEmail = (Button) dialog.findViewById(R.id.btn_by_email);
-        btnByEmail.setOnClickListener(new OnClickListener() {
-            
-            @Override
-            public void onClick(View arg0) {
-                sendEmail();
-            }
-        });
-        
-        Button btnByGh4a = (Button) dialog.findViewById(R.id.btn_by_gh4a);
-        btnByGh4a.setOnClickListener(new OnClickListener() {
-            
-            @Override
-            public void onClick(View arg0) {
-                if (isAuthorized()) {
-                    Intent intent = new Intent().setClass(BaseActivity.this, IssueCreateActivity.class);
-                    intent.putExtra(Constants.Repository.REPO_OWNER, getResources().getString(R.string.my_username));
-                    intent.putExtra(Constants.Repository.REPO_NAME, getResources().getString(R.string.my_repo));
-                    startActivity(intent);
-                }
-                else {
-                    showMessage("Please login", false);
-                }
-            }
-        });
-        
-        dialog.show();
-    }
-
-    private void sendEmail() {
-        Intent sendIntent = new Intent(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[] { getString(R.string.my_email) });
-        sendIntent.setType("message/rfc822");
-        startActivity(Intent.createChooser(sendIntent, getString(R.string.send_email_title)));
-    }
-
     public void openDonateDialog() {
         Dialog dialog = new Dialog(this);
         dialog.setTitle(getResources().getString(R.string.donate));
@@ -360,10 +321,7 @@ public class BaseActivity extends SherlockActivity {
      * Show error.
      */
     public void showError() {
-        Toast
-                .makeText(getApplication(), "An error occured while fetching data",
-                        Toast.LENGTH_SHORT).show();
-        //super.finish();
+        showError(false);
     }
 
     /**
@@ -372,18 +330,11 @@ public class BaseActivity extends SherlockActivity {
      * @param finishThisActivity the finish this activity
      */
     public void showError(boolean finishThisActivity) {
-        Toast
-                .makeText(getApplication(), "An error occured while fetching data",
-                        Toast.LENGTH_SHORT).show();
-        if (finishThisActivity) {
-            super.finish();
-        }
+        showMessage(getString(R.string.error_toast), finishThisActivity);
     }
     
     public void showMessage(String message, boolean finishThisActivity) {
-        Toast
-                .makeText(getApplication(), message,
-                        Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplication(), message, Toast.LENGTH_SHORT).show();
         if (finishThisActivity) {
             super.finish();
         }

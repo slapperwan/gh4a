@@ -13,4 +13,6 @@
 
     <color name="link">@android:color/transparent</color>
     <color name="link_active">#FD9B00</color>
+
+    <color name="highlight">#0099cc</color>
 </resources>

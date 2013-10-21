@@ -87,13 +87,17 @@ public class MilestoneAdapter extends RootAdapter<Milestone> {
             }
 
             if (viewHolder.tvExtra != null) {
-                String extraData = milestone.getClosedIssues() + " closed"
-                        + "   " + milestone.getOpenIssues() + " open ";
-                
+                String extraData;
                 if (milestone.getDueOn() != null) {
                     SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
-                    extraData += "  Due on " + sdf.format(milestone.getDueOn());
+                    extraData = mContext.getString(R.string.milestone_extradata_due,
+                            milestone.getClosedIssues(), milestone.getOpenIssues(),
+                            sdf.format(milestone.getDueOn()));
+                } else {
+                    extraData = mContext.getString(R.string.milestone_extradata,
+                            milestone.getClosedIssues(), milestone.getOpenIssues());
                 }
+
                 viewHolder.tvExtra.setText(extraData);
             }
         }

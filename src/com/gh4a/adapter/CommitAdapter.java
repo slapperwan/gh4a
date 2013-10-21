@@ -77,7 +77,8 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
         if (commit != null) {
             
             aq.recycle(convertView);
-            aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(CommitUtils.getAuthorGravatarId(commit)), 
+            aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(
+                    CommitUtils.getAuthorGravatarId(mContext, commit)),
                     true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
             
             viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
@@ -85,11 +86,11 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
                 @Override
                 public void onClick(View v) {
                     /** Open user activity */
-                    if (CommitUtils.getAuthorLogin(commit) != null) {
-                        Gh4Application context = (Gh4Application) v.getContext()
-                                .getApplicationContext();
-                        context.openUserInfoActivity(v.getContext(), CommitUtils.getAuthorLogin(commit),
-                                null);
+                    Gh4Application context = (Gh4Application)
+                            v.getContext().getApplicationContext();
+                    if (CommitUtils.getAuthorLogin(context, commit) != null) {
+                        context.openUserInfoActivity(context,
+                                CommitUtils.getAuthorLogin(context, commit), null);
                     }
                 }
             });
@@ -99,7 +100,7 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
 
             Resources res = v.getResources();
             String extraData = String.format(res.getString(R.string.more_commit_data),
-                    CommitUtils.getAuthorName(commit), 
+                    CommitUtils.getAuthorName(mContext, commit),
                     Gh4Application.pt.format(commit.getCommit().getAuthor().getDate()));
 
             viewHolder.tvExtra.setText(extraData);

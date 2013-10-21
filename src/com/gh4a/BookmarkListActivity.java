@@ -88,14 +88,14 @@ public class BookmarkListActivity extends BaseActivity {
                     builder.setIcon(android.R.drawable.ic_dialog_alert);
                     builder.setMessage(R.string.remove_bookmark_confirm)
                            .setCancelable(false)
-                           .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                           .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                                public void onClick(DialogInterface dialog, int id) {
                                    dialog.dismiss();
                                    db.deleteBookmark(b.getId());
                                    fillData();
                                }
                            })
-                           .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                           .setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
                                public void onClick(DialogInterface dialog, int id) {
                                     dialog.cancel();
                                }

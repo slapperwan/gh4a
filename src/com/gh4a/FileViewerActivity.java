@@ -126,8 +126,8 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
             menu.removeItem(R.id.search);
         }
 
-        menu.add(0, 10, Menu.NONE, "History")
-            .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        menu.add(0, 10, Menu.NONE, getString(R.string.history))
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
         
         return super.onCreateOptionsMenu(menu);
     }

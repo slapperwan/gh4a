@@ -16,6 +16,7 @@
 package com.gh4a.adapter;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.GollumPage;
@@ -192,7 +193,7 @@ public class FeedAdapter extends RootAdapter<Event> {
                                 R.style.default_text_small_url), 0, spannableSha.length(), 0);
                     }
                     else {
-                        spannableSha = new SpannableString("(deleted)");
+                        spannableSha = new SpannableString(mContext.getString(R.string.deleted));
                     }
                     
                     TextView tvCommitMsg = new TextView(baseView.getContext());
@@ -426,10 +427,11 @@ public class FeedAdapter extends RootAdapter<Event> {
                 login = payload.getGist().getUser().getLogin(); 
             }
             
+            String id = payload.getGist() != null
+                    ? payload.getGist().getId() : mContext.getString(R.string.deleted);
             String text = String.format(res.getString(R.string.event_gist_title),
-                    !StringUtils.isBlank(login) ? login : "Unknown",
-                    payload.getAction(), 
-                    payload.getGist() != null ? payload.getGist().getId() : "(deleted)");
+                    !StringUtils.isBlank(login) ? login : mContext.getString(R.string.unknown),
+                    payload.getAction(), id);
             return text;
         }
 
@@ -522,8 +524,7 @@ public class FeedAdapter extends RootAdapter<Event> {
         /** GollumEvent */
         else if (Event.TYPE_GOLLUM.equals(eventType)) {
             String text = String.format(res.getString(R.string.event_gollum_title),
-                    actor.getLogin(), "edited", "page",
-                    formatFromRepoName(eventRepo));
+                    actor.getLogin(), formatFromRepoName(eventRepo));
             return text;
         }
 
@@ -537,11 +538,12 @@ public class FeedAdapter extends RootAdapter<Event> {
         /** IssueCommentEvent */
         else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
             IssueCommentPayload payload = (IssueCommentPayload) event.getPayload();
-            String type = mContext.getResources().getString(R.string.issue).toLowerCase();
+            String type = mContext.getResources().getString(R.string.issue).toLowerCase(Locale.getDefault());
             if (payload.getIssue() != null) {
                 if (payload.getIssue().getPullRequest() != null
                         && payload.getIssue().getPullRequest().getHtmlUrl() != null) {
-                    type = mContext.getResources().getString(R.string.pull_request_title).toLowerCase();
+                    type = mContext.getResources().getString(
+                            R.string.pull_request_title).toLowerCase(Locale.getDefault());
                 }
                 
                 String text = String.format(res.getString(R.string.event_issue_comment),
@@ -593,18 +595,18 @@ public class FeedAdapter extends RootAdapter<Event> {
         }
     }
     
-    private static String formatFromRepoName(EventRepository repository) {
+    private String formatFromRepoName(EventRepository repository) {
         if (repository != null) {
             return repository.getName();
         }
-        return "(deleted)";
+        return mContext.getString(R.string.deleted);
     }
 
-    private static String formatToRepoName(Repository repository) {
+    private String formatToRepoName(Repository repository) {
         if (repository != null && repository.getOwner() != null) {
             return repository.getOwner().getLogin() + "/" + repository.getName();
         }
-        return "(deleted)";
+        return mContext.getString(R.string.deleted);
     }
     
     /**

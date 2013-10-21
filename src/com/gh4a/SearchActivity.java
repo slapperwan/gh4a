@@ -214,7 +214,7 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
             return null;
         }
 
-        if (language == null || "Any Language".equals(language)) {
+        if (language == null || getResources().getStringArray(R.array.languages_array)[0].equals(language)) {
             return repoService.searchRepositories(searchKey, 1);
         }
         else {
@@ -320,20 +320,20 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
             ListAdapter listAdapter = mListViewResults.getAdapter();
             Object object = listAdapter.getItem(info.position);
-            menu.setHeaderTitle("Go to");
+            menu.setHeaderTitle(R.string.go_to);
 
             /** Menu for user */
             if (object instanceof SearchUser) {
                 SearchUser user = (SearchUser) object;
-                menu.add("User " + user.getLogin()
-                        + (!StringUtils.isBlank(user.getName()) ? " - " + user.getName() : ""));
+                menu.add(getString(R.string.menu_user, user.getLogin()
+                        + (!StringUtils.isBlank(user.getName()) ? " - " + user.getName() : "")));
             }
 
             /** Menu for repository */
             else {
                 SearchRepository repository = (SearchRepository) object;
-                menu.add("User " + repository.getOwner());
-                menu.add("Repo " + repository.getName());
+                menu.add(getString(R.string.menu_user, repository.getOwner()));
+                menu.add(getString(R.string.menu_repo, repository.getName()));
             }
         }
         super.onCreateContextMenu(menu, v, menuInfo);

@@ -82,10 +82,11 @@ public class GistAdapter  extends RootAdapter<Gist> {
                 viewHolder.tvDesc.setText(gist.getDescription());
                 viewHolder.tvDesc.setVisibility(View.VISIBLE);
             }
-            viewHolder.tvExtra.setText(pt.format(gist.getCreatedAt())
-                    + "  "
-                    + gist.getFiles().size()
-                    + " " + v.getResources().getQuantityString(R.plurals.file, gist.getFiles().size()));
+
+            String count = v.getResources().getQuantityString(R.plurals.file,
+                    gist.getFiles().size(), gist.getFiles().size());
+            viewHolder.tvExtra.setText(mContext.getString(R.string.gist_extradata,
+                    pt.format(gist.getCreatedAt()), count));
         }
         return v;
     }

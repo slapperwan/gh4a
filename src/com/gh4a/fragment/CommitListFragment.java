@@ -26,7 +26,6 @@ import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.CommitService;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -98,8 +97,8 @@ public class CommitListFragment extends BaseFragment
         
         LayoutInflater vi = getSherlockActivity().getLayoutInflater();
         mLoadingView = (TextView) vi.inflate(R.layout.row_simple, null);
-        mLoadingView.setText("Loading...");
-        mLoadingView.setTextColor(Color.parseColor("#0099cc"));
+        mLoadingView.setText(R.string.loading_msg);
+        mLoadingView.setTextColor(getResources().getColor(R.color.highlight));
         
         mAdapter = new CommitAdapter(getSherlockActivity(), new ArrayList<RepositoryCommit>());
         mListView.setAdapter(mAdapter);

@@ -159,7 +159,8 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> {
             
             viewHolder.tvComments.setText(String.valueOf(issue.getComments()));
             
-            viewHolder.tvRepo.setText("on " + issue.getRepository().getOwner().getLogin() + "/" + issue.getRepository().getName());
+            viewHolder.tvRepo.setText(mContext.getString(R.string.repo_issue_on,
+                    issue.getRepository().getOwner().getLogin() + "/" + issue.getRepository().getName()));
             
             if (issue.getMilestone() != null) {
                 viewHolder.tvMilestone.setVisibility(View.VISIBLE);

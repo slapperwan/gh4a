@@ -183,7 +183,7 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
     public boolean onPrepareOptionsMenu(Menu menu) {
         menu.clear();
         if (mExploreItem == 0) {
-            menu.add(0, R.id.refresh, 0, "Refresh")
+            menu.add(0, R.id.refresh, 0, getString(R.string.refresh))
                 .setIcon(Gh4Application.THEME != R.style.LightTheme ? 
                         R.drawable.navigation_refresh_dark : R.drawable.navigation_refresh)
                 .setShowAsAction(com.actionbarsherlock.view.MenuItem.SHOW_AS_ACTION_ALWAYS);

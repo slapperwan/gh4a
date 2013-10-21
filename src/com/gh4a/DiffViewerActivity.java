@@ -88,7 +88,7 @@ public class DiffViewerActivity extends BaseActivity {
                 mWebView.loadDataWithBaseURL("file:///android_asset/", formatted, "text/html", "utf-8", "");
             }
             else {
-                Toast.makeText(this, "Unable to view diff.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.fail_view_diff), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -128,10 +128,10 @@ public class DiffViewerActivity extends BaseActivity {
         inflater.inflate(R.menu.download_menu, menu);
         
         if (Gh4Application.THEME != R.style.LightTheme) {
-            menu.getItem(0).setIcon(R.drawable.download_dark);
-            menu.getItem(1).setIcon(R.drawable.web_site_dark);
-            menu.getItem(2).setIcon(R.drawable.action_search_dark);
-            menu.getItem(3).setIcon(R.drawable.social_share_dark);
+            menu.findItem(R.id.download).setIcon(R.drawable.download_dark);
+            menu.findItem(R.id.browser).setIcon(R.drawable.web_site_dark);
+            menu.findItem(R.id.search).setIcon(R.drawable.action_search_dark);
+            menu.findItem(R.id.share).setIcon(R.drawable.social_share_dark);
         }
         
         menu.removeItem(R.id.download);
@@ -139,8 +139,8 @@ public class DiffViewerActivity extends BaseActivity {
             menu.removeItem(R.id.search);
         }
         
-        menu.add(0, 10, Menu.NONE, "View file @" + mSha.substring(0, 7))
-            .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        menu.add(0, 10, Menu.NONE, getString(R.string.object_view_file_at, mSha.substring(0, 7)))
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
         
         return super.onCreateOptionsMenu(menu);
     }
