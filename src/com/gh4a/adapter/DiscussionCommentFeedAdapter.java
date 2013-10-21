@@ -15,11 +15,11 @@
  */
 package com.gh4a.adapter;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import android.content.Context;
 import android.text.Html;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,8 +31,6 @@ import com.gh4a.holder.Feed;
 
 public class DiscussionCommentFeedAdapter extends RootAdapter<Feed> {
 
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
-    
     public DiscussionCommentFeedAdapter(Context context, List<Feed> objects) {
         super(context, objects);
     }
@@ -63,7 +61,8 @@ public class DiscussionCommentFeedAdapter extends RootAdapter<Feed> {
             viewHolder.tvDesc.setText(Html.fromHtml(feed.getContent()));
             
             viewHolder.tvExtra.setText(feed.getAuthor() 
-                    +  (feed.getPublished() != null ? " | " + sdf.format(feed.getPublished()) : ""));
+                    +  (feed.getPublished() != null ? " | "
+                    + DateFormat.getMediumDateFormat(mContext).format(feed.getPublished()) : ""));
         }
         return v;
     }

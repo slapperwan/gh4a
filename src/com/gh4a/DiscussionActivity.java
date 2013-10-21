@@ -21,7 +21,6 @@ import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -35,6 +34,7 @@ import org.xml.sax.SAXException;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
@@ -219,11 +219,9 @@ public class DiscussionActivity extends BaseActivity {
  
         });
 
-        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
-        
         Feed feed = result.get(0);
         tvLogin.setText(feed.getAuthor());
-        tvCreateAt.setText(sdf.format(feed.getPublished()));
+        tvCreateAt.setText(DateFormat.getMediumDateFormat(this).format(feed.getPublished()));
         tvTitle.setText(feed.getTitle());
         tvDesc.setText(Html.fromHtml(feed.getContent()));
         

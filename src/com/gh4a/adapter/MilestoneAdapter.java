@@ -15,7 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Milestone;
@@ -23,6 +22,7 @@ import org.eclipse.egit.github.core.Milestone;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.text.TextUtils.TruncateAt;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,10 +89,9 @@ public class MilestoneAdapter extends RootAdapter<Milestone> {
             if (viewHolder.tvExtra != null) {
                 String extraData;
                 if (milestone.getDueOn() != null) {
-                    SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
                     extraData = mContext.getString(R.string.milestone_extradata_due,
                             milestone.getClosedIssues(), milestone.getOpenIssues(),
-                            sdf.format(milestone.getDueOn()));
+                            DateFormat.getMediumDateFormat(mContext).format(milestone.getDueOn()));
                 } else {
                     extraData = mContext.getString(R.string.milestone_extradata,
                             milestone.getClosedIssues(), milestone.getOpenIssues());

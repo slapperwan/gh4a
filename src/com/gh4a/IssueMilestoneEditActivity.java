@@ -17,7 +17,6 @@ package com.gh4a;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 
@@ -37,6 +36,7 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.View;
@@ -274,8 +274,7 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
         tvDesc.setText(mMilestone.getDescription());
         
         if (mMilestone.getDueOn() != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
-            etDueDate.setText(sdf.format(mMilestone.getDueOn()));
+            etDueDate.setText(DateFormat.getMediumDateFormat(this).format(mMilestone.getDueOn()));
         }
     }
 
@@ -321,8 +320,7 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
         mMilestone.setDueOn(cal.getTime());
         
         EditText etDueDate = (EditText) findViewById(R.id.et_due_date);
-        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
-        etDueDate.setText(sdf.format(mMilestone.getDueOn()));
+        etDueDate.setText(DateFormat.getMediumDateFormat(this).format(mMilestone.getDueOn()));
     }
     
     @Override
