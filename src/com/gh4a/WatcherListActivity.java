@@ -18,13 +18,9 @@ package com.gh4a;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.Tab;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.fragment.ForkListFragment;
 import com.gh4a.fragment.StargazerListFragment;
@@ -34,11 +30,6 @@ public class WatcherListActivity extends BaseSherlockFragmentActivity  {
 
     private String mRepoOwner;
     private String mRepoName;
-    private ThisPageAdapter mAdapter;
-    private ViewPager mPager;
-    private ActionBar mActionBar;
-    private int tabCount;
-    private int mPos;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,7 +39,6 @@ public class WatcherListActivity extends BaseSherlockFragmentActivity  {
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
-        mPos = data.getInt("pos");
         
         if (!isOnline()) {
             setErrorView();
@@ -57,51 +47,14 @@ public class WatcherListActivity extends BaseSherlockFragmentActivity  {
         
         setContentView(R.layout.view_pager);
         
-        tabCount = 3;
-        
-        mActionBar = getSupportActionBar();
-        mAdapter = new ThisPageAdapter(getSupportFragmentManager());
-        mPager = (ViewPager) findViewById(R.id.pager);
-        mPager.setAdapter(mAdapter);
-        
-        mPager.setOnPageChangeListener(new OnPageChangeListener() {
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(mRepoOwner + "/" + mRepoName);
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
-            @Override
-            public void onPageScrollStateChanged(int arg0) {}
-            
-            @Override
-            public void onPageScrolled(int arg0, float arg1, int arg2) {}
-
-            @Override
-            public void onPageSelected(int position) {
-                mActionBar.setSelectedNavigationItem(position);
-            }
+        setupPager(new ThisPageAdapter(getSupportFragmentManager()), new int[] {
+            R.string.repo_stargazers, R.string.repo_watchers, R.string.repo_forks
         });
-        
-        mActionBar.setTitle(mRepoOwner + "/" + mRepoName);
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        mActionBar.setDisplayHomeAsUpEnabled(true);
-        
-        Tab tab = mActionBar
-                .newTab()
-                .setText(R.string.repo_stargazers)
-                .setTabListener(
-                        new TabListener<SherlockFragmentActivity>(this, 0 + "", mPager));
-        mActionBar.addTab(tab, mPos == 0);
-        
-        tab = mActionBar
-                .newTab()
-                .setText(R.string.repo_watchers)
-                .setTabListener(
-                        new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
-        mActionBar.addTab(tab, mPos == 1);
-        
-        tab = mActionBar
-                .newTab()
-                .setText(R.string.repo_forks)
-                .setTabListener(
-                        new TabListener<SherlockFragmentActivity>(this, 2 + "", mPager));
-        mActionBar.addTab(tab, mPos == 2);
+        actionBar.selectTab(actionBar.getTabAt(data.getInt("pos")));
     }
 
     public class ThisPageAdapter extends FragmentStatePagerAdapter {
@@ -112,7 +65,7 @@ public class WatcherListActivity extends BaseSherlockFragmentActivity  {
 
         @Override
         public int getCount() {
-            return tabCount;
+            return 3;
         }
 
         @Override

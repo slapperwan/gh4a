@@ -19,13 +19,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.Tab;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.fragment.PullRequestListFragment;
 
@@ -33,10 +29,6 @@ public class PullRequestListActivity extends BaseSherlockFragmentActivity {
 
     private String mRepoOwner;
     private String mRepoName;
-    private ThisPageAdapter mAdapter;
-    private ViewPager mPager;
-    private ActionBar mActionBar;
-    private int tabCount;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,47 +45,14 @@ public class PullRequestListActivity extends BaseSherlockFragmentActivity {
         
         setContentView(R.layout.view_pager);
 
-        mActionBar = getSupportActionBar();
-        mActionBar.setTitle(R.string.pull_requests);
-        mActionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        mActionBar.setDisplayHomeAsUpEnabled(true);
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        
-        mAdapter = new ThisPageAdapter(getSupportFragmentManager());
-        mPager = (ViewPager) findViewById(R.id.pager);
-        mPager.setAdapter(mAdapter);
-        
-        mPager.setOnPageChangeListener(new OnPageChangeListener() {
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(R.string.pull_requests);
+        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
-            @Override
-            public void onPageScrollStateChanged(int arg0) {}
-            
-            @Override
-            public void onPageScrolled(int arg0, float arg1, int arg2) {}
-
-            @Override
-            public void onPageSelected(int position) {
-                mActionBar.setSelectedNavigationItem(position);
-            }
+        setupPager(new ThisPageAdapter(getSupportFragmentManager()), new int[] {
+            R.string.open, R.string.closed
         });
-        
-        tabCount = 2;
-        
-        Tab tab = mActionBar
-                .newTab()
-                .setText(R.string.open)
-                .setTabListener(
-                        new TabListener<SherlockFragmentActivity>(this, 0 + "", mPager));
-        mActionBar.addTab(tab);
-        
-        if (tabCount == 2) {
-            tab = mActionBar
-                    .newTab()
-                    .setText(R.string.closed)
-                    .setTabListener(
-                            new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
-            mActionBar.addTab(tab);
-        }
     }
     
     public class ThisPageAdapter extends FragmentStatePagerAdapter {
@@ -104,17 +63,13 @@ public class PullRequestListActivity extends BaseSherlockFragmentActivity {
 
         @Override
         public int getCount() {
-            return tabCount;
+            return 2;
         }
 
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
-            if (position == 1) {
-                return PullRequestListFragment.newInstance(mRepoOwner, mRepoName, Constants.Issue.ISSUE_STATE_CLOSED);
-            }
-            else {
-                return PullRequestListFragment.newInstance(mRepoOwner, mRepoName, Constants.Issue.ISSUE_STATE_OPEN);
-            }
+            return PullRequestListFragment.newInstance(mRepoOwner, mRepoName,
+                    position == 1 ? Constants.Issue.ISSUE_STATE_CLOSED : Constants.Issue.ISSUE_STATE_OPEN);
         }
         
         @Override

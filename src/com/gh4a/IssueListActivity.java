@@ -24,6 +24,7 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -33,16 +34,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.Tab;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -50,6 +46,7 @@ import com.gh4a.Constants.LoaderResult;
 import com.gh4a.fragment.IssueListByCommentsFragment;
 import com.gh4a.fragment.IssueListBySubmittedFragment;
 import com.gh4a.fragment.IssueListByUpdatedFragment;
+import com.gh4a.fragment.IssueListFragment;
 import com.gh4a.loader.CollaboratorListLoader;
 import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.LabelListLoader;
@@ -62,13 +59,13 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
     private String mRepoName;
     private String mState;
     private ThisPageAdapter mAdapter;
-    private ViewPager mPager;
+    private IssueListFragment mUpdateFragment;
+    private IssueListFragment mCommentFragment;
+    private IssueListFragment mSubmitFragment;
     private ActionBar mActionBar;
-    private int tabCount;
     private Map<String, String> mFilterData;
     private boolean isCollaborator;
     private ProgressDialog mProgressDialog;
-    private int mCurrentTab;
     private List<Label> mLabels;
     private List<Milestone> mMilestones;
     private List<User> mAssignees;
@@ -85,7 +82,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         
         mFilterData = new HashMap<String, String>();
         mFilterData.put("state", mState);
-        
+
         if (!isOnline()) {
             setErrorView();
             return;
@@ -93,69 +90,30 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         
         setContentView(R.layout.view_pager);
 
-        mActionBar = getSupportActionBar();
-        fillTabs();
-        
         getSupportLoaderManager().initLoader(0, null, this);
         getSupportLoaderManager().initLoader(1, null, this);
         getSupportLoaderManager().initLoader(2, null, this);
         getSupportLoaderManager().initLoader(3, null, this);
         getSupportLoaderManager().getLoader(3).forceLoad();
-    }
 
-    private void fillTabs() {
-        mActionBar.removeAllTabs();
-        tabCount = 3;
+        mActionBar = getSupportActionBar();
+        updateTitle();
+        mActionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
+        mActionBar.setDisplayHomeAsUpEnabled(true);
         
         mAdapter = new ThisPageAdapter(getSupportFragmentManager());
-        mPager = (ViewPager) findViewById(R.id.pager);
-        mPager.setAdapter(mAdapter);
-        
-        mPager.setOnPageChangeListener(new OnPageChangeListener() {
-
-            @Override
-            public void onPageScrollStateChanged(int arg0) {}
-            
-            @Override
-            public void onPageScrolled(int arg0, float arg1, int arg2) {}
-
-            @Override
-            public void onPageSelected(int position) {
-                mActionBar.setSelectedNavigationItem(position);
-            }
+        setupPager(mAdapter, new int[] {
+            R.string.issues_submitted, R.string.issues_updated, R.string.issues_comments
         });
-        
+    }
+
+    private void updateTitle() {
         if (mState == null || "open".equals(mState)) {
             mActionBar.setTitle(R.string.issue_open);
         }
         else {
             mActionBar.setTitle(R.string.issue_closed);
         }
-        
-        mActionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        mActionBar.setDisplayHomeAsUpEnabled(true);
-        
-        Tab tab = mActionBar
-                .newTab()
-                .setText(R.string.issues_submitted)
-                .setTabListener(
-                        new TabListener<SherlockFragmentActivity>(this, 0 + "", mPager));
-        mActionBar.addTab(tab, mCurrentTab == 0);
-        
-        tab = mActionBar
-                .newTab()
-                .setText(R.string.issues_updated)
-                .setTabListener(
-                        new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
-        mActionBar.addTab(tab, mCurrentTab == 1);
-        
-        tab = mActionBar
-                .newTab()
-                .setText(R.string.issues_comments)
-                .setTabListener(
-                        new TabListener<SherlockFragmentActivity>(this, 2 + "", mPager));
-        mActionBar.addTab(tab, mCurrentTab == 2);
     }
     
     public class ThisPageAdapter extends FragmentStatePagerAdapter {
@@ -166,27 +124,37 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
 
         @Override
         public int getCount() {
-            return tabCount;
+            return 3;
         }
 
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
-            if (position == 0) {
-                return IssueListBySubmittedFragment.newInstance(mRepoOwner, mRepoName, mFilterData);
+            if (position == 1) {
+                mUpdateFragment = IssueListByUpdatedFragment.newInstance(mRepoOwner, mRepoName, mFilterData);
+                return mUpdateFragment;
             }
-            
-            else if (position == 1) {
-                return IssueListByUpdatedFragment.newInstance(mRepoOwner, mRepoName, mFilterData);
-            }
-            
             else if (position == 2) {
-                return IssueListByCommentsFragment.newInstance(mRepoOwner, mRepoName, mFilterData);
+                mCommentFragment = IssueListByCommentsFragment.newInstance(mRepoOwner, mRepoName, mFilterData);
+                return mCommentFragment;
             }
-            return null;
+            else {
+                mSubmitFragment = IssueListBySubmittedFragment.newInstance(mRepoOwner, mRepoName, mFilterData);
+                return mSubmitFragment;
+            }
         }
         
         @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
+        public int getItemPosition(Object object) {
+            if (object instanceof IssueListByUpdatedFragment && mUpdateFragment != object) {
+                return POSITION_NONE;
+            }
+            else if (object instanceof IssueListByCommentsFragment && mUpdateFragment != object) {
+                return POSITION_NONE;
+            }
+            else if (object instanceof IssueListBySubmittedFragment && mSubmitFragment != object) {
+                return POSITION_NONE;
+            }
+            return POSITION_UNCHANGED;
         }
     }
     
@@ -313,8 +281,11 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
     }
     
     private void reloadIssueList() {
-        mCurrentTab = mPager.getCurrentItem();
-        fillTabs();
+        updateTitle();
+        mSubmitFragment = null;
+        mUpdateFragment = null;
+        mCommentFragment = null;
+        mAdapter.notifyDataSetChanged();
     }
     
     private void showLabelsDialog() {
@@ -505,6 +476,8 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         }
     }
 
+    @SuppressLint("NewApi") // ABS provides invalidateOptionsMenu for us
+    @SuppressWarnings("unchecked")
     @Override
     public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
         if (!isLoaderError(result)) {

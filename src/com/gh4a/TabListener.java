@@ -7,18 +7,18 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
-public class TabListener<T extends SherlockFragmentActivity> implements ActionBar.TabListener {
+public class TabListener implements ActionBar.TabListener {
     
-    private final String mTag;
+    private final int mTag;
     private ViewPager mPager;
 
-    public TabListener(SherlockFragmentActivity activity, String tag, ViewPager pager) {
+    public TabListener(SherlockFragmentActivity activity, int tag, ViewPager pager) {
         mTag = tag;
         mPager = pager;
     }
 
     public void onTabSelected(Tab tab, FragmentTransaction ft) {
-        mPager.setCurrentItem(Integer.parseInt(mTag));
+        mPager.setCurrentItem(mTag);
         //mPager.setCurrentItem(mActivity.getSupportActionBar().getSelectedNavigationIndex());
     }
 

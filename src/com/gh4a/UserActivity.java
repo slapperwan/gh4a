@@ -2,24 +2,18 @@ package com.gh4a;
 
 import java.util.HashMap;
 import java.util.Map;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.util.Log;
 import android.view.ViewGroup;
-
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.Tab;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -34,11 +28,8 @@ public class UserActivity extends BaseSherlockFragmentActivity {
 
     public String mUserLogin;
     public String mUserName;
-    private UserAdapter mAdapter;
+    private boolean mIsLoginUserPage;
     private ViewPager mPager;
-    private ActionBar mActionBar;
-    private boolean isLoginUserPage;
-    private int tabCount;
     private UserFragment mUserFragment;
     private PrivateEventListFragment mPrivateEventListFragment;
     private PublicEventListFragment mPublicEventListFragment;
@@ -54,7 +45,6 @@ public class UserActivity extends BaseSherlockFragmentActivity {
         Bundle data = getIntent().getExtras();
         mUserLogin = data.getString(Constants.User.USER_LOGIN);
         mUserName = data.getString(Constants.User.USER_NAME);
-        int position = data.getInt("position");
         
         if (!isOnline()) {
             setErrorView();
@@ -65,73 +55,23 @@ public class UserActivity extends BaseSherlockFragmentActivity {
 
         BugSenseHandler.setup(this, "6e1b031");
         
-        isLoginUserPage = mUserLogin.equals(getAuthLogin());
+        mIsLoginUserPage = mUserLogin.equals(getAuthLogin());
         
-        if (isLoginUserPage) {
-            tabCount = 4;
+        ActionBar actionBar = getSupportActionBar();
+        if (mIsLoginUserPage) {
+            actionBar.setDisplayShowHomeEnabled(false);
+            actionBar.setDisplayShowTitleEnabled(false);
+            mPager = setupPager(new UserAdapter(getSupportFragmentManager()), new int[] {
+                R.string.about, R.string.user_news_feed,
+                R.string.user_your_actions, R.string.issues
+             });
         }
         else {
-            tabCount = 2;
-        }
-        
-        mActionBar = getSupportActionBar();
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        if (isLoginUserPage) {
-            mActionBar.setDisplayShowHomeEnabled(false);
-            mActionBar.setDisplayShowTitleEnabled(false);
-        }
-        else {
-            mActionBar.setTitle(mUserLogin);
-            mActionBar.setDisplayHomeAsUpEnabled(true);            
-        }
-        
-        mAdapter = new UserAdapter(getSupportFragmentManager());
-        mPager = (ViewPager) findViewById(R.id.pager);
-        mPager.setAdapter(mAdapter);
-        
-        mPager.setOnPageChangeListener(new OnPageChangeListener() {
-
-            @Override
-            public void onPageScrollStateChanged(int arg0) {}
-            
-            @Override
-            public void onPageScrolled(int arg0, float arg1, int arg2) {}
-
-            @Override
-            public void onPageSelected(int position) {
-                Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onPageSelected " + position);
-                mActionBar.setSelectedNavigationItem(position);
-            }
-        });
-        
-        Tab tab = mActionBar
-                .newTab()
-                .setText(R.string.about)
-                .setTabListener(
-                        new TabListener<SherlockFragmentActivity>(this, 0 + "", mPager));
-        mActionBar.addTab(tab, position == 0);
-        
-        tab = mActionBar
-                .newTab()
-                .setText(isLoginUserPage ? R.string.user_news_feed : R.string.user_public_activity)
-                .setTabListener(
-                        new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
-        mActionBar.addTab(tab, position == 1);
-        
-        if (isLoginUserPage) {
-            tab = mActionBar
-                    .newTab()
-                    .setText(R.string.user_your_actions)
-                    .setTabListener(
-                            new TabListener<SherlockFragmentActivity>(this, 2 + "", mPager));
-            mActionBar.addTab(tab, position == 2);
-            
-            tab = mActionBar
-                    .newTab()
-                    .setText(R.string.issues)
-                    .setTabListener(
-                            new TabListener<SherlockFragmentActivity>(this, 3 + "", mPager));
-            mActionBar.addTab(tab, position == 3);
+            actionBar.setTitle(mUserLogin);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            mPager = setupPager(new UserAdapter(getSupportFragmentManager()), new int[] {
+                R.string.about, R.string.user_public_activity
+             });
         }
     }
     
@@ -143,53 +83,35 @@ public class UserActivity extends BaseSherlockFragmentActivity {
 
         @Override
         public int getCount() {
-            return tabCount;
+            return mIsLoginUserPage ? 4 : 2;
         }
 
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
-            Log.i(Constants.LOG_TAG, ">>>>>>>>>>> getItem " + position);
-            if (position == 0) {
-                mUserFragment = UserFragment.newInstance(UserActivity.this.mUserLogin,
-                        UserActivity.this.mUserName);
-                return mUserFragment;
-            }
-            else if (position == 1) {
-                mPrivateEventListFragment = (PrivateEventListFragment) PrivateEventListFragment
-                        .newInstance(UserActivity.this.mUserLogin, 
-                        UserActivity.this.isLoginUserPage);
+            if (position == 1) {
+                mPrivateEventListFragment = (PrivateEventListFragment)
+                        PrivateEventListFragment.newInstance(mUserLogin, mIsLoginUserPage);
                 return mPrivateEventListFragment;
             }
-            else if (position == 2 && isLoginUserPage) {
-                mPublicEventListFragment = (PublicEventListFragment) PublicEventListFragment
-                        .newInstance(UserActivity.this.mUserLogin, false);
+            else if (position == 2) {
+                mPublicEventListFragment = (PublicEventListFragment)
+                        PublicEventListFragment.newInstance(mUserLogin, false);
                 return mPublicEventListFragment;
             }
-            else if (position == 3 && isLoginUserPage) {
+            else if (position == 3) {
                 Map<String, String> filterData = new HashMap<String, String>();
                 filterData.put("filter", "subscribed");
                 mRepositoryIssueListFragment = RepositoryIssueListFragment.newInstance(filterData);
                 return mRepositoryIssueListFragment;
             }
             else {
-                return UserFragment.newInstance(UserActivity.this.mUserLogin,
-                        UserActivity.this.mUserName);
+                return UserFragment.newInstance(mUserLogin, mUserName);
             }
         }
         
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            Log.i(Constants.LOG_TAG, ">>>>>>>>>>> destroyItem " + container + ", " + position + ", " + object);
         }
-    }
-    
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        Log.i(Constants.LOG_TAG, ">>>>>>>>>>> onConfigurationChanged " + newConfig.orientation);
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE
-                || newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            //invalidateOptionsMenu();
-        } 
     }
     
     @Override
@@ -346,6 +268,7 @@ public class UserActivity extends BaseSherlockFragmentActivity {
         }
     }
     
+    @SuppressLint("NewApi")
     private void saveTheme(int theme) {
         SharedPreferences sharedPreferences = getSharedPreferences(
                 Constants.PREF_NAME, MODE_PRIVATE);
@@ -392,6 +315,7 @@ public class UserActivity extends BaseSherlockFragmentActivity {
         }
     }
     
+    @SuppressLint("NewApi")
     public void updateFollowingAction(boolean isFollowing) {
         this.isFollowing = isFollowing;
         this.isFinishLoadingFollowing = true;

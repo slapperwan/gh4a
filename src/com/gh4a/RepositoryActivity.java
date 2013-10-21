@@ -21,15 +21,12 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.ContextThemeWrapper;
 import android.view.KeyEvent;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.Tab;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -119,59 +116,22 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
                 getSupportLoaderManager().getLoader(i).forceLoad();
             }
         }
-    }
-    
-    private void updateTabs() {
-        mActionBar.setSubtitle(StringUtils.isBlank(mSelectBranchTag) ?
-                mRepository.getMasterBranch() : mSelectBranchTag);
-        
-        if (mPager != null) {
-            mAdapter.notifyDataSetChanged();
-            return;
-        }
-
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         mAdapter = new RepositoryAdapter(getSupportFragmentManager());
-        mPager = (ViewPager) findViewById(R.id.pager);
-        mPager.setAdapter(mAdapter);
-        
-        mPager.setOnPageChangeListener(new OnPageChangeListener() {
-
-            @Override
-            public void onPageScrollStateChanged(int state) {}
-            
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
-
-            @Override
-            public void onPageSelected(int position) {
-                mActionBar.getTabAt(position).select();
-            }
-        });
-        
-        Tab tab = mActionBar
-                .newTab()
-                .setText(R.string.about)
-                .setTabListener(
-                        new TabListener<SherlockFragmentActivity>(this, 0 + "", mPager));
-        mActionBar.addTab(tab);
-        
-        tab = mActionBar
-                .newTab()
-                .setText(R.string.repo_files)
-                .setTabListener(
-                        new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
-        mActionBar.addTab(tab);
-        
-        tab = mActionBar
-                .newTab()
-                .setText(getResources().getQuantityString(R.plurals.commit, 2))
-                .setTabListener(
-                        new TabListener<SherlockFragmentActivity>(this, 2 + "", mPager));
-        mActionBar.addTab(tab);
     }
-    
+
+    private void initializePager() {
+        if (mPager != null) {
+            mAdapter.notifyDataSetChanged();
+        } else {
+            mPager = setupPager(mAdapter, new int[] {
+                    R.string.about, R.string.repo_files, R.string.commits
+            });
+        }
+        mActionBar.setSubtitle(StringUtils.isBlank(mSelectBranchTag) ?
+                mRepository.getMasterBranch() : mSelectBranchTag);
+    }
+
     public class RepositoryAdapter extends FragmentStatePagerAdapter {
 
         public Content mContent;
@@ -415,7 +375,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
                 case LOADER_REPO:
                     hideLoading();
                     mRepository = (Repository) data;
-                    updateTabs();
+                    initializePager();
                     invalidateOptionsMenu();
                     break;
                 case LOADER_BRANCHES:

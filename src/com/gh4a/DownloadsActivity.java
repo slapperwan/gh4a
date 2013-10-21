@@ -3,13 +3,9 @@ package com.gh4a;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.Tab;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.fragment.DownloadBranchesFragment;
 import com.gh4a.fragment.DownloadTagsFragment;
@@ -19,10 +15,6 @@ public class DownloadsActivity extends BaseSherlockFragmentActivity {
 
     private String mRepoOwner;
     private String mRepoName;
-    private ThisPageAdapter mAdapter;
-    private ViewPager mPager;
-    private ActionBar mActionBar;
-    private int tabCount;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,52 +32,14 @@ public class DownloadsActivity extends BaseSherlockFragmentActivity {
         
         setContentView(R.layout.view_pager);
         
-        tabCount = 3;
-        
-        mActionBar = getSupportActionBar();
-        mAdapter = new ThisPageAdapter(getSupportFragmentManager());
-        mPager = (ViewPager) findViewById(R.id.pager);
-        mPager.setAdapter(mAdapter);
-        
-        mPager.setOnPageChangeListener(new OnPageChangeListener() {
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(R.string.downloads);
+        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
-            @Override
-            public void onPageScrollStateChanged(int arg0) {}
-            
-            @Override
-            public void onPageScrolled(int arg0, float arg1, int arg2) {}
-
-            @Override
-            public void onPageSelected(int position) {
-                mActionBar.setSelectedNavigationItem(position);
-            }
+        setupPager(new ThisPageAdapter(getSupportFragmentManager()), new int[] {
+            R.string.packages, R.string.repo_branches, R.string.repo_tags
         });
-        
-        mActionBar.setTitle(R.string.downloads);
-        mActionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        mActionBar.setDisplayHomeAsUpEnabled(true);
-        
-        Tab tab = mActionBar
-                .newTab()
-                .setText(R.string.packages)
-                .setTabListener(
-                        new TabListener<SherlockFragmentActivity>(this, 0 + "", mPager));
-        mActionBar.addTab(tab);
-        
-        tab = mActionBar
-                .newTab()
-                .setText(R.string.repo_branches)
-                .setTabListener(
-                        new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
-        mActionBar.addTab(tab);
-        
-        tab = mActionBar
-                .newTab()
-                .setText(R.string.repo_tags)
-                .setTabListener(
-                        new TabListener<SherlockFragmentActivity>(this, 2 + "", mPager));
-        mActionBar.addTab(tab);
     }
     
     public class ThisPageAdapter extends FragmentStatePagerAdapter {
@@ -96,7 +50,7 @@ public class DownloadsActivity extends BaseSherlockFragmentActivity {
 
         @Override
         public int getCount() {
-            return tabCount;
+            return 3;
         }
 
         @Override

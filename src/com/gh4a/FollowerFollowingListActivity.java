@@ -19,24 +19,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.Tab;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.fragment.FollowersFollowingListFragment;
 
 public class FollowerFollowingListActivity extends BaseSherlockFragmentActivity {
 
     private String mUserLogin;
-    private boolean mFindFollowers;// flag to search followers or followingprivate ThisPageAdapter mAdapter;
-    private ThisPageAdapter mAdapter;
-    private ViewPager mPager;
-    private ActionBar mActionBar;
-    private int tabCount;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,7 +36,6 @@ public class FollowerFollowingListActivity extends BaseSherlockFragmentActivity 
 
         Bundle data = getIntent().getExtras();
         mUserLogin = data.getString(Constants.User.USER_LOGIN);
-        mFindFollowers = data.getBoolean("FIND_FOLLOWERS");
         
         if (!isOnline()) {
             setErrorView();
@@ -54,44 +44,13 @@ public class FollowerFollowingListActivity extends BaseSherlockFragmentActivity 
         
         setContentView(R.layout.view_pager);
         
-        tabCount = 2;
-        
-        mActionBar = getSupportActionBar();
-        mAdapter = new ThisPageAdapter(getSupportFragmentManager());
-        mPager = (ViewPager) findViewById(R.id.pager);
-        mPager.setAdapter(mAdapter);
-        
-        mPager.setOnPageChangeListener(new OnPageChangeListener() {
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(mUserLogin);
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
-            @Override
-            public void onPageScrollStateChanged(int arg0) {}
-            
-            @Override
-            public void onPageScrolled(int arg0, float arg1, int arg2) {}
-
-            @Override
-            public void onPageSelected(int position) {
-                mActionBar.setSelectedNavigationItem(position);
-            }
+        setupPager(new ThisPageAdapter(getSupportFragmentManager()), new int[] {
+            R.string.user_followers, R.string.user_following
         });
-        
-        mActionBar.setTitle(mUserLogin);
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        mActionBar.setDisplayHomeAsUpEnabled(true);
-        
-        Tab tab = mActionBar
-                .newTab()
-                .setText(R.string.user_followers)
-                .setTabListener(
-                        new TabListener<SherlockFragmentActivity>(this, 0 + "", mPager));
-        mActionBar.addTab(tab, mFindFollowers);
-        
-        tab = mActionBar
-                .newTab()
-                .setText(R.string.user_following)
-                .setTabListener(
-                        new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
-        mActionBar.addTab(tab, !mFindFollowers);
     }
 
     public class ThisPageAdapter extends FragmentStatePagerAdapter {
@@ -102,21 +61,14 @@ public class FollowerFollowingListActivity extends BaseSherlockFragmentActivity 
 
         @Override
         public int getCount() {
-            return tabCount;
+            return 2;
         }
 
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
-            if (position == 0) {
-                return FollowersFollowingListFragment.newInstance(
-                        FollowerFollowingListActivity.this.mUserLogin,
-                        true);
-            }
-            else {
-                return FollowersFollowingListFragment.newInstance(
-                        FollowerFollowingListActivity.this.mUserLogin,
-                        false);
-            }
+            return FollowersFollowingListFragment.newInstance(
+                    FollowerFollowingListActivity.this.mUserLogin,
+                    position == 0);
         }
         
         @Override

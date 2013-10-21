@@ -11,7 +11,6 @@ import org.eclipse.egit.github.core.service.RepositoryService;
 
 import android.content.Context;
 
-import com.gh4a.Constants;
 import com.gh4a.Constants.LoaderResult;
 import com.gh4a.Gh4Application;
 

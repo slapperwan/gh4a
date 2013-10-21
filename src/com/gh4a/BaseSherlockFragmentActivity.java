@@ -33,6 +33,8 @@ import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
@@ -40,6 +42,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -511,5 +514,33 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         else {
             return false;
         }
+    }
+
+    public ViewPager setupPager(PagerAdapter adapter, int[] titleResIds) {
+        final ActionBar actionBar = getSupportActionBar();
+        ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        pager.setAdapter(adapter);
+
+        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrollStateChanged(int state) {}
+
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+
+            @Override
+            public void onPageSelected(int position) {
+                actionBar.getTabAt(position).select();
+            }
+        });
+
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        for (int i = 0; i < titleResIds.length; i++) {
+            actionBar.addTab(actionBar.newTab()
+                .setText(titleResIds[i])
+                .setTabListener(new TabListener(this, i, pager)));
+        }
+
+        return pager;
     }
 }
