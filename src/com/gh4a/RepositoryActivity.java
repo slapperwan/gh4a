@@ -1,15 +1,16 @@
 package com.gh4a;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import org.eclipse.egit.github.core.Content;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryBranch;
 import org.eclipse.egit.github.core.RepositoryTag;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -50,38 +51,42 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     implements OnTreeSelectedListener, LoaderManager.LoaderCallbacks<HashMap<Integer, Object>> {
 
     private static final int NUM_ITEMS = 3;
+
+    private static final int LOADER_REPO = 0;
+    private static final int LOADER_BRANCHES = 1;
+    private static final int LOADER_TAGS = 2;
+    private static final int LOADER_WATCHING = 3;
+    private static final int LOADER_WATCH = 4;
+    private static final int LOADER_STARRING = 5;
+    private static final int LOADER_STAR = 6;
+
     private String mRepoOwner;
     private String mRepoName;
     private RepositoryAdapter mAdapter;
     private ViewPager mPager;
     private ActionBar mActionBar;
-    private List<ContentListFragment> fileStacks;//to keep track folders for use in on back pressed
-    private List<List<Content>> mContentList;
-    private boolean backPressed;
+    private Stack<ContentListFragment> mDirStack;
     private Repository mRepository;
     private List<RepositoryBranch> mBranches;
     private List<RepositoryTag> mTags;
     private String mSelectedRef;
     private String mSelectBranchTag;
     private ProgressDialog mProgressDialog;
-    private boolean isFinishLoadingWatching;
-    private boolean isWatching;
-    private boolean isFinishLoadingStarring;
-    private boolean isStarring;
+    private boolean mIsFinishLoadingWatching;
+    private boolean mIsWatching;
+    private boolean mIsFinishLoadingStarring;
+    private boolean mIsStarring;
     private RepositoryFragment mRepositoryFragment;
     private ContentListFragment mContentListFragment;
     private CommitListFragment mCommitListFragment;
-    private String mPath;
-    private int mCurrentTab;
     private Map<String, String> mGitModuleMap;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
-        
-        fileStacks = new ArrayList<ContentListFragment>();
-        mContentList = new ArrayList<List<Content>>();
+
+        mDirStack = new Stack<ContentListFragment>();
         
         Bundle data = getIntent().getExtras().getBundle(Constants.DATA_BUNDLE);
         if (data != null) {
@@ -108,29 +113,25 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         mActionBar.setDisplayHomeAsUpEnabled(true);
         
         showLoading();
-        getSupportLoaderManager().initLoader(0, null, this);
-        getSupportLoaderManager().getLoader(0).forceLoad();
-        
-        getSupportLoaderManager().initLoader(1, null, this);
-        getSupportLoaderManager().initLoader(2, null, this);
-        
-        getSupportLoaderManager().initLoader(3, null, this);
-        getSupportLoaderManager().getLoader(3).forceLoad();
-        
-        getSupportLoaderManager().initLoader(4, null, this);
-        
-        getSupportLoaderManager().initLoader(5, null, this);
-        getSupportLoaderManager().getLoader(5).forceLoad();
-        
-        getSupportLoaderManager().initLoader(6, null, this);
+        for (int i = LOADER_REPO; i <= LOADER_STAR; i++) {
+            getSupportLoaderManager().initLoader(i, null, this);
+            if (i == LOADER_REPO || i == LOADER_WATCHING || i == LOADER_STARRING) {
+                getSupportLoaderManager().getLoader(i).forceLoad();
+            }
+        }
     }
     
-    private void fillTabs() {
-        mActionBar.removeAllTabs();
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+    private void updateTabs() {
         mActionBar.setSubtitle(StringUtils.isBlank(mSelectBranchTag) ?
                 mRepository.getMasterBranch() : mSelectBranchTag);
         
+        if (mPager != null) {
+            mAdapter.notifyDataSetChanged();
+            return;
+        }
+
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
         mAdapter = new RepositoryAdapter(getSupportFragmentManager());
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
@@ -138,14 +139,14 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         mPager.setOnPageChangeListener(new OnPageChangeListener() {
 
             @Override
-            public void onPageScrollStateChanged(int arg0) {}
+            public void onPageScrollStateChanged(int state) {}
             
             @Override
-            public void onPageScrolled(int arg0, float arg1, int arg2) {}
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
 
             @Override
-            public void onPageSelected(int arg0) {
-                mActionBar.getTabAt(arg0).select();
+            public void onPageSelected(int position) {
+                mActionBar.getTabAt(position).select();
             }
         });
         
@@ -154,21 +155,21 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
                 .setText(R.string.about)
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 0 + "", mPager));
-        mActionBar.addTab(tab, mCurrentTab == 0);
+        mActionBar.addTab(tab);
         
         tab = mActionBar
                 .newTab()
                 .setText(R.string.repo_files)
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 1 + "", mPager));
-        mActionBar.addTab(tab, mCurrentTab == 1);
+        mActionBar.addTab(tab);
         
         tab = mActionBar
                 .newTab()
                 .setText(getResources().getQuantityString(R.plurals.commit, 2))
                 .setTabListener(
                         new TabListener<SherlockFragmentActivity>(this, 2 + "", mPager));
-        mActionBar.addTab(tab, mCurrentTab == 2);
+        mActionBar.addTab(tab);
     }
     
     public class RepositoryAdapter extends FragmentStatePagerAdapter {
@@ -186,29 +187,13 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
 
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
-            if (position == 0) {
-                mRepositoryFragment = RepositoryFragment.newInstance(mRepository);
-                return mRepositoryFragment;
-            }
-            
-            else if (position == 1) {
+            if (position == 1) {
                 if (mContentListFragment == null) {
                     mContentListFragment = ContentListFragment.newInstance(mRepository, null, mSelectedRef);
-                    fileStacks.add(mContentListFragment);
+                    mDirStack.add(mContentListFragment);
                 }
-                
-                else if (backPressed) {
-                    fileStacks.remove(mContentListFragment);
-                    getSupportFragmentManager().beginTransaction().remove(mContentListFragment).commit();
-                    mContentListFragment = fileStacks.get(fileStacks.size() - 1);
-                    mContentListFragment.setTreeEntryList(mContentList.get(fileStacks.size() - 1));
-                }
-                
                 else {
-                    getSupportFragmentManager().beginTransaction().remove(mContentListFragment).commit();
-                    mContentListFragment = ContentListFragment.newInstance(mRepository, 
-                            mPath, mSelectedRef);
-                    fileStacks.add(mContentListFragment);
+                    mContentListFragment = mDirStack.peek();
                 }
                 return mContentListFragment;
             }
@@ -233,8 +218,11 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         
         @Override
         public int getItemPosition(Object object) {
-            if (object instanceof ContentListFragment && !StringUtils.isBlank(mContent.getSha())) {
-                return POSITION_NONE;
+            if (object instanceof ContentListFragment) {
+                if (mDirStack.isEmpty() || mContentListFragment == null
+                        || mContentListFragment != mDirStack.peek()) {
+                    return POSITION_NONE;
+                }
             }
             return POSITION_UNCHANGED;
         }
@@ -244,11 +232,9 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     public void onTreeSelected(int position, AdapterView<?> adapterView,
             Content content, List<Content> contents, String ref) {
         if ("dir".equals(content.getType())) {
-            backPressed = false;
             mAdapter.mContent = content;
             mSelectedRef = ref;
-            mPath = content.getPath();
-            mContentList.add(contents);
+            mDirStack.push(ContentListFragment.newInstance(mRepository, content.getPath(), mSelectedRef));
             mAdapter.notifyDataSetChanged();
         }
         else {
@@ -295,27 +281,12 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
 
     @Override
     public void onBackPressed() {
-        if (mPager != null) {
-            if (mPager.getCurrentItem() == 1) {
-                backPressed = true;
-                if (mPath != null && mPath.lastIndexOf("/") != -1) {
-                    mPath = mPath.substring(0, mPath.lastIndexOf("/"));
-                }
-                else {
-                    mPath = null;
-                }
-                
-                if (fileStacks.size() > 1) {
-                    mAdapter.notifyDataSetChanged();
-                    return;
-                }
-                else {
-                    super.onBackPressed();
-                }
-            }
-            else {
-                super.onBackPressed();
-            }
+        if (mPager != null && mPager.getCurrentItem() == 1 && mDirStack.size() > 1) {
+            mDirStack.pop();
+            mAdapter.notifyDataSetChanged();
+        }
+        else {
+            super.onBackPressed();
         }
     }
     
@@ -326,41 +297,37 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         inflater.inflate(R.menu.repo_menu, menu);
         
         if (Gh4Application.THEME != R.style.LightTheme) {
-            menu.getItem(0).setIcon(R.drawable.navigation_refresh_dark);
+            menu.findItem(R.id.refresh).setIcon(R.drawable.navigation_refresh_dark);
         }
         
-        MenuItem watchAction = menu.getItem(2);
+        MenuItem watchAction = menu.findItem(R.id.watch);
         if (isAuthorized()) {
-            if (!isFinishLoadingWatching) {
+            if (!mIsFinishLoadingWatching) {
                 watchAction.setActionView(R.layout.ab_loading);
                 watchAction.expandActionView();
             }
+            else if (mIsWatching) {
+                watchAction.setTitle(R.string.repo_unwatch_action);
+            }
             else {
-                if (isWatching) {
-                    watchAction.setTitle(R.string.repo_unwatch_action);
-                }
-                else {
-                    watchAction.setTitle(R.string.repo_watch_action);
-                }
+                watchAction.setTitle(R.string.repo_watch_action);
             }
         }
         else {
             menu.removeItem(R.id.watch);
         }
         
-        MenuItem starAction = menu.getItem(1);
+        MenuItem starAction = menu.findItem(R.id.star);
         if (isAuthorized()) {
-            if (!isFinishLoadingStarring) {
+            if (!mIsFinishLoadingStarring) {
                 starAction.setActionView(R.layout.ab_loading);
                 starAction.expandActionView();
             }
+            else if (mIsStarring) {
+                starAction.setTitle(R.string.repo_unstar_action);
+            }
             else {
-                if (isStarring) {
-                    starAction.setTitle(R.string.repo_unstar_action);
-                }
-                else {
-                    starAction.setTitle(R.string.repo_star_action);
-                }
+                starAction.setTitle(R.string.repo_star_action);
             }
         }
         else {
@@ -379,19 +346,19 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
             case R.id.watch:
                 item.setActionView(R.layout.ab_loading);
                 item.expandActionView();
-                getSupportLoaderManager().restartLoader(4, null, this);
-                getSupportLoaderManager().getLoader(4).forceLoad();
+                getSupportLoaderManager().restartLoader(LOADER_WATCH, null, this);
+                getSupportLoaderManager().getLoader(LOADER_WATCH).forceLoad();
                 return true;
             case R.id.star:
                 item.setActionView(R.layout.ab_loading);
                 item.expandActionView();
-                getSupportLoaderManager().restartLoader(6, null, this);
-                getSupportLoaderManager().getLoader(6).forceLoad();
+                getSupportLoaderManager().restartLoader(LOADER_STAR, null, this);
+                getSupportLoaderManager().getLoader(LOADER_STAR).forceLoad();
                 return true;
             case R.id.branches:
                 if (mBranches == null) {
                     mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-                    getSupportLoaderManager().getLoader(1).forceLoad();
+                    getSupportLoaderManager().getLoader(LOADER_BRANCHES).forceLoad();
                 }
                 else {
                     showBranchesDialog();
@@ -400,7 +367,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
             case R.id.tags:
                 if (mTags == null) {
                     mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-                    getSupportLoaderManager().getLoader(2).forceLoad();
+                    getSupportLoaderManager().getLoader(LOADER_TAGS).forceLoad();
                 }
                 else {
                     showTagsDialog();
@@ -426,75 +393,56 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     
     @Override
     public Loader<HashMap<Integer, Object>> onCreateLoader(int id, Bundle bundle) {
-        if (id == 0) {
-            return new RepositoryLoader(this, mRepoOwner, mRepoName);
+        switch (id) {
+            case LOADER_REPO: return new RepositoryLoader(this, mRepoOwner, mRepoName);
+            case LOADER_BRANCHES: return new BranchListLoader(this, mRepoOwner, mRepoName);
+            case LOADER_TAGS: return new TagListLoader(this, mRepoOwner, mRepoName);
+            case LOADER_WATCHING: return new IsWatchingLoader(this, mRepoOwner, mRepoName);
+            case LOADER_WATCH: return new WatchLoader(this, mRepoOwner, mRepoName, mIsWatching);
+            case LOADER_STARRING: return new IsStarringLoader(this, mRepoOwner, mRepoName);
+            case LOADER_STAR: return new StarLoader(this, mRepoOwner, mRepoName, mIsStarring);
         }
-        else if (id == 1) {
-            return new BranchListLoader(this, mRepoOwner, mRepoName);
-        }
-        else if (id == 2) {
-            return new TagListLoader(this, mRepoOwner, mRepoName);
-        }
-        else if (id == 3) {
-            return new IsWatchingLoader(this, mRepoOwner, mRepoName);
-        }
-        else if (id == 4){
-            return new WatchLoader(this, mRepoOwner, mRepoName, isWatching);
-        }
-        else if (id == 5) {
-            return new IsStarringLoader(this, mRepoOwner, mRepoName);
-        }
-        else {
-            return new StarLoader(this, mRepoOwner, mRepoName, isStarring);
-        }
+        return null;
     }
 
+    @SuppressWarnings("unchecked")
+    @SuppressLint("NewApi") // don't generate errors on invalidateOptionsMenu(), ABS provides that for us
     @Override
     public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
         if (!isLoaderError(result)) {
             Object data = result.get(LoaderResult.DATA); 
-            
-            if (loader.getId() == 0) {
-                hideLoading();
-                this.mRepository = (Repository) data;
-                fillTabs();
-                invalidateOptionsMenu();
-            }
-            else if (loader.getId() == 1) {
-                stopProgressDialog(mProgressDialog);
-                this.mBranches = (List<RepositoryBranch>) data;
-                showBranchesDialog();
-            }
-            else if (loader.getId() == 2) {
-                stopProgressDialog(mProgressDialog);
-                this.mTags = (List<RepositoryTag>) data;
-                showTagsDialog();
-            }
-            else if (loader.getId() == 3) {
-                isWatching = (Boolean) data;
-                isFinishLoadingWatching = true;
-                invalidateOptionsMenu();
-            }
-            else if (loader.getId() == 4){
-                isWatching = (Boolean) data;
-                isFinishLoadingWatching = true;
-                if (mRepositoryFragment != null) {
-                    //mRepositoryFragment.updateWatcherCount(isWatching);
-                }
-                invalidateOptionsMenu();
-            }
-            else if (loader.getId() == 5) {
-                isStarring = (Boolean) data;
-                isFinishLoadingStarring = true;
-                invalidateOptionsMenu();
-            }
-            else {
-                isStarring = (Boolean) data;
-                isFinishLoadingStarring = true;
-                if (mRepositoryFragment != null) {
-                    mRepositoryFragment.updateStargazerCount(isStarring);
-                }
-                invalidateOptionsMenu();
+            switch (loader.getId()) {
+                case LOADER_REPO:
+                    hideLoading();
+                    mRepository = (Repository) data;
+                    updateTabs();
+                    invalidateOptionsMenu();
+                    break;
+                case LOADER_BRANCHES:
+                    stopProgressDialog(mProgressDialog);
+                    mBranches = (List<RepositoryBranch>) data;
+                    showBranchesDialog();
+                    break;
+                case LOADER_TAGS:
+                    stopProgressDialog(mProgressDialog);
+                    mTags = (List<RepositoryTag>) data;
+                    showTagsDialog();
+                    break;
+                case LOADER_WATCHING:
+                case LOADER_WATCH:
+                    mIsWatching = (Boolean) data;
+                    mIsFinishLoadingWatching = true;
+                    invalidateOptionsMenu();
+                    break;
+                case LOADER_STARRING:
+                case LOADER_STAR:
+                    mIsStarring = (Boolean) data;
+                    mIsFinishLoadingStarring = true;
+                    invalidateOptionsMenu();
+                    if (loader.getId() == LOADER_STAR && mRepositoryFragment != null) {
+                        mRepositoryFragment.updateStargazerCount(mIsStarring);
+                    }
+                    break;
             }
         }
         else {
@@ -528,20 +476,12 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
             }
         });
         
-        builder.setPositiveButton(R.string.ok,
-                new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 refreshFragment();
-                dialog.dismiss();
             }
-        })
-        .setNegativeButton(R.string.cancel,
-                new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        })
-       .create();
+        });
+        builder.setNegativeButton(R.string.cancel, null);
         
         builder.show();
     }
@@ -566,34 +506,20 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
             }
         });
         
-        builder.setPositiveButton(R.string.ok,
-                new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 refreshFragment();
-                dialog.dismiss();
             }
-        })
-        .setNegativeButton(R.string.cancel,
-                new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        })
-       .create();
+        });
         
         builder.show();
     }
     
     private void refreshFragment() {
-        mCurrentTab = 0;
-        if (mPager != null) {
-            mCurrentTab = mPager.getCurrentItem();
-        }
         mRepositoryFragment = null;
         mContentListFragment = null;
         mCommitListFragment = null;
-        fileStacks.clear();
-        mPath = null;
+        mDirStack.clear();
         showLoading();
         getSupportLoaderManager().restartLoader(0, null, this);
         getSupportLoaderManager().getLoader(0).forceLoad();
