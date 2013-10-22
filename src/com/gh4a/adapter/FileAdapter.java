@@ -17,7 +17,7 @@ package com.gh4a.adapter;
 
 import java.util.List;
 
-import org.eclipse.egit.github.core.Content;
+import org.eclipse.egit.github.core.RepositoryContents;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -29,9 +29,9 @@ import android.widget.TextView;
 import com.gh4a.R;
 import com.gh4a.utils.FileUtils;
 
-public class FileAdapter extends RootAdapter<Content> {
+public class FileAdapter extends RootAdapter<RepositoryContents> {
 
-    public FileAdapter(Context context, List<Content> objects) {
+    public FileAdapter(Context context, List<RepositoryContents> objects) {
         super(context, objects);
     }
 
@@ -42,7 +42,7 @@ public class FileAdapter extends RootAdapter<Content> {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
             v = vi.inflate(R.layout.row_file_manager, null);
         }
-        Content content = mObjects.get(position);
+        RepositoryContents content = mObjects.get(position);
         if (content != null) {
             ImageView ivIcon = (ImageView) v.findViewById(R.id.iv_icon);
             ivIcon.setBackgroundResource(getIconId(content.getType(), FileUtils

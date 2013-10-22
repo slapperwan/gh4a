@@ -2,12 +2,13 @@ package com.gh4a.loader;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.eclipse.egit.github.core.Content;
+import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.ContentService;
+import org.eclipse.egit.github.core.service.ContentsService;
 import org.eclipse.egit.github.core.util.EncodingUtils;
 
 import android.content.Context;
@@ -36,10 +37,11 @@ public class GitModuleParserLoader extends BaseLoader {
         Gh4Application app = (Gh4Application) getContext().getApplicationContext();
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(app.getAuthToken());
-        ContentService contentService = new ContentService(client);
-        Content content = contentService.getContent(new RepositoryId(mRepoOwner, mRepoName), mPath, mRef);
-        if (content != null) {
-            String data = new String(EncodingUtils.fromBase64(content.getContent()));
+        ContentsService contentService = new ContentsService(client);
+        List<RepositoryContents> contents =
+                contentService.getContents(new RepositoryId(mRepoOwner, mRepoName), mPath, mRef);
+        if (contents != null && !contents.isEmpty()) {
+            String data = new String(EncodingUtils.fromBase64(contents.get(0).getContent()));
             if (!StringUtils.isBlank(data)) {
                 Map<String, String> gitModuleMap = new HashMap<String, String>();
                 String[] lines = data.split("\n");

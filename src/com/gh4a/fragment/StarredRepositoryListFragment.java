@@ -22,7 +22,7 @@ import java.util.List;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.PageIterator;
-import org.eclipse.egit.github.core.service.StarringService;
+import org.eclipse.egit.github.core.service.StarService;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -117,7 +117,7 @@ public class StarredRepositoryListFragment extends BaseFragment
         Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(app.getAuthToken());
-        StarringService starringService = new StarringService(client);
+        StarService starringService = new StarService(client);
         try {
             mDataIterator = starringService.pageStarred(mLogin);
         } catch (IOException e) {

@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.StarringService;
+import org.eclipse.egit.github.core.service.StarService;
 
 import android.content.Context;
 
@@ -28,7 +28,7 @@ public class IsStarringLoader extends BaseLoader {
         Gh4Application app = (Gh4Application) getContext().getApplicationContext();
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(app.getAuthToken());
-        StarringService starringService = new StarringService(client);
+        StarService starringService = new StarService(client);
         result.put(LoaderResult.DATA, starringService.isStarring(new RepositoryId(mRepoOwner, mRepoName)));
     }
 }

@@ -17,7 +17,7 @@ package com.gh4a;
 
 import java.util.HashMap;
 
-import org.eclipse.egit.github.core.Content;
+import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.util.EncodingUtils;
 
 import android.annotation.TargetApi;
@@ -49,7 +49,7 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
     private String mRef;
     private String mSha;
     private String mName;
-    private Content mContent;
+    private RepositoryContents mContent;
 
     private WebView mWebView;
 
@@ -200,7 +200,7 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
         
         if (!isLoaderError(result)) {
             if (result != null) {
-                mContent = (Content) result.get(LoaderResult.DATA);
+                mContent = (RepositoryContents) result.get(LoaderResult.DATA);
                 fillData(true);
             }    
         }

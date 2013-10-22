@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.ContentService;
+import org.eclipse.egit.github.core.service.ContentsService;
 
 import android.content.Context;
 
@@ -32,7 +32,7 @@ public class ContentLoader extends BaseLoader {
         Gh4Application app = (Gh4Application) getContext().getApplicationContext();
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(app.getAuthToken());
-        ContentService contentService = new ContentService(client);
-        result.put(LoaderResult.DATA, contentService.getContent(new RepositoryId(mRepoOwner, mRepoName), mPath, mRef));
+        ContentsService contentService = new ContentsService(client);
+        result.put(LoaderResult.DATA, contentService.getContents(new RepositoryId(mRepoOwner, mRepoName), mPath, mRef));
     }
 }

@@ -4,7 +4,7 @@ import java.io.InputStream;
 
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.ContentService;
+import org.eclipse.egit.github.core.service.ContentsService;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
@@ -32,8 +32,8 @@ public class ReadmeLoader extends AsyncTaskLoader<String> {
         GitHubClient client = new DefaultClient("application/vnd.github.beta.html");
         client.setOAuth2Token(app.getAuthToken());
         try {
-            ContentService contentService = new ContentService(client);
-            InputStream is = contentService.getHtmlReadme(new RepositoryId(mRepoOwner, mRepoName));
+            ContentsService contentService = new ContentsService(client);
+            InputStream is = contentService.getReadmeStream(new RepositoryId(mRepoOwner, mRepoName));
             if (is != null) {
                 return StringUtils.convertStreamToString(is);
             }

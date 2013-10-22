@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import org.eclipse.egit.github.core.Content;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryBranch;
+import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.RepositoryTag;
 
 import android.annotation.SuppressLint;
@@ -134,7 +134,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
 
     public class RepositoryAdapter extends FragmentStatePagerAdapter {
 
-        public Content mContent;
+        public RepositoryContents mContent;
         
         public RepositoryAdapter(FragmentManager fm) {
             super(fm);
@@ -190,8 +190,8 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
 
     @Override
     public void onTreeSelected(int position, AdapterView<?> adapterView,
-            Content content, List<Content> contents, String ref) {
-        if ("dir".equals(content.getType())) {
+            RepositoryContents content, List<RepositoryContents> contents, String ref) {
+        if (RepositoryContents.TYPE_DIR.equals(content.getType())) {
             mAdapter.mContent = content;
             mSelectedRef = ref;
             mDirStack.push(ContentListFragment.newInstance(mRepository, content.getPath(), mSelectedRef));
@@ -217,7 +217,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         mGitModuleMap = gitModuleMap;
     }
     
-    private void openFileViewer(Content content, String ref) {
+    private void openFileViewer(RepositoryContents content, String ref) {
         Intent intent = new Intent().setClass(this, FileViewerActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);

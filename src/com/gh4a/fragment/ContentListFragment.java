@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.egit.github.core.Content;
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.util.EncodingUtils;
 
 import android.app.Activity;
@@ -62,7 +62,7 @@ public class ContentListFragment extends BaseFragment
     private ListView mListView;
     public FileAdapter mAdapter;
     private OnTreeSelectedListener mCallback;
-    private List<Content> mContents;
+    private List<RepositoryContents> mContents;
     private boolean mDataLoaded;
     private String mPathReadme;
     private TextView mFooter;
@@ -124,7 +124,7 @@ public class ContentListFragment extends BaseFragment
         super.onActivityCreated(savedInstanceState);
         
         if (mContents == null) {
-            mContents = new ArrayList<Content>();
+            mContents = new ArrayList<RepositoryContents>();
             mAdapter = new FileAdapter(getSherlockActivity(), mContents);
             mListView.setAdapter(mAdapter);
         }
@@ -164,11 +164,11 @@ public class ContentListFragment extends BaseFragment
         }
     }
     
-    public void setTreeEntryList(List<Content> contents) {
+    public void setTreeEntryList(List<RepositoryContents> contents) {
         mContents = contents;
     }
     
-    private void fillData(List<Content> entries) {
+    private void fillData(List<RepositoryContents> entries) {
         RepositoryActivity activity = (RepositoryActivity) getSherlockActivity();
         activity.hideLoading();
         if (entries != null && entries.size() > 0) {
@@ -208,7 +208,7 @@ public class ContentListFragment extends BaseFragment
         else if (loader.getId() == 0) {
             mDataLoaded = true;
             if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
-                List<Content> files = (List<Content>) data;
+                List<RepositoryContents> files = (List<RepositoryContents>) data;
                 fillData(files);
                 
                 readmeExists(files);
@@ -216,7 +216,10 @@ public class ContentListFragment extends BaseFragment
         }
         else if (loader.getId() == 2) {
             if (data != null) {
-                loadMarkdown((Content) data);
+                List<RepositoryContents> contents = (List<RepositoryContents>) data;
+                if (!contents.isEmpty()) {
+                    loadMarkdown(contents.get(0));
+                }
             }
         }
         else if (loader.getId() == 3) {
@@ -229,9 +232,9 @@ public class ContentListFragment extends BaseFragment
         }
     }
     
-    public void readmeExists(List<Content> files) {
-        for (Content content : files) {
-            if ("file".equals(content.getType())) {
+    public void readmeExists(List<RepositoryContents> files) {
+        for (RepositoryContents content : files) {
+            if (RepositoryContents.TYPE_FILE.equals(content.getType())) {
                 String nameWithoutExt = null;
                 String filename = content.getName();
                         
@@ -263,7 +266,7 @@ public class ContentListFragment extends BaseFragment
         }
     }
     
-    public void loadMarkdown(Content content) {
+    public void loadMarkdown(RepositoryContents content) {
         String ext = FileUtils.getFileExtension(content.getName());
         mMarkdownText = content.getContent();
         mMarkdownText = new String(EncodingUtils.fromBase64(mMarkdownText));
@@ -289,8 +292,8 @@ public class ContentListFragment extends BaseFragment
     public interface OnTreeSelectedListener {
         public void onTreeSelected(int position, 
                 AdapterView<?> adapterView,
-                Content content,
-                List<Content> contents,
+                RepositoryContents content,
+                List<RepositoryContents> contents,
                 String ref);
         
         public void setGitModuleMap(Map<String, String> gitModuleMap);
@@ -298,7 +301,7 @@ public class ContentListFragment extends BaseFragment
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        Content content = (Content) adapterView.getAdapter().getItem(position);
+        RepositoryContents content = (RepositoryContents) adapterView.getAdapter().getItem(position);
         mCallback.onTreeSelected(position, adapterView, content, mContents, mRef);
     }
 
