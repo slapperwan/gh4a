@@ -130,7 +130,7 @@ public class CommonFeedAdapter extends RootAdapter<Feed> {
             
             viewHolder.tvTitle.setText(feed.getTitle());
 
-            viewHolder.tvDesc.setText(feed.getContent().replaceAll("<(.|\n)*?>",""));
+            viewHolder.tvDesc.setText(feed.getPreview());
             viewHolder.tvDesc.setSingleLine(true);
             
             if (mShowExtra) {

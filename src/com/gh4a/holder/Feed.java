@@ -25,6 +25,7 @@ public class Feed {
     private String link;
     private String title;
     private String content;
+    private String preview;
     private String author;
     private String gravatarId;
     
@@ -61,8 +62,19 @@ public class Feed {
     public String getContent() {
         return content;
     }
+    public String getPreview() {
+        return preview;
+    }
     public void setContent(String content) {
         this.content = content;
+        if (content != null) {
+            preview = content.replaceAll("<(.|\n)*?>","");
+            if (preview.length() > 500) {
+                preview = preview.substring(0,  500);
+            }
+        } else {
+            preview = null;
+        }
     }
     public String getAuthor() {
         return author;
