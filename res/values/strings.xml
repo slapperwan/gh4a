@@ -68,11 +68,11 @@
     <string name="unknown">unknown</string>
     <string name="history">History</string>
     <string name="deleted">(deleted)</string>
-    <string name="repo_search_extradata">%1$s  %2$s  %3$d forks  %4$d watchers</string>
-    <string name="milestone_extradata">%1$d open  %2$d closed</string>
-    <string name="milestone_extradata_due">%1$d open  %2$d closed, due on %3$s</string>
-    <string name="download_extradata">%1$s  %2$d downloads  created %3$s</string>
-    <string name="gist_extradata">%1$s  %2$s</string>
+    <string name="repo_search_extradata">%1$s\u00a0\u00a0\u00a0%2$s\u00a0\u00a0\u00a0%3$d forks\u00a0\u00a0\u00a0%4$d watchers</string>
+    <string name="milestone_extradata">%1$d open\u00a0\u00a0\u00a0%2$d closed</string>
+    <string name="milestone_extradata_due">%1$d open\u00a0\u00a0\u00a0%2$d closed\u00a0\u00a0\u00a0due on %3$s</string>
+    <string name="download_extradata">%1$s\u00a0\u00a0\u00a0%2$d downloads\u00a0\u00a0\u00a0created %3$s</string>
+    <string name="gist_extradata">%1$s\u00a0\u00a0\u00a0%2$s</string>
     <string name="go_to">Go to</string>
     <string name="no_repos_found">No repositories found.</string>
     <string name="fail_view_diff">Unable to view diff</string>
