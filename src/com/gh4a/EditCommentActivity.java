@@ -82,10 +82,7 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity
             }
             return true;
         case R.id.delete:
-            int dialogTheme = Gh4Application.THEME == R.style.DefaultTheme ? 
-                    R.style.Theme_Sherlock_Dialog : R.style.Theme_Sherlock_Light_Dialog;
-            AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this,
-                    dialogTheme));
+            AlertDialog.Builder builder = createDialogBuilder();
             builder.setMessage(R.string.delete_comment_message);
             builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {

@@ -38,7 +38,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.text.format.DateFormat;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -190,8 +189,7 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
                 new EditIssueMilestonesTask(IssueMilestoneEditActivity.this).execute(tvTitle.getText().toString(), desc);
             }
         } else if (itemId == R.id.delete) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(IssueMilestoneEditActivity.this,
-                    android.R.style.Theme));
+            AlertDialog.Builder builder = createDialogBuilder();
             builder.setTitle(getString(R.string.issue_milestone_delete_title, mMilestone.getTitle()));
             builder.setMessage(R.string.issue_milestone_delete_message);
             builder.setPositiveButton(R.string.ok,

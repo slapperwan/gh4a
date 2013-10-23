@@ -13,7 +13,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,8 +81,8 @@ public class DownloadTagsFragment extends BaseFragment implements OnItemClickLis
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, final int position, long id) {
         final RepositoryTag tag = (RepositoryTag) mAdapter.getItem(position);
-        AlertDialog.Builder builder = new AlertDialog.Builder(
-                new ContextThemeWrapper(getSherlockActivity(),android.R.style.Theme));
+        BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) getActivity();
+        AlertDialog.Builder builder = activity.createDialogBuilder();
         builder.setTitle(R.string.download_file_title);
         builder.setMessage(getString(R.string.download_file_message, tag.getName()));
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {

@@ -317,8 +317,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
                         mSelectedEtLabel.getText().toString(), IssueLabelListActivity.this.mSelectedColor);
                 break;
             case 1:
-                AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(IssueLabelListActivity.this,
-                        android.R.style.Theme));
+                AlertDialog.Builder builder = createDialogBuilder();
                 builder.setTitle("Delete " + mCurrentLabelName + "?");
                 builder.setMessage("Are you sure?");
                 builder.setPositiveButton(R.string.ok,

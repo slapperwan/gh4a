@@ -21,6 +21,7 @@ import java.util.Locale;
 
 import org.ocpsoft.pretty.time.PrettyTime;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -35,6 +36,7 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
@@ -532,5 +534,11 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         }
 
         return pager;
+    }
+
+    public AlertDialog.Builder createDialogBuilder() {
+        int dialogTheme = Gh4Application.THEME == R.style.DefaultTheme ?
+                R.style.Theme_Sherlock_Dialog : R.style.Theme_Sherlock_Light_Dialog;
+        return new AlertDialog.Builder(new ContextThemeWrapper(this, dialogTheme));
     }
 }

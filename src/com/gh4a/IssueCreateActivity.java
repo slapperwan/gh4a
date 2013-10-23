@@ -296,9 +296,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
             }
         }
         
-        int dialogTheme = Gh4Application.THEME == R.style.DefaultTheme ? 
-                R.style.Theme_Sherlock_Dialog : R.style.Theme_Sherlock_Light_Dialog;
-        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, dialogTheme));
+        AlertDialog.Builder builder = createDialogBuilder();
         builder.setCancelable(true);
         builder.setTitle(R.string.issue_milestone);
         builder.setSingleChoiceItems(milestones, checkedItem, new DialogInterface.OnClickListener() {
@@ -353,9 +351,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
             }
         }
         
-        int dialogTheme = Gh4Application.THEME == R.style.DefaultTheme ? 
-                R.style.Theme_Sherlock_Dialog : R.style.Theme_Sherlock_Light_Dialog;
-        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, dialogTheme));
+        AlertDialog.Builder builder = createDialogBuilder();
         builder.setCancelable(true);
         builder.setTitle(R.string.issue_assignee);
         builder.setSingleChoiceItems(assignees, checkedItem, new DialogInterface.OnClickListener() {
