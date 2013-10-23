@@ -16,6 +16,7 @@
 package com.gh4a;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.util.EncodingUtils;
@@ -200,8 +201,12 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
         
         if (!isLoaderError(result)) {
             if (result != null) {
-                mContent = (RepositoryContents) result.get(LoaderResult.DATA);
-                fillData(true);
+                List<RepositoryContents> contents =
+                        (List<RepositoryContents>) result.get(LoaderResult.DATA);
+                if (!contents.isEmpty()) {
+                    mContent = contents.get(0);
+                    fillData(true);
+                }
             }    
         }
     }
