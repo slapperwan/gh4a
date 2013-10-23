@@ -107,8 +107,7 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
     }
 
     protected void searchUser(final String searchKey) {
-        mUserAdapter = new SearchUserAdapter(this,
-                new ArrayList<SearchUser>(), R.layout.row_gravatar_1);
+        mUserAdapter = new SearchUserAdapter(this, new ArrayList<SearchUser>());
         mListViewResults.setAdapter(mUserAdapter);
         new LoadUserTask(this).execute(new String[] { searchKey });
     }

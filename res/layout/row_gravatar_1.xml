@@ -8,27 +8,34 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
     android:paddingTop="8dp"
     android:paddingBottom="8dp" >
     <ImageView
         android:id="@+id/iv_gravatar"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="5dp" />
-    <TextView
-        android:id="@+id/tv_title"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_toRightOf="@id/iv_gravatar" />
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="8dp" />
     <TextView
         android:id="@+id/tv_extra"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="@style/default_text_micro"
         android:layout_toRightOf="@id/iv_gravatar"
-        android:layout_below="@id/tv_title" />
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true" />
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:gravity="center_vertical"
+        android:layout_toRightOf="@id/iv_gravatar"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_above="@id/tv_extra"
+        android:layout_alignWithParentIfMissing="true" />
 </RelativeLayout>

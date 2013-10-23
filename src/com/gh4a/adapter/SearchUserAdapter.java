@@ -38,12 +38,10 @@ import com.gh4a.utils.StringUtils;
 
 public class SearchUserAdapter extends RootAdapter<SearchUser> {
 
-    private int mRowLayout;
     private AQuery aq;
     
-    public SearchUserAdapter(Context context, List<SearchUser> objects, int rowLayout) {
+    public SearchUserAdapter(Context context, List<SearchUser> objects) {
         super(context, objects);
-        mRowLayout = rowLayout;
         aq = new AQuery((BaseSherlockFragmentActivity) context);
     }
     
@@ -55,7 +53,7 @@ public class SearchUserAdapter extends RootAdapter<SearchUser> {
         
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(mRowLayout, null);
+            v = vi.inflate(R.layout.row_gravatar_1, parent, false);
 
             
             Typeface boldCondensed = app.boldCondensed;

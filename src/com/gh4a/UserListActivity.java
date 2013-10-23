@@ -63,7 +63,7 @@ public class UserListActivity extends BaseSherlockFragmentActivity implements On
         mListViewUsers = (ListView) findViewById(R.id.list_view);
         mListViewUsers.setOnItemClickListener(this);
 
-        mUserAdapter = new UserAdapter(this, new ArrayList<User>(), getRowLayout(), getShowExtraData());
+        mUserAdapter = new UserAdapter(this, new ArrayList<User>(), getShowExtraData());
         mListViewUsers.setAdapter(mUserAdapter);
 
         new LoadUserListTask(this).execute();
@@ -129,10 +129,6 @@ public class UserListActivity extends BaseSherlockFragmentActivity implements On
 
     protected void setRequestData() {
         mSearchKey = getIntent().getExtras().getString("searchKey");
-    }
-
-    protected int getRowLayout() {
-        return R.layout.row_gravatar_1;
     }
 
     protected String getTitleBar() {

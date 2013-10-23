@@ -41,11 +41,6 @@ public class ContributorListActivity extends UserListActivity {
     }
 
     @Override
-    protected int getRowLayout() {
-        return R.layout.row_gravatar_1;
-    }
-    
-    @Override
     protected String getTitleBar() {
         return getResources().getString(R.string.repo_contributors);
     }

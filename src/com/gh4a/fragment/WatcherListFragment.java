@@ -80,8 +80,7 @@ public class WatcherListFragment extends BaseFragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        mAdapter = new UserAdapter(getSherlockActivity(), new ArrayList<User>(), 
-                R.layout.row_gravatar_1, false);
+        mAdapter = new UserAdapter(getSherlockActivity(), new ArrayList<User>(), false);
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         

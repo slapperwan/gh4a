@@ -46,11 +46,6 @@ public class OrganizationMemberListActivity extends UserListActivity {
     }
 
     @Override
-    protected int getRowLayout() {
-        return R.layout.row_gravatar_1;
-    }
-    
-    @Override
     protected boolean getShowExtraData() {
         return false;
     }

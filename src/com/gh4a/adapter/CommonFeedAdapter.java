@@ -72,12 +72,7 @@ public class CommonFeedAdapter extends RootAdapter<Feed> {
 
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            if (mRowLayout != 0) {
-                v = vi.inflate(mRowLayout, null);
-            }
-            else {
-                v = vi.inflate(R.layout.row_gravatar_3, null);
-            }
+            v = vi.inflate(mRowLayout != 0 ? mRowLayout : R.layout.row_gravatar_3, parent, false);
             
             Gh4Application app = (Gh4Application) mContext.getApplicationContext();
             Typeface boldCondensed = app.boldCondensed;
@@ -128,11 +123,13 @@ public class CommonFeedAdapter extends RootAdapter<Feed> {
                     viewHolder.ivGravatar.setVisibility(View.GONE);
                 }
             }
-            
-            viewHolder.tvTitle.setText(feed.getTitle());
+
+            String title = feed.getTitle();
+            viewHolder.tvTitle.setText(title);
+            viewHolder.tvTitle.setVisibility(title != null ? View.VISIBLE : View.GONE);
 
             viewHolder.tvDesc.setText(feed.getPreview());
-            viewHolder.tvDesc.setSingleLine(true);
+            viewHolder.tvDesc.setSingleLine(title != null || mShowExtra);
             
             if (mShowExtra) {
                 viewHolder.tvExtra.setText(feed.getAuthor() 

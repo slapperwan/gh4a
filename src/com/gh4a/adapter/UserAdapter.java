@@ -20,7 +20,6 @@ import java.util.List;
 import org.eclipse.egit.github.core.User;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,18 +37,11 @@ import com.gh4a.utils.StringUtils;
 
 public class UserAdapter extends RootAdapter<User> {
 
-    private int mRowLayout;
     private boolean mShowExtraData;
     private AQuery aq;
     
-    public UserAdapter(Context context, List<User> objects) {
+    public UserAdapter(Context context, List<User> objects, boolean showExtraData) {
         super(context, objects);
-        aq = new AQuery((BaseSherlockFragmentActivity) context);
-    }
-
-    public UserAdapter(Context context, List<User> objects, int rowLayout, boolean showExtraData) {
-        super(context, objects);
-        mRowLayout = rowLayout;
         mShowExtraData = showExtraData;
         aq = new AQuery((BaseSherlockFragmentActivity) context);
     }
@@ -62,7 +54,7 @@ public class UserAdapter extends RootAdapter<User> {
         
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(mRowLayout, null);
+            v = vi.inflate(R.layout.row_gravatar_1, parent, false);
 
             
             Typeface boldCondensed = app.boldCondensed;
@@ -135,11 +127,13 @@ public class UserAdapter extends RootAdapter<User> {
                 viewHolder.tvDesc.setText(StringUtils.formatName(user.getLogin(), user.getName()));
             }
 
-            if (mShowExtraData && viewHolder.tvExtra != null) {
-                Resources res = v.getResources();
-                String extraData = String.format(res.getString(R.string.user_extra_data), user
-                            .getFollowers(), user.getPublicRepos());
-                viewHolder.tvExtra.setText(extraData);
+            if (viewHolder.tvExtra != null) {
+                viewHolder.tvExtra.setVisibility(mShowExtraData ? View.VISIBLE : View.GONE);
+                if (mShowExtraData) {
+                    String extraData = v.getResources().getString(R.string.user_extra_data,
+                            user.getFollowers(), user.getPublicRepos());
+                    viewHolder.tvExtra.setText(extraData);
+                }
             }
         }
         return v;

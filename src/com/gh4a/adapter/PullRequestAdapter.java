@@ -50,7 +50,7 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> {
         ViewHolder viewHolder;
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_gravatar_2, null);
+            v = vi.inflate(R.layout.row_gravatar_1, parent, false);
             
             Gh4Application app = (Gh4Application) mContext.getApplicationContext();
             Typeface boldCondensed = app.boldCondensed;
@@ -59,7 +59,7 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> {
             viewHolder = new ViewHolder();
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
             
-            viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+            viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_title);
             viewHolder.tvDesc.setTypeface(boldCondensed);
             
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
