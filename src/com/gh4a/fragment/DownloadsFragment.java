@@ -1,7 +1,6 @@
 package com.gh4a.fragment;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Download;
@@ -11,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,19 +20,32 @@ import android.widget.ListView;
 
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
-import com.gh4a.Constants.LoaderResult;
 import com.gh4a.R;
 import com.gh4a.adapter.DownloadAdapter;
 import com.gh4a.loader.DownloadsLoader;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 
-public class DownloadsFragment extends BaseFragment implements OnItemClickListener,
-    LoaderManager.LoaderCallbacks<HashMap<Integer, Object>> {
-
+public class DownloadsFragment extends BaseFragment implements OnItemClickListener {
     private String mRepoOwner;
     private String mRepoName;
     private ListView mListView;
     private DownloadAdapter mAdapter;
-    
+
+    private LoaderCallbacks<List<Download>> mDownloadsCallback = new LoaderCallbacks<List<Download>>() {
+        @Override
+        public Loader<LoaderResult<List<Download>>> onCreateLoader(int id, Bundle args) {
+            return new DownloadsLoader(getSherlockActivity(), mRepoOwner, mRepoName);
+        }
+        @Override
+        public void onResultReady(LoaderResult<List<Download>> result) {
+            hideLoading();
+            if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
+                fillData(result.getData());
+            }
+        }
+    };
+
     public static DownloadsFragment newInstance(String repoOwner, String repoName) {
         DownloadsFragment f = new DownloadsFragment();
         Bundle args = new Bundle();
@@ -69,7 +80,7 @@ public class DownloadsFragment extends BaseFragment implements OnItemClickListen
         
         showLoading();
         
-        getLoaderManager().initLoader(0, null, this);
+        getLoaderManager().initLoader(0, null, mDownloadsCallback);
         getLoaderManager().getLoader(0).forceLoad();
     }
 
@@ -93,27 +104,5 @@ public class DownloadsFragment extends BaseFragment implements OnItemClickListen
         });
         builder.setNegativeButton(R.string.cancel, null);
         builder.show();
-    }
-
-    @Override
-    public Loader<HashMap<Integer, Object>> onCreateLoader(int id, Bundle args) {
-        return new DownloadsLoader(getSherlockActivity(), mRepoOwner, mRepoName);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader,
-            HashMap<Integer, Object> object) {
-        hideLoading();
-        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
-        
-        if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
-            fillData((List<Download>) result.get(LoaderResult.DATA));
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<HashMap<Integer, Object>> arg0) {
-        // TODO Auto-generated method stub
-        
     }
 }

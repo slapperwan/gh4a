@@ -16,14 +16,12 @@
 package com.gh4a.fragment;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryCommit;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,20 +33,36 @@ import android.widget.ListView;
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.CommitActivity;
 import com.gh4a.Constants;
-import com.gh4a.Constants.LoaderResult;
 import com.gh4a.R;
 import com.gh4a.adapter.CommitAdapter;
+import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.RepositoryCommitsLoader;
 
-public class PullRequestCommitListFragment extends BaseFragment 
-    implements LoaderManager.LoaderCallbacks<HashMap<Integer, Object>>, OnItemClickListener {
-
+public class PullRequestCommitListFragment extends BaseFragment implements OnItemClickListener {
     private String mRepoOwner;
     private String mRepoName;
     private int mPullRequestNumber;
     private ListView mListView;
     private CommitAdapter mAdapter;
-    
+
+    private LoaderCallbacks<List<RepositoryCommit>> mCommitCallback =
+            new LoaderCallbacks<List<RepositoryCommit>>() {
+
+        @Override
+        public Loader<com.gh4a.loader.LoaderResult<List<RepositoryCommit>>> onCreateLoader(int id, Bundle args) {
+            return new RepositoryCommitsLoader(getSherlockActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
+        }
+
+        @Override
+        public void onResultReady(com.gh4a.loader.LoaderResult<List<RepositoryCommit>> result) {
+            hideLoading();
+
+            if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
+                fillData(result.getData());
+            }
+        }
+    };
+
     public static PullRequestCommitListFragment newInstance(String repoOwner, String repoName, int pullRequestNumber) {
         
         PullRequestCommitListFragment f = new PullRequestCommitListFragment();
@@ -86,7 +100,7 @@ public class PullRequestCommitListFragment extends BaseFragment
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         
-        getLoaderManager().initLoader(0, null, this);
+        getLoaderManager().initLoader(0, null, mCommitCallback);
         getLoaderManager().getLoader(0).forceLoad();
     }
     
@@ -101,24 +115,6 @@ public class PullRequestCommitListFragment extends BaseFragment
         }
     }
 
-    @Override
-    public Loader<HashMap<Integer, Object>> onCreateLoader(int id, Bundle args) {
-        return new RepositoryCommitsLoader(getSherlockActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
-        hideLoading();
-        
-        if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
-            fillData((List<RepositoryCommit>) result.get(LoaderResult.DATA));
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<HashMap<Integer, Object>> loader) {
-    }
-    
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         RepositoryCommit commit = (RepositoryCommit) adapterView.getAdapter().getItem(position);
         Intent intent = new Intent().setClass(getSherlockActivity(), CommitActivity.class);

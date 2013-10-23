@@ -1,6 +1,5 @@
 package com.gh4a;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -10,7 +9,6 @@ import org.eclipse.egit.github.core.RepositoryBranch;
 import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.RepositoryTag;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -18,10 +16,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
-import android.view.ContextThemeWrapper;
 import android.view.KeyEvent;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -30,7 +26,6 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.gh4a.Constants.LoaderResult;
 import com.gh4a.fragment.CommitListFragment;
 import com.gh4a.fragment.ContentListFragment;
 import com.gh4a.fragment.ContentListFragment.OnTreeSelectedListener;
@@ -38,17 +33,15 @@ import com.gh4a.fragment.RepositoryFragment;
 import com.gh4a.loader.BranchListLoader;
 import com.gh4a.loader.IsStarringLoader;
 import com.gh4a.loader.IsWatchingLoader;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.RepositoryLoader;
 import com.gh4a.loader.StarLoader;
 import com.gh4a.loader.TagListLoader;
 import com.gh4a.loader.WatchLoader;
 import com.gh4a.utils.StringUtils;
 
-public class RepositoryActivity extends BaseSherlockFragmentActivity
-    implements OnTreeSelectedListener, LoaderManager.LoaderCallbacks<HashMap<Integer, Object>> {
-
-    private static final int NUM_ITEMS = 3;
-
+public class RepositoryActivity extends BaseSherlockFragmentActivity implements OnTreeSelectedListener {
     private static final int LOADER_REPO = 0;
     private static final int LOADER_BRANCHES = 1;
     private static final int LOADER_TAGS = 2;
@@ -56,6 +49,107 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
     private static final int LOADER_WATCH = 4;
     private static final int LOADER_STARRING = 5;
     private static final int LOADER_STAR = 6;
+
+    private LoaderCallbacks<Repository> mRepoCallback = new LoaderCallbacks<Repository>() {
+        @Override
+        public Loader<LoaderResult<Repository>> onCreateLoader(int id, Bundle args) {
+            return new RepositoryLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
+        }
+
+        @Override
+        public void onResultReady(LoaderResult<Repository> result) {
+            if (!checkForError(result)) {
+                hideLoading();
+                mRepository = result.getData();
+                initializePager();
+                invalidateOptionsMenu();
+            }
+        }
+    };
+
+    private LoaderCallbacks<List<RepositoryBranch>> mBranchCallback =
+            new LoaderCallbacks<List<RepositoryBranch>>() {
+        @Override
+        public Loader<LoaderResult<List<RepositoryBranch>>> onCreateLoader(int id, Bundle args) {
+            return new BranchListLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
+        }
+        @Override
+        public void onResultReady(LoaderResult<List<RepositoryBranch>> result) {
+            if (!checkForError(result)) {
+                stopProgressDialog(mProgressDialog);
+                mBranches = result.getData();
+                showBranchesDialog();
+            }
+        }
+    };
+
+    private LoaderCallbacks<List<RepositoryTag>> mTagCallback =
+            new LoaderCallbacks<List<RepositoryTag>>() {
+        @Override
+        public Loader<LoaderResult<List<RepositoryTag>>> onCreateLoader(int id, Bundle args) {
+            return new TagListLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
+        }
+        @Override
+        public void onResultReady(LoaderResult<List<RepositoryTag>> result) {
+            if (!checkForError(result)) {
+                stopProgressDialog(mProgressDialog);
+                mTags = (List<RepositoryTag>) result.getData();
+                showTagsDialog();
+            }
+        }
+    };
+
+    private LoaderCallbacks<Boolean> mWatchCallback = new LoaderCallbacks<Boolean>() {
+        @Override
+        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
+            if (id == LOADER_WATCH) {
+                return new WatchLoader(RepositoryActivity.this, mRepoOwner, mRepoName, mIsWatching);
+            } else {
+                return new IsWatchingLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
+            }
+        }
+        @Override
+        public void onResultReady(LoaderResult<Boolean> result) {
+            if (!checkForError(result)) {
+                mIsWatching = result.getData();
+                mIsFinishLoadingWatching = true;
+                invalidateOptionsMenu();
+            }
+        }
+    };
+
+    private LoaderCallbacks<Boolean> mIsStarringCallback = new LoaderCallbacks<Boolean>() {
+        @Override
+        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
+            return new IsStarringLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
+        }
+        @Override
+        public void onResultReady(LoaderResult<Boolean> result) {
+            if (!checkForError(result)) {
+                mIsStarring = result.getData();
+                mIsFinishLoadingStarring = true;
+                invalidateOptionsMenu();
+            }
+        }
+    };
+
+    private LoaderCallbacks<Boolean> mStarCallback = new LoaderCallbacks<Boolean>() {
+        @Override
+        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
+            return new StarLoader(RepositoryActivity.this, mRepoOwner, mRepoName, mIsStarring);
+        }
+        @Override
+        public void onResultReady(LoaderResult<Boolean> result) {
+            if (!checkForError(result)) {
+                mIsStarring = result.getData();
+                mIsFinishLoadingStarring = true;
+                invalidateOptionsMenu();
+                if (mRepositoryFragment != null) {
+                    mRepositoryFragment.updateStargazerCount(mIsStarring);
+                }
+            }
+        }
+    };
 
     private String mRepoOwner;
     private String mRepoName;
@@ -110,12 +204,18 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         mActionBar.setDisplayHomeAsUpEnabled(true);
         
         showLoading();
-        for (int i = LOADER_REPO; i <= LOADER_STAR; i++) {
-            getSupportLoaderManager().initLoader(i, null, this);
-            if (i == LOADER_REPO || i == LOADER_WATCHING || i == LOADER_STARRING) {
-                getSupportLoaderManager().getLoader(i).forceLoad();
-            }
-        }
+
+        getSupportLoaderManager().initLoader(LOADER_REPO, null, mRepoCallback);
+        getSupportLoaderManager().initLoader(LOADER_BRANCHES, null, mBranchCallback);
+        getSupportLoaderManager().initLoader(LOADER_TAGS, null, mTagCallback);
+        getSupportLoaderManager().initLoader(LOADER_WATCHING, null, mWatchCallback);
+        getSupportLoaderManager().initLoader(LOADER_WATCH, null, mWatchCallback);
+        getSupportLoaderManager().initLoader(LOADER_STARRING, null, mIsStarringCallback);
+        getSupportLoaderManager().initLoader(LOADER_STAR, null, mStarCallback);
+
+        getSupportLoaderManager().getLoader(LOADER_REPO).forceLoad();
+        getSupportLoaderManager().getLoader(LOADER_WATCHING).forceLoad();
+        getSupportLoaderManager().getLoader(LOADER_STARRING).forceLoad();
 
         mAdapter = new RepositoryAdapter(getSupportFragmentManager());
     }
@@ -142,7 +242,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
 
         @Override
         public int getCount() {
-            return NUM_ITEMS;
+            return 3;
         }
 
         @Override
@@ -306,13 +406,13 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
             case R.id.watch:
                 item.setActionView(R.layout.ab_loading);
                 item.expandActionView();
-                getSupportLoaderManager().restartLoader(LOADER_WATCH, null, this);
+                getSupportLoaderManager().restartLoader(LOADER_WATCH, null, mWatchCallback);
                 getSupportLoaderManager().getLoader(LOADER_WATCH).forceLoad();
                 return true;
             case R.id.star:
                 item.setActionView(R.layout.ab_loading);
                 item.expandActionView();
-                getSupportLoaderManager().restartLoader(LOADER_STAR, null, this);
+                getSupportLoaderManager().restartLoader(LOADER_STAR, null, mStarCallback);
                 getSupportLoaderManager().getLoader(LOADER_STAR).forceLoad();
                 return true;
             case R.id.branches:
@@ -349,71 +449,6 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
             default:
                 return true;
         }
-    }
-    
-    @Override
-    public Loader<HashMap<Integer, Object>> onCreateLoader(int id, Bundle bundle) {
-        switch (id) {
-            case LOADER_REPO: return new RepositoryLoader(this, mRepoOwner, mRepoName);
-            case LOADER_BRANCHES: return new BranchListLoader(this, mRepoOwner, mRepoName);
-            case LOADER_TAGS: return new TagListLoader(this, mRepoOwner, mRepoName);
-            case LOADER_WATCHING: return new IsWatchingLoader(this, mRepoOwner, mRepoName);
-            case LOADER_WATCH: return new WatchLoader(this, mRepoOwner, mRepoName, mIsWatching);
-            case LOADER_STARRING: return new IsStarringLoader(this, mRepoOwner, mRepoName);
-            case LOADER_STAR: return new StarLoader(this, mRepoOwner, mRepoName, mIsStarring);
-        }
-        return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    @SuppressLint("NewApi") // don't generate errors on invalidateOptionsMenu(), ABS provides that for us
-    @Override
-    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
-        if (!isLoaderError(result)) {
-            Object data = result.get(LoaderResult.DATA); 
-            switch (loader.getId()) {
-                case LOADER_REPO:
-                    hideLoading();
-                    mRepository = (Repository) data;
-                    initializePager();
-                    invalidateOptionsMenu();
-                    break;
-                case LOADER_BRANCHES:
-                    stopProgressDialog(mProgressDialog);
-                    mBranches = (List<RepositoryBranch>) data;
-                    showBranchesDialog();
-                    break;
-                case LOADER_TAGS:
-                    stopProgressDialog(mProgressDialog);
-                    mTags = (List<RepositoryTag>) data;
-                    showTagsDialog();
-                    break;
-                case LOADER_WATCHING:
-                case LOADER_WATCH:
-                    mIsWatching = (Boolean) data;
-                    mIsFinishLoadingWatching = true;
-                    invalidateOptionsMenu();
-                    break;
-                case LOADER_STARRING:
-                case LOADER_STAR:
-                    mIsStarring = (Boolean) data;
-                    mIsFinishLoadingStarring = true;
-                    invalidateOptionsMenu();
-                    if (loader.getId() == LOADER_STAR && mRepositoryFragment != null) {
-                        mRepositoryFragment.updateStargazerCount(mIsStarring);
-                    }
-                    break;
-            }
-        }
-        else {
-            hideLoading();
-            stopProgressDialog(mProgressDialog);
-            invalidateOptionsMenu();
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<HashMap<Integer, Object>> arg0) {
     }
     
     private void showBranchesDialog() {
@@ -477,8 +512,17 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity
         mCommitListFragment = null;
         mDirStack.clear();
         showLoading();
-        getSupportLoaderManager().restartLoader(0, null, this);
-        getSupportLoaderManager().getLoader(0).forceLoad();
+        getSupportLoaderManager().restartLoader(LOADER_REPO, null, mRepoCallback);
+        getSupportLoaderManager().getLoader(LOADER_REPO).forceLoad();
     }
 
+    private boolean checkForError(LoaderResult<?> result) {
+        if (isLoaderError(result)) {
+            hideLoading();
+            stopProgressDialog(mProgressDialog);
+            invalidateOptionsMenu();
+            return true;
+        }
+        return false;
+    }
 }

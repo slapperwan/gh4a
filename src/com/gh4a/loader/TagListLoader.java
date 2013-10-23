@@ -1,18 +1,18 @@
 package com.gh4a.loader;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.RepositoryTag;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
 import android.content.Context;
 
-import com.gh4a.Constants.LoaderResult;
 import com.gh4a.Gh4Application;
 
-public class TagListLoader extends BaseLoader {
+public class TagListLoader extends BaseLoader<List<RepositoryTag>> {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -24,11 +24,11 @@ public class TagListLoader extends BaseLoader {
     }
     
     @Override
-    public void doLoadInBackground(HashMap<Integer, Object> result) throws IOException {
+    public List<RepositoryTag> doLoadInBackground() throws IOException {
         Gh4Application app = (Gh4Application) getContext().getApplicationContext();
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(app.getAuthToken());
         RepositoryService repoService = new RepositoryService(client);
-        result.put(LoaderResult.DATA, repoService.getTags(new RepositoryId(mRepoOwner, mRepoName)));
+        return repoService.getTags(new RepositoryId(mRepoOwner, mRepoName));
     }
 }

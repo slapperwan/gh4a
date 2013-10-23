@@ -18,7 +18,6 @@ package com.gh4a;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.Calendar;
-import java.util.HashMap;
 
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -34,7 +33,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -46,18 +44,34 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.gh4a.Constants.LoaderResult;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneLoader;
 import com.gh4a.utils.StringUtils;
 
-public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
-    implements LoaderManager.LoaderCallbacks<HashMap<Integer, Object>> {
-
+public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity {
     private String mRepoOwner;
     private String mRepoName;
     private int mMilestoneNumber;
     private Milestone mMilestone;
     private ProgressDialog mProgressDialog;
+
+    private LoaderCallbacks<Milestone> mMilestoneCallback = new LoaderCallbacks<Milestone>() {
+        @Override
+        public Loader<LoaderResult<Milestone>> onCreateLoader(int id, Bundle args) {
+            return new MilestoneLoader(IssueMilestoneEditActivity.this,
+                    mRepoOwner, mRepoName, mMilestoneNumber);
+        }
+        @Override
+        public void onResultReady(LoaderResult<Milestone> result) {
+            hideLoading();
+
+            if (!isLoaderError(result)) {
+                mMilestone = result.getData();
+                fillData();
+            }
+        }
+    };
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -87,7 +101,7 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
         actionBar.setDisplayHomeAsUpEnabled(true);
         
         showLoading();
-        getSupportLoaderManager().initLoader(0, null, this);
+        getSupportLoaderManager().initLoader(0, null, mMilestoneCallback);
         getSupportLoaderManager().getLoader(0).forceLoad();
     }
     
@@ -319,25 +333,5 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
         
         EditText etDueDate = (EditText) findViewById(R.id.et_due_date);
         etDueDate.setText(DateFormat.getMediumDateFormat(this).format(mMilestone.getDueOn()));
-    }
-    
-    @Override
-    public Loader<HashMap<Integer, Object>> onCreateLoader(int arg0, Bundle arg1) {
-        return new MilestoneLoader(this, mRepoOwner, mRepoName, mMilestoneNumber);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
-        hideLoading();
-        
-        if (!isLoaderError(result)) {
-            Object data = result.get(LoaderResult.DATA);
-            mMilestone = (Milestone) data;
-            fillData();
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<HashMap<Integer, Object>> loader) {
     }
 }

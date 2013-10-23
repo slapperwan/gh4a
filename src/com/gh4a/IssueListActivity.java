@@ -24,7 +24,6 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -32,9 +31,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.View.OnClickListener;
 
@@ -42,7 +39,6 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.gh4a.Constants.LoaderResult;
 import com.gh4a.fragment.IssueListByCommentsFragment;
 import com.gh4a.fragment.IssueListBySubmittedFragment;
 import com.gh4a.fragment.IssueListByUpdatedFragment;
@@ -50,10 +46,11 @@ import com.gh4a.fragment.IssueListFragment;
 import com.gh4a.loader.CollaboratorListLoader;
 import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.LabelListLoader;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
 
-public class IssueListActivity extends BaseSherlockFragmentActivity
-    implements OnClickListener, LoaderManager.LoaderCallbacks<HashMap<Integer, Object>> {
+public class IssueListActivity extends BaseSherlockFragmentActivity implements OnClickListener {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -69,6 +66,65 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
     private List<Label> mLabels;
     private List<Milestone> mMilestones;
     private List<User> mAssignees;
+
+    private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
+        @Override
+        public Loader<LoaderResult<List<Label>>> onCreateLoader(int id, Bundle args) {
+            return new LabelListLoader(IssueListActivity.this, mRepoOwner, mRepoName);
+        }
+        @Override
+        public void onResultReady(LoaderResult<List<Label>> result) {
+            if (!checkForError(result)) {
+                stopProgressDialog(mProgressDialog);
+                mLabels = result.getData();
+                showLabelsDialog();
+            }
+        }
+    };
+
+    private LoaderCallbacks<List<Milestone>> mMilestoneCallback = new LoaderCallbacks<List<Milestone>>() {
+        @Override
+        public Loader<LoaderResult<List<Milestone>>> onCreateLoader(int id, Bundle args) {
+            return new MilestoneListLoader(IssueListActivity.this, mRepoOwner, mRepoName, "open");
+        }
+        @Override
+        public void onResultReady(LoaderResult<List<Milestone>> result) {
+            if (!checkForError(result)) {
+                stopProgressDialog(mProgressDialog);
+                mMilestones = result.getData();
+                showMilestonesDialog();
+            }
+        }
+    };
+
+    private LoaderCallbacks<List<User>> mCollaboratorListCallback =new LoaderCallbacks<List<User>>() {
+        @Override
+        public Loader<LoaderResult<List<User>>> onCreateLoader(int id, Bundle args) {
+            return new CollaboratorListLoader(IssueListActivity.this, mRepoOwner, mRepoName);
+        }
+        @Override
+        public void onResultReady(LoaderResult<List<User>> result) {
+            if (!checkForError(result)) {
+                stopProgressDialog(mProgressDialog);
+                mAssignees = result.getData();
+                showAssigneesDialog();
+            }
+        }
+    };
+
+    private LoaderCallbacks<Boolean> mIsCollaboratorCallback = new LoaderCallbacks<Boolean>() {
+        @Override
+        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
+            return new IsCollaboratorLoader(IssueListActivity.this, mRepoOwner, mRepoName);
+        }
+        @Override
+        public void onResultReady(LoaderResult<Boolean> result) {
+            if (!checkForError(result)) {
+                isCollaborator = result.getData();
+                invalidateOptionsMenu();
+            }
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -90,10 +146,10 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         
         setContentView(R.layout.view_pager);
 
-        getSupportLoaderManager().initLoader(0, null, this);
-        getSupportLoaderManager().initLoader(1, null, this);
-        getSupportLoaderManager().initLoader(2, null, this);
-        getSupportLoaderManager().initLoader(3, null, this);
+        getSupportLoaderManager().initLoader(0, null, mLabelCallback);
+        getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
+        getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
+        getSupportLoaderManager().initLoader(3, null, mIsCollaboratorCallback);
         getSupportLoaderManager().getLoader(3).forceLoad();
 
         mActionBar = getSupportActionBar();
@@ -454,55 +510,12 @@ public class IssueListActivity extends BaseSherlockFragmentActivity
         builder.show();
     }
 
-    @Override
-    public Loader<HashMap<Integer, Object>> onCreateLoader(int id, Bundle args) {
-        if (id == 0) {
-            return new LabelListLoader(this, mRepoOwner, mRepoName);
-        }
-        else if (id == 1) {
-            return new MilestoneListLoader(this, mRepoOwner, mRepoName, "open");
-        }
-        else if (id == 2) {
-            return new CollaboratorListLoader(this, mRepoOwner, mRepoName);
-        }
-        else {
-            return new IsCollaboratorLoader(this, mRepoOwner, mRepoName);            
-        }
-    }
-
-    @SuppressLint("NewApi") // ABS provides invalidateOptionsMenu for us
-    @SuppressWarnings("unchecked")
-    @Override
-    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
-        if (!isLoaderError(result)) {
-            Object data = result.get(LoaderResult.DATA); 
-            
-            if (loader.getId() == 0) {
-                stopProgressDialog(mProgressDialog);
-                mLabels = (List<Label>) data;
-                showLabelsDialog();
-            }
-            else if (loader.getId() == 1) {
-                stopProgressDialog(mProgressDialog);
-                mMilestones = (List<Milestone>) data;
-                showMilestonesDialog();
-            }
-            else if (loader.getId() == 2) {
-                stopProgressDialog(mProgressDialog);
-                mAssignees = (List<User>) data;
-                showAssigneesDialog();
-            }
-            else {
-                isCollaborator = (Boolean) data;
-            }
-        }
-        else {
+    private boolean checkForError(LoaderResult<?> result) {
+        if (isLoaderError(result)) {
             stopProgressDialog(mProgressDialog);
             invalidateOptionsMenu();
+            return true;
         }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<HashMap<Integer, Object>> loader) {
+        return false;
     }
 }

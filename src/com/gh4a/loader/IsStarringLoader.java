@@ -1,7 +1,6 @@
 package com.gh4a.loader;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
@@ -9,10 +8,9 @@ import org.eclipse.egit.github.core.service.StarService;
 
 import android.content.Context;
 
-import com.gh4a.Constants.LoaderResult;
 import com.gh4a.Gh4Application;
 
-public class IsStarringLoader extends BaseLoader {
+public class IsStarringLoader extends BaseLoader<Boolean> {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -24,11 +22,11 @@ public class IsStarringLoader extends BaseLoader {
     }
     
     @Override
-    public void doLoadInBackground(HashMap<Integer, Object> result) throws IOException {
+    public Boolean doLoadInBackground() throws IOException {
         Gh4Application app = (Gh4Application) getContext().getApplicationContext();
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(app.getAuthToken());
         StarService starringService = new StarService(client);
-        result.put(LoaderResult.DATA, starringService.isStarring(new RepositoryId(mRepoOwner, mRepoName)));
+        return starringService.isStarring(new RepositoryId(mRepoOwner, mRepoName));
     }
 }

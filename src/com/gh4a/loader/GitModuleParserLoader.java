@@ -13,11 +13,10 @@ import org.eclipse.egit.github.core.util.EncodingUtils;
 
 import android.content.Context;
 
-import com.gh4a.Constants.LoaderResult;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.StringUtils;
 
-public class GitModuleParserLoader extends BaseLoader {
+public class GitModuleParserLoader extends BaseLoader<Map<String, String>> {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -33,42 +32,44 @@ public class GitModuleParserLoader extends BaseLoader {
     }
     
     @Override
-    public void doLoadInBackground(HashMap<Integer, Object> result) throws IOException {
+    public Map<String, String> doLoadInBackground() throws IOException {
         Gh4Application app = (Gh4Application) getContext().getApplicationContext();
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(app.getAuthToken());
         ContentsService contentService = new ContentsService(client);
         List<RepositoryContents> contents =
                 contentService.getContents(new RepositoryId(mRepoOwner, mRepoName), mPath, mRef);
-        if (contents != null && !contents.isEmpty()) {
-            String data = new String(EncodingUtils.fromBase64(contents.get(0).getContent()));
-            if (!StringUtils.isBlank(data)) {
-                Map<String, String> gitModuleMap = new HashMap<String, String>();
-                String[] lines = data.split("\n");
-                String path = null;
-                for (String line : lines) {
-                    
-                    line = line.trim();
-                    if (line.startsWith("path = ")) {
-                        String[] pathPart = line.split("=");
-                        path = pathPart[1].trim();
-                    }
-                    
-                    if (line.startsWith("url = ")) {
-                        String[] urlPart = line.split("=");
-                        String url = urlPart[1].trim();
-                        String[] userRepoPart = url.split("/");
-                        String user = userRepoPart[3];
-                        String repo = userRepoPart[4];
-                        
-                        if (repo.lastIndexOf(".") != -1) {
-                            repo = repo.substring(0, repo.lastIndexOf("."));
-                        }
-                        gitModuleMap.put(path, user + "/" + repo);
-                    }
+
+        if (contents == null || contents.isEmpty()) {
+            return null;
+        }
+        String data = new String(EncodingUtils.fromBase64(contents.get(0).getContent()));
+        if (StringUtils.isBlank(data)) {
+            return null;
+        }
+        Map<String, String> gitModuleMap = new HashMap<String, String>();
+        String[] lines = data.split("\n");
+        String path = null;
+        for (String line : lines) {
+            line = line.trim();
+            if (line.startsWith("path = ")) {
+                String[] pathPart = line.split("=");
+                path = pathPart[1].trim();
+            }
+
+            if (line.startsWith("url = ")) {
+                String[] urlPart = line.split("=");
+                String url = urlPart[1].trim();
+                String[] userRepoPart = url.split("/");
+                String user = userRepoPart[3];
+                String repo = userRepoPart[4];
+
+                if (repo.lastIndexOf(".") != -1) {
+                    repo = repo.substring(0, repo.lastIndexOf("."));
                 }
-                result.put(LoaderResult.DATA, gitModuleMap);
+                gitModuleMap.put(path, user + "/" + repo);
             }
         }
+        return gitModuleMap;
     }
 }

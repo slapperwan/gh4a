@@ -1,7 +1,6 @@
 package com.gh4a.fragment;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryBranch;
@@ -11,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,19 +20,33 @@ import android.widget.ListView;
 
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
-import com.gh4a.Constants.LoaderResult;
 import com.gh4a.R;
 import com.gh4a.adapter.BranchAdapter;
 import com.gh4a.loader.BranchListLoader;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 
-public class DownloadBranchesFragment extends BaseFragment implements OnItemClickListener,
-    LoaderManager.LoaderCallbacks<HashMap<Integer, Object>> {
-
+public class DownloadBranchesFragment extends BaseFragment implements OnItemClickListener {
     private String mRepoOwner;
     private String mRepoName;
     private ListView mListView;
     private BranchAdapter mAdapter;
     
+    private LoaderCallbacks<List<RepositoryBranch>> mBranchCallback =
+            new LoaderCallbacks<List<RepositoryBranch>>() {
+        @Override
+        public Loader<LoaderResult<List<RepositoryBranch>>> onCreateLoader(int id, Bundle args) {
+            return new BranchListLoader(getSherlockActivity(), mRepoOwner, mRepoName);
+        }
+        @Override
+        public void onResultReady(LoaderResult<List<RepositoryBranch>> result) {
+            hideLoading();
+            if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
+                fillData(result.getData());
+            }
+        }
+    };
+
     public static DownloadBranchesFragment newInstance(String repoOwner, String repoName) {
         DownloadBranchesFragment f = new DownloadBranchesFragment();
         Bundle args = new Bundle();
@@ -69,7 +81,7 @@ public class DownloadBranchesFragment extends BaseFragment implements OnItemClic
         
         showLoading();
         
-        getLoaderManager().initLoader(0, null, this);
+        getLoaderManager().initLoader(0, null, mBranchCallback);
         getLoaderManager().getLoader(0).forceLoad();
     }
 
@@ -94,27 +106,5 @@ public class DownloadBranchesFragment extends BaseFragment implements OnItemClic
         });
         builder.setNegativeButton(R.string.cancel, null);
         builder.show();
-    }
-
-    @Override
-    public Loader<HashMap<Integer, Object>> onCreateLoader(int id, Bundle args) {
-        return new BranchListLoader(getSherlockActivity(), mRepoOwner, mRepoName);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader,
-            HashMap<Integer, Object> object) {
-        hideLoading();
-        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
-        
-        if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
-            fillData((List<RepositoryBranch>) result.get(LoaderResult.DATA));
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<HashMap<Integer, Object>> arg0) {
-        // TODO Auto-generated method stub
-        
     }
 }

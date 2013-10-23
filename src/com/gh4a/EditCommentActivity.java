@@ -1,30 +1,26 @@
 package com.gh4a;
 
-import java.util.HashMap;
+import org.eclipse.egit.github.core.Comment;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.view.ContextThemeWrapper;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.gh4a.Constants.LoaderResult;
 import com.gh4a.loader.DeleteCommentLoader;
 import com.gh4a.loader.EditCommentLoader;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
 
-public class EditCommentActivity extends BaseSherlockFragmentActivity
-    implements LoaderManager.LoaderCallbacks<HashMap<Integer, Object>> {
-
+public class EditCommentActivity extends BaseSherlockFragmentActivity {
     private String mRepoOwner;
     private String mRepoName;
     private long mCommentId;
@@ -33,7 +29,32 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity
     private String mText;
     private EditText mEditText;
     private ProgressDialog mProgressDialog;
-    
+
+    private LoaderCallbacks<Void> mDeleteCallback = new LoaderCallbacks<Void>() {
+        @Override
+        public Loader<LoaderResult<Void>> onCreateLoader(int id, Bundle args) {
+            return new DeleteCommentLoader(EditCommentActivity.this, mRepoOwner, mRepoName, mCommentId);
+        }
+
+        @Override
+        public void onResultReady(LoaderResult<Void> result) {
+            handleLoadResult(result);
+        }
+    };
+
+    private LoaderCallbacks<Comment> mEditCallback = new LoaderCallbacks<Comment>() {
+        @Override
+        public Loader<LoaderResult<Comment>> onCreateLoader(int id, Bundle args) {
+            return new EditCommentLoader(EditCommentActivity.this, mRepoOwner,
+                    mRepoName, mCommentId, mEditText.getText().toString());
+        }
+
+        @Override
+        public void onResultReady(LoaderResult<Comment> result) {
+            handleLoadResult(result);
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
@@ -77,7 +98,7 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity
         case R.id.accept:
             if (!StringUtils.isBlank(mEditText.getText().toString())) {
                 mProgressDialog = showProgressDialog(getResources().getString(R.string.saving_msg), true);
-                getSupportLoaderManager().initLoader(1, null, this);
+                getSupportLoaderManager().initLoader(1, null, mEditCallback);
                 getSupportLoaderManager().getLoader(1).forceLoad();
             }
             return true;
@@ -87,7 +108,7 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity
             builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
                     mProgressDialog = showProgressDialog(getResources().getString(R.string.deleting_msg), true);
-                    getSupportLoaderManager().initLoader(0, null, EditCommentActivity.this);
+                    getSupportLoaderManager().initLoader(0, null, mDeleteCallback);
                     getSupportLoaderManager().getLoader(0).forceLoad();
                 }
             });
@@ -101,42 +122,24 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity
         }
     }
 
-    @Override
-    public Loader<HashMap<Integer, Object>> onCreateLoader(int id, Bundle args) {
-        if (id == 0) {
-            return new DeleteCommentLoader(this, mRepoOwner, mRepoName, mCommentId);
-        } 
-        else {
-            return new EditCommentLoader(this, mRepoOwner, mRepoName, mCommentId, mEditText.getText().toString());
-        }
-    }
-
-    @Override
-    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader,
-            HashMap<Integer, Object> result) {
+    private void handleLoadResult(LoaderResult<?> result) {
         stopProgressDialog(mProgressDialog);
-        if (!isLoaderError(result)) {
-            Intent intent = new Intent().setClass(this, IssueActivity.class);
-            intent.putExtra(Constants.Issue.ISSUE_NUMBER, mIssueNumber);
-            
-            if ("com.gh4a.PullRequestActivity".equals(getCallingActivity().getClassName())) {
-                intent = new Intent().setClass(this, PullRequestActivity.class);
-                intent.putExtra(Constants.PullRequest.NUMBER, mIssueNumber);
-            }
-            intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-            intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-            intent.putExtra(Constants.Issue.ISSUE_STATE, mIssueState);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
+        if (isLoaderError(result)) {
+            return;
         }
-        else {
-            Toast.makeText(this, (String) result.get(LoaderResult.ERROR_MSG), Toast.LENGTH_SHORT).show();
+
+        Intent intent = new Intent().setClass(this, IssueActivity.class);
+        intent.putExtra(Constants.Issue.ISSUE_NUMBER, mIssueNumber);
+
+        if ("com.gh4a.PullRequestActivity".equals(getCallingActivity().getClassName())) {
+            intent = new Intent().setClass(this, PullRequestActivity.class);
+            intent.putExtra(Constants.PullRequest.NUMBER, mIssueNumber);
         }
+        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        intent.putExtra(Constants.Issue.ISSUE_STATE, mIssueState);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
-    @Override
-    public void onLoaderReset(Loader<HashMap<Integer, Object>> arg0) {
-        // TODO Auto-generated method stub
-        
-    }
 }

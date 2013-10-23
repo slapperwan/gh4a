@@ -16,7 +16,6 @@
 package com.gh4a;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryCommit;
@@ -24,7 +23,6 @@ import org.eclipse.egit.github.core.RepositoryCommitCompare;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.AdapterView;
@@ -33,20 +31,39 @@ import android.widget.ListView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.MenuItem;
-import com.gh4a.Constants.LoaderResult;
 import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.loader.CommitCompareLoader;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 
-public class CompareActivity extends BaseSherlockFragmentActivity implements OnItemClickListener,
-    LoaderManager.LoaderCallbacks<HashMap<Integer, Object>> {
-
+public class CompareActivity extends BaseSherlockFragmentActivity implements OnItemClickListener {
     private String mRepoOwner;
     private String mRepoName;
     private String mBase;
     private String mHead;
     private CommitAdapter mAdapter;
     private ListView mListView;
-    
+
+    private LoaderCallbacks<RepositoryCommitCompare> mCompareCallback =
+            new LoaderCallbacks<RepositoryCommitCompare>() {
+        @Override
+        public Loader<LoaderResult<RepositoryCommitCompare>> onCreateLoader(int id, Bundle args) {
+            return new CommitCompareLoader(CompareActivity.this, mRepoOwner, mRepoName, mBase, mHead);
+        }
+        @Override
+        public void onResultReady(LoaderResult<RepositoryCommitCompare> result) {
+            hideLoading();
+
+            if (!isLoaderError(result)) {
+                List<RepositoryCommit> commits = result.getData().getCommits();
+                if (commits != null && !commits.isEmpty()) {
+                    mAdapter.addAll(commits);
+                    mAdapter.notifyDataSetChanged();
+                }
+            }
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
@@ -69,17 +86,8 @@ public class CompareActivity extends BaseSherlockFragmentActivity implements OnI
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         
-        getSupportLoaderManager().initLoader(0, null, this);
+        getSupportLoaderManager().initLoader(0, null, mCompareCallback);
         getSupportLoaderManager().getLoader(0).forceLoad();
-    }
-    
-    private void fillData(RepositoryCommitCompare commitCompare) {
-        
-        List<RepositoryCommit> commits = commitCompare.getCommits();
-        if (commits != null && !commits.isEmpty()) {
-            mAdapter.addAll(commitCompare.getCommits());
-            mAdapter.notifyDataSetChanged();
-        }
     }
     
     @Override
@@ -99,28 +107,5 @@ public class CompareActivity extends BaseSherlockFragmentActivity implements OnI
             default:
                 return true;
         }
-    }
-
-    @Override
-    public Loader<HashMap<Integer, Object>> onCreateLoader(int id, Bundle args) {
-        return new CommitCompareLoader(this, mRepoOwner, mRepoName, mBase, mHead);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader,
-            HashMap<Integer, Object> object) {
-        
-        hideLoading();
-        HashMap<Integer, Object> result = (HashMap<Integer, Object>) object;
-        
-        if (!isLoaderError(result)) {
-            fillData((RepositoryCommitCompare) result.get(LoaderResult.DATA));
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<HashMap<Integer, Object>> arg0) {
-        // TODO Auto-generated method stub
-        
     }
 }

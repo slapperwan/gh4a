@@ -123,7 +123,6 @@ public class GistViewerActivity extends BaseSherlockFragmentActivity {
         s.setBuiltInZoomControls(true);
         s.setLightTouchEnabled(true);
         s.setLoadsImagesAutomatically(true);
-        s.setPluginsEnabled(false);
         s.setSupportZoom(true);
         s.setSupportMultipleWindows(true);
         s.setJavaScriptEnabled(true);

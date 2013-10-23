@@ -17,6 +17,7 @@ package com.gh4a.adapter;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -36,7 +37,7 @@ import com.gh4a.utils.GravatarUtils;
 
 public class CommonFeedAdapter extends RootAdapter<Feed> {
 
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy", Locale.US);
     private boolean mShowGravatar;
     private boolean mShowExtra;
     private int mRowLayout;

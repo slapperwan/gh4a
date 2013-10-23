@@ -22,7 +22,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
@@ -407,16 +406,6 @@ public class StringUtils {
         content.append("</body></html>");
         
         return content.toString();
-    }
-    
-    public static String encodeUrl(String s) {
-//        s = s.replaceAll("%", "%25");
-//        s = s.replaceAll(" ", "%20");
-//        s = s.replaceAll("!", "%21");
-//        s = s.replaceAll("\"", "%22");
-//        s = s.replaceAll("#", "%23");
-        s = URLEncoder.encode(s).replaceAll("\\+", "%20");
-        return s;
     }
     
     public static boolean checkEmail(String email) {

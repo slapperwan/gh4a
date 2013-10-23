@@ -35,10 +35,8 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
@@ -51,13 +49,12 @@ import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.gh4a.Constants.LoaderResult;
 import com.gh4a.loader.LabelListLoader;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
 
-public class IssueLabelListActivity extends BaseSherlockFragmentActivity 
-    implements LoaderManager.LoaderCallbacks<HashMap<Integer, Object>> {
-
+public class IssueLabelListActivity extends BaseSherlockFragmentActivity {
     private String mRepoOwner;
     private String mRepoName;
     protected ListView mListView;
@@ -68,6 +65,25 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
     private ProgressDialog mProgressDialog;
     private List<Label> mLabels;
     private EditText mSelectedEtLabel;
+
+    private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
+        @Override
+        public Loader<LoaderResult<List<Label>>> onCreateLoader(int id, Bundle args) {
+            return new LabelListLoader(IssueLabelListActivity.this, mRepoOwner, mRepoName);
+        }
+        @Override
+        public void onResultReady(LoaderResult<List<Label>> result) {
+            hideLoading();
+            stopProgressDialog(mProgressDialog);
+            if (getCurrentFocus() != null) {
+                hideKeyboard(getCurrentFocus().getWindowToken());
+            }
+            if (!isLoaderError(result)) {
+                mLabels = result.getData();
+                fillData();
+            }
+        }
+    };
 
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
@@ -88,7 +104,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
-        getSupportLoaderManager().initLoader(0, null, this);
+        getSupportLoaderManager().initLoader(0, null, mLabelCallback);
         getSupportLoaderManager().getLoader(0).forceLoad();
     }
     
@@ -399,7 +415,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
                     activity.showError();
                 }
                 else {
-                    activity.getSupportLoaderManager().restartLoader(0, null, activity).forceLoad();
+                    activity.getSupportLoaderManager().restartLoader(0, null, activity.mLabelCallback).forceLoad();
                 }
             }
         }
@@ -455,7 +471,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
                     activity.showMessage(activity.getResources().getString(R.string.issue_error_edit_label), false);
                 }
                 else {
-                    activity.getSupportLoaderManager().restartLoader(0, null, activity).forceLoad();
+                    activity.getSupportLoaderManager().restartLoader(0, null, activity.mLabelCallback).forceLoad();
                 }
             }
         }
@@ -484,29 +500,5 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
             startActivity(intent);
         }
         return true;
-    }
-
-    @Override
-    public Loader<HashMap<Integer, Object>> onCreateLoader(int arg0, Bundle arg1) {
-        return new LabelListLoader(this, mRepoOwner, mRepoName);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
-        hideLoading();
-        stopProgressDialog(mProgressDialog);
-        if (getCurrentFocus() != null) {
-            hideKeyboard(getCurrentFocus().getWindowToken());
-        }
-        if (!isLoaderError(result)) {
-            mLabels = (List<Label>) result.get(LoaderResult.DATA);
-            fillData();
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<HashMap<Integer, Object>> arg0) {
-        // TODO Auto-generated method stub
-        
     }
 }

@@ -1,17 +1,15 @@
 package com.gh4a.loader;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.MarkdownService;
 
 import android.content.Context;
 
-import com.gh4a.Constants.LoaderResult;
 import com.gh4a.Gh4Application;
 
-public class MarkdownLoader extends BaseLoader {
+public class MarkdownLoader extends BaseLoader<String> {
 
     private String mText;
     private String mMode;
@@ -23,11 +21,11 @@ public class MarkdownLoader extends BaseLoader {
     }
     
     @Override
-    public void doLoadInBackground(HashMap<Integer, Object> result) throws IOException {
+    public String doLoadInBackground() throws IOException {
         Gh4Application app = (Gh4Application) getContext().getApplicationContext();
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(app.getAuthToken());
         MarkdownService markdownService = new MarkdownService(client);
-        result.put(LoaderResult.DATA, markdownService.getHtml(mText, mMode));
+        return markdownService.getHtml(mText, mMode);
     }
 }

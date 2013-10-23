@@ -3,7 +3,6 @@ package com.gh4a.fragment;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.CommitComment;
@@ -13,7 +12,6 @@ import org.eclipse.egit.github.core.service.CommitService;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,21 +26,38 @@ import android.widget.RelativeLayout;
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.CommitActivity;
 import com.gh4a.Constants;
-import com.gh4a.Constants.LoaderResult;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.adapter.CommitNoteAdapter;
 import com.gh4a.loader.CommitCommentListLoader;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
 
-public class CommitNoteFragment extends BaseFragment
-    implements LoaderManager.LoaderCallbacks<HashMap<Integer, Object>>, OnClickListener{
+public class CommitNoteFragment extends BaseFragment implements OnClickListener {
 
     private String mRepoOwner;
     private String mRepoName;
     private String mObjectSha;
     private ListView mListView;
     private CommitNoteAdapter mAdapter;
+
+    private LoaderCallbacks<List<CommitComment>> mCommentCallback = new LoaderCallbacks<List<CommitComment>>() {
+        @Override
+        public Loader<LoaderResult<List<CommitComment>>> onCreateLoader(int id, Bundle args) {
+            return new CommitCommentListLoader(getSherlockActivity(), mRepoOwner, mRepoName, mObjectSha);
+        }
+
+        @Override
+        public void onResultReady(LoaderResult<List<CommitComment>> result) {
+            CommitActivity activity = (CommitActivity) getSherlockActivity();
+            hideLoading();
+            activity.stopProgressDialog(activity.mProgressDialog);
+            if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
+                fillData(result.getData());
+            }
+        }
+    };
     
     public static CommitNoteFragment newInstance(String repoOwner, String repoName, String objectSha) {
         CommitNoteFragment f = new CommitNoteFragment();
@@ -96,7 +111,7 @@ public class CommitNoteFragment extends BaseFragment
         ivComment.setPadding(5, 2, 5, 2);
         ivComment.setOnClickListener(this);
         
-        getLoaderManager().initLoader(0, null, this);
+        getLoaderManager().initLoader(0, null, mCommentCallback);
         getLoaderManager().getLoader(0).forceLoad();
     }
     
@@ -106,26 +121,6 @@ public class CommitNoteFragment extends BaseFragment
             mAdapter.addAll(comments);
             mAdapter.notifyDataSetChanged();
         }
-    }
-
-    @Override
-    public Loader<HashMap<Integer, Object>> onCreateLoader(int id, Bundle args) {
-        return new CommitCommentListLoader(getSherlockActivity(), mRepoOwner, mRepoName, mObjectSha);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
-        CommitActivity activity = (CommitActivity) getSherlockActivity();
-        hideLoading();
-        activity.stopProgressDialog(activity.mProgressDialog);
-        if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
-            Object data = result.get(LoaderResult.DATA);
-            fillData((List<CommitComment>) data);
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<HashMap<Integer, Object>> loader) {
     }
     
     @Override

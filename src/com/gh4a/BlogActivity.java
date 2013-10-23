@@ -70,7 +70,6 @@ public class BlogActivity extends BaseActivity {
         s.setBuiltInZoomControls(false);
         s.setLightTouchEnabled(true);
         s.setLoadsImagesAutomatically(true);
-        s.setPluginsEnabled(false);
         s.setSupportZoom(true);
         s.setSupportMultipleWindows(true);
         s.setJavaScriptEnabled(true);

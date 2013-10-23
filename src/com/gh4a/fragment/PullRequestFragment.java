@@ -18,7 +18,6 @@ package com.gh4a.fragment;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -30,7 +29,6 @@ import org.eclipse.egit.github.core.service.IssueService;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
@@ -48,26 +46,54 @@ import android.widget.TextView;
 import com.androidquery.AQuery;
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
-import com.gh4a.Constants.LoaderResult;
 import com.gh4a.Gh4Application;
 import com.gh4a.PullRequestActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.CommentAdapter;
 import com.gh4a.loader.IssueCommentsLoader;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestLoader;
 import com.gh4a.utils.GravatarUtils;
 import com.gh4a.utils.StringUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
-public class PullRequestFragment extends BaseFragment 
-    implements LoaderManager.LoaderCallbacks<HashMap<Integer, Object>> {
+public class PullRequestFragment extends BaseFragment {
 
     private String mRepoOwner;
     private String mRepoName;
     private int mPullRequestNumber;
     private LinearLayout mHeader;
     private CommentAdapter mCommentAdapter;
+
+    private LoaderCallbacks<PullRequest> mPullRequestCallback = new LoaderCallbacks<PullRequest>() {
+        @Override
+        public Loader<LoaderResult<PullRequest>> onCreateLoader(int id, Bundle args) {
+            return new PullRequestLoader(getSherlockActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
+        }
+        @Override
+        public void onResultReady(LoaderResult<PullRequest> result) {
+            if (!checkForError(result)) {
+                hideLoading();
+                fillData(result.getData());
+            }
+        }
+    };
+    private LoaderCallbacks<List<Comment>> mCommentCallback = new LoaderCallbacks<List<Comment>>() {
+        @Override
+        public Loader<LoaderResult<List<Comment>>> onCreateLoader(int id, Bundle args) {
+            return new IssueCommentsLoader(getSherlockActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
+        }
+        @Override
+        public void onResultReady(LoaderResult<List<Comment>> result) {
+            PullRequestActivity activity = (PullRequestActivity) getSherlockActivity();
+            if (!checkForError(result)) {
+                activity.stopProgressDialog(activity.mProgressDialog);
+                fillDiscussion(result.getData());
+            }
+        }
+    };
 
     public static PullRequestFragment newInstance(String repoOwner, String repoName, int pullRequestNumber) {
         PullRequestFragment f = new PullRequestFragment();
@@ -100,17 +126,16 @@ public class PullRequestFragment extends BaseFragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) getSherlockActivity();
-        
+        BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) getActivity();
         RelativeLayout rlComment = (RelativeLayout) getView().findViewById(R.id.rl_comment);
         if (!activity.isAuthorized()) {
             rlComment.setVisibility(View.GONE);
         }
         
-        getLoaderManager().initLoader(0, null, this);
+        getLoaderManager().initLoader(0, null, mPullRequestCallback);
         getLoaderManager().getLoader(0).forceLoad();
         
-        getLoaderManager().initLoader(1, null, this);
+        getLoaderManager().initLoader(1, null, mCommentCallback);
     }
     
     private void fillData(final PullRequest pullRequest) {
@@ -275,7 +300,7 @@ public class PullRequestFragment extends BaseFragment
                         activity.showMessage(activity.getResources().getString(R.string.issue_success_comment),
                                 false);
                         //reload comments
-                        fragment.getLoaderManager().restartLoader(1, null, fragment);
+                        fragment.getLoaderManager().restartLoader(1, null, fragment.mCommentCallback);
                         fragment.getLoaderManager().getLoader(1).forceLoad();
                     }
                     EditText etComment = (EditText) activity.findViewById(R.id.et_comment);
@@ -293,41 +318,14 @@ public class PullRequestFragment extends BaseFragment
             mCommentAdapter.notifyDataSetChanged();
         }
     }
-    
-    @Override
-    public Loader<HashMap<Integer, Object>> onCreateLoader(int id, Bundle args) {
-        if (id == 0) {
-            return new PullRequestLoader(getSherlockActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
-        }
-        else {
-            return new IssueCommentsLoader(getSherlockActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
-        }
-    }
 
-    @Override
-    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
+    private boolean checkForError(LoaderResult<?> result) {
         PullRequestActivity activity = (PullRequestActivity) getSherlockActivity();
-        
-        if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
-            Object data = result.get(LoaderResult.DATA);
-            
-            if (loader.getId() == 0) {
-                hideLoading();
-                fillData((PullRequest) data);
-            }
-            else if (loader.getId() == 1) {
-                activity.stopProgressDialog(activity.mProgressDialog);
-                fillDiscussion((List<Comment>) data);
-            }
-        }
-        else {
+        if (activity.isLoaderError(result)) {
             hideLoading();
             activity.stopProgressDialog(activity.mProgressDialog);
+            return true;
         }
+        return false;
     }
-
-    @Override
-    public void onLoaderReset(Loader<HashMap<Integer, Object>> loader) {
-    }
-
 }

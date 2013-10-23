@@ -517,7 +517,7 @@ public abstract class EventListFragment extends BaseFragment
             /** IssueEvent extra menu for commits */
             else if (Event.TYPE_ISSUES.equals(eventType)) {
                 IssuesPayload payload = (IssuesPayload) event.getPayload();
-                MenuItem item = menu.add(groupId, MENU_ISSUE, Menu.NONE,
+                menu.add(groupId, MENU_ISSUE, Menu.NONE,
                         getString(R.string.menu_issue, payload.getIssue().getNumber()));
             }
 

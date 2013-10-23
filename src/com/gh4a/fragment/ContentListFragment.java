@@ -17,7 +17,6 @@ package com.gh4a.fragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +26,6 @@ import org.eclipse.egit.github.core.util.EncodingUtils;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
@@ -40,21 +38,21 @@ import android.widget.TextView;
 
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
-import com.gh4a.Constants.LoaderResult;
 import com.gh4a.R;
 import com.gh4a.RepositoryActivity;
 import com.gh4a.adapter.FileAdapter;
 import com.gh4a.loader.ContentListLoader;
 import com.gh4a.loader.ContentLoader;
 import com.gh4a.loader.GitModuleParserLoader;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MarkdownLoader;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
-public class ContentListFragment extends BaseFragment 
-    implements LoaderManager.LoaderCallbacks<HashMap<Integer, Object>>, OnItemClickListener {
+public class ContentListFragment extends BaseFragment implements OnItemClickListener {
 
     private Repository mRepository;
     public String mPath;
@@ -67,6 +65,73 @@ public class ContentListFragment extends BaseFragment
     private String mPathReadme;
     private TextView mFooter;
     private String mMarkdownText; 
+
+    private LoaderCallbacks<List<RepositoryContents>> mContentsListCallback =
+            new LoaderCallbacks<List<RepositoryContents>>() {
+        @Override
+        public Loader<LoaderResult<List<RepositoryContents>>> onCreateLoader(int id, Bundle args) {
+            return new ContentListLoader(getSherlockActivity(), mRepository.getOwner().getLogin(),
+                    mRepository.getName(), mPath, mRef);
+        }
+        @Override
+        public void onResultReady(LoaderResult<List<RepositoryContents>> result) {
+            hideLoading();
+            mDataLoaded = true;
+            if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
+                fillData(result.getData());
+                readmeExists(result.getData());
+            }
+        }
+    };
+
+    private LoaderCallbacks<Map<String, String>> mGitModuleCallback =
+            new LoaderCallbacks<Map<String, String>>() {
+        @Override
+        public Loader<LoaderResult<Map<String, String>>> onCreateLoader(int id, Bundle args) {
+            return new GitModuleParserLoader(getSherlockActivity(), mRepository.getOwner().getLogin(),
+                    mRepository.getName(), ".gitmodules", mRef);
+        }
+        @Override
+        public void onResultReady(LoaderResult<Map<String, String>> result) {
+            hideLoading();
+            mCallback.setGitModuleMap(result.getData());
+        }
+    };
+
+    private LoaderCallbacks<List<RepositoryContents>> mContentCallback =
+            new LoaderCallbacks<List<RepositoryContents>>() {
+        @Override
+        public Loader<LoaderResult<List<RepositoryContents>>> onCreateLoader(int id, Bundle args) {
+            return new ContentLoader(getSherlockActivity(), mRepository.getOwner().getLogin(),
+                    mRepository.getName(), mPathReadme, mRef);
+        }
+
+        @Override
+        public void onResultReady(LoaderResult<List<RepositoryContents>> result) {
+            hideLoading();
+            List<RepositoryContents> data = result.getData();
+            if (data != null && !data.isEmpty()) {
+                loadMarkdown(data.get(0));
+            }
+        }
+    };
+    
+    private LoaderCallbacks<String> mMarkdownCallback = new LoaderCallbacks<String>() {
+        @Override
+        public Loader<LoaderResult<String>> onCreateLoader(int id, Bundle args) {
+            return new MarkdownLoader(getSherlockActivity(), mMarkdownText, "markdown");
+        }
+        @Override
+        public void onResultReady(LoaderResult<String> result) {
+            hideLoading();
+            if (result.getData() != null) {
+                String readme = HtmlUtils.format(result.getData()).toString();
+                HttpImageGetter imageGetter = new HttpImageGetter(getSherlockActivity());
+                imageGetter.bind(mFooter, readme, mRepository.getId());
+                mAdapter.notifyDataSetChanged();
+            }
+        }
+    };
     
     public static ContentListFragment newInstance(Repository repository,
             String path, String ref) {
@@ -143,20 +208,20 @@ public class ContentListFragment extends BaseFragment
         super.onResume();
         if (!mDataLoaded) {
             if (getLoaderManager().getLoader(0) == null) {
-                getLoaderManager().initLoader(0, null, this);
+                getLoaderManager().initLoader(0, null, mContentsListCallback);
             }
             else {
-                getLoaderManager().restartLoader(0, null, this);
+                getLoaderManager().restartLoader(0, null, mContentsListCallback);
             }
             getLoaderManager().getLoader(0).forceLoad();
             
             //get .gitmodules to be parsed
             if (StringUtils.isBlank(mPath)) {
                 if (getLoaderManager().getLoader(1) == null) {
-                    getLoaderManager().initLoader(1, null, this);
+                    getLoaderManager().initLoader(1, null, mGitModuleCallback);
                 }
                 else {
-                    getLoaderManager().restartLoader(1, null, this);
+                    getLoaderManager().restartLoader(1, null, mGitModuleCallback);
                 }
                 getLoaderManager().getLoader(1).forceLoad();
             }
@@ -176,60 +241,6 @@ public class ContentListFragment extends BaseFragment
             mAdapter.addAll(entries);
         }
         mAdapter.notifyDataSetChanged();
-    }
-    
-    @Override
-    public Loader<HashMap<Integer, Object>> onCreateLoader(int id, Bundle args) {
-        if (id == 0) {
-            return new ContentListLoader(getSherlockActivity(), mRepository.getOwner().getLogin(),
-                    mRepository.getName(), mPath, mRef);
-        }
-        else if (id == 1) {
-            return new GitModuleParserLoader(getSherlockActivity(), mRepository.getOwner().getLogin(),
-                    mRepository.getName(), ".gitmodules", mRef);            
-        }
-        else if (id == 2) {
-            return new ContentLoader(getSherlockActivity(), mRepository.getOwner().getLogin(), 
-                    mRepository.getName(), mPathReadme, mRef);
-        }
-        else {
-            return new MarkdownLoader(getSherlockActivity(), mMarkdownText, "markdown");
-        }
-    }
-
-    @Override
-    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
-        Object data = result.get(LoaderResult.DATA);
-        
-        hideLoading();
-        if (loader.getId() == 1) {
-            mCallback.setGitModuleMap((Map<String, String>) data);
-        }
-        else if (loader.getId() == 0) {
-            mDataLoaded = true;
-            if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
-                List<RepositoryContents> files = (List<RepositoryContents>) data;
-                fillData(files);
-                
-                readmeExists(files);
-            }
-        }
-        else if (loader.getId() == 2) {
-            if (data != null) {
-                List<RepositoryContents> contents = (List<RepositoryContents>) data;
-                if (!contents.isEmpty()) {
-                    loadMarkdown(contents.get(0));
-                }
-            }
-        }
-        else if (loader.getId() == 3) {
-            if (data != null) {
-                String readme = HtmlUtils.format((String) data).toString();
-                HttpImageGetter imageGetter = new HttpImageGetter(getSherlockActivity());
-                imageGetter.bind(mFooter, readme, mRepository.getId());
-                mAdapter.notifyDataSetChanged();    
-            }
-        }
     }
     
     public void readmeExists(List<RepositoryContents> files) {
@@ -253,10 +264,10 @@ public class ContentListFragment extends BaseFragment
                     }
                     
                     if (getLoaderManager().getLoader(2) == null) {
-                        getLoaderManager().initLoader(2, null, this);
+                        getLoaderManager().initLoader(2, null, mContentCallback);
                     }
                     else {
-                        getLoaderManager().restartLoader(2, null, this);
+                        getLoaderManager().restartLoader(2, null, mContentCallback);
                     }
                     getLoaderManager().getLoader(2).forceLoad();
                     
@@ -272,10 +283,10 @@ public class ContentListFragment extends BaseFragment
         mMarkdownText = new String(EncodingUtils.fromBase64(mMarkdownText));
         if (Arrays.asList(Constants.MARKDOWN_EXT).contains(ext)) {
             if (getLoaderManager().getLoader(3) == null) {
-                getLoaderManager().initLoader(3, null, this);
+                getLoaderManager().initLoader(3, null, mMarkdownCallback);
             }
             else {
-                getLoaderManager().restartLoader(3, null, this);
+                getLoaderManager().restartLoader(3, null, mMarkdownCallback);
             }
             getLoaderManager().getLoader(3).forceLoad();
         }
@@ -283,10 +294,6 @@ public class ContentListFragment extends BaseFragment
             mFooter.setText(mMarkdownText);
             mAdapter.notifyDataSetChanged();    
         }
-    }
-    
-    @Override
-    public void onLoaderReset(Loader<HashMap<Integer, Object>> loader) {
     }
     
     public interface OnTreeSelectedListener {

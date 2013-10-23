@@ -15,18 +15,17 @@
  */
 package com.gh4a;
 
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.util.EncodingUtils;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -36,14 +35,13 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.gh4a.Constants.LoaderResult;
 import com.gh4a.loader.ContentLoader;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 
-public class FileViewerActivity extends BaseSherlockFragmentActivity 
-    implements LoaderManager.LoaderCallbacks<HashMap<Integer, Object>> {
-
+public class FileViewerActivity extends BaseSherlockFragmentActivity {
     protected String mRepoOwner;
     protected String mRepoName;
     private String mPath;
@@ -53,6 +51,38 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
     private RepositoryContents mContent;
 
     private WebView mWebView;
+
+    private WebViewClient mWebViewClient = new WebViewClient() {
+        @Override
+        public void onPageFinished(WebView webView, String url) {
+            hideLoading();
+        }
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
+            return true;
+        }
+    };
+
+    private LoaderCallbacks<List<RepositoryContents>> mFileCallback =
+            new LoaderCallbacks<List<RepositoryContents>>() {
+        @Override
+        public Loader<LoaderResult<List<RepositoryContents>>> onCreateLoader(int id, Bundle args) {
+            return new ContentLoader(FileViewerActivity.this, mRepoOwner, mRepoName, mPath, mRef);
+        }
+        @Override
+        public void onResultReady(LoaderResult<List<RepositoryContents>> result) {
+            hideLoading();
+            if (!isLoaderError(result)) {
+                List<RepositoryContents> data = result.getData();
+                if (data != null && !data.isEmpty()) {
+                    mContent = data.get(0);
+                    fillData(true);
+                }
+            }
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -79,10 +109,11 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
         actionBar.setDisplayHomeAsUpEnabled(true);
         
         showLoading();
-        getSupportLoaderManager().initLoader(0, null, this);
+        getSupportLoaderManager().initLoader(0, null, mFileCallback);
         getSupportLoaderManager().getLoader(0).forceLoad();
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     private void fillData(boolean highlight) {
         String data = new String(EncodingUtils.fromBase64(mContent.getContent()));
         mWebView = (WebView) findViewById(R.id.web_view);
@@ -93,13 +124,12 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
         s.setBuiltInZoomControls(true);
         s.setLightTouchEnabled(true);
         s.setLoadsImagesAutomatically(true);
-        s.setPluginsEnabled(false);
         s.setSupportZoom(true);
         s.setSupportMultipleWindows(true);
         s.setJavaScriptEnabled(true);
         s.setUseWideViewPort(true);
 
-        mWebView.setWebViewClient(webViewClient);
+        mWebView.setWebViewClient(mWebViewClient);
         if (FileUtils.isImage(mName)) {
             String htmlImage = StringUtils.highlightImage("https://github.com/" + mRepoOwner + "/" + mRepoName + "/raw/" + mRef + "/" + mPath);
             mWebView.loadDataWithBaseURL("file:///android_asset/", htmlImage, "text/html", "utf-8", "");
@@ -174,45 +204,4 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity
             mWebView.showFindDialog(null, true);
         }
     }
-
-    private WebViewClient webViewClient = new WebViewClient() {
-
-        @Override
-        public void onPageFinished(WebView webView, String url) {
-            hideLoading();
-        }
-        
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            startActivity(intent);
-            return true;
-        }
-    };
-
-    @Override
-    public Loader<HashMap<Integer, Object>> onCreateLoader(int arg0, Bundle arg1) {
-        return new ContentLoader(this, mRepoOwner, mRepoName, mPath, mRef);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
-        hideLoading();
-        
-        if (!isLoaderError(result)) {
-            if (result != null) {
-                List<RepositoryContents> contents =
-                        (List<RepositoryContents>) result.get(LoaderResult.DATA);
-                if (!contents.isEmpty()) {
-                    mContent = contents.get(0);
-                    fillData(true);
-                }
-            }    
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<HashMap<Integer, Object>> loader) {
-    }
-
 }

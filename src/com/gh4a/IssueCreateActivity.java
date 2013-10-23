@@ -18,7 +18,6 @@ package com.gh4a;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Issue;
@@ -36,10 +35,8 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
@@ -50,17 +47,16 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.gh4a.Constants.LoaderResult;
 import com.gh4a.loader.CollaboratorListLoader;
 import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.IssueLoader;
 import com.gh4a.loader.LabelListLoader;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
 import com.gh4a.utils.StringUtils;
 
-public class IssueCreateActivity extends BaseSherlockFragmentActivity 
-    implements LoaderManager.LoaderCallbacks<HashMap<Integer, Object>> {
-
+public class IssueCreateActivity extends BaseSherlockFragmentActivity {
     private String mRepoOwner;
     private String mRepoName;
     private ActionBar mActionBar;
@@ -78,8 +74,83 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
     private int mIssueNumber;
     private boolean mEditMode; 
     private Issue mEditIssue;
-    private boolean isCollaborator;
     private ProgressDialog mProgressDialog;
+
+    private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
+        @Override
+        public Loader<LoaderResult<List<Label>>> onCreateLoader(int id, Bundle args) {
+            return new LabelListLoader(IssueCreateActivity.this, mRepoOwner, mRepoName);
+        }
+        @Override
+        public void onResultReady(LoaderResult<List<Label>> result) {
+            if (!checkForError(result)) {
+                mAllLabel = result.getData();
+                fillLabels();
+            }
+        }
+    };
+
+    private LoaderCallbacks<List<Milestone>> mMilestoneCallback = new LoaderCallbacks<List<Milestone>>() {
+        @Override
+        public Loader<LoaderResult<List<Milestone>>> onCreateLoader(int id, Bundle args) {
+            return new MilestoneListLoader(IssueCreateActivity.this, mRepoOwner, mRepoName, "open");
+        }
+        @Override
+        public void onResultReady(LoaderResult<List<Milestone>> result) {
+            if (!checkForError(result)) {
+                stopProgressDialog(mProgressDialog);
+                mAllMilestone = result.getData();
+                showMilestonesDialog();
+            }
+        }
+    };
+
+    private LoaderCallbacks<List<User>> mCollaboratorListCallback = new LoaderCallbacks<List<User>>() {
+        @Override
+        public Loader<LoaderResult<List<User>>> onCreateLoader(int id, Bundle args) {
+            return new CollaboratorListLoader(IssueCreateActivity.this, mRepoOwner, mRepoName);
+        }
+        @Override
+        public void onResultReady(LoaderResult<List<User>> result) {
+            if (!checkForError(result)) {
+                stopProgressDialog(mProgressDialog);
+                mAllAssignee = result.getData();
+                showAssigneesDialog();
+            }
+        }
+    };
+
+    private LoaderCallbacks<Boolean> mIsCollaboratorCallback = new LoaderCallbacks<Boolean>() {
+        @Override
+        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
+            return new IsCollaboratorLoader(IssueCreateActivity.this, mRepoOwner, mRepoName);
+        }
+        @Override
+        public void onResultReady(LoaderResult<Boolean> result) {
+            LinearLayout collaboratorLayout = (LinearLayout) findViewById(R.id.for_collaborator);
+            if (result.getData()) {
+                collaboratorLayout.setVisibility(View.VISIBLE);
+                getSupportLoaderManager().getLoader(0).forceLoad();
+            }
+            else {
+                collaboratorLayout.setVisibility(View.GONE);
+            }
+        }
+    };
+
+    private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>() {
+        @Override
+        public Loader<LoaderResult<Issue>> onCreateLoader(int id, Bundle args) {
+            return new IssueLoader(IssueCreateActivity.this, mRepoOwner, mRepoName, mIssueNumber);
+        }
+        @Override
+        public void onResultReady(LoaderResult<Issue> result) {
+            hideLoading();
+            mEditIssue = result.getData();
+            getSupportLoaderManager().getLoader(4).forceLoad();
+            fillIssueData();
+        }
+    };
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -126,17 +197,17 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
         tvIssueLabelAdd.setTypeface(getApplicationContext().boldCondensed);
         tvIssueLabelAdd.setTextColor(getResources().getColor(R.color.highlight));
         
-        getSupportLoaderManager().initLoader(0, null, this);
-        getSupportLoaderManager().initLoader(1, null, this);
-        getSupportLoaderManager().initLoader(2, null, this);
-        getSupportLoaderManager().initLoader(4, null, this);
-        
-        LinearLayout ll = (LinearLayout) findViewById(R.id.for_collaborator);
-        ll.setVisibility(View.GONE);
+        LinearLayout collaboratorLayout = (LinearLayout) findViewById(R.id.for_collaborator);
+        collaboratorLayout.setVisibility(View.GONE);
+
+        getSupportLoaderManager().initLoader(0, null, mLabelCallback);
+        getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
+        getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
+        getSupportLoaderManager().initLoader(4, null, mIsCollaboratorCallback);
         
         if (mEditMode) {
             showLoading();
-            getSupportLoaderManager().initLoader(3, null, this);
+            getSupportLoaderManager().initLoader(3, null, mIssueCallback);
             getSupportLoaderManager().getLoader(3).forceLoad();
         }
         else {
@@ -492,71 +563,13 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity
                     R.string.issue_assignee, mSelectedAssignee.getLogin()));
         }
     }
-    
-    @Override
-    public Loader<HashMap<Integer, Object>> onCreateLoader(int id, Bundle args) {
-        if (id == 0) {
-            return new LabelListLoader(this, mRepoOwner, mRepoName);
-        }
-        else if (id == 1) {
-            return new MilestoneListLoader(this, mRepoOwner, mRepoName, "open");
-        }
-        else if (id == 2) {
-            return new CollaboratorListLoader(this, mRepoOwner, mRepoName);
-        }
-        else if (id == 3) {
-            return new IssueLoader(this, mRepoOwner, mRepoName, mIssueNumber);
-        }
-        else {
-            return new IsCollaboratorLoader(this, mRepoOwner, mRepoName);
-        }
-    }
 
-    @Override
-    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
-        if (!isLoaderError(result)) {
-            Object data = result.get(LoaderResult.DATA); 
-        
-            if (loader.getId() == 0) {
-                mAllLabel = (List<Label>) data;
-                fillLabels();
-            }
-            else if (loader.getId() == 1) {
-                stopProgressDialog(mProgressDialog);
-                mAllMilestone = (List<Milestone>) data;
-                showMilestonesDialog();
-            }
-            else if (loader.getId() == 2) {
-                stopProgressDialog(mProgressDialog);
-                mAllAssignee = (List<User>) data;
-                showAssigneesDialog();
-            }
-            else if (loader.getId() == 3) {
-                hideLoading();
-                mEditIssue = (Issue) data;
-                getSupportLoaderManager().getLoader(4).forceLoad();
-                fillIssueData();
-            }
-            else {
-                isCollaborator = (Boolean) data;
-                LinearLayout ll = (LinearLayout) findViewById(R.id.for_collaborator);
-                if (isCollaborator) {
-                    ll.setVisibility(View.VISIBLE);
-                    getSupportLoaderManager().getLoader(0).forceLoad();
-                }
-                else {
-                    ll.setVisibility(View.GONE);
-                }
-            }
-        }
-        else {
+    private boolean checkForError(LoaderResult<?> result) {
+        if (isLoaderError(result)) {
             hideLoading();
             stopProgressDialog(mProgressDialog);
+            return true;
         }
+        return false;
     }
-
-    @Override
-    public void onLoaderReset(Loader<HashMap<Integer, Object>> loader) {
-    }
-
 }

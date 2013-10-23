@@ -1,19 +1,19 @@
 package com.gh4a.loader;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.List;
 
+import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CommitService;
 
 import android.content.Context;
 
-import com.gh4a.Constants.LoaderResult;
 import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
 
-public class CommitCommentListLoader extends BaseLoader {
+public class CommitCommentListLoader extends BaseLoader<List<CommitComment>> {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -27,13 +27,12 @@ public class CommitCommentListLoader extends BaseLoader {
     }
 
     @Override
-    public void doLoadInBackground(HashMap<Integer, Object> result) throws IOException {
+    public List<CommitComment> doLoadInBackground() throws IOException {
         Gh4Application app = (Gh4Application) getContext().getApplicationContext();
         GitHubClient client = new DefaultClient();
         client.setOAuth2Token(app.getAuthToken());
         CommitService commitService = new CommitService(client);
-        result.put(LoaderResult.DATA, 
-                commitService.getComments(new RepositoryId(mRepoOwner, mRepoName),mSha));
+        return commitService.getComments(new RepositoryId(mRepoOwner, mRepoName),mSha);
     }
 
 }

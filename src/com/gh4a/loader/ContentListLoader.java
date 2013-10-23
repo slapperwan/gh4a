@@ -3,7 +3,6 @@ package com.gh4a.loader;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Repository;
@@ -15,10 +14,9 @@ import org.eclipse.egit.github.core.service.RepositoryService;
 
 import android.content.Context;
 
-import com.gh4a.Constants.LoaderResult;
 import com.gh4a.Gh4Application;
 
-public class ContentListLoader extends BaseLoader {
+public class ContentListLoader extends BaseLoader<List<RepositoryContents>> {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -35,10 +33,8 @@ public class ContentListLoader extends BaseLoader {
     }
 
     @Override
-    public void doLoadInBackground(HashMap<Integer, Object> result)
-            throws IOException {
-        Gh4Application app = (Gh4Application) getContext()
-                .getApplicationContext();
+    public List<RepositoryContents> doLoadInBackground() throws IOException {
+        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
         GitHubClient client = new GitHubClient();
         client.setOAuth2Token(app.getAuthToken());
 
@@ -72,8 +68,7 @@ public class ContentListLoader extends BaseLoader {
             };
             Collections.sort(contents, comp);
         }
-        
-        result.put(LoaderResult.DATA, contents);
-    }
 
+        return contents;
+    }
 }

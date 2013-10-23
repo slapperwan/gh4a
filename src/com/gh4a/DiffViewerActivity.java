@@ -73,7 +73,6 @@ public class DiffViewerActivity extends BaseActivity {
         s.setBuiltInZoomControls(true);
         s.setLightTouchEnabled(true);
         s.setLoadsImagesAutomatically(true);
-        s.setPluginsEnabled(false);
         s.setSupportZoom(true);
         s.setSupportMultipleWindows(true);
         s.setJavaScriptEnabled(true);

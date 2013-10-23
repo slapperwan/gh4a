@@ -25,7 +25,6 @@ import org.eclipse.egit.github.core.User;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,7 +38,6 @@ import android.widget.TextView;
 import com.androidquery.AQuery;
 import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
-import com.gh4a.Constants.LoaderResult;
 import com.gh4a.FollowerFollowingListActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.GistListActivity;
@@ -49,23 +47,101 @@ import com.gh4a.RepositoryListActivity;
 import com.gh4a.UserActivity;
 import com.gh4a.loader.FollowUserLoader;
 import com.gh4a.loader.IsFollowingUserLoader;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.OrganizationListLoader;
 import com.gh4a.loader.RepositoryListLoader;
 import com.gh4a.loader.UserLoader;
 import com.gh4a.utils.GravatarUtils;
 import com.gh4a.utils.StringUtils;
 
-public class UserFragment extends BaseFragment implements 
-    OnClickListener, LoaderManager.LoaderCallbacks<HashMap<Integer, Object>> {
+public class UserFragment extends BaseFragment implements  OnClickListener {
 
     private String mUserLogin;
     private String mUserName;
     private User mUser;
     private Boolean isFollowing;
     private int mFollowersCount;
-    private boolean mDataLoaded;
     private List<Repository> mTopRepos;
     private List<User> mOrgs;
+
+    private LoaderCallbacks<User> mUserCallback = new LoaderCallbacks<User>() {
+        @Override
+        public Loader<LoaderResult<User>> onCreateLoader(int id, Bundle args) {
+            return new UserLoader(getSherlockActivity(), mUserLogin);
+        }
+        @Override
+        public void onResultReady(LoaderResult<User> result) {
+            if (!checkForError(result)) {
+                hideLoading();
+                mUser = (User) result.getData();
+                fillData();
+            }
+        }
+    };
+
+    private LoaderCallbacks<List<Repository>> mRepoListCallback = new LoaderCallbacks<List<Repository>>() {
+        @Override
+        public Loader<LoaderResult<List<Repository>>> onCreateLoader(int id, Bundle args) {
+            Map<String, String> filterData = new HashMap<String, String>();
+            filterData.put("sort", "pushed");
+            return new RepositoryListLoader(getSherlockActivity(), mUserLogin,
+                    mUser.getType(), filterData, 5);
+        }
+        @Override
+        public void onResultReady(LoaderResult<List<Repository>> result) {
+            if (!checkForError(result)) {
+                hideLoading(R.id.pb_top_repos, 0);
+                mTopRepos = (List<Repository>) result.getData();
+                fillTopRepos();
+            }
+        }
+    };
+
+    private LoaderCallbacks<List<User>> mOrganizationCallback = new LoaderCallbacks<List<User>>() {
+        @Override
+        public Loader<LoaderResult<List<User>>> onCreateLoader(int id, Bundle args) {
+            return new OrganizationListLoader(getSherlockActivity(), mUserLogin);
+        }
+        @Override
+        public void onResultReady(LoaderResult<List<User>> result) {
+            mOrgs = result.getData();
+            fillOrganizations();
+        }
+    };
+
+    private LoaderCallbacks<Boolean> mIsFollowingCallback = new LoaderCallbacks<Boolean>() {
+        @Override
+        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
+            return new IsFollowingUserLoader(getSherlockActivity(), mUserLogin);
+        }
+        @Override
+        public void onResultReady(LoaderResult<Boolean> result) {
+            UserActivity userActivity = (UserActivity) getSherlockActivity();
+            isFollowing = result.getData();
+            userActivity.updateFollowingAction(isFollowing);
+        }
+    };
+
+    private LoaderCallbacks<Boolean> mFollowCallback = new LoaderCallbacks<Boolean>() {
+        @Override
+        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
+            return new FollowUserLoader(getSherlockActivity(), mUserLogin, isFollowing);
+        }
+        @Override
+        public void onResultReady(LoaderResult<Boolean> result) {
+            UserActivity userActivity = (UserActivity) getSherlockActivity();
+            isFollowing = result.getData();
+            userActivity.updateFollowingAction(isFollowing);
+            TextView tvFollowersCount = (TextView) getView().findViewById(R.id.tv_followers_count);
+            if (isFollowing) {
+                tvFollowersCount.setText(String.valueOf(++mFollowersCount));
+            }
+            else {
+                tvFollowersCount.setText(String.valueOf(--mFollowersCount));
+            }
+        }
+    };
 
     public static UserFragment newInstance(String login, String name) {
         UserFragment f = new UserFragment();
@@ -102,21 +178,21 @@ public class UserFragment extends BaseFragment implements
     @Override
     public void onResume() {
         super.onResume();
-        if (!mDataLoaded) {
+        if (mUser == null || mTopRepos == null || mOrgs == null || isFollowing == null) {
             refresh();
         }
     }
     
     public void refresh() {
         if (getLoaderManager().getLoader(0) == null) {
-            getLoaderManager().initLoader(0, null, this);
-            getLoaderManager().initLoader(3, null, this);
-            getLoaderManager().initLoader(4, null, this);
+            getLoaderManager().initLoader(0, null, mUserCallback);
+            getLoaderManager().initLoader(3, null, mIsFollowingCallback);
+            getLoaderManager().initLoader(4, null, mFollowCallback);
         }
         else {
-            getLoaderManager().restartLoader(0, null, this);
-            getLoaderManager().restartLoader(3, null, this);
-            getLoaderManager().restartLoader(4, null, this);
+            getLoaderManager().restartLoader(0, null, mUserCallback);
+            getLoaderManager().restartLoader(3, null, mIsFollowingCallback);
+            getLoaderManager().restartLoader(4, null, mFollowCallback);
         }
         
         getLoaderManager().getLoader(0).forceLoad();
@@ -276,8 +352,8 @@ public class UserFragment extends BaseFragment implements
         tvOrgs.setTypeface(boldCondensed);
         tvOrgs.setTextColor(getResources().getColor(R.color.highlight));
         
-        getLoaderManager().initLoader(1, null, this);
-        getLoaderManager().initLoader(2, null, this);
+        getLoaderManager().initLoader(1, null, mRepoListCallback);
+        getLoaderManager().initLoader(2, null, mOrganizationCallback);
         
         getLoaderManager().getLoader(1).forceLoad();
         getLoaderManager().getLoader(2).forceLoad();
@@ -457,85 +533,16 @@ public class UserFragment extends BaseFragment implements
     }
     
     public void followUser(String userLogin) {
-        getLoaderManager().restartLoader(4, null, UserFragment.this);
+        getLoaderManager().restartLoader(4, null, mFollowCallback);
         getLoaderManager().getLoader(4).forceLoad();
     }
     
-    @Override
-    public Loader<HashMap<Integer, Object>> onCreateLoader(int id, Bundle arg1) {
-        if (id == 1) {
-            Map<String, String> filterData = new HashMap<String, String>();
-            filterData.put("sort", "pushed");
-            return new RepositoryListLoader(getSherlockActivity(), mUserLogin, 
-                    mUser.getType(), filterData, 5);
-        }
-        else if (id == 2) {
-            return new OrganizationListLoader(getSherlockActivity(), mUserLogin);
-        }
-        else if (id == 3) {
-            return new IsFollowingUserLoader(getSherlockActivity(), mUserLogin);
-        }
-        else if (id == 4) {
-            return new FollowUserLoader(getSherlockActivity(), mUserLogin, isFollowing);
-        }
-        else {
-            return new UserLoader(getSherlockActivity(), mUserLogin);
-            
-        }
-    }
-
-    @Override
-    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
-        UserActivity userActivity = (UserActivity) getSherlockActivity();
-        
-        if (mUser != null 
-                && mTopRepos != null 
-                && mOrgs != null 
-                && isFollowing != null) {
-            mDataLoaded = true;
-        }
-        
-        if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
-            Object data = result.get(LoaderResult.DATA); 
-            
-            if (loader.getId() == 1) {
-                hideLoading(R.id.pb_top_repos, 0);
-                mTopRepos = (List<Repository>) data;
-                fillTopRepos();
-            }
-            else if (loader.getId() == 2) {
-                mOrgs = (List<User>) data;
-                fillOrganizations();
-            }
-            else if (loader.getId() == 3) {
-                isFollowing = (Boolean) data;
-                userActivity.updateFollowingAction(isFollowing);
-            }
-            else if (loader.getId() == 4) {
-                isFollowing = (Boolean) data;
-                userActivity.updateFollowingAction(isFollowing);
-                TextView tvFollowersCount = (TextView) getView().findViewById(R.id.tv_followers_count);
-                if (isFollowing) {
-                    tvFollowersCount.setText(String.valueOf(++mFollowersCount));
-                }
-                else {
-                    tvFollowersCount.setText(String.valueOf(--mFollowersCount));
-                }
-            }
-            else {
-                hideLoading();
-                mUser = (User) result.get(LoaderResult.DATA);
-                fillData();
-            }
-        }
-        else {
+    private boolean checkForError(LoaderResult<?> result) {
+        if (((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
             hideLoading(R.id.pb_top_repos, 0);
             hideLoading();
+            return true;
         }
+        return false;
     }
-
-    @Override
-    public void onLoaderReset(Loader<HashMap<Integer, Object>> loader) {
-    }
-    
 }

@@ -16,7 +16,6 @@
 package com.gh4a;
 
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Locale;
 
 import org.ocpsoft.pretty.time.PrettyTime;
@@ -50,7 +49,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
-import com.gh4a.Constants.LoaderResult;
+import com.gh4a.loader.LoaderResult;
 
 /**
  * The Base activity.
@@ -493,19 +492,16 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         });
     }
     
-    public boolean isLoaderError(HashMap<Integer, Object> result) {
-        if (result.get(LoaderResult.ERROR) != null
-                && (Boolean) result.get(LoaderResult.ERROR)) {
-            if (result.get(LoaderResult.AUTH_ERROR) != null
-                    && (Boolean) result.get(LoaderResult.AUTH_ERROR)) {
-                logout();
-            }
-            Toast.makeText(this, (String) result.get(LoaderResult.ERROR_MSG), Toast.LENGTH_SHORT).show();
-            return true;
-        }
-        else {
+    public boolean isLoaderError(LoaderResult<?> result) {
+        if (result.isSuccess()) {
             return false;
         }
+
+        if (result.isAuthError()) {
+            logout();
+        }
+        Toast.makeText(this, result.getErrorMessage(), Toast.LENGTH_SHORT).show();
+        return true;
     }
 
     public ViewPager setupPager(PagerAdapter adapter, int[] titleResIds) {

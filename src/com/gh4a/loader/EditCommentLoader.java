@@ -1,6 +1,6 @@
 package com.gh4a.loader;
 
-import java.util.HashMap;
+import java.io.IOException;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -12,7 +12,7 @@ import android.content.Context;
 import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
 
-public class EditCommentLoader extends BaseLoader {
+public class EditCommentLoader extends BaseLoader<Comment> {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -29,8 +29,7 @@ public class EditCommentLoader extends BaseLoader {
     }
     
     @Override
-    public void doLoadInBackground(HashMap<Integer, Object> result)
-            throws Exception {
+    public Comment doLoadInBackground() throws IOException {
         Gh4Application app = (Gh4Application) getContext().getApplicationContext();
         GitHubClient client = new DefaultClient();
         client.setOAuth2Token(app.getAuthToken());
@@ -39,7 +38,6 @@ public class EditCommentLoader extends BaseLoader {
         Comment comment = new Comment();
         comment.setBody(mBody);
         comment.setId(mCommentId);
-        issueService.editComment(new RepositoryId(mRepoOwner, mRepoName), comment);
+        return issueService.editComment(new RepositoryId(mRepoOwner, mRepoName), comment);
     }
-
 }

@@ -18,7 +18,6 @@ package com.gh4a;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -35,7 +34,6 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
@@ -55,17 +53,17 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.androidquery.AQuery;
-import com.gh4a.Constants.LoaderResult;
 import com.gh4a.adapter.CommentAdapter;
 import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.IssueLoader;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.GravatarUtils;
 import com.gh4a.utils.StringUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
-public class IssueActivity extends BaseSherlockFragmentActivity implements 
-    OnClickListener, LoaderManager.LoaderCallbacks<HashMap<Integer, Object>> {
+public class IssueActivity extends BaseSherlockFragmentActivity implements OnClickListener {
 
     private Issue mIssue;
     private String mRepoOwner;
@@ -77,6 +75,41 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
     private boolean isCreator;
     private ProgressDialog mProgressDialog;
     private AQuery aq;
+
+    private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>() {
+        @Override
+        public Loader<LoaderResult<Issue>> onCreateLoader(int id, Bundle args) {
+            return new IssueLoader(IssueActivity.this, mRepoOwner, mRepoName, mIssueNumber);
+        }
+        @Override
+        public void onResultReady(LoaderResult<Issue> result) {
+            hideLoading();
+            if (!isLoaderError(result)) {
+                mIssue = result.getData();
+                mIssueState = mIssue.getState();
+                getSupportLoaderManager().getLoader(1).forceLoad();
+                fillData();
+            }
+            else {
+                invalidateOptionsMenu();
+            }
+        }
+    };
+
+    private LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>() {
+        @Override
+        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
+            return new IsCollaboratorLoader(IssueActivity.this, mRepoOwner, mRepoName);
+        }
+        @Override
+        public void onResultReady(LoaderResult<Boolean> result) {
+            if (!isLoaderError(result)) {
+                isCollaborator = result.getData();
+                isCreator = mIssue.getUser().getLogin().equals(getApplicationContext().getAuthLogin());
+                invalidateOptionsMenu();
+            }
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -108,10 +141,10 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
             tlComment.setVisibility(View.GONE);
         }
         
-        getSupportLoaderManager().initLoader(0, null, this);
+        getSupportLoaderManager().initLoader(0, null, mIssueCallback);
         getSupportLoaderManager().getLoader(0).forceLoad();
         
-        getSupportLoaderManager().initLoader(1, null, this);
+        getSupportLoaderManager().initLoader(1, null, mCollaboratorCallback);
     }
 
     private void fillData() {
@@ -668,43 +701,4 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
             break;
         }
     }
-    
-    @Override
-    public Loader<HashMap<Integer, Object>> onCreateLoader(int id, Bundle arg1) {
-        if (id == 0) {
-            return new IssueLoader(this, mRepoOwner, mRepoName, mIssueNumber);
-        }
-        else {
-            return new IsCollaboratorLoader(this, mRepoOwner, mRepoName);
-        }
-    }
-
-    @Override
-    public void onLoadFinished(Loader<HashMap<Integer, Object>> loader, HashMap<Integer, Object> result) {
-        if (!isLoaderError(result)) {
-            Object data = result.get(LoaderResult.DATA); 
-            
-            if (loader.getId() == 0) {
-                hideLoading();
-                mIssue = (Issue) data;
-                mIssueState = mIssue.getState();
-                getSupportLoaderManager().getLoader(1).forceLoad();
-                fillData();
-            }
-            else {
-                isCollaborator = (Boolean) data;
-                isCreator = mIssue.getUser().getLogin().equals(getApplicationContext().getAuthLogin());
-                invalidateOptionsMenu();
-            }
-        }
-        else {
-            hideLoading();
-            invalidateOptionsMenu();
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<HashMap<Integer, Object>> loader) {
-    }
-    
 }
