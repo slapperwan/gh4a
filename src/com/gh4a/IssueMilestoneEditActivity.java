@@ -190,8 +190,8 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity
             }
         } else if (itemId == R.id.delete) {
             AlertDialog.Builder builder = createDialogBuilder();
-            builder.setTitle(getString(R.string.issue_milestone_delete_title, mMilestone.getTitle()));
-            builder.setMessage(R.string.issue_milestone_delete_message);
+            builder.setTitle(getString(R.string.issue_dialog_delete_title, mMilestone.getTitle()));
+            builder.setMessage(R.string.issue_dialog_delete_message);
             builder.setPositiveButton(R.string.ok,
                     new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {

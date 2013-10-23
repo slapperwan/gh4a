@@ -79,7 +79,7 @@
     <string name="forked_from">forked from %1$s</string>
     <string name="enter_username_toast">Please enter your user name instead of your email address</string>
     <string name="download_file_title">Download this file?</string>
-    <string name="download_file_message">The download of %1$s will be completed using the browser.</string>
+    <string name="download_file_message">The download of \'%1$s\' will be completed using the browser.</string>
     <string name="menu_user">User %1$s</string>
     <string name="menu_repo">Repo %1$s</string>
     <string name="menu_compare">Compare %1$s</string>
@@ -284,8 +284,8 @@
     <string name="issue_manage_labels">Manage Labels</string>
     <string name="issue_view_milestones">Milestones</string>
     <string name="issue_manage_milestones">Manage Milestones</string>
-    <string name="issue_milestone_delete_title">Delete %1$s?</string>
-    <string name="issue_milestone_delete_message">Are you sure?</string>
+    <string name="issue_dialog_delete_title">Delete %1$s?</string>
+    <string name="issue_dialog_delete_message">Are you sure?</string>
     <string name="issue_success_comment">Successful create comment</string>
     <string name="issue_error_comment">Cannot create comment</string>
     <string name="issue_create_label">New Label</string>

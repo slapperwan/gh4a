@@ -318,8 +318,8 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity
                 break;
             case 1:
                 AlertDialog.Builder builder = createDialogBuilder();
-                builder.setTitle("Delete " + mCurrentLabelName + "?");
-                builder.setMessage("Are you sure?");
+                builder.setTitle(getString(R.string.issue_dialog_delete_title, mCurrentLabelName));
+                builder.setMessage(R.string.issue_dialog_delete_message);
                 builder.setPositiveButton(R.string.ok,
                         new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
