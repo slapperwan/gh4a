@@ -403,9 +403,7 @@ public class RepositoryFragment extends BaseFragment implements
     public void onLoadFinished(Loader<String> loader, String readme) {
         mDataLoaded = true;
         hideLoading(R.id.pb_readme, R.id.readme);
-        if (readme != null) {
-            fillReadme(readme);
-        }
+        fillReadme(readme);
     }
 
     @Override
