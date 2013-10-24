@@ -15,7 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -39,9 +38,9 @@ import android.widget.ListView;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
-import com.gh4a.IssueActivity;
 import com.gh4a.R;
-import com.gh4a.UserActivity;
+import com.gh4a.activities.IssueActivity;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.adapter.RepositoryIssueAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 
@@ -99,7 +98,7 @@ public class RepositoryIssueListFragment extends BaseFragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        mAdapter = new RepositoryIssueAdapter(getSherlockActivity(), new ArrayList<RepositoryIssue>());
+        mAdapter = new RepositoryIssueAdapter(getSherlockActivity());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
     }

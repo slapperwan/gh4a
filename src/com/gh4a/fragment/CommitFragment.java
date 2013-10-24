@@ -25,11 +25,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
-import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
-import com.gh4a.DiffViewerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.BaseSherlockFragmentActivity;
+import com.gh4a.activities.DiffViewerActivity;
 import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.GravatarUtils;
 
@@ -133,8 +133,7 @@ public class CommitFragment extends BaseFragment {
             return;
         }
         View v = getView();
-        final BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) getSherlockActivity();
-        final Gh4Application context = activity.getApplicationContext();
+        final Gh4Application app = Gh4Application.get(getActivity());
         LinearLayout llChanged = (LinearLayout) v.findViewById(R.id.ll_changed);
         LinearLayout llAdded = (LinearLayout) v.findViewById(R.id.ll_added);
         LinearLayout llDeleted = (LinearLayout) v.findViewById(R.id.ll_deleted);
@@ -143,17 +142,17 @@ public class CommitFragment extends BaseFragment {
         
         AQuery aq = new AQuery(getSherlockActivity());
         aq.id(R.id.iv_gravatar).image(
-                GravatarUtils.getGravatarUrl(CommitUtils.getAuthorGravatarId(context, commit)), 
+                GravatarUtils.getGravatarUrl(CommitUtils.getAuthorGravatarId(app, commit)), 
                 true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
         
-        if (CommitUtils.getAuthorLogin(context, commit) != null) {
+        if (CommitUtils.getAuthorLogin(app, commit) != null) {
             ivGravatar.setOnClickListener(new OnClickListener() {
     
                 @Override
                 public void onClick(View v) {
                     /** Open user activity */
-                    context.openUserInfoActivity(activity,
-                            CommitUtils.getAuthorLogin(context, commit), null);
+                    app.openUserInfoActivity(getActivity(),
+                            CommitUtils.getAuthorLogin(app, commit), null);
                 }
             });
         }
@@ -163,20 +162,20 @@ public class CommitFragment extends BaseFragment {
         TextView tvSummary = (TextView) v.findViewById(R.id.tv_desc);
         
         TextView tvChangeTitle = (TextView) v.findViewById(R.id.commit_changed);
-        tvChangeTitle.setTypeface(context.boldCondensed);
+        tvChangeTitle.setTypeface(app.boldCondensed);
         tvChangeTitle.setTextColor(getResources().getColor(R.color.highlight));
         
         TextView tvAddedTitle = (TextView) v.findViewById(R.id.commit_added);
-        tvAddedTitle.setTypeface(context.boldCondensed);
+        tvAddedTitle.setTypeface(app.boldCondensed);
         tvAddedTitle.setTextColor(getResources().getColor(R.color.highlight));
         
         TextView tvDeletedTitle = (TextView) v.findViewById(R.id.commit_deleted);
-        tvDeletedTitle.setTypeface(context.boldCondensed);
+        tvDeletedTitle.setTypeface(app.boldCondensed);
         tvDeletedTitle.setTextColor(getResources().getColor(R.color.highlight));
         
         tvMessage.setText(commit.getCommit().getMessage());
         
-        tvExtra.setText(CommitUtils.getAuthorName(context, commit)
+        tvExtra.setText(CommitUtils.getAuthorName(app, commit)
                 + " "
                 + Gh4Application.pt.format(commit.getCommit().getAuthor().getDate()));
 
@@ -200,7 +199,7 @@ public class CommitFragment extends BaseFragment {
         }
         
         for (final CommitFile file: addedFiles) {
-            TextView tvFilename = new TextView(context);
+            TextView tvFilename = new TextView(getActivity());
             tvFilename.setText(file.getFilename());
             tvFilename.setTypeface(Typeface.MONOSPACE);
             tvFilename.setTextColor(getResources().getColor(R.color.highlight));
@@ -210,8 +209,7 @@ public class CommitFragment extends BaseFragment {
 
                 @Override
                 public void onClick(View arg0) {
-                    Intent intent = new Intent().setClass(activity,
-                            DiffViewerActivity.class);
+                    Intent intent = new Intent(getActivity(), DiffViewerActivity.class);
                     intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
                     intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                     intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
@@ -226,7 +224,7 @@ public class CommitFragment extends BaseFragment {
         }
         
         for (final CommitFile file: removedFiles) {
-            TextView tvFilename = new TextView(context);
+            TextView tvFilename = new TextView(getActivity());
             tvFilename.setText(file.getFilename());
             tvFilename.setPadding(0, 10, 0, 10);
             tvFilename.setTypeface(Typeface.MONOSPACE);
@@ -235,7 +233,7 @@ public class CommitFragment extends BaseFragment {
         }
 
         for (final CommitFile file: modifiedFiles) {
-            TextView tvFilename = new TextView(context);
+            TextView tvFilename = new TextView(getActivity());
             tvFilename.setText(file.getFilename());
             tvFilename.setTypeface(Typeface.MONOSPACE);
             tvFilename.setTextColor(getResources().getColor(R.color.highlight));
@@ -245,8 +243,7 @@ public class CommitFragment extends BaseFragment {
 
                 @Override
                 public void onClick(View arg0) {
-                    Intent intent = new Intent().setClass(activity,
-                            DiffViewerActivity.class);
+                    Intent intent = new Intent(getActivity(), DiffViewerActivity.class);
                     intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
                     intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                     intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
@@ -261,19 +258,19 @@ public class CommitFragment extends BaseFragment {
         }
 
         if (addedFiles.size() == 0) {
-            TextView tvFilename = new TextView(context);
+            TextView tvFilename = new TextView(getActivity());
             tvFilename.setText(R.string.commit_no_files);
             llAdded.addView(tvFilename);
         }
         
         if (removedFiles.size() == 0) {
-            TextView tvFilename = new TextView(context);
+            TextView tvFilename = new TextView(getActivity());
             tvFilename.setText(R.string.commit_no_files);
             llDeleted.addView(tvFilename);
         }
         
         if (modifiedFiles.size() == 0) {
-            TextView tvFilename = new TextView(context);
+            TextView tvFilename = new TextView(getActivity());
             tvFilename.setText(R.string.commit_no_files);
             llChanged.addView(tvFilename);
         }

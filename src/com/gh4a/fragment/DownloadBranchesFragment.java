@@ -1,6 +1,5 @@
 package com.gh4a.fragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryBranch;
@@ -18,9 +17,9 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
 import com.gh4a.R;
+import com.gh4a.activities.BaseSherlockFragmentActivity;
 import com.gh4a.adapter.BranchAdapter;
 import com.gh4a.loader.BranchListLoader;
 import com.gh4a.loader.LoaderCallbacks;
@@ -75,7 +74,7 @@ public class DownloadBranchesFragment extends BaseFragment implements OnItemClic
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        mAdapter = new BranchAdapter(getSherlockActivity(), new ArrayList<RepositoryBranch>());
+        mAdapter = new BranchAdapter(getSherlockActivity());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         

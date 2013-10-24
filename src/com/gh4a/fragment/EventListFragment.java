@@ -15,7 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Commit;
@@ -57,12 +56,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.gh4a.BaseSherlockFragmentActivity;
-import com.gh4a.CompareActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.WikiListActivity;
+import com.gh4a.activities.CompareActivity;
+import com.gh4a.activities.WikiListActivity;
 import com.gh4a.adapter.FeedAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 import com.gh4a.utils.StringUtils;
@@ -118,7 +116,7 @@ public abstract class EventListFragment extends BaseFragment
         mLoadingView.setText(R.string.loading_msg);
         mLoadingView.setTextColor(getResources().getColor(R.color.highlight));
         
-        mAdapter = new FeedAdapter(getSherlockActivity(), new ArrayList<Event>());
+        mAdapter = new FeedAdapter(getSherlockActivity());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         mListView.setOnScrollListener(this);
@@ -222,7 +220,7 @@ public abstract class EventListFragment extends BaseFragment
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         Event event = (Event) adapterView.getAdapter().getItem(position);
-        Gh4Application context = ((BaseSherlockFragmentActivity) getActivity()).getApplicationContext();
+        Gh4Application context = Gh4Application.get(getActivity());
         
         if (event == null || event.getPayload() == null) {
             return;
@@ -595,16 +593,16 @@ public abstract class EventListFragment extends BaseFragment
             repoName = repoNamePart[1];
         }
         
-        Gh4Application context = ((BaseSherlockFragmentActivity) getActivity()).getApplicationContext();
+        Gh4Application app = Gh4Application.get(getActivity());
         int id = item.getItemId();
 
         /** User item */
         if (id == MENU_USER) {
-            context.openUserInfoActivity(getSherlockActivity(), repoOwner, null);
+            app.openUserInfoActivity(getSherlockActivity(), repoOwner, null);
         }
         /** Repo item */
         else if (id == MENU_REPO) {
-            context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
+            app.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
         }
         /** Commit item */
         else if (id >= MENU_PUSH_COMMIT_START && id <= MENU_PUSH_COMMIT_END || id == MENU_COMMENT_COMMIT) {
@@ -617,37 +615,37 @@ public abstract class EventListFragment extends BaseFragment
                     sha = ((CommitCommentPayload) event.getPayload()).getComment().getCommitId();
                 }
                 if (sha != null) {
-                    context.openCommitInfoActivity(getSherlockActivity(), repoOwner, repoName, sha, 0);
+                    app.openCommitInfoActivity(getSherlockActivity(), repoOwner, repoName, sha, 0);
                 }
             }
             else {
-                context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
+                app.notFoundMessage(getSherlockActivity(), R.plurals.repository);
             }
         }
         /** Open issues item */
         else if (id == MENU_OPEN_ISSUES) {
-            context.openIssueListActivity(getSherlockActivity(), repoOwner, repoName,
+            app.openIssueListActivity(getSherlockActivity(), repoOwner, repoName,
                     Constants.Issue.ISSUE_STATE_OPEN);
         }
         /** Issue item */
         else if (id == MENU_ISSUE) {
             IssuesPayload payload = (IssuesPayload) event.getPayload();
-            context.openIssueActivity(getSherlockActivity(), repoOwner, repoName, payload.getIssue().getNumber());
+            app.openIssueActivity(getSherlockActivity(), repoOwner, repoName, payload.getIssue().getNumber());
         }
         /** Gist item */
         else if (id == MENU_GIST) {
             GistPayload payload = (GistPayload) event.getPayload();
-            context.openGistActivity(getSherlockActivity(), payload.getGist().getUser().getLogin(),
+            app.openGistActivity(getSherlockActivity(), payload.getGist().getUser().getLogin(),
                     payload.getGist().getId(), 0);
         }
         /** Download item */
         else if (id == MENU_FILE) {
             if (repoOwner != null) {
                 DownloadPayload payload = (DownloadPayload) event.getPayload();
-                context.openBrowser(getSherlockActivity(), payload.getDownload().getHtmlUrl());
+                app.openBrowser(getSherlockActivity(), payload.getDownload().getHtmlUrl());
             }
             else {
-                context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
+                app.notFoundMessage(getSherlockActivity(), R.plurals.repository);
             }
         }
         /** Fork item */
@@ -655,10 +653,10 @@ public abstract class EventListFragment extends BaseFragment
             ForkPayload payload = (ForkPayload) event.getPayload();
             Repository forkee = payload.getForkee();
             if (forkee != null) {
-                context.openRepositoryInfoActivity(getSherlockActivity(), forkee);
+                app.openRepositoryInfoActivity(getSherlockActivity(), forkee);
             }
             else {
-                context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
+                app.notFoundMessage(getSherlockActivity(), R.plurals.repository);
             }
         }
         /** Wiki item */
@@ -666,20 +664,20 @@ public abstract class EventListFragment extends BaseFragment
             GollumPayload payload = (GollumPayload) event.getPayload();
             List<GollumPage> pages = payload.getPages();
             if (pages != null && !pages.isEmpty()) {//TODO: now just open the first page
-                context.openBrowser(getSherlockActivity(), pages.get(0).getHtmlUrl());                
+                app.openBrowser(getSherlockActivity(), pages.get(0).getHtmlUrl());                
             }
         }
         /** Pull Request item */
         else if (id == MENU_PULL_REQ) {
             PullRequestPayload payload = (PullRequestPayload) event.getPayload();
-            context.openPullRequestActivity(getSherlockActivity(), repoOwner, repoName, payload.getNumber());
+            app.openPullRequestActivity(getSherlockActivity(), repoOwner, repoName, payload.getNumber());
         }
         
         else if (id == MENU_COMPARE) {
             if (repoOwner != null) {
                 PushPayload payload = (PushPayload) event.getPayload();
                 
-                Intent intent = new Intent().setClass(context, CompareActivity.class);
+                Intent intent = new Intent().setClass(app, CompareActivity.class);
                 intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
                 intent.putExtra(Constants.Repository.REPO_NAME, repoName);
                 intent.putExtra(Constants.Repository.HEAD, payload.getHead());

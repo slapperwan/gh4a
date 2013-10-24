@@ -15,8 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import java.util.List;
-
 import org.eclipse.egit.github.core.CommitComment;
 
 import android.content.Context;
@@ -29,7 +27,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
-import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarUtils;
@@ -41,10 +38,10 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> {
     private HttpImageGetter imageGetter;
     private AQuery aq;
     
-    public CommitNoteAdapter(Context context, List<CommitComment> objects) {
-        super(context, objects);
+    public CommitNoteAdapter(Context context) {
+        super(context);
         imageGetter = new HttpImageGetter(context);
-        aq = new AQuery((BaseSherlockFragmentActivity) context);
+        aq = new AQuery(context);
     }
 
     @Override

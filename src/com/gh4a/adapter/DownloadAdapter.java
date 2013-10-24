@@ -5,8 +5,6 @@ import static android.text.format.DateUtils.FORMAT_SHOW_DATE;
 import static android.text.format.DateUtils.FORMAT_SHOW_YEAR;
 import static android.text.format.DateUtils.MINUTE_IN_MILLIS;
 
-import java.util.List;
-
 import org.eclipse.egit.github.core.Download;
 
 import android.content.Context;
@@ -24,8 +22,8 @@ import com.gh4a.utils.StringUtils;
 
 public class DownloadAdapter extends RootAdapter<Download> {
 
-    public DownloadAdapter(Context context, List<Download> objects) {
-        super(context, objects);
+    public DownloadAdapter(Context context) {
+        super(context);
     }
 
     @Override

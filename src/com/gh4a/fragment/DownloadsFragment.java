@@ -1,6 +1,5 @@
 package com.gh4a.fragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Download;
@@ -18,9 +17,9 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
 import com.gh4a.R;
+import com.gh4a.activities.BaseSherlockFragmentActivity;
 import com.gh4a.adapter.DownloadAdapter;
 import com.gh4a.loader.DownloadsLoader;
 import com.gh4a.loader.LoaderCallbacks;
@@ -74,7 +73,7 @@ public class DownloadsFragment extends BaseFragment implements OnItemClickListen
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        mAdapter = new DownloadAdapter(getSherlockActivity(), new ArrayList<Download>());
+        mAdapter = new DownloadAdapter(getSherlockActivity());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         

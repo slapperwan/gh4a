@@ -16,7 +16,6 @@
 package com.gh4a.fragment;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Repository;
@@ -38,11 +37,10 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.RepositoryActivity;
+import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 
@@ -91,7 +89,7 @@ public class StarredRepositoryListFragment extends BaseFragment
         mLoadingView.setText(R.string.loading_msg);
         mLoadingView.setTextColor(getResources().getColor(R.color.highlight));
         
-        mAdapter = new RepositoryAdapter(getSherlockActivity(), new ArrayList<Repository>());
+        mAdapter = new RepositoryAdapter(getSherlockActivity());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         mListView.setOnScrollListener(this);
@@ -150,12 +148,11 @@ public class StarredRepositoryListFragment extends BaseFragment
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        Gh4Application context = ((BaseSherlockFragmentActivity) getActivity()).getApplicationContext();
+        Gh4Application app = Gh4Application.get(getActivity());
         Repository repository = (Repository) adapterView.getAdapter().getItem(position);
         
-        Intent intent = new Intent()
-                .setClass(getActivity(), RepositoryActivity.class);
-        Bundle data = context.populateRepository(repository);
+        Intent intent = new Intent(getActivity(), RepositoryActivity.class);
+        Bundle data = app.populateRepository(repository);
         intent.putExtra(Constants.DATA_BUNDLE, data);
         startActivity(intent);
     }

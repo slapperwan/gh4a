@@ -15,7 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import android.os.Bundle;
@@ -28,10 +27,9 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.gh4a.BaseSherlockFragmentActivity;
-import com.gh4a.ExploreActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.ExploreActivity;
 import com.gh4a.adapter.TrendAdapter;
 import com.gh4a.holder.Trend;
 import com.gh4a.loader.TrendLoader;
@@ -71,7 +69,7 @@ public class TrendingFragment extends BaseFragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mAdapter = new TrendAdapter(getSherlockActivity(), new ArrayList<Trend>());
+        mAdapter = new TrendAdapter(getSherlockActivity());
         mListView.setAdapter(mAdapter);
         
         getLoaderManager().initLoader(0, null, this);
@@ -88,11 +86,10 @@ public class TrendingFragment extends BaseFragment
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        Gh4Application context = ((BaseSherlockFragmentActivity) getActivity()).getApplicationContext();
-        
+        Gh4Application app = Gh4Application.get(getActivity());
         Trend trend = (Trend) adapterView.getAdapter().getItem(position);
         String[] repos = trend.getTitle().split("/");
-        context.openRepositoryInfoActivity(getSherlockActivity(), repos[0].trim(), repos[1].trim(), 0);
+        app.openRepositoryInfoActivity(getSherlockActivity(), repos[0].trim(), repos[1].trim(), 0);
     }
 
     @Override

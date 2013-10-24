@@ -2,7 +2,6 @@ package com.gh4a.fragment;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.egit.github.core.CommitComment;
@@ -23,11 +22,11 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
-import com.gh4a.BaseSherlockFragmentActivity;
-import com.gh4a.CommitActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.BaseSherlockFragmentActivity;
+import com.gh4a.activities.CommitActivity;
 import com.gh4a.adapter.CommitNoteAdapter;
 import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.LoaderCallbacks;
@@ -91,7 +90,7 @@ public class CommitNoteFragment extends BaseFragment implements OnClickListener 
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        mAdapter = new CommitNoteAdapter(getSherlockActivity(), new ArrayList<CommitComment>());
+        mAdapter = new CommitNoteAdapter(getSherlockActivity());
         mListView.setAdapter(mAdapter);
         
         showLoading();

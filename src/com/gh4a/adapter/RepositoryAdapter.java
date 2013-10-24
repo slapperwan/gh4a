@@ -15,8 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import java.util.List;
-
 import org.eclipse.egit.github.core.Repository;
 
 import android.content.Context;
@@ -32,8 +30,8 @@ import com.gh4a.utils.StringUtils;
 
 public class RepositoryAdapter extends RootAdapter<Repository> {
 
-    public RepositoryAdapter(Context context, List<Repository> objects) {
-        super(context, objects);
+    public RepositoryAdapter(Context context) {
+        super(context);
     }
 
     @Override

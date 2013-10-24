@@ -1,7 +1,5 @@
 package com.gh4a.adapter;
 
-import java.util.List;
-
 import android.content.Context;
 import android.graphics.Typeface;
 import android.util.TypedValue;
@@ -21,8 +19,8 @@ public class BookmarkAdapter extends RootAdapter<Bookmark> {
 
     private boolean mHideAdd;
     
-    public BookmarkAdapter(Context context, List<Bookmark> objects, boolean hideAdd) {
-        super(context, objects);
+    public BookmarkAdapter(Context context, boolean hideAdd) {
+        super(context);
         mHideAdd = hideAdd;
     }
 

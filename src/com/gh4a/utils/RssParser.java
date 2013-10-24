@@ -57,7 +57,7 @@ public class RssParser {
     
     final static HostnameVerifier DO_NOT_VERIFY = new HostnameVerifier() {
         public boolean verify(String hostname, SSLSession session) {
-                return true;
+            return true;
         }
     };
 }

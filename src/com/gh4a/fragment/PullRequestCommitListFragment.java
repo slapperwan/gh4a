@@ -15,7 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryCommit;
@@ -30,10 +29,10 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.gh4a.BaseSherlockFragmentActivity;
-import com.gh4a.CommitActivity;
 import com.gh4a.Constants;
 import com.gh4a.R;
+import com.gh4a.activities.BaseSherlockFragmentActivity;
+import com.gh4a.activities.CommitActivity;
 import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.RepositoryCommitsLoader;
@@ -96,7 +95,7 @@ public class PullRequestCommitListFragment extends BaseFragment implements OnIte
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        mAdapter = new CommitAdapter(getSherlockActivity(), new ArrayList<RepositoryCommit>());
+        mAdapter = new CommitAdapter(getSherlockActivity());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         

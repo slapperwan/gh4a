@@ -15,7 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryId;
@@ -34,7 +33,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -80,7 +78,7 @@ public class WatcherListFragment extends BaseFragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        mAdapter = new UserAdapter(getSherlockActivity(), new ArrayList<User>(), false);
+        mAdapter = new UserAdapter(getSherlockActivity(), false);
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         
@@ -105,9 +103,9 @@ public class WatcherListFragment extends BaseFragment
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        Gh4Application context = ((BaseSherlockFragmentActivity) getActivity()).getApplicationContext();
+        Gh4Application app = Gh4Application.get(getActivity());
         User user = (User) adapterView.getAdapter().getItem(position);
-        context.openUserInfoActivity(getActivity(), user.getLogin(), user.getName());
+        app.openUserInfoActivity(getActivity(), user.getLogin(), user.getName());
     }
 
     @Override

@@ -15,7 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Milestone;
@@ -30,10 +29,10 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
-import com.gh4a.IssueMilestoneEditActivity;
 import com.gh4a.R;
+import com.gh4a.activities.BaseSherlockFragmentActivity;
+import com.gh4a.activities.IssueMilestoneEditActivity;
 import com.gh4a.adapter.MilestoneAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
@@ -92,7 +91,7 @@ public class IssueMilestoneListFragment extends BaseFragment implements OnItemCl
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        mAdapter = new MilestoneAdapter(getSherlockActivity(), new ArrayList<Milestone>());
+        mAdapter = new MilestoneAdapter(getSherlockActivity());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         

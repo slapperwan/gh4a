@@ -15,8 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import java.util.List;
-
 import org.eclipse.egit.github.core.Comment;
 
 import android.content.Context;
@@ -30,11 +28,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
-import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
-import com.gh4a.EditCommentActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.BaseSherlockFragmentActivity;
+import com.gh4a.activities.EditCommentActivity;
 import com.gh4a.utils.GravatarUtils;
 import com.github.mobile.util.HttpImageGetter;
 
@@ -47,17 +45,17 @@ public class CommentAdapter extends RootAdapter<Comment> {
     private String repoOwner;
     private String repoName;
     
-    public CommentAdapter(Context context, List<Comment> objects) {
-        super(context, objects);
+    public CommentAdapter(Context context) {
+        super(context);
         imageGetter = new HttpImageGetter(mContext);
-        aq = new AQuery((BaseSherlockFragmentActivity) context);
+        aq = new AQuery(context);
     }
     
-    public CommentAdapter(Context context, List<Comment> objects,
-            int issueNumber, String issueState, String repoOwner, String repoName) {
-        super(context, objects);
+    public CommentAdapter(Context context, int issueNumber,
+            String issueState, String repoOwner, String repoName) {
+        super(context);
         imageGetter = new HttpImageGetter(mContext);
-        aq = new AQuery((BaseSherlockFragmentActivity) context);
+        aq = new AQuery(context);
         this.issueNumber = issueNumber;
         this.issueState = issueState;
         this.repoOwner = repoOwner;

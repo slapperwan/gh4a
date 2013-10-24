@@ -33,6 +33,17 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.gh4a.activities.CommitActivity;
+import com.gh4a.activities.CommitListActivity;
+import com.gh4a.activities.FileViewerActivity;
+import com.gh4a.activities.GistActivity;
+import com.gh4a.activities.IssueActivity;
+import com.gh4a.activities.IssueListActivity;
+import com.gh4a.activities.PullRequestActivity;
+import com.gh4a.activities.PullRequestListActivity;
+import com.gh4a.activities.RepositoryActivity;
+import com.gh4a.activities.UserActivity;
+
 /**
  * The Class Gh4Application.
  */
@@ -438,5 +449,8 @@ public class Gh4Application extends Application {
         String token = sharedPreferences.getString(Constants.User.USER_AUTH_TOKEN, null);
         return token;
     }
-    
+
+    public static Gh4Application get(Context context) {
+        return (Gh4Application) context.getApplicationContext();
+    }
 }

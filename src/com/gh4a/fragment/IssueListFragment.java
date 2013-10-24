@@ -15,7 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -43,8 +42,8 @@ import android.widget.TextView;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
-import com.gh4a.IssueActivity;
 import com.gh4a.R;
+import com.gh4a.activities.IssueActivity;
 import com.gh4a.adapter.IssueAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 
@@ -102,7 +101,7 @@ public class IssueListFragment extends BaseFragment
         mLoadingView.setText(R.string.loading_msg);
         mLoadingView.setTextColor(getResources().getColor(R.color.highlight));
         
-        mAdapter = new IssueAdapter(getSherlockActivity(), new ArrayList<Issue>());
+        mAdapter = new IssueAdapter(getSherlockActivity());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         mListView.setOnScrollListener(this);

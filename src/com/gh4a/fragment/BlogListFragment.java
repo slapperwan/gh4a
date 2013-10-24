@@ -21,7 +21,6 @@ import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -45,9 +44,9 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.gh4a.BlogActivity;
 import com.gh4a.Constants;
 import com.gh4a.R;
+import com.gh4a.activities.BlogActivity;
 import com.gh4a.adapter.CommonFeedAdapter;
 import com.gh4a.feeds.FeedHandler;
 import com.gh4a.holder.Feed;
@@ -83,8 +82,7 @@ public class BlogListFragment extends BaseFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mAdapter = new CommonFeedAdapter(getSherlockActivity(),
-                new ArrayList<Feed>());
+        mAdapter = new CommonFeedAdapter(getSherlockActivity());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(new OnItemClickListener() {
             @Override

@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -36,15 +37,15 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
-import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
-import com.gh4a.FollowerFollowingListActivity;
 import com.gh4a.Gh4Application;
-import com.gh4a.GistListActivity;
-import com.gh4a.OrganizationMemberListActivity;
 import com.gh4a.R;
-import com.gh4a.RepositoryListActivity;
-import com.gh4a.UserActivity;
+import com.gh4a.activities.BaseSherlockFragmentActivity;
+import com.gh4a.activities.FollowerFollowingListActivity;
+import com.gh4a.activities.GistListActivity;
+import com.gh4a.activities.OrganizationMemberListActivity;
+import com.gh4a.activities.RepositoryListActivity;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.loader.FollowUserLoader;
 import com.gh4a.loader.IsFollowingUserLoader;
 import com.gh4a.loader.LoaderCallbacks;
@@ -295,10 +296,14 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
             tvName.append(Constants.User.USER_TYPE_ORG);
             tvName.append(")");
         }
-        
-        tvCreated.setText(mUser.getCreatedAt() != null ? 
-                getResources().getString(R.string.user_created_at,
-                        StringUtils.formatDate(mUser.getCreatedAt())) : "");
+
+        if (mUser.getCreatedAt() != null) {
+            tvCreated.setText(getString(R.string.user_created_at,
+                    DateFormat.getMediumDateFormat(getActivity()).format(mUser.getCreatedAt())));
+            tvCreated.setVisibility(View.VISIBLE);
+        } else {
+            tvCreated.setVisibility(View.GONE);
+        }
 
         //show email row if not blank
         TextView tvEmail = (TextView) v.findViewById(R.id.tv_email);

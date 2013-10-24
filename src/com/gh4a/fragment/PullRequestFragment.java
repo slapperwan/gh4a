@@ -17,7 +17,6 @@ package com.gh4a.fragment;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -44,11 +43,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
-import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
-import com.gh4a.PullRequestActivity;
 import com.gh4a.R;
+import com.gh4a.activities.BaseSherlockFragmentActivity;
+import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.adapter.CommentAdapter;
 import com.gh4a.loader.IssueCommentsLoader;
 import com.gh4a.loader.LoaderCallbacks;
@@ -142,8 +141,7 @@ public class PullRequestFragment extends BaseFragment {
         //load comments
         getLoaderManager().getLoader(1).forceLoad();
         
-        final BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) getSherlockActivity();
-        final Gh4Application context = activity.getApplicationContext();
+        final Gh4Application app = Gh4Application.get(getActivity());
         
         View v = getView();
         ListView lvComments = (ListView) v.findViewById(R.id.list_view);
@@ -155,9 +153,8 @@ public class PullRequestFragment extends BaseFragment {
         lvComments.addHeaderView(mHeader, null, true);
 
         TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
-        mCommentAdapter = new CommentAdapter((PullRequestActivity) getSherlockActivity(), new ArrayList<Comment>(), 
-                pullRequest.getNumber(), pullRequest.getState(),
-                mRepoOwner, mRepoName);
+        mCommentAdapter = new CommentAdapter(getSherlockActivity(), pullRequest.getNumber(),
+                pullRequest.getState(), mRepoOwner, mRepoName);
         lvComments.setAdapter(mCommentAdapter);
         
         ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
@@ -170,9 +167,8 @@ public class PullRequestFragment extends BaseFragment {
     
                 @Override
                 public void onClick(View arg0) {
-                    context.openUserInfoActivity(getSherlockActivity(),
-                                    pullRequest.getUser().getLogin(),
-                                    pullRequest.getUser().getName());
+                    app.openUserInfoActivity(getSherlockActivity(),
+                            pullRequest.getUser().getLogin(), pullRequest.getUser().getName());
                 }
             });
         }
@@ -184,7 +180,7 @@ public class PullRequestFragment extends BaseFragment {
         TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
         tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
         
-        tvCommentTitle.setTypeface(activity.getApplicationContext().boldCondensed);
+        tvCommentTitle.setTypeface(app.boldCondensed);
         tvCommentTitle.setTextColor(getResources().getColor(R.color.highlight));
         tvCommentTitle.setText(getResources().getString(R.string.issue_comment_title) + " (" + pullRequest.getComments() + ")");
         
@@ -199,7 +195,7 @@ public class PullRequestFragment extends BaseFragment {
             tvState.setText(getString(R.string.open).toUpperCase(Locale.getDefault()));
         }
         tvTitle.setText(pullRequest.getTitle());
-        tvTitle.setTypeface(context.boldCondensed);
+        tvTitle.setTypeface(app.boldCondensed);
         
         String body = pullRequest.getBodyHtml();
         if (!StringUtils.isBlank(body)) {
@@ -225,6 +221,7 @@ public class PullRequestFragment extends BaseFragment {
                 if (etComment.getText() != null && !StringUtils.isBlank(etComment.getText().toString())) {
                     new CommentIssueTask(PullRequestFragment.this).execute();
                 }
+                BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) getActivity();
                 if (activity.getCurrentFocus() != null) {
                     activity.hideKeyboard(activity.getCurrentFocus().getWindowToken());
                 }

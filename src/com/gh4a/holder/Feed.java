@@ -17,6 +17,8 @@ package com.gh4a.holder;
 
 import java.util.Date;
 
+import com.github.mobile.util.HtmlUtils;
+
 public class Feed {
 
     private String id;
@@ -68,7 +70,8 @@ public class Feed {
     public void setContent(String content) {
         this.content = content;
         if (content != null) {
-            preview = content.replaceAll("<(.|\n)*?>","");
+            preview = content.length() > 2000 ? content.substring(0, 2000) : content;
+            preview = HtmlUtils.format(content).toString();
             if (preview.length() > 500) {
                 preview = preview.substring(0,  500);
             }

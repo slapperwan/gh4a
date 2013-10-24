@@ -15,7 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.egit.github.core.PullRequest;
@@ -94,7 +93,7 @@ public class PullRequestListFragment extends BaseFragment
         mLoadingView.setText(R.string.loading_msg);
         mLoadingView.setTextColor(getResources().getColor(R.color.highlight));
         
-        mAdapter = new PullRequestAdapter(getSherlockActivity(), new ArrayList<PullRequest>());
+        mAdapter = new PullRequestAdapter(getSherlockActivity());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         mListView.setOnScrollListener(this);

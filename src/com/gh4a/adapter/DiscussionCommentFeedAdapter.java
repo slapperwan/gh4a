@@ -15,8 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import java.util.List;
-
 import android.content.Context;
 import android.text.Html;
 import android.text.format.DateFormat;
@@ -31,8 +29,8 @@ import com.gh4a.holder.Feed;
 
 public class DiscussionCommentFeedAdapter extends RootAdapter<Feed> {
 
-    public DiscussionCommentFeedAdapter(Context context, List<Feed> objects) {
-        super(context, objects);
+    public DiscussionCommentFeedAdapter(Context context) {
+        super(context);
     }
     
     
@@ -59,10 +57,10 @@ public class DiscussionCommentFeedAdapter extends RootAdapter<Feed> {
         if (feed != null) {
             viewHolder.ivGravatar.setVisibility(View.GONE);
             viewHolder.tvDesc.setText(Html.fromHtml(feed.getContent()));
-            
-            viewHolder.tvExtra.setText(feed.getAuthor() 
-                    +  (feed.getPublished() != null ? " | "
-                    + DateFormat.getMediumDateFormat(mContext).format(feed.getPublished()) : ""));
+
+            String published = feed.getPublished() != null
+                    ? DateFormat.getMediumDateFormat(mContext).format(feed.getPublished()) : null;
+            viewHolder.tvExtra.setText(feed.getAuthor() + (published != null ? " | " + published : ""));
         }
         return v;
     }

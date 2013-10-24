@@ -15,8 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import java.util.List;
-
 import org.eclipse.egit.github.core.RepositoryTag;
 
 import android.content.Context;
@@ -31,8 +29,8 @@ import com.gh4a.R;
 
 public class TagAdapter extends RootAdapter<RepositoryTag> {
 
-    public TagAdapter(Context context, List<RepositoryTag> objects) {
-        super(context, objects);
+    public TagAdapter(Context context) {
+        super(context);
     }
     
     @Override
@@ -50,13 +48,15 @@ public class TagAdapter extends RootAdapter<RepositoryTag> {
             viewHolder = new ViewHolder();
             viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
             viewHolder.tvTitle.setTypeface(boldCondensed);
+            v.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolder) v.getTag();
         }
         
         RepositoryTag tag = mObjects.get(position);
         
         if (tag != null) {
-            TextView tvFormattedName = (TextView) v.findViewById(R.id.tv_title);
-            tvFormattedName.setText(tag.getName());
+            viewHolder.tvTitle.setText(tag.getName());
         }
         
         return v;

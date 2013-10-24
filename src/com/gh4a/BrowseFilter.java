@@ -7,9 +7,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.gh4a.activities.BaseSherlockFragmentActivity;
+import com.gh4a.activities.BlogListActivity;
+import com.gh4a.activities.ExploreActivity;
+import com.gh4a.activities.WikiListActivity;
 import com.gh4a.utils.StringUtils;
 
-public class BrowseFilter extends BaseActivity {
+public class BrowseFilter extends BaseSherlockFragmentActivity {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +38,7 @@ public class BrowseFilter extends BaseActivity {
             startActivity(intent);
         }
         else {
-            Gh4Application context = getApplicationContext();
+            Gh4Application context = Gh4Application.get(this);
 
             // strip off extra data like line numbers etc.
             String last = parts.get(parts.size() - 1);

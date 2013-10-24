@@ -15,8 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import java.util.List;
-
 import org.eclipse.egit.github.core.RepositoryBranch;
 
 import android.content.Context;
@@ -31,8 +29,8 @@ import com.gh4a.R;
 
 public class BranchAdapter extends RootAdapter<RepositoryBranch> {
 
-    public BranchAdapter(Context context, List<RepositoryBranch> objects) {
-        super(context, objects);
+    public BranchAdapter(Context context) {
+        super(context);
     }
 
     @Override
@@ -50,13 +48,15 @@ public class BranchAdapter extends RootAdapter<RepositoryBranch> {
             viewHolder = new ViewHolder();
             viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
             viewHolder.tvTitle.setTypeface(boldCondensed);
+            v.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolder) v.getTag();
         }
         
         RepositoryBranch branch = mObjects.get(position);
         
         if (branch != null) {
-            TextView tvFormattedName = (TextView) v.findViewById(R.id.tv_title);
-            tvFormattedName.setText(branch.getName());
+            viewHolder.tvTitle.setText(branch.getName());
         }
         
         return v;

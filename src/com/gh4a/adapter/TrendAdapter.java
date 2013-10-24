@@ -15,8 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import java.util.List;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,8 +26,8 @@ import com.gh4a.holder.Trend;
 
 public class TrendAdapter extends RootAdapter<Trend> {
 
-    public TrendAdapter(Context context, List<Trend> objects) {
-        super(context, objects);
+    public TrendAdapter(Context context) {
+        super(context);
     }
 
     @Override

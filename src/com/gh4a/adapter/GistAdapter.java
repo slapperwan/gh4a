@@ -15,8 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import java.util.List;
-
 import org.eclipse.egit.github.core.Gist;
 
 import android.content.Context;
@@ -41,8 +39,8 @@ public class GistAdapter  extends RootAdapter<Gist> {
      * @param context the context
      * @param objects the objects
      */
-    public GistAdapter(Context context, List<Gist> objects) {
-        super(context, objects);
+    public GistAdapter(Context context) {
+        super(context);
     }
 
     /* (non-Javadoc)

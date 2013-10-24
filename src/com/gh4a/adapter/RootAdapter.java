@@ -15,6 +15,7 @@
  */
 package com.gh4a.adapter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -47,8 +48,8 @@ public abstract class RootAdapter<T> extends BaseAdapter {
      * @param context the context
      * @param objects the objects
      */
-    public RootAdapter(Context context, List<T> objects) {
-        mObjects = objects;
+    public RootAdapter(Context context) {
+        mObjects = new ArrayList<T>();
         mContext = context;
     }
 
@@ -66,7 +67,7 @@ public abstract class RootAdapter<T> extends BaseAdapter {
      * @see android.widget.Adapter#getItem(int)
      */
     @Override
-    public Object getItem(int position) {
+    public T getItem(int position) {
         return mObjects.get(position);
     }
 

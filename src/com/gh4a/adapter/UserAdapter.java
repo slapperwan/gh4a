@@ -15,8 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import java.util.List;
-
 import org.eclipse.egit.github.core.User;
 
 import android.content.Context;
@@ -29,7 +27,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
-import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarUtils;
@@ -40,10 +37,10 @@ public class UserAdapter extends RootAdapter<User> {
     private boolean mShowExtraData;
     private AQuery aq;
     
-    public UserAdapter(Context context, List<User> objects, boolean showExtraData) {
-        super(context, objects);
+    public UserAdapter(Context context, boolean showExtraData) {
+        super(context);
         mShowExtraData = showExtraData;
-        aq = new AQuery((BaseSherlockFragmentActivity) context);
+        aq = new AQuery(context);
     }
     
     @Override

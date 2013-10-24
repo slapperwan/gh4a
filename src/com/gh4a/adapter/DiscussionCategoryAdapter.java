@@ -1,7 +1,5 @@
 package com.gh4a.adapter;
 
-import java.util.List;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -17,8 +15,8 @@ import com.gh4a.R;
 
 public class DiscussionCategoryAdapter extends RootAdapter<JSONObject> {
 
-    public DiscussionCategoryAdapter(Context context, List<JSONObject> objects) {
-        super(context, objects);
+    public DiscussionCategoryAdapter(Context context) {
+        super(context);
     }
 
     @Override

@@ -15,7 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Repository;
@@ -39,11 +38,11 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.gh4a.CommitActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.RepositoryActivity;
+import com.gh4a.activities.CommitActivity;
+import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 import com.gh4a.utils.StringUtils;
@@ -100,7 +99,7 @@ public class CommitListFragment extends BaseFragment
         mLoadingView.setText(R.string.loading_msg);
         mLoadingView.setTextColor(getResources().getColor(R.color.highlight));
         
-        mAdapter = new CommitAdapter(getSherlockActivity(), new ArrayList<RepositoryCommit>());
+        mAdapter = new CommitAdapter(getSherlockActivity());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         mListView.setOnScrollListener(this);

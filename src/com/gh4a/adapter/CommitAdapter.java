@@ -15,8 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import java.util.List;
-
 import org.eclipse.egit.github.core.RepositoryCommit;
 
 import android.content.Context;
@@ -30,7 +28,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
-import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.CommitUtils;
@@ -40,9 +37,9 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
     
     private AQuery aq;
     
-    public CommitAdapter(Context context, List<RepositoryCommit> objects) {
-        super(context, objects);
-        aq = new AQuery((BaseSherlockFragmentActivity) context);
+    public CommitAdapter(Context context) {
+        super(context);
+        aq = new AQuery(context);
     }
 
     @Override

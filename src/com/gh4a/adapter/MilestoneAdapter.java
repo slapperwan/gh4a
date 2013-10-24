@@ -15,8 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import java.util.List;
-
 import org.eclipse.egit.github.core.Milestone;
 
 import android.content.Context;
@@ -34,8 +32,8 @@ import com.gh4a.utils.StringUtils;
 
 public class MilestoneAdapter extends RootAdapter<Milestone> {
 
-    public MilestoneAdapter(Context context, List<Milestone> objects) {
-        super(context, objects);
+    public MilestoneAdapter(Context context) {
+        super(context);
     }
 
     @Override

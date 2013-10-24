@@ -15,8 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import java.util.List;
-
 import org.eclipse.egit.github.core.SearchRepository;
 
 import android.content.Context;
@@ -32,8 +30,8 @@ import com.gh4a.utils.StringUtils;
 
 public class SearchRepositoryAdapter extends RootAdapter<SearchRepository> {
 
-    public SearchRepositoryAdapter(Context context, List<SearchRepository> objects) {
-        super(context, objects);
+    public SearchRepositoryAdapter(Context context) {
+        super(context);
     }
 
     @Override

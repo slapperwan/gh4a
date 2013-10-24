@@ -15,8 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import java.util.List;
-
 import android.content.Context;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
@@ -29,8 +27,8 @@ import com.gh4a.R;
 
 public class SimpleStringAdapter extends RootAdapter<String> {
 
-    public SimpleStringAdapter(Context context, List<String> objects) {
-        super(context, objects);
+    public SimpleStringAdapter(Context context) {
+        super(context);
     }
 
     @Override
@@ -48,13 +46,15 @@ public class SimpleStringAdapter extends RootAdapter<String> {
             viewHolder = new ViewHolder();
             viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
             viewHolder.tvTitle.setTypeface(boldCondensed);
+            v.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolder) v.getTag();
         }
         
         String string = mObjects.get(position);
         
         if (string != null) {
-            TextView tvFormattedName = (TextView) v.findViewById(R.id.tv_title);
-            tvFormattedName.setText(string);
+            viewHolder.tvTitle.setText(string);
         }
         
         return v;

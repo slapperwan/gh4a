@@ -1,6 +1,5 @@
 package com.gh4a.fragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryTag;
@@ -18,9 +17,9 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
 import com.gh4a.R;
+import com.gh4a.activities.BaseSherlockFragmentActivity;
 import com.gh4a.adapter.TagAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
@@ -75,7 +74,7 @@ public class DownloadTagsFragment extends BaseFragment implements OnItemClickLis
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        mAdapter = new TagAdapter(getSherlockActivity(), new ArrayList<RepositoryTag>());
+        mAdapter = new TagAdapter(getSherlockActivity());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         

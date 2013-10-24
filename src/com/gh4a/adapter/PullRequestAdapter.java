@@ -15,8 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import java.util.List;
-
 import org.eclipse.egit.github.core.PullRequest;
 
 import android.content.Context;
@@ -30,7 +28,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
-import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarUtils;
@@ -39,9 +36,9 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> {
 
     private AQuery aq;
     
-    public PullRequestAdapter(Context context, List<PullRequest> objects) {
-        super(context, objects);
-        aq = new AQuery((BaseSherlockFragmentActivity) context);
+    public PullRequestAdapter(Context context) {
+        super(context);
+        aq = new AQuery(context);
     }
 
     @Override

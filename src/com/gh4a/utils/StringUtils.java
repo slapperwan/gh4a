@@ -26,10 +26,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.Locale;
 import java.util.regex.Pattern;
 
 import android.text.TextUtils;
@@ -40,14 +37,7 @@ import com.gh4a.Constants;
  * The Class StringUtils.
  */
 public class StringUtils {
-
-    /** The Constant DATE_FORMAT. */
-    private static final String DATE_FORMAT = "MMM dd, yyyy";
-
-    /** The Constant MEGABYTE. */
-    private static final long MEGABYTE = 1024L;
-
-    public static final Pattern EMAIL_ADDRESS_PATTERN = Pattern.compile(
+    private static final Pattern EMAIL_ADDRESS_PATTERN = Pattern.compile(
             "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" +
             "\\@" +
             "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
@@ -65,77 +55,6 @@ public class StringUtils {
      */
     public static boolean isBlank(String val) {
         return val == null || (val != null && val.trim().equals(""));
-    }
-
-    /**
-     * Format long text dot.
-     * 
-     * @param text the text
-     * @return the string
-     */
-    public static String formatLongTextDot(String text) {
-        if (StringUtils.isBlank(text)) {
-            return "";
-        }
-        else {
-            int index = text.indexOf(".");
-            if (index != -1) {
-                return text.substring(0, index);
-            }
-            else {
-                return StringUtils.formatLongText(text);
-            }
-        }
-    }
-
-    /**
-     * Format long text.
-     * 
-     * @param text the text
-     * @return the string
-     */
-    public static String formatLongText(String text) {
-        if (StringUtils.isBlank(text)) {
-            return "";
-        }
-        else {
-            if (text.length() <= 20) {
-                return text;
-            }
-            else if (text.length() > 20) {
-                int newLineIndex = text.indexOf("\n");
-                if (newLineIndex != -1) {
-                    return text.substring(0, newLineIndex);
-                }
-                else {
-                    return text.substring(0, text.length() > 20 ? 20 : text.length()) + "...";
-                }
-            }
-            else {
-                return text.substring(0, text.length() > 20 ? 20 : text.length()) + "...";
-            }
-        }
-    }
-
-    /**
-     * Format long text.
-     * 
-     * @param text the text
-     * @param length the length
-     * @return the string
-     */
-    public static String formatLongText(String text, int length) {
-        if (StringUtils.isBlank(text)) {
-            return "";
-        }
-        else {
-            if (text.length() <= length) {
-                return text;
-            }
-            else {
-                return text.substring(0, length);
-            }
-        }
     }
 
     /**
@@ -167,30 +86,6 @@ public class StringUtils {
             return text;
         }
         return "";
-    }
-
-    /**
-     * Repeat.
-     * 
-     * @param val the val
-     * @param count the count
-     * @return the string
-     */
-    public static String repeat(String val, int count) {
-        for (int i = 0; i < count; i++) {
-            val += val;
-        }
-        return val;
-    }
-
-    /**
-     * Kbytes to meg.
-     * 
-     * @param kbytes the kbytes
-     * @return the float
-     */
-    public static float kbytesToMeg(long kbytes) {
-        return kbytes / MEGABYTE;
     }
 
     /**
@@ -228,27 +123,6 @@ public class StringUtils {
             sb.append(Character.forDigit(a[i] & 0x0f, 16));
         }
         return sb.toString();
-    }
-
-    /**
-     * If null default to.
-     * 
-     * @param ori the ori
-     * @param defaultTo the default to
-     * @return the string
-     */
-    public static String ifNullDefaultTo(String ori, String defaultTo) {
-        if (!StringUtils.isBlank(ori)) {
-            return ori;
-        }
-        else {
-            if (!StringUtils.isBlank(defaultTo)) {
-                return defaultTo;
-            }
-            else {
-                return "";
-            }
-        }
     }
 
     /**
@@ -299,22 +173,6 @@ public class StringUtils {
                 is.close();
             }
             return writer.toString();
-        }
-        else {
-            return "";
-        }
-    }
-
-    /**
-     * Format date.
-     *
-     * @param date the date
-     * @return the string
-     */
-    public static String formatDate(Date date) {
-        if (date != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat(StringUtils.DATE_FORMAT, Locale.US);
-            return sdf.format(date);
         }
         else {
             return "";

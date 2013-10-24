@@ -32,7 +32,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
-import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarUtils;
@@ -41,9 +40,9 @@ public class IssueAdapter extends RootAdapter<Issue> {
 
     private AQuery aq;
     
-    public IssueAdapter(Context context, List<Issue> objects) {
-        super(context, objects);
-        aq = new AQuery((BaseSherlockFragmentActivity) context);
+    public IssueAdapter(Context context) {
+        super(context);
+        aq = new AQuery(context);
     }
     
     @Override

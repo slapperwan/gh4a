@@ -15,8 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import java.util.List;
-
 import org.eclipse.egit.github.core.RepositoryContents;
 
 import android.content.Context;
@@ -31,8 +29,8 @@ import com.gh4a.utils.FileUtils;
 
 public class FileAdapter extends RootAdapter<RepositoryContents> {
 
-    public FileAdapter(Context context, List<RepositoryContents> objects) {
-        super(context, objects);
+    public FileAdapter(Context context) {
+        super(context);
     }
 
     @Override
@@ -55,10 +53,10 @@ public class FileAdapter extends RootAdapter<RepositoryContents> {
     }
 
     private int getIconId(String type, String ext) {
-        if ("dir".equals(type)) {
+        if (RepositoryContents.TYPE_DIR.equals(type)) {
             return R.drawable.folder;
         }
-        else if ("file".equals(type)) {
+        else if (RepositoryContents.TYPE_FILE.equals(type)) {
             if ("png".equalsIgnoreCase(ext) || "ico".equalsIgnoreCase(ext)
                     || "jpg".equalsIgnoreCase(ext) || "jpeg".equalsIgnoreCase(ext)
                     || "gif".equalsIgnoreCase(ext)) {

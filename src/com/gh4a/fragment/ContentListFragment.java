@@ -15,7 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -36,10 +35,10 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
 import com.gh4a.R;
-import com.gh4a.RepositoryActivity;
+import com.gh4a.activities.BaseSherlockFragmentActivity;
+import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.FileAdapter;
 import com.gh4a.loader.ContentListLoader;
 import com.gh4a.loader.ContentLoader;
@@ -188,19 +187,13 @@ public class ContentListFragment extends BaseFragment implements OnItemClickList
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        if (mContents == null) {
-            mContents = new ArrayList<RepositoryContents>();
-            mAdapter = new FileAdapter(getSherlockActivity(), mContents);
-            mListView.setAdapter(mAdapter);
-        }
-        else {
+        mAdapter = new FileAdapter(getSherlockActivity());
+        if (mContents != null) {
             hideLoading();
-            mAdapter = new FileAdapter(getSherlockActivity(), mContents);
-            mListView.setAdapter(mAdapter);
-            mAdapter.notifyDataSetChanged();
-            
+            mAdapter.addAll(mContents);
             readmeExists(mContents);
         }
+        mListView.setAdapter(mAdapter);
     }
     
     @Override

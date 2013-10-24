@@ -15,12 +15,9 @@
  */
 package com.gh4a.adapter;
 
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Locale;
-
 import android.content.Context;
 import android.graphics.Typeface;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -29,40 +26,35 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
-import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.holder.Feed;
 import com.gh4a.utils.GravatarUtils;
 
 public class CommonFeedAdapter extends RootAdapter<Feed> {
-
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy", Locale.US);
     private boolean mShowGravatar;
     private boolean mShowExtra;
     private int mRowLayout;
     private AQuery aq;
     
-    public CommonFeedAdapter(Context context, List<Feed> objects) {
-        super(context, objects);
+    public CommonFeedAdapter(Context context) {
+        super(context);
         mShowGravatar = true;//default true
         mShowExtra = true;//default true
-        aq = new AQuery((BaseSherlockFragmentActivity) context);
-    }
-    
-    public CommonFeedAdapter(Context context, List<Feed> objects, boolean showGravatar, boolean showExtra) {
-        super(context, objects);
-        mShowGravatar = showGravatar;
-        mShowExtra = showExtra;
         aq = new AQuery(context);
     }
     
-    public CommonFeedAdapter(Context context, List<Feed> objects, boolean showGravatar, boolean showExtra, int rowLayout) {
-        super(context, objects);
+    public CommonFeedAdapter(Context context, boolean showGravatar, boolean showExtra) {
+        this(context);
+        mShowGravatar = showGravatar;
+        mShowExtra = showExtra;
+    }
+    
+    public CommonFeedAdapter(Context context, boolean showGravatar, boolean showExtra, int rowLayout) {
+        this(context);
         mShowGravatar = showGravatar;
         mShowExtra = showExtra;
         mRowLayout = rowLayout;
-        aq = new AQuery(context);
     }
     
     @Override
@@ -132,8 +124,9 @@ public class CommonFeedAdapter extends RootAdapter<Feed> {
             viewHolder.tvDesc.setSingleLine(title != null || mShowExtra);
             
             if (mShowExtra) {
-                viewHolder.tvExtra.setText(feed.getAuthor() 
-                        +  (feed.getPublished() != null ? " | " + sdf.format(feed.getPublished()) : ""));
+                String published = feed.getPublished() != null
+                        ? DateFormat.getMediumDateFormat(mContext).format(feed.getPublished()) : null;
+                viewHolder.tvExtra.setText(feed.getAuthor() + (published != null ? " | " + published : ""));
                 viewHolder.tvExtra.setVisibility(View.VISIBLE);
             }
             else {

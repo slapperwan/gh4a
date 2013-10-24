@@ -17,7 +17,7 @@
         android:label="@string/app_name"
         android:name="com.gh4a.Gh4Application">
         <activity
-            android:name=".Github4AndroidActivity"
+            android:name=".activities.Github4AndroidActivity"
             android:configChanges="orientation|screenSize" >
             <intent-filter>
                 <action
@@ -27,157 +27,151 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SearchActivity"
+            android:name=".activities.SearchActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".RepositoryListActivity"
+            android:name=".activities.RepositoryListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".RepositoryActivity"
+            android:name=".activities.RepositoryActivity"
             android:configChanges="orientation|screenSize"
             android:uiOptions="splitActionBarWhenNarrow" />
         <activity
-            android:name=".UserListActivity"
+            android:name=".activities.UserListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".UserActivity"
+            android:name=".activities.UserActivity"
             android:uiOptions="splitActionBarWhenNarrow"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".CommitListActivity"
+            android:name=".activities.CommitListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".CommitActivity"
+            android:name=".activities.CommitActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".WatcherListActivity"
+            android:name=".activities.WatcherListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".ForkListActivity"
+            android:name=".activities.FollowerFollowingListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".FollowerFollowingListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".IssueListActivity"
+            android:name=".activities.IssueListActivity"
             android:configChanges="orientation|screenSize"
             android:uiOptions="splitActionBarWhenNarrow" />
         <activity
-            android:name=".IssueActivity"
+            android:name=".activities.IssueActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".DiffViewerActivity"
+            android:name=".activities.DiffViewerActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".PullRequestListActivity"
+            android:name=".activities.PullRequestListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".PullRequestActivity"
+            android:name=".activities.PullRequestActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".FileManagerActivity"
+            android:name=".activities.FileManagerActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".FileViewerActivity"
+            android:name=".activities.FileViewerActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".OrganizationMemberListActivity"
+            android:name=".activities.OrganizationMemberListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".ContributorListActivity"
+            android:name=".activities.ContributorListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".CollaboratorListActivity"
+            android:name=".activities.CollaboratorListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".IssueCreateActivity"
+            android:name=".activities.IssueCreateActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".IssueLabelListActivity"
+            android:name=".activities.IssueLabelListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".IssueListByLabelActivity"
+            android:name=".activities.IssueListByLabelActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".CompareActivity"
+            android:name=".activities.CompareActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".CommitHistoryActivity"
+            android:name=".activities.CommitHistoryActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".UserYourActionsActivity"
+            android:name=".activities.UserYourActionsActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".AppPreferenceActivity"
-            android:theme="@android:style/Theme" />
-        <activity
-            android:name=".GistActivity"
+            android:name=".activities.GistActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".GistListActivity"
+            android:name=".activities.GistListActivity"
             android:configChanges="orientation|screenSize"/>
         <activity
-            android:name=".GistViewerActivity"
+            android:name=".activities.GistViewerActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".PushableRepoListActivity"
+            android:name=".activities.PushableRepoListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".ExploreActivity"
+            android:name=".activities.ExploreActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".TrendingActivity"
+            android:name=".activities.TrendingActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".TimelineActivity"
+            android:name=".activities.TimelineActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name="BlogListActivity"
+            android:name=".activities.logListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name="BlogActivity"
+            android:name=".activities.logActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name="WikiListActivity"
+            android:name=".activities.ikiListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name="WikiActivity"
+            android:name=".activities.ikiActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name="DiscussionCategoryListActivity"
+            android:name=".activities.iscussionCategoryListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name="DiscussionListActivity"
+            android:name=".activities.iscussionListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name="DiscussionActivity"
+            android:name=".activities.iscussionActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name="OrganizationListActivity"
+            android:name=".activities.rganizationListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name="BookmarkListActivity"
+            android:name=".activities.ookmarkListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name="IssueMilestoneListActivity"
+            android:name=".activities.ssueMilestoneListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".IssueListByMilestoneActivity"
+            android:name=".activities.IssueListByMilestoneActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".IssueLabelCreateActivity"
+            android:name=".activities.IssueLabelCreateActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".IssueMilestoneCreateActivity"
+            android:name=".activities.IssueMilestoneCreateActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".IssueMilestoneEditActivity"
+            android:name=".activities.IssueMilestoneEditActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".EditCommentActivity"
+            android:name=".activities.EditCommentActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".DownloadsActivity"
+            android:name=".activities.DownloadsActivity"
             android:configChanges="orientation|screenSize" />
         <activity android:name="BrowseFilter">
             <intent-filter>
@@ -201,9 +195,6 @@
                     android:scheme="https"
                     android:host="github.com"
                     android:pathPattern="/.*/.*/issues" />
-                <data
-                    android:scheme="http"
-                    android:host="jobs.github.com" />
                     
             </intent-filter>
         </activity>
