@@ -1,5 +1,7 @@
 package com.gh4a;
 
+import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -7,17 +9,23 @@ import java.util.Stack;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryBranch;
 import org.eclipse.egit.github.core.RepositoryContents;
+import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.RepositoryTag;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.StarService;
+import org.eclipse.egit.github.core.service.WatcherService;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -36,9 +44,7 @@ import com.gh4a.loader.IsWatchingLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.RepositoryLoader;
-import com.gh4a.loader.StarLoader;
 import com.gh4a.loader.TagListLoader;
-import com.gh4a.loader.WatchLoader;
 import com.gh4a.utils.StringUtils;
 
 public class RepositoryActivity extends BaseSherlockFragmentActivity implements OnTreeSelectedListener {
@@ -46,9 +52,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
     private static final int LOADER_BRANCHES = 1;
     private static final int LOADER_TAGS = 2;
     private static final int LOADER_WATCHING = 3;
-    private static final int LOADER_WATCH = 4;
-    private static final int LOADER_STARRING = 5;
-    private static final int LOADER_STAR = 6;
+    private static final int LOADER_STARRING = 4;
 
     private LoaderCallbacks<Repository> mRepoCallback = new LoaderCallbacks<Repository>() {
         @Override
@@ -102,11 +106,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
     private LoaderCallbacks<Boolean> mWatchCallback = new LoaderCallbacks<Boolean>() {
         @Override
         public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
-            if (id == LOADER_WATCH) {
-                return new WatchLoader(RepositoryActivity.this, mRepoOwner, mRepoName, mIsWatching);
-            } else {
-                return new IsWatchingLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
-            }
+            return new IsWatchingLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
         }
         @Override
         public void onResultReady(LoaderResult<Boolean> result) {
@@ -118,7 +118,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
         }
     };
 
-    private LoaderCallbacks<Boolean> mIsStarringCallback = new LoaderCallbacks<Boolean>() {
+    private LoaderCallbacks<Boolean> mStarCallback = new LoaderCallbacks<Boolean>() {
         @Override
         public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
             return new IsStarringLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
@@ -129,24 +129,6 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
                 mIsStarring = result.getData();
                 mIsFinishLoadingStarring = true;
                 invalidateOptionsMenu();
-            }
-        }
-    };
-
-    private LoaderCallbacks<Boolean> mStarCallback = new LoaderCallbacks<Boolean>() {
-        @Override
-        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
-            return new StarLoader(RepositoryActivity.this, mRepoOwner, mRepoName, mIsStarring);
-        }
-        @Override
-        public void onResultReady(LoaderResult<Boolean> result) {
-            if (!checkForError(result)) {
-                mIsStarring = result.getData();
-                mIsFinishLoadingStarring = true;
-                invalidateOptionsMenu();
-                if (mRepositoryFragment != null) {
-                    mRepositoryFragment.updateStargazerCount(mIsStarring);
-                }
             }
         }
     };
@@ -209,9 +191,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
         getSupportLoaderManager().initLoader(LOADER_BRANCHES, null, mBranchCallback);
         getSupportLoaderManager().initLoader(LOADER_TAGS, null, mTagCallback);
         getSupportLoaderManager().initLoader(LOADER_WATCHING, null, mWatchCallback);
-        getSupportLoaderManager().initLoader(LOADER_WATCH, null, mWatchCallback);
-        getSupportLoaderManager().initLoader(LOADER_STARRING, null, mIsStarringCallback);
-        getSupportLoaderManager().initLoader(LOADER_STAR, null, mStarCallback);
+        getSupportLoaderManager().initLoader(LOADER_STARRING, null, mStarCallback);
 
         getSupportLoaderManager().getLoader(LOADER_REPO).forceLoad();
         getSupportLoaderManager().getLoader(LOADER_WATCHING).forceLoad();
@@ -406,14 +386,12 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
             case R.id.watch:
                 item.setActionView(R.layout.ab_loading);
                 item.expandActionView();
-                getSupportLoaderManager().restartLoader(LOADER_WATCH, null, mWatchCallback);
-                getSupportLoaderManager().getLoader(LOADER_WATCH).forceLoad();
+                new UpdateWatchTask(this).execute();
                 return true;
             case R.id.star:
                 item.setActionView(R.layout.ab_loading);
                 item.expandActionView();
-                getSupportLoaderManager().restartLoader(LOADER_STAR, null, mStarCallback);
-                getSupportLoaderManager().getLoader(LOADER_STAR).forceLoad();
+                new UpdateStarTask(this).execute();
                 return true;
             case R.id.branches:
                 if (mBranches == null) {
@@ -524,5 +502,104 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
             return true;
         }
         return false;
+    }
+
+    private static class UpdateStarTask extends AsyncTask<Void, Void, Void> {
+        private WeakReference<RepositoryActivity> mTarget;
+        private boolean mException;
+        
+        public UpdateStarTask(RepositoryActivity activity) {
+            mTarget = new WeakReference<RepositoryActivity>(activity);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            RepositoryActivity activity = mTarget.get();
+            if (activity == null) {
+                return null;
+            }
+            try {
+                GitHubClient client = new GitHubClient();
+                client.setOAuth2Token(activity.getAuthToken());
+                StarService starringService = new StarService(client);
+                RepositoryId repoId = new RepositoryId(activity.mRepoOwner, activity.mRepoName);
+                if (activity.mIsStarring) {
+                    starringService.unstar(repoId);
+                }
+                else {
+                    starringService.star(repoId);
+                }
+            }
+            catch (IOException e) {
+                Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                mException = true;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            RepositoryActivity activity = mTarget.get();
+            if (activity != null) {
+                if (mException) {
+                    activity.stopProgressDialog(activity.mProgressDialog);
+                }
+                else {
+                    activity.mIsStarring = !activity.mIsStarring;
+                    if (activity.mRepositoryFragment != null) {
+                        activity.mRepositoryFragment.updateStargazerCount(activity.mIsStarring);
+                    }
+                }
+                activity.invalidateOptionsMenu();
+            }
+        }
+    }
+
+    private static class UpdateWatchTask extends AsyncTask<Void, Void, Void> {
+        private WeakReference<RepositoryActivity> mTarget;
+        private boolean mException;
+
+        public UpdateWatchTask(RepositoryActivity activity) {
+            mTarget = new WeakReference<RepositoryActivity>(activity);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            RepositoryActivity activity = mTarget.get();
+            if (activity == null) {
+                return null;
+            }
+            try {
+                GitHubClient client = new GitHubClient();
+                client.setOAuth2Token(activity.getAuthToken());
+                WatcherService watcherService = new WatcherService(client);
+                RepositoryId repoId = new RepositoryId(activity.mRepoOwner, activity.mRepoName);
+                if (activity.mIsWatching) {
+                    watcherService.unwatch(repoId);
+                }
+                else {
+                    watcherService.watch(repoId);
+                }
+            }
+            catch (IOException e) {
+                Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                mException = true;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            RepositoryActivity activity = mTarget.get();
+            if (activity != null) {
+                if (mException) {
+                    activity.stopProgressDialog(activity.mProgressDialog);
+                }
+                else {
+                    activity.mIsWatching = !activity.mIsWatching;
+                }
+                activity.invalidateOptionsMenu();
+            }
+        }
     }
 }
