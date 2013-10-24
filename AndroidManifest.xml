@@ -126,34 +126,34 @@
             android:name=".activities.TimelineActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.logListActivity"
+            android:name=".activities.BlogListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.logActivity"
+            android:name=".activities.BlogActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.ikiListActivity"
+            android:name=".activities.WikiListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.ikiActivity"
+            android:name=".activities.WikiActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.iscussionCategoryListActivity"
+            android:name=".activities.DiscussionCategoryListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.iscussionListActivity"
+            android:name=".activities.DiscussionListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.iscussionActivity"
+            android:name=".activities.DiscussionActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.rganizationListActivity"
+            android:name=".activities.OrganizationListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.ookmarkListActivity"
+            android:name=".activities.BookmarkListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.ssueMilestoneListActivity"
+            android:name=".activities.IssueMilestoneListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activities.IssueListByMilestoneActivity"
