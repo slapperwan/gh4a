@@ -146,13 +146,15 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
 
     private final class EditActionMode implements ActionMode.Callback {
         private String mCurrentLabelName;
-        private Label mLabel;
         private View mItemContainer;
-        
+        private EditText mEditor;
+
         public EditActionMode(Label label, View itemContainer) {
             mCurrentLabelName = label.getName();
-            mLabel = label;
             mItemContainer = itemContainer;
+
+            mEditor = (EditText) itemContainer.findViewById(R.id.et_label);
+            mEditor.setText(mCurrentLabelName);
 
             itemContainer.findViewById(R.id.collapsed).setVisibility(View.GONE);
             itemContainer.findViewById(R.id.expanded).setVisibility(View.VISIBLE);
@@ -181,13 +183,9 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
             case 0:
-                EditText editor = (EditText) mItemContainer.findViewById(R.id.et_label);
-                String color = (String) editor.getTag();
-
-                mLabel.setColor(color);
                 mProgressDialog = showProgressDialog(getResources().getString(R.string.saving_msg), true);
                 new EditIssueLabelsTask(IssueLabelListActivity.this).execute(mCurrentLabelName, 
-                        editor.getText().toString(), color);
+                        mEditor.getText().toString(), (String) mEditor.getTag());
                 break;
             case 1:
                 AlertDialog.Builder builder = createDialogBuilder();

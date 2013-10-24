@@ -50,7 +50,6 @@ public class IssueLabelAdapter extends RootAdapter<Label> implements OnClickList
         assignColor(holder, label.getColor());
 
         holder.label.setText(label.getName());
-        holder.editor.setText(label.getName());
 
         return convertView;
     }
