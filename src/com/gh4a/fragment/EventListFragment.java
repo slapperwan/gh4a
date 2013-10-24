@@ -392,6 +392,10 @@ public abstract class EventListFragment extends BaseFragment
             Intent intent = new Intent().setClass(getSherlockActivity(), WikiListActivity.class);
             intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
             intent.putExtra(Constants.Repository.REPO_NAME, repoName);
+            GollumPayload payload = (GollumPayload) event.getPayload();
+            if (!payload.getPages().isEmpty()) {
+                intent.putExtra(Constants.Object.OBJECT_SHA, payload.getPages().get(0).getSha());
+            }
             startActivity(intent);
         }
 

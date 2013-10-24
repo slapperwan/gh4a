@@ -52,8 +52,6 @@ public class WikiListActivity extends BaseSherlockFragmentActivity {
     
     private String mUserLogin;
     private String mRepoName;
-    private String mWikiUrl;
-    private int page = 1;
     private ListView mListView;
 
     @Override
@@ -63,7 +61,6 @@ public class WikiListActivity extends BaseSherlockFragmentActivity {
 
         mUserLogin = getIntent().getStringExtra(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getStringExtra(Constants.Repository.REPO_NAME);
-        mWikiUrl = "https://github.com/" + mUserLogin + "/" + mRepoName + "/wiki.atom?page=";
         
         if (!isOnline()) {
             setErrorView();
@@ -85,17 +82,11 @@ public class WikiListActivity extends BaseSherlockFragmentActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Feed feed = (Feed) adapterView.getAdapter().getItem(position);
-                Intent intent = new Intent().setClass(WikiListActivity.this, WikiActivity.class);
-                intent.putExtra(Constants.Blog.TITLE, feed.getTitle());
-                intent.putExtra(Constants.Blog.CONTENT, feed.getContent());
-                intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
-                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                intent.putExtra(Constants.Blog.LINK, feed.getLink());
-                startActivity(intent);
+                openViewer(feed);
             }
         });
         
-        new LoadWikiTask(this).execute("true");
+        new LoadWikiTask(this).execute(mUserLogin, mRepoName);
     }
 
     private static class LoadWikiTask extends
@@ -114,20 +105,13 @@ public class WikiListActivity extends BaseSherlockFragmentActivity {
             if (mTarget.get() != null) {
                 BufferedInputStream bis = null;
                 try {
-                    URL url = new URL(mTarget.get().mWikiUrl + mTarget.get().page);
+                    URL url = new URL("https://github.com/" + params[0] + "/" + params[1] + "/wiki.atom");
                     HttpsURLConnection request = (HttpsURLConnection) url.openConnection();
                     
                     request.setHostnameVerifier(DO_NOT_VERIFY);
                     request.setRequestMethod("GET");
                     request.setDoOutput(true);
                     
-//                    if (ApplicationConstants.CONNECT_TIMEOUT > -1) {
-//                        request.setConnectTimeout(ApplicationConstants.CONNECT_TIMEOUT);
-//                    }
-//
-//                    if (ApplicationConstants.READ_TIMEOUT > -1) {
-//                        request.setReadTimeout(ApplicationConstants.READ_TIMEOUT);
-//                    }
                     request.connect();
                     bis = new BufferedInputStream(request.getInputStream());
                     
@@ -192,7 +176,6 @@ public class WikiListActivity extends BaseSherlockFragmentActivity {
                 }
                 else {
                     activity.fillData(result);
-                    activity.page++;
                 }
             }
         }
@@ -200,12 +183,32 @@ public class WikiListActivity extends BaseSherlockFragmentActivity {
 
     private void fillData(List<Feed> result) {
         if (result != null) {
-            List<Feed> blogs = ((CommonFeedAdapter) mListView.getAdapter()).getObjects();
-            blogs.addAll(result);
-            ((CommonFeedAdapter) mListView.getAdapter()).notifyDataSetChanged();
+            CommonFeedAdapter adapter = (CommonFeedAdapter) mListView.getAdapter();
+            adapter.addAll(result);
+            adapter.notifyDataSetChanged();
+
+            String initialPage = getIntent().getStringExtra(Constants.Object.OBJECT_SHA);
+            if (initialPage != null) {
+                for (Feed feed : result) {
+                    if (initialPage.equals(feed.getId())) {
+                        openViewer(feed);
+                        break;
+                    }
+                }
+            }
         }
     }
-    
+
+    private void openViewer(Feed feed) {
+        Intent intent = new Intent(this, WikiActivity.class);
+        intent.putExtra(Constants.Blog.TITLE, feed.getTitle());
+        intent.putExtra(Constants.Blog.CONTENT, feed.getContent());
+        intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        intent.putExtra(Constants.Blog.LINK, feed.getLink());
+        startActivity(intent);
+    }
+
     final static HostnameVerifier DO_NOT_VERIFY = new HostnameVerifier() {
         public boolean verify(String hostname, SSLSession session) {
                 return true;
