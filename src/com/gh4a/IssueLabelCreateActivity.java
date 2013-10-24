@@ -30,6 +30,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -74,137 +75,26 @@ public class IssueLabelCreateActivity extends BaseSherlockFragmentActivity {
     }
     
     private void buildUi() {
-        final View viewColor = (View) findViewById(R.id.view_color);
-        viewColor.setBackgroundColor(Color.parseColor("#DDDDDD"));//set default color
-        
-        final View color1 = (View) findViewById(R.id.color_444444);
-        color1.setOnClickListener(new OnClickListener() {
+        final View viewColor = findViewById(R.id.view_color);
+        final ViewGroup colors = (ViewGroup) findViewById(R.id.colors);
+        int count = colors.getChildCount();
+
+        final OnClickListener listener = new OnClickListener() {
             @Override
-            public void onClick(View v) { 
-                mSelectectedColor = (String) color1.getTag();
+            public void onClick(View v) {
+                mSelectectedColor = (String) v.getTag();
                 viewColor.setBackgroundColor(Color.parseColor("#" + mSelectectedColor));
             }
-        });
+        };
         
-        final View color2 = (View) findViewById(R.id.color_02d7e1);
-        color2.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) { 
-                mSelectectedColor = (String) color2.getTag();
-                viewColor.setBackgroundColor(Color.parseColor("#" + mSelectectedColor));
-            }
-        });
-        
-        final View color3 = (View) findViewById(R.id.color_02e10c);
-        color3.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) { 
-                mSelectectedColor = (String) color3.getTag();
-                viewColor.setBackgroundColor(Color.parseColor("#" + mSelectectedColor));
-            }
-        });
-        
-        final View color4 = (View) findViewById(R.id.color_0b02e1);
-        color4.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) { 
-                mSelectectedColor = (String) color4.getTag();
-                viewColor.setBackgroundColor(Color.parseColor("#" + mSelectectedColor));
-            }
-        });
-        
-        final View color5 = (View) findViewById(R.id.color_d7e102);
-        color5.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) { 
-                mSelectectedColor = (String) color5.getTag();
-                viewColor.setBackgroundColor(Color.parseColor("#" + mSelectectedColor));
-            }
-        });
-        
-        final View color6 = (View) findViewById(R.id.color_DDDDDD);
-        color6.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) { 
-                mSelectectedColor = (String) color6.getTag();
-                viewColor.setBackgroundColor(Color.parseColor("#" + mSelectectedColor));
-            }
-        });
-        
-        final View color7 = (View) findViewById(R.id.color_e102d8);
-        color7.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) { 
-                mSelectectedColor = (String) color7.getTag();
-                viewColor.setBackgroundColor(Color.parseColor("#" + mSelectectedColor));
-            }
-        });
-        
-        final View color8 = (View) findViewById(R.id.color_e10c02);
-        color8.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) { 
-                mSelectectedColor = (String) color8.getTag();
-                viewColor.setBackgroundColor(Color.parseColor("#" + mSelectectedColor));
-            }
-        });
+        for (int i = 0; i < count; i++) {
+            colors.getChildAt(i).setOnClickListener(listener);
+        }
+
+        // set default color
+        listener.onClick(colors.getChildAt(0));
     }
-    
-    private static class AddIssueLabelsTask extends AsyncTask<String, Void, Void> {
 
-        private WeakReference<IssueLabelCreateActivity> mTarget;
-        private boolean mException;
-        
-        public AddIssueLabelsTask(IssueLabelCreateActivity activity) {
-            mTarget = new WeakReference<IssueLabelCreateActivity>(activity);
-        }
-
-        @Override
-        protected Void doInBackground(String... params) {
-            if (mTarget.get() != null) {
-                try {
-                    IssueLabelCreateActivity activity = mTarget.get();
-                    GitHubClient client = new GitHubClient();
-                    client.setOAuth2Token(mTarget.get().getAuthToken());
-                    LabelService labelService = new LabelService(client);
-                    
-                    Label label = new Label();
-                    label.setName(params[0]);
-                    label.setColor(activity.mSelectectedColor);
-                    
-                    labelService.createLabel(activity.mRepoOwner, activity.mRepoName, label);
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                IssueLabelCreateActivity activity = mTarget.get();
-                activity.mProgressDialog = activity.showProgressDialog(activity.getString(R.string.saving_msg), false);
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
-            if (mTarget.get() != null) {
-                IssueLabelCreateActivity activity = mTarget.get();
-                activity.stopProgressDialog(activity.mProgressDialog);
-                if (mException) {
-                    activity.showMessage(activity.getResources().getString(R.string.issue_error_create_label), false);
-                }
-                else {
-                    activity.openIssueLabels();
-                }
-            }
-        }
-    }
-    
     private void openIssueLabels() {
         Intent intent = new Intent().setClass(this, IssueLabelListActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
@@ -232,15 +122,74 @@ public class IssueLabelCreateActivity extends BaseSherlockFragmentActivity {
                     Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
         } else if (itemId == R.id.accept) {
             EditText etLabel = (EditText) findViewById(R.id.et_label);
-            if (etLabel.getText() == null || StringUtils.isBlank(etLabel.getText().toString())) {
-                showMessage(getResources().getString(R.string.issue_error_label), false);
+            String name = etLabel.getText() == null ? null : etLabel.getText().toString();
+
+            if (StringUtils.isBlank(name)) {
+                etLabel.setError(getString(R.string.issue_error_label));
             }
             else {
-                new AddIssueLabelsTask(IssueLabelCreateActivity.this).execute(etLabel.getText().toString());
+                new AddIssueLabelsTask(IssueLabelCreateActivity.this).execute(name);
             }
         } else if (itemId == R.id.cancel) {
             finish();
         }
         return true;
+    }
+
+    private static class AddIssueLabelsTask extends AsyncTask<String, Void, Void> {
+        private WeakReference<IssueLabelCreateActivity> mTarget;
+        private boolean mException;
+
+        public AddIssueLabelsTask(IssueLabelCreateActivity activity) {
+            mTarget = new WeakReference<IssueLabelCreateActivity>(activity);
+        }
+
+        @Override
+        protected Void doInBackground(String... params) {
+            IssueLabelCreateActivity activity = mTarget.get();
+            if (activity == null) {
+                return null;
+            }
+
+            try {
+                GitHubClient client = new GitHubClient();
+                client.setOAuth2Token(activity.getAuthToken());
+                LabelService labelService = new LabelService(client);
+
+                Label label = new Label();
+                label.setName(params[0]);
+                label.setColor(activity.mSelectectedColor);
+
+                labelService.createLabel(activity.mRepoOwner, activity.mRepoName, label);
+            }
+            catch (IOException e) {
+                Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                mException = true;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            IssueLabelCreateActivity activity = mTarget.get();
+            if (activity != null) {
+                activity.mProgressDialog = activity.showProgressDialog(
+                        activity.getString(R.string.saving_msg), false);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            IssueLabelCreateActivity activity = mTarget.get();
+            if (activity != null) {
+                activity.stopProgressDialog(activity.mProgressDialog);
+                if (mException) {
+                    activity.showMessage(activity.getString(R.string.issue_error_create_label), false);
+                }
+                else {
+                    activity.openIssueLabels();
+                }
+            }
+        }
     }
 }
