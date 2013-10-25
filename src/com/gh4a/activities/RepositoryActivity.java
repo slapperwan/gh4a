@@ -182,7 +182,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
             return;
         }
         
-        setContentView(R.layout.view_pager_repo);
+        setContentView(R.layout.view_pager);
         
         mActionBar = getSupportActionBar();
         mActionBar.setTitle(mRepoOwner + "/" + mRepoName);

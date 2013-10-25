@@ -29,6 +29,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.SAXException;
 
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -41,7 +42,6 @@ import android.widget.ListView;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
-import com.gh4a.LoadingDialog;
 import com.gh4a.R;
 import com.gh4a.adapter.TrendAdapter;
 import com.gh4a.feeds.TrendHandler;
@@ -54,7 +54,7 @@ public class TrendActivity extends BaseSherlockFragmentActivity {
     private static final String MONTH = "http://github-trends.oscardelben.com/explore/month.xml";
     private static final String FOREVER = "http://github-trends.oscardelben.com/explore/forever.xml";
     
-    private LoadingDialog mLoadingDialog;
+    private ProgressDialog mProgressDialog;
     private Button mBtnToday;
     private Button mBtnWeek;
     private Button mBtnMonth;
@@ -213,8 +213,10 @@ public class TrendActivity extends BaseSherlockFragmentActivity {
          */
         @Override
         protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().mLoadingDialog = LoadingDialog.show(mTarget.get(), true, true);
+            TrendActivity activity = mTarget.get();
+            if (activity != null) {
+                activity.mProgressDialog = activity.showProgressDialog(
+                        activity.getString(R.string.loading_msg), true);
             }
         }
 
@@ -224,13 +226,14 @@ public class TrendActivity extends BaseSherlockFragmentActivity {
          */
         @Override
         protected void onPostExecute(List<Trend> result) {
-            if (mTarget.get() != null) {
+            TrendActivity activity = mTarget.get();
+            if (activity != null) {
                 if (mException) {
-                    mTarget.get().showError();
+                    activity.showError();
                 }
                 else {
-                    mTarget.get().mLoadingDialog.dismiss();
-                    mTarget.get().fillData(result);
+                    activity.stopProgressDialog(activity.mProgressDialog);
+                    activity.fillData(result);
                 }
             }
         }

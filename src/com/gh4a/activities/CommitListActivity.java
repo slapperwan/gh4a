@@ -24,6 +24,7 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.CommitService;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -37,7 +38,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.gh4a.Constants;
-import com.gh4a.LoadingDialog;
 import com.gh4a.R;
 import com.gh4a.adapter.CommitAdapter;
 
@@ -63,7 +63,7 @@ public class CommitListActivity extends BaseSherlockFragmentActivity implements
     protected int mFromBtnId;
 
     /** The loading dialog. */
-    protected LoadingDialog mLoadingDialog;
+    protected ProgressDialog mProgressDialog;
 
     /** The commit adapter. */
     protected CommitAdapter mCommitAdapter;
@@ -109,7 +109,7 @@ public class CommitListActivity extends BaseSherlockFragmentActivity implements
         mListViewCommits.setAdapter(mCommitAdapter);
         mListViewCommits.setOnScrollListener(this);
 
-        new LoadCommitListTask(this).execute("false");
+        new LoadCommitListTask(this).execute();
     }
 
     /**
@@ -123,8 +123,6 @@ public class CommitListActivity extends BaseSherlockFragmentActivity implements
         
         /** The exception. */
         private boolean mException;
-        /** The hide main view. */
-        private boolean mHideMainView;
         
         /**
          * Instantiates a new load commit list task.
@@ -143,7 +141,6 @@ public class CommitListActivity extends BaseSherlockFragmentActivity implements
         protected List<RepositoryCommit> doInBackground(String... params) {
             if (mTarget.get() != null) {
                 if (!mTarget.get().lastPage) {
-                    this.mHideMainView = Boolean.valueOf(params[0]);
                     CommitListActivity activity = mTarget.get();
                     GitHubClient client = new GitHubClient();
                     client.setOAuth2Token(mTarget.get().getAuthToken());
@@ -193,8 +190,8 @@ public class CommitListActivity extends BaseSherlockFragmentActivity implements
             CommitListActivity activity = mTarget.get();
             if (activity != null) {
                 if (activity.mPage == 1) {
-                    activity.mLoadingDialog = LoadingDialog.show(activity, true, true,
-                            mHideMainView);
+                    activity.mProgressDialog = activity.showProgressDialog(
+                            activity.getString(R.string.loading_msg), true);
                 }
                 else if (activity.lastPage) {
                     Toast.makeText(activity, activity.getString(R.string.no_more_results),
@@ -212,9 +209,7 @@ public class CommitListActivity extends BaseSherlockFragmentActivity implements
             if (mTarget.get() != null) {
                 CommitListActivity activity = mTarget.get();
     
-                if (activity.mLoadingDialog != null && activity.mLoadingDialog.isShowing()) {
-                    activity.mLoadingDialog.dismiss();
-                }
+                activity.stopProgressDialog(activity.mProgressDialog);
     
                 if (mException) {
                     activity.showError();
