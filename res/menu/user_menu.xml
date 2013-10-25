@@ -10,7 +10,7 @@
         android:showAsAction="always" />
     <item android:id="@+id/bookmarks"
         android:title="@string/bookmarks"
-        android:showAsAction="never" />
+        android:showAsAction="always" />
     <item android:id="@+id/share"
         android:title="@string/share"
         android:showAsAction="never" />

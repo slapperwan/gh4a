@@ -132,10 +132,11 @@ public class UserActivity extends BaseSherlockFragmentActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        boolean isSelf = mUserLogin.equals(getAuthLogin());
+
         MenuItem logoutAction = menu.findItem(R.id.logout);
         logoutAction.setTitle(isAuthorized() ? R.string.logout : R.string.login);
-
-        boolean isSelf = mUserLogin.equals(getAuthLogin());
+        logoutAction.setVisible(isSelf || !isAuthorized());
 
         MenuItem followAction = menu.findItem(R.id.follow);
         followAction.setVisible(!isSelf && isAuthorized());
@@ -152,8 +153,7 @@ public class UserActivity extends BaseSherlockFragmentActivity {
             }
         }
 
-        menu.findItem(R.id.bookmarks).setShowAsAction(
-                isSelf ? MenuItem.SHOW_AS_ACTION_ALWAYS : MenuItem.SHOW_AS_ACTION_NEVER);
+        menu.findItem(R.id.bookmarks).setVisible(isSelf);
         menu.findItem(R.id.share).setVisible(!isSelf);
         menu.findItem(R.id.bookmark).setVisible(!isSelf);
 
