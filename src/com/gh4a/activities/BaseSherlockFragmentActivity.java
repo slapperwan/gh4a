@@ -135,6 +135,10 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         case R.id.about:
             openAboutDialog();
             return true;
+        case R.id.search:
+            intent = new Intent().setClass(this, SearchActivity.class);
+            startActivity(intent);
+            return true;
         case R.id.bookmarks:
             intent = new Intent(this, BookmarkListActivity.class);
             startActivity(intent);
@@ -377,7 +381,7 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
     protected void saveBookmark(String name, int type, Intent intent) {
         ContentValues cv = new ContentValues();
         cv.put(BookmarksProvider.Columns.NAME, name);
-        cv.put(BookmarksProvider.Columns.TYPE, BookmarksProvider.Columns.TYPE_REPO);
+        cv.put(BookmarksProvider.Columns.TYPE, type);
         cv.put(BookmarksProvider.Columns.URI, intent.toUri(0));
         if (getContentResolver().insert(BookmarksProvider.Columns.CONTENT_URI, cv) != null) {
             showMessage(getString(R.string.bookmark_saved), false);

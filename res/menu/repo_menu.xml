@@ -14,7 +14,7 @@
         android:title="@string/repo_tags"
         android:showAsAction="never" />
     <item android:id="@+id/bookmark"
-        android:title="@string/bookmark"
+        android:title="@string/bookmark_repo"
         android:showAsAction="never" />
     <item android:id="@+id/share"
         android:title="@string/share"

@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.adapter.BookmarkAdapter;
@@ -35,7 +36,10 @@ public class BookmarkListActivity extends BaseSherlockFragmentActivity implement
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.generic_list);
-        getSupportActionBar().setTitle(R.string.bookmarks);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(R.string.bookmarks);
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         mListView = (ListView) findViewById(R.id.list_view);
         mAdapter = new BookmarkAdapter(this);
@@ -67,7 +71,7 @@ public class BookmarkListActivity extends BaseSherlockFragmentActivity implement
                 .setMessage(R.string.remove_bookmark_confirm)
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
+                    public void onClick(DialogInterface dialog, int which) {
                         Uri uri = ContentUris.withAppendedId(Columns.CONTENT_URI, id);
                         getContentResolver().delete(uri, null, null);
                     }
@@ -91,5 +95,10 @@ public class BookmarkListActivity extends BaseSherlockFragmentActivity implement
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.swapCursor(null);
+    }
+
+    @Override
+    protected void navigateUp() {
+        finish();
     }
 }

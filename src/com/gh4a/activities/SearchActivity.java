@@ -81,6 +81,7 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
         LinearLayout searchLayout = (LinearLayout) inflater.inflate(R.layout.search_action_bar, null);
         actionBar.setCustomView(searchLayout);
         actionBar.setDisplayShowCustomEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         mSearchType = (Spinner) searchLayout.findViewById(R.id.search_type);
         mSearchType.setAdapter(new SearchTypeAdapter(this,
@@ -428,5 +429,10 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
             Gh4Application.get(this).openRepositoryInfoActivity(this,
                     repository.getOwner(), repository.getName(), 0);
         }
+    }
+
+    @Override
+    protected void navigateUp() {
+        finish();
     }
 }

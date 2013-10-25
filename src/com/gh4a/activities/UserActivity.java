@@ -23,6 +23,7 @@ import com.bugsense.trace.BugSenseHandler;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.db.BookmarksProvider;
 import com.gh4a.fragment.PrivateEventListFragment;
 import com.gh4a.fragment.PublicEventListFragment;
 import com.gh4a.fragment.RepositoryIssueListFragment;
@@ -118,29 +119,27 @@ public class UserActivity extends BaseSherlockFragmentActivity {
         public void destroyItem(ViewGroup container, int position, Object object) {
         }
     }
-    
+
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.clear();
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.user_menu, menu);
-        
         if (Gh4Application.THEME != R.style.LightTheme) {
             menu.findItem(R.id.refresh).setIcon(R.drawable.navigation_refresh_dark);
         }
-        
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem logoutAction = menu.findItem(R.id.logout);
-        if (!isAuthorized()) {
-            logoutAction.setTitle(R.string.login);
-        }
-        
+        logoutAction.setTitle(isAuthorized() ? R.string.logout : R.string.login);
+
+        boolean isSelf = mUserLogin.equals(getAuthLogin());
+
         MenuItem followAction = menu.findItem(R.id.follow);
-        if (mUserLogin.equals(getAuthLogin())) {
-            menu.findItem(R.id.explore).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            menu.removeItem(R.id.follow);
-            menu.removeItem(R.id.share);
-        }
-        else if (isAuthorized()) {
+        followAction.setVisible(!isSelf && isAuthorized());
+        if (followAction.isVisible()) {
             if (!isFinishLoadingFollowing) {
                 followAction.setActionView(R.layout.ab_loading);
                 followAction.expandActionView();
@@ -152,10 +151,12 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                 followAction.setTitle(R.string.user_follow_action);
             }
         }
-        else {
-            menu.getItem(2).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            menu.removeItem(R.id.follow);
-        }
+
+        menu.findItem(R.id.bookmarks).setShowAsAction(
+                isSelf ? MenuItem.SHOW_AS_ACTION_ALWAYS : MenuItem.SHOW_AS_ACTION_NEVER);
+        menu.findItem(R.id.share).setVisible(!isSelf);
+        menu.findItem(R.id.bookmark).setVisible(!isSelf);
+
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -195,33 +196,6 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                     }
                 }
                 return true;
-            case R.id.logout:
-                if (isAuthorized()) {
-                    SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
-                            Constants.PREF_NAME, MODE_PRIVATE);
-                    
-                    if (sharedPreferences != null) {
-                        if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
-                                && sharedPreferences.getString(Constants.User.USER_AUTH_TOKEN, null) != null){
-                            Editor editor = sharedPreferences.edit();
-                            editor.clear();
-                            editor.commit();
-                            Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP
-                                    |Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
-                            this.finish();
-                        }
-                    }
-                }
-                else {
-                    Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP
-                            |Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    this.finish();
-                }
-                return true;
             case R.id.dark:
                 Gh4Application.THEME = R.style.DefaultTheme;
                 saveTheme(R.style.DefaultTheme);
@@ -254,13 +228,6 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                 item.expandActionView();
                 mUserFragment.followUser(mUserLogin);
                 return true;
-            case R.id.about:
-                openAboutDialog();
-                return true;
-            case R.id.search:
-                intent = new Intent().setClass(getApplication(), SearchActivity.class);
-                startActivity(intent);
-                return true;
             case R.id.share:
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
                 int subjectId = StringUtils.isBlank(mUserName)
@@ -271,8 +238,19 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                 shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
                 return true;
+            case R.id.bookmark:
+                Intent bookmarkIntent = new Intent(this, getClass());
+                bookmarkIntent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
+                bookmarkIntent.putExtra(Constants.User.USER_NAME, mUserName);
+                saveBookmark(getSupportActionBar().getTitle().toString(),
+                        BookmarksProvider.Columns.TYPE_USER, bookmarkIntent);
+                return true;
         }
-        return super.onOptionsItemSelected(item);
+        boolean result = super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.logout) {
+            finish();
+        }
+        return result;
     }
     
     @SuppressLint("NewApi")
