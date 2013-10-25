@@ -11,9 +11,9 @@
     <LinearLayout
         android:id="@+id/collapsed"
         android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:paddingTop="8dp"
-		android:paddingBottom="8dp" >
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp" >
 
         <View
             android:id="@+id/view_color"
@@ -108,6 +108,14 @@
                 android:layout_weight="1"
                 android:tag="e102d8"
                 android:background="#e102d8" />
+            <TextView
+                android:id="@+id/custom"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/ellipse" />
 
         </LinearLayout>
 

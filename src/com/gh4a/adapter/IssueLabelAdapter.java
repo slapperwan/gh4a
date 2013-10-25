@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.gh4a.ColorPickerDialog;
+import com.gh4a.ColorPickerDialog.OnColorChangedListener;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 
@@ -40,7 +42,11 @@ public class IssueLabelAdapter extends RootAdapter<Label> implements OnClickList
             ViewGroup colors = (ViewGroup) convertView.findViewById(R.id.colors);
             int count = colors.getChildCount();
             for (int i = 0; i < count; i++) {
-                colors.getChildAt(i).setOnClickListener(this);
+                View child = colors.getChildAt(i);
+                child.setOnClickListener(this);
+                if (child.getId() == R.id.custom) {
+                    holder.customColorButton = (TextView) child;
+                }
             }
             colors.setTag(holder);
         } else {
@@ -58,22 +64,37 @@ public class IssueLabelAdapter extends RootAdapter<Label> implements OnClickList
         public View color;
         public TextView label;
         public EditText editor;
+        public TextView customColorButton;
     }
 
     private void assignColor(ViewHolder holder, String colorString) {
         int color = Color.parseColor("#" + colorString);
         boolean dark = Color.red(color) + Color.green(color) + Color.blue(color) < 383;
+        int textColor = mContext.getResources().getColor(
+                dark ? R.color.abs__primary_text_holo_dark : R.color.abs__primary_text_holo_light);
 
         holder.color.setBackgroundColor(color);
         holder.editor.setBackgroundColor(color);
+        holder.customColorButton.setBackgroundColor(color);
+        holder.customColorButton.setTextColor(textColor);
+        holder.editor.setTextColor(textColor);
         holder.editor.setTag(colorString);
-        holder.editor.setTextColor(mContext.getResources().getColor(
-                dark ? R.color.abs__primary_text_holo_dark : R.color.abs__primary_text_holo_light));
     }
 
     @Override
     public void onClick(View v) {
-        ViewHolder holder = (ViewHolder) ((View) v.getParent()).getTag();
-        assignColor(holder, (String) v.getTag());
+        final ViewHolder holder = (ViewHolder) ((View) v.getParent()).getTag();
+        if (v == holder.customColorButton) {
+            String color = (String) holder.editor.getTag();
+            ColorPickerDialog dialog = new ColorPickerDialog(mContext, color, new OnColorChangedListener() {
+                @Override
+                public void colorChanged(String color) {
+                    assignColor(holder, color);
+                }
+            });
+            dialog.show();
+        } else {
+            assignColor(holder, (String) v.getTag());
+        }
     }
 }
