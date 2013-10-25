@@ -17,7 +17,6 @@ package com.gh4a.fragment;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryContents;
@@ -42,7 +41,6 @@ import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.FileAdapter;
 import com.gh4a.loader.ContentListLoader;
 import com.gh4a.loader.ContentLoader;
-import com.gh4a.loader.GitModuleParserLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MarkdownLoader;
@@ -58,12 +56,16 @@ public class ContentListFragment extends BaseFragment implements OnItemClickList
     public String mRef;
     private ListView mListView;
     public FileAdapter mAdapter;
-    private OnTreeSelectedListener mCallback;
-    private List<RepositoryContents> mContents;
+    private ParentCallback mCallback;
     private boolean mDataLoaded;
     private String mPathReadme;
     private TextView mFooter;
     private String mMarkdownText; 
+
+    public interface ParentCallback {
+        public void onModuleMapFound(ContentListFragment fragment);
+        public void onTreeSelected(ContentListFragment fragment, RepositoryContents content, String ref);
+    }
 
     private LoaderCallbacks<List<RepositoryContents>> mContentsListCallback =
             new LoaderCallbacks<List<RepositoryContents>>() {
@@ -79,21 +81,15 @@ public class ContentListFragment extends BaseFragment implements OnItemClickList
             if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
                 fillData(result.getData());
                 readmeExists(result.getData());
+                for (RepositoryContents content : result.getData()) {
+                    if (RepositoryContents.TYPE_FILE.equals(content.getType())) {
+                        if (content.getName().equals(".gitmodulemap")) {
+                            mCallback.onModuleMapFound(ContentListFragment.this);
+                            break;
+                        }
+                    }
+                }
             }
-        }
-    };
-
-    private LoaderCallbacks<Map<String, String>> mGitModuleCallback =
-            new LoaderCallbacks<Map<String, String>>() {
-        @Override
-        public Loader<LoaderResult<Map<String, String>>> onCreateLoader(int id, Bundle args) {
-            return new GitModuleParserLoader(getSherlockActivity(), mRepository.getOwner().getLogin(),
-                    mRepository.getName(), ".gitmodules", mRef);
-        }
-        @Override
-        public void onResultReady(LoaderResult<Map<String, String>> result) {
-            hideLoading();
-            mCallback.setGitModuleMap(result.getData());
         }
     };
 
@@ -176,7 +172,7 @@ public class ContentListFragment extends BaseFragment implements OnItemClickList
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mCallback = (OnTreeSelectedListener) activity;
+            mCallback = (ParentCallback) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnTreeSelectedListener");
@@ -186,12 +182,9 @@ public class ContentListFragment extends BaseFragment implements OnItemClickList
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        
-        mAdapter = new FileAdapter(getSherlockActivity());
-        if (mContents != null) {
-            hideLoading();
-            mAdapter.addAll(mContents);
-            readmeExists(mContents);
+
+        if (mAdapter == null) {
+            mAdapter = new FileAdapter(getSherlockActivity());
         }
         mListView.setAdapter(mAdapter);
     }
@@ -207,23 +200,10 @@ public class ContentListFragment extends BaseFragment implements OnItemClickList
                 getLoaderManager().restartLoader(0, null, mContentsListCallback);
             }
             getLoaderManager().getLoader(0).forceLoad();
-            
-            //get .gitmodules to be parsed
-            if (StringUtils.isBlank(mPath)) {
-                if (getLoaderManager().getLoader(1) == null) {
-                    getLoaderManager().initLoader(1, null, mGitModuleCallback);
-                }
-                else {
-                    getLoaderManager().restartLoader(1, null, mGitModuleCallback);
-                }
-                getLoaderManager().getLoader(1).forceLoad();
-            }
-           
         }
-    }
-    
-    public void setTreeEntryList(List<RepositoryContents> contents) {
-        mContents = contents;
+        else {
+            hideLoading();
+        }
     }
     
     private void fillData(List<RepositoryContents> entries) {
@@ -289,20 +269,9 @@ public class ContentListFragment extends BaseFragment implements OnItemClickList
         }
     }
     
-    public interface OnTreeSelectedListener {
-        public void onTreeSelected(int position, 
-                AdapterView<?> adapterView,
-                RepositoryContents content,
-                List<RepositoryContents> contents,
-                String ref);
-        
-        public void setGitModuleMap(Map<String, String> gitModuleMap);
-    }
-
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         RepositoryContents content = (RepositoryContents) adapterView.getAdapter().getItem(position);
-        mCallback.onTreeSelected(position, adapterView, content, mContents, mRef);
+        mCallback.onTreeSelected(this, content, mRef);
     }
-
 }

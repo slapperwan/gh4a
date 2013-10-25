@@ -23,12 +23,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
@@ -40,9 +40,10 @@ import com.gh4a.R;
 import com.gh4a.db.BookmarksProvider;
 import com.gh4a.fragment.CommitListFragment;
 import com.gh4a.fragment.ContentListFragment;
-import com.gh4a.fragment.ContentListFragment.OnTreeSelectedListener;
 import com.gh4a.fragment.RepositoryFragment;
+import com.gh4a.fragment.ContentListFragment.ParentCallback;
 import com.gh4a.loader.BranchListLoader;
+import com.gh4a.loader.GitModuleParserLoader;
 import com.gh4a.loader.IsStarringLoader;
 import com.gh4a.loader.IsWatchingLoader;
 import com.gh4a.loader.LoaderCallbacks;
@@ -51,12 +52,13 @@ import com.gh4a.loader.RepositoryLoader;
 import com.gh4a.loader.TagListLoader;
 import com.gh4a.utils.StringUtils;
 
-public class RepositoryActivity extends BaseSherlockFragmentActivity implements OnTreeSelectedListener {
+public class RepositoryActivity extends BaseSherlockFragmentActivity implements ParentCallback {
     private static final int LOADER_REPO = 0;
     private static final int LOADER_BRANCHES = 1;
     private static final int LOADER_TAGS = 2;
     private static final int LOADER_WATCHING = 3;
     private static final int LOADER_STARRING = 4;
+    private static final int LOADER_MODULEMAP = 5;
 
     private LoaderCallbacks<Repository> mRepoCallback = new LoaderCallbacks<Repository>() {
         @Override
@@ -72,6 +74,19 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
                 initializePager();
                 invalidateOptionsMenu();
             }
+        }
+    };
+
+    private LoaderCallbacks<Map<String, String>> mGitModuleCallback =
+            new LoaderCallbacks<Map<String, String>>() {
+        @Override
+        public Loader<LoaderResult<Map<String, String>>> onCreateLoader(int id, Bundle args) {
+            return new GitModuleParserLoader(RepositoryActivity.this, mRepository.getOwner().getLogin(),
+                    mRepository.getName(), ".gitmodules", mSelectedRef);
+        }
+        @Override
+        public void onResultReady(LoaderResult<Map<String, String>> result) {
+            mGitModuleMap = result.getData();
         }
     };
 
@@ -273,32 +288,35 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
     }
 
     @Override
-    public void onTreeSelected(int position, AdapterView<?> adapterView,
-            RepositoryContents content, List<RepositoryContents> contents, String ref) {
+    public void onModuleMapFound(ContentListFragment fragment) {
+        if (!mDirStack.isEmpty() && mDirStack.get(0) == fragment) {
+            LoaderManager lm = getSupportLoaderManager();
+            if (lm.getLoader(LOADER_MODULEMAP) == null) {
+                lm.initLoader(LOADER_MODULEMAP, null, mGitModuleCallback);
+            }
+            else {
+                lm.restartLoader(LOADER_MODULEMAP, null, mGitModuleCallback);
+            }
+            lm.getLoader(LOADER_MODULEMAP).forceLoad();
+        }
+    }
+
+    @Override
+    public void onTreeSelected(ContentListFragment fragment, RepositoryContents content, String ref) {
+        String path = content.getPath();
         if (RepositoryContents.TYPE_DIR.equals(content.getType())) {
             mAdapter.mContent = content;
             mSelectedRef = ref;
-            mDirStack.push(ContentListFragment.newInstance(mRepository, content.getPath(), mSelectedRef));
+            mDirStack.push(ContentListFragment.newInstance(mRepository, path, mSelectedRef));
             mAdapter.notifyDataSetChanged();
         }
-        else {
-            if (mGitModuleMap != null) {
-                if (!StringUtils.isBlank(mGitModuleMap.get(content.getPath()))) {
-                    String[] userRepo = mGitModuleMap.get(content.getPath()).split("/");
-                    Gh4Application.get(this).openRepositoryInfoActivity(this, userRepo[0], userRepo[1], 0);
-                }
-                else {
-                   openFileViewer(content, ref);
-                }
-            }
-            else {
-                openFileViewer(content, ref);
-            }
+        else if (mGitModuleMap != null && mGitModuleMap.get(path) != null) {
+            String[] userRepo = mGitModuleMap.get(path).split("/");
+            Gh4Application.get(this).openRepositoryInfoActivity(this, userRepo[0], userRepo[1], 0);
         }
-    }
-    
-    public void setGitModuleMap(Map<String, String> gitModuleMap) {
-        mGitModuleMap = gitModuleMap;
+        else {
+            openFileViewer(content, ref);
+        }
     }
     
     private void openFileViewer(RepositoryContents content, String ref) {
