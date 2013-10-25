@@ -37,6 +37,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.db.BookmarksProvider;
 import com.gh4a.fragment.CommitListFragment;
 import com.gh4a.fragment.ContentListFragment;
 import com.gh4a.fragment.ContentListFragment.OnTreeSelectedListener;
@@ -334,16 +335,20 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
     }
     
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.clear();
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.repo_menu, menu);
         
         if (Gh4Application.THEME != R.style.LightTheme) {
             menu.findItem(R.id.refresh).setIcon(R.drawable.navigation_refresh_dark);
         }
-        
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem watchAction = menu.findItem(R.id.watch);
+        watchAction.setVisible(isAuthorized());
         if (isAuthorized()) {
             if (!mIsFinishLoadingWatching) {
                 watchAction.setActionView(R.layout.ab_loading);
@@ -356,11 +361,9 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
                 watchAction.setTitle(R.string.repo_watch_action);
             }
         }
-        else {
-            menu.removeItem(R.id.watch);
-        }
         
         MenuItem starAction = menu.findItem(R.id.star);
+        starAction.setVisible(isAuthorized());
         if (isAuthorized()) {
             if (!mIsFinishLoadingStarring) {
                 starAction.setActionView(R.layout.ab_loading);
@@ -372,9 +375,6 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
             else {
                 starAction.setTitle(R.string.repo_star_action);
             }
-        }
-        else {
-            menu.removeItem(R.id.star);
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -428,6 +428,15 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
                 shareIntent.putExtra(Intent.EXTRA_TEXT,  mRepository.getHtmlUrl());
                 shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
+                return true;
+            case R.id.bookmark:
+                Intent bookmarkIntent = new Intent(this, getClass());
+                bookmarkIntent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+                bookmarkIntent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                bookmarkIntent.putExtra(Constants.Repository.SELECTED_REF, mSelectedRef);
+                bookmarkIntent.putExtra(Constants.Repository.SELECTED_BRANCHTAG_NAME, mSelectBranchTag);
+                saveBookmark(mActionBar.getTitle().toString(),
+                        BookmarksProvider.Columns.TYPE_REPO, bookmarkIntent);
                 return true;
         }
         return super.onOptionsItemSelected(item);

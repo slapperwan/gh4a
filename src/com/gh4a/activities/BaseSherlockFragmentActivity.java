@@ -23,6 +23,7 @@ import org.ocpsoft.pretty.time.PrettyTime;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -53,6 +54,7 @@ import com.actionbarsherlock.view.Window;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.db.BookmarksProvider;
 import com.gh4a.loader.LoaderResult;
 
 /**
@@ -134,7 +136,8 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
             openAboutDialog();
             return true;
         case R.id.bookmarks:
-            openBookmarkActivity();
+            intent = new Intent(this, BookmarkListActivity.class);
+            startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -160,10 +163,6 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
                 this.finish();
             }
         }
-    }
-    
-    public void openBookmarkActivity() {
-        //should be override at sub class
     }
     
     public void openAboutDialog() {
@@ -374,7 +373,17 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
             }
         });
     }
-    
+
+    protected void saveBookmark(String name, int type, Intent intent) {
+        ContentValues cv = new ContentValues();
+        cv.put(BookmarksProvider.Columns.NAME, name);
+        cv.put(BookmarksProvider.Columns.TYPE, BookmarksProvider.Columns.TYPE_REPO);
+        cv.put(BookmarksProvider.Columns.URI, intent.toUri(0));
+        if (getContentResolver().insert(BookmarksProvider.Columns.CONTENT_URI, cv) != null) {
+            showMessage(getString(R.string.bookmark_saved), false);
+        }
+    }
+
     public boolean isLoaderError(LoaderResult<?> result) {
         if (result.isSuccess()) {
             return false;

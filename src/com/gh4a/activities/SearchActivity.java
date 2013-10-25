@@ -77,8 +77,8 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.search);
 
-        LinearLayout searchLayout = (LinearLayout) getLayoutInflater().inflate(
-                R.layout.search_action_bar, null);
+        LayoutInflater inflater = LayoutInflater.from(actionBar.getThemedContext());
+        LinearLayout searchLayout = (LinearLayout) inflater.inflate(R.layout.search_action_bar, null);
         actionBar.setCustomView(searchLayout);
         actionBar.setDisplayShowCustomEnabled(true);
 

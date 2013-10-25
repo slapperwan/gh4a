@@ -96,7 +96,7 @@
     <string name="please_wait">Please wait</string>
     <string name="no_more_results">No more results</string>
     <string name="auth_err_toast">Your API token may be invalid</string>
-    <string name="bookmark_add">Add %1$s</string>
+    <string name="bookmark">Bookmark</string>
     <string name="ellipse" translatable="false">\u2026</string>
 
     <plurals name="file">

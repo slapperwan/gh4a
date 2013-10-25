@@ -1,32 +1,33 @@
 package com.gh4a.activities;
 
-import java.util.List;
+import java.net.URISyntaxException;
 
 import android.app.AlertDialog;
+import android.content.ContentUris;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.adapter.BookmarkAdapter;
-import com.gh4a.db.Bookmark;
-import com.gh4a.db.BookmarkParam;
-import com.gh4a.db.DbHelper;
+import com.gh4a.db.BookmarksProvider.Columns;
 
-public class BookmarkListActivity extends BaseSherlockFragmentActivity {
+public class BookmarkListActivity extends BaseSherlockFragmentActivity implements
+        AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, LoaderCallbacks<Cursor> {
+    private static final String TAG = "BookmarkListActivity";
 
-    private String mName;
-    private String mObjectType;
-    private boolean mHideAdd;
+    private ListView mListView;
+    private BookmarkAdapter mAdapter;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -34,93 +35,61 @@ public class BookmarkListActivity extends BaseSherlockFragmentActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.generic_list);
-        
-        mName = getIntent().getStringExtra(Constants.Bookmark.NAME);
-        mObjectType = getIntent().getStringExtra(Constants.Bookmark.OBJECT_TYPE);
-        mHideAdd = getIntent().getBooleanExtra(Constants.Bookmark.HIDE_ADD, false);
-        
-        fillData();
+        getSupportActionBar().setTitle(R.string.bookmarks);
+
+        mListView = (ListView) findViewById(R.id.list_view);
+        mAdapter = new BookmarkAdapter(this);
+        mListView.setAdapter(mAdapter);
+        mListView.setOnItemClickListener(this);
+        mListView.setOnItemLongClickListener(this);
+
+        getSupportLoaderManager().initLoader(0, null, this);
     }
     
-    private void fillData() {
-        final DbHelper db = new DbHelper(this);
-        ListView listView = (ListView) findViewById(R.id.list_view);
-        listView.setOnItemClickListener(new OnItemClickListener() {
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Cursor cursor = (Cursor) mAdapter.getItem(position);
+        String uri = cursor.getString(cursor.getColumnIndexOrThrow(Columns.URI));
 
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Bookmark b = (Bookmark) adapterView.getAdapter().getItem(position);
-                if (position == 0) {
-                    setResult(Constants.Bookmark.ADD, null);
-                    Toast.makeText(BookmarkListActivity.this, 
-                            getResources().getString(R.string.bookmark_saved), Toast.LENGTH_LONG).show();
-                    finish();
-                }
-                else {
-                    List<BookmarkParam> params = db.findBookmarkParams(b.getId());
-                    Intent intent;
-                    try {
-                        intent = new Intent().setClass(BookmarkListActivity.this, Class.forName(b.getObjectClass()));
-                        for (BookmarkParam param : params) {
-                            try {
-                                int v = Integer.parseInt(param.getValue());
-                                intent.putExtra(param.getKey(), v);
-                            }
-                            catch (NumberFormatException e) {
-                                intent.putExtra(param.getKey(), param.getValue());
-                            }
-                        }
-                        startActivity(intent);
-                    }
-                    catch (ClassNotFoundException e) {
-                        Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    }
-                }
-            }
-            
-        });
-        listView.setOnItemLongClickListener(new OnItemLongClickListener() {
-
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
-                if (position != 0) {
-                    final Bookmark b = (Bookmark) adapterView.getAdapter().getItem(position);
-                    AlertDialog.Builder builder = new AlertDialog.Builder(BookmarkListActivity.this);
-                    builder.setTitle(R.string.remove_bookmark);
-                    builder.setIcon(android.R.drawable.ic_dialog_alert);
-                    builder.setMessage(R.string.remove_bookmark_confirm)
-                           .setCancelable(false)
-                           .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
-                               public void onClick(DialogInterface dialog, int id) {
-                                   dialog.dismiss();
-                                   db.deleteBookmark(b.getId());
-                                   fillData();
-                               }
-                           })
-                           .setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
-                               public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                               }
-                           });
-                    AlertDialog alert = builder.create();
-                    alert.show();
-                }
-                return false;
-            }
-        });
-        
-        BookmarkAdapter adapter = new BookmarkAdapter(this, mHideAdd);
-        listView.setAdapter(adapter);
-        
-        List<Bookmark> list = db.findAllBookmark();
-        
-        Bookmark newBookmark = new Bookmark();
-        newBookmark.setName(mName);
-        newBookmark.setObjectType(mObjectType);
-        adapter.add(newBookmark);
-        for (Bookmark b : list) {
-            adapter.add(b);
-            adapter.notifyDataSetChanged();
+        try {
+            Intent intent = Intent.parseUri(uri, 0);
+            startActivity(intent);
+        } catch (URISyntaxException e) {
+            Log.e(TAG, "Couldn't parse bookmark URI " + uri);
         }
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, final long id) {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.remove_bookmark)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setMessage(R.string.remove_bookmark_confirm)
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Uri uri = ContentUris.withAppendedId(Columns.CONTENT_URI, id);
+                        getContentResolver().delete(uri, null, null);
+                    }
+                })
+                .setNegativeButton(getString(R.string.no), null)
+                .show();
+        return true;
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(this, Columns.CONTENT_URI, null, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mAdapter.swapCursor(data);
+        hideLoading();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.swapCursor(null);
     }
 }

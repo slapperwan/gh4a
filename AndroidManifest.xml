@@ -6,7 +6,7 @@
     android:versionCode="33"
     android:versionName="3.3">
     
-    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="16" />
+    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="18" />
     <uses-permission
         android:name="android.permission.INTERNET" />
     <uses-permission
@@ -15,6 +15,7 @@
     <application
         android:icon="@drawable/octodroid"
         android:label="@string/app_name"
+        android:allowBackup="true"
         android:name="com.gh4a.Gh4Application">
         <activity
             android:name=".activities.Github4AndroidActivity"
@@ -190,16 +191,9 @@
                     
             </intent-filter>
         </activity>
-        <!-- activity android:name="BrowseFilter">
-            <intent-filter>
-                <action
-                    android:name="android.intent.action.SEND" />
-                <category
-                    android:name="android.intent.category.DEFAULT" />
-                <data
-                    android:mimeType="text/plain"
-                    android:pathPattern="slapperwan/gh4a"/>
-            </intent-filter>
-        </activity-->
+        <provider
+            android:name=".db.BookmarksProvider"
+            android:authorities="com.gh4a"
+            android:exported="false" />
     </application>
 </manifest>

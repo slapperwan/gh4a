@@ -23,6 +23,9 @@
     <item android:id="@+id/share"
         android:title="@string/share"
         android:showAsAction="never" />
+    <item android:id="@+id/bookmarks"
+        android:title="@string/bookmarks"
+        android:showAsAction="never" />
     <item android:id="@+id/theme"
         android:title="@string/theme"
         android:showAsAction="never">
