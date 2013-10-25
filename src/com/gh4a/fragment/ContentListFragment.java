@@ -15,39 +15,29 @@
  */
 package com.gh4a.fragment;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryContents;
-import org.eclipse.egit.github.core.util.EncodingUtils;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.activities.BaseSherlockFragmentActivity;
-import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.FileAdapter;
 import com.gh4a.loader.ContentListLoader;
-import com.gh4a.loader.ContentLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.MarkdownLoader;
-import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
-import com.github.mobile.util.HtmlUtils;
-import com.github.mobile.util.HttpImageGetter;
 
 public class ContentListFragment extends BaseFragment implements OnItemClickListener {
 
@@ -58,9 +48,6 @@ public class ContentListFragment extends BaseFragment implements OnItemClickList
     public FileAdapter mAdapter;
     private ParentCallback mCallback;
     private boolean mDataLoaded;
-    private String mPathReadme;
-    private TextView mFooter;
-    private String mMarkdownText; 
 
     public interface ParentCallback {
         public void onModuleMapFound(ContentListFragment fragment);
@@ -80,7 +67,6 @@ public class ContentListFragment extends BaseFragment implements OnItemClickList
             mDataLoaded = true;
             if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
                 fillData(result.getData());
-                readmeExists(result.getData());
                 for (RepositoryContents content : result.getData()) {
                     if (RepositoryContents.TYPE_FILE.equals(content.getType())) {
                         if (content.getName().equals(".gitmodulemap")) {
@@ -93,41 +79,6 @@ public class ContentListFragment extends BaseFragment implements OnItemClickList
         }
     };
 
-    private LoaderCallbacks<List<RepositoryContents>> mContentCallback =
-            new LoaderCallbacks<List<RepositoryContents>>() {
-        @Override
-        public Loader<LoaderResult<List<RepositoryContents>>> onCreateLoader(int id, Bundle args) {
-            return new ContentLoader(getSherlockActivity(), mRepository.getOwner().getLogin(),
-                    mRepository.getName(), mPathReadme, mRef);
-        }
-
-        @Override
-        public void onResultReady(LoaderResult<List<RepositoryContents>> result) {
-            hideLoading();
-            List<RepositoryContents> data = result.getData();
-            if (data != null && !data.isEmpty()) {
-                loadMarkdown(data.get(0));
-            }
-        }
-    };
-    
-    private LoaderCallbacks<String> mMarkdownCallback = new LoaderCallbacks<String>() {
-        @Override
-        public Loader<LoaderResult<String>> onCreateLoader(int id, Bundle args) {
-            return new MarkdownLoader(getSherlockActivity(), mMarkdownText, "markdown");
-        }
-        @Override
-        public void onResultReady(LoaderResult<String> result) {
-            hideLoading();
-            if (result.getData() != null) {
-                String readme = HtmlUtils.format(result.getData()).toString();
-                HttpImageGetter imageGetter = new HttpImageGetter(getSherlockActivity());
-                imageGetter.bind(mFooter, readme, mRepository.getId());
-                mAdapter.notifyDataSetChanged();
-            }
-        }
-    };
-    
     public static ContentListFragment newInstance(Repository repository,
             String path, String ref) {
         ContentListFragment f = new ContentListFragment();
@@ -158,12 +109,6 @@ public class ContentListFragment extends BaseFragment implements OnItemClickList
         View v = inflater.inflate(R.layout.generic_list, container, false);
         mListView = (ListView) v.findViewById(R.id.list_view);
         mListView.setOnItemClickListener(this);
-        
-        mFooter = (TextView) inflater.inflate(R.layout.row_simple, mListView, false);
-        mFooter.setMovementMethod(LinkMovementMethod.getInstance());
-        
-        mFooter.setTextAppearance(getSherlockActivity(), android.R.style.TextAppearance_Small);
-        mListView.addFooterView(mFooter, null, false);
         
         return v;
     }
@@ -207,66 +152,11 @@ public class ContentListFragment extends BaseFragment implements OnItemClickList
     }
     
     private void fillData(List<RepositoryContents> entries) {
-        RepositoryActivity activity = (RepositoryActivity) getSherlockActivity();
-        activity.hideLoading();
         if (entries != null && entries.size() > 0) {
             mAdapter.clear();
             mAdapter.addAll(entries);
         }
         mAdapter.notifyDataSetChanged();
-    }
-    
-    public void readmeExists(List<RepositoryContents> files) {
-        for (RepositoryContents content : files) {
-            if (RepositoryContents.TYPE_FILE.equals(content.getType())) {
-                String nameWithoutExt = null;
-                String filename = content.getName();
-                        
-                int mid = filename.lastIndexOf(".");
-                
-                if (mid != -1) {
-                    nameWithoutExt = filename.substring(0, mid);
-                }
-                
-                if (nameWithoutExt != null && nameWithoutExt.equalsIgnoreCase("readme")) {
-                    if (mPath != null) {
-                        mPathReadme = mPath + "/" + filename;
-                    }
-                    else {
-                        mPathReadme = filename;
-                    }
-                    
-                    if (getLoaderManager().getLoader(2) == null) {
-                        getLoaderManager().initLoader(2, null, mContentCallback);
-                    }
-                    else {
-                        getLoaderManager().restartLoader(2, null, mContentCallback);
-                    }
-                    getLoaderManager().getLoader(2).forceLoad();
-                    
-                    break;
-                }
-            }
-        }
-    }
-    
-    public void loadMarkdown(RepositoryContents content) {
-        String ext = FileUtils.getFileExtension(content.getName());
-        mMarkdownText = content.getContent();
-        mMarkdownText = new String(EncodingUtils.fromBase64(mMarkdownText));
-        if (Arrays.asList(Constants.MARKDOWN_EXT).contains(ext)) {
-            if (getLoaderManager().getLoader(3) == null) {
-                getLoaderManager().initLoader(3, null, mMarkdownCallback);
-            }
-            else {
-                getLoaderManager().restartLoader(3, null, mMarkdownCallback);
-            }
-            getLoaderManager().getLoader(3).forceLoad();
-        }
-        else {
-            mFooter.setText(mMarkdownText);
-            mAdapter.notifyDataSetChanged();    
-        }
     }
     
     @Override
