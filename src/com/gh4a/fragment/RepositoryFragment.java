@@ -20,7 +20,6 @@ import org.eclipse.egit.github.core.Repository;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
@@ -39,20 +38,34 @@ import com.gh4a.activities.DownloadsActivity;
 import com.gh4a.activities.IssueListActivity;
 import com.gh4a.activities.WatcherListActivity;
 import com.gh4a.activities.WikiListActivity;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.ReadmeLoader;
 import com.gh4a.utils.StringUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
-public class RepositoryFragment extends BaseFragment implements 
-    OnClickListener, LoaderManager.LoaderCallbacks<String> {
+public class RepositoryFragment extends BaseFragment implements  OnClickListener {
 
     private Repository mRepository;
     private String mRepoOwner;
     private String mRepoName;
     private int mStargazerCount;
     private boolean mDataLoaded;
-    
+
+    private LoaderCallbacks<String> mReadmeCallback = new LoaderCallbacks<String>() {
+        @Override
+        public Loader<LoaderResult<String>> onCreateLoader(int id, Bundle args) {
+            return new ReadmeLoader(getSherlockActivity(), mRepoOwner, mRepoName);
+        }
+        @Override
+        public void onResultReady(LoaderResult<String> result) {
+            mDataLoaded = true;
+            hideLoading(R.id.pb_readme, R.id.readme);
+            fillReadme(result.getData());
+        }
+    };
+
     public static RepositoryFragment newInstance(Repository repository) {
         RepositoryFragment f = new RepositoryFragment();
 
@@ -99,10 +112,10 @@ public class RepositoryFragment extends BaseFragment implements
         super.onResume();
         if (!mDataLoaded) {
             if (getLoaderManager().getLoader(0) == null) {
-                getLoaderManager().initLoader(0, null, this);
+                getLoaderManager().initLoader(0, null, mReadmeCallback);
             }
             else {
-                getLoaderManager().restartLoader(0, null, this);
+                getLoaderManager().restartLoader(0, null, mReadmeCallback);
             }
             getLoaderManager().getLoader(0).forceLoad();
         }
@@ -392,23 +405,5 @@ public class RepositoryFragment extends BaseFragment implements
         intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
         startActivity(intent);
-    }
-
-    @Override
-    public Loader<String> onCreateLoader(int id, Bundle bundle) {
-        return new ReadmeLoader(getSherlockActivity(), mRepoOwner, mRepoName);            
-    }
-
-    @Override
-    public void onLoadFinished(Loader<String> loader, String readme) {
-        mDataLoaded = true;
-        hideLoading(R.id.pb_readme, R.id.readme);
-        fillReadme(readme);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<String> arg0) {
-        // TODO Auto-generated method stub
-        
     }
 }
