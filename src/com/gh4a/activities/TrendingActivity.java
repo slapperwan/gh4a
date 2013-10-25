@@ -45,6 +45,7 @@ public class TrendingActivity extends BaseSherlockFragmentActivity {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.explore_menu, menu);
         menu.removeItem(R.id.refresh);
+        menu.findItem(R.id.trend).setVisible(false);
         return super.onCreateOptionsMenu(menu);
     }
 

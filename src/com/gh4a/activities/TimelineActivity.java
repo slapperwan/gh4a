@@ -15,110 +15,38 @@
  */
 package com.gh4a.activities;
 
-import java.util.List;
-
-import org.eclipse.egit.github.core.Commit;
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.client.PageIterator;
-import org.eclipse.egit.github.core.event.CommitCommentPayload;
-import org.eclipse.egit.github.core.event.DownloadPayload;
-import org.eclipse.egit.github.core.event.Event;
-import org.eclipse.egit.github.core.event.EventRepository;
-import org.eclipse.egit.github.core.event.FollowPayload;
-import org.eclipse.egit.github.core.event.ForkPayload;
-import org.eclipse.egit.github.core.event.GistPayload;
-import org.eclipse.egit.github.core.event.IssueCommentPayload;
-import org.eclipse.egit.github.core.event.IssuesPayload;
-import org.eclipse.egit.github.core.event.PullRequestPayload;
-import org.eclipse.egit.github.core.event.PullRequestReviewCommentPayload;
-import org.eclipse.egit.github.core.event.PushPayload;
-import org.eclipse.egit.github.core.service.EventService;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
+import android.support.v4.app.FragmentManager;
 
-import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.adapter.FeedAdapter;
-import com.gh4a.loader.PageIteratorLoader;
-import com.gh4a.utils.CommitUtils;
+import com.gh4a.fragment.PublicTimelineFragment;
 
-
-
-public class TimelineActivity extends BaseSherlockFragmentActivity
-    implements OnItemClickListener, LoaderManager.LoaderCallbacks<List<Event>> {
-
-    private FeedAdapter mFeedAdapter;
-    private ListView mListView;
-    private PageIterator<Event> mDataIterator;
+public class TimelineActivity extends BaseSherlockFragmentActivity {
+    private PublicTimelineFragment mFragment;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.generic_list);
-        
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(R.string.pub_timeline);
-        actionBar.setSubtitle(R.string.explore);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        
-        mFeedAdapter = new FeedAdapter(this);
-        mListView = (ListView) findViewById(R.id.list_view);
-        mListView.setAdapter(mFeedAdapter);
-        mListView.setOnItemClickListener(this);
-
-        loadData();
-        
-        getSupportLoaderManager().initLoader(0, null, this);
-        getSupportLoaderManager().getLoader(0).forceLoad();
-    }
-
-    public void loadData() {
-        EventService eventService = new EventService();
-        mDataIterator = eventService.pagePublicEvents();    
-    }
-
-    private void fillData(List<Event> events) {
-        invalidateOptionsMenu();
-        mFeedAdapter.clear();
-        mFeedAdapter.addAll(events);
-        mFeedAdapter.notifyDataSetChanged();
-    }
-    
-    @Override
-    public Loader<List<Event>> onCreateLoader(int arg0, Bundle arg1) {
-        return new PageIteratorLoader<Event>(this, mDataIterator);
+        FragmentManager fm = getSupportFragmentManager();
+        if (savedInstanceState == null) {
+            mFragment = PublicTimelineFragment.newInstance();
+            fm.beginTransaction().add(android.R.id.content, mFragment).commit();
+        } else {
+            mFragment = (PublicTimelineFragment) fm.findFragmentById(android.R.id.content);
+        }
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Event>> loader, List<Event> events) {
-        hideLoading();
-        fillData(events);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<List<Event>> arg0) {
-        // TODO Auto-generated method stub
-    }
-    
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuInflater inflater = getSupportMenuInflater();
-        inflater.inflate(R.menu.explore_menu, menu);
-        return super.onPrepareOptionsMenu(menu);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getSupportMenuInflater().inflate(R.menu.explore_menu, menu);
+        menu.findItem(R.id.pub_timeline).setVisible(false);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -138,13 +66,8 @@ public class TimelineActivity extends BaseSherlockFragmentActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.pub_timeline:
-                Intent intent = new Intent().setClass(this, TimelineActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                return true;
             case R.id.trend:
-                intent = new Intent().setClass(this, TrendingActivity.class);
+                Intent intent = new Intent().setClass(this, TrendingActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;
@@ -154,240 +77,9 @@ public class TimelineActivity extends BaseSherlockFragmentActivity
                 startActivity(intent);
                 return true;
             case R.id.refresh:
-                item.setActionView(R.layout.ab_loading);
-                item.expandActionView();
-                loadData();
-                getSupportLoaderManager().restartLoader(0, null, this);
-                getSupportLoaderManager().getLoader(0).forceLoad();
+                mFragment.refresh();
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-    
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        Event event = (Event) adapterView.getAdapter().getItem(position);
-        Gh4Application app = Gh4Application.get(this);
-        
-        //if payload is a base class, return void.  Think that it is an old event which not supported
-        //by API v3.
-        if (event.getPayload().getClass().getSimpleName().equals("EventPayload")) {
-            return;
-        }
-        
-        String eventType = event.getType();
-        EventRepository eventRepo = event.getRepo();
-        String repoOwner = "";
-        String repoName = "";
-
-        if (eventRepo != null) {
-            String[] repoNamePart = eventRepo.getName().split("/");
-            if (repoNamePart.length == 2) {
-                repoOwner = repoNamePart[0];
-                repoName = repoNamePart[1];
-            }
-        }
-        
-        /** PushEvent */
-        if (Event.TYPE_PUSH.equals(eventType)) {
-            
-            if (eventRepo != null) {
-                PushPayload payload = (PushPayload) event.getPayload();
-                
-                List<Commit> commits = payload.getCommits();
-                // if commit > 1, then show compare activity
-                
-                if (commits != null && commits.size() > 1) {
-                    Intent intent = new Intent(this, CompareActivity.class);
-                    for (Commit commit : commits) {
-                        String[] commitInfo = new String[4];
-                        commitInfo[0] = commit.getSha();
-                        commitInfo[1] = CommitUtils.getAuthorEmail(this, commit);
-                        commitInfo[2] = commit.getMessage();
-                        commitInfo[3] = CommitUtils.getAuthorName(this, commit);
-                        intent.putExtra("commit" + commit.getSha(), commitInfo);
-                    }
-                    
-                    intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
-                    intent.putExtra(Constants.Repository.REPO_NAME, repoName);
-                    intent.putExtra(Constants.Repository.HEAD, payload.getHead());
-                    intent.putExtra(Constants.Repository.BASE, payload.getRef());
-                    startActivity(intent);
-                }
-                // only 1 commit, then show the commit details
-                else {
-                    app.openCommitInfoActivity(this, repoOwner, repoName,
-                            payload.getCommits().get(0).getSha(), 0);
-                }
-            }
-            else {
-                app.notFoundMessage(this, R.plurals.repository);
-            }
-        }
-
-        /** IssueEvent */
-        else if (Event.TYPE_ISSUES.equals(eventType)) {
-            if (eventRepo != null) {
-                IssuesPayload payload = (IssuesPayload) event.getPayload();
-                app.openIssueActivity(this, repoOwner, repoName, payload.getIssue().getNumber());
-            }
-            else {
-                app.notFoundMessage(this, R.plurals.repository);
-            }
-        }
-
-        /** WatchEvent */
-        else if (Event.TYPE_WATCH.equals(eventType)) {
-            if (eventRepo != null) {
-                app.openRepositoryInfoActivity(this, repoOwner, repoName, 0);
-            }
-            else {
-                app.notFoundMessage(this, R.plurals.repository);
-            }
-        }
-
-        /** CreateEvent */
-        else if (Event.TYPE_CREATE.equals(eventType)) {
-            if (eventRepo != null) {
-                app.openRepositoryInfoActivity(this, repoOwner, repoName, 0);
-            }
-            else {
-                app.notFoundMessage(this, R.plurals.repository);
-            }
-        }
-
-        /** PullRequestEvent */
-        else if (Event.TYPE_PULL_REQUEST.equals(eventType)) {
-            if (eventRepo != null) {
-                PullRequestPayload payload = (PullRequestPayload) event.getPayload();
-                int pullRequestNumber = payload.getNumber();
-                app.openPullRequestActivity(this, repoOwner, repoName, pullRequestNumber);
-            }
-            else {
-                app.notFoundMessage(this, R.plurals.repository);
-            }
-        }
-
-        /** FollowEvent */
-        else if (Event.TYPE_FOLLOW.equals(eventType)) {
-            FollowPayload payload = (FollowPayload) event.getPayload();
-            if (payload.getTarget() != null) {
-                app.openUserInfoActivity(this, payload.getTarget().getLogin(), null);
-            }
-        }
-
-        /** CommitCommentEvent */
-        else if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
-            if (eventRepo != null) {
-                CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
-                app.openCommitInfoActivity(this, repoOwner, repoName, 
-                        payload.getComment().getCommitId(), 0);
-            }
-            else {
-                app.notFoundMessage(this, R.plurals.repository);
-            }
-        }
-
-        /** DeleteEvent */
-        else if (Event.TYPE_DELETE.equals(eventType)) {
-            if (eventRepo != null) {
-                app.openRepositoryInfoActivity(this, repoOwner, repoName, 0);
-            }
-            else {
-                app.notFoundMessage(this, R.plurals.repository);
-            }
-        }
-
-        /** DownloadEvent */
-        else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
-            if (eventRepo != null) {
-                DownloadPayload payload = (DownloadPayload) event.getPayload();
-                app.openBrowser(this, payload.getDownload().getHtmlUrl());
-            }
-            else {
-                app.notFoundMessage(this, R.plurals.repository);
-            }
-        }
-
-        /** ForkEvent */
-        else if (Event.TYPE_FORK.equals(eventType)) {
-            ForkPayload payload = (ForkPayload) event.getPayload();
-            Repository forkee = payload.getForkee();
-            if (forkee != null) {
-                app.openRepositoryInfoActivity(this, forkee);
-            }
-            else {
-                app.notFoundMessage(this, R.plurals.repository);
-            }
-        }
-
-        /** ForkEvent */
-        else if (Event.TYPE_FORK_APPLY.equals(eventType)) {
-            if (eventRepo != null) {
-                app.openRepositoryInfoActivity(this, repoOwner, repoName, 0);
-            }
-            else {
-                app.notFoundMessage(this, R.plurals.repository);
-            }
-        }
-
-        /** GollumEvent */
-        else if (Event.TYPE_GOLLUM.equals(eventType)) {
-            Intent intent = new Intent(this, WikiListActivity.class);
-            intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
-            intent.putExtra(Constants.Repository.REPO_NAME, repoName);
-            startActivity(intent);
-        }
-
-        /** PublicEvent */
-        else if (Event.TYPE_PUBLIC.equals(eventType)) {
-            if (eventRepo != null) {
-                app.openRepositoryInfoActivity(this, repoOwner, repoName, 0);
-            }
-            else {
-                app.notFoundMessage(this, R.plurals.repository);
-            }
-        }
-        
-        /** MemberEvent */
-        else if (Event.TYPE_MEMBER.equals(eventType)) {
-            if (eventRepo != null) {
-                app.openRepositoryInfoActivity(this, repoOwner, repoName, 0);
-            }
-            else {
-                app.notFoundMessage(this, R.plurals.repository);
-            }
-        }
-        
-        /** Gist Event **/
-        else if (Event.TYPE_GIST.equals(eventType)) {
-            GistPayload payload = (GistPayload) event.getPayload();
-            app.openGistActivity(this, payload.getGist().getUser().getLogin(),
-                    payload.getGist().getId(), 0);
-        }
-        
-        /** IssueCommentEvent */
-        else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
-            if (eventRepo != null) {
-                IssueCommentPayload payload = (IssueCommentPayload) event.getPayload();
-                if (payload.getIssue().getPullRequest().getDiffUrl() != null) {
-                    app.openPullRequestActivity(this, repoOwner, repoName, payload.getIssue().getNumber());   
-                }
-                else {
-                    app.openIssueActivity(this, repoOwner, repoName, payload.getIssue().getNumber(),
-                            payload.getIssue().getState()); 
-                }
-            }
-            else {
-                app.notFoundMessage(this, R.plurals.repository);
-            }
-        }
-        
-        /** PullRequestReviewComment */
-        else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
-            PullRequestReviewCommentPayload payload = (PullRequestReviewCommentPayload) event.getPayload();
-            app.openCommitInfoActivity(this, repoOwner, repoName, 
-                    payload.getComment().getCommitId(), 0);
-        }
     }
 }
