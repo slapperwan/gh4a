@@ -54,10 +54,10 @@ public class IssueLabelAdapter extends RootAdapter<Label> implements OnClickList
         return convertView;
     }
 
-    private static class ViewHolder {
-        View color;
-        TextView label;
-        EditText editor;
+    protected static class ViewHolder {
+        public View color;
+        public TextView label;
+        public EditText editor;
     }
 
     private void assignColor(ViewHolder holder, String colorString) {

@@ -111,6 +111,10 @@ public abstract class RootAdapter<T> extends BaseAdapter {
         }
     }
 
+    public void remove(T object) {
+        mObjects.remove(object);
+    }
+
     public List<T> getObjects() {
         return mObjects;
     }

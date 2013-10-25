@@ -33,6 +33,7 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
@@ -56,7 +57,8 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
     private String mRepoName;
     private ActionMode mActionMode;
     private ProgressDialog mProgressDialog;
-    private IssueLabelAdapter mAdapter;
+    private Label mAddedLabel;
+    private boolean mShouldStartAdding;
 
     private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
         @Override
@@ -80,6 +82,25 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
         }
     };
 
+    private IssueLabelAdapter mAdapter = new IssueLabelAdapter(this) {
+        @Override
+        public View doGetView(int position, View convertView, ViewGroup parent) {
+            View view = super.doGetView(position, convertView, parent);
+            ViewHolder holder = (ViewHolder) view.getTag();
+            Label label = getItem(position);
+
+            if (label == mAddedLabel && mShouldStartAdding) {
+                holder.editor.setHint(R.string.issue_label_new);
+                mActionMode = startActionMode(new EditActionMode(label, view));
+                mShouldStartAdding = false;
+            } else {
+                holder.editor.setHint(null);
+            }
+
+            return view;
+        }
+    };
+
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
@@ -95,7 +116,6 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
         setContentView(R.layout.issue_label_list);
 
         ListView listView = (ListView) findViewById(R.id.main_content);
-        mAdapter = new IssueLabelAdapter(this);
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
 
@@ -135,10 +155,13 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.create_new:
-            Intent intent = new Intent().setClass(this, IssueLabelCreateActivity.class);
-            intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-            intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-            startActivity(intent);
+            if (mActionMode == null) {
+                mAddedLabel = new Label();
+                mAddedLabel.setColor("dddddd");
+                mAdapter.add(mAddedLabel);
+                mShouldStartAdding = true;
+                mAdapter.notifyDataSetChanged();
+            }
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -148,10 +171,12 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
         private String mCurrentLabelName;
         private View mItemContainer;
         private EditText mEditor;
+        private Label mLabel;
 
         public EditActionMode(Label label, View itemContainer) {
             mCurrentLabelName = label.getName();
             mItemContainer = itemContainer;
+            mLabel = label;
 
             mEditor = (EditText) itemContainer.findViewById(R.id.et_label);
             mEditor.setText(mCurrentLabelName);
@@ -163,13 +188,15 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             boolean isLight = Gh4Application.THEME == R.style.LightTheme;
-            menu.add(0, 0, 0, R.string.save)
+            menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.save)
                 .setIcon(isLight ? R.drawable.content_save : R.drawable.content_save_dark)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-            menu.add(0, 1, 1, R.string.delete)
-                .setIcon(isLight ? R.drawable.content_discard: R.drawable.content_discard_dark)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            if (mLabel != mAddedLabel) {
+                menu.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, R.string.delete)
+                    .setIcon(isLight ? R.drawable.content_discard: R.drawable.content_discard_dark)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            }
             
             return true;
         }
@@ -182,12 +209,17 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
-            case 0:
-                mProgressDialog = showProgressDialog(getResources().getString(R.string.saving_msg), true);
-                new EditIssueLabelsTask(IssueLabelListActivity.this).execute(mCurrentLabelName, 
-                        mEditor.getText().toString(), (String) mEditor.getTag());
+            case Menu.FIRST:
+                if (mLabel == mAddedLabel) {
+                    new AddIssueLabelsTask(IssueLabelListActivity.this).execute(
+                            mEditor.getText().toString(), (String) mEditor.getTag());
+                    mLabel = null;
+                } else {
+                    new EditIssueLabelsTask(IssueLabelListActivity.this).execute(mCurrentLabelName,
+                            mEditor.getText().toString(), (String) mEditor.getTag());
+                }
                 break;
-            case 1:
+            case Menu.FIRST + 1:
                 AlertDialog.Builder builder = createDialogBuilder();
                 builder.setTitle(getString(R.string.issue_dialog_delete_title, mCurrentLabelName));
                 builder.setMessage(R.string.issue_dialog_delete_message);
@@ -212,9 +244,12 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
             mItemContainer.findViewById(R.id.collapsed).setVisibility(View.VISIBLE);
             mItemContainer.findViewById(R.id.expanded).setVisibility(View.GONE);
             mActionMode = null;
+            if (mLabel == mAddedLabel) {
+                mAdapter.remove(mLabel);
+                mAddedLabel = null;
+            }
             mAdapter.notifyDataSetChanged();
         }
-        
     }
     
     private static class DeleteIssueLabelsTask extends AsyncTask<String, Void, Void> {
@@ -307,6 +342,15 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
         }
 
         @Override
+        protected void onPreExecute() {
+            IssueLabelListActivity activity = mTarget.get();
+            if (activity != null) {
+                activity.mProgressDialog = activity.showProgressDialog(
+                        activity.getString(R.string.saving_msg), false);
+            }
+        }
+
+        @Override
         protected void onPostExecute(Void result) {
             IssueLabelListActivity activity = mTarget.get();
             if (activity != null) {
@@ -317,6 +361,65 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
                 else {
                     activity.getSupportLoaderManager().restartLoader(0, null, activity.mLabelCallback).forceLoad();
                 }
+            }
+        }
+    }
+
+    private static class AddIssueLabelsTask extends AsyncTask<String, Void, Void> {
+        private WeakReference<IssueLabelListActivity> mTarget;
+        private boolean mException;
+
+        public AddIssueLabelsTask(IssueLabelListActivity activity) {
+            mTarget = new WeakReference<IssueLabelListActivity>(activity);
+        }
+
+        @Override
+        protected Void doInBackground(String... params) {
+            IssueLabelListActivity activity = mTarget.get();
+            if (activity == null) {
+                return null;
+            }
+
+            try {
+                GitHubClient client = new GitHubClient();
+                client.setOAuth2Token(activity.getAuthToken());
+                LabelService labelService = new LabelService(client);
+
+                Label label = new Label();
+                label.setName(params[0]);
+                label.setColor(params[1]);
+
+                labelService.createLabel(activity.mRepoOwner, activity.mRepoName, label);
+            }
+            catch (IOException e) {
+                Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                mException = true;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            IssueLabelListActivity activity = mTarget.get();
+            if (activity != null) {
+                activity.mProgressDialog = activity.showProgressDialog(
+                        activity.getString(R.string.saving_msg), false);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            IssueLabelListActivity activity = mTarget.get();
+            if (activity != null) {
+                activity.stopProgressDialog(activity.mProgressDialog);
+                if (mException) {
+                    activity.showMessage(activity.getString(R.string.issue_error_create_label), false);
+                    activity.mAdapter.remove(activity.mAddedLabel);
+                }
+                else {
+                    activity.getSupportLoaderManager().restartLoader(0, null, activity.mLabelCallback).forceLoad();
+                }
+                activity.mAddedLabel = null;
             }
         }
     }

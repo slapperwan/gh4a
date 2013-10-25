@@ -163,9 +163,6 @@
             android:name=".activities.IssueListByMilestoneActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.IssueLabelCreateActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
             android:name=".activities.IssueMilestoneCreateActivity"
             android:configChanges="orientation|screenSize" />
         <activity
