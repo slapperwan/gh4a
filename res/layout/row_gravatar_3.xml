@@ -10,7 +10,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="fill_parent"
-    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:layout_height="wrap_content"
+    android:minHeight="?android:attr/listPreferredItemHeight"
     android:paddingTop="8dp"
     android:paddingBottom="8dp" >
     <ImageView
@@ -33,7 +34,6 @@
         android:layout_height="wrap_content"
         android:textAppearance="@style/default_text_micro"
         android:layout_toRightOf="@id/iv_gravatar"
-        android:layout_below="@id/tv_desc"
         android:layout_alignParentBottom="true" />
     <TextView
         android:id="@+id/tv_desc"
