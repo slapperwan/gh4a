@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -262,41 +261,21 @@ public class UserActivity extends BaseSherlockFragmentActivity {
         editor.commit();
         
         recreate();
-        
     }
     
-    /**
-     * Copy from 
-     * https://github.com/JakeWharton/ActionBarSherlock/blob/bd8d05b6a0302dba40a12cdfc4c3f0f77b4a9e54/library/src/android/support/v4/app/FragmentActivity.java#L926-961
-     */
     @Override
     public void recreate() {
-        //This SUCKS! Figure out a way to call the super method and support Android 1.6
-        /*
-        if (IS_HONEYCOMB) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             super.recreate();
         } else {
-        */
             final Intent intent = getIntent();
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
 
             startActivity(intent);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR) {
-                OverridePendingTransition.invoke(this);
-            }
+            overridePendingTransition(0, 0);
 
             finish();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR) {
-                OverridePendingTransition.invoke(this);
-            }
-        /*
-        }
-        */
-    }
-    
-    private static final class OverridePendingTransition {
-        static void invoke(Activity activity) {
-            activity.overridePendingTransition(0, 0);
+            overridePendingTransition(0, 0);
         }
     }
     

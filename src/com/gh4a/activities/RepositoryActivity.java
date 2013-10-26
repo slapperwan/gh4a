@@ -29,7 +29,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -343,17 +342,6 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
         startActivity(intent);
     }
     
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)  {
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.ECLAIR
-                && keyCode == KeyEvent.KEYCODE_BACK
-                && event.getRepeatCount() == 0) {
-            onBackPressed();
-        }
-
-        return super.onKeyDown(keyCode, event);
-    }
-
     @Override
     public void onBackPressed() {
         if (mPager != null && mPager.getCurrentItem() == 1 && mDirStack.size() > 1) {
