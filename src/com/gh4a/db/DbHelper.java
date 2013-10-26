@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DbHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "gh4adb.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 1;
 
     static final String BOOKMARKS_TABLE = "bookmarks";
     
@@ -20,7 +20,8 @@ public class DbHelper extends SQLiteOpenHelper {
                 + "_id integer primary key autoincrement, "
                 + "name text not null, "
                 + "type integer not null, "
-                + "uri text not null);");
+                + "uri text not null, "
+                + "extra_data text);");
     }
 
     @Override

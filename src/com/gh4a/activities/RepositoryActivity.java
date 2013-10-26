@@ -456,8 +456,8 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
                 bookmarkIntent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                 bookmarkIntent.putExtra(Constants.Repository.SELECTED_REF, mSelectedRef);
                 bookmarkIntent.putExtra(Constants.Repository.SELECTED_BRANCHTAG_NAME, mSelectBranchTag);
-                saveBookmark(mActionBar.getTitle().toString(),
-                        BookmarksProvider.Columns.TYPE_REPO, bookmarkIntent);
+                saveBookmark(mActionBar.getTitle().toString(), BookmarksProvider.Columns.TYPE_REPO,
+                        bookmarkIntent, mActionBar.getSubtitle().toString());
                 return true;
         }
         return super.onOptionsItemSelected(item);

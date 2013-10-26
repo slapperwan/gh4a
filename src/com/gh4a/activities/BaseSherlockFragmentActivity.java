@@ -378,11 +378,12 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         });
     }
 
-    protected void saveBookmark(String name, int type, Intent intent) {
+    protected void saveBookmark(String name, int type, Intent intent, String extraData) {
         ContentValues cv = new ContentValues();
         cv.put(BookmarksProvider.Columns.NAME, name);
         cv.put(BookmarksProvider.Columns.TYPE, type);
         cv.put(BookmarksProvider.Columns.URI, intent.toUri(0));
+        cv.put(BookmarksProvider.Columns.EXTRA, extraData);
         if (getContentResolver().insert(BookmarksProvider.Columns.CONTENT_URI, cv) != null) {
             showMessage(getString(R.string.bookmark_saved), false);
         }

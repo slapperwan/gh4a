@@ -20,6 +20,7 @@ public class BookmarksProvider extends ContentProvider {
         public static final String NAME = "name";
         public static final String TYPE = "type";
         public static final String URI = "uri";
+        public static final String EXTRA = "extra_data";
     
         public static final int TYPE_USER = 0;
         public static final int TYPE_REPO = 1;

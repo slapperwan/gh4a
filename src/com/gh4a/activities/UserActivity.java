@@ -241,8 +241,7 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                 Intent bookmarkIntent = new Intent(this, getClass());
                 bookmarkIntent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
                 bookmarkIntent.putExtra(Constants.User.USER_NAME, mUserName);
-                saveBookmark(getSupportActionBar().getTitle().toString(),
-                        BookmarksProvider.Columns.TYPE_USER, bookmarkIntent);
+                saveBookmark(mUserLogin, BookmarksProvider.Columns.TYPE_USER, bookmarkIntent, mUserName);
                 return true;
         }
         boolean result = super.onOptionsItemSelected(item);
