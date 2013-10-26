@@ -51,7 +51,6 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity {
     private String mRef;
     private String mSha;
     private String mName;
-    private RepositoryContents mContent;
 
     private WebView mWebView;
 
@@ -80,8 +79,7 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity {
             if (!isLoaderError(result)) {
                 List<RepositoryContents> data = result.getData();
                 if (data != null && !data.isEmpty()) {
-                    mContent = data.get(0);
-                    fillData(true);
+                    loadContent(data.get(0));
                 }
             }
         }
@@ -117,8 +115,14 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity {
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private void fillData(boolean highlight) {
-        String data = new String(EncodingUtils.fromBase64(mContent.getContent()));
+    private void loadContent(RepositoryContents content) {
+        String data;
+        if (content.getContent() != null) {
+            data = new String(EncodingUtils.fromBase64(content.getContent()));
+        } else {
+            data = "";
+        }
+
         mWebView = (WebView) findViewById(R.id.web_view);
 
         WebSettings s = mWebView.getSettings();
@@ -138,7 +142,7 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity {
             mWebView.loadDataWithBaseURL("file:///android_asset/", htmlImage, "text/html", "utf-8", "");
         }
         else {
-            String highlighted = StringUtils.highlightSyntax(data, highlight, mName);
+            String highlighted = StringUtils.highlightSyntax(data, true, mName);
             mWebView.loadDataWithBaseURL("file:///android_asset/", highlighted, "text/html", "utf-8", "");
         }
     }
