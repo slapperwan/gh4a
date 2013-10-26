@@ -2,6 +2,8 @@ package com.gh4a.activities;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -40,8 +42,8 @@ import com.gh4a.R;
 import com.gh4a.db.BookmarksProvider;
 import com.gh4a.fragment.CommitListFragment;
 import com.gh4a.fragment.ContentListFragment;
-import com.gh4a.fragment.RepositoryFragment;
 import com.gh4a.fragment.ContentListFragment.ParentCallback;
+import com.gh4a.fragment.RepositoryFragment;
 import com.gh4a.loader.BranchListLoader;
 import com.gh4a.loader.GitModuleParserLoader;
 import com.gh4a.loader.IsStarringLoader;
@@ -172,13 +174,23 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
     private ContentListFragment mContentListFragment;
     private CommitListFragment mCommitListFragment;
     private Map<String, String> mGitModuleMap;
-    
+
+    private Map<String, ArrayList<RepositoryContents>> mContentCache;
+    private static final int MAX_CACHE_ENTRIES = 100;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         mDirStack = new Stack<ContentListFragment>();
+        mContentCache = new LinkedHashMap<String, ArrayList<RepositoryContents>>() {
+            private static final long serialVersionUID = -2379579224736389357L;
+            @Override
+            protected boolean removeEldestEntry(Entry<String, ArrayList<RepositoryContents>> eldest) {
+                return size() > MAX_CACHE_ENTRIES;
+            }
+        };
         
         Bundle data = getIntent().getExtras().getBundle(Constants.DATA_BUNDLE);
         if (data != null) {
@@ -248,7 +260,8 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
         public android.support.v4.app.Fragment getItem(int position) {
             if (position == 1) {
                 if (mContentListFragment == null) {
-                    mContentListFragment = ContentListFragment.newInstance(mRepository, null, mSelectedRef);
+                    mContentListFragment = ContentListFragment.newInstance(mRepository, null,
+                            mContentCache.get(null), mSelectedRef);
                     mDirStack.add(mContentListFragment);
                 }
                 else {
@@ -307,7 +320,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
         if (RepositoryContents.TYPE_DIR.equals(content.getType())) {
             mAdapter.mContent = content;
             mSelectedRef = ref;
-            mDirStack.push(ContentListFragment.newInstance(mRepository, path, mSelectedRef));
+            mDirStack.push(ContentListFragment.newInstance(mRepository, path, mContentCache.get(path), mSelectedRef));
             mAdapter.notifyDataSetChanged();
         }
         else if (mGitModuleMap != null && mGitModuleMap.get(path) != null) {
@@ -344,7 +357,9 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
     @Override
     public void onBackPressed() {
         if (mPager != null && mPager.getCurrentItem() == 1 && mDirStack.size() > 1) {
-            mDirStack.pop();
+            ContentListFragment fragment = mDirStack.pop();
+            mContentCache.put(fragment.getPath(),
+                    new ArrayList<RepositoryContents>(fragment.getContents()));
             mAdapter.notifyDataSetChanged();
         }
         else {
@@ -521,6 +536,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
         mCommitListFragment = null;
         mGitModuleMap = null;
         mDirStack.clear();
+        mContentCache.clear();
         showLoading();
         getSupportLoaderManager().restartLoader(LOADER_REPO, null, mRepoCallback);
         getSupportLoaderManager().getLoader(LOADER_REPO).forceLoad();

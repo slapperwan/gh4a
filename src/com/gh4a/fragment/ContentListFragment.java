@@ -15,6 +15,7 @@
  */
 package com.gh4a.fragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Repository;
@@ -80,13 +81,14 @@ public class ContentListFragment extends BaseFragment implements OnItemClickList
     };
 
     public static ContentListFragment newInstance(Repository repository,
-            String path, String ref) {
+            String path, ArrayList<RepositoryContents> contents, String ref) {
         ContentListFragment f = new ContentListFragment();
 
         Bundle args = new Bundle();
         args.putString(Constants.Object.PATH, path);
         args.putString(Constants.Object.REF, ref);
         args.putSerializable("REPOSITORY", repository);
+        args.putSerializable("CONTENTS", contents);
         f.setArguments(args);
         
         return f;
@@ -130,6 +132,13 @@ public class ContentListFragment extends BaseFragment implements OnItemClickList
 
         if (mAdapter == null) {
             mAdapter = new FileAdapter(getSherlockActivity());
+            @SuppressWarnings("unchecked")
+            ArrayList<RepositoryContents> contents =
+                    (ArrayList<RepositoryContents>) getArguments().getSerializable("CONTENTS");
+            if (contents != null) {
+                mAdapter.addAll(contents);
+                mDataLoaded = true;
+            }
         }
         mListView.setAdapter(mAdapter);
     }
@@ -158,7 +167,18 @@ public class ContentListFragment extends BaseFragment implements OnItemClickList
         }
         mAdapter.notifyDataSetChanged();
     }
-    
+
+    public String getPath() {
+        return mPath;
+    }
+
+    public List<RepositoryContents> getContents() {
+        if (mAdapter == null) {
+            return new ArrayList<RepositoryContents>();
+        }
+        return mAdapter.getObjects();
+    }
+
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         RepositoryContents content = (RepositoryContents) adapterView.getAdapter().getItem(position);
