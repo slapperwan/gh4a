@@ -58,8 +58,9 @@ public class TimelineActivity extends BaseSherlockFragmentActivity {
             finish();
         }
         else {
-            Gh4Application.get(this).openUserInfoActivity(this, getAuthLogin(),
-                    null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            Gh4Application app = Gh4Application.get(this);
+            app.openUserInfoActivity(this, app.getAuthLogin(), null,
+                    Intent.FLAG_ACTIVITY_CLEAR_TOP);
         }
     }
 

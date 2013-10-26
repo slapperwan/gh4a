@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.StarService;
 
@@ -89,11 +88,9 @@ public class StargazerListFragment extends BaseFragment
     }
     
     private void loadData() {
-        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        StarService starringService = new StarService(client);
-        mDataIterator = starringService.pageStargazers(new RepositoryId(mRepoOwner, mRepoName));
+        StarService starService = (StarService)
+                getActivity().getApplicationContext().getSystemService(Gh4Application.STAR_SERVICE);
+        mDataIterator = starService.pageStargazers(new RepositoryId(mRepoOwner, mRepoName));
     }
 
     private void fillData(List<User> users) {

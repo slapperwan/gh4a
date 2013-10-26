@@ -3,7 +3,6 @@ package com.gh4a.loader;
 import java.io.IOException;
 
 import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
 import android.content.Context;
@@ -23,10 +22,8 @@ public class RepositoryLoader extends BaseLoader<Repository> {
     
     @Override
     public Repository doLoadInBackground() throws IOException {
-        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        RepositoryService repoService = new RepositoryService(client);
+        RepositoryService repoService = (RepositoryService)
+                getContext().getApplicationContext().getSystemService(Gh4Application.REPO_SERVICE);
         return repoService.getRepository(mRepoOwner, mRepoName);
     }
 }

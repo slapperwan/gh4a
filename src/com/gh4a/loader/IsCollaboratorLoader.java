@@ -3,7 +3,6 @@ package com.gh4a.loader;
 import java.io.IOException;
 
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 
 import android.content.Context;
@@ -23,10 +22,9 @@ public class IsCollaboratorLoader extends BaseLoader<Boolean> {
     
     @Override
     public Boolean doLoadInBackground() throws IOException {
-        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        CollaboratorService collabService = new CollaboratorService(client);
+        Gh4Application app = Gh4Application.get(getContext());
+        CollaboratorService collabService = (CollaboratorService)
+                app.getSystemService(Gh4Application.COLLAB_SERVICE);
         return collabService.isCollaborator(new RepositoryId(mRepoOwner, mRepoName), app.getAuthLogin());
     }
 }

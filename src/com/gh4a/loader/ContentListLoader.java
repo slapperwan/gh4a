@@ -8,7 +8,6 @@ import java.util.List;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.ContentsService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
@@ -34,12 +33,10 @@ public class ContentListLoader extends BaseLoader<List<RepositoryContents>> {
 
     @Override
     public List<RepositoryContents> doLoadInBackground() throws IOException {
-        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
+        Context app = getContext().getApplicationContext();
+        ContentsService contentService = (ContentsService) app.getSystemService(Gh4Application.CONTENTS_SERVICE);
+        RepositoryService repoService = (RepositoryService) app.getSystemService(Gh4Application.REPO_SERVICE);
 
-        RepositoryService repoService = new RepositoryService(client);
-        ContentsService contentService = new ContentsService(client);
         if (mRef == null) {
             Repository repo = repoService.getRepository(mRepoOwner, mRepoName);
             mRef = repo.getMasterBranch();

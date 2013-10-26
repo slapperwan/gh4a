@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
 import android.content.Context;
@@ -30,10 +29,8 @@ public class RepositoryListLoader extends BaseLoader<List<Repository>> {
     
     @Override
     public List<Repository> doLoadInBackground() throws IOException {
-        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        RepositoryService repoService = new RepositoryService(client);
+        Gh4Application app = Gh4Application.get(getContext());
+        RepositoryService repoService = (RepositoryService) app.getSystemService(Gh4Application.REPO_SERVICE);
         if (mLogin.equals(app.getAuthLogin())) {
             if (mSize > 0) {
                 return (List<Repository>) repoService.pageRepositories(mFilterData, mSize).next();

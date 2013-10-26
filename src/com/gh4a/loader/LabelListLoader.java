@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.LabelService;
 
 import android.content.Context;
@@ -24,10 +23,8 @@ public class LabelListLoader extends BaseLoader<List<Label>> {
     
     @Override
     public List<Label> doLoadInBackground() throws IOException {
-        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        LabelService labelService = new LabelService(client);
+        LabelService labelService = (LabelService)
+                getContext().getApplicationContext().getSystemService(Gh4Application.LABEL_SERVICE);
         return labelService.getLabels(mRepoOwner, mRepoName);
     }
 }

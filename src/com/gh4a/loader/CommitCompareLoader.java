@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.eclipse.egit.github.core.RepositoryCommitCompare;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CommitService;
 
 import android.content.Context;
@@ -29,10 +28,8 @@ public class CommitCompareLoader extends BaseLoader<RepositoryCommitCompare> {
     
     @Override
     public RepositoryCommitCompare doLoadInBackground() throws IOException {
-        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        CommitService commitService = new CommitService(client);
+        CommitService commitService = (CommitService)
+                getContext().getApplicationContext().getSystemService(Gh4Application.COMMIT_SERVICE);
         return commitService.compare(new RepositoryId(mRepoOwner, mRepoName), mBase, mHead);
     }
 }

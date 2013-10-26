@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.ContentsService;
 import org.eclipse.egit.github.core.util.EncodingUtils;
 
@@ -33,10 +32,8 @@ public class GitModuleParserLoader extends BaseLoader<Map<String, String>> {
     
     @Override
     public Map<String, String> doLoadInBackground() throws IOException {
-        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        ContentsService contentService = new ContentsService(client);
+        ContentsService contentService = (ContentsService)
+                getContext().getApplicationContext().getSystemService(Gh4Application.CONTENTS_SERVICE);
         List<RepositoryContents> contents =
                 contentService.getContents(new RepositoryId(mRepoOwner, mRepoName), mPath, mRef);
 

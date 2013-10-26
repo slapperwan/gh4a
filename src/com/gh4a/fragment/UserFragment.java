@@ -266,7 +266,7 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
         TextView tvReposCount = (TextView) v.findViewById(R.id.tv_repos_count);
         tvReposCount.setTypeface(boldCondensed);
         
-        if (mUserLogin.equals(((BaseSherlockFragmentActivity) getSherlockActivity()).getAuthLogin())) {
+        if (mUserLogin.equals(Gh4Application.get(getActivity()).getAuthLogin())) {
             tvReposCount.setText(String.valueOf(mUser.getTotalPrivateRepos() + mUser.getPublicRepos()));    
         }
         else {

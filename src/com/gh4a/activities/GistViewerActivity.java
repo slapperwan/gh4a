@@ -15,6 +15,8 @@
  */
 package com.gh4a.activities;
 
+import org.eclipse.egit.github.core.Gist;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -39,15 +41,15 @@ public class GistViewerActivity extends BaseSherlockFragmentActivity {
     private String mGistId;
     private String mData;
 
-    private LoaderCallbacks<String> mGistCallback = new LoaderCallbacks<String>() {
+    private LoaderCallbacks<Gist> mGistCallback = new LoaderCallbacks<Gist>() {
         @Override
-        public Loader<LoaderResult<String>> onCreateLoader(int id, Bundle args) {
-            return new GistLoader(GistViewerActivity.this, mFilename, mGistId);
+        public Loader<LoaderResult<Gist>> onCreateLoader(int id, Bundle args) {
+            return new GistLoader(GistViewerActivity.this, mGistId);
         }
         @Override
-        public void onResultReady(LoaderResult<String> result) {
+        public void onResultReady(LoaderResult<Gist> result) {
             if (!isLoaderError(result)) {
-                fillData(result.getData(), true);
+                fillData(result.getData().getFiles().get(mFilename).getContent(), true);
             }
         }
     };

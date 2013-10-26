@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
@@ -105,10 +104,8 @@ public class PullRequestListFragment extends BaseFragment
     }
     
     public void loadData() {
-        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        PullRequestService pullRequestService = new PullRequestService(client);
+        PullRequestService pullRequestService = (PullRequestService)
+                getActivity().getApplicationContext().getSystemService(Gh4Application.PULL_SERVICE);
         mDataIterator = pullRequestService.pagePullRequests(new RepositoryId(mRepoOwner, mRepoName), mState);
     }
     

@@ -3,7 +3,6 @@ package com.gh4a.loader;
 import java.io.IOException;
 
 import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.MilestoneService;
 
 import android.content.Context;
@@ -25,10 +24,8 @@ public class MilestoneLoader extends BaseLoader<Milestone> {
     
     @Override
     public Milestone doLoadInBackground() throws IOException {
-        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        MilestoneService milestoneService = new MilestoneService(client);
+        MilestoneService milestoneService = (MilestoneService)
+                getContext().getApplicationContext().getSystemService(Gh4Application.MILESTONE_SERVICE);
         return milestoneService.getMilestone(mRepoOwner, mRepoName, mNumber);
     }
 }

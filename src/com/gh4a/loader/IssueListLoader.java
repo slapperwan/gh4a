@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.IssueService;
 
 import android.content.Context;
@@ -27,10 +26,8 @@ public class IssueListLoader extends BaseLoader<List<Issue>> {
 
     @Override
     public List<Issue> doLoadInBackground() throws IOException {
-        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        IssueService issueService = new IssueService(client);
+        IssueService issueService = (IssueService)
+                getContext().getApplicationContext().getSystemService(Gh4Application.ISSUE_SERVICE);
         return issueService.getIssues(mLogin, mRepo, mFilterData);
     }
 }

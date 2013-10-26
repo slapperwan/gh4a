@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.egit.github.core.RepositoryIssue;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.IssueService;
 
@@ -123,10 +122,8 @@ public class RepositoryIssueListFragment extends BaseFragment
     }
     
     public void loadData() {
-        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        IssueService issueService = new IssueService(client);
+        IssueService issueService = (IssueService)
+                getActivity().getApplicationContext().getSystemService(Gh4Application.ISSUE_SERVICE);
         mDataIterator = issueService.pageIssues(mFilterData);
     }
     

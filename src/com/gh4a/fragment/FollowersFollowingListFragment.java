@@ -18,7 +18,6 @@ package com.gh4a.fragment;
 import java.util.List;
 
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.UserService;
 
@@ -88,10 +87,8 @@ public class FollowersFollowingListFragment extends BaseFragment
     }
     
     private void loadData() {
-        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        UserService userService = new UserService(client);
+        UserService userService = (UserService)
+                getActivity().getApplicationContext().getSystemService(Gh4Application.GHUSER_SERVICE);
         if (mFindFollowers) {
             mDataIterator = userService.pageFollowers(mLogin);
         } 

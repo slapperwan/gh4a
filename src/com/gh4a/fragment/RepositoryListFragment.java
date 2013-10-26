@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
@@ -119,10 +118,9 @@ public class RepositoryListFragment extends BaseFragment
     }
 
     public void loadData() {
-        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        RepositoryService repoService = new RepositoryService(client);
+        Gh4Application app = Gh4Application.get(getActivity());
+        RepositoryService repoService = (RepositoryService)
+                app.getSystemService(Gh4Application.REPO_SERVICE);
         
         Map<String, String> filterData = new HashMap<String, String>();
         if ("sources".equals(mRepoType) || "forks".equals(mRepoType)) {

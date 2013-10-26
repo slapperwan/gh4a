@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.Download;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.DownloadService;
 
 import android.content.Context;
@@ -25,11 +24,8 @@ public class DownloadsLoader extends BaseLoader<List<Download>> {
     
     @Override
     public List<Download> doLoadInBackground() throws IOException {
-        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        
-        DownloadService downloadService = new DownloadService(client);
+        DownloadService downloadService = (DownloadService)
+                getContext().getApplicationContext().getSystemService(Gh4Application.GHDOWNLOAD_SERVICE);
         return downloadService.getDownloads(new RepositoryId(mRepoOwner, mRepoName));
     }
 }

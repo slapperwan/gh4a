@@ -16,7 +16,6 @@
 package com.gh4a.activities;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Locale;
 
@@ -24,17 +23,14 @@ import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.IssueService;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -52,8 +48,8 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.androidquery.AQuery;
 import com.gh4a.Constants;
-import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
+import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.adapter.CommentAdapter;
 import com.gh4a.loader.IsCollaboratorLoader;
@@ -121,7 +117,8 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
         public void onResultReady(LoaderResult<Boolean> result) {
             if (!isLoaderError(result)) {
                 isCollaborator = result.getData();
-                isCreator = mIssue.getUser().getLogin().equals(getAuthLogin());
+                isCreator = mIssue.getUser().getLogin().equals(
+                        Gh4Application.get(IssueActivity.this).getAuthLogin());
                 invalidateOptionsMenu();
             }
         }
@@ -224,7 +221,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
         ivComment.setPadding(5, 2, 5, 2);
         ivComment.setOnClickListener(this);
 
-        tvExtra.setText(mIssue.getUser().getLogin() + "\n" + pt.format(mIssue.getCreatedAt()));
+        tvExtra.setText(mIssue.getUser().getLogin() + "\n" + Gh4Application.pt.format(mIssue.getCreatedAt()));
         tvState.setTextColor(Color.WHITE);
         if ("closed".equals(mIssue.getState())) {
             tvState.setBackgroundResource(R.drawable.default_red_box);
@@ -401,18 +398,9 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
                 }     
                 return true;
             case R.id.issue_close:
-                if (isAuthorized()) {
-                    new CloseIssueTask(this, false).execute();
-                }
-                else {
-                    Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-                return true;
             case R.id.issue_reopen:
                 if (isAuthorized()) {
-                    new ReopenIssueTask(this, false).execute();
+                    new IssueOpenCloseTask(item.getItemId() == R.id.issue_reopen).execute();
                 }
                 else {
                     Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
@@ -433,226 +421,15 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
         return super.onOptionsItemSelected(item);
     }
     
-    private static class CloseIssueTask extends AsyncTask<Void, Void, Boolean> {
-
-        private WeakReference<IssueActivity> mTarget;
-        private boolean mException;
-
-        public CloseIssueTask(IssueActivity activity, boolean hideMainView) {
-            mTarget = new WeakReference<IssueActivity>(activity);
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            if (mTarget.get() != null) {
-                try {
-                    IssueActivity activity = mTarget.get();
-                    GitHubClient client = new GitHubClient();
-                    client.setOAuth2Token(mTarget.get().getAuthToken());
-                    IssueService issueService = new IssueService(client);
-                    
-                    Issue issue = issueService.getIssue(new RepositoryId(activity.mRepoOwner,
-                            activity.mRepoName), activity.mIssueNumber);
-                    
-                    issue.setState("closed");
-                    
-                    activity.mIssue = issueService.editIssue(new RepositoryId(activity.mRepoOwner,
-                            activity.mRepoName), issue);
-                    return true;
-                }
-                catch (Exception e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
-            }
-            else {
-                return false;
-            }
-        }
-
-        @Override
-        protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                IssueActivity activity = mTarget.get();
-                activity.mProgressDialog = activity.showProgressDialog(activity.getString(R.string.closing_msg), false);
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Boolean result) {
-            if (mTarget.get() != null) {
-                IssueActivity activity = mTarget.get();
-                activity.stopProgressDialog(activity.mProgressDialog);
-                
-                if (mException) {
-                    activity.showMessage(activity.getResources().getString(R.string.issue_error_close),
-                            false);
-                }
-                else {
-                    activity.mIssueState = "closed";
-                    activity.showMessage(activity.getResources().getString(R.string.issue_success_close),
-                            false);
-                    TextView tvState = (TextView)activity.findViewById(R.id.tv_state);
-                    tvState.setBackgroundResource(R.drawable.default_red_box);
-                    tvState.setText(activity.getString(R.string.closed).toUpperCase(Locale.getDefault()));
-                    activity.invalidateOptionsMenu();
-                }
-            }
-        }
-    }
-    
-    private static class ReopenIssueTask extends AsyncTask<Void, Void, Boolean> {
-
-        private WeakReference<IssueActivity> mTarget;
-        private boolean mException;
-
-        public ReopenIssueTask(IssueActivity activity, boolean hideMainView) {
-            mTarget = new WeakReference<IssueActivity>(activity);
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            if (mTarget.get() != null) {
-                try {
-                    IssueActivity activity = mTarget.get();
-                    GitHubClient client = new GitHubClient();
-                    client.setOAuth2Token(mTarget.get().getAuthToken());
-                    IssueService issueService = new IssueService(client);
-                    
-                    Issue issue = issueService.getIssue(new RepositoryId(activity.mRepoOwner,
-                            activity.mRepoName), activity.mIssueNumber);
-                    
-                    issue.setState("open");
-                    
-                    activity.mIssue = issueService.editIssue(new RepositoryId(activity.mRepoOwner,
-                            activity.mRepoName), issue);
-                    return true;
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
-            }
-            else {
-                return false;
-            }
-        }
-
-        @Override
-        protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                IssueActivity activity = mTarget.get();
-                activity.mProgressDialog = activity.showProgressDialog(activity.getString(R.string.opening_msg), false);
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Boolean result) {
-            if (mTarget.get() != null) {
-                IssueActivity activity = mTarget.get();
-                activity.stopProgressDialog(activity.mProgressDialog);
-                
-                if (mException) {
-                    activity.showMessage(activity.getResources().getString(R.string.issue_error_reopen),
-                            false);
-                }
-                else {
-                    activity.mIssueState = "open";
-                    activity.showMessage(activity.getResources().getString(R.string.issue_success_reopen),
-                            false);
-                    TextView tvState = (TextView)activity.findViewById(R.id.tv_state);
-                    tvState.setBackgroundResource(R.drawable.default_green_box);
-                    tvState.setText(activity.getString(R.string.open).toUpperCase(Locale.getDefault()));
-                    activity.invalidateOptionsMenu();
-                }
-            }
-        }
-    }
-    
-    private static class CommentIssueTask extends AsyncTask<Void, Void, Boolean> {
-
-        private WeakReference<IssueActivity> mTarget;
-        private boolean mException;
-
-        public CommentIssueTask(IssueActivity activity, boolean hideMainView) {
-            mTarget = new WeakReference<IssueActivity>(activity);
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            if (mTarget.get() != null) {
-                try {
-                    IssueActivity activity = mTarget.get();
-                    EditText etComment = (EditText) activity.findViewById(R.id.et_comment);
-                    
-                    if (etComment.getText() != null && !StringUtils.isBlank(etComment.getText().toString())) {  
-                        String comment = etComment.getText().toString();
-                        GitHubClient client = new GitHubClient();
-                        client.setOAuth2Token(mTarget.get().getAuthToken());
-                        IssueService issueService = new IssueService(client);
-                        issueService.createComment(activity.mRepoOwner, 
-                                activity.mRepoName,
-                                activity.mIssueNumber,
-                                comment);
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
-            }
-            else {
-                return false;
-            }
-        }
-
-        @Override
-        protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                IssueActivity activity = mTarget.get();
-                activity.mProgressDialog = activity.showProgressDialog(activity.getString(R.string.loading_msg), false);
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Boolean result) {
-            if (mTarget.get() != null) {
-                IssueActivity activity = mTarget.get();
-                
-                if (mException) {
-                    activity.stopProgressDialog(activity.mProgressDialog);
-                    activity.showMessage(activity.getResources().getString(R.string.issue_error_comment),
-                            false);
-                }
-                else {
-                    if (result) {
-                        activity.showMessage(activity.getResources().getString(R.string.issue_success_comment),
-                                false);
-                        //reload comments
-                        activity.getSupportLoaderManager().getLoader(2).forceLoad();
-                    }
-                    EditText etComment = (EditText) activity.findViewById(R.id.et_comment);
-                    etComment.setText(null);
-                    etComment.clearFocus();
-                }
-            }
-        }
-    }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
         case R.id.iv_comment:
             EditText etComment = (EditText) findViewById(R.id.et_comment);
-            if (etComment.getText() != null && !StringUtils.isBlank(etComment.getText().toString())) {
-                new CommentIssueTask(this, false).execute();
+            String comment = etComment.getText() == null ? null : etComment.getText().toString();
+            if (!StringUtils.isBlank(comment)) {
+                new CommentIssueTask(comment).execute();
             }
             if (getCurrentFocus() != null) {
                 hideKeyboard(getCurrentFocus().getWindowToken());
@@ -664,6 +441,77 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
             break;
         default:
             break;
+        }
+    }
+    
+    private class IssueOpenCloseTask extends ProgressDialogTask<Issue> {
+        private boolean mOpen;
+        
+        public IssueOpenCloseTask(boolean open) {
+            super(IssueActivity.this, 0, open ? R.string.opening_msg : R.string.closing_msg);
+            mOpen = open;
+        }
+
+        @Override
+        protected Issue run() throws IOException {
+            IssueService issueService = (IssueService)
+                    getApplicationContext().getSystemService(Gh4Application.ISSUE_SERVICE);
+            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+            
+            Issue issue = issueService.getIssue(repoId, mIssueNumber);
+            issue.setState(mOpen ? "open" : "closed");
+
+            return issueService.editIssue(repoId, issue);
+        }
+
+        @Override
+        protected void onSuccess(Issue result) {
+            mIssue = result;
+            mIssueState = mOpen ? "open" : "closed";
+            showMessage(getString(mOpen ? R.string.issue_success_reopen : R.string.issue_success_close), false);
+            
+            TextView tvState = (TextView) findViewById(R.id.tv_state);
+            tvState.setBackgroundResource(mOpen ? R.drawable.default_green_box : R.drawable.default_red_box);
+            tvState.setText(getString(mOpen ? R.string.open : R.string.closed).toUpperCase(Locale.getDefault()));
+            invalidateOptionsMenu();
+        }
+        
+        @Override
+        protected void onError(Exception e) {
+            showMessage(getString(R.string.issue_error_close), false);
+        }
+    }
+    
+    private class CommentIssueTask extends ProgressDialogTask<Void> {
+        private String mComment;
+
+        public CommentIssueTask(String comment) {
+            super(IssueActivity.this, 0, R.string.loading_msg);
+            mComment = comment;
+        }
+
+        @Override
+        protected Void run() throws IOException {
+            IssueService issueService = (IssueService)
+                    getApplicationContext().getSystemService(Gh4Application.ISSUE_SERVICE);
+            issueService.createComment(mRepoOwner, mRepoName, mIssueNumber, mComment);
+            return null;
+        }
+
+        @Override
+        protected void onSuccess(Void result) {
+            showMessage(getString(R.string.issue_success_comment), false);
+            //reload comments
+            getSupportLoaderManager().getLoader(2).forceLoad();
+            
+            EditText etComment = (EditText) findViewById(R.id.et_comment);
+            etComment.setText(null);
+            etComment.clearFocus();
+        }
+        
+        @Override
+        protected void onError(Exception e) {
+            showMessage(getString(R.string.issue_error_comment), false);
         }
     }
 }

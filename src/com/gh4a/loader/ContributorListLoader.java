@@ -7,7 +7,6 @@ import java.util.List;
 import org.eclipse.egit.github.core.Contributor;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
 import android.content.Context;
@@ -27,10 +26,8 @@ public class ContributorListLoader extends BaseLoader<List<User>> {
     
     @Override
     public List<User> doLoadInBackground() throws IOException {
-        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        RepositoryService repoService = new RepositoryService(client);
+        RepositoryService repoService = (RepositoryService)
+                getContext().getApplicationContext().getSystemService(Gh4Application.REPO_SERVICE);
         List<Contributor> contributors = repoService.getContributors(new RepositoryId(mRepoOwner, mRepoName), true);
         
         List<User> users = new ArrayList<User>();

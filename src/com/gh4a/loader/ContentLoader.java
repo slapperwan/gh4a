@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.ContentsService;
 
 import android.content.Context;
@@ -29,10 +28,8 @@ public class ContentLoader extends BaseLoader<List<RepositoryContents>> {
     
     @Override
     public List<RepositoryContents> doLoadInBackground() throws IOException {
-        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        ContentsService contentService = new ContentsService(client);
+        ContentsService contentService = (ContentsService)
+                getContext().getApplicationContext().getSystemService(Gh4Application.CONTENTS_SERVICE);
         return contentService.getContents(new RepositoryId(mRepoOwner, mRepoName), mPath, mRef);
     }
 }

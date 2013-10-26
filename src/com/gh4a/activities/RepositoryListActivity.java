@@ -45,7 +45,7 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
         Context context = mActionBar.getThemedContext();
         ArrayAdapter<CharSequence> list = new ArrayAdapter<CharSequence>(context, R.layout.sherlock_spinner_item);
         if (!Constants.User.USER_TYPE_ORG.equals(mUserType)) {
-            if (mUserLogin.equals(getAuthLogin())) {
+            if (mUserLogin.equals(Gh4Application.get(this).getAuthLogin())) {
                 for (String item : getResources().getStringArray(R.array.repo_login_item)) {
                     list.add(item);    
                 }
@@ -71,7 +71,7 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
     @Override
     public boolean onNavigationItemSelected(int position, long itemId) {
         BaseFragment fragment = null;
-        if (mUserLogin.equals(getAuthLogin())) {
+        if (mUserLogin.equals(Gh4Application.get(this).getAuthLogin())) {
             switch (position) {
             case 0:
                 fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "all");

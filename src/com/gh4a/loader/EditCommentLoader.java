@@ -4,14 +4,13 @@ import java.io.IOException;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.IssueService;
 
 import android.content.Context;
 
-import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
 
+//XXX: make me a task
 public class EditCommentLoader extends BaseLoader<Comment> {
 
     private String mRepoOwner;
@@ -30,10 +29,8 @@ public class EditCommentLoader extends BaseLoader<Comment> {
     
     @Override
     public Comment doLoadInBackground() throws IOException {
-        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new DefaultClient();
-        client.setOAuth2Token(app.getAuthToken());
-        IssueService issueService = new IssueService(client);
+        IssueService issueService = (IssueService)
+                getContext().getApplicationContext().getSystemService(Gh4Application.ISSUE_SERVICE);
         
         Comment comment = new Comment();
         comment.setBody(mBody);

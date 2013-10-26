@@ -202,7 +202,8 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
             finish();
         }
         else {
-            Gh4Application.get(this).openUserInfoActivity(this, getAuthLogin(), null);
+            Gh4Application app = Gh4Application.get(this);
+            app.openUserInfoActivity(this, app.getAuthLogin(), null);
         }
     }
 

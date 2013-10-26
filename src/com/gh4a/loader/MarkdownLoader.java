@@ -2,7 +2,6 @@ package com.gh4a.loader;
 
 import java.io.IOException;
 
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.MarkdownService;
 
 import android.content.Context;
@@ -22,10 +21,8 @@ public class MarkdownLoader extends BaseLoader<String> {
     
     @Override
     public String doLoadInBackground() throws IOException {
-        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        MarkdownService markdownService = new MarkdownService(client);
+        MarkdownService markdownService = (MarkdownService)
+                getContext().getApplicationContext().getSystemService(Gh4Application.MARKDOWN_SERVICE);
         return markdownService.getHtml(mText, mMode);
     }
 }

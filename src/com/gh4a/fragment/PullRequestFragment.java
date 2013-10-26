@@ -16,21 +16,17 @@
 package com.gh4a.fragment;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.PullRequest;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.IssueService;
 
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -45,6 +41,7 @@ import android.widget.TextView;
 import com.androidquery.AQuery;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.activities.BaseSherlockFragmentActivity;
 import com.gh4a.activities.PullRequestActivity;
@@ -218,8 +215,9 @@ public class PullRequestFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 EditText etComment = (EditText) PullRequestFragment.this.getView().findViewById(R.id.et_comment);
-                if (etComment.getText() != null && !StringUtils.isBlank(etComment.getText().toString())) {
-                    new CommentIssueTask(PullRequestFragment.this).execute();
+                String text = etComment.getText() == null ? null : etComment.getText().toString();
+                if (!StringUtils.isBlank(text)) {
+                    new CommentIssueTask(text).execute();
                 }
                 BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) getActivity();
                 if (activity.getCurrentFocus() != null) {
@@ -229,82 +227,39 @@ public class PullRequestFragment extends BaseFragment {
         });
     }
     
-    private static class CommentIssueTask extends AsyncTask<Void, Void, Boolean> {
+    private class CommentIssueTask extends ProgressDialogTask<Void> {
+        private String mText;
 
-        private WeakReference<PullRequestFragment> mTarget;
-        private boolean mException;
-
-        public CommentIssueTask(PullRequestFragment fragment) {
-            mTarget = new WeakReference<PullRequestFragment>(fragment);
+        public CommentIssueTask(String text) {
+            super(getActivity(), 0, R.string.loading_msg);
+            mText = text;
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
-            if (mTarget.get() != null) {
-                try {
-                    PullRequestFragment fragment = mTarget.get();
-                    EditText etComment = (EditText) fragment.getView().findViewById(R.id.et_comment);
-                    BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) fragment.getSherlockActivity();
-                    
-                    if (etComment.getText() != null && !StringUtils.isBlank(etComment.getText().toString())) {  
-                        String comment = etComment.getText().toString();
-                        GitHubClient client = new GitHubClient();
-                        client.setOAuth2Token(activity.getAuthToken());
-                        IssueService issueService = new IssueService(client);
-                        issueService.createComment(fragment.mRepoOwner, 
-                                fragment.mRepoName,
-                                fragment.mPullRequestNumber,
-                                comment);
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
-            }
-            else {
-                return false;
-            }
+        protected Void run() throws IOException {
+            IssueService issueService = (IssueService)
+                    getActivity().getApplicationContext().getSystemService(Gh4Application.ISSUE_SERVICE);
+            issueService.createComment(mRepoOwner, mRepoName, mPullRequestNumber, mText);
+            return null;
         }
 
         @Override
-        protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                PullRequestFragment fragment = mTarget.get();
-                PullRequestActivity activity = (PullRequestActivity) fragment.getSherlockActivity();
-                activity.mProgressDialog = activity.showProgressDialog(activity.getString(R.string.loading_msg), false);
-            }
+        protected void onSuccess(Void result) {
+            PullRequestActivity activity = (PullRequestActivity) getSherlockActivity();
+            activity.showMessage(getString(R.string.issue_success_comment), false);
+            //reload comments
+            getLoaderManager().restartLoader(1, null, mCommentCallback);
+            getLoaderManager().getLoader(1).forceLoad();
+            
+            EditText etComment = (EditText) activity.findViewById(R.id.et_comment);
+            etComment.setText(null);
+            etComment.clearFocus();
         }
 
         @Override
-        protected void onPostExecute(Boolean result) {
-            if (mTarget.get() != null) {
-                PullRequestFragment fragment = mTarget.get();
-                PullRequestActivity activity = (PullRequestActivity) fragment.getSherlockActivity();
-                
-                if (mException) {
-                    activity.stopProgressDialog(activity.mProgressDialog);
-                    activity.showMessage(activity.getResources().getString(R.string.issue_error_comment),
-                            false);
-                }
-                else {
-                    if (result) {
-                        activity.showMessage(activity.getResources().getString(R.string.issue_success_comment),
-                                false);
-                        //reload comments
-                        fragment.getLoaderManager().restartLoader(1, null, fragment.mCommentCallback);
-                        fragment.getLoaderManager().getLoader(1).forceLoad();
-                    }
-                    EditText etComment = (EditText) activity.findViewById(R.id.et_comment);
-                    etComment.setText(null);
-                    etComment.clearFocus();
-                }
-            }
+        protected void onError(Exception e) {
+            PullRequestActivity activity = (PullRequestActivity) getSherlockActivity();
+            activity.showMessage(getString(R.string.issue_error_comment), false);
         }
     }
 

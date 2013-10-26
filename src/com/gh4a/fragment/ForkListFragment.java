@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
@@ -89,10 +88,8 @@ public class ForkListFragment extends BaseFragment
     }
     
     private void loadData() {
-        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        RepositoryService repoService = new RepositoryService(client);
+        RepositoryService repoService = (RepositoryService)
+                getActivity().getApplicationContext().getSystemService(Gh4Application.REPO_SERVICE);
         mDataIterator = repoService.pageForks(new RepositoryId(mRepoOwner, mRepoName));
     }
 

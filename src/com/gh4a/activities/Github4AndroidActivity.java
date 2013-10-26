@@ -16,7 +16,6 @@
 package com.gh4a.activities;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,9 +27,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -40,6 +37,7 @@ import android.widget.Toast;
 import com.bugsense.trace.BugSenseHandler;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
@@ -66,8 +64,8 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
         super.onCreate(savedInstanceState);
 
         if (isAuthorized()) {
-            Gh4Application.get(this).openUserInfoActivity(this,
-                    getAuthLogin(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            Gh4Application app = Gh4Application.get(this);
+            app.openUserInfoActivity(this, app.getAuthLogin(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
             finish();
             return;
         }
@@ -84,8 +82,10 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
             @Override
             public void onClick(View v) {
                 hideKeyboard(btnLogin.getWindowToken());
-                if (!StringUtils.checkEmail(mEtUserLogin.getText().toString())) {
-                    new LoginTask(Github4AndroidActivity.this).execute();    
+                String username = mEtUserLogin.getText().toString();
+                String password = mEtPassword.getText().toString();
+                if (!StringUtils.checkEmail(username)) {
+                    new LoginTask(username, password).execute();
                 }
                 else {
                     Toast.makeText(Github4AndroidActivity.this,
@@ -95,135 +95,62 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
         });
     }
 
-    private static class LoginTask extends AsyncTask<Void, Void, Authorization> {
-
-        /** The target. */
-        private WeakReference<Github4AndroidActivity> mTarget;
-
-        /** The exception. */
-        private boolean mException;
+    private class LoginTask extends ProgressDialogTask<Authorization> {
+        private String mUserName;
+        private String mPassword;
         
-        /** The is auth error. */
-        private boolean isAuthError; 
-        
-        /** The exception msg. */
-        private String mExceptionMsg;
-
         /**
          * Instantiates a new load repository list task.
-         * 
-         * @param activity the activity
          */
-        public LoginTask(Github4AndroidActivity activity) {
-            mTarget = new WeakReference<Github4AndroidActivity>(activity);
+        public LoginTask(String userName, String password) {
+            super(Github4AndroidActivity.this, R.string.please_wait, R.string.authenticating);
+            mUserName = userName;
+            mPassword = password;
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#doInBackground(Params[])
-         */
         @Override
-        protected Authorization doInBackground(Void...params) {
-            if (mTarget.get() != null) {
-                try {
-                    String username = mTarget.get().mEtUserLogin.getText().toString();
-                    String password = mTarget.get().mEtPassword.getText().toString();
+        protected Authorization run() throws IOException {
+            GitHubClient client = new GitHubClient();
+            client.setCredentials(mUserName, mPassword); 
+            client.setUserAgent("Gh4a");
+                    
+            Authorization auth = null;
+            OAuthService authService = new OAuthService(client);
+            List<Authorization> auths = authService.getAuthorizations();
+            for (Authorization authorization : auths) {
+                if ("Gh4a".equals(authorization.getNote())) {
+                    auth = authorization;
+                    break;
+                }
+            }
+                    
+            if (auth == null) {
+                auth = new Authorization();
+                auth.setNote("Gh4a");
+                auth.setUrl("http://github.com/slapperwan/gh4a");
+                List<String> scopes = new ArrayList<String>();
+                scopes.add("user");
+                scopes.add("repo");
+                scopes.add("gist");
+                auth.setScopes(scopes);
 
-                    GitHubClient client = new GitHubClient();
-                    client.setCredentials(username, 
-                            password);
-                    client.setUserAgent("Gh4a");
-                    
-                    Authorization auth = null;
-                    OAuthService authService = new OAuthService(client);
-                    List<Authorization> auths = authService.getAuthorizations();
-                    for (Authorization authorization : auths) {
-                        if ("Gh4a".equals(authorization.getNote())) {
-                            auth = authorization;
-                            break;
-                        }
-                    }
-                    
-                    if (auth == null) {
-                        auth = new Authorization();
-                        auth.setNote("Gh4a");
-                        auth.setUrl("http://github.com/slapperwan/gh4a");
-                        List<String> scopes = new ArrayList<String>();
-                        scopes.add("user");
-                        scopes.add("repo");
-                        scopes.add("gist");
-                        auth.setScopes(scopes);
-                        
-                        auth = authService.createAuthorization(auth);
-                    }
-                    return auth;
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    if (e.getMessage().equalsIgnoreCase(
-                                    "Received authentication challenge is null")) {
-                        isAuthError = true;
-                    }
-                    mException = true;
-                    mExceptionMsg = e.getMessage();
-                    if (e.getCause() != null) {
-                        mExceptionMsg += ", " + e.getCause().getMessage();
-                    }
-                }
-                
-                return null;
+                auth = authService.createAuthorization(auth);
             }
-            else {
-                return null;
-            }
+            return auth;
         }
 
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPreExecute()
-         */
         @Override
-        protected void onPreExecute() {
-            Github4AndroidActivity activity = mTarget.get();
-            if (activity != null) {
-                activity.mProgressDialog = ProgressDialog.show(activity,
-                        activity.getString(R.string.please_wait),
-                        activity.getString(R.string.authenticating), false, false);
-            }
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
-         */
-        @Override
-        protected void onPostExecute(Authorization result) {
-            if (mTarget.get() != null) {
-                Github4AndroidActivity activity = mTarget.get();
-                activity.mProgressDialog.dismiss();
-                if (mException && isAuthError) {
-                    Toast.makeText(activity,
-                            activity.getResources().getString(R.string.invalid_login),
-                            Toast.LENGTH_SHORT).show();
-                }
-                else if (mException) {
-                    Toast.makeText(activity, mExceptionMsg, Toast.LENGTH_LONG).show();
-                }
-                else {
-                    SharedPreferences sharedPreferences = activity.getSharedPreferences(
-                            Constants.PREF_NAME, MODE_PRIVATE);
-                    Editor editor = sharedPreferences.edit();
-                    editor.putString(Constants.User.USER_AUTH_TOKEN, result.getToken());
-                    editor.putString(Constants.User.USER_LOGIN, mTarget.get().mEtUserLogin.getText().toString());
-                    editor.commit();
-                    
-                    Gh4Application.get(activity).openUserInfoActivity(activity,
-                            activity.mEtUserLogin.getText().toString().trim(),
-                            null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    activity.finish();
-                    
-                }
-            }
+        protected void onSuccess(Authorization result) {
+            SharedPreferences sharedPreferences = getSharedPreferences(
+                    Constants.PREF_NAME, MODE_PRIVATE);
+            Editor editor = sharedPreferences.edit();
+            editor.putString(Constants.User.USER_AUTH_TOKEN, result.getToken());
+            editor.putString(Constants.User.USER_LOGIN, mUserName);
+            editor.commit();
+            
+            Gh4Application.get(mContext).openUserInfoActivity(mContext,
+                    mUserName.trim(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            finish();
         }
     }
 }

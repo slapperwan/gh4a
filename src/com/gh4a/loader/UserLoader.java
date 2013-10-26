@@ -3,7 +3,6 @@ package com.gh4a.loader;
 import java.io.IOException;
 
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.UserService;
 
 import android.content.Context;
@@ -21,10 +20,8 @@ public class UserLoader extends BaseLoader<User> {
     
     @Override
     public User doLoadInBackground() throws IOException {
-        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        UserService userService = new UserService(client);
+        UserService userService = (UserService)
+                getContext().getApplicationContext().getSystemService(Gh4Application.GHUSER_SERVICE);
         return userService.getUser(mLogin);
     }
 }

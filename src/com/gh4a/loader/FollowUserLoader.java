@@ -2,7 +2,6 @@ package com.gh4a.loader;
 
 import java.io.IOException;
 
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.UserService;
 
 import android.content.Context;
@@ -22,10 +21,8 @@ public class FollowUserLoader extends BaseLoader<Boolean> {
     
     @Override
     public Boolean doLoadInBackground() throws IOException {
-        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        UserService userService = new UserService(client);
+        UserService userService = (UserService)
+                getContext().getApplicationContext().getSystemService(Gh4Application.GHUSER_SERVICE);
         if (mIsFollowing != null && mIsFollowing) {
             userService.unfollow(mLogin);
             return false;

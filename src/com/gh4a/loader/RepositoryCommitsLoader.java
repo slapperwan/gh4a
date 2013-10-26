@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
 import android.content.Context;
@@ -27,10 +26,8 @@ public class RepositoryCommitsLoader extends BaseLoader<List<RepositoryCommit>> 
 
     @Override
     public List<RepositoryCommit> doLoadInBackground() throws IOException {
-        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        PullRequestService pullRequestService = new PullRequestService(client);
+        PullRequestService pullRequestService = (PullRequestService)
+                getContext().getApplicationContext().getSystemService(Gh4Application.PULL_SERVICE);
         return pullRequestService.getCommits(new RepositoryId(mRepoOwner, mRepoName), mPullRequestNumber);
     }
 }

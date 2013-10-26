@@ -87,8 +87,7 @@ public class GistListActivity extends BaseSherlockFragmentActivity implements On
             listView.setAdapter(adapter);
         }
         else {
-            Gh4Application.get(this).notFoundMessage(this,
-                    getResources().getQuantityString(R.plurals.gist, 1));
+            Gh4Application.get(this).notFoundMessage(this, R.plurals.gist);
         }
     }
 

@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CommitService;
 
 import android.content.Context;
@@ -25,10 +24,8 @@ public class CommitLoader extends BaseLoader<RepositoryCommit> {
 
     @Override
     public RepositoryCommit doLoadInBackground() throws IOException {
-        Gh4Application app = Gh4Application.get(getContext());
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        CommitService commitService = new CommitService(client);
+        CommitService commitService = (CommitService)
+                getContext().getApplicationContext().getSystemService(Gh4Application.COMMIT_SERVICE);
         return commitService.getCommit(new RepositoryId(mRepoOwner, mRepoName), mObjectSha);
     }
 

@@ -16,7 +16,6 @@
 package com.gh4a.activities;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +23,6 @@ import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.IssueService;
 
 import android.app.AlertDialog;
@@ -32,10 +30,8 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
@@ -48,6 +44,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.loader.CollaboratorListLoader;
 import com.gh4a.loader.IsCollaboratorLoader;
@@ -239,11 +236,12 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.accept:
-            if (mEtTitle.getText() == null || StringUtils.isBlank(mEtTitle.getText().toString())) {
+            String title = mEtTitle.getText() == null ? null : mEtTitle.getText().toString();
+            if (StringUtils.isBlank(title)) {
                 mEtTitle.setError(getString(R.string.issue_error_title));
             }
             else {
-                new SaveIssueTask(this, false).execute();
+                new SaveIssueTask(title, mEtDesc.getText().toString()).execute();
             }
             return true;
         case R.id.cancel:
@@ -273,86 +271,49 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
         }
     }
     
-    private static class SaveIssueTask extends AsyncTask<String, Void, Boolean> {
-
-        private WeakReference<IssueCreateActivity> mTarget;
-        private boolean mException;
-
-        public SaveIssueTask(IssueCreateActivity activity, boolean hideMainView) {
-            mTarget = new WeakReference<IssueCreateActivity>(activity);
+    private class SaveIssueTask extends ProgressDialogTask<Void> {
+        private String mTitle;
+        private String mBody;
+        
+        public SaveIssueTask(String title, String body) {
+            super(IssueCreateActivity.this, 0, R.string.saving_msg);
+            mTitle = title;
+            mBody = body;
         }
 
         @Override
-        protected Boolean doInBackground(String... params) {
-            if (mTarget.get() != null) {
-                try {
-                    IssueCreateActivity activity = mTarget.get();
-                    GitHubClient client = new GitHubClient();
-                    client.setOAuth2Token(mTarget.get().getAuthToken());
-                    IssueService issueService = new IssueService(client);
+        protected Void run() throws IOException {
+            IssueService issueService = (IssueService)
+                    getApplicationContext().getSystemService(Gh4Application.ISSUE_SERVICE);
                     
-                    Issue issue = new Issue();
-                    if (activity.mEditMode) {
-                        issue = activity.mEditIssue;
-                    }
-                    
-                    issue.setTitle(activity.mEtTitle.getText().toString());
-                    issue.setBody(activity.mEtDesc.getText().toString());
-                    
-                    issue.setLabels(activity.mSelectedLabels);
-                    issue.setMilestone(activity.mSelectedMilestone);
-                    issue.setAssignee(activity.mSelectedAssignee);
-                    
-                    if (activity.mEditMode) {
-                        activity.mEditIssue = issueService.editIssue(activity.mRepoOwner, 
-                                activity.mRepoName, issue);
-                    }
-                    else {
-                        activity.mEditIssue = issueService.createIssue(activity.mRepoOwner, 
-                                activity.mRepoName, issue);
-                    }
-                    
-                    return true;
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
+            Issue issue = mEditMode ? mEditIssue : new Issue();
+            issue.setTitle(mTitle);
+            issue.setBody(mBody);
+
+            issue.setLabels(mSelectedLabels);
+            issue.setMilestone(mSelectedMilestone);
+            issue.setAssignee(mSelectedAssignee);
+
+            if (mEditMode) {
+                mEditIssue = issueService.editIssue(mRepoOwner, mRepoName, issue);
+            } else {
+                mEditIssue = issueService.createIssue(mRepoOwner, mRepoName, issue);
             }
-            else {
-                return false;
-            }
+            return null;
         }
 
         @Override
-        protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                IssueCreateActivity activity = mTarget.get();
-                activity.mProgressDialog = activity.showProgressDialog(activity.getString(R.string.saving_msg), false);
-            }
+        protected void onSuccess(Void result) {
+            showMessage(getString(
+                    mEditMode ? R.string.issue_success_edit : R.string.issue_success_create), false);
+            Gh4Application.get(IssueCreateActivity.this).openIssueActivity(IssueCreateActivity.this, 
+                    mRepoOwner, mRepoName, mEditIssue.getNumber(),
+                    Intent.FLAG_ACTIVITY_CLEAR_TOP);
         }
-
+        
         @Override
-        protected void onPostExecute(Boolean result) {
-            if (mTarget.get() != null) {
-                IssueCreateActivity activity = mTarget.get();
-                activity.stopProgressDialog(activity.mProgressDialog);
-    
-                if (mException) {
-                    activity.showError(false);
-                }
-                else {
-                    activity.showMessage(activity.getResources().getString(
-                            activity.mEditMode ? R.string.issue_success_edit : R.string.issue_success_create),
-                            false);
-                    Gh4Application.get(activity).openIssueActivity(activity, 
-                            activity.mRepoOwner, 
-                            activity.mRepoName,
-                            activity.mEditIssue.getNumber(),
-                            Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                }
-            }
+        protected void onError(Exception e) {
+            showError();
         }
     }
     

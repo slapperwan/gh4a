@@ -16,22 +16,18 @@
 package com.gh4a.activities;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.LabelService;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -46,6 +42,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.adapter.IssueLabelAdapter;
 import com.gh4a.loader.LabelListLoader;
@@ -210,13 +207,13 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
             case Menu.FIRST:
+                String labelName = mEditor.getText().toString();
+                String color = (String) mEditor.getTag();
                 if (mLabel == mAddedLabel) {
-                    new AddIssueLabelsTask(IssueLabelListActivity.this).execute(
-                            mEditor.getText().toString(), (String) mEditor.getTag());
+                    new AddIssueLabelTask(labelName, color).execute();
                     mLabel = null;
                 } else {
-                    new EditIssueLabelsTask(IssueLabelListActivity.this).execute(mCurrentLabelName,
-                            mEditor.getText().toString(), (String) mEditor.getTag());
+                    new EditIssueLabelTask(mCurrentLabelName, labelName, color).execute();
                 }
                 break;
             case Menu.FIRST + 1:
@@ -225,7 +222,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
                 builder.setMessage(R.string.issue_dialog_delete_message);
                 builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        new DeleteIssueLabelsTask(IssueLabelListActivity.this).execute(mCurrentLabelName);
+                        new DeleteIssueLabelTask(mCurrentLabelName).execute();
                     }
                 });
                 builder.setNegativeButton(R.string.cancel, null);
@@ -252,175 +249,103 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
         }
     }
     
-    private static class DeleteIssueLabelsTask extends AsyncTask<String, Void, Void> {
-        private WeakReference<IssueLabelListActivity> mTarget;
-        private boolean mException;
+    private class DeleteIssueLabelTask extends ProgressDialogTask<Void> {
+        private String mLabelName;
         
-        public DeleteIssueLabelsTask(IssueLabelListActivity activity) {
-            mTarget = new WeakReference<IssueLabelListActivity>(activity);
+        public DeleteIssueLabelTask(String labelName) {
+            super(IssueLabelListActivity.this, 0, R.string.deleting_msg);
+            mLabelName = labelName;
         }
 
         @Override
-        protected Void doInBackground(String... params) {
-            IssueLabelListActivity activity = mTarget.get();
-            if (activity == null) {
-                return null;
-            }
-            try {
-                GitHubClient client = new GitHubClient();
-                client.setOAuth2Token(activity.getAuthToken());
-                LabelService labelService = new LabelService(client);
-
-                String labelName = params[0];
-                labelService.deleteLabel(activity.mRepoOwner, activity.mRepoName, labelName);
-            }
-            catch (IOException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
-            }
+        protected Void run() throws IOException {
+            LabelService labelService = (LabelService)
+                    mContext.getApplicationContext().getSystemService(Gh4Application.LABEL_SERVICE);
+            labelService.deleteLabel(mRepoOwner, mRepoName, mLabelName);
             return null;
         }
 
         @Override
-        protected void onPreExecute() {
-            IssueLabelListActivity activity = mTarget.get();
-            if (activity != null) {
-                activity.mProgressDialog = activity.showProgressDialog(
-                        activity.getString(R.string.deleting_msg), true);
-            }
+        protected void onSuccess(Void result) {
+            getSupportLoaderManager().restartLoader(0, null, mLabelCallback).forceLoad();
         }
-
+        
         @Override
-        protected void onPostExecute(Void result) {
-            IssueLabelListActivity activity = mTarget.get();
-            if (activity != null) {
-                if (mException) {
-                    activity.stopProgressDialog(activity.mProgressDialog);
-                    activity.showError();
-                }
-                else {
-                    activity.getSupportLoaderManager().restartLoader(0, null, activity.mLabelCallback).forceLoad();
-                }
-            }
+        protected void onError(Exception e) {
+            showError();
         }
     }
     
-    private static class EditIssueLabelsTask extends AsyncTask<String, Void, Void> {
-        private WeakReference<IssueLabelListActivity> mTarget;
-        private boolean mException;
+    private class EditIssueLabelTask extends ProgressDialogTask<Void> {
+        private String mOldLabelName;
+        private String mNewLabelName;
+        private String mColor;
         
-        public EditIssueLabelsTask(IssueLabelListActivity activity) {
-            mTarget = new WeakReference<IssueLabelListActivity>(activity);
+        public EditIssueLabelTask(String oldLabelName, String newLabelName, String color) {
+            super(IssueLabelListActivity.this, 0, R.string.saving_msg);
+            mOldLabelName = oldLabelName;
+            mNewLabelName = newLabelName;
+            mColor = color;
         }
 
         @Override
-        protected Void doInBackground(String... params) {
-            IssueLabelListActivity activity = mTarget.get();
-            if (activity == null) {
-                return null;
-            }
-            try {
-                GitHubClient client = new GitHubClient();
-                client.setOAuth2Token(activity.getAuthToken());
-                LabelService labelService = new LabelService(client);
+        protected Void run() throws IOException {
+            LabelService labelService = (LabelService)
+                    mContext.getApplicationContext().getSystemService(Gh4Application.LABEL_SERVICE);
 
-                String labelName = params[0];
-                String newLabelName = params[1];
-                String color = params[2];
+            Label label = new Label();
+            label.setName(mNewLabelName);
+            label.setColor(mColor);
 
-                Label label = new Label();
-                label.setName(newLabelName);
-                label.setColor(color);
-
-                labelService.editLabel(new RepositoryId(activity.mRepoOwner, activity.mRepoName), labelName, label);
-            }
-            catch (IOException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
-            }
+            labelService.editLabel(new RepositoryId(mRepoOwner, mRepoName), mOldLabelName, label);
             return null;
         }
 
         @Override
-        protected void onPreExecute() {
-            IssueLabelListActivity activity = mTarget.get();
-            if (activity != null) {
-                activity.mProgressDialog = activity.showProgressDialog(
-                        activity.getString(R.string.saving_msg), false);
-            }
+        protected void onSuccess(Void result) {
+            getSupportLoaderManager().restartLoader(0, null, mLabelCallback).forceLoad();
         }
-
+        
         @Override
-        protected void onPostExecute(Void result) {
-            IssueLabelListActivity activity = mTarget.get();
-            if (activity != null) {
-                if (mException) {
-                    activity.stopProgressDialog(activity.mProgressDialog);
-                    activity.showMessage(activity.getString(R.string.issue_error_edit_label), false);
-                }
-                else {
-                    activity.getSupportLoaderManager().restartLoader(0, null, activity.mLabelCallback).forceLoad();
-                }
-            }
+        protected void onError(Exception e) {
+            showMessage(getString(R.string.issue_error_edit_label), false);
         }
     }
 
-    private static class AddIssueLabelsTask extends AsyncTask<String, Void, Void> {
-        private WeakReference<IssueLabelListActivity> mTarget;
-        private boolean mException;
+    private class AddIssueLabelTask extends ProgressDialogTask<Void> {
+        private String mLabelName;
+        private String mColor;
 
-        public AddIssueLabelsTask(IssueLabelListActivity activity) {
-            mTarget = new WeakReference<IssueLabelListActivity>(activity);
+        public AddIssueLabelTask(String labelName, String color) {
+            super(IssueLabelListActivity.this, 0, R.string.saving_msg);
+            mLabelName = labelName;
+            mColor = color;
         }
 
         @Override
-        protected Void doInBackground(String... params) {
-            IssueLabelListActivity activity = mTarget.get();
-            if (activity == null) {
-                return null;
-            }
+        protected Void run() throws IOException {
+            LabelService labelService = (LabelService)
+                    mContext.getApplicationContext().getSystemService(Gh4Application.LABEL_SERVICE);
 
-            try {
-                GitHubClient client = new GitHubClient();
-                client.setOAuth2Token(activity.getAuthToken());
-                LabelService labelService = new LabelService(client);
+            Label label = new Label();
+            label.setName(mLabelName);
+            label.setColor(mColor);
 
-                Label label = new Label();
-                label.setName(params[0]);
-                label.setColor(params[1]);
-
-                labelService.createLabel(activity.mRepoOwner, activity.mRepoName, label);
-            }
-            catch (IOException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
-            }
+            labelService.createLabel(mRepoOwner, mRepoName, label);
             return null;
         }
 
         @Override
-        protected void onPreExecute() {
-            IssueLabelListActivity activity = mTarget.get();
-            if (activity != null) {
-                activity.mProgressDialog = activity.showProgressDialog(
-                        activity.getString(R.string.saving_msg), false);
-            }
+        protected void onSuccess(Void result) {
+            getSupportLoaderManager().restartLoader(0, null, mLabelCallback).forceLoad();
+            mAddedLabel = null;
         }
-
+        
         @Override
-        protected void onPostExecute(Void result) {
-            IssueLabelListActivity activity = mTarget.get();
-            if (activity != null) {
-                activity.stopProgressDialog(activity.mProgressDialog);
-                if (mException) {
-                    activity.showMessage(activity.getString(R.string.issue_error_create_label), false);
-                    activity.mAdapter.remove(activity.mAddedLabel);
-                }
-                else {
-                    activity.getSupportLoaderManager().restartLoader(0, null, activity.mLabelCallback).forceLoad();
-                }
-                activity.mAddedLabel = null;
-            }
+        protected void onError(Exception e) {
+            showMessage(getString(R.string.issue_error_create_label), false);
+            mAdapter.remove(mAddedLabel);
+            mAddedLabel = null;
         }
     }
 }

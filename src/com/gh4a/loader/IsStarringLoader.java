@@ -3,7 +3,6 @@ package com.gh4a.loader;
 import java.io.IOException;
 
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.StarService;
 
 import android.content.Context;
@@ -23,10 +22,8 @@ public class IsStarringLoader extends BaseLoader<Boolean> {
     
     @Override
     public Boolean doLoadInBackground() throws IOException {
-        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        StarService starringService = new StarService(client);
-        return starringService.isStarring(new RepositoryId(mRepoOwner, mRepoName));
+        StarService starService = (StarService)
+                getContext().getApplicationContext().getSystemService(Gh4Application.STAR_SERVICE);
+        return starService.isStarring(new RepositoryId(mRepoOwner, mRepoName));
     }
 }

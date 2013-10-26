@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.StarService;
 
@@ -112,10 +111,8 @@ public class StarredRepositoryListFragment extends BaseFragment
     }
 
     public void loadData() {
-        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        StarService starringService = new StarService(client);
+        StarService starringService = (StarService)
+                getActivity().getApplication().getSystemService(Gh4Application.STAR_SERVICE);
         try {
             mDataIterator = starringService.pageStarred(mLogin);
         } catch (IOException e) {

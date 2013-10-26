@@ -13,7 +13,6 @@ import org.eclipse.egit.github.core.RepositoryBranch;
 import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.RepositoryTag;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.StarService;
 import org.eclipse.egit.github.core.service.WatcherService;
 
@@ -555,15 +554,14 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
                 return null;
             }
             try {
-                GitHubClient client = new GitHubClient();
-                client.setOAuth2Token(activity.getAuthToken());
-                StarService starringService = new StarService(client);
+                StarService starService = (StarService)
+                        activity.getApplicationContext().getSystemService(Gh4Application.STAR_SERVICE);
                 RepositoryId repoId = new RepositoryId(activity.mRepoOwner, activity.mRepoName);
                 if (activity.mIsStarring) {
-                    starringService.unstar(repoId);
+                    starService.unstar(repoId);
                 }
                 else {
-                    starringService.star(repoId);
+                    starService.star(repoId);
                 }
             }
             catch (IOException e) {
@@ -606,9 +604,8 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
                 return null;
             }
             try {
-                GitHubClient client = new GitHubClient();
-                client.setOAuth2Token(activity.getAuthToken());
-                WatcherService watcherService = new WatcherService(client);
+                WatcherService watcherService = (WatcherService)
+                        activity.getApplicationContext().getSystemService(Gh4Application.WATCHER_SERVICE);
                 RepositoryId repoId = new RepositoryId(activity.mRepoOwner, activity.mRepoName);
                 if (activity.mIsWatching) {
                     watcherService.unwatch(repoId);

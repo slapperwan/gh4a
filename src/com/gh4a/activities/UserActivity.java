@@ -60,7 +60,7 @@ public class UserActivity extends BaseSherlockFragmentActivity {
 
         BugSenseHandler.setup(this, "6e1b031");
         
-        mIsLoginUserPage = mUserLogin.equals(getAuthLogin());
+        mIsLoginUserPage = mUserLogin.equals(Gh4Application.get(this).getAuthLogin());
         
         ActionBar actionBar = getSupportActionBar();
         if (mIsLoginUserPage) {
@@ -131,7 +131,7 @@ public class UserActivity extends BaseSherlockFragmentActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        boolean isSelf = mUserLogin.equals(getAuthLogin());
+        boolean isSelf = mUserLogin.equals(Gh4Application.get(this).getAuthLogin());
 
         MenuItem logoutAction = menu.findItem(R.id.logout);
         logoutAction.setTitle(isAuthorized() ? R.string.logout : R.string.login);
@@ -162,8 +162,8 @@ public class UserActivity extends BaseSherlockFragmentActivity {
     @Override
     protected void navigateUp() {
         if (isAuthorized()) {
-            Gh4Application.get(this).openUserInfoActivity(this,
-                    getAuthLogin(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            Gh4Application app = Gh4Application.get(this);
+            app.openUserInfoActivity(this, app.getAuthLogin(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
         }
         else {
             Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);

@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.CommitService;
 
@@ -66,9 +65,8 @@ public class CommitHistoryActivity extends BaseSherlockFragmentActivity
     }
     
     public void loadData() {
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(getAuthToken());
-        CommitService commitService = new CommitService(client);
+        CommitService commitService = (CommitService)
+                getApplicationContext().getSystemService(Gh4Application.COMMIT_SERVICE);
         mDataIterator = commitService.pageCommits(new RepositoryId(mRepoOwner, mRepoName), 
                 mRef, mFilePath);
     }

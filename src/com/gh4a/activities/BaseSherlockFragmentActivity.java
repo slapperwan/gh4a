@@ -16,9 +16,6 @@
 package com.gh4a.activities;
 
 import java.util.Calendar;
-import java.util.Locale;
-
-import org.ocpsoft.pretty.time.PrettyTime;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -32,7 +29,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -61,10 +57,6 @@ import com.gh4a.loader.LoaderResult;
  * The Base activity.
  */
 public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
-
-    /** The Constant pt. */
-    protected static final PrettyTime pt = new PrettyTime(new Locale(""));
-
     /**
      * Common function when device search button pressed, then open
      * SearchActivity.
@@ -93,16 +85,11 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu = setupOptionMenu(menu);
         if (!isAuthorized()) {
             MenuInflater inflater = getSupportMenuInflater();
             inflater.inflate(R.menu.anon_menu, menu);
         }
         return true;        
-    }
-    
-    public Menu setupOptionMenu(Menu menu) {
-        return menu;
     }
     
     /* (non-Javadoc)
@@ -217,84 +204,21 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
     }
 
     public boolean isAuthorized() {
-        SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
-                Constants.PREF_NAME, MODE_PRIVATE);
-        
-        if (sharedPreferences != null) {
-            if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
-                    && sharedPreferences.getString(Constants.User.USER_AUTH_TOKEN, null) != null){
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    public String getAuthLogin() {
-        SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
-                Constants.PREF_NAME, MODE_PRIVATE);
-        if (sharedPreferences != null) {
-            if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null){
-                return sharedPreferences.getString(Constants.User.USER_LOGIN, null);
-            }
-        }
-        return null;
+        Gh4Application app = Gh4Application.get(this);
+        return app.getAuthLogin() != null && app.getAuthToken() != null;
     }
     
     /**
      * Show error.
      */
     public void showError() {
-        showError(false);
+        showMessage(getString(R.string.error_toast), false);
     }
 
-    /**
-     * Show error.
-     *
-     * @param finishThisActivity the finish this activity
-     */
-    public void showError(boolean finishThisActivity) {
-        showMessage(getString(R.string.error_toast), finishThisActivity);
-    }
-    
     public void showMessage(String message, boolean finishThisActivity) {
         Toast.makeText(getApplication(), message, Toast.LENGTH_SHORT).show();
         if (finishThisActivity) {
             super.finish();
-        }
-    }
-    
-    public boolean isSettingEnabled(String key) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        return sp.getBoolean(key, false);
-    }
-    
-    public String getSettingStringValue(String key) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        return sp.getString(key, null);
-    }
-    
-    public String getAuthToken() {
-        SharedPreferences sharedPreferences = getSharedPreferences(
-                Constants.PREF_NAME, Context.MODE_PRIVATE);
-        String token = sharedPreferences.getString(Constants.User.USER_AUTH_TOKEN, null);
-        return token;
-    }
-    
-    public void unauthorized() {
-        SharedPreferences sharedPreferences = getSharedPreferences(
-                Constants.PREF_NAME, MODE_PRIVATE);
-        
-        if (sharedPreferences != null) {
-            if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
-                    && sharedPreferences.getString(Constants.User.USER_AUTH_TOKEN, null) != null){
-                Editor editor = sharedPreferences.edit();
-                editor.clear();
-                editor.commit();
-                Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                finish();
-            }
         }
     }
     
@@ -366,8 +290,9 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
             public void onClick(View v) {
                 Context context = BaseSherlockFragmentActivity.this;
                 if (isAuthorized()) {
-                    Gh4Application.get(context).openUserInfoActivity(context, 
-                            getAuthLogin(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
+                    Gh4Application app = Gh4Application.get(context);
+                    app.openUserInfoActivity(context, 
+                            app.getAuthLogin(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
                 }
                 else {
                     Intent intent = new Intent().setClass(context, Github4AndroidActivity.class);

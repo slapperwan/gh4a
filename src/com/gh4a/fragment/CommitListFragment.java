@@ -20,7 +20,6 @@ import java.util.List;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.CommitService;
 
@@ -122,10 +121,8 @@ public class CommitListFragment extends BaseFragment
         
     }
     public void loadData() {
-        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        CommitService commitService = new CommitService(client);
+        CommitService commitService = (CommitService)
+                getActivity().getApplicationContext().getSystemService(Gh4Application.COMMIT_SERVICE);
         mDataIterator = commitService.pageCommits(new RepositoryId(mRepository.getOwner().getLogin(), mRepository.getName()), 
                 mRef, null);
     }

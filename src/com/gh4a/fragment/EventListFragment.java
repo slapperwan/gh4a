@@ -20,7 +20,6 @@ import java.util.List;
 import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.GollumPage;
 import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.event.CommitCommentPayload;
 import org.eclipse.egit.github.core.event.DownloadPayload;
@@ -133,10 +132,8 @@ public abstract class EventListFragment extends BaseFragment
     }
     
     public void loadData() {
-        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        EventService eventService = new EventService(client);
+        EventService eventService = (EventService)
+                getActivity().getApplicationContext().getSystemService(Gh4Application.EVENT_SERVICE);
         if (mIsPrivate) {
             mDataIterator = eventService.pageUserReceivedEvents(mLogin, true);
         }

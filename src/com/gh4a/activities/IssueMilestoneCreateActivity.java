@@ -16,23 +16,18 @@
 package com.gh4a.activities;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.Calendar;
 import java.util.Date;
 
 import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.MilestoneService;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -43,6 +38,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
@@ -51,7 +47,6 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
     private String mRepoOwner;
     private String mRepoName;
     private Date mDueOn;
-    private ProgressDialog mProgressDialog;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -81,64 +76,41 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
     
-    private static class AddIssueMilestonesTask extends AsyncTask<String, Void, Void> {
-
-        private WeakReference<IssueMilestoneCreateActivity> mTarget;
-        private boolean mException;
+    private class AddIssueMilestonesTask extends ProgressDialogTask<Void> {
+        private String mTitle;
+        private String mDesc;
+        private Date mDueOn;
         
-        public AddIssueMilestonesTask(IssueMilestoneCreateActivity activity) {
-            mTarget = new WeakReference<IssueMilestoneCreateActivity>(activity);
+        public AddIssueMilestonesTask(String title, String desc, Date dueOn) {
+            super(IssueMilestoneCreateActivity.this, 0, R.string.saving_msg);
+            mTitle = title;
+            mDesc = desc;
+            mDueOn = dueOn;
         }
 
         @Override
-        protected Void doInBackground(String... params) {
-            if (mTarget.get() != null) {
-                try {
-                    IssueMilestoneCreateActivity activity = mTarget.get();
-                    GitHubClient client = new GitHubClient();
-                    client.setOAuth2Token(mTarget.get().getAuthToken());
-                    MilestoneService milestoneService = new MilestoneService(client);
+        protected Void run() throws IOException {
+            MilestoneService milestoneService = (MilestoneService)
+                    getApplicationContext().getSystemService(Gh4Application.MILESTONE_SERVICE);
                     
-                    String title = params[0];
-                    String desc = params[1];
+            Milestone milestone = new Milestone();
+            milestone.setTitle(mTitle);
+            milestone.setDescription(mDesc);
+            milestone.setDueOn(mDueOn);
                     
-                    Milestone milestone = new Milestone();
-                    milestone.setTitle(title);
-                    milestone.setDescription(desc);
-                    milestone.setDueOn(activity.mDueOn);
-                    
-                    milestoneService.createMilestone(activity.mRepoOwner, activity.mRepoName, milestone);
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                }
-            }
+            milestoneService.createMilestone(mRepoOwner, mRepoName, milestone);
             return null;
         }
 
         @Override
-        protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                IssueMilestoneCreateActivity activity = mTarget.get();
-                activity.mProgressDialog = activity.showProgressDialog(activity.getString(R.string.saving_msg), false);
-            }
+        protected void onSuccess(Void result) {
+            openIssueMilestones();
         }
 
         @Override
-        protected void onPostExecute(Void result) {
-            if (mTarget.get() != null) {
-                IssueMilestoneCreateActivity activity = mTarget.get();
-                activity.stopProgressDialog(activity.mProgressDialog);
-                
-                if (mException) {
-                    activity.showMessage(activity.getResources().getString(R.string.issue_error_create_milestone), false);
-                }
-                else {
-                    activity.openIssueMilestones();
-                }
-            }
-        }
+        protected void onError(Exception e) {
+            showMessage(getString(R.string.issue_error_create_milestone), false);
+        }    
     }
     
     public void showDatePickerDialog(View v) {
@@ -218,7 +190,7 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
                 showMessage(getResources().getString(R.string.issue_error_milestone_title), false);
             }
             else {
-                new AddIssueMilestonesTask(IssueMilestoneCreateActivity.this).execute(tvTitle.getText().toString(), desc);
+                new AddIssueMilestonesTask(tvTitle.getText().toString(), desc, mDueOn).execute();
             }
             return true;
         case R.id.cancel:

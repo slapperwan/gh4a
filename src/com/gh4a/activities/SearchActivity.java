@@ -16,21 +16,16 @@
 package com.gh4a.activities;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.List;
 
 import org.eclipse.egit.github.core.SearchRepository;
 import org.eclipse.egit.github.core.SearchUser;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.egit.github.core.service.UserService;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -50,6 +45,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.widget.SearchView;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.adapter.SearchRepositoryAdapter;
 import com.gh4a.adapter.SearchUserAdapter;
@@ -62,7 +58,6 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
     protected SearchUserAdapter mUserAdapter;
     protected SearchRepositoryAdapter mRepoAdapter;
     protected ListView mListViewResults;
-    private ProgressDialog mProgressDialog;
 
     private Spinner mSearchType;
     private SearchView mSearch;
@@ -103,28 +98,16 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
         registerForContextMenu(mListViewResults);
     }
 
-    protected void searchRepository(final String searchKey, final String language) {
+    protected void searchRepository(final String searchKey) {
         mRepoAdapter = new SearchRepositoryAdapter(this);
         mListViewResults.setAdapter(mRepoAdapter);
-        new LoadRepositoryTask(this).execute(new String[] { searchKey, language, "true" });
+        new LoadRepositoryTask(searchKey).execute();
     }
 
     protected void searchUser(final String searchKey) {
         mUserAdapter = new SearchUserAdapter(this);
         mListViewResults.setAdapter(mUserAdapter);
-        new LoadUserTask(this).execute(new String[] { searchKey });
-    }
-
-    protected List<SearchUser> getUsers(String searchKey) throws IOException {
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(getAuthToken());
-        UserService userService = new UserService();
-        
-        if (StringUtils.isBlank(searchKey)) {
-            return null;
-        }
-
-        return userService.searchUsers(searchKey);
+        new LoadUserTask(searchKey).execute();
     }
 
     private static class SearchTypeAdapter extends BaseAdapter implements SpinnerAdapter {
@@ -206,111 +189,62 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
         }
     }
 
-    protected List<SearchRepository> getRepositories(String searchKey, String language)
-            throws IOException {
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(getAuthToken());
-        RepositoryService repoService = new RepositoryService();
+    private class LoadRepositoryTask extends ProgressDialogTask<List<SearchRepository>> {
+        private String mQuery;
         
-        if (StringUtils.isBlank(searchKey)) {
-            return null;
+        public LoadRepositoryTask(String query) {
+            super(SearchActivity.this, 0, R.string.loading_msg);
+            mQuery = query;
         }
 
-        if (language == null || getResources().getStringArray(R.array.languages_array)[0].equals(language)) {
-            return repoService.searchRepositories(searchKey, 1);
+        @Override
+        protected List<SearchRepository> run() throws IOException {
+            if (StringUtils.isBlank(mQuery)) {
+                return null;
+            }
+
+            RepositoryService repoService = (RepositoryService)
+                    mContext.getApplicationContext().getSystemService(Gh4Application.REPO_SERVICE);
+            return repoService.searchRepositories(mQuery, 1);
         }
-        else {
-            return repoService.searchRepositories(searchKey, language, 1);
+
+        @Override
+        protected void onSuccess(List<SearchRepository> result) {
+            fillRepositoriesData(result);
+        }
+        
+        @Override
+        protected void onError(Exception e) {
+            showError();
         }
     }
 
-    private static class LoadRepositoryTask extends AsyncTask<String, Integer, List<SearchRepository>> {
+    private class LoadUserTask extends ProgressDialogTask<List<SearchUser>> {
+        private String mQuery;
 
-        private boolean mException;
-        private WeakReference<SearchActivity> mTarget;
-
-        public LoadRepositoryTask(SearchActivity activity) {
-            mTarget = new WeakReference<SearchActivity>(activity);
+        public LoadUserTask(String query) {
+            super(SearchActivity.this, 0, R.string.loading_msg);
         }
 
         @Override
-        protected List<SearchRepository> doInBackground(String... params) {
-            if (mTarget.get() != null) {
-                try {
-                    return mTarget.get().getRepositories(params[0], params[1]);
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
-            }
-            else {
+        protected List<SearchUser> run() throws IOException {
+            if (StringUtils.isBlank(mQuery)) {
                 return null;
             }
+
+            UserService userService = (UserService)
+                    mContext.getApplicationContext().getSystemService(Gh4Application.GHUSER_SERVICE);
+            return userService.searchUsers(mQuery);
         }
 
         @Override
-        protected void onPreExecute() {
+        protected void onSuccess(List<SearchUser> result) {
+            fillUsersData(result);
         }
-
+        
         @Override
-        protected void onPostExecute(List<SearchRepository> result) {
-            if (mTarget.get() != null) {
-                SearchActivity activity = mTarget.get();
-                activity.stopProgressDialog(activity.mProgressDialog);
-                if (mException) {
-                    mTarget.get().showError(false);
-                }
-                else {
-                    activity.fillRepositoriesData(result);
-                }
-            }
-        }
-    }
-
-    private static class LoadUserTask extends AsyncTask<String, Integer, List<SearchUser>> {
-
-        private WeakReference<SearchActivity> mTarget;
-        private boolean mException;
-
-        public LoadUserTask(SearchActivity activity) {
-            mTarget = new WeakReference<SearchActivity>(activity);
-        }
-
-        @Override
-        protected List<SearchUser> doInBackground(String... params) {
-            if (mTarget.get() != null) {
-                try {
-                    return mTarget.get().getUsers(params[0]);
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
-            }
-            else {
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected void onPostExecute(List<SearchUser> result) {
-            if (mTarget.get() != null) {
-                SearchActivity activity = mTarget.get();
-                activity.stopProgressDialog(activity.mProgressDialog);
-                if (mException) {
-                    mTarget.get().showError(false);
-                }
-                else {
-                    activity.fillUsersData(result);
-                }
-            }
+        protected void onError(Exception e) {
+            showError();
         }
     }
 
@@ -376,11 +310,10 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
     @Override
     public boolean onQueryTextSubmit(String query) {
         boolean searchUser = mSearchType.getSelectedItemPosition() == 1;
-        mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
         if (searchUser) {
             searchUser(query);
         } else {
-            searchRepository(query, null);
+            searchRepository(query);
         }
         mSearch.clearFocus();
         return true;
