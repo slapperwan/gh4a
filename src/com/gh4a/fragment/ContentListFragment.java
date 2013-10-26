@@ -69,7 +69,7 @@ public class ContentListFragment extends BaseFragment implements OnItemClickList
                 fillData(result.getData());
                 for (RepositoryContents content : result.getData()) {
                     if (RepositoryContents.TYPE_FILE.equals(content.getType())) {
-                        if (content.getName().equals(".gitmodulemap")) {
+                        if (content.getName().equals(".gitmodules")) {
                             mCallback.onModuleMapFound(ContentListFragment.this);
                             break;
                         }

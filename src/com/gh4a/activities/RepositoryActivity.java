@@ -519,6 +519,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
         mRepositoryFragment = null;
         mContentListFragment = null;
         mCommitListFragment = null;
+        mGitModuleMap = null;
         mDirStack.clear();
         showLoading();
         getSupportLoaderManager().restartLoader(LOADER_REPO, null, mRepoCallback);
