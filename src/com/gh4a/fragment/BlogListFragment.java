@@ -15,28 +15,11 @@
  */
 package com.gh4a.fragment;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.ref.WeakReference;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.xml.sax.SAXException;
-
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,19 +31,33 @@ import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.activities.BlogActivity;
 import com.gh4a.adapter.CommonFeedAdapter;
-import com.gh4a.feeds.FeedHandler;
 import com.gh4a.holder.Feed;
+import com.gh4a.loader.FeedLoader;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 
 public class BlogListFragment extends BaseFragment {
+    private static final String BLOG = "https://github.com/blog.atom";
 
-    private static final String BLOG = "https://github.com/blog.atom?page=";
-
-    private int page = 1;
     private ListView mListView;
     private CommonFeedAdapter mAdapter;
 
-    public static BlogListFragment newInstance() {
+    private LoaderCallbacks<List<Feed>> mFeedCallback = new LoaderCallbacks<List<Feed>>() {
 
+        @Override
+        public Loader<LoaderResult<List<Feed>>> onCreateLoader(int id, Bundle args) {
+            return new FeedLoader(getActivity(), BLOG);
+        }
+
+        @Override
+        public void onResultReady(LoaderResult<List<Feed>> result) {
+            if (result.getData() != null) {
+                fillData(result.getData());
+            }
+        }
+    };
+
+    public static BlogListFragment newInstance() {
         BlogListFragment f = new BlogListFragment();
         return f;
     }
@@ -98,81 +95,9 @@ public class BlogListFragment extends BaseFragment {
             }
         });
 
-        new LoadBlogsTask(this).execute();
+        getLoaderManager().initLoader(0, null, mFeedCallback).forceLoad();
     }
 
-    private static class LoadBlogsTask extends
-            AsyncTask<String, Void, List<Feed>> {
-
-        private WeakReference<BlogListFragment> mTarget;
-
-        public LoadBlogsTask(BlogListFragment activity) {
-            mTarget = new WeakReference<BlogListFragment>(activity);
-        }
-
-        @Override
-        protected List<Feed> doInBackground(String... params) {
-            if (mTarget.get() != null) {
-                InputStream bis = null;
-                try {
-                    URL url = new URL(BLOG + mTarget.get().page);
-                    HttpClient httpClient = new DefaultHttpClient();
-                    HttpGet pageGet = new HttpGet(url.toURI());
-                    HttpResponse response = httpClient.execute(pageGet);
-
-                    bis = response.getEntity().getContent();
-
-                    SAXParserFactory factory = SAXParserFactory.newInstance();
-                    SAXParser parser = factory.newSAXParser();
-                    FeedHandler handler = new FeedHandler();
-                    parser.parse(bis, handler);
-                    return handler.getFeeds();
-                } catch (MalformedURLException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    return null;
-                } catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    return null;
-                } catch (ParserConfigurationException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    return null;
-                } catch (SAXException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    return null;
-                } catch (URISyntaxException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    return null;
-                } finally {
-                    if (bis != null) {
-                        try {
-                            bis.close();
-                        } catch (IOException e) {
-                            Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                        }
-                    }
-                }
-            } else {
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPreExecute() {
-            if (mTarget.get() != null) {
-            }
-        }
-
-        @Override
-        protected void onPostExecute(List<Feed> result) {
-            if (mTarget.get() != null) {
-                mTarget.get().hideLoading();
-                if (mTarget.get() != null && result != null) {
-                    mTarget.get().fillData(result);
-                }
-            }
-        }
-    }
-    
     private void fillData(List<Feed> result) {
         if (result != null) {
             List<Feed> blogs = ((CommonFeedAdapter) mListView.getAdapter()).getObjects();

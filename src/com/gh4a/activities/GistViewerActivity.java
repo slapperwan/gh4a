@@ -15,17 +15,10 @@
  */
 package com.gh4a.activities;
 
-import java.io.IOException;
-import java.lang.ref.WeakReference;
-
-import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.GistService;
-
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.content.Loader;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -34,6 +27,9 @@ import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.loader.GistLoader;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
 
 public class GistViewerActivity extends BaseSherlockFragmentActivity {
@@ -42,6 +38,19 @@ public class GistViewerActivity extends BaseSherlockFragmentActivity {
     private String mFilename;
     private String mGistId;
     private String mData;
+
+    private LoaderCallbacks<String> mGistCallback = new LoaderCallbacks<String>() {
+        @Override
+        public Loader<LoaderResult<String>> onCreateLoader(int id, Bundle args) {
+            return new GistLoader(GistViewerActivity.this, mFilename, mGistId);
+        }
+        @Override
+        public void onResultReady(LoaderResult<String> result) {
+            if (!isLoaderError(result)) {
+                fillData(result.getData(), true);
+            }
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,56 +73,7 @@ public class GistViewerActivity extends BaseSherlockFragmentActivity {
         mActionBar.setDisplayHomeAsUpEnabled(true);
         
         showLoading();
-        new LoadGistTask(this, true).execute(mGistId, mFilename);
-    }
-    
-    private static class LoadGistTask extends AsyncTask<String, Void, String> {
-
-        private WeakReference<GistViewerActivity> mTarget;
-        private boolean mException;
-        private boolean mHighlight;
-        
-        public LoadGistTask(GistViewerActivity activity, boolean highlight) {
-            mTarget = new WeakReference<GistViewerActivity>(activity);
-            mHighlight = highlight;
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            if (mTarget.get() != null) {
-                try {
-                    GitHubClient client = new GitHubClient();
-                    client.setOAuth2Token(mTarget.get().getAuthToken());
-                    GistService gistService = new GistService(client);
-                    return gistService.getGist(params[0]).getFiles().get(params[1]).getContent();
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
-            }
-            else {
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            if (mTarget.get() != null) {
-                GistViewerActivity activity = mTarget.get();
-                if (mException) {
-                    activity.showError();
-                }
-                else {
-                    mTarget.get().fillData(result, mHighlight);
-                }
-            }
-        }
+        getSupportLoaderManager().initLoader(0, null, mGistCallback).forceLoad();
     }
     
     private void fillData(String data, boolean highlight) {

@@ -15,21 +15,18 @@
  */
 package com.gh4a.activities;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.egit.github.core.Contributor;
-import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.RepositoryService;
 
 import android.content.Intent;
+import android.support.v4.content.Loader;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.loader.ContributorListLoader;
+import com.gh4a.loader.LoaderResult;
 
 public class ContributorListActivity extends UserListActivity {
 
@@ -57,26 +54,9 @@ public class ContributorListActivity extends UserListActivity {
         return false;
     }
 
-    protected List<User> getUsers() throws IOException {
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(getAuthToken());
-        RepositoryService repoService = new RepositoryService(client);
-        
-        List<Contributor> contributors = repoService
-                .getContributors(new RepositoryId(mUserLogin, mRepoName), true);
-        
-        List<User> users = new ArrayList<User>();
-        for (Contributor contributor : contributors) {
-            User user = new User();
-            user.setName(contributor.getName());
-            if (contributor.getLogin() != null) {
-                user.setLogin(contributor.getLogin());
-                user.setAvatarUrl(contributor.getAvatarUrl());
-            }
-            
-            users.add(user);
-        }
-        return users;
+    @Override
+    protected Loader<LoaderResult<List<User>>> getUserListLoader() {
+        return new ContributorListLoader(this, mUserLogin, mRepoName);
     }
     
     @Override

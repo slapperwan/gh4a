@@ -34,7 +34,6 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import com.gh4a.activities.CommitActivity;
-import com.gh4a.activities.CommitListActivity;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.GistActivity;
 import com.gh4a.activities.IssueActivity;
@@ -314,27 +313,6 @@ public class Gh4Application extends Application {
         intent.putExtra(Constants.Object.REF, sha);
         intent.putExtra(Constants.Object.NAME, fileName);
         intent.putExtra(Constants.Object.OBJECT_SHA, sha);
-        context.startActivity(intent);
-    }
-
-    /**
-     * Open commit list activity.
-     *
-     * @param context the context
-     * @param repoOwner the repo owner
-     * @param repoName the repo name
-     * @param branchName the branch name
-     * @param sha the sha
-     * @param viewId the view id
-     */
-    public void openCommitListActivity(Context context, String repoOwner, String repoName,
-            String branchName, String sha, int viewId) {
-        Intent intent = new Intent().setClass(context, CommitListActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, repoName);
-        intent.putExtra(Constants.Repository.REPO_BRANCH, branchName);
-        intent.putExtra(Constants.Object.TREE_SHA, sha);
-        intent.putExtra(Constants.VIEW_ID, viewId);
         context.startActivity(intent);
     }
 

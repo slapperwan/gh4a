@@ -15,17 +15,13 @@
  */
 package com.gh4a.activities;
 
-import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.egit.github.core.User;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -36,14 +32,31 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.adapter.UserAdapter;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
 
-public class UserListActivity extends BaseSherlockFragmentActivity implements OnItemClickListener {
+public abstract class UserListActivity extends BaseSherlockFragmentActivity implements OnItemClickListener {
 
     protected String mSearchKey;
     protected UserAdapter mUserAdapter;
     protected ListView mListViewUsers;
-    
+
+    protected LoaderCallbacks<List<User>> mUserListCallback = new LoaderCallbacks<List<User>>() {
+        @Override
+        public Loader<LoaderResult<List<User>>> onCreateLoader(int id, Bundle args) {
+            return getUserListLoader();
+        }
+
+        @Override
+        public void onResultReady(LoaderResult<List<User>> result) {
+            hideLoading();
+            if (!isLoaderError(result)) {
+                fillData(result.getData());
+            }
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
@@ -69,66 +82,17 @@ public class UserListActivity extends BaseSherlockFragmentActivity implements On
         mUserAdapter = new UserAdapter(this, getShowExtraData());
         mListViewUsers.setAdapter(mUserAdapter);
 
-        new LoadUserListTask(this).execute();
-    }
-
-    private static class LoadUserListTask extends AsyncTask<Void, Integer, List<User>> {
-
-        private WeakReference<UserListActivity> mTarget;
-        private boolean mException;
-
-        public LoadUserListTask(UserListActivity activity) {
-            mTarget = new WeakReference<UserListActivity>(activity);
-        }
-
-        @Override
-        protected List<User> doInBackground(Void... params) {
-            if (mTarget.get() != null) {
-                try {
-                    return mTarget.get().getUsers();
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
-            }
-            else {
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected void onPostExecute(List<User> result) {
-            if (mTarget.get() != null) {
-                mTarget.get().hideLoading();
-                if (mException) {
-                    mTarget.get().showError();
-                }
-                else {
-                    mTarget.get().fillData(result);
-                }
-            }
-        }
+        getSupportLoaderManager().initLoader(0, null, mUserListCallback).forceLoad();
     }
 
     protected void fillData(List<User> users) {
-        if (users != null && users.size() > 0) {
-            mUserAdapter.notifyDataSetChanged();
-            for (User user : users) {
-                mUserAdapter.add(user);
-            }
+        if (users != null) {
+            mUserAdapter.addAll(users);
         }
         mUserAdapter.notifyDataSetChanged();
     }
 
-    protected List<User> getUsers() throws IOException {
-        return new ArrayList<User>();
-    }
+    protected abstract Loader<LoaderResult<List<User>>> getUserListLoader();
 
     protected void setRequestData() {
         mSearchKey = getIntent().getExtras().getString("searchKey");

@@ -1,21 +1,15 @@
 package com.gh4a.fragment;
 
-import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.RepositoryCommit;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.CommitService;
 
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -30,6 +24,9 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.BaseSherlockFragmentActivity;
 import com.gh4a.activities.DiffViewerActivity;
+import com.gh4a.loader.CommitLoader;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.GravatarUtils;
 
@@ -38,7 +35,25 @@ public class CommitFragment extends BaseFragment {
     private String mRepoOwner;
     private String mRepoName;
     private String mObjectSha;
- 
+
+    private LoaderCallbacks<RepositoryCommit> mCommitCallback = new LoaderCallbacks<RepositoryCommit>() {
+        @Override
+        public Loader<LoaderResult<RepositoryCommit>> onCreateLoader(int id, Bundle args) {
+            return new CommitLoader(getActivity(), mRepoOwner, mRepoName, mObjectSha);
+        }
+
+        @Override
+        public void onResultReady(LoaderResult<RepositoryCommit> result) {
+            hideLoading();
+            if (result.isSuccess()) {
+                fillData(result.getData());
+            } else {
+                BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) getSherlockActivity();
+                activity.showError();
+            }
+        }
+    };
+    
     public static CommitFragment newInstance(String repoOwner, String repoName, String objectSha) {
         CommitFragment f = new CommitFragment();
 
@@ -69,63 +84,7 @@ public class CommitFragment extends BaseFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         showLoading();
-        new LoadCommitInfoTask(this).execute();
-    }
-    
-    private static class LoadCommitInfoTask extends AsyncTask<Void, Integer, RepositoryCommit> {
-
-        private WeakReference<CommitFragment> mTarget;
-        private boolean mException;
-
-        public LoadCommitInfoTask(CommitFragment fragment) {
-            mTarget = new WeakReference<CommitFragment>(fragment);
-        }
-
-        @Override
-        protected RepositoryCommit doInBackground(Void... params) {
-            if (mTarget.get() != null) {
-                try {
-                    CommitFragment fragment = mTarget.get();
-                    BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) fragment.getSherlockActivity();
-                    
-                    GitHubClient client = new GitHubClient();
-                    client.setOAuth2Token(activity.getAuthToken());
-                    CommitService commitService = new CommitService(client);
-                    return commitService.getCommit(new RepositoryId(fragment.mRepoOwner, fragment.mRepoName),
-                            fragment.mObjectSha);
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
-            }
-            else {
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected void onPostExecute(RepositoryCommit result) {
-            if (mTarget.get() != null) {
-                CommitFragment fragment = mTarget.get();
-                fragment.hideLoading();
-                BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) fragment.getSherlockActivity();
-                if (mException) {
-                    if (activity != null) {
-                        activity.showError();
-                    }
-                }
-                else {
-                    mTarget.get().fillData(result);
-                }
-            }
-        }
-
+        getLoaderManager().initLoader(0, null, mCommitCallback).forceLoad();
     }
 
     private void fillData(final RepositoryCommit commit) {

@@ -15,18 +15,18 @@
  */
 package com.gh4a.activities;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.OrganizationService;
 
 import android.content.Intent;
+import android.support.v4.content.Loader;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.loader.LoaderResult;
+import com.gh4a.loader.OrganizationMemberListLoader;
 
 public class OrganizationMemberListActivity extends UserListActivity {
 
@@ -52,13 +52,12 @@ public class OrganizationMemberListActivity extends UserListActivity {
         return false;
     }
 
-    protected List<User> getUsers() throws IOException {
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(getAuthToken());
-        OrganizationService orgService = new OrganizationService(client);
-        return orgService.getPublicMembers(mUserLogin);
+    @Override
+    protected Loader<LoaderResult<List<User>>> getUserListLoader() {
+        return new OrganizationMemberListLoader(this, mUserLogin);
     }
     
+
     @Override
     protected void navigateUp() {
         Gh4Application.get(this).openUserInfoActivity(this, mUserLogin, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);

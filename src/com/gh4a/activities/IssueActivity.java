@@ -57,6 +57,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.adapter.CommentAdapter;
 import com.gh4a.loader.IsCollaboratorLoader;
+import com.gh4a.loader.IssueCommentListLoader;
 import com.gh4a.loader.IssueLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
@@ -98,6 +99,19 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
         }
     };
 
+    private LoaderCallbacks<List<Comment>> mCommentCallback = new LoaderCallbacks<List<Comment>>() {
+        @Override
+        public Loader<LoaderResult<List<Comment>>> onCreateLoader(int id, Bundle args) {
+            return new IssueCommentListLoader(IssueActivity.this, mRepoOwner, mRepoName, mIssueNumber);
+        }
+        @Override
+        public void onResultReady(LoaderResult<List<Comment>> result) {
+            if (!isLoaderError(result)) {
+                fillComments(result.getData());
+            }
+        }
+    };
+
     private LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>() {
         @Override
         public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
@@ -112,7 +126,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
             }
         }
     };
-
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
@@ -147,10 +161,11 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
         getSupportLoaderManager().getLoader(0).forceLoad();
         
         getSupportLoaderManager().initLoader(1, null, mCollaboratorCallback);
+        getSupportLoaderManager().initLoader(2, null, mCommentCallback);
     }
 
     private void fillData() {
-        new LoadCommentsTask(this).execute();
+        getSupportLoaderManager().getLoader(2).forceLoad();
 
         final Gh4Application app = Gh4Application.get(this);
         
@@ -326,58 +341,6 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
         mCommentAdapter.notifyDataSetChanged();
     }
 
-    private List<Comment> getComments() throws IOException {
-        GitHubClient client = new DefaultClient();
-        client.setOAuth2Token(getAuthToken());
-        IssueService issueService = new IssueService(client);
-        return issueService.getComments(mRepoOwner, mRepoName, mIssueNumber);
-    }
-
-    private static class LoadCommentsTask extends AsyncTask<Boolean, Integer, List<Comment>> {
-
-        private WeakReference<IssueActivity> mTarget;
-        private boolean mException;
-
-        public LoadCommentsTask(IssueActivity activity) {
-            mTarget = new WeakReference<IssueActivity>(activity);
-        }
-
-        @Override
-        protected List<Comment> doInBackground(Boolean... params) {
-            if (mTarget.get() != null) {
-                try {
-                    return mTarget.get().getComments();
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
-            }
-            else {
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected void onPostExecute(List<Comment> result) {
-            if (mTarget.get() != null) {
-                IssueActivity activity = mTarget.get();
-    
-                if (mException) {
-                    activity.showError(false);
-                }
-                else {
-                    activity.fillComments(result);
-                }
-            }
-        }
-    }
-    
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         if (isAuthorized()) {
@@ -673,7 +636,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
                         activity.showMessage(activity.getResources().getString(R.string.issue_success_comment),
                                 false);
                         //reload comments
-                        new LoadCommentsTask(activity).execute(false);
+                        activity.getSupportLoaderManager().getLoader(2).forceLoad();
                     }
                     EditText etComment = (EditText) activity.findViewById(R.id.et_comment);
                     etComment.setText(null);

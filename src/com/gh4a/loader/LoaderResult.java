@@ -27,7 +27,11 @@ public class LoaderResult<T> {
         return "Received authentication challenge is null".equalsIgnoreCase(mException.getMessage())
                 || "No authentication challenges found".equalsIgnoreCase(mException.getMessage());
     }
-    
+
+    public Exception getException() {
+        return mException;
+    }
+
     public String getErrorMessage() {
         return mException != null ? mException.getMessage() : null;
     }
