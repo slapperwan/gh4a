@@ -31,25 +31,17 @@ import com.androidquery.AQuery;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.activities.BaseSherlockFragmentActivity;
 import com.gh4a.activities.EditCommentActivity;
 import com.gh4a.utils.GravatarUtils;
 import com.github.mobile.util.HttpImageGetter;
 
-public class CommentAdapter extends RootAdapter<Comment> {
-
+public class CommentAdapter extends RootAdapter<Comment> implements OnClickListener {
     private HttpImageGetter imageGetter;
     private AQuery aq;
     private int issueNumber;
     private String issueState;
     private String repoOwner;
     private String repoName;
-    
-    public CommentAdapter(Context context) {
-        super(context);
-        imageGetter = new HttpImageGetter(mContext);
-        aq = new AQuery(context);
-    }
     
     public CommentAdapter(Context context, int issueNumber,
             String issueState, String repoOwner, String repoName) {
@@ -67,10 +59,13 @@ public class CommentAdapter extends RootAdapter<Comment> {
         View v = convertView;
         ViewHolder viewHolder;
         if (v == null) {
-            LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_gravatar_comment, null);
+            v = LayoutInflater.from(mContext).inflate(R.layout.row_gravatar_comment, null);
+            
             viewHolder = new ViewHolder();
+            
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
+            viewHolder.ivGravatar.setOnClickListener(this);
+            
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
             viewHolder.tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
@@ -88,53 +83,50 @@ public class CommentAdapter extends RootAdapter<Comment> {
         }
         
         final Comment comment = mObjects.get(position);
-        if (comment != null) {
-            
-            final Gh4Application appContext = (Gh4Application) v.getContext().getApplicationContext();
-            
-            aq.recycle(convertView);
-            aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(comment.getUser().getGravatarId()), 
-                    true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
+        String login = Gh4Application.get(mContext).getAuthLogin();
 
-            viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
+        aq.recycle(convertView);
+        aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(comment.getUser().getGravatarId()), 
+                true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
 
-                @Override
-                public void onClick(View v) {
-                    appContext.openUserInfoActivity(v.getContext(), comment.getUser().getLogin(), null);
-                }
-            });
+        viewHolder.tvExtra.setText(comment.getUser().getLogin() + "\n" + pt.format(comment.getCreatedAt()));
 
-            viewHolder.tvExtra.setText(comment.getUser().getLogin() + "\n" + pt.format(comment.getCreatedAt()));
-            
-            String body = comment.getBodyHtml();
-            imageGetter.bind(viewHolder.tvDesc, body, comment.getId());
-            
-            if (comment.getUser().getLogin().equals(appContext.getAuthLogin())
-                    || repoOwner.equals(appContext.getAuthLogin())) {
-                
-                viewHolder.ivEdit.setVisibility(View.VISIBLE);
-                
-                viewHolder.ivEdit.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View arg0) {
-                        Intent intent = new Intent().setClass(mContext, EditCommentActivity.class);
-                        intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
-                        intent.putExtra(Constants.Repository.REPO_NAME, repoName);
-                        intent.putExtra(Constants.Issue.ISSUE_NUMBER, issueNumber);
-                        intent.putExtra(Constants.Issue.ISSUE_STATE, issueState);
-                        intent.putExtra(Constants.Comment.ID, comment.getId());
-                        intent.putExtra(Constants.Comment.BODY, comment.getBody());
-                        ((BaseSherlockFragmentActivity)mContext).startActivityForResult(intent, 0);
-                    }
-                });
-            }
-            else {
-                viewHolder.ivEdit.setVisibility(View.GONE);
-            }
+        String body = comment.getBodyHtml();
+        imageGetter.bind(viewHolder.tvDesc, body, comment.getId());
+
+        viewHolder.ivGravatar.setTag(comment);
+
+        if (comment.getUser().getLogin().equals(login) || repoOwner.equals(login)) {
+            viewHolder.ivEdit.setVisibility(View.VISIBLE);
+            viewHolder.ivEdit.setTag(comment);
+            viewHolder.ivEdit.setOnClickListener(this);
         }
+        else {
+            viewHolder.ivEdit.setVisibility(View.GONE);
+        }
+
         return v;
     }
-    
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.iv_gravatar) {
+            Comment comment = (Comment) v.getTag();
+            Gh4Application.get(mContext).openUserInfoActivity(mContext, comment.getUser().getLogin(), null);
+        } else if (v.getId() == R.id.iv_edit) {
+            Comment comment = (Comment) v.getTag();
+            Intent intent = new Intent(mContext, EditCommentActivity.class);
+            
+            intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
+            intent.putExtra(Constants.Repository.REPO_NAME, repoName);
+            intent.putExtra(Constants.Issue.ISSUE_NUMBER, issueNumber);
+            intent.putExtra(Constants.Issue.ISSUE_STATE, issueState);
+            intent.putExtra(Constants.Comment.ID, comment.getId());
+            intent.putExtra(Constants.Comment.BODY, comment.getBody());
+            mContext.startActivity(intent);
+        }
+    }
+
     private static class ViewHolder {
         
         public ImageView ivGravatar;

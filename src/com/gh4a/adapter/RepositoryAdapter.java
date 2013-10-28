@@ -40,8 +40,7 @@ public class RepositoryAdapter extends RootAdapter<Repository> {
         ViewHolder viewHolder = null;
 
         if (v == null) {
-            LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_simple_3, null);
+            v = LayoutInflater.from(mContext).inflate(R.layout.row_simple_3, null);
 
             Gh4Application app = (Gh4Application) mContext.getApplicationContext();
             Typeface boldCondensed = app.boldCondensed;
@@ -64,31 +63,29 @@ public class RepositoryAdapter extends RootAdapter<Repository> {
         }
 
         Repository repository = mObjects.get(position);
-        if (repository != null) {
+        
+        if (viewHolder.tvTitle != null) {
+            viewHolder.tvTitle.setText(repository.getOwner().getLogin() + "/" + repository.getName());
+        }
 
-            if (viewHolder.tvTitle != null) {
-                viewHolder.tvTitle.setText(repository.getOwner().getLogin() + "/" + repository.getName());
+        if (viewHolder.tvDesc != null) {
+            if (!StringUtils.isBlank(repository.getDescription())) {
+                viewHolder.tvDesc.setVisibility(View.VISIBLE);
+                viewHolder.tvDesc.setText(StringUtils.doTeaser(repository.getDescription()));
             }
-
-            if (viewHolder.tvDesc != null) {
-                if (!StringUtils.isBlank(repository.getDescription())) {
-                    viewHolder.tvDesc.setVisibility(View.VISIBLE);
-                    viewHolder.tvDesc.setText(StringUtils.doTeaser(repository.getDescription()));
-                }
-                else {
-                    viewHolder.tvDesc.setVisibility(View.GONE);
-                }
-            }
-
-            if (viewHolder.tvExtra != null) {
-                String language = repository.getLanguage() != null
-                        ? repository.getLanguage() : mContext.getString(R.string.unknown);
-                String extraData = mContext.getString(R.string.repo_search_extradata, language,
-                        StringUtils.toHumanReadbleFormat(repository.getSize()),
-                        repository.getForks(), repository.getWatchers());
-                viewHolder.tvExtra.setText(extraData);
+            else {
+                viewHolder.tvDesc.setVisibility(View.GONE);
             }
         }
+
+        if (viewHolder.tvExtra != null) {
+            String language = repository.getLanguage() != null
+                    ? repository.getLanguage() : mContext.getString(R.string.unknown);
+            viewHolder.tvExtra.setText(mContext.getString(R.string.repo_search_extradata,
+                    language, StringUtils.toHumanReadbleFormat(repository.getSize()),
+                    repository.getForks(), repository.getWatchers()));
+        }
+
         return v;
     }
 

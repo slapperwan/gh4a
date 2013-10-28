@@ -26,7 +26,6 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 
 public class SimpleStringAdapter extends RootAdapter<String> {
-
     public SimpleStringAdapter(Context context) {
         super(context);
     }
@@ -37,8 +36,7 @@ public class SimpleStringAdapter extends RootAdapter<String> {
         ViewHolder viewHolder = null;
         
         if (v == null) {
-            LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_simple, null);
+            v = LayoutInflater.from(mContext).inflate(R.layout.row_simple, null);
             
             Gh4Application app = (Gh4Application) mContext.getApplicationContext();
             Typeface boldCondensed = app.boldCondensed;
@@ -51,11 +49,7 @@ public class SimpleStringAdapter extends RootAdapter<String> {
             viewHolder = (ViewHolder) v.getTag();
         }
         
-        String string = mObjects.get(position);
-        
-        if (string != null) {
-            viewHolder.tvTitle.setText(string);
-        }
+        viewHolder.tvTitle.setText(mObjects.get(position));
         
         return v;
     }

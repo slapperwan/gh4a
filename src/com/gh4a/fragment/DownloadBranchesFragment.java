@@ -20,7 +20,7 @@ import android.widget.ListView;
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.activities.BaseSherlockFragmentActivity;
-import com.gh4a.adapter.BranchAdapter;
+import com.gh4a.adapter.SimpleStringAdapter;
 import com.gh4a.loader.BranchListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
@@ -29,7 +29,8 @@ public class DownloadBranchesFragment extends BaseFragment implements OnItemClic
     private String mRepoOwner;
     private String mRepoName;
     private ListView mListView;
-    private BranchAdapter mAdapter;
+    private List<RepositoryBranch> mBranches;
+    private SimpleStringAdapter mAdapter;
     
     private LoaderCallbacks<List<RepositoryBranch>> mBranchCallback =
             new LoaderCallbacks<List<RepositoryBranch>>() {
@@ -74,7 +75,7 @@ public class DownloadBranchesFragment extends BaseFragment implements OnItemClic
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        mAdapter = new BranchAdapter(getSherlockActivity());
+        mAdapter = new SimpleStringAdapter(getSherlockActivity());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         
@@ -85,13 +86,16 @@ public class DownloadBranchesFragment extends BaseFragment implements OnItemClic
     }
 
     public void fillData(List<RepositoryBranch> branches) {
-        mAdapter.addAll(branches);
+        mBranches = branches;
+        for (RepositoryBranch branch : branches) {
+            mAdapter.add(branch.getName());
+        }
         mAdapter.notifyDataSetChanged();
     }
     
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, final int position, long id) {
-        final RepositoryBranch branch = (RepositoryBranch) mAdapter.getItem(position);
+        final RepositoryBranch branch = mBranches.get(position);
         BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) getSherlockActivity();
         AlertDialog.Builder builder = activity.createDialogBuilder();
         builder.setTitle(R.string.download_file_title);

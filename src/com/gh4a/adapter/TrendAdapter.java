@@ -25,7 +25,6 @@ import com.gh4a.R;
 import com.gh4a.holder.Trend;
 
 public class TrendAdapter extends RootAdapter<Trend> {
-
     public TrendAdapter(Context context) {
         super(context);
     }
@@ -36,8 +35,8 @@ public class TrendAdapter extends RootAdapter<Trend> {
         ViewHolder viewHolder = null;
 
         if (v == null) {
-            LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_simple_3, null);
+            v = LayoutInflater.from(mContext).inflate(R.layout.row_simple_3, null);
+
             viewHolder = new ViewHolder();
             viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
@@ -50,11 +49,10 @@ public class TrendAdapter extends RootAdapter<Trend> {
         }
 
         final Trend trend = mObjects.get(position);
-        if (trend != null) {
-            viewHolder.tvTitle.setText(trend.getTitle());
-            viewHolder.tvDesc.setText(trend.getDescription());
-            viewHolder.tvExtra.setVisibility(View.GONE);
-        }
+        viewHolder.tvTitle.setText(trend.getTitle());
+        viewHolder.tvDesc.setText(trend.getDescription());
+        viewHolder.tvExtra.setVisibility(View.GONE);
+
         return v;
     }
 

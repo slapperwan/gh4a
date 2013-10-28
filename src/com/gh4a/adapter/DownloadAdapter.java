@@ -21,7 +21,6 @@ import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
 public class DownloadAdapter extends RootAdapter<Download> {
-
     public DownloadAdapter(Context context) {
         super(context);
     }
@@ -32,11 +31,9 @@ public class DownloadAdapter extends RootAdapter<Download> {
         ViewHolder viewHolder = null;
 
         if (v == null) {
-            LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_simple_3, null);
+            v = LayoutInflater.from(mContext).inflate(R.layout.row_simple_3, null);
 
-            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
-            Typeface boldCondensed = app.boldCondensed;
+            Typeface boldCondensed = Gh4Application.get(mContext).boldCondensed;
             
             viewHolder = new ViewHolder();
             viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
@@ -54,25 +51,24 @@ public class DownloadAdapter extends RootAdapter<Download> {
         }
 
         Download download = mObjects.get(position);
-        if (download != null) {
 
-            viewHolder.tvTitle.setText(download.getName());
-            if (!StringUtils.isBlank(download.getDescription())) {
-                viewHolder.tvDesc.setVisibility(View.VISIBLE);
-                viewHolder.tvDesc.setText(download.getDescription());
-            }
-            else {
-                viewHolder.tvDesc.setVisibility(View.GONE);
-            }
-
-            long now = System.currentTimeMillis();
-            String extraData = mContext.getString(R.string.download_extradata,
-                    Formatter.formatFileSize(mContext, download.getSize()),
-                    download.getDownloadCount(),
-                    DateUtils.getRelativeTimeSpanString(download.getCreatedAt().getTime(), now,
-                            MINUTE_IN_MILLIS, FORMAT_SHOW_DATE | FORMAT_SHOW_YEAR | FORMAT_NUMERIC_DATE));
-            viewHolder.tvExtra.setText(extraData);
+        viewHolder.tvTitle.setText(download.getName());
+        if (!StringUtils.isBlank(download.getDescription())) {
+            viewHolder.tvDesc.setVisibility(View.VISIBLE);
+            viewHolder.tvDesc.setText(download.getDescription());
         }
+        else {
+            viewHolder.tvDesc.setVisibility(View.GONE);
+        }
+
+        long now = System.currentTimeMillis();
+        String extraData = mContext.getString(R.string.download_extradata,
+                Formatter.formatFileSize(mContext, download.getSize()),
+                download.getDownloadCount(),
+                DateUtils.getRelativeTimeSpanString(download.getCreatedAt().getTime(), now,
+                        MINUTE_IN_MILLIS, FORMAT_SHOW_DATE | FORMAT_SHOW_YEAR | FORMAT_NUMERIC_DATE));
+        viewHolder.tvExtra.setText(extraData);
+
         return v;
     }
 

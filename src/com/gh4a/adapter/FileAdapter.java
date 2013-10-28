@@ -36,19 +36,23 @@ public class FileAdapter extends RootAdapter<RepositoryContents> {
     @Override
     public View doGetView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
+        ViewHolder holder;
+        
         if (v == null) {
-            LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_file_manager, null);
+            v = LayoutInflater.from(mContext).inflate(R.layout.row_file_manager, null);
+            holder = new ViewHolder();
+            holder.icon = (ImageView) v.findViewById(R.id.iv_icon);
+            holder.fileName = (TextView) v.findViewById(R.id.tv_text);
+            v.setTag(holder);
+        } else {
+            holder = (ViewHolder) v.getTag();
         }
-        RepositoryContents content = mObjects.get(position);
-        if (content != null) {
-            ImageView ivIcon = (ImageView) v.findViewById(R.id.iv_icon);
-            ivIcon.setBackgroundResource(getIconId(content.getType(), FileUtils
-                    .getFileExtension(content.getName())));
 
-            TextView tvFilename = (TextView) v.findViewById(R.id.tv_text);
-            tvFilename.setText(content.getName());
-        }
+        RepositoryContents content = mObjects.get(position);
+        holder.icon.setBackgroundResource(getIconId(content.getType(),
+                FileUtils.getFileExtension(content.getName())));
+        holder.fileName.setText(content.getName());
+
         return v;
     }
 
@@ -65,5 +69,10 @@ public class FileAdapter extends RootAdapter<RepositoryContents> {
             return R.drawable.page_white_text;
         }
         return R.drawable.page_white_text;
+    }
+    
+    private static class ViewHolder {
+        ImageView icon;
+        TextView fileName;
     }
 }

@@ -20,7 +20,7 @@ import android.widget.ListView;
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.activities.BaseSherlockFragmentActivity;
-import com.gh4a.adapter.TagAdapter;
+import com.gh4a.adapter.SimpleStringAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.TagListLoader;
@@ -29,7 +29,8 @@ public class DownloadTagsFragment extends BaseFragment implements OnItemClickLis
     private String mRepoOwner;
     private String mRepoName;
     private ListView mListView;
-    private TagAdapter mAdapter;
+    private List<RepositoryTag> mTags;
+    private SimpleStringAdapter mAdapter;
     
     private LoaderCallbacks<List<RepositoryTag>> mTagCallback = new LoaderCallbacks<List<RepositoryTag>>() {
         @Override
@@ -74,7 +75,7 @@ public class DownloadTagsFragment extends BaseFragment implements OnItemClickLis
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        mAdapter = new TagAdapter(getSherlockActivity());
+        mAdapter = new SimpleStringAdapter(getSherlockActivity());
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
         
@@ -85,13 +86,16 @@ public class DownloadTagsFragment extends BaseFragment implements OnItemClickLis
     }
 
     public void fillData(List<RepositoryTag> tags) {
-        mAdapter.addAll(tags);            
+        mTags = tags;
+        for (RepositoryTag tag : tags) {
+            mAdapter.add(tag.getName());
+        }
         mAdapter.notifyDataSetChanged();
     }
     
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, final int position, long id) {
-        final RepositoryTag tag = (RepositoryTag) mAdapter.getItem(position);
+        final RepositoryTag tag = mTags.get(position);
         BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) getActivity();
         AlertDialog.Builder builder = activity.createDialogBuilder();
         builder.setTitle(R.string.download_file_title);

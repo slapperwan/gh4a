@@ -32,28 +32,17 @@ import com.gh4a.utils.StringUtils;
  * The Gist adapter.
  */
 public class GistAdapter  extends RootAdapter<Gist> {
-
-    /**
-     * Instantiates a new gist adapter.
-     *
-     * @param context the context
-     * @param objects the objects
-     */
     public GistAdapter(Context context) {
         super(context);
     }
 
-    /* (non-Javadoc)
-     * @see com.gh4a.adapter.RootAdapter#doGetView(int, android.view.View, android.view.ViewGroup)
-     */
     @Override
     public View doGetView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
         ViewHolder viewHolder = null;
 
         if (v == null) {
-            LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_gist, null);
+            v = LayoutInflater.from(mContext).inflate(R.layout.row_gist, null);
 
             Gh4Application app = (Gh4Application) mContext.getApplicationContext();
             Typeface boldCondensed = app.boldCondensed;
@@ -70,38 +59,27 @@ public class GistAdapter  extends RootAdapter<Gist> {
         }
 
         Gist gist = mObjects.get(position);
-
-        if (gist != null) {
-            viewHolder.tvTitle.setText(gist.getId());
-            if (StringUtils.isBlank(gist.getDescription())) {
-                viewHolder.tvDesc.setVisibility(View.GONE);
-            }
-            else {
-                viewHolder.tvDesc.setText(gist.getDescription());
-                viewHolder.tvDesc.setVisibility(View.VISIBLE);
-            }
-
-            String count = v.getResources().getQuantityString(R.plurals.file,
-                    gist.getFiles().size(), gist.getFiles().size());
-            viewHolder.tvExtra.setText(mContext.getString(R.string.gist_extradata,
-                    pt.format(gist.getCreatedAt()), count));
+        
+        viewHolder.tvTitle.setText(gist.getId());
+        if (StringUtils.isBlank(gist.getDescription())) {
+            viewHolder.tvDesc.setVisibility(View.GONE);
         }
+        else {
+            viewHolder.tvDesc.setText(gist.getDescription());
+            viewHolder.tvDesc.setVisibility(View.VISIBLE);
+        }
+
+        String count = v.getResources().getQuantityString(R.plurals.file,
+                gist.getFiles().size(), gist.getFiles().size());
+        viewHolder.tvExtra.setText(mContext.getString(R.string.gist_extradata,
+                pt.format(gist.getCreatedAt()), count));
+
         return v;
     }
 
-    /**
-     * The Class ViewHolder.
-     */
     private static class ViewHolder {
-
-        /** The tv title. */
         public TextView tvTitle;
-        
-        /** The tv desc. */
         public TextView tvDesc;
-        
-        /** The tv extra. */
         public TextView tvExtra;
-
     }
 }

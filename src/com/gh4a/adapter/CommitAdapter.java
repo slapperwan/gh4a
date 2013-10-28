@@ -33,7 +33,7 @@ import com.gh4a.R;
 import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.GravatarUtils;
 
-public class CommitAdapter extends RootAdapter<RepositoryCommit> {
+public class CommitAdapter extends RootAdapter<RepositoryCommit> implements OnClickListener {
     
     private AQuery aq;
     
@@ -46,12 +46,10 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
     public View doGetView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
         ViewHolder viewHolder;
-        Gh4Application app = (Gh4Application) mContext.getApplicationContext();
         if (v == null) {
-            LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_commit, null);
+            v = LayoutInflater.from(mContext).inflate(R.layout.row_commit, null);
             
-            Typeface boldCondensed = app.boldCondensed;
+            Typeface boldCondensed = Gh4Application.get(mContext).boldCondensed;
             
             viewHolder = new ViewHolder();
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
@@ -63,6 +61,7 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
             
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
+            viewHolder.ivGravatar.setOnClickListener(this);
 
             v.setTag(viewHolder);
         }
@@ -71,38 +70,37 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> {
         }
 
         final RepositoryCommit commit = mObjects.get(position);
-        if (commit != null) {
-            
-            aq.recycle(convertView);
-            aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(
-                    CommitUtils.getAuthorGravatarId(mContext, commit)),
-                    true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
-            
-            viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
+        
+        aq.recycle(convertView);
+        aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(
+                CommitUtils.getAuthorGravatarId(mContext, commit)),
+                true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
 
-                @Override
-                public void onClick(View v) {
-                    /** Open user activity */
-                    Gh4Application context = (Gh4Application)
-                            v.getContext().getApplicationContext();
-                    if (CommitUtils.getAuthorLogin(context, commit) != null) {
-                        context.openUserInfoActivity(context,
-                                CommitUtils.getAuthorLogin(context, commit), null);
-                    }
-                }
-            });
+        viewHolder.ivGravatar.setTag(commit);
 
-            viewHolder.tvSha.setText(commit.getSha().substring(0, 10));
-            viewHolder.tvDesc.setText(commit.getCommit().getMessage());
+        viewHolder.tvSha.setText(commit.getSha().substring(0, 10));
+        viewHolder.tvDesc.setText(commit.getCommit().getMessage());
 
-            Resources res = v.getResources();
-            String extraData = String.format(res.getString(R.string.more_commit_data),
-                    CommitUtils.getAuthorName(mContext, commit),
-                    Gh4Application.pt.format(commit.getCommit().getAuthor().getDate()));
+        Resources res = v.getResources();
+        String extraData = String.format(res.getString(R.string.more_commit_data),
+                CommitUtils.getAuthorName(mContext, commit),
+                Gh4Application.pt.format(commit.getCommit().getAuthor().getDate()));
 
-            viewHolder.tvExtra.setText(extraData);
-        }
+        viewHolder.tvExtra.setText(extraData);
+
         return v;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.iv_gravatar) {
+            RepositoryCommit commit = (RepositoryCommit) v.getTag();
+            /** Open user activity */
+            String login = CommitUtils.getAuthorLogin(mContext, commit);
+            if (login != null) {
+                Gh4Application.get(mContext).openUserInfoActivity(mContext, login, null);
+            }
+        }
     }
 
     private static class ViewHolder {

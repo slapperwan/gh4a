@@ -31,7 +31,7 @@ import com.gh4a.R;
 import com.gh4a.holder.Feed;
 import com.gh4a.utils.GravatarUtils;
 
-public class CommonFeedAdapter extends RootAdapter<Feed> {
+public class CommonFeedAdapter extends RootAdapter<Feed> implements OnClickListener {
     private boolean mShowGravatar;
     private boolean mShowExtra;
     private int mRowLayout;
@@ -42,12 +42,6 @@ public class CommonFeedAdapter extends RootAdapter<Feed> {
         mShowGravatar = true;//default true
         mShowExtra = true;//default true
         aq = new AQuery(context);
-    }
-    
-    public CommonFeedAdapter(Context context, boolean showGravatar, boolean showExtra) {
-        this(context);
-        mShowGravatar = showGravatar;
-        mShowExtra = showExtra;
     }
     
     public CommonFeedAdapter(Context context, boolean showGravatar, boolean showExtra, int rowLayout) {
@@ -63,8 +57,8 @@ public class CommonFeedAdapter extends RootAdapter<Feed> {
         ViewHolder viewHolder = null;
 
         if (v == null) {
-            LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(mRowLayout != 0 ? mRowLayout : R.layout.row_gravatar_3, parent, false);
+            int layoutId = mRowLayout != 0 ? mRowLayout : R.layout.row_gravatar_3;
+            v = LayoutInflater.from(mContext).inflate(layoutId, parent, false);
             
             Gh4Application app = (Gh4Application) mContext.getApplicationContext();
             Typeface boldCondensed = app.boldCondensed;
@@ -73,6 +67,9 @@ public class CommonFeedAdapter extends RootAdapter<Feed> {
             viewHolder = new ViewHolder();
             
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
+            if (viewHolder.ivGravatar != null) {
+                viewHolder.ivGravatar.setOnClickListener(this);
+            }
             
             viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
             viewHolder.tvTitle.setTypeface(boldCondensed);
@@ -90,50 +87,48 @@ public class CommonFeedAdapter extends RootAdapter<Feed> {
         }
 
         final Feed feed = mObjects.get(position);
-        if (feed != null) {
-            
-            aq.recycle(convertView);
-            
-            if (viewHolder.ivGravatar != null) {
-                if (mShowGravatar) {
-                    
-                    aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(feed.getGravatarId()), 
-                            true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
-                    viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
         
-                        @Override
-                        public void onClick(View v) {
-                            /** Open user activity */
-                            Gh4Application context = (Gh4Application) v.getContext()
-                                    .getApplicationContext();
-                            context.openUserInfoActivity(v.getContext(), feed.getAuthor(), null);
-                        }
-                    });
-                    viewHolder.ivGravatar.setVisibility(View.VISIBLE);
-                }
-                else {
-                    viewHolder.ivGravatar.setVisibility(View.GONE);
-                }
-            }
+        aq.recycle(convertView);
 
-            String title = feed.getTitle();
-            viewHolder.tvTitle.setText(title);
-            viewHolder.tvTitle.setVisibility(title != null ? View.VISIBLE : View.GONE);
-
-            viewHolder.tvDesc.setText(feed.getPreview());
-            viewHolder.tvDesc.setSingleLine(title != null || mShowExtra);
-            
-            if (mShowExtra) {
-                String published = feed.getPublished() != null
-                        ? DateFormat.getMediumDateFormat(mContext).format(feed.getPublished()) : null;
-                viewHolder.tvExtra.setText(feed.getAuthor() + (published != null ? " | " + published : ""));
-                viewHolder.tvExtra.setVisibility(View.VISIBLE);
+        if (viewHolder.ivGravatar != null) {
+            if (mShowGravatar) {
+                aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(feed.getGravatarId()), 
+                        true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
+                viewHolder.ivGravatar.setTag(feed);
+                viewHolder.ivGravatar.setVisibility(View.VISIBLE);
             }
             else {
-                viewHolder.tvExtra.setVisibility(View.GONE);
+                viewHolder.ivGravatar.setVisibility(View.GONE);
             }
         }
+
+        String title = feed.getTitle();
+        viewHolder.tvTitle.setText(title);
+        viewHolder.tvTitle.setVisibility(title != null ? View.VISIBLE : View.GONE);
+
+        viewHolder.tvDesc.setText(feed.getPreview());
+        viewHolder.tvDesc.setSingleLine(title != null || mShowExtra);
+
+        if (mShowExtra) {
+            String published = feed.getPublished() != null
+                    ? DateFormat.getMediumDateFormat(mContext).format(feed.getPublished()) : null;
+                    viewHolder.tvExtra.setText(feed.getAuthor() + (published != null ? " | " + published : ""));
+                    viewHolder.tvExtra.setVisibility(View.VISIBLE);
+        }
+        else {
+            viewHolder.tvExtra.setVisibility(View.GONE);
+        }
+
         return v;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.iv_gravatar) {
+            Feed feed = (Feed) v.getTag();
+            /** Open user activity */
+            Gh4Application.get(mContext).openUserInfoActivity(mContext, feed.getAuthor(), null);
+        }
     }
 
     private static class ViewHolder {

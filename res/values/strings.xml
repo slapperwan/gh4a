@@ -132,7 +132,7 @@
     <string name="event_create_repo_desc">New repository is at %1$s</string>
     <string name="event_create_branch_desc">New %1$s is at %2$s/tree/%3$s</string>
     <string name="event_gollum_desc">View %1$s</string>
-    <string name="event_commit_comment_desc">Comment in </string>
+    <string name="event_commit_comment_desc">Comment in %1$s - %2$s</string>
     <string name="event_push_desc">%1$d more commits...</string>
     <string name="event_pull_request_review_comment_desc">Comment on %1$s in pull request %2$d</string>
     

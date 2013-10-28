@@ -16,9 +16,9 @@
 package com.gh4a.adapter;
 
 import org.eclipse.egit.github.core.PullRequest;
+import org.eclipse.egit.github.core.User;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,8 +32,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarUtils;
 
-public class PullRequestAdapter extends RootAdapter<PullRequest> {
-
+public class PullRequestAdapter extends RootAdapter<PullRequest> implements OnClickListener {
     private AQuery aq;
     
     public PullRequestAdapter(Context context) {
@@ -46,8 +45,7 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> {
         View v = convertView;
         ViewHolder viewHolder;
         if (v == null) {
-            LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_gravatar_1, parent, false);
+            v = LayoutInflater.from(mContext).inflate(R.layout.row_gravatar_1, parent, false);
             
             Gh4Application app = (Gh4Application) mContext.getApplicationContext();
             Typeface boldCondensed = app.boldCondensed;
@@ -55,7 +53,8 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> {
             
             viewHolder = new ViewHolder();
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-            
+            viewHolder.ivGravatar.setOnClickListener(this);
+
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_title);
             viewHolder.tvDesc.setTypeface(boldCondensed);
             
@@ -69,38 +68,35 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> {
         }
 
         final PullRequest pullRequest = mObjects.get(position);
-        if (pullRequest != null) {
-            aq.recycle(convertView);
-            if (pullRequest.getUser() != null) {
-                aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(pullRequest.getUser().getGravatarId()), 
-                        true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
-                
-                viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
-    
-                    @Override
-                    public void onClick(View v) {
-                        /** Open user activity */
-                        Gh4Application context = (Gh4Application) v.getContext()
-                                .getApplicationContext();
-                        context.openUserInfoActivity(v.getContext(), pullRequest.getUser()
-                                .getLogin(), null);
-                    }
-                });
-            }
-            else {
-                aq.id(viewHolder.ivGravatar).image(R.drawable.default_avatar);
-            }
-
-            viewHolder.tvDesc.setText(pullRequest.getTitle());
-            Resources res = v.getResources();
-            
-            String extraData = res.getString(R.string.more_issue_data, 
-                    pullRequest.getUser() != null ? pullRequest.getUser().getLogin() : "",
-                    pt.format(pullRequest.getCreatedAt()));
-            
-            viewHolder.tvExtra.setText(extraData);
+        String login;
+        
+        aq.recycle(convertView);
+        viewHolder.ivGravatar.setTag(pullRequest.getUser());
+        if (pullRequest.getUser() != null) {
+            aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(pullRequest.getUser().getGravatarId()), 
+                    true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
+            login = pullRequest.getUser().getLogin();
         }
+        else {
+            aq.id(viewHolder.ivGravatar).image(R.drawable.default_avatar);
+            login = "";
+        }
+
+        viewHolder.tvDesc.setText(pullRequest.getTitle());
+        viewHolder.tvExtra.setText(mContext.getString(R.string.more_issue_data,
+                login, pt.format(pullRequest.getCreatedAt())));
+
         return v;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.iv_gravatar) {
+            User user = (User) v.getTag();
+            if (user != null) {
+                Gh4Application.get(mContext).openUserInfoActivity(mContext, user.getLogin(), null);
+            }
+        }
     }
 
     private static class ViewHolder {

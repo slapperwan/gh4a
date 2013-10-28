@@ -45,15 +45,12 @@ import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.text.SpannableString;
 import android.text.TextUtils;
-import android.text.style.ClickableSpan;
 import android.text.style.TextAppearanceSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
@@ -62,8 +59,7 @@ import com.gh4a.R;
 import com.gh4a.utils.GravatarUtils;
 import com.gh4a.utils.StringUtils;
 
-public class FeedAdapter extends RootAdapter<Event> {
-
+public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
     private AQuery aq;
     
     public FeedAdapter(Context context) {
@@ -77,8 +73,7 @@ public class FeedAdapter extends RootAdapter<Event> {
         ViewHolder viewHolder = null;
 
         if (v == null) {
-            LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.feed_row, null);
+            v = LayoutInflater.from(mContext).inflate(R.layout.feed_row, null);
             
             Gh4Application app = (Gh4Application) mContext.getApplicationContext();
             Typeface boldCondensed = app.boldCondensed;
@@ -86,13 +81,16 @@ public class FeedAdapter extends RootAdapter<Event> {
 
             viewHolder = new ViewHolder();
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-            
+            viewHolder.ivGravatar.setOnClickListener(this);
+
             viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
             viewHolder.tvTitle.setTypeface(boldCondensed);
             
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
             viewHolder.tvDesc.setTypeface(regular);
-            
+
+            viewHolder.llPushDesc = (ViewGroup) v.findViewById(R.id.ll_push_desc);
+
             v.setTag(viewHolder);
         }
         else {
@@ -102,59 +100,38 @@ public class FeedAdapter extends RootAdapter<Event> {
         Event event = mObjects.get(position);
         final User actor = event.getActor();
         
-        if (event != null) {
-            
-            aq.recycle(convertView);
-            aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(actor.getGravatarId()), 
-                    true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
+        aq.recycle(convertView);
+        aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(actor.getGravatarId()), 
+                true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
 
-            viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
+        viewHolder.ivGravatar.setTag(actor);
 
-                @Override
-                public void onClick(View v) {
-                    if (!StringUtils.isBlank(actor.getLogin())) {
-                        /** Open user activity */
-                        Gh4Application context = (Gh4Application) v.getContext()
-                                .getApplicationContext();
-                        context.openUserInfoActivity(v.getContext(), actor
-                                .getLogin(), actor.getName());
-                    }
-                }
-            });
-            SpannableString createdAt = new SpannableString(pt.format(event.getCreatedAt()));
-            createdAt.setSpan(new TextAppearanceSpan(v.getContext(), R.style.default_text_small_italic),
-                    0, createdAt.length(), 0);
-            
-            viewHolder.tvTitle.setText(TextUtils.concat(formatTitle(event), " ", createdAt));
-            
-            String content = formatDescription(event, viewHolder, (RelativeLayout) v);
-            if (content != null) {
-                viewHolder.tvDesc.setVisibility(View.VISIBLE);
-                viewHolder.tvDesc.setText(content);
-            }
-            else if (View.VISIBLE == viewHolder.tvDesc.getVisibility()) {
-                viewHolder.tvDesc.setText(null);
-                viewHolder.tvDesc.setVisibility(View.GONE);
-            }
-            else {
-                viewHolder.tvDesc.setText(null);
-                viewHolder.tvDesc.setVisibility(View.GONE);
-            }
-        }
+        SpannableString createdAt = new SpannableString(pt.format(event.getCreatedAt()));
+        createdAt.setSpan(new TextAppearanceSpan(v.getContext(), R.style.default_text_small_italic),
+                0, createdAt.length(), 0);
+
+        viewHolder.tvTitle.setText(TextUtils.concat(formatTitle(event), " ", createdAt));
+
+        String content = formatDescription(event, viewHolder);
+        viewHolder.tvDesc.setText(content);
+        viewHolder.tvDesc.setVisibility(content != null ? View.VISIBLE : View.GONE);
+
         return v;
     }
 
-    /**
-     * Format description.
-     *
-     * @param feed the feed
-     * @param viewHolder the view holder
-     * @param baseView the base view
-     * @return the string
-     */
-    private String formatDescription(Event event, ViewHolder viewHolder,
-            final RelativeLayout baseView) {
-        
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.iv_gravatar) {
+            User actor = (User) v.getTag();
+            if (!StringUtils.isBlank(actor.getLogin())) {
+                /** Open user activity */
+                Gh4Application.get(mContext).openUserInfoActivity(mContext,
+                        actor.getLogin(), actor.getName());
+            }
+        }
+    }
+
+    private String formatDescription(Event event, ViewHolder viewHolder) {
         String eventType = event.getType();
         EventRepository eventRepo = event.getRepo();
         
@@ -165,52 +142,48 @@ public class FeedAdapter extends RootAdapter<Event> {
         }
         
         Resources res = mContext.getResources();
-        LinearLayout ll = (LinearLayout) baseView.findViewById(R.id.ll_push_desc);
-        ll.removeAllViews();
-        TextView generalDesc = (TextView) baseView.findViewById(R.id.tv_desc);
-        ll.setVisibility(View.GONE);
-        generalDesc.setVisibility(View.VISIBLE);
+        
+        viewHolder.llPushDesc.setVisibility(View.GONE);
 
         /** PushEvent */
         if (Event.TYPE_PUSH.equals(eventType)) {
-            generalDesc.setVisibility(View.GONE);
-            ll.setVisibility(View.VISIBLE);
+            viewHolder.llPushDesc.setVisibility(View.VISIBLE);
+            viewHolder.llPushDesc.removeAllViews();
+
             PushPayload payload = (PushPayload) event.getPayload();
             List<Commit> commits = payload.getCommits();
             
             if (commits != null) {
-                
                 Gh4Application app = (Gh4Application) mContext.getApplicationContext();
                 Typeface regular = app.regular;
                 Typeface italic = app.italic;
                 
-                for (int i = 0; i < commits.size(); i++) {
+                for (int i = 0; i < commits.size() && i < 3; i++) {
                     Commit commit = commits.get(i);
                     SpannableString spannableSha = new SpannableString(commit.getSha().substring(0, 7));
+
                     if (eventRepo != null) {
-                        spannableSha.setSpan(new TextAppearanceSpan(baseView.getContext(),
+                        spannableSha.setSpan(new TextAppearanceSpan(mContext,
                                 R.style.default_text_small_url), 0, spannableSha.length(), 0);
                     }
                     else {
                         spannableSha = new SpannableString(mContext.getString(R.string.deleted));
                     }
                     
-                    TextView tvCommitMsg = new TextView(baseView.getContext());
+                    TextView tvCommitMsg = new TextView(mContext);
                     tvCommitMsg.setText(spannableSha);
                     tvCommitMsg.append(" " + commit.getMessage());
                     tvCommitMsg.setSingleLine(true);
-                    tvCommitMsg.setTextAppearance(baseView.getContext(), android.R.style.TextAppearance_Small);
+                    tvCommitMsg.setTextAppearance(mContext, android.R.style.TextAppearance_Small);
                     tvCommitMsg.setTypeface(regular);
-                    ll.addView(tvCommitMsg);
-    
-                    if (i == 2 && commits.size() > 3) {// show limit 3 lines
-                        TextView tvMoreMsg = new TextView(baseView.getContext());
-                        String text = res.getString(R.string.event_push_desc, commits.size() - 3);
-                        tvMoreMsg.setText(text);
-                        tvMoreMsg.setTypeface(italic);
-                        ll.addView(tvMoreMsg);
-                        break;
-                    }
+                    viewHolder.llPushDesc.addView(tvCommitMsg);
+                }
+                if (commits.size() > 3) {
+                    TextView tvMoreMsg = new TextView(mContext);
+                    String text = res.getString(R.string.event_push_desc, commits.size() - 3);
+                    tvMoreMsg.setText(text);
+                    tvMoreMsg.setTypeface(italic);
+                    viewHolder.llPushDesc.addView(tvMoreMsg);
                 }
             }
             return null;
@@ -220,10 +193,9 @@ public class FeedAdapter extends RootAdapter<Event> {
         else if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
             CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
 
-            String text = res.getString(R.string.event_commit_comment_desc) + " ";
-            text += payload.getComment().getCommitId().substring(0, 7) 
-                    + " - " + payload.getComment().getBody();
-            return text;
+            return res.getString(R.string.event_commit_comment_desc,
+                    payload.getComment().getCommitId().substring(0, 7), 
+                    payload.getComment().getBody());
         }
 
         /** PullRequestEvent */
@@ -232,12 +204,9 @@ public class FeedAdapter extends RootAdapter<Event> {
             PullRequest pullRequest = payload.getPullRequest();
             
             if (!StringUtils.isBlank(pullRequest.getTitle())) {
-                String text = String.format(res.getString(R.string.event_pull_request_desc),
-                        pullRequest.getTitle(),
-                        pullRequest.getCommits(),
-                        pullRequest.getAdditions(),
-                        pullRequest.getDeletions());
-                return text;
+                return res.getString(R.string.event_pull_request_desc,
+                        pullRequest.getTitle(), pullRequest.getCommits(),
+                        pullRequest.getAdditions(), pullRequest.getDeletions());
             }
             return null;
         }
@@ -247,11 +216,8 @@ public class FeedAdapter extends RootAdapter<Event> {
             FollowPayload payload = (FollowPayload) event.getPayload();
             User target = payload.getTarget();
             if (target != null) {
-                String text = String.format(res.getString(R.string.event_follow_desc),
-                        target.getLogin(),
-                        target.getPublicRepos(),
-                        target.getFollowers());
-                return text;
+                return res.getString(R.string.event_follow_desc,
+                        target.getLogin(), target.getPublicRepos(), target.getFollowers());
             }
             return null;
         }
@@ -259,29 +225,19 @@ public class FeedAdapter extends RootAdapter<Event> {
         /** ForkEvent */
         else if (Event.TYPE_FORK.equals(eventType)) {
             ForkPayload payload = (ForkPayload) event.getPayload();
-            String text = String.format(res.getString(R.string.event_fork_desc),
-                    formatToRepoName(payload.getForkee()));
-            return text;
+            return res.getString(R.string.event_fork_desc, formatToRepoName(payload.getForkee()));
         }
 
         /** CreateEvent */
         else if (Event.TYPE_CREATE.equals(eventType)) {
             CreatePayload payload = (CreatePayload) event.getPayload();
             if ("repository".equals(payload.getRefType())) {
-                String text = String.format(res.getString(R.string.event_create_repo_desc),
-                        eventRepo.getName());
-
-                return text;
+                return res.getString(R.string.event_create_repo_desc, eventRepo.getName());
             }
             else if ("branch".equals(payload.getRefType()) || "tag".equals(payload.getRefType())) {
-                String text = String.format(res.getString(R.string.event_create_branch_desc),
-                        payload.getRefType(),
-                        eventRepo.getName(),
-                        payload.getRef());
-
-                return text;
+                return res.getString(R.string.event_create_branch_desc,
+                        payload.getRefType(), eventRepo.getName(), payload.getRef());
             }
-            generalDesc.setVisibility(View.GONE);
             return null;
         }
 
@@ -296,16 +252,13 @@ public class FeedAdapter extends RootAdapter<Event> {
             GollumPayload payload = (GollumPayload) event.getPayload();
             List<GollumPage> pages = payload.getPages();
             if (pages != null && !pages.isEmpty()) {
-                String text = String.format(res.getString(R.string.event_gollum_desc),
-                        pages.get(0).getPageName());
-                return text;
+                return res.getString(R.string.event_gollum_desc, pages.get(0).getPageName());
             }
-            return "";
+            return null;
         }
 
         /** PublicEvent */
         else if (Event.TYPE_PUBLIC.equals(eventType)) {
-            eventRepo.getName();
             return null;
         }
         
@@ -321,37 +274,20 @@ public class FeedAdapter extends RootAdapter<Event> {
             if (payload != null && payload.getComment() != null) {
                 return payload.getComment().getBody();
             }
-            else {
-                return eventType;
-            }
+            return null;
         }
 
         /** PullRequestReviewComment */
         else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
             PullRequestReviewCommentPayload payload = (PullRequestReviewCommentPayload) event.getPayload();
-            
-//            String text = String.format(res.getString(R.string.event_pull_request_review_comment_desc),
-//                    payload.getComment().getPath(), payload.getComment().getId());
-            
-            String text = res.getString(R.string.event_commit_comment_desc) + " ";
-            text += payload.getComment().getCommitId().substring(0, 7) 
-                    + " - " + payload.getComment().getBody();
-            
-            return text;
+            return res.getString(R.string.event_commit_comment_desc,
+                    payload.getComment().getCommitId().substring(0, 7), 
+                    payload.getComment().getBody());
         }
-        
-        else {
-            generalDesc.setVisibility(View.GONE);
-            return null;
-        }
+
+        return null;
     }
 
-    /**
-     * Format title.
-     * 
-     * @param feed the feed
-     * @return the string
-     */
     private String formatTitle(Event event) {
         String eventType = event.getType();
         EventRepository eventRepo = event.getRepo();
@@ -368,53 +304,37 @@ public class FeedAdapter extends RootAdapter<Event> {
         if (Event.TYPE_PUSH.equals(eventType)) {
             PushPayload payload = (PushPayload) event.getPayload();
             String[] refPart = payload.getRef().split("/"); 
-            String text = String.format(res.getString(R.string.event_push_title),
-                    actor.getLogin(),
-                    refPart.length == 3 ? refPart[2] : payload.getRef(),
+            return res.getString(R.string.event_push_title,
+                    actor.getLogin(), refPart.length == 3 ? refPart[2] : payload.getRef(),
                     formatFromRepoName(eventRepo));
-            return text;
         }
 
         /** IssuesEvent */
         else if (Event.TYPE_ISSUES.equals(eventType)) {
             IssuesPayload eventPayload = (IssuesPayload) event.getPayload();
-            String text = String.format(res.getString(R.string.event_issues_title),
-                    actor.getLogin(),
-                    eventPayload.getAction(),
-                    eventPayload.getIssue().getNumber(),
-                    formatFromRepoName(eventRepo)); 
-            return text;
+            return res.getString(R.string.event_issues_title,
+                    actor.getLogin(), eventPayload.getAction(),
+                    eventPayload.getIssue().getNumber(), formatFromRepoName(eventRepo)); 
         }
 
         /** CommitCommentEvent */
         else if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
-            String text = String.format(res.getString(R.string.event_commit_comment_title),
-                    actor.getLogin(),
-                    formatFromRepoName(eventRepo));
-            return text;
+            return res.getString(R.string.event_commit_comment_title,
+                    actor.getLogin(), formatFromRepoName(eventRepo));
         }
 
         /** PullRequestEvent */
         else if (Event.TYPE_PULL_REQUEST.equals(eventType)) {
             PullRequestPayload payload = (PullRequestPayload) event.getPayload();
-            int pullRequestNumber = payload.getNumber();
-            String text = String.format(res.getString(R.string.event_pull_request_title),
-                    actor.getLogin(),
-                    payload.getAction(),
-                    pullRequestNumber,
-                    formatFromRepoName(eventRepo));
-            return text;
+            return res.getString(R.string.event_pull_request_title,
+                    actor.getLogin(), payload.getAction(),
+                    payload.getNumber(), formatFromRepoName(eventRepo));
         }
 
         /** WatchEvent */
         else if (Event.TYPE_WATCH.equals(eventType)) {
-//            String text = String.format(res.getString(R.string.event_watch_title),
-//                    actor.getLogin(), payload.getAction(),
-//                    formatFromRepoName(eventRepo));
-            String text = String.format(res.getString(R.string.event_watch_title),
-                    actor.getLogin(),
-                    formatFromRepoName(eventRepo));
-            return text;
+            return res.getString(R.string.event_watch_title,
+                    actor.getLogin(), formatFromRepoName(eventRepo));
         }
 
         /** GistEvent */
@@ -428,50 +348,41 @@ public class FeedAdapter extends RootAdapter<Event> {
             
             String id = payload.getGist() != null
                     ? payload.getGist().getId() : mContext.getString(R.string.deleted);
-            String text = String.format(res.getString(R.string.event_gist_title),
+            return res.getString(R.string.event_gist_title,
                     !StringUtils.isBlank(login) ? login : mContext.getString(R.string.unknown),
                     payload.getAction(), id);
-            return text;
         }
 
         /** ForkEvent */
         else if (Event.TYPE_FORK.equals(event.getType())) {
-            String text = String.format(res.getString(R.string.event_fork_title), 
-                    actor.getLogin(),
-                    formatFromRepoName(eventRepo));
-            return text;
+            return res.getString(R.string.event_fork_title, 
+                    actor.getLogin(), formatFromRepoName(eventRepo));
         }
 
         /** ForkApplyEvent */
         else if (Event.TYPE_FORK_APPLY.equals(eventType)) {
-            String text = String.format(res.getString(R.string.event_fork_apply_title),
-                    actor.getLogin(),
-                    formatFromRepoName(eventRepo));
-            return text;
+            return res.getString(R.string.event_fork_apply_title,
+                    actor.getLogin(), formatFromRepoName(eventRepo));
         }
 
         /** FollowEvent */
         else if (Event.TYPE_FOLLOW.equals(eventType)) {
             FollowPayload payload = (FollowPayload) event.getPayload();
-            String text = String.format(res.getString(R.string.event_follow_title),
-                    actor.getLogin(),
-                    payload.getTarget().getLogin());
-            return text;
+            return res.getString(R.string.event_follow_title,
+                    actor.getLogin(), payload.getTarget().getLogin());
         }
 
         /** CreateEvent */
         else if (Event.TYPE_CREATE.equals(eventType)) {
             CreatePayload payload = (CreatePayload) event.getPayload();
             if ("repository".equals(payload.getRefType())) {
-                String text = String.format(res.getString(R.string.event_create_repo_title),
+                return res.getString(R.string.event_create_repo_title,
                         actor.getLogin(), formatFromRepoName(eventRepo));
-                return text;
             }
             else if ("branch".equals(payload.getRefType()) || "tag".equals(payload.getRefType())) {
-                String text = String.format(res.getString(R.string.event_create_branch_title),
+                return res.getString(R.string.event_create_branch_title,
                         actor.getLogin(), payload.getRefType(), payload.getRef(),
                         formatFromRepoName(eventRepo));
-                return text;
             }
             else {
                 return actor.getLogin();
@@ -482,56 +393,40 @@ public class FeedAdapter extends RootAdapter<Event> {
         else if (Event.TYPE_DELETE.equals(eventType)) {
             DeletePayload payload = (DeletePayload) event.getPayload();
             if ("repository".equals(payload.getRefType())) {
-                String text = String.format(res.getString(R.string.event_delete_repo_title),
+                return res.getString(R.string.event_delete_repo_title,
                         actor.getLogin(), payload.getRef());
-                return text;
             }
             else {
-                String text = String.format(res.getString(R.string.event_delete_branch_title),
+                return res.getString(R.string.event_delete_branch_title,
                         actor.getLogin(), payload.getRefType(), payload.getRef(),
                         formatFromRepoName(eventRepo));
-                return text;
             }
         }
-
-        /** WikiEvent */
-//        else if (Event.TYPE_.WIKI_EVENT.equals(feed.getType())) {
-//            String text = String.format(res.getString(R.string.event_wiki_title), 
-//                    feed.getActor(),
-//                    payload.getAction(),
-//                    formatFromRepoName(feed));
-//            return text;
-//        }
 
         /** MemberEvent */
         else if (Event.TYPE_MEMBER.equals(eventType)) {
             MemberPayload payload = (MemberPayload) event.getPayload();
-            String text = String.format(res.getString(R.string.event_member_title),
+            return res.getString(R.string.event_member_title,
                     actor.getLogin(), payload.getMember() != null ? payload.getMember().getLogin() : "",
                     formatFromRepoName(eventRepo));
-            return text;
         }
 
         /** DownloadEvent */
         else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
-            String text = String.format(res.getString(R.string.event_download_title),
-                    actor.getLogin(),
-                    formatFromRepoName(eventRepo));
-            return text;
+            return res.getString(R.string.event_download_title,
+                    actor.getLogin(), formatFromRepoName(eventRepo));
         }
 
         /** GollumEvent */
         else if (Event.TYPE_GOLLUM.equals(eventType)) {
-            String text = String.format(res.getString(R.string.event_gollum_title),
+            return res.getString(R.string.event_gollum_title,
                     actor.getLogin(), formatFromRepoName(eventRepo));
-            return text;
         }
 
         /** PublicEvent */
         else if (Event.TYPE_PUBLIC.equals(eventType)) {
-            String text = String.format(res.getString(R.string.event_public_title),
+            return res.getString(R.string.event_public_title,
                     actor.getLogin(), formatFromRepoName(eventRepo));
-            return text;
         }
         
         /** IssueCommentEvent */
@@ -545,9 +440,8 @@ public class FeedAdapter extends RootAdapter<Event> {
                             R.string.pull_request_title).toLowerCase(Locale.getDefault());
                 }
                 
-                String text = String.format(res.getString(R.string.event_issue_comment),
+                return res.getString(R.string.event_issue_comment,
                         actor.getLogin(), type, payload.getIssue().getNumber(), formatFromRepoName(eventRepo));
-                return text;
             }
             else {
                 return "";
@@ -556,44 +450,13 @@ public class FeedAdapter extends RootAdapter<Event> {
 
         /** PullRequestReviewComment */
         else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
-            String text = String.format(res.getString(R.string.event_commit_comment_title),
-                    actor.getLogin(),
-                    formatFromRepoName(eventRepo));
-            return text;
+            return res.getString(R.string.event_commit_comment_title,
+                    actor.getLogin(), formatFromRepoName(eventRepo));
         }
         
-        else {
-            return "";
-        }
+        return "";
     }
 
-    /**
-     * The Class InternalURLSpan.
-     */
-    static class InternalURLSpan extends ClickableSpan {
-
-        /** The listener. */
-        OnClickListener mListener;
-
-        /**
-         * Instantiates a new internal url span.
-         * 
-         * @param listener the listener
-         */
-        public InternalURLSpan(OnClickListener listener) {
-            mListener = listener;
-        }
-
-        /*
-         * (non-Javadoc)
-         * @see android.text.style.ClickableSpan#onClick(android.view.View)
-         */
-        @Override
-        public void onClick(View widget) {
-            mListener.onClick(widget);
-        }
-    }
-    
     private String formatFromRepoName(EventRepository repository) {
         if (repository != null) {
             return repository.getName();
@@ -612,14 +475,9 @@ public class FeedAdapter extends RootAdapter<Event> {
      * The Class ViewHolder.
      */
     private static class ViewHolder {
-        
-        /** The iv gravatar. */
         public ImageView ivGravatar;
-        
-        /** The tv title. */
         public TextView tvTitle;
-        
-        /** The tv desc. */
         public TextView tvDesc;
+        public ViewGroup llPushDesc;
     }
 }

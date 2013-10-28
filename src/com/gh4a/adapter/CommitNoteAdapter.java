@@ -33,7 +33,7 @@ import com.gh4a.utils.GravatarUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
-public class CommitNoteAdapter extends RootAdapter<CommitComment> {
+public class CommitNoteAdapter extends RootAdapter<CommitComment> implements OnClickListener {
 
     private HttpImageGetter imageGetter;
     private AQuery aq;
@@ -53,6 +53,7 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> {
             v = vi.inflate(R.layout.row_gravatar_comment, null);
             viewHolder = new ViewHolder();
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
+            viewHolder.ivGravatar.setOnClickListener(this);
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
             viewHolder.tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
@@ -65,32 +66,28 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> {
         }
 
         final CommitComment comment = mObjects.get(position);
-        if (comment != null) {
-            aq.recycle(convertView);
-            aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(comment.getUser().getGravatarId()), 
-                    true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
-            viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
+        
+        aq.recycle(convertView);
+        aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(comment.getUser().getGravatarId()), 
+                true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
 
-                @Override
-                public void onClick(View v) {
-                    /** Open user activity */
-                    Gh4Application context = (Gh4Application) v.getContext()
-                            .getApplicationContext();
-                    context.openUserInfoActivity(v.getContext(), comment.getUser().getLogin(), null);
-                }
-            });
+        viewHolder.ivGravatar.setTag(comment);
+        viewHolder.tvExtra.setText(comment.getUser().getLogin() + "\n" + pt.format(comment.getCreatedAt()));
 
-            viewHolder.tvExtra.setText(comment.getUser().getLogin() + "\n" + pt.format(comment.getCreatedAt()));
-            
-            String body = comment.getBodyHtml();
-            if (body != null) {
-                body = HtmlUtils.format(body).toString();
-            } else {
-                body = comment.getBody();
-            }
-            imageGetter.bind(viewHolder.tvDesc, body, comment.getId());
-        }
+        String body = HtmlUtils.format(comment.getBodyHtml()).toString();
+        imageGetter.bind(viewHolder.tvDesc, body, comment.getId());
+
         return v;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.iv_gravatar) {
+            CommitComment comment = (CommitComment) v.getTag();
+            /** Open user activity */
+            Gh4Application.get(mContext).openUserInfoActivity(mContext,
+                    comment.getUser().getLogin(), null);
+        }
     }
 
     @Override

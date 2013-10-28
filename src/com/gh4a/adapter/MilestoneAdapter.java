@@ -31,7 +31,6 @@ import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
 public class MilestoneAdapter extends RootAdapter<Milestone> {
-
     public MilestoneAdapter(Context context) {
         super(context);
     }
@@ -68,41 +67,39 @@ public class MilestoneAdapter extends RootAdapter<Milestone> {
         }
 
         Milestone milestone = mObjects.get(position);
-        if (milestone != null) {
 
-            if (viewHolder.tvTitle != null) {
-                viewHolder.tvTitle.setText(milestone.getTitle());
+        if (viewHolder.tvTitle != null) {
+            viewHolder.tvTitle.setText(milestone.getTitle());
+        }
+
+        if (viewHolder.tvDesc != null) {
+            if (!StringUtils.isBlank(milestone.getDescription())) {
+                viewHolder.tvDesc.setVisibility(View.VISIBLE);
+                viewHolder.tvDesc.setText(milestone.getDescription());
             }
-
-            if (viewHolder.tvDesc != null) {
-                if (!StringUtils.isBlank(milestone.getDescription())) {
-                    viewHolder.tvDesc.setVisibility(View.VISIBLE);
-                    viewHolder.tvDesc.setText(milestone.getDescription());
-                }
-                else {
-                    viewHolder.tvDesc.setVisibility(View.GONE);
-                }
-            }
-
-            if (viewHolder.tvExtra != null) {
-                String extraData;
-                if (milestone.getDueOn() != null) {
-                    extraData = mContext.getString(R.string.milestone_extradata_due,
-                            milestone.getClosedIssues(), milestone.getOpenIssues(),
-                            DateFormat.getMediumDateFormat(mContext).format(milestone.getDueOn()));
-                } else {
-                    extraData = mContext.getString(R.string.milestone_extradata,
-                            milestone.getClosedIssues(), milestone.getOpenIssues());
-                }
-
-                viewHolder.tvExtra.setText(extraData);
+            else {
+                viewHolder.tvDesc.setVisibility(View.GONE);
             }
         }
+
+        if (viewHolder.tvExtra != null) {
+            String extraData;
+            if (milestone.getDueOn() != null) {
+                extraData = mContext.getString(R.string.milestone_extradata_due,
+                        milestone.getClosedIssues(), milestone.getOpenIssues(),
+                        DateFormat.getMediumDateFormat(mContext).format(milestone.getDueOn()));
+            } else {
+                extraData = mContext.getString(R.string.milestone_extradata,
+                        milestone.getClosedIssues(), milestone.getOpenIssues());
+            }
+
+            viewHolder.tvExtra.setText(extraData);
+        }
+
         return v;
     }
 
     private static class ViewHolder {
-        
         public TextView tvTitle;
         public TextView tvDesc;
         public TextView tvExtra;
