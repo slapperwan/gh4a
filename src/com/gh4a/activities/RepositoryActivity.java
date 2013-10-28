@@ -14,6 +14,7 @@ import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.RepositoryTag;
 import org.eclipse.egit.github.core.service.StarService;
+import org.eclipse.egit.github.core.service.UserService;
 import org.eclipse.egit.github.core.service.WatcherService;
 
 import android.app.AlertDialog;
@@ -555,7 +556,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
             }
             try {
                 StarService starService = (StarService)
-                        activity.getApplicationContext().getSystemService(Gh4Application.STAR_SERVICE);
+                        Gh4Application.get(activity).getService(Gh4Application.STAR_SERVICE);
                 RepositoryId repoId = new RepositoryId(activity.mRepoOwner, activity.mRepoName);
                 if (activity.mIsStarring) {
                     starService.unstar(repoId);
@@ -605,7 +606,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
             }
             try {
                 WatcherService watcherService = (WatcherService)
-                        activity.getApplicationContext().getSystemService(Gh4Application.WATCHER_SERVICE);
+                        Gh4Application.get(activity).getService(Gh4Application.WATCHER_SERVICE);
                 RepositoryId repoId = new RepositoryId(activity.mRepoOwner, activity.mRepoName);
                 if (activity.mIsWatching) {
                     watcherService.unwatch(repoId);

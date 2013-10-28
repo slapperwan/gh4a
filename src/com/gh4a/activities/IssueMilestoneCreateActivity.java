@@ -91,7 +91,7 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
         @Override
         protected Void run() throws IOException {
             MilestoneService milestoneService = (MilestoneService)
-                    getApplicationContext().getSystemService(Gh4Application.MILESTONE_SERVICE);
+                    Gh4Application.get(mContext).getService(Gh4Application.MILESTONE_SERVICE);
                     
             Milestone milestone = new Milestone();
             milestone.setTitle(mTitle);

@@ -25,7 +25,7 @@ public class CommitLoader extends BaseLoader<RepositoryCommit> {
     @Override
     public RepositoryCommit doLoadInBackground() throws IOException {
         CommitService commitService = (CommitService)
-                getContext().getApplicationContext().getSystemService(Gh4Application.COMMIT_SERVICE);
+                Gh4Application.get(getContext()).getService(Gh4Application.COMMIT_SERVICE);
         return commitService.getCommit(new RepositoryId(mRepoOwner, mRepoName), mObjectSha);
     }
 

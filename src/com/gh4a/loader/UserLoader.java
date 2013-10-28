@@ -21,7 +21,7 @@ public class UserLoader extends BaseLoader<User> {
     @Override
     public User doLoadInBackground() throws IOException {
         UserService userService = (UserService)
-                getContext().getApplicationContext().getSystemService(Gh4Application.GHUSER_SERVICE);
+                Gh4Application.get(getContext()).getService(Gh4Application.USER_SERVICE);
         return userService.getUser(mLogin);
     }
 }

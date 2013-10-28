@@ -122,9 +122,9 @@ public class CommitListFragment extends BaseFragment
     }
     public void loadData() {
         CommitService commitService = (CommitService)
-                getActivity().getApplicationContext().getSystemService(Gh4Application.COMMIT_SERVICE);
-        mDataIterator = commitService.pageCommits(new RepositoryId(mRepository.getOwner().getLogin(), mRepository.getName()), 
-                mRef, null);
+                Gh4Application.get(getActivity()).getService(Gh4Application.COMMIT_SERVICE);
+        mDataIterator = commitService.pageCommits(new RepositoryId(mRepository.getOwner().getLogin(),
+                mRepository.getName()), mRef, null);
     }
     
     private void fillData(List<RepositoryCommit> commits) {

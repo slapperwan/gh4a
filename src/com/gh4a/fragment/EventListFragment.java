@@ -133,7 +133,7 @@ public abstract class EventListFragment extends BaseFragment
     
     public void loadData() {
         EventService eventService = (EventService)
-                getActivity().getApplicationContext().getSystemService(Gh4Application.EVENT_SERVICE);
+                Gh4Application.get(getActivity()).getService(Gh4Application.EVENT_SERVICE);
         if (mIsPrivate) {
             mDataIterator = eventService.pageUserReceivedEvents(mLogin, true);
         }

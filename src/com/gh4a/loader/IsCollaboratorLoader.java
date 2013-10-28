@@ -23,8 +23,7 @@ public class IsCollaboratorLoader extends BaseLoader<Boolean> {
     @Override
     public Boolean doLoadInBackground() throws IOException {
         Gh4Application app = Gh4Application.get(getContext());
-        CollaboratorService collabService = (CollaboratorService)
-                app.getSystemService(Gh4Application.COLLAB_SERVICE);
+        CollaboratorService collabService = (CollaboratorService) app.getService(Gh4Application.COLLAB_SERVICE);
         return collabService.isCollaborator(new RepositoryId(mRepoOwner, mRepoName), app.getAuthLogin());
     }
 }

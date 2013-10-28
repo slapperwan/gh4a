@@ -260,7 +260,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
         @Override
         protected Void run() throws IOException {
             LabelService labelService = (LabelService)
-                    mContext.getApplicationContext().getSystemService(Gh4Application.LABEL_SERVICE);
+                    Gh4Application.get(mContext).getService(Gh4Application.LABEL_SERVICE);
             labelService.deleteLabel(mRepoOwner, mRepoName, mLabelName);
             return null;
         }
@@ -291,7 +291,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
         @Override
         protected Void run() throws IOException {
             LabelService labelService = (LabelService)
-                    mContext.getApplicationContext().getSystemService(Gh4Application.LABEL_SERVICE);
+                    Gh4Application.get(mContext).getService(Gh4Application.LABEL_SERVICE);
 
             Label label = new Label();
             label.setName(mNewLabelName);
@@ -325,7 +325,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
         @Override
         protected Void run() throws IOException {
             LabelService labelService = (LabelService)
-                    mContext.getApplicationContext().getSystemService(Gh4Application.LABEL_SERVICE);
+                    Gh4Application.get(mContext).getService(Gh4Application.LABEL_SERVICE);
 
             Label label = new Label();
             label.setName(mLabelName);

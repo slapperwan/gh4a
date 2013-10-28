@@ -6,6 +6,7 @@ import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.CommitService;
+import org.eclipse.egit.github.core.service.IssueService;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -66,7 +67,7 @@ public class CommitHistoryActivity extends BaseSherlockFragmentActivity
     
     public void loadData() {
         CommitService commitService = (CommitService)
-                getApplicationContext().getSystemService(Gh4Application.COMMIT_SERVICE);
+                Gh4Application.get(this).getService(Gh4Application.COMMIT_SERVICE);
         mDataIterator = commitService.pageCommits(new RepositoryId(mRepoOwner, mRepoName), 
                 mRef, mFilePath);
     }

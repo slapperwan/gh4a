@@ -238,7 +238,7 @@ public class PullRequestFragment extends BaseFragment {
         @Override
         protected Void run() throws IOException {
             IssueService issueService = (IssueService)
-                    getActivity().getApplicationContext().getSystemService(Gh4Application.ISSUE_SERVICE);
+                    Gh4Application.get(getActivity()).getService(Gh4Application.ISSUE_SERVICE);
             issueService.createComment(mRepoOwner, mRepoName, mPullRequestNumber, mText);
             return null;
         }

@@ -22,7 +22,7 @@ public class MarkdownLoader extends BaseLoader<String> {
     @Override
     public String doLoadInBackground() throws IOException {
         MarkdownService markdownService = (MarkdownService)
-                getContext().getApplicationContext().getSystemService(Gh4Application.MARKDOWN_SERVICE);
+                Gh4Application.get(getContext()).getService(Gh4Application.MARKDOWN_SERVICE);
         return markdownService.getHtml(mText, mMode);
     }
 }

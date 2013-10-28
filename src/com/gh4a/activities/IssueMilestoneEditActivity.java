@@ -207,7 +207,7 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity {
         @Override
         protected Void run() throws IOException {
             MilestoneService milestoneService = (MilestoneService)
-                    mContext.getApplicationContext().getSystemService(Gh4Application.MILESTONE_SERVICE);
+                    Gh4Application.get(mContext).getService(Gh4Application.MILESTONE_SERVICE);
 
             mMilestone.setTitle(mTitle);
             mMilestone.setDescription(mDesc);
@@ -238,7 +238,7 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity {
         @Override
         protected Void run() throws IOException {
             MilestoneService milestoneService = (MilestoneService)
-                    mContext.getApplicationContext().getSystemService(Gh4Application.MILESTONE_SERVICE);
+                    Gh4Application.get(mContext).getService(Gh4Application.MILESTONE_SERVICE);
             milestoneService.deleteMilestone(mRepoOwner, mRepoName, mNumber); 
             return null;
         }

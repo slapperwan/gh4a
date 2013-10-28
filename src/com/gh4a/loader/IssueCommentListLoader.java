@@ -27,7 +27,7 @@ public class IssueCommentListLoader extends BaseLoader<List<Comment>> {
     @Override
     public List<Comment> doLoadInBackground() throws IOException {
         IssueService issueService = (IssueService)
-                getContext().getApplicationContext().getSystemService(Gh4Application.ISSUE_SERVICE);
+                Gh4Application.get(getContext()).getService(Gh4Application.ISSUE_SERVICE);
         return issueService.getComments(new RepositoryId(mRepoOwner, mRepoName), mIssueNumber);
     }
 

@@ -455,7 +455,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
         @Override
         protected Issue run() throws IOException {
             IssueService issueService = (IssueService)
-                    getApplicationContext().getSystemService(Gh4Application.ISSUE_SERVICE);
+                    Gh4Application.get(mContext).getService(Gh4Application.ISSUE_SERVICE);
             RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
             
             Issue issue = issueService.getIssue(repoId, mIssueNumber);
@@ -493,7 +493,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
         @Override
         protected Void run() throws IOException {
             IssueService issueService = (IssueService)
-                    getApplicationContext().getSystemService(Gh4Application.ISSUE_SERVICE);
+                    Gh4Application.get(mContext).getService(Gh4Application.ISSUE_SERVICE);
             issueService.createComment(mRepoOwner, mRepoName, mIssueNumber, mComment);
             return null;
         }

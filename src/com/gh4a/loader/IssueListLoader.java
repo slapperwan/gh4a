@@ -27,7 +27,7 @@ public class IssueListLoader extends BaseLoader<List<Issue>> {
     @Override
     public List<Issue> doLoadInBackground() throws IOException {
         IssueService issueService = (IssueService)
-                getContext().getApplicationContext().getSystemService(Gh4Application.ISSUE_SERVICE);
+                Gh4Application.get(getContext()).getService(Gh4Application.ISSUE_SERVICE);
         return issueService.getIssues(mLogin, mRepo, mFilterData);
     }
 }

@@ -25,7 +25,7 @@ public class BranchListLoader extends BaseLoader<List<RepositoryBranch>> {
     @Override
     public List<RepositoryBranch> doLoadInBackground() throws IOException {
         RepositoryService repoService = (RepositoryService)
-                getContext().getApplicationContext().getSystemService(Gh4Application.REPO_SERVICE);
+                Gh4Application.get(getContext()).getService(Gh4Application.REPO_SERVICE);
         return repoService.getBranches(new RepositoryId(mRepoOwner, mRepoName));
     }
 }

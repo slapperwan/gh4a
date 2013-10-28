@@ -8,6 +8,7 @@ import android.content.Context;
 
 import com.gh4a.Gh4Application;
 
+//XXX: make me a task
 public class FollowUserLoader extends BaseLoader<Boolean> {
 
     private String mLogin;
@@ -22,7 +23,7 @@ public class FollowUserLoader extends BaseLoader<Boolean> {
     @Override
     public Boolean doLoadInBackground() throws IOException {
         UserService userService = (UserService)
-                getContext().getApplicationContext().getSystemService(Gh4Application.GHUSER_SERVICE);
+                Gh4Application.get(getContext()).getService(Gh4Application.USER_SERVICE);
         if (mIsFollowing != null && mIsFollowing) {
             userService.unfollow(mLogin);
             return false;

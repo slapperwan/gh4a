@@ -27,7 +27,7 @@ public class CommitCommentListLoader extends BaseLoader<List<CommitComment>> {
     @Override
     public List<CommitComment> doLoadInBackground() throws IOException {
         CommitService commitService = (CommitService)
-                getContext().getApplicationContext().getSystemService(Gh4Application.COMMIT_SERVICE);
+                Gh4Application.get(getContext()).getService(Gh4Application.COMMIT_SERVICE);
         return commitService.getComments(new RepositoryId(mRepoOwner, mRepoName),mSha);
     }
 

@@ -123,7 +123,7 @@ public class RepositoryIssueListFragment extends BaseFragment
     
     public void loadData() {
         IssueService issueService = (IssueService)
-                getActivity().getApplicationContext().getSystemService(Gh4Application.ISSUE_SERVICE);
+                Gh4Application.get(getActivity()).getService(Gh4Application.ISSUE_SERVICE);
         mDataIterator = issueService.pageIssues(mFilterData);
     }
     

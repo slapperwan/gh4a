@@ -29,7 +29,7 @@ public class CommitCompareLoader extends BaseLoader<RepositoryCommitCompare> {
     @Override
     public RepositoryCommitCompare doLoadInBackground() throws IOException {
         CommitService commitService = (CommitService)
-                getContext().getApplicationContext().getSystemService(Gh4Application.COMMIT_SERVICE);
+                Gh4Application.get(getContext()).getService(Gh4Application.COMMIT_SERVICE);
         return commitService.compare(new RepositoryId(mRepoOwner, mRepoName), mBase, mHead);
     }
 }

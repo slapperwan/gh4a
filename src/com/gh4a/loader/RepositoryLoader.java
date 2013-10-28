@@ -23,7 +23,7 @@ public class RepositoryLoader extends BaseLoader<Repository> {
     @Override
     public Repository doLoadInBackground() throws IOException {
         RepositoryService repoService = (RepositoryService)
-                getContext().getApplicationContext().getSystemService(Gh4Application.REPO_SERVICE);
+                Gh4Application.get(getContext()).getService(Gh4Application.REPO_SERVICE);
         return repoService.getRepository(mRepoOwner, mRepoName);
     }
 }

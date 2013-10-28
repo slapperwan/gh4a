@@ -88,7 +88,7 @@ public class FollowersFollowingListFragment extends BaseFragment
     
     private void loadData() {
         UserService userService = (UserService)
-                getActivity().getApplicationContext().getSystemService(Gh4Application.GHUSER_SERVICE);
+                Gh4Application.get(getActivity()).getService(Gh4Application.USER_SERVICE);
         if (mFindFollowers) {
             mDataIterator = userService.pageFollowers(mLogin);
         } 

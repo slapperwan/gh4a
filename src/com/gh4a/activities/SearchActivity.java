@@ -204,7 +204,7 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
             }
 
             RepositoryService repoService = (RepositoryService)
-                    mContext.getApplicationContext().getSystemService(Gh4Application.REPO_SERVICE);
+                    Gh4Application.get(mContext).getService(Gh4Application.REPO_SERVICE);
             return repoService.searchRepositories(mQuery, 1);
         }
 
@@ -233,7 +233,7 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
             }
 
             UserService userService = (UserService)
-                    mContext.getApplicationContext().getSystemService(Gh4Application.GHUSER_SERVICE);
+                    Gh4Application.get(mContext).getService(Gh4Application.USER_SERVICE);
             return userService.searchUsers(mQuery);
         }
 

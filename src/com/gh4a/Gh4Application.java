@@ -80,10 +80,10 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     public static String ISSUE_SERVICE = "github.issue";
     public static String COMMIT_SERVICE = "github.commit";
     public static String REPO_SERVICE = "github.repository";
-    public static String GHUSER_SERVICE = "github.user";
+    public static String USER_SERVICE = "github.user";
     public static String MILESTONE_SERVICE = "github.milestone";
     public static String COLLAB_SERVICE = "github.collaborator";
-    public static String GHDOWNLOAD_SERVICE = "github.download";
+    public static String DOWNLOAD_SERVICE = "github.download";
     public static String CONTENTS_SERVICE = "github.contents";
     public static String GIST_SERVICE = "github.gist";
     public static String ORG_SERVICE = "github.organization";
@@ -122,10 +122,10 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         mServices.put(ISSUE_SERVICE, new IssueService(mClient));
         mServices.put(COMMIT_SERVICE, new CommitService(mClient));
         mServices.put(REPO_SERVICE, new RepositoryService(mClient));
-        mServices.put(GHUSER_SERVICE, new UserService(mClient));
+        mServices.put(USER_SERVICE, new UserService(mClient));
         mServices.put(MILESTONE_SERVICE, new MilestoneService(mClient));
         mServices.put(COLLAB_SERVICE, new CollaboratorService(mClient));
-        mServices.put(GHDOWNLOAD_SERVICE, new DownloadService(mClient));
+        mServices.put(DOWNLOAD_SERVICE, new DownloadService(mClient));
         mServices.put(CONTENTS_SERVICE, new ContentsService(mClient));
         mServices.put(GIST_SERVICE, new GistService(mClient));
         mServices.put(ORG_SERVICE, new OrganizationService(mClient));
@@ -133,14 +133,9 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         mServices.put(EVENT_SERVICE, new EventService(mClient));
         mServices.put(MARKDOWN_SERVICE, new MarkdownService(mClient));
     }
-
-    @Override
-    public Object getSystemService(String name) {
-        GitHubService service = mServices.get(name);
-        if (service != null) {
-            return service;
-        }
-        return super.getSystemService(name);
+    
+    public GitHubService getService(String name) {
+        return mServices.get(name);
     }
 
 

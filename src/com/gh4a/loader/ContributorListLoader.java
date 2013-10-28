@@ -27,7 +27,7 @@ public class ContributorListLoader extends BaseLoader<List<User>> {
     @Override
     public List<User> doLoadInBackground() throws IOException {
         RepositoryService repoService = (RepositoryService)
-                getContext().getApplicationContext().getSystemService(Gh4Application.REPO_SERVICE);
+                Gh4Application.get(getContext()).getService(Gh4Application.REPO_SERVICE);
         List<Contributor> contributors = repoService.getContributors(new RepositoryId(mRepoOwner, mRepoName), true);
         
         List<User> users = new ArrayList<User>();

@@ -26,7 +26,7 @@ public class PullRequestLoader extends BaseLoader<PullRequest> {
     @Override
     public PullRequest doLoadInBackground() throws IOException {
         PullRequestService pullRequestService = (PullRequestService)
-                getContext().getApplicationContext().getSystemService(Gh4Application.PULL_SERVICE);
+                Gh4Application.get(getContext()).getService(Gh4Application.PULL_SERVICE);
         return pullRequestService.getPullRequest(new RepositoryId(mRepoOwner, mRepoName), mPullRequestNumber);
     }
 }

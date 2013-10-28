@@ -119,8 +119,7 @@ public class RepositoryListFragment extends BaseFragment
 
     public void loadData() {
         Gh4Application app = Gh4Application.get(getActivity());
-        RepositoryService repoService = (RepositoryService)
-                app.getSystemService(Gh4Application.REPO_SERVICE);
+        RepositoryService repoService = (RepositoryService) app.getService(Gh4Application.REPO_SERVICE);
         
         Map<String, String> filterData = new HashMap<String, String>();
         if ("sources".equals(mRepoType) || "forks".equals(mRepoType)) {

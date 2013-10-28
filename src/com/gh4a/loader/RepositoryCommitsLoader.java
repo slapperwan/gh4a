@@ -27,7 +27,7 @@ public class RepositoryCommitsLoader extends BaseLoader<List<RepositoryCommit>> 
     @Override
     public List<RepositoryCommit> doLoadInBackground() throws IOException {
         PullRequestService pullRequestService = (PullRequestService)
-                getContext().getApplicationContext().getSystemService(Gh4Application.PULL_SERVICE);
+                Gh4Application.get(getContext()).getService(Gh4Application.PULL_SERVICE);
         return pullRequestService.getCommits(new RepositoryId(mRepoOwner, mRepoName), mPullRequestNumber);
     }
 }

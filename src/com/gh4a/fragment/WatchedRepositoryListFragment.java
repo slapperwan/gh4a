@@ -112,7 +112,7 @@ public class WatchedRepositoryListFragment extends BaseFragment
 
     public void loadData() {
         WatcherService watcherService = (WatcherService)
-                getActivity().getApplicationContext().getSystemService(Gh4Application.WATCHER_SERVICE);
+                Gh4Application.get(getActivity()).getService(Gh4Application.WATCHER_SERVICE);
         try {
             mDataIterator = watcherService.pageWatched(mLogin);
         } catch (IOException e) {

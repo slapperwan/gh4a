@@ -33,9 +33,9 @@ public class ContentListLoader extends BaseLoader<List<RepositoryContents>> {
 
     @Override
     public List<RepositoryContents> doLoadInBackground() throws IOException {
-        Context app = getContext().getApplicationContext();
-        ContentsService contentService = (ContentsService) app.getSystemService(Gh4Application.CONTENTS_SERVICE);
-        RepositoryService repoService = (RepositoryService) app.getSystemService(Gh4Application.REPO_SERVICE);
+        Gh4Application app = Gh4Application.get(getContext());
+        ContentsService contentService = (ContentsService) app.getService(Gh4Application.CONTENTS_SERVICE);
+        RepositoryService repoService = (RepositoryService) app.getService(Gh4Application.REPO_SERVICE);
 
         if (mRef == null) {
             Repository repo = repoService.getRepository(mRepoOwner, mRepoName);

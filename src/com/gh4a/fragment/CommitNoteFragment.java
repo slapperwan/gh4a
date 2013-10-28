@@ -145,7 +145,7 @@ public class CommitNoteFragment extends BaseFragment implements OnClickListener 
         @Override
         protected Void run() throws IOException {
             CommitService commitService = (CommitService)
-                    mContext.getApplicationContext().getSystemService(Gh4Application.COMMIT_SERVICE);
+                    Gh4Application.get(mContext).getService(Gh4Application.COMMIT_SERVICE);
             CommitComment commitComment = new CommitComment();
             commitComment.setBody(mText);
             commitService.addComment(new RepositoryId(mRepoOwner, mRepoName), mObjectSha, commitComment);

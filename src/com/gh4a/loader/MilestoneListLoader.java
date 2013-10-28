@@ -26,7 +26,7 @@ public class MilestoneListLoader extends BaseLoader<List<Milestone>> {
     @Override
     public List<Milestone> doLoadInBackground() throws IOException {
         MilestoneService milestoneService = (MilestoneService)
-                getContext().getApplicationContext().getSystemService(Gh4Application.MILESTONE_SERVICE);
+                Gh4Application.get(getContext()).getService(Gh4Application.MILESTONE_SERVICE);
         return milestoneService.getMilestones(mRepoOwner, mRepoName, mState);
     }
 }

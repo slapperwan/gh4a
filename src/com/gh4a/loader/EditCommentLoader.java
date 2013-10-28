@@ -30,7 +30,7 @@ public class EditCommentLoader extends BaseLoader<Comment> {
     @Override
     public Comment doLoadInBackground() throws IOException {
         IssueService issueService = (IssueService)
-                getContext().getApplicationContext().getSystemService(Gh4Application.ISSUE_SERVICE);
+                Gh4Application.get(getContext()).getService(Gh4Application.ISSUE_SERVICE);
         
         Comment comment = new Comment();
         comment.setBody(mBody);

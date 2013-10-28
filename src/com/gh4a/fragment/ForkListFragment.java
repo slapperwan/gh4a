@@ -89,7 +89,7 @@ public class ForkListFragment extends BaseFragment
     
     private void loadData() {
         RepositoryService repoService = (RepositoryService)
-                getActivity().getApplicationContext().getSystemService(Gh4Application.REPO_SERVICE);
+                Gh4Application.get(getActivity()).getService(Gh4Application.REPO_SERVICE);
         mDataIterator = repoService.pageForks(new RepositoryId(mRepoOwner, mRepoName));
     }
 

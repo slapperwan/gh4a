@@ -25,7 +25,7 @@ public class DeleteCommentLoader extends BaseLoader<Void> {
     @Override
     public Void doLoadInBackground() throws Exception {
         IssueService issueService = (IssueService)
-                getContext().getApplicationContext().getSystemService(Gh4Application.ISSUE_SERVICE);
+                Gh4Application.get(getContext()).getService(Gh4Application.ISSUE_SERVICE);
         issueService.deleteComment(new RepositoryId(mRepoOwner, mRepoName), mCommentId);
         return null;
     }

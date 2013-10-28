@@ -284,7 +284,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
         @Override
         protected Void run() throws IOException {
             IssueService issueService = (IssueService)
-                    getApplicationContext().getSystemService(Gh4Application.ISSUE_SERVICE);
+                    Gh4Application.get(mContext).getService(Gh4Application.ISSUE_SERVICE);
                     
             Issue issue = mEditMode ? mEditIssue : new Issue();
             issue.setTitle(mTitle);

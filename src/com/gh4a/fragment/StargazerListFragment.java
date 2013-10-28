@@ -89,7 +89,7 @@ public class StargazerListFragment extends BaseFragment
     
     private void loadData() {
         StarService starService = (StarService)
-                getActivity().getApplicationContext().getSystemService(Gh4Application.STAR_SERVICE);
+                Gh4Application.get(getActivity()).getService(Gh4Application.STAR_SERVICE);
         mDataIterator = starService.pageStargazers(new RepositoryId(mRepoOwner, mRepoName));
     }
 

@@ -111,10 +111,10 @@ public class StarredRepositoryListFragment extends BaseFragment
     }
 
     public void loadData() {
-        StarService starringService = (StarService)
-                getActivity().getApplication().getSystemService(Gh4Application.STAR_SERVICE);
+        StarService starService = (StarService)
+                Gh4Application.get(getActivity()).getService(Gh4Application.STAR_SERVICE);
         try {
-            mDataIterator = starringService.pageStarred(mLogin);
+            mDataIterator = starService.pageStarred(mLogin);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

@@ -105,7 +105,7 @@ public class PullRequestListFragment extends BaseFragment
     
     public void loadData() {
         PullRequestService pullRequestService = (PullRequestService)
-                getActivity().getApplicationContext().getSystemService(Gh4Application.PULL_SERVICE);
+                Gh4Application.get(getActivity()).getService(Gh4Application.PULL_SERVICE);
         mDataIterator = pullRequestService.pagePullRequests(new RepositoryId(mRepoOwner, mRepoName), mState);
     }
     
