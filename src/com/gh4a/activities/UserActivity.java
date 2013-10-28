@@ -3,6 +3,8 @@ package com.gh4a.activities;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.egit.github.core.service.UserService;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.view.ViewGroup;
 
@@ -19,6 +22,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
+import com.gh4a.BackgroundTask;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -27,6 +31,9 @@ import com.gh4a.fragment.PrivateEventListFragment;
 import com.gh4a.fragment.PublicEventListFragment;
 import com.gh4a.fragment.RepositoryIssueListFragment;
 import com.gh4a.fragment.UserFragment;
+import com.gh4a.loader.IsFollowingUserLoader;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
 
 public class UserActivity extends BaseSherlockFragmentActivity {
@@ -39,9 +46,20 @@ public class UserActivity extends BaseSherlockFragmentActivity {
     private PrivateEventListFragment mPrivateEventListFragment;
     private PublicEventListFragment mPublicEventListFragment;
     private RepositoryIssueListFragment mRepositoryIssueListFragment;
-    public boolean isFinishLoadingFollowing;
-    public boolean isFollowing;
+    public Boolean mIsFollowing;
     
+    private LoaderCallbacks<Boolean> mIsFollowingCallback = new LoaderCallbacks<Boolean>() {
+        @Override
+        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
+            return new IsFollowingUserLoader(UserActivity.this, mUserLogin);
+        }
+        @Override
+        public void onResultReady(LoaderResult<Boolean> result) {
+            mIsFollowing = result.getData();
+            invalidateOptionsMenu();
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
@@ -78,6 +96,10 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                 R.string.about, R.string.user_public_activity
              });
         }
+
+        if (!mUserLogin.equals(Gh4Application.get(this).getAuthLogin())) {
+            getSupportLoaderManager().initLoader(4, null, mIsFollowingCallback).forceLoad();
+        }
     }
     
     public class UserAdapter extends FragmentStatePagerAdapter {
@@ -110,7 +132,8 @@ public class UserActivity extends BaseSherlockFragmentActivity {
                 return mRepositoryIssueListFragment;
             }
             else {
-                return UserFragment.newInstance(mUserLogin, mUserName);
+                mUserFragment = UserFragment.newInstance(mUserLogin, mUserName);
+                return mUserFragment;
             }
         }
         
@@ -140,11 +163,11 @@ public class UserActivity extends BaseSherlockFragmentActivity {
         MenuItem followAction = menu.findItem(R.id.follow);
         followAction.setVisible(!isSelf && isAuthorized());
         if (followAction.isVisible()) {
-            if (!isFinishLoadingFollowing) {
+            if (mIsFollowing == null) {
                 followAction.setActionView(R.layout.ab_loading);
                 followAction.expandActionView();
             }
-            else if (isFollowing) {
+            else if (mIsFollowing) {
                 followAction.setTitle(R.string.user_unfollow_action);
             }
             else {
@@ -225,7 +248,7 @@ public class UserActivity extends BaseSherlockFragmentActivity {
             case R.id.follow:
                 item.setActionView(R.layout.ab_loading);
                 item.expandActionView();
-                mUserFragment.followUser(mUserLogin);
+                new UpdateFollowTask().execute();
                 return true;
             case R.id.share:
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
@@ -278,10 +301,30 @@ public class UserActivity extends BaseSherlockFragmentActivity {
         }
     }
     
-    @SuppressLint("NewApi")
-    public void updateFollowingAction(boolean isFollowing) {
-        this.isFollowing = isFollowing;
-        this.isFinishLoadingFollowing = true;
-        invalidateOptionsMenu();
+    private class UpdateFollowTask extends BackgroundTask<Void> {
+        public UpdateFollowTask() {
+            super(UserActivity.this);
+        }
+
+        @Override
+        protected Void run() throws Exception {
+            UserService userService = (UserService)
+                    Gh4Application.get(mContext).getService(Gh4Application.USER_SERVICE);
+            if (mIsFollowing) {
+                userService.unfollow(mUserLogin);
+            }
+            else {
+                userService.follow(mUserLogin);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onSuccess(Void result) {
+            mIsFollowing = !mIsFollowing;
+            mUserFragment.updateFollowingAction(mIsFollowing);
+            invalidateOptionsMenu();
+        }
     }
+
 }

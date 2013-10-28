@@ -1,13 +1,13 @@
 package com.gh4a.activities;
 
 import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.service.IssueService;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
 import android.widget.EditText;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -16,11 +16,8 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
-import com.gh4a.loader.DeleteCommentLoader;
-import com.gh4a.loader.EditCommentLoader;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
 
 public class EditCommentActivity extends BaseSherlockFragmentActivity {
@@ -31,32 +28,6 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
     private String mIssueState;
     private String mText;
     private EditText mEditText;
-    private ProgressDialog mProgressDialog;
-
-    private LoaderCallbacks<Void> mDeleteCallback = new LoaderCallbacks<Void>() {
-        @Override
-        public Loader<LoaderResult<Void>> onCreateLoader(int id, Bundle args) {
-            return new DeleteCommentLoader(EditCommentActivity.this, mRepoOwner, mRepoName, mCommentId);
-        }
-
-        @Override
-        public void onResultReady(LoaderResult<Void> result) {
-            handleLoadResult(result);
-        }
-    };
-
-    private LoaderCallbacks<Comment> mEditCallback = new LoaderCallbacks<Comment>() {
-        @Override
-        public Loader<LoaderResult<Comment>> onCreateLoader(int id, Bundle args) {
-            return new EditCommentLoader(EditCommentActivity.this, mRepoOwner,
-                    mRepoName, mCommentId, mEditText.getText().toString());
-        }
-
-        @Override
-        public void onResultReady(LoaderResult<Comment> result) {
-            handleLoadResult(result);
-        }
-    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -101,10 +72,9 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.accept:
-            if (!StringUtils.isBlank(mEditText.getText().toString())) {
-                mProgressDialog = showProgressDialog(getResources().getString(R.string.saving_msg), true);
-                getSupportLoaderManager().initLoader(1, null, mEditCallback);
-                getSupportLoaderManager().getLoader(1).forceLoad();
+            String text = mEditText.getText().toString();
+            if (!StringUtils.isBlank(text)) {
+                new EditCommentTask(mCommentId, text).execute();
             }
             return true;
         case R.id.delete:
@@ -112,9 +82,7 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
             builder.setMessage(R.string.delete_comment_message);
             builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
-                    mProgressDialog = showProgressDialog(getResources().getString(R.string.deleting_msg), true);
-                    getSupportLoaderManager().initLoader(0, null, mDeleteCallback);
-                    getSupportLoaderManager().getLoader(0).forceLoad();
+                    new DeleteCommentTask(mCommentId).execute();
                 }
             });
             builder.setNegativeButton(R.string.cancel, null);
@@ -125,13 +93,8 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void handleLoadResult(LoaderResult<?> result) {
-        stopProgressDialog(mProgressDialog);
-        if (isLoaderError(result)) {
-            return;
-        }
-
-        Intent intent = new Intent().setClass(this, IssueActivity.class);
+    private void goToParent() {
+        Intent intent = new Intent(this, IssueActivity.class);
         intent.putExtra(Constants.Issue.ISSUE_NUMBER, mIssueNumber);
 
         if ("com.gh4a.PullRequestActivity".equals(getCallingActivity().getClassName())) {
@@ -145,4 +108,64 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
         startActivity(intent);
     }
 
+    private class EditCommentTask extends ProgressDialogTask<Void> {
+        private long mId;
+        private String mBody;
+
+        public EditCommentTask(long id, String body) {
+            super(EditCommentActivity.this, 0, R.string.saving_msg);
+            mId = id;
+            mBody = body;
+        }
+
+        @Override
+        protected Void run() throws Exception {
+            IssueService issueService = (IssueService)
+                    Gh4Application.get(mContext).getService(Gh4Application.ISSUE_SERVICE);
+
+            Comment comment = new Comment();
+            comment.setBody(mBody);
+            comment.setId(mId);
+            issueService.editComment(new RepositoryId(mRepoOwner, mRepoName), comment);
+            return null;
+        }
+
+        @Override
+        protected void onSuccess(Void result) {
+            goToParent();
+        }
+
+        @Override
+        protected void onError(Exception e) {
+            showError();
+        }
+    }
+
+    private class DeleteCommentTask extends ProgressDialogTask<Void> {
+        private long mId;
+
+        public DeleteCommentTask(long id) {
+            super(EditCommentActivity.this, 0, R.string.deleting_msg);
+            mId = id;
+        }
+
+        @Override
+        protected Void run() throws Exception {
+            IssueService issueService = (IssueService)
+                    Gh4Application.get(mContext).getService(Gh4Application.ISSUE_SERVICE);
+            
+            issueService.deleteComment(new RepositoryId(mRepoOwner, mRepoName), mId);
+            return null;
+        }
+
+        @Override
+        protected void onSuccess(Void result) {
+            goToParent();
+        }
+
+        @Override
+        protected void onError(Exception e) {
+            showError();
+        }
+    }
 }

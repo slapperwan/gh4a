@@ -1,7 +1,6 @@
 package com.gh4a.activities;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,27 +13,25 @@ import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.RepositoryTag;
 import org.eclipse.egit.github.core.service.StarService;
-import org.eclipse.egit.github.core.service.UserService;
 import org.eclipse.egit.github.core.service.WatcherService;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.gh4a.BackgroundTask;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -412,12 +409,12 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
             case R.id.watch:
                 item.setActionView(R.layout.ab_loading);
                 item.expandActionView();
-                new UpdateWatchTask(this).execute();
+                new UpdateWatchTask().execute();
                 return true;
             case R.id.star:
                 item.setActionView(R.layout.ab_loading);
                 item.expandActionView();
-                new UpdateStarTask(this).execute();
+                new UpdateStarTask().execute();
                 return true;
             case R.id.branches:
                 if (mBranches == null) {
@@ -540,100 +537,58 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
         return false;
     }
 
-    private static class UpdateStarTask extends AsyncTask<Void, Void, Void> {
-        private WeakReference<RepositoryActivity> mTarget;
-        private boolean mException;
-        
-        public UpdateStarTask(RepositoryActivity activity) {
-            mTarget = new WeakReference<RepositoryActivity>(activity);
+    private class UpdateStarTask extends BackgroundTask<Void> {
+        public UpdateStarTask() {
+            super(RepositoryActivity.this);
         }
 
         @Override
-        protected Void doInBackground(Void... params) {
-            RepositoryActivity activity = mTarget.get();
-            if (activity == null) {
-                return null;
+        protected Void run() throws IOException {
+            StarService starService = (StarService)
+                    Gh4Application.get(mContext).getService(Gh4Application.STAR_SERVICE);
+            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+            if (mIsStarring) {
+                starService.unstar(repoId);
             }
-            try {
-                StarService starService = (StarService)
-                        Gh4Application.get(activity).getService(Gh4Application.STAR_SERVICE);
-                RepositoryId repoId = new RepositoryId(activity.mRepoOwner, activity.mRepoName);
-                if (activity.mIsStarring) {
-                    starService.unstar(repoId);
-                }
-                else {
-                    starService.star(repoId);
-                }
-            }
-            catch (IOException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
+                starService.star(repoId);
             }
             return null;
         }
 
         @Override
-        protected void onPostExecute(Void result) {
-            RepositoryActivity activity = mTarget.get();
-            if (activity != null) {
-                if (mException) {
-                    activity.stopProgressDialog(activity.mProgressDialog);
-                }
-                else {
-                    activity.mIsStarring = !activity.mIsStarring;
-                    if (activity.mRepositoryFragment != null) {
-                        activity.mRepositoryFragment.updateStargazerCount(activity.mIsStarring);
-                    }
-                }
-                activity.invalidateOptionsMenu();
+        protected void onSuccess(Void result) {
+            mIsStarring = !mIsStarring;
+            if (mRepositoryFragment != null) {
+                mRepositoryFragment.updateStargazerCount(mIsStarring);
             }
+            invalidateOptionsMenu();
         }
     }
 
-    private static class UpdateWatchTask extends AsyncTask<Void, Void, Void> {
-        private WeakReference<RepositoryActivity> mTarget;
-        private boolean mException;
-
-        public UpdateWatchTask(RepositoryActivity activity) {
-            mTarget = new WeakReference<RepositoryActivity>(activity);
+    private class UpdateWatchTask extends BackgroundTask<Void> {
+        public UpdateWatchTask() {
+            super(RepositoryActivity.this);
         }
 
         @Override
-        protected Void doInBackground(Void... params) {
-            RepositoryActivity activity = mTarget.get();
-            if (activity == null) {
-                return null;
+        protected Void run() throws IOException {
+            WatcherService watcherService = (WatcherService)
+                    Gh4Application.get(mContext).getService(Gh4Application.WATCHER_SERVICE);
+            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+            if (mIsWatching) {
+                watcherService.unwatch(repoId);
             }
-            try {
-                WatcherService watcherService = (WatcherService)
-                        Gh4Application.get(activity).getService(Gh4Application.WATCHER_SERVICE);
-                RepositoryId repoId = new RepositoryId(activity.mRepoOwner, activity.mRepoName);
-                if (activity.mIsWatching) {
-                    watcherService.unwatch(repoId);
-                }
-                else {
-                    watcherService.watch(repoId);
-                }
-            }
-            catch (IOException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                mException = true;
+            else {
+                watcherService.watch(repoId);
             }
             return null;
         }
 
         @Override
-        protected void onPostExecute(Void result) {
-            RepositoryActivity activity = mTarget.get();
-            if (activity != null) {
-                if (mException) {
-                    activity.stopProgressDialog(activity.mProgressDialog);
-                }
-                else {
-                    activity.mIsWatching = !activity.mIsWatching;
-                }
-                activity.invalidateOptionsMenu();
-            }
+        protected void onSuccess(Void result) {
+            mIsWatching = !mIsWatching;
+            invalidateOptionsMenu();
         }
     }
 }

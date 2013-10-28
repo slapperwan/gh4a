@@ -45,9 +45,6 @@ import com.gh4a.activities.FollowerFollowingListActivity;
 import com.gh4a.activities.GistListActivity;
 import com.gh4a.activities.OrganizationMemberListActivity;
 import com.gh4a.activities.RepositoryListActivity;
-import com.gh4a.activities.UserActivity;
-import com.gh4a.loader.FollowUserLoader;
-import com.gh4a.loader.IsFollowingUserLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.OrganizationListLoader;
@@ -61,7 +58,6 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
     private String mUserLogin;
     private String mUserName;
     private User mUser;
-    private Boolean isFollowing;
     private int mFollowersCount;
     private List<Repository> mTopRepos;
     private List<User> mOrgs;
@@ -111,39 +107,6 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
         }
     };
 
-    private LoaderCallbacks<Boolean> mIsFollowingCallback = new LoaderCallbacks<Boolean>() {
-        @Override
-        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
-            return new IsFollowingUserLoader(getSherlockActivity(), mUserLogin);
-        }
-        @Override
-        public void onResultReady(LoaderResult<Boolean> result) {
-            UserActivity userActivity = (UserActivity) getSherlockActivity();
-            isFollowing = result.getData();
-            userActivity.updateFollowingAction(isFollowing);
-        }
-    };
-
-    private LoaderCallbacks<Boolean> mFollowCallback = new LoaderCallbacks<Boolean>() {
-        @Override
-        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
-            return new FollowUserLoader(getSherlockActivity(), mUserLogin, isFollowing);
-        }
-        @Override
-        public void onResultReady(LoaderResult<Boolean> result) {
-            UserActivity userActivity = (UserActivity) getSherlockActivity();
-            isFollowing = result.getData();
-            userActivity.updateFollowingAction(isFollowing);
-            TextView tvFollowersCount = (TextView) getView().findViewById(R.id.tv_followers_count);
-            if (isFollowing) {
-                tvFollowersCount.setText(String.valueOf(++mFollowersCount));
-            }
-            else {
-                tvFollowersCount.setText(String.valueOf(--mFollowersCount));
-            }
-        }
-    };
-
     public static UserFragment newInstance(String login, String name) {
         UserFragment f = new UserFragment();
 
@@ -179,7 +142,7 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-        if (mUser == null || mTopRepos == null || mOrgs == null || isFollowing == null) {
+        if (mUser == null || mTopRepos == null || mOrgs == null) {
             refresh();
         }
     }
@@ -187,22 +150,15 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
     public void refresh() {
         if (getLoaderManager().getLoader(0) == null) {
             getLoaderManager().initLoader(0, null, mUserCallback);
-            getLoaderManager().initLoader(3, null, mIsFollowingCallback);
-            getLoaderManager().initLoader(4, null, mFollowCallback);
         }
         else {
             getLoaderManager().restartLoader(0, null, mUserCallback);
-            getLoaderManager().restartLoader(3, null, mIsFollowingCallback);
-            getLoaderManager().restartLoader(4, null, mFollowCallback);
         }
         
         getLoaderManager().getLoader(0).forceLoad();
-        getLoaderManager().getLoader(3).forceLoad();
     }
     
     private void fillData() {
-        UserActivity activity = (UserActivity) getSherlockActivity();
-        activity.invalidateOptionsMenu();
         View v = getView();
         Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
         Typeface boldCondensed = app.boldCondensed;
@@ -362,6 +318,7 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
         
         getLoaderManager().getLoader(1).forceLoad();
         getLoaderManager().getLoader(2).forceLoad();
+        getSherlockActivity().invalidateOptionsMenu();
     }
 
     /*
@@ -536,10 +493,15 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
             llOrgs.setVisibility(View.GONE);
         }
     }
-    
-    public void followUser(String userLogin) {
-        getLoaderManager().restartLoader(4, null, mFollowCallback);
-        getLoaderManager().getLoader(4).forceLoad();
+
+    public void updateFollowingAction(boolean following) {
+        TextView tvFollowersCount = (TextView) getView().findViewById(R.id.tv_followers_count);
+        if (following) {
+            tvFollowersCount.setText(String.valueOf(++mFollowersCount));
+        }
+        else {
+            tvFollowersCount.setText(String.valueOf(--mFollowersCount));
+        }
     }
     
     private boolean checkForError(LoaderResult<?> result) {

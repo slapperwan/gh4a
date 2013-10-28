@@ -6,7 +6,6 @@ import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.CommitService;
-import org.eclipse.egit.github.core.service.IssueService;
 
 import android.content.Intent;
 import android.os.Bundle;
