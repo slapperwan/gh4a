@@ -35,6 +35,7 @@ import com.gh4a.activities.BaseSherlockFragmentActivity;
 import com.gh4a.activities.CommitActivity;
 import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.RepositoryCommitsLoader;
 
 public class PullRequestCommitListFragment extends BaseFragment implements OnItemClickListener {
@@ -48,15 +49,15 @@ public class PullRequestCommitListFragment extends BaseFragment implements OnIte
             new LoaderCallbacks<List<RepositoryCommit>>() {
 
         @Override
-        public Loader<com.gh4a.loader.LoaderResult<List<RepositoryCommit>>> onCreateLoader(int id, Bundle args) {
+        public Loader<LoaderResult<List<RepositoryCommit>>> onCreateLoader(int id, Bundle args) {
             return new RepositoryCommitsLoader(getSherlockActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
         }
 
         @Override
-        public void onResultReady(com.gh4a.loader.LoaderResult<List<RepositoryCommit>> result) {
+        public void onResultReady(LoaderResult<List<RepositoryCommit>> result) {
             hideLoading();
 
-            if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
+            if (!result.handleError(getActivity())) {
                 fillData(result.getData());
             }
         }
@@ -104,6 +105,7 @@ public class PullRequestCommitListFragment extends BaseFragment implements OnIte
     }
     
     private void fillData(List<RepositoryCommit> commits) {
+        // FIXME
         BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) getSherlockActivity();
         activity.hideLoading();
         if (commits != null && !commits.isEmpty()) {

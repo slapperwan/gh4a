@@ -18,7 +18,6 @@ package com.gh4a.adapter;
 import org.eclipse.egit.github.core.Comment;
 
 import android.content.Context;
-import android.content.Intent;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,30 +27,27 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.activities.EditCommentActivity;
 import com.gh4a.utils.GravatarUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 public class CommentAdapter extends RootAdapter<Comment> implements OnClickListener {
-    private HttpImageGetter imageGetter;
+    public interface OnEditComment {
+        void editComment(Comment comment);
+    }
+
     private AQuery aq;
-    private int issueNumber;
-    private String issueState;
-    private String repoOwner;
-    private String repoName;
-    
-    public CommentAdapter(Context context, int issueNumber,
-            String issueState, String repoOwner, String repoName) {
+    private HttpImageGetter imageGetter;
+    private OnEditComment mEditCallback;
+    private String mRepoOwner;
+
+    public CommentAdapter(Context context, String repoOwner, OnEditComment editCallback) {
         super(context);
         imageGetter = new HttpImageGetter(mContext);
         aq = new AQuery(context);
-        this.issueNumber = issueNumber;
-        this.issueState = issueState;
-        this.repoOwner = repoOwner;
-        this.repoName = repoName;
+        mRepoOwner = repoOwner;
+        mEditCallback = editCallback;
     }
 
     @Override
@@ -85,7 +81,7 @@ public class CommentAdapter extends RootAdapter<Comment> implements OnClickListe
         final Comment comment = mObjects.get(position);
         String login = Gh4Application.get(mContext).getAuthLogin();
 
-        aq.recycle(convertView);
+        aq.recycle(v);
         aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(comment.getUser().getGravatarId()), 
                 true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
 
@@ -96,7 +92,7 @@ public class CommentAdapter extends RootAdapter<Comment> implements OnClickListe
 
         viewHolder.ivGravatar.setTag(comment);
 
-        if (comment.getUser().getLogin().equals(login) || repoOwner.equals(login)) {
+        if (comment.getUser().getLogin().equals(login) || mRepoOwner.equals(login)) {
             viewHolder.ivEdit.setVisibility(View.VISIBLE);
             viewHolder.ivEdit.setTag(comment);
             viewHolder.ivEdit.setOnClickListener(this);
@@ -113,26 +109,16 @@ public class CommentAdapter extends RootAdapter<Comment> implements OnClickListe
         if (v.getId() == R.id.iv_gravatar) {
             Comment comment = (Comment) v.getTag();
             Gh4Application.get(mContext).openUserInfoActivity(mContext, comment.getUser().getLogin(), null);
-        } else if (v.getId() == R.id.iv_edit) {
+        } else if (v.getId() == R.id.iv_edit && mEditCallback != null) {
             Comment comment = (Comment) v.getTag();
-            Intent intent = new Intent(mContext, EditCommentActivity.class);
-            
-            intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
-            intent.putExtra(Constants.Repository.REPO_NAME, repoName);
-            intent.putExtra(Constants.Issue.ISSUE_NUMBER, issueNumber);
-            intent.putExtra(Constants.Issue.ISSUE_STATE, issueState);
-            intent.putExtra(Constants.Comment.ID, comment.getId());
-            intent.putExtra(Constants.Comment.BODY, comment.getBody());
-            mContext.startActivity(intent);
+            mEditCallback.editComment(comment);
         }
     }
 
     private static class ViewHolder {
-        
         public ImageView ivGravatar;
         public TextView tvDesc;
         public TextView tvExtra;
         public ImageView ivEdit;
-        
     }
 }

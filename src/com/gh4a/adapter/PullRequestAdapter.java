@@ -70,7 +70,7 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> implements OnCl
         final PullRequest pullRequest = mObjects.get(position);
         String login;
         
-        aq.recycle(convertView);
+        aq.recycle(v);
         viewHolder.ivGravatar.setTag(pullRequest.getUser());
         if (pullRequest.getUser() != null) {
             aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(pullRequest.getUser().getGravatarId()), 

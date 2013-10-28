@@ -48,6 +48,8 @@ import com.gh4a.adapter.IssueLabelAdapter;
 import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.ToastUtils;
+import com.gh4a.utils.UiUtils;
 
 public class IssueLabelListActivity extends BaseSherlockFragmentActivity implements OnItemClickListener {
     private String mRepoOwner;
@@ -66,10 +68,8 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
         public void onResultReady(LoaderResult<List<Label>> result) {
             hideLoading();
             stopProgressDialog(mProgressDialog);
-            if (getCurrentFocus() != null) {
-                hideKeyboard(getCurrentFocus().getWindowToken());
-            }
-            if (!isLoaderError(result)) {
+            UiUtils.hideImeForView(getCurrentFocus());
+            if (!result.handleError(IssueLabelListActivity.this)) {
                 mAdapter.clear();
                 for (Label label : result.getData()) {
                     mAdapter.add(label);
@@ -217,7 +217,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
                 }
                 break;
             case Menu.FIRST + 1:
-                AlertDialog.Builder builder = createDialogBuilder();
+                AlertDialog.Builder builder = UiUtils.createDialogBuilder(IssueLabelListActivity.this);
                 builder.setTitle(getString(R.string.issue_dialog_delete_title, mCurrentLabelName));
                 builder.setMessage(R.string.issue_dialog_delete_message);
                 builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
@@ -269,11 +269,6 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
         protected void onSuccess(Void result) {
             getSupportLoaderManager().restartLoader(0, null, mLabelCallback).forceLoad();
         }
-        
-        @Override
-        protected void onError(Exception e) {
-            showError();
-        }
     }
     
     private class EditIssueLabelTask extends ProgressDialogTask<Void> {
@@ -308,7 +303,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
         
         @Override
         protected void onError(Exception e) {
-            showMessage(getString(R.string.issue_error_edit_label), false);
+            ToastUtils.showMessage(mContext, R.string.issue_error_edit_label);
         }
     }
 
@@ -343,7 +338,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
         
         @Override
         protected void onError(Exception e) {
-            showMessage(getString(R.string.issue_error_create_label), false);
+            ToastUtils.showMessage(mContext, R.string.issue_error_create_label);
             mAdapter.remove(mAddedLabel);
             mAddedLabel = null;
         }

@@ -41,6 +41,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.ToastUtils;
 
 public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
 
@@ -61,7 +62,7 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
             return;
         }
         
-        if (!isAuthorized()) {
+        if (!Gh4Application.get(this).isAuthorized()) {
             Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
             startActivity(intent);
             finish();
@@ -109,7 +110,7 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
 
         @Override
         protected void onError(Exception e) {
-            showMessage(getString(R.string.issue_error_create_milestone), false);
+            ToastUtils.showMessage(mContext, R.string.issue_error_create_milestone);
         }    
     }
     
@@ -187,7 +188,7 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
                 desc = tvDesc.getText().toString();    
             }
             if (tvTitle.getText() == null || StringUtils.isBlank(tvTitle.getText().toString())) {
-                showMessage(getResources().getString(R.string.issue_error_milestone_title), false);
+                ToastUtils.showMessage(this, R.string.issue_error_milestone_title);
             }
             else {
                 new AddIssueMilestonesTask(tvTitle.getText().toString(), desc, mDueOn).execute();

@@ -71,7 +71,7 @@ public class SearchUserAdapter extends RootAdapter<SearchUser> implements OnClic
 
         final SearchUser user = mObjects.get(position);
         
-        aq.recycle(convertView);
+        aq.recycle(v);
 
         viewHolder.ivGravatar.setTag(user);
         if (!StringUtils.isBlank(user.getGravatarId())) {

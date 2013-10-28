@@ -47,6 +47,8 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneLoader;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.ToastUtils;
+import com.gh4a.utils.UiUtils;
 
 public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity {
     private String mRepoOwner;
@@ -64,7 +66,7 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity {
         public void onResultReady(LoaderResult<Milestone> result) {
             hideLoading();
 
-            if (!isLoaderError(result)) {
+            if (!result.handleError(IssueMilestoneEditActivity.this)) {
                 mMilestone = result.getData();
                 fillData();
             }
@@ -85,7 +87,7 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity {
             return;
         }
         
-        if (!isAuthorized()) {
+        if (!Gh4Application.get(this).isAuthorized()) {
             Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
             startActivity(intent);
             finish();
@@ -141,13 +143,13 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity {
                 desc = tvDesc.getText().toString();    
             }
             if (StringUtils.isBlank(title)) {
-                showMessage(getString(R.string.issue_error_milestone_title), false);
+                ToastUtils.showMessage(this, R.string.issue_error_milestone_title);
             }
             else {
                 new EditIssueMilestoneTask(title, desc).execute();
             }
         } else if (itemId == R.id.delete) {
-            AlertDialog.Builder builder = createDialogBuilder();
+            AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
             builder.setTitle(getString(R.string.issue_dialog_delete_title, mMilestone.getTitle()));
             builder.setMessage(R.string.issue_dialog_delete_message);
             builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
@@ -223,7 +225,7 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity {
         
         @Override
         protected void onError(Exception e) {
-            showMessage(getString(R.string.issue_error_create_milestone), false);
+            ToastUtils.showMessage(mContext, R.string.issue_error_create_milestone);
         }
     }
     
@@ -246,11 +248,6 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity {
         @Override
         protected void onSuccess(Void result) {
             openIssueMilestones();
-        }
-        
-        @Override
-        protected void onError(Exception e) {
-            showError();
         }
     }
     

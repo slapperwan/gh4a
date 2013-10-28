@@ -33,7 +33,6 @@ import android.widget.ListView;
 
 import com.gh4a.Constants;
 import com.gh4a.R;
-import com.gh4a.activities.BaseSherlockFragmentActivity;
 import com.gh4a.adapter.FileAdapter;
 import com.gh4a.loader.ContentListLoader;
 import com.gh4a.loader.LoaderCallbacks;
@@ -66,7 +65,7 @@ public class ContentListFragment extends BaseFragment implements OnItemClickList
         public void onResultReady(LoaderResult<List<RepositoryContents>> result) {
             hideLoading();
             mDataLoaded = true;
-            if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
+            if (!result.handleError(getActivity())) {
                 fillData(result.getData());
                 for (RepositoryContents content : result.getData()) {
                     if (RepositoryContents.TYPE_FILE.equals(content.getType())) {

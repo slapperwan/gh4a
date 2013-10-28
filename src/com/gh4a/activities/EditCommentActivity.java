@@ -6,7 +6,6 @@ import org.eclipse.egit.github.core.service.IssueService;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
 
@@ -19,13 +18,12 @@ import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.UiUtils;
 
 public class EditCommentActivity extends BaseSherlockFragmentActivity {
     private String mRepoOwner;
     private String mRepoName;
     private long mCommentId;
-    private int mIssueNumber;
-    private String mIssueState;
     private String mText;
     private EditText mEditText;
 
@@ -39,8 +37,6 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
-        mIssueNumber = data.getInt(Constants.Issue.ISSUE_NUMBER);
-        mIssueState = data.getString(Constants.Issue.ISSUE_STATE);
         mCommentId = data.getLong(Constants.Comment.ID);
         mText = data.getString(Constants.Comment.BODY);
         
@@ -50,6 +46,8 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
         
         mEditText = (EditText) findViewById(R.id.et_text);
         mEditText.setText(mText);
+        
+        setResult(RESULT_CANCELED);
     }
     
     @Override
@@ -78,7 +76,7 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
             }
             return true;
         case R.id.delete:
-            AlertDialog.Builder builder = createDialogBuilder();
+            AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
             builder.setMessage(R.string.delete_comment_message);
             builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
@@ -91,21 +89,6 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void goToParent() {
-        Intent intent = new Intent(this, IssueActivity.class);
-        intent.putExtra(Constants.Issue.ISSUE_NUMBER, mIssueNumber);
-
-        if ("com.gh4a.PullRequestActivity".equals(getCallingActivity().getClassName())) {
-            intent = new Intent().setClass(this, PullRequestActivity.class);
-            intent.putExtra(Constants.PullRequest.NUMBER, mIssueNumber);
-        }
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-        intent.putExtra(Constants.Issue.ISSUE_STATE, mIssueState);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
     }
 
     private class EditCommentTask extends ProgressDialogTask<Void> {
@@ -132,12 +115,8 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
 
         @Override
         protected void onSuccess(Void result) {
-            goToParent();
-        }
-
-        @Override
-        protected void onError(Exception e) {
-            showError();
+            setResult(RESULT_OK);
+            finish();
         }
     }
 
@@ -160,12 +139,8 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
 
         @Override
         protected void onSuccess(Void result) {
-            goToParent();
-        }
-
-        @Override
-        protected void onError(Exception e) {
-            showError();
+            setResult(RESULT_OK);
+            finish();
         }
     }
 }

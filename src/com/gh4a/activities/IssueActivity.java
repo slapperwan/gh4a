@@ -25,6 +25,7 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.IssueService;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
@@ -59,10 +60,15 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.GravatarUtils;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.ToastUtils;
+import com.gh4a.utils.UiUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
-public class IssueActivity extends BaseSherlockFragmentActivity implements OnClickListener {
+public class IssueActivity extends BaseSherlockFragmentActivity implements
+        OnClickListener, CommentAdapter.OnEditComment {
+
+    private static final int REQUEST_EDIT = 1000;
 
     private Issue mIssue;
     private String mRepoOwner;
@@ -83,7 +89,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
         @Override
         public void onResultReady(LoaderResult<Issue> result) {
             hideLoading();
-            if (!isLoaderError(result)) {
+            if (!result.handleError(IssueActivity.this)) {
                 mIssue = result.getData();
                 mIssueState = mIssue.getState();
                 getSupportLoaderManager().getLoader(1).forceLoad();
@@ -102,7 +108,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
         }
         @Override
         public void onResultReady(LoaderResult<List<Comment>> result) {
-            if (!isLoaderError(result)) {
+            if (!result.handleError(IssueActivity.this)) {
                 fillComments(result.getData());
             }
         }
@@ -115,7 +121,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
         }
         @Override
         public void onResultReady(LoaderResult<Boolean> result) {
-            if (!isLoaderError(result)) {
+            if (!result.handleError(IssueActivity.this)) {
                 isCollaborator = result.getData();
                 isCreator = mIssue.getUser().getLogin().equals(
                         Gh4Application.get(IssueActivity.this).getAuthLogin());
@@ -150,7 +156,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
         actionBar.setDisplayHomeAsUpEnabled(true);
         
         RelativeLayout tlComment = (RelativeLayout) findViewById(R.id.rl_comment);
-        if (!isAuthorized()) {
+        if (!Gh4Application.get(this).isAuthorized()) {
             tlComment.setVisibility(View.GONE);
         }
         
@@ -175,13 +181,12 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
         lvComments.addHeaderView(mHeader, null, false);
         
         RelativeLayout rlComment = (RelativeLayout) findViewById(R.id.rl_comment);
-        if (!isAuthorized()) {
+        if (!Gh4Application.get(this).isAuthorized()) {
             rlComment.setVisibility(View.GONE);
         }
 
         TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
-        mCommentAdapter = new CommentAdapter(IssueActivity.this, mIssue.getNumber(), mIssue.getState(),
-                mRepoOwner, mRepoName);
+        mCommentAdapter = new CommentAdapter(this, mRepoOwner, this);
         lvComments.setAdapter(mCommentAdapter);
 
         ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
@@ -340,7 +345,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (isAuthorized()) {
+        if (Gh4Application.get(this).isAuthorized()) {
             menu.clear();
             MenuInflater inflater = getSupportMenuInflater();
             inflater.inflate(R.menu.issue_menu, menu);
@@ -371,41 +376,26 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.issue_create:
-                if (isAuthorized()) {
+                if (checkForAuthOrExit()) {
                     Intent intent = new Intent().setClass(this, IssueCreateActivity.class);
                     intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
                     intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                     startActivity(intent);
                 }
-                else {
-                    Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
-                    startActivity(intent);
-                    finish();
-                }                
                 return true;
             case R.id.issue_edit:
-                if (isAuthorized()) {
+                if (checkForAuthOrExit()) {
                     Intent intent = new Intent().setClass(this, IssueCreateActivity.class);
                     intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
                     intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                     intent.putExtra(Constants.Issue.ISSUE_NUMBER, mIssue.getNumber());
                     startActivity(intent);
                 }
-                else {
-                    Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
-                    startActivity(intent);
-                    finish();
-                }     
                 return true;
             case R.id.issue_close:
             case R.id.issue_reopen:
-                if (isAuthorized()) {
+                if (checkForAuthOrExit()) {
                     new IssueOpenCloseTask(item.getItemId() == R.id.issue_reopen).execute();
-                }
-                else {
-                    Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
-                    startActivity(intent);
-                    finish();
                 }
                 return true;
             case R.id.share:
@@ -421,7 +411,16 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
         return super.onOptionsItemSelected(item);
     }
     
-
+    private boolean checkForAuthOrExit() {
+        if (Gh4Application.get(this).isAuthorized()) {
+            return true;
+        }
+        Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+        startActivity(intent);
+        finish();
+        return false;
+    }
+    
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -431,9 +430,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
             if (!StringUtils.isBlank(comment)) {
                 new CommentIssueTask(comment).execute();
             }
-            if (getCurrentFocus() != null) {
-                hideKeyboard(getCurrentFocus().getWindowToken());
-            }
+            UiUtils.hideImeForView(getCurrentFocus());
             break;
         case R.id.tv_pull:
             Gh4Application.get(this).openPullRequestActivity(this,
@@ -444,6 +441,25 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
         }
     }
     
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_EDIT && resultCode == Activity.RESULT_OK) {
+            getSupportLoaderManager().getLoader(2).forceLoad();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void editComment(Comment comment) {
+        Intent intent = new Intent(this, EditCommentActivity.class);
+        
+        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        intent.putExtra(Constants.Comment.ID, comment.getId());
+        intent.putExtra(Constants.Comment.BODY, comment.getBody());
+        startActivityForResult(intent, REQUEST_EDIT);
+    }
+
     private class IssueOpenCloseTask extends ProgressDialogTask<Issue> {
         private boolean mOpen;
         
@@ -468,7 +484,8 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
         protected void onSuccess(Issue result) {
             mIssue = result;
             mIssueState = mOpen ? "open" : "closed";
-            showMessage(getString(mOpen ? R.string.issue_success_reopen : R.string.issue_success_close), false);
+            ToastUtils.showMessage(mContext,
+                    mOpen ? R.string.issue_success_reopen : R.string.issue_success_close);
             
             TextView tvState = (TextView) findViewById(R.id.tv_state);
             tvState.setBackgroundResource(mOpen ? R.drawable.default_green_box : R.drawable.default_red_box);
@@ -478,7 +495,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
         
         @Override
         protected void onError(Exception e) {
-            showMessage(getString(R.string.issue_error_close), false);
+            ToastUtils.showMessage(mContext, R.string.issue_error_close);
         }
     }
     
@@ -500,7 +517,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
 
         @Override
         protected void onSuccess(Void result) {
-            showMessage(getString(R.string.issue_success_comment), false);
+            ToastUtils.showMessage(mContext, R.string.issue_success_comment);
             //reload comments
             getSupportLoaderManager().getLoader(2).forceLoad();
             
@@ -511,7 +528,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements OnCli
         
         @Override
         protected void onError(Exception e) {
-            showMessage(getString(R.string.issue_error_comment), false);
+            ToastUtils.showMessage(mContext, R.string.issue_error_comment);
         }
     }
 }

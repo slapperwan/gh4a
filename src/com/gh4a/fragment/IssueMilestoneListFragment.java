@@ -31,7 +31,6 @@ import android.widget.ListView;
 
 import com.gh4a.Constants;
 import com.gh4a.R;
-import com.gh4a.activities.BaseSherlockFragmentActivity;
 import com.gh4a.activities.IssueMilestoneEditActivity;
 import com.gh4a.adapter.MilestoneAdapter;
 import com.gh4a.loader.LoaderCallbacks;
@@ -54,7 +53,7 @@ public class IssueMilestoneListFragment extends BaseFragment implements OnItemCl
         @Override
         public void onResultReady(LoaderResult<List<Milestone>> result) {
             hideLoading();
-            if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
+            if (!result.handleError(getActivity())) {
                 fillData(result.getData());
             }
         }

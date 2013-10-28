@@ -156,12 +156,10 @@ public class WatchedRepositoryListFragment extends BaseFragment
 
     @Override
     public void onScroll(AbsListView view, int firstVisible, int visibleCount, int totalCount) {
-
         boolean loadMore = firstVisible + visibleCount >= totalCount;
 
-        if(loadMore) {
-            if (getLoaderManager().getLoader(0) != null
-                    && isLoadCompleted) {
+        if (loadMore) {
+            if (getLoaderManager().getLoader(0) != null && isLoadCompleted) {
                 isLoadMore = true;
                 isLoadCompleted = false;
                 getLoaderManager().getLoader(0).forceLoad();

@@ -22,13 +22,14 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
-import com.gh4a.activities.BaseSherlockFragmentActivity;
 import com.gh4a.activities.CommitActivity;
 import com.gh4a.adapter.CommitNoteAdapter;
 import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.ToastUtils;
+import com.gh4a.utils.UiUtils;
 
 public class CommitNoteFragment extends BaseFragment implements OnClickListener {
 
@@ -48,8 +49,9 @@ public class CommitNoteFragment extends BaseFragment implements OnClickListener 
         public void onResultReady(LoaderResult<List<CommitComment>> result) {
             CommitActivity activity = (CommitActivity) getSherlockActivity();
             hideLoading();
+            // FIXME
             activity.stopProgressDialog(activity.mProgressDialog);
-            if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
+            if (!result.handleError(getActivity())) {
                 fillData(result.getData());
             }
         }
@@ -92,10 +94,8 @@ public class CommitNoteFragment extends BaseFragment implements OnClickListener 
         
         showLoading();
         
-        BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) getSherlockActivity();
-        
         RelativeLayout rlComment = (RelativeLayout) getView().findViewById(R.id.rl_comment);
-        if (!activity.isAuthorized()) {
+        if (!Gh4Application.get(getActivity()).isAuthorized()) {
             rlComment.setVisibility(View.GONE);
         }
         
@@ -121,17 +121,13 @@ public class CommitNoteFragment extends BaseFragment implements OnClickListener 
     
     @Override
     public void onClick(View v) {
-        BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) getSherlockActivity();
         EditText etComment = (EditText) getView().findViewById(R.id.et_comment);
         String text = etComment.getText() == null ? null : etComment.getText().toString();
         
         if (!StringUtils.isBlank(text)) {
             new CommentCommitTask(text).execute();
         }
-        
-        if (activity.getCurrentFocus() != null) {
-            activity.hideKeyboard(activity.getCurrentFocus().getWindowToken());
-        }
+        UiUtils.hideImeForView(getActivity().getCurrentFocus());
     }
     
     private class CommentCommitTask extends ProgressDialogTask<Void> {
@@ -154,18 +150,16 @@ public class CommitNoteFragment extends BaseFragment implements OnClickListener 
 
         @Override
         protected void onSuccess(Void result) {
-            CommitActivity activity = (CommitActivity) getSherlockActivity();
             getLoaderManager().getLoader(0).forceLoad();
             
-            EditText etComment = (EditText) activity.findViewById(R.id.et_comment);
+            EditText etComment = (EditText) getView().findViewById(R.id.et_comment);
             etComment.setText(null);
             etComment.clearFocus();
         }
 
         @Override
         protected void onError(Exception e) {
-            CommitActivity activity = (CommitActivity) getSherlockActivity();
-            activity.showMessage(getString(R.string.issue_error_comment), false);
+            ToastUtils.showMessage(mContext, R.string.issue_error_comment);
         }
     }
 }

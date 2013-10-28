@@ -55,7 +55,7 @@ public class CompareActivity extends BaseSherlockFragmentActivity implements OnI
         public void onResultReady(LoaderResult<RepositoryCommitCompare> result) {
             hideLoading();
 
-            if (!isLoaderError(result)) {
+            if (!result.handleError(CompareActivity.this)) {
                 List<RepositoryCommit> commits = result.getData().getCommits();
                 if (commits != null && !commits.isEmpty()) {
                     mAdapter.addAll(commits);

@@ -53,7 +53,7 @@ public class GistActivity extends BaseSherlockFragmentActivity {
         @Override
         public void onResultReady(LoaderResult<Gist> result) {
             hideLoading();
-            if (!isLoaderError(result)) {
+            if (!result.handleError(GistActivity.this)) {
                 fillData(result.getData());
             }
         }

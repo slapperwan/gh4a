@@ -212,11 +212,6 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
         protected void onSuccess(List<SearchRepository> result) {
             fillRepositoriesData(result);
         }
-        
-        @Override
-        protected void onError(Exception e) {
-            showError();
-        }
     }
 
     private class LoadUserTask extends ProgressDialogTask<List<SearchUser>> {
@@ -240,11 +235,6 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
         @Override
         protected void onSuccess(List<SearchUser> result) {
             fillUsersData(result);
-        }
-        
-        @Override
-        protected void onError(Exception e) {
-            showError();
         }
     }
 

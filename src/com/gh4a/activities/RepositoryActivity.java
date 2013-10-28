@@ -49,6 +49,7 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.RepositoryLoader;
 import com.gh4a.loader.TagListLoader;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.UiUtils;
 
 public class RepositoryActivity extends BaseSherlockFragmentActivity implements ParentCallback {
     private static final int LOADER_REPO = 0;
@@ -365,9 +366,10 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        boolean authorized = Gh4Application.get(this).isAuthorized();
         MenuItem watchAction = menu.findItem(R.id.watch);
-        watchAction.setVisible(isAuthorized());
-        if (isAuthorized()) {
+        watchAction.setVisible(authorized);
+        if (authorized) {
             if (!mIsFinishLoadingWatching) {
                 watchAction.setActionView(R.layout.ab_loading);
                 watchAction.expandActionView();
@@ -381,8 +383,8 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
         }
         
         MenuItem starAction = menu.findItem(R.id.star);
-        starAction.setVisible(isAuthorized());
-        if (isAuthorized()) {
+        starAction.setVisible(authorized);
+        if (authorized) {
             if (!mIsFinishLoadingStarring) {
                 starAction.setActionView(R.layout.ab_loading);
                 starAction.expandActionView();
@@ -466,25 +468,22 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
             branchList[i] = mBranches.get(i).getName();
         }
         
-        AlertDialog.Builder builder = createDialogBuilder();
+        AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
         builder.setCancelable(true);
         builder.setTitle(R.string.repo_branches);
         builder.setSingleChoiceItems(branchList, -1, new DialogInterface.OnClickListener() {
-            
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 mSelectedRef = mBranches.get(which).getCommit().getSha();
                 mSelectBranchTag = mBranches.get(which).getName();
             }
         });
-        
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 refreshFragment();
             }
         });
         builder.setNegativeButton(R.string.cancel, null);
-        
         builder.show();
     }
     
@@ -494,7 +493,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
             tagList[i] = mTags.get(i).getName();
         }
         
-        AlertDialog.Builder builder = createDialogBuilder();
+        AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
         builder.setCancelable(true);
         builder.setTitle(R.string.repo_tags);
         builder.setSingleChoiceItems(tagList, -1, new DialogInterface.OnClickListener() {
@@ -528,7 +527,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
     }
 
     private boolean checkForError(LoaderResult<?> result) {
-        if (isLoaderError(result)) {
+        if (result.handleError(RepositoryActivity.this)) {
             hideLoading();
             stopProgressDialog(mProgressDialog);
             invalidateOptionsMenu();

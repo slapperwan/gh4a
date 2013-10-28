@@ -71,7 +71,7 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> implements OnCl
 
         final RepositoryCommit commit = mObjects.get(position);
         
-        aq.recycle(convertView);
+        aq.recycle(v);
         aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(
                 CommitUtils.getAuthorGravatarId(mContext, commit)),
                 true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);

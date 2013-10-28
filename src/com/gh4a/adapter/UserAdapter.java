@@ -84,7 +84,7 @@ public class UserAdapter extends RootAdapter<User> implements OnClickListener {
             avatarUrl = null;
         }
 
-        aq.recycle(convertView);
+        aq.recycle(v);
 
         viewHolder.ivGravatar.setTag(user);
         if (avatarUrl != null) {

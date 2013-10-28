@@ -39,7 +39,6 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.IssueActivity;
-import com.gh4a.activities.UserActivity;
 import com.gh4a.adapter.RepositoryIssueAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 
@@ -128,8 +127,7 @@ public class RepositoryIssueListFragment extends BaseFragment
     }
     
     private void fillData(List<RepositoryIssue> issues) {
-        UserActivity activity = (UserActivity) getSherlockActivity();
-        activity.invalidateOptionsMenu();
+        getActivity().invalidateOptionsMenu();
         if (issues != null && issues.size() > 0) {
             mAdapter.clear();
             mAdapter.addAll(issues);

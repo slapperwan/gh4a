@@ -128,6 +128,7 @@ public class CommitListFragment extends BaseFragment
     }
     
     private void fillData(List<RepositoryCommit> commits) {
+        // FIXME
         RepositoryActivity activity = (RepositoryActivity) getSherlockActivity();
         activity.hideLoading();
         if (commits != null && !commits.isEmpty()) {

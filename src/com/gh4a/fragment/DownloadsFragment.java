@@ -19,11 +19,11 @@ import android.widget.ListView;
 
 import com.gh4a.Constants;
 import com.gh4a.R;
-import com.gh4a.activities.BaseSherlockFragmentActivity;
 import com.gh4a.adapter.DownloadAdapter;
 import com.gh4a.loader.DownloadsLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.UiUtils;
 
 public class DownloadsFragment extends BaseFragment implements OnItemClickListener {
     private String mRepoOwner;
@@ -39,7 +39,7 @@ public class DownloadsFragment extends BaseFragment implements OnItemClickListen
         @Override
         public void onResultReady(LoaderResult<List<Download>> result) {
             hideLoading();
-            if (!((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
+            if (!result.handleError(getActivity())) {
                 fillData(result.getData());
             }
         }
@@ -91,8 +91,7 @@ public class DownloadsFragment extends BaseFragment implements OnItemClickListen
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, final int position, long id) {
         final Download download = (Download) mAdapter.getItem(position);
-        BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) getSherlockActivity();
-        AlertDialog.Builder builder = activity.createDialogBuilder();
+        AlertDialog.Builder builder = UiUtils.createDialogBuilder(getActivity());
         builder.setTitle(R.string.download_file_title);
         builder.setMessage(getString(R.string.download_file_message, download.getName()));
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {

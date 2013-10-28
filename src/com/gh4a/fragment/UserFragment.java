@@ -40,7 +40,6 @@ import com.androidquery.AQuery;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.activities.BaseSherlockFragmentActivity;
 import com.gh4a.activities.FollowerFollowingListActivity;
 import com.gh4a.activities.GistListActivity;
 import com.gh4a.activities.OrganizationMemberListActivity;
@@ -505,7 +504,7 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
     }
     
     private boolean checkForError(LoaderResult<?> result) {
-        if (((BaseSherlockFragmentActivity) getSherlockActivity()).isLoaderError(result)) {
+        if (result.handleError(getActivity())) {
             hideLoading(R.id.pb_top_repos, 0);
             hideLoading();
             return true;

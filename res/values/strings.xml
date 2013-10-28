@@ -242,8 +242,6 @@
     <string name="commit_added">Files Added</string>
     <string name="commit_deleted">Files Deleted</string>
     <string name="commit_summary">Showing %1$d changed files with %2$d additions and %3$d deletions.</string>
-    <!-- string name="commit_summary">%1$d changed | %2$d added | %3$d deleted</string-->
-    <string name="commit_no_files">No files</string>
     <string name="commit_sha">Commit - %1$s</string>
     <string name="commit_comment">Commented on %1$s</string>
     <string name="commit_compare">Compare View</string>

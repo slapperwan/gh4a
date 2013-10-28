@@ -46,6 +46,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Resources;
 import android.graphics.Typeface;
@@ -56,6 +57,7 @@ import android.widget.Toast;
 import com.gh4a.activities.CommitActivity;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.GistActivity;
+import com.gh4a.activities.Github4AndroidActivity;
 import com.gh4a.activities.IssueActivity;
 import com.gh4a.activities.IssueListActivity;
 import com.gh4a.activities.PullRequestActivity;
@@ -489,6 +491,23 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         return (Gh4Application) context.getApplicationContext();
     }
 
+    public boolean isAuthorized() {
+        return getAuthLogin() != null && getAuthToken() != null;
+    }
+    
+    public void logout() {
+        SharedPreferences sharedPreferences = getSharedPreferences(Constants.PREF_NAME,
+                MODE_PRIVATE);
+        Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.commit();
+
+        Intent intent = new Intent(this, Github4AndroidActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP
+                | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+    
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(Constants.User.USER_AUTH_TOKEN)) {

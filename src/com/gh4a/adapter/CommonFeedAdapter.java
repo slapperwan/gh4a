@@ -88,7 +88,7 @@ public class CommonFeedAdapter extends RootAdapter<Feed> implements OnClickListe
 
         final Feed feed = mObjects.get(position);
         
-        aq.recycle(convertView);
+        aq.recycle(v);
 
         if (viewHolder.ivGravatar != null) {
             if (mShowGravatar) {

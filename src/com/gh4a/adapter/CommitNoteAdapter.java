@@ -67,7 +67,7 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements OnC
 
         final CommitComment comment = mObjects.get(position);
         
-        aq.recycle(convertView);
+        aq.recycle(v);
         aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(comment.getUser().getGravatarId()), 
                 true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
 

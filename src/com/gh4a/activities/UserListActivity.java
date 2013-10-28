@@ -51,7 +51,7 @@ public abstract class UserListActivity extends BaseSherlockFragmentActivity impl
         @Override
         public void onResultReady(LoaderResult<List<User>> result) {
             hideLoading();
-            if (!isLoaderError(result)) {
+            if (!result.handleError(UserListActivity.this)) {
                 fillData(result.getData());
             }
         }

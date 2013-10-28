@@ -48,7 +48,7 @@ public class GistViewerActivity extends BaseSherlockFragmentActivity {
         }
         @Override
         public void onResultReady(LoaderResult<Gist> result) {
-            if (!isLoaderError(result)) {
+            if (!result.handleError(GistViewerActivity.this)) {
                 fillData(result.getData().getFiles().get(mFilename).getContent(), true);
             }
         }

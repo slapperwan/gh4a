@@ -36,7 +36,7 @@ import com.gh4a.loader.FeedLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 
-public class BlogListFragment extends BaseFragment {
+public class BlogListFragment extends BaseFragment implements OnItemClickListener {
     private static final String BLOG = "https://github.com/blog.atom";
 
     private ListView mListView;
@@ -81,28 +81,25 @@ public class BlogListFragment extends BaseFragment {
 
         mAdapter = new CommonFeedAdapter(getSherlockActivity());
         mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view,
-                    int position, long id) {
-                Feed blog = (Feed) adapterView.getAdapter().getItem(position);
-                Intent intent = new Intent().setClass(getSherlockActivity(),
-                        BlogActivity.class);
-                intent.putExtra(Constants.Blog.TITLE, blog.getTitle());
-                intent.putExtra(Constants.Blog.CONTENT, blog.getContent());
-                intent.putExtra(Constants.Blog.LINK, blog.getLink());
-                startActivity(intent);
-            }
-        });
+        mListView.setOnItemClickListener(this);
 
         getLoaderManager().initLoader(0, null, mFeedCallback).forceLoad();
     }
 
     private void fillData(List<Feed> result) {
         if (result != null) {
-            List<Feed> blogs = ((CommonFeedAdapter) mListView.getAdapter()).getObjects();
-            blogs.addAll(result);
-            ((CommonFeedAdapter) mListView.getAdapter()).notifyDataSetChanged();
+            mAdapter.addAll(result);
+            mAdapter.notifyDataSetChanged();
         }
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+        Feed blog = mAdapter.getItem(position);
+        Intent intent = new Intent(getSherlockActivity(), BlogActivity.class);
+        intent.putExtra(Constants.Blog.TITLE, blog.getTitle());
+        intent.putExtra(Constants.Blog.CONTENT, blog.getContent());
+        intent.putExtra(Constants.Blog.LINK, blog.getLink());
+        startActivity(intent);
     }
 }

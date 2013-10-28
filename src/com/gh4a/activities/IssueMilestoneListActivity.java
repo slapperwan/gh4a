@@ -88,7 +88,7 @@ public class IssueMilestoneListActivity extends BaseSherlockFragmentActivity {
     
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if (isAuthorized()) {
+        if (Gh4Application.get(this).isAuthorized()) {
             menu.clear();
             MenuInflater inflater = getSupportMenuInflater();
             inflater.inflate(R.menu.create_new, menu);
@@ -109,17 +109,10 @@ public class IssueMilestoneListActivity extends BaseSherlockFragmentActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.create_new:
-            if (isAuthorized()) {
-                Intent intent = new Intent().setClass(this, IssueMilestoneCreateActivity.class);
-                intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                startActivity(intent);
-            }
-            else {
-                Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
-                startActivity(intent);
-                finish();
-            }
+            Intent intent = new Intent().setClass(this, IssueMilestoneCreateActivity.class);
+            intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+            intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+            startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);

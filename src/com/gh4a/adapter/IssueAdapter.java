@@ -82,7 +82,7 @@ public class IssueAdapter extends RootAdapter<Issue> implements OnClickListener 
 
         final Issue issue = mObjects.get(position);
 
-        aq.recycle(convertView);
+        aq.recycle(v);
         aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(issue.getUser().getGravatarId()), 
                 true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
 

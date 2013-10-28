@@ -55,7 +55,7 @@ public class WikiListActivity extends BaseSherlockFragmentActivity {
             if (result.getException() instanceof SAXException) {
                 Gh4Application.get(WikiListActivity.this).notFoundMessage(WikiListActivity.this,
                         getString(R.string.recent_wiki));
-            } else if (!isLoaderError(result)) {
+            } else if (!result.handleError(WikiListActivity.this)) {
                 fillData(result.getData());
             }
         }

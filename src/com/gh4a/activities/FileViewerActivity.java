@@ -76,7 +76,7 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity {
         @Override
         public void onResultReady(LoaderResult<List<RepositoryContents>> result) {
             hideLoading();
-            if (!isLoaderError(result)) {
+            if (!result.handleError(FileViewerActivity.this)) {
                 List<RepositoryContents> data = result.getData();
                 if (data != null && !data.isEmpty()) {
                     loadContent(data.get(0));

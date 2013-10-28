@@ -100,7 +100,7 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         Event event = mObjects.get(position);
         final User actor = event.getActor();
         
-        aq.recycle(convertView);
+        aq.recycle(v);
         aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(actor.getGravatarId()), 
                 true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
 

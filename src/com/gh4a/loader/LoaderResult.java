@@ -1,5 +1,10 @@
 package com.gh4a.loader;
 
+import android.content.Context;
+import android.widget.Toast;
+
+import com.gh4a.Gh4Application;
+
 public class LoaderResult<T> {
     private T mData;
     private Exception mException;
@@ -20,7 +25,7 @@ public class LoaderResult<T> {
         return mException == null;
     }
 
-    public boolean isAuthError() {
+    private boolean isAuthError() {
         if (mException == null) {
             return false;
         }
@@ -34,5 +39,17 @@ public class LoaderResult<T> {
 
     public String getErrorMessage() {
         return mException != null ? mException.getMessage() : null;
+    }
+    
+    public boolean handleError(Context context) {
+        if (isSuccess()) {
+            return false;
+        }
+
+        if (isAuthError()) {
+            Gh4Application.get(context).logout();
+        }
+        Toast.makeText(context, getErrorMessage(), Toast.LENGTH_SHORT).show();
+        return true;
     }
 }

@@ -23,6 +23,8 @@ import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.service.IssueService;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
@@ -43,7 +45,7 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
-import com.gh4a.activities.BaseSherlockFragmentActivity;
+import com.gh4a.activities.EditCommentActivity;
 import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.adapter.CommentAdapter;
 import com.gh4a.loader.IssueCommentsLoader;
@@ -52,10 +54,13 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestLoader;
 import com.gh4a.utils.GravatarUtils;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.ToastUtils;
+import com.gh4a.utils.UiUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
-public class PullRequestFragment extends BaseFragment {
+public class PullRequestFragment extends BaseFragment implements CommentAdapter.OnEditComment {
+    private static final int REQUEST_EDIT = 1000;
 
     private String mRepoOwner;
     private String mRepoName;
@@ -83,6 +88,7 @@ public class PullRequestFragment extends BaseFragment {
         }
         @Override
         public void onResultReady(LoaderResult<List<Comment>> result) {
+            // FIXME
             PullRequestActivity activity = (PullRequestActivity) getSherlockActivity();
             if (!checkForError(result)) {
                 activity.stopProgressDialog(activity.mProgressDialog);
@@ -122,9 +128,8 @@ public class PullRequestFragment extends BaseFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) getActivity();
         RelativeLayout rlComment = (RelativeLayout) getView().findViewById(R.id.rl_comment);
-        if (!activity.isAuthorized()) {
+        if (!Gh4Application.get(getActivity()).isAuthorized()) {
             rlComment.setVisibility(View.GONE);
         }
         
@@ -150,8 +155,7 @@ public class PullRequestFragment extends BaseFragment {
         lvComments.addHeaderView(mHeader, null, true);
 
         TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
-        mCommentAdapter = new CommentAdapter(getSherlockActivity(), pullRequest.getNumber(),
-                pullRequest.getState(), mRepoOwner, mRepoName);
+        mCommentAdapter = new CommentAdapter(getSherlockActivity(), mRepoOwner, this);
         lvComments.setAdapter(mCommentAdapter);
         
         ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
@@ -219,10 +223,7 @@ public class PullRequestFragment extends BaseFragment {
                 if (!StringUtils.isBlank(text)) {
                     new CommentIssueTask(text).execute();
                 }
-                BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) getActivity();
-                if (activity.getCurrentFocus() != null) {
-                    activity.hideKeyboard(activity.getCurrentFocus().getWindowToken());
-                }
+                UiUtils.hideImeForView(getActivity().getCurrentFocus());
             }
         });
     }
@@ -245,21 +246,19 @@ public class PullRequestFragment extends BaseFragment {
 
         @Override
         protected void onSuccess(Void result) {
-            PullRequestActivity activity = (PullRequestActivity) getSherlockActivity();
-            activity.showMessage(getString(R.string.issue_success_comment), false);
+            ToastUtils.showMessage(mContext, R.string.issue_success_comment);
             //reload comments
             getLoaderManager().restartLoader(1, null, mCommentCallback);
             getLoaderManager().getLoader(1).forceLoad();
             
-            EditText etComment = (EditText) activity.findViewById(R.id.et_comment);
+            EditText etComment = (EditText) getView().findViewById(R.id.et_comment);
             etComment.setText(null);
             etComment.clearFocus();
         }
 
         @Override
         protected void onError(Exception e) {
-            PullRequestActivity activity = (PullRequestActivity) getSherlockActivity();
-            activity.showMessage(getString(R.string.issue_error_comment), false);
+            ToastUtils.showMessage(mContext, R.string.issue_error_comment);
         }
     }
 
@@ -272,12 +271,32 @@ public class PullRequestFragment extends BaseFragment {
     }
 
     private boolean checkForError(LoaderResult<?> result) {
+        // FIXME
         PullRequestActivity activity = (PullRequestActivity) getSherlockActivity();
-        if (activity.isLoaderError(result)) {
+        if (!result.handleError(activity)) {
             hideLoading();
             activity.stopProgressDialog(activity.mProgressDialog);
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_EDIT && resultCode == Activity.RESULT_OK) {
+            getLoaderManager().getLoader(1).forceLoad();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void editComment(Comment comment) {
+        Intent intent = new Intent(getActivity(), EditCommentActivity.class);
+        
+        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        intent.putExtra(Constants.Comment.ID, comment.getId());
+        intent.putExtra(Constants.Comment.BODY, comment.getBody());
+        startActivityForResult(intent, REQUEST_EDIT);
     }
 }

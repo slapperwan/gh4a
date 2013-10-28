@@ -48,7 +48,7 @@ public class BlogListActivity extends BaseSherlockFragmentActivity {
 
     @Override
     protected void navigateUp() {
-        if (!isAuthorized()) {
+        if (!Gh4Application.get(this).isAuthorized()) {
             Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);

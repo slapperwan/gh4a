@@ -17,28 +17,21 @@ package com.gh4a.activities;
 
 import java.util.Calendar;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
-import android.os.IBinder;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
@@ -51,7 +44,7 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.db.BookmarksProvider;
-import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.ToastUtils;
 
 /**
  * The Base activity.
@@ -70,22 +63,12 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         return true;
     }
 
-    /**
-     * Hide keyboard.
-     *
-     * @param binder the binder
-     */
-    public void hideKeyboard(IBinder binder) {
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(binder, InputMethodManager.HIDE_NOT_ALWAYS);
-    }
-
     /* (non-Javadoc)
      * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (!isAuthorized()) {
+        if (!Gh4Application.get(this).isAuthorized()) {
             MenuInflater inflater = getSupportMenuInflater();
             inflater.inflate(R.menu.anon_menu, menu);
         }
@@ -103,15 +86,7 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
             navigateUp();
             return true;
         case R.id.logout:
-            if (isAuthorized()) {
-                logout();
-            }
-            else {
-                Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP
-                        |Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            }
+            Gh4Application.get(this).logout();
             return true;
         case R.id.login:
             Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
@@ -137,25 +112,6 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
     protected void navigateUp() {
     }
 
-    public void logout() {
-        SharedPreferences sharedPreferences = getApplication().getSharedPreferences(
-                Constants.PREF_NAME, MODE_PRIVATE);
-        
-        if (sharedPreferences != null) {
-            if (sharedPreferences.getString(Constants.User.USER_LOGIN, null) != null
-                    && sharedPreferences.getString(Constants.User.USER_AUTH_TOKEN, null) != null){
-                Editor editor = sharedPreferences.edit();
-                editor.clear();
-                editor.commit();
-                Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP
-                        |Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                this.finish();
-            }
-        }
-    }
-    
     public void openAboutDialog() {
         Dialog dialog = new Dialog(this);
 
@@ -188,14 +144,14 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         btnByGh4a.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isAuthorized()) {
-                    Intent intent = new Intent().setClass(BaseSherlockFragmentActivity.this, IssueCreateActivity.class);
+                if (Gh4Application.get(BaseSherlockFragmentActivity.this).isAuthorized()) {
+                    Intent intent = new Intent(BaseSherlockFragmentActivity.this, IssueCreateActivity.class);
                     intent.putExtra(Constants.Repository.REPO_OWNER, getResources().getString(R.string.my_username));
                     intent.putExtra(Constants.Repository.REPO_NAME, getResources().getString(R.string.my_repo));
                     startActivity(intent);
                 }
                 else {
-                    showMessage(getString(R.string.login_prompt), false);
+                    ToastUtils.showMessage(BaseSherlockFragmentActivity.this, R.string.login_prompt);
                 }
             }
         });
@@ -203,25 +159,6 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         dialog.show();
     }
 
-    public boolean isAuthorized() {
-        Gh4Application app = Gh4Application.get(this);
-        return app.getAuthLogin() != null && app.getAuthToken() != null;
-    }
-    
-    /**
-     * Show error.
-     */
-    public void showError() {
-        showMessage(getString(R.string.error_toast), false);
-    }
-
-    public void showMessage(String message, boolean finishThisActivity) {
-        Toast.makeText(getApplication(), message, Toast.LENGTH_SHORT).show();
-        if (finishThisActivity) {
-            super.finish();
-        }
-    }
-    
     public void showLoading() {
         if (findViewById(R.id.pager) != null) {
             findViewById(R.id.pager).setVisibility(View.INVISIBLE);
@@ -289,8 +226,8 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
             @Override
             public void onClick(View v) {
                 Context context = BaseSherlockFragmentActivity.this;
-                if (isAuthorized()) {
-                    Gh4Application app = Gh4Application.get(context);
+                Gh4Application app = Gh4Application.get(context);
+                if (app.isAuthorized()) {
                     app.openUserInfoActivity(context, 
                             app.getAuthLogin(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
                 }
@@ -310,28 +247,10 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         cv.put(BookmarksProvider.Columns.URI, intent.toUri(0));
         cv.put(BookmarksProvider.Columns.EXTRA, extraData);
         if (getContentResolver().insert(BookmarksProvider.Columns.CONTENT_URI, cv) != null) {
-            showMessage(getString(R.string.bookmark_saved), false);
+            ToastUtils.showMessage(this, R.string.bookmark_saved);
         }
     }
 
-    public boolean isLoaderError(LoaderResult<?> result) {
-        if (result.isSuccess()) {
-            return false;
-        }
-
-        if (result.isAuthError()) {
-            logout();
-        }
-        Toast.makeText(this, result.getErrorMessage(), Toast.LENGTH_SHORT).show();
-        return true;
-    }
-
-    public AlertDialog.Builder createDialogBuilder() {
-        int dialogTheme = Gh4Application.THEME == R.style.DefaultTheme ?
-                R.style.Theme_Sherlock_Dialog : R.style.Theme_Sherlock_Light_Dialog;
-        return new AlertDialog.Builder(new ContextThemeWrapper(this, dialogTheme));
-    }
-    
     public ViewPager setupPager(PagerAdapter adapter, int[] titleResIds) {
         final ActionBar actionBar = getSupportActionBar();
         ViewPager pager = (ViewPager) findViewById(R.id.pager);

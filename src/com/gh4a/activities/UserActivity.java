@@ -155,13 +155,14 @@ public class UserActivity extends BaseSherlockFragmentActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         boolean isSelf = mUserLogin.equals(Gh4Application.get(this).getAuthLogin());
+        boolean authorized = Gh4Application.get(this).isAuthorized();
 
         MenuItem logoutAction = menu.findItem(R.id.logout);
-        logoutAction.setTitle(isAuthorized() ? R.string.logout : R.string.login);
-        logoutAction.setVisible(isSelf || !isAuthorized());
+        logoutAction.setTitle(authorized ? R.string.logout : R.string.login);
+        logoutAction.setVisible(isSelf || !authorized);
 
         MenuItem followAction = menu.findItem(R.id.follow);
-        followAction.setVisible(!isSelf && isAuthorized());
+        followAction.setVisible(!isSelf && authorized);
         if (followAction.isVisible()) {
             if (mIsFollowing == null) {
                 followAction.setActionView(R.layout.ab_loading);
@@ -184,7 +185,7 @@ public class UserActivity extends BaseSherlockFragmentActivity {
 
     @Override
     protected void navigateUp() {
-        if (isAuthorized()) {
+        if (Gh4Application.get(this).isAuthorized()) {
             Gh4Application app = Gh4Application.get(this);
             app.openUserInfoActivity(this, app.getAuthLogin(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
         }

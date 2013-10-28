@@ -52,6 +52,7 @@ import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
+import com.gh4a.utils.UiUtils;
 
 public class IssueListActivity extends BaseSherlockFragmentActivity implements OnClickListener {
 
@@ -266,7 +267,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity implements O
             reloadIssueList();
             return true;
         case R.id.create_issue:
-            if (isAuthorized()) {
+            if (Gh4Application.get(this).isAuthorized()) {
                 Intent intent = new Intent().setClass(this, IssueCreateActivity.class);
                 intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
                 intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
@@ -382,24 +383,16 @@ public class IssueListActivity extends BaseSherlockFragmentActivity implements O
             }
         }
         
-        AlertDialog.Builder builder = createDialogBuilder();
+        AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
         builder.setCancelable(true);
         builder.setTitle(R.string.issue_filter_by_labels);
         builder.setMultiChoiceItems(allLabelArray, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
             public void onClick(DialogInterface dialog, int whichButton, boolean isChecked) {
-                if (isChecked) {
-                    checkedItems[whichButton] = true;
-                }
-                else {
-                    checkedItems[whichButton] = false;
-                }
+                checkedItems[whichButton] = isChecked;
             }
         });
-        
-        builder.setPositiveButton(R.string.ok,
-                new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.dismiss();
                 String labels = "";
                 for (int i = 0; i < allLabelArray.length; i++) {
                     if (checkedItems[i]) {
@@ -409,15 +402,8 @@ public class IssueListActivity extends BaseSherlockFragmentActivity implements O
                 mFilterData.put("labels", labels);
                 reloadIssueList();
             }
-        })
-        .setNegativeButton(R.string.cancel,
-                new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.dismiss();
-            }
-        })
-       .create();
-        
+        });
+        builder.setNegativeButton(R.string.cancel, null);
         builder.show();
     }
     
@@ -441,11 +427,10 @@ public class IssueListActivity extends BaseSherlockFragmentActivity implements O
             }
         }
         
-        AlertDialog.Builder builder = createDialogBuilder();
+        AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
         builder.setCancelable(true);
         builder.setTitle(R.string.issue_filter_by_milestone);
         builder.setSingleChoiceItems(milestones, checkedItem, new DialogInterface.OnClickListener() {
-            
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (which == 0) {
@@ -456,22 +441,12 @@ public class IssueListActivity extends BaseSherlockFragmentActivity implements O
                 }
             }
         });
-        
-        builder.setPositiveButton(R.string.ok,
-                new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
                 reloadIssueList();
             }
-        })
-        .setNegativeButton(R.string.cancel,
-                new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        })
-       .create();
-        
+        });
+        builder.setNegativeButton(R.string.cancel, null);
         builder.show();
     }
     
@@ -491,11 +466,10 @@ public class IssueListActivity extends BaseSherlockFragmentActivity implements O
             }
         }
         
-        AlertDialog.Builder builder = createDialogBuilder();
+        AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
         builder.setCancelable(true);
         builder.setTitle(R.string.issue_filter_by_assignee);
         builder.setSingleChoiceItems(assignees, checkedItem, new DialogInterface.OnClickListener() {
-            
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (which == 0) {
@@ -506,27 +480,17 @@ public class IssueListActivity extends BaseSherlockFragmentActivity implements O
                 }
             }
         });
-        
-        builder.setPositiveButton(R.string.ok,
-                new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
                 reloadIssueList();
             }
-        })
-        .setNegativeButton(R.string.cancel,
-                new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        })
-       .create();
-        
+        });
+        builder.setNegativeButton(R.string.cancel, null);
         builder.show();
     }
 
     private boolean checkForError(LoaderResult<?> result) {
-        if (isLoaderError(result)) {
+        if (result.handleError(IssueListActivity.this)) {
             stopProgressDialog(mProgressDialog);
             invalidateOptionsMenu();
             return true;

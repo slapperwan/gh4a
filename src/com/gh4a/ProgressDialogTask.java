@@ -1,5 +1,7 @@
 package com.gh4a;
 
+import com.gh4a.utils.ToastUtils;
+
 import android.app.ProgressDialog;
 import android.content.Context;
 
@@ -26,5 +28,11 @@ public abstract class ProgressDialogTask<T> extends BackgroundTask<T> {
     protected void onPostExecute(T result) {
         mProgressDialog.dismiss();
         super.onPostExecute(result);
+    }
+
+    @Override
+    protected void onError(Exception e) {
+        super.onError(e);
+        ToastUtils.showError(mContext);
     }
 }

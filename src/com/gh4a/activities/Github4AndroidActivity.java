@@ -40,6 +40,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.UiUtils;
 
 /**
  * The Github4Android activity.
@@ -63,8 +64,8 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
-        if (isAuthorized()) {
-            Gh4Application app = Gh4Application.get(this);
+        Gh4Application app = Gh4Application.get(this);
+        if (app.isAuthorized()) {
             app.openUserInfoActivity(this, app.getAuthLogin(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
             finish();
             return;
@@ -81,7 +82,7 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
 
             @Override
             public void onClick(View v) {
-                hideKeyboard(btnLogin.getWindowToken());
+                UiUtils.hideImeForView(btnLogin);
                 String username = mEtUserLogin.getText().toString();
                 String password = mEtPassword.getText().toString();
                 if (!StringUtils.checkEmail(username)) {

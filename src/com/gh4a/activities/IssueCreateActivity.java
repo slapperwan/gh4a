@@ -54,6 +54,8 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.ToastUtils;
+import com.gh4a.utils.UiUtils;
 
 public class IssueCreateActivity extends BaseSherlockFragmentActivity {
     private String mRepoOwner;
@@ -171,7 +173,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
             return;
         }
         
-        if (!isAuthorized()) {
+        if (!Gh4Application.get(this).isAuthorized()) {
             Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
             startActivity(intent);
             finish();
@@ -304,16 +306,11 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
 
         @Override
         protected void onSuccess(Void result) {
-            showMessage(getString(
-                    mEditMode ? R.string.issue_success_edit : R.string.issue_success_create), false);
+            ToastUtils.showMessage(mContext,
+                    mEditMode ? R.string.issue_success_edit : R.string.issue_success_create);
             Gh4Application.get(IssueCreateActivity.this).openIssueActivity(IssueCreateActivity.this, 
                     mRepoOwner, mRepoName, mEditIssue.getNumber(),
                     Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        }
-        
-        @Override
-        protected void onError(Exception e) {
-            showError();
         }
     }
     
@@ -335,11 +332,10 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
             }
         }
         
-        AlertDialog.Builder builder = createDialogBuilder();
+        AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
         builder.setCancelable(true);
         builder.setTitle(R.string.issue_milestone);
         builder.setSingleChoiceItems(milestones, checkedItem, new DialogInterface.OnClickListener() {
-            
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (which == 0) {
@@ -350,9 +346,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
                 }
             }
         });
-        
-        builder.setPositiveButton(R.string.ok,
-                new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 if (mSelectedMilestone != null) {
                     mTvSelectedMilestone.setText(getString(
@@ -361,17 +355,9 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
                 else {
                     mTvSelectedMilestone.setText(null);
                 }
-                dialog.dismiss();
             }
-        })
-        .setNegativeButton(R.string.cancel,
-                new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        })
-       .create();
-        
+        });
+        builder.setNegativeButton(R.string.cancel, null);
         builder.show();
     }
     
@@ -390,11 +376,10 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
             }
         }
         
-        AlertDialog.Builder builder = createDialogBuilder();
+        AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
         builder.setCancelable(true);
         builder.setTitle(R.string.issue_assignee);
         builder.setSingleChoiceItems(assignees, checkedItem, new DialogInterface.OnClickListener() {
-            
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (which == 0) {
@@ -405,9 +390,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
                 }
             }
         });
-        
-        builder.setPositiveButton(R.string.ok,
-                new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 if (mSelectedAssignee != null) {
                     mTvSelectedAssignee.setText(getString(
@@ -416,17 +399,9 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
                 else {
                     mTvSelectedAssignee.setText(null);
                 }
-                dialog.dismiss();
             }
-        })
-        .setNegativeButton(R.string.cancel,
-                new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        })
-       .create();
-        
+        });
+        builder.setNegativeButton(R.string.cancel, null);
         builder.show();
     }
     
@@ -532,7 +507,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
     }
 
     private boolean checkForError(LoaderResult<?> result) {
-        if (isLoaderError(result)) {
+        if (result.handleError(IssueCreateActivity.this)) {
             hideLoading();
             stopProgressDialog(mProgressDialog);
             return true;
