@@ -94,7 +94,8 @@ public class CommitFragment extends BaseFragment implements OnClickListener {
         LinearLayout llChanged = (LinearLayout) v.findViewById(R.id.ll_changed);
         LinearLayout llAdded = (LinearLayout) v.findViewById(R.id.ll_added);
         LinearLayout llDeleted = (LinearLayout) v.findViewById(R.id.ll_deleted);
-
+        int added = 0, changed = 0, deleted = 0;
+        
         ImageView ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
         
         aq.id(R.id.iv_gravatar).image(
@@ -115,28 +116,19 @@ public class CommitFragment extends BaseFragment implements OnClickListener {
                 + " "
                 + Gh4Application.pt.format(mCommit.getCommit().getAuthor().getDate()));
 
-        TextView tvChangeTitle = (TextView) v.findViewById(R.id.commit_changed);
-        tvChangeTitle.setTypeface(app.boldCondensed);
-        tvChangeTitle.setTextColor(getResources().getColor(R.color.highlight));
-        
-        TextView tvAddedTitle = (TextView) v.findViewById(R.id.commit_added);
-        tvAddedTitle.setTypeface(app.boldCondensed);
-        tvAddedTitle.setTextColor(getResources().getColor(R.color.highlight));
-        
-        TextView tvDeletedTitle = (TextView) v.findViewById(R.id.commit_deleted);
-        tvDeletedTitle.setTypeface(app.boldCondensed);
-        tvDeletedTitle.setTextColor(getResources().getColor(R.color.highlight));
-
         for (CommitFile file : mCommit.getFiles()) {
             String status = file.getStatus();
             final LinearLayout parent;
 
             if ("added".equals(status)) {
                 parent = llAdded;
+                added++;
             } else if ("modified".equals(status)) {
                 parent = llChanged;
+                changed++;
             } else if ("removed".equals(status)) {
                 parent = llDeleted;
+                deleted++;
             } else {
                 continue;
             }
@@ -150,15 +142,24 @@ public class CommitFragment extends BaseFragment implements OnClickListener {
             }
             parent.addView(fileNameView);
         }
-
-        if (llAdded.getChildCount() == 0) {
+        
+        if (added == 0) {
             llAdded.setVisibility(View.GONE);
+        } else {
+            TextView tvAddedTitle = (TextView) v.findViewById(R.id.commit_added);
+            tvAddedTitle.setTypeface(app.boldCondensed);
         }
-        if (llChanged.getChildCount() == 0) {
+        if (changed == 0) {
             llChanged.setVisibility(View.GONE);
+        } else {
+            TextView tvChangeTitle = (TextView) v.findViewById(R.id.commit_changed);
+            tvChangeTitle.setTypeface(app.boldCondensed);
         }
-        if (llDeleted.getChildCount() == 0) {
+        if (deleted == 0) {
             llDeleted.setVisibility(View.GONE);
+        } else {
+            TextView tvDeletedTitle = (TextView) v.findViewById(R.id.commit_deleted);
+            tvDeletedTitle.setTypeface(app.boldCondensed);
         }
         
         TextView tvSummary = (TextView) v.findViewById(R.id.tv_desc);

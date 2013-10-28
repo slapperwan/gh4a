@@ -66,6 +66,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/highlight"
                     android:text="@string/commit_changed" />
                 <View 
                     android:layout_width="fill_parent"
@@ -88,6 +89,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/highlight"
                     android:text="@string/commit_added" />
                 <View 
                     android:layout_width="fill_parent"
@@ -111,6 +113,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/highlight"
                     android:text="@string/commit_deleted" />
                 <View 
                     android:layout_width="fill_parent"
