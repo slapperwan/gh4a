@@ -112,7 +112,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         THEME = sharedPreferences.getInt("THEME", R.style.DefaultTheme);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
         
-        mClient = new GitHubClient();
+        mClient = new DefaultClient();
         mClient.setOAuth2Token(getAuthToken());
         
         mServices = new HashMap<String, GitHubService>();
