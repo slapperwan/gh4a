@@ -83,7 +83,11 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> {
             viewHolder.tvExtra.setText(comment.getUser().getLogin() + "\n" + pt.format(comment.getCreatedAt()));
             
             String body = comment.getBodyHtml();
-            body = HtmlUtils.format(body).toString();
+            if (body != null) {
+                body = HtmlUtils.format(body).toString();
+            } else {
+                body = comment.getBody();
+            }
             imageGetter.bind(viewHolder.tvDesc, body, comment.getId());
         }
         return v;
