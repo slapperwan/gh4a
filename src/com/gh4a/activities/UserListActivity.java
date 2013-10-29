@@ -82,7 +82,7 @@ public abstract class UserListActivity extends BaseSherlockFragmentActivity impl
         mUserAdapter = new UserAdapter(this, getShowExtraData());
         mListViewUsers.setAdapter(mUserAdapter);
 
-        getSupportLoaderManager().initLoader(0, null, mUserListCallback).forceLoad();
+        getSupportLoaderManager().initLoader(0, null, mUserListCallback);
     }
 
     protected void fillData(List<User> users) {

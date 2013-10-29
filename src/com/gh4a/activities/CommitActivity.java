@@ -15,7 +15,6 @@
  */
 package com.gh4a.activities;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -34,11 +33,9 @@ import com.gh4a.fragment.CommitFragment;
 import com.gh4a.fragment.CommitNoteFragment;
 
 public class CommitActivity extends BaseSherlockFragmentActivity {
-
     private String mRepoOwner;
     private String mRepoName;
     private String mObjectSha;
-    public ProgressDialog mProgressDialog;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {

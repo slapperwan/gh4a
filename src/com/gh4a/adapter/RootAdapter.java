@@ -16,6 +16,7 @@
 package com.gh4a.adapter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -99,13 +100,13 @@ public abstract class RootAdapter<T> extends BaseAdapter {
         mObjects.add(object);
     }
     
-    public void addAll(List<T> objects) {
+    public void addAll(Collection<T> objects) {
         if (objects != null) {
             mObjects.addAll(objects);
         }
     }
     
-    public void addAll(int position, List<T> objects) {
+    public void addAll(int position, Collection<T> objects) {
         if (objects != null) {
             mObjects.addAll(position, objects);
         }

@@ -102,7 +102,6 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity {
         
         showLoading();
         getSupportLoaderManager().initLoader(0, null, mMilestoneCallback);
-        getSupportLoaderManager().getLoader(0).forceLoad();
     }
     
     private void openIssueMilestones() {

@@ -75,7 +75,7 @@ public class GistViewerActivity extends BaseSherlockFragmentActivity {
         mActionBar.setDisplayHomeAsUpEnabled(true);
         
         showLoading();
-        getSupportLoaderManager().initLoader(0, null, mGistCallback).forceLoad();
+        getSupportLoaderManager().initLoader(0, null, mGistCallback);
     }
     
     private void fillData(String data, boolean highlight) {

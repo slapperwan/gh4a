@@ -1,6 +1,5 @@
 package com.gh4a.fragment;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import android.os.Bundle;
@@ -19,9 +18,7 @@ public class IssueListByCommentsFragment extends IssueListFragment {
         args.putString("sort", "comments");
         
         if (filterData != null) {
-            Iterator<String> i = filterData.keySet().iterator();
-            while (i.hasNext()) {
-                String key = i.next();
+            for (String key : filterData.keySet()) {
                 args.putString(key, filterData.get(key));
             }
         }

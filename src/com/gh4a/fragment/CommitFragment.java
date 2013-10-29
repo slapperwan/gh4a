@@ -81,7 +81,7 @@ public class CommitFragment extends BaseFragment implements OnClickListener {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         showLoading();
-        getLoaderManager().initLoader(0, null, mCommitCallback).forceLoad();
+        getLoaderManager().initLoader(0, null, mCommitCallback);
     }
 
     private void fillData() {

@@ -26,6 +26,7 @@
                     android:id="@+id/tv_login"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/highlight"
                     android:textColorLink="@color/titletextcolor"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
                 <TextView
@@ -216,6 +217,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/highlight"
                 android:text="@string/other_info" />
             
             <View 
@@ -234,8 +236,8 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/repo_contributors"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp" />
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp" />
             
             <TextView
                 android:id="@+id/tv_collaborators_label"
@@ -243,8 +245,8 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/repo_collaborators"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp" />
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp" />
             
             <TextView
                 android:id="@+id/tv_wiki_label"
@@ -252,8 +254,8 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/recent_wiki"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp" />
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp" />
             
             <TextView
                 android:id="@+id/tv_downloads_label"
@@ -261,8 +263,8 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/downloads"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp" />
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

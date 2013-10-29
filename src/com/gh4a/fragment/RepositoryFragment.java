@@ -35,7 +35,6 @@ import com.gh4a.R;
 import com.gh4a.activities.CollaboratorListActivity;
 import com.gh4a.activities.ContributorListActivity;
 import com.gh4a.activities.DownloadsActivity;
-import com.gh4a.activities.IssueListActivity;
 import com.gh4a.activities.WatcherListActivity;
 import com.gh4a.activities.WikiListActivity;
 import com.gh4a.loader.LoaderCallbacks;
@@ -46,21 +45,16 @@ import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 public class RepositoryFragment extends BaseFragment implements  OnClickListener {
-
     private Repository mRepository;
-    private String mRepoOwner;
-    private String mRepoName;
-    private int mStargazerCount;
-    private boolean mDataLoaded;
 
     private LoaderCallbacks<String> mReadmeCallback = new LoaderCallbacks<String>() {
         @Override
         public Loader<LoaderResult<String>> onCreateLoader(int id, Bundle args) {
-            return new ReadmeLoader(getSherlockActivity(), mRepoOwner, mRepoName);
+            return new ReadmeLoader(getSherlockActivity(),
+                    mRepository.getOwner().getLogin(), mRepository.getName());
         }
         @Override
         public void onResultReady(LoaderResult<String> result) {
-            mDataLoaded = true;
             hideLoading(R.id.pb_readme, R.id.readme);
             fillReadme(result.getData());
         }
@@ -80,15 +74,12 @@ public class RepositoryFragment extends BaseFragment implements  OnClickListener
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mRepository = (Repository) getArguments().getSerializable("REPOSITORY");
-        mRepoOwner = mRepository.getOwner().getLogin();
-        mRepoName = mRepository.getName();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.repository, container, false);
-        return v;
+        return inflater.inflate(R.layout.repository, container, false);
     }
     
     @Override
@@ -105,106 +96,53 @@ public class RepositoryFragment extends BaseFragment implements  OnClickListener
         tvReadmeTitle.setTextColor(getResources().getColor(R.color.highlight));
 
         showLoading(R.id.pb_readme, R.id.readme);
+        getLoaderManager().initLoader(0, null, mReadmeCallback);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (!mDataLoaded) {
-            if (getLoaderManager().getLoader(0) == null) {
-                getLoaderManager().initLoader(0, null, mReadmeCallback);
-            }
-            else {
-                getLoaderManager().restartLoader(0, null, mReadmeCallback);
-            }
-            getLoaderManager().getLoader(0).forceLoad();
-        }
-    }
-    
-    public void fillData() {
+    private void fillData() {
         View v = getView();
         final Gh4Application app = (Gh4Application) getActivity().getApplicationContext();
         Typeface boldCondensed = app.boldCondensed;
         Typeface condensed = app.condensed;
-        Typeface regular = app.regular;
         Typeface italic = app.italic;
         
         TextView tvOwner = (TextView) v.findViewById(R.id.tv_login);
-        tvOwner.setText(mRepoOwner);
-        tvOwner.setTextColor(getResources().getColor(R.color.highlight));
+        tvOwner.setText(mRepository.getOwner().getLogin());
         tvOwner.setTypeface(boldCondensed);
-        tvOwner.setOnClickListener(new OnClickListener() {
+        tvOwner.setOnClickListener(this);
 
-            @Override
-            public void onClick(View v) {
-                app.openUserInfoActivity(getSherlockActivity(),
-                        mRepoOwner, null);
-            }
-        });
         TextView tvRepoName = (TextView) v.findViewById(R.id.tv_name);
-        tvRepoName.setText(mRepoName);
+        tvRepoName.setText(mRepository.getName());
         tvRepoName.setTypeface(boldCondensed);
         
         TextView tvParentRepo = (TextView) v.findViewById(R.id.tv_parent);
-        
-        TextView tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        tvDesc.setTypeface(regular);
-        
-        TextView tvUrl = (TextView) v.findViewById(R.id.tv_url);
-        tvUrl.setTypeface(regular);
-        
-        TextView tvLanguage = (TextView) v.findViewById(R.id.tv_language);
-        tvLanguage.setTypeface(regular);
         
         if (mRepository.isFork()) {
             tvParentRepo.setVisibility(View.VISIBLE);
             tvParentRepo.setTypeface(italic);
 
-            if (mRepository.getParent() != null) {
+            Repository parent = mRepository.getParent();
+            if (parent != null) {
                 tvParentRepo.setText(app.getString(R.string.forked_from,
-                        mRepository.getParent().getOwner().getLogin() + "/" +
-                        mRepository.getParent().getName()));
+                        parent.getOwner().getLogin() + "/" + parent.getName()));
                 tvParentRepo.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-                tvParentRepo.setOnClickListener(new OnClickListener() {
-
-                    @Override
-                    public void onClick(View arg0) {
-                        app.openRepositoryInfoActivity(getSherlockActivity(),
-                                mRepository.getParent().getOwner().getLogin(),
-                                mRepository.getParent().getName(), 0);
-                    }
-                });
+                tvParentRepo.setOnClickListener(this);
+                tvParentRepo.setTag(parent);
             }
-        }
-        else {
+        } else {
             tvParentRepo.setVisibility(View.GONE);
         }
-        
-        if (!StringUtils.isBlank(mRepository.getDescription())) {
-            tvDesc.setText(mRepository.getDescription());
-            tvDesc.setVisibility(View.VISIBLE);
-        }
-        else {
-            tvDesc.setVisibility(View.GONE);
-        }
-        
-        if (!StringUtils.isBlank(mRepository.getLanguage())) {
-            tvLanguage.setText(getString(R.string.repo_language, mRepository.getLanguage()));
-            tvLanguage.setVisibility(View.VISIBLE);
-        }
-        else {
-            tvLanguage.setVisibility(View.GONE);
-        }
-        
-        tvUrl.setText(mRepository.getHtmlUrl());
+
+        fillTextView(v, R.id.tv_desc, 0, mRepository.getDescription(), app);
+        fillTextView(v, R.id.tv_language,R.string.repo_language, mRepository.getLanguage(), app);
+        fillTextView(v, R.id.tv_url, 0, mRepository.getHtmlUrl(), app);
 
         TableLayout tlStargazers = (TableLayout) v.findViewById(R.id.cell_stargazers);
         tlStargazers.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
         tlStargazers.setOnClickListener(this);
         
         TextView tvStargazersCount = (TextView) v.findViewById(R.id.tv_stargazers_count);
-        mStargazerCount = mRepository.getWatchers();
-        tvStargazersCount.setText(String.valueOf(mStargazerCount));
+        tvStargazersCount.setText(String.valueOf(mRepository.getWatchers()));
         tvStargazersCount.setTypeface(boldCondensed);
         
         TableLayout tlForks = (TableLayout) v.findViewById(R.id.cell_forks);
@@ -216,13 +154,13 @@ public class RepositoryFragment extends BaseFragment implements  OnClickListener
         tvForksCount.setText(String.valueOf(mRepository.getForks()));
         
         TableLayout tlIssues = (TableLayout) v.findViewById(R.id.cell_issues);
-        tlIssues.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
         TextView tvIssues = (TextView) v.findViewById(R.id.tv_issues_label);
         TextView tvIssuesCount = (TextView) v.findViewById(R.id.tv_issues_count);
         
         if (mRepository.isHasIssues()) {
             tlIssues.setVisibility(View.VISIBLE);
             tlIssues.setOnClickListener(this);
+            tlIssues.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
             
             tvIssues.setVisibility(View.VISIBLE);
             
@@ -246,84 +184,58 @@ public class RepositoryFragment extends BaseFragment implements  OnClickListener
         TextView tvPullRequests = (TextView) v.findViewById(R.id.tv_pull_requests_label);
         tvPullRequests.setTypeface(condensed);
         
-        if (mRepository.isHasIssues()) {
-            tlIssues.setVisibility(View.VISIBLE);
-            tlIssues.setOnClickListener(this);
-            
-            tvIssues.setVisibility(View.VISIBLE);
-            
-            tvIssuesCount.setTypeface(boldCondensed);
-            tvIssuesCount.setText(String.valueOf(mRepository.getOpenIssues()));
-            tvIssuesCount.setVisibility(View.VISIBLE);
+        if (!mRepository.isHasWiki()) {
+            v.findViewById(R.id.tv_wiki_label).setVisibility(View.GONE);
         }
-        else {
-            tlIssues.setVisibility(View.GONE);
-            tvIssues.setVisibility(View.GONE);
-            tvIssuesCount.setVisibility(View.GONE);
+
+        initOtherTextView(v, R.id.tv_wiki_label, app);
+        initOtherTextView(v, R.id.tv_contributors_label, app);
+        initOtherTextView(v, R.id.tv_collaborators_label, app);
+        initOtherTextView(v, R.id.other_info, app);
+        initOtherTextView(v, R.id.tv_downloads_label, app);
+    }
+
+    private void initOtherTextView(View parent, int id, Gh4Application app) {
+        TextView view = (TextView) parent.findViewById(id);
+
+        view.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
+        view.setOnClickListener(this);
+        view.setTypeface(app.boldCondensed);
+    }
+
+    private void fillTextView(View parent, int id, int stringId, String text, Gh4Application app) {
+        TextView view = (TextView) parent.findViewById(id);
+        
+        if (!StringUtils.isBlank(text)) {
+            view.setText(stringId != 0 ? getString(stringId, text) : text);
+            view.setVisibility(View.VISIBLE);
+            view.setTypeface(app.regular);
+        } else {
+            view.setVisibility(View.GONE);
         }
-        
-        TextView tvWiki = (TextView) v.findViewById(R.id.tv_wiki_label);
-        tvWiki.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-        tvWiki.setPadding(0, 16, 0, 16);
-        if (mRepository.isHasWiki()) {
-            tvWiki.setTypeface(boldCondensed);
-            tvWiki.setOnClickListener(this);
-            tvWiki.setVisibility(View.VISIBLE);
-        }
-        else {
-            tvWiki.setVisibility(View.GONE);
-        }
-        
-        TextView tvContributor = (TextView) v.findViewById(R.id.tv_contributors_label);
-        tvContributor.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-        tvContributor.setPadding(0, 16, 0, 16);
-        tvContributor.setOnClickListener(this);
-        tvContributor.setTypeface(boldCondensed);
-        
-        TextView tvCollaborators = (TextView) v.findViewById(R.id.tv_collaborators_label);
-        tvCollaborators.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-        tvCollaborators.setPadding(0, 16, 0, 16);
-        tvCollaborators.setOnClickListener(this);
-        tvCollaborators.setTypeface(boldCondensed);
-        
-        TextView tvOthers = (TextView) v.findViewById(R.id.other_info);
-        tvOthers.setTypeface(boldCondensed);
-        tvOthers.setTextColor(getResources().getColor(R.color.highlight));
-        
-        TextView tvDownloads = (TextView) v.findViewById(R.id.tv_downloads_label);
-        tvDownloads.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-        tvDownloads.setPadding(0, 16, 0, 16);
-        tvDownloads.setOnClickListener(this);
-        tvDownloads.setTypeface(boldCondensed);
     }
 
     public void updateStargazerCount(boolean starring) {
         TextView tvStargazersCount = (TextView) getView().findViewById(R.id.tv_stargazers_count);
         if (starring) {
-            tvStargazersCount.setText(String.valueOf(++mStargazerCount));
+            mRepository.setWatchers(mRepository.getWatchers() + 1);
+        } else {
+            mRepository.setWatchers(mRepository.getWatchers() - 1);
         }
-        else {
-            tvStargazersCount.setText(String.valueOf(--mStargazerCount));
-        }
+        tvStargazersCount.setText(String.valueOf(mRepository.getWatchers()));
     }
     
     public void fillReadme(String readme) {
+        TextView tvReadme = (TextView) getView().findViewById(R.id.readme);
         if (readme != null) {
-            if (getActivity() != null) {
-                TextView tvReadme = (TextView) getView().findViewById(R.id.readme);
-                tvReadme.setMovementMethod(LinkMovementMethod.getInstance());
-                
-                readme = HtmlUtils.format(readme).toString();
-                HttpImageGetter imageGetter = new HttpImageGetter(getSherlockActivity());
-                imageGetter.bind(tvReadme, readme, mRepository.getId());
-            }
-        }
-        else {
-            if (getView() != null) {
-                TextView tvReadme = (TextView) getView().findViewById(R.id.readme);
-                tvReadme.setText(R.string.repo_no_readme);
-                tvReadme.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
-            }
+            tvReadme.setMovementMethod(LinkMovementMethod.getInstance());
+
+            readme = HtmlUtils.format(readme).toString();
+            HttpImageGetter imageGetter = new HttpImageGetter(getSherlockActivity());
+            imageGetter.bind(tvReadme, readme, mRepository.getId());
+        } else {
+            tvReadme.setText(R.string.repo_no_readme);
+            tvReadme.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
         }
     }
     
@@ -331,79 +243,42 @@ public class RepositoryFragment extends BaseFragment implements  OnClickListener
     public void onClick(View view) {
         int id = view.getId();
         Gh4Application app = (Gh4Application) getActivity().getApplicationContext();
-        
-        if (id == R.id.cell_pull_requests) {
-            app.openPullRequestListActivity(getActivity(),
-                    mRepoOwner, mRepoName,
+        String owner = mRepository.getOwner().getLogin();
+        String name = mRepository.getName();
+        Intent intent = null;
+
+        if (id == R.id.tv_login) {
+            app.openUserInfoActivity(getActivity(), owner, null);
+        } else if (id == R.id.cell_pull_requests) {
+            app.openPullRequestListActivity(getActivity(), owner, name,
                     Constants.Issue.ISSUE_STATE_OPEN);
         } else if (id == R.id.tv_contributors_label) {
-            getContributors(view);
+            intent = new Intent(getActivity(), ContributorListActivity.class);
         } else if (id == R.id.tv_collaborators_label) {
-            getCollaborators(view);
+            intent = new Intent(getActivity(), CollaboratorListActivity.class);
         } else if (id == R.id.cell_issues) {
-            app.openIssueListActivity(getActivity(),
-                    mRepoOwner, mRepoName,
+            app.openIssueListActivity(getActivity(), owner, name,
                     Constants.Issue.ISSUE_STATE_OPEN);
         } else if (id == R.id.cell_stargazers) {
-            getStargazers(view);
+            intent = new Intent(getActivity(), WatcherListActivity.class);
+            intent.putExtra("pos", 0);
         } else if (id == R.id.cell_forks) {
-            getNetworks(view);
+            intent = new Intent(getActivity(), WatcherListActivity.class);
+            intent.putExtra("pos", 2);
         } else if (id == R.id.tv_wiki_label) {
-            getWiki(view);
+            intent = new Intent(getActivity(), WikiListActivity.class);
         } else if (id == R.id.tv_downloads_label) {
-            getDownloads(view);
+            intent = new Intent(getActivity(), DownloadsActivity.class);
+        } else if (view.getTag() instanceof Repository) {
+            Repository repo = (Repository) view.getTag();
+            app.openRepositoryInfoActivity(getActivity(),
+                    repo.getOwner().getLogin(), repo.getName(), 0);
         }
-    }
 
-    public void getWiki(View view) {
-        Intent intent = new Intent().setClass(getActivity(), WikiListActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-        startActivity(intent);
-    }
-    
-    public void getStargazers(View view) {
-        Intent intent = new Intent().setClass(getActivity(), WatcherListActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-        intent.putExtra("pos", 0);
-        startActivity(intent);
-    }
-
-    public void getNetworks(View view) {
-        Intent intent = new Intent().setClass(getActivity(), WatcherListActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-        intent.putExtra("pos", 2);
-        startActivity(intent);
-    }
-
-    public void getOpenIssues(View view) {
-        Intent intent = new Intent().setClass(getActivity(), IssueListActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-        intent.putExtra(Constants.Issue.ISSUE_STATE, Constants.Issue.ISSUE_STATE_OPEN);
-        startActivity(intent);
-    }
-
-    public void getContributors(View view) {
-        Intent intent = new Intent().setClass(getActivity(), ContributorListActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-        startActivity(intent);
-    }
-    
-    public void getCollaborators(View view) {
-        Intent intent = new Intent().setClass(getActivity(), CollaboratorListActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-        startActivity(intent);
-    }
-    
-    public void getDownloads(View view) {
-        Intent intent = new Intent().setClass(getActivity(), DownloadsActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-        startActivity(intent);
+        if (intent != null) {
+            intent.putExtra(Constants.Repository.REPO_OWNER, owner);
+            intent.putExtra(Constants.Repository.REPO_NAME, name);
+            startActivity(intent);
+        }
     }
 }

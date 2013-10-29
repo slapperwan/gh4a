@@ -15,47 +15,24 @@
  */
 package com.gh4a.fragment;
 
-import java.util.List;
-
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
-import com.gh4a.R;
 import com.gh4a.adapter.PullRequestAdapter;
-import com.gh4a.loader.PageIteratorLoader;
+import com.gh4a.adapter.RootAdapter;
 
-public class PullRequestListFragment extends BaseFragment 
-    implements LoaderManager.LoaderCallbacks<List<PullRequest>>, OnItemClickListener, OnScrollListener {
-
+public class PullRequestListFragment extends PagedDataBaseFragment<PullRequest> {
     private String mRepoOwner;
     private String mRepoName;
     private String mState;
-    private ListView mListView;
-    private PullRequestAdapter mAdapter;
-    private PageIterator<PullRequest> mDataIterator;
-    private boolean isLoadMore;
-    private boolean isLoadCompleted;
-    private TextView mLoadingView;
     
     public static PullRequestListFragment newInstance(String repoOwner, String repoName, String state) {
-        
         PullRequestListFragment f = new PullRequestListFragment();
         Bundle args = new Bundle();
         args.putString(Constants.Repository.REPO_OWNER, repoOwner);
@@ -76,104 +53,21 @@ public class PullRequestListFragment extends BaseFragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.generic_list, container, false);
-        mListView = (ListView) v.findViewById(R.id.list_view);
-        return v;
-    }
-    
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        
-        LayoutInflater vi = getSherlockActivity().getLayoutInflater();
-        mLoadingView = (TextView) vi.inflate(R.layout.row_simple, null);
-        mLoadingView.setText(R.string.loading_msg);
-        mLoadingView.setTextColor(getResources().getColor(R.color.highlight));
-        
-        mAdapter = new PullRequestAdapter(getSherlockActivity());
-        mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener(this);
-        mListView.setOnScrollListener(this);
-        
-        loadData();
-        
-        getLoaderManager().initLoader(0, null, this);
-        getLoaderManager().getLoader(0).forceLoad();
-    }
-    
-    public void loadData() {
-        PullRequestService pullRequestService = (PullRequestService)
-                Gh4Application.get(getActivity()).getService(Gh4Application.PULL_SERVICE);
-        mDataIterator = pullRequestService.pagePullRequests(new RepositoryId(mRepoOwner, mRepoName), mState);
-    }
-    
-    private void fillData(List<PullRequest> pullRequests) {
-        if (pullRequests != null && !pullRequests.isEmpty()) {
-            if (mListView.getFooterViewsCount() == 0) {
-                mListView.addFooterView(mLoadingView);
-                mListView.setAdapter(mAdapter);
-            }
-            if (isLoadMore) {
-                mAdapter.addAll(mAdapter.getCount(), pullRequests);
-                mAdapter.notifyDataSetChanged();
-            }
-            else {
-                mAdapter.clear();
-                mAdapter.addAll(pullRequests);
-                mAdapter.notifyDataSetChanged();
-                mListView.setSelection(0);
-            }
-        }
-        else {
-            mListView.removeFooterView(mLoadingView);
-        }
-    }
-
-    @Override
-    public void onScroll(AbsListView view, int firstVisible, int visibleCount, int totalCount) {
-
-        boolean loadMore = firstVisible + visibleCount >= totalCount;
-
-        if(loadMore) {
-            if (getLoaderManager().getLoader(0) != null
-                    && isLoadCompleted) {
-                isLoadMore = true;
-                isLoadCompleted = false;
-                getLoaderManager().getLoader(0).forceLoad();
-            }
-        }
-    }
-    
-    @Override
-    public void onScrollStateChanged(AbsListView view, int scrollState) {}
-    
-    @Override
-    public Loader<List<PullRequest>> onCreateLoader(int id, Bundle args) {
-        return new PageIteratorLoader<PullRequest>(getSherlockActivity(), mDataIterator);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<List<PullRequest>> loader, List<PullRequest> pullRequests) {
-        isLoadCompleted = true;
-        hideLoading();
-        fillData(pullRequests);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<List<PullRequest>> arg0) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+    protected void onItemClick(PullRequest pullRequest) {
         Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
-        PullRequest pullRequest = (PullRequest) mAdapter.getItem(position);
         app.openPullRequestActivity(getSherlockActivity(), mRepoOwner,
                 mRepoName, pullRequest.getNumber());
     }
 
-        
+    @Override
+    protected RootAdapter<PullRequest> onCreateAdapter() {
+        return new PullRequestAdapter(getSherlockActivity());
+    }
+
+    @Override
+    protected PageIterator<PullRequest> onCreateIterator() {
+        PullRequestService pullRequestService = (PullRequestService)
+                Gh4Application.get(getActivity()).getService(Gh4Application.PULL_SERVICE);
+        return pullRequestService.pagePullRequests(new RepositoryId(mRepoOwner, mRepoName), mState);
+    }
 }

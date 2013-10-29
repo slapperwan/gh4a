@@ -98,7 +98,7 @@ public class UserActivity extends BaseSherlockFragmentActivity {
         }
 
         if (!mUserLogin.equals(Gh4Application.get(this).getAuthLogin())) {
-            getSupportLoaderManager().initLoader(4, null, mIsFollowingCallback).forceLoad();
+            getSupportLoaderManager().initLoader(4, null, mIsFollowingCallback);
         }
     }
     
@@ -116,12 +116,12 @@ public class UserActivity extends BaseSherlockFragmentActivity {
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
             if (position == 1) {
-                mPrivateEventListFragment = (PrivateEventListFragment)
+                mPrivateEventListFragment = 
                         PrivateEventListFragment.newInstance(mUserLogin, mIsLoginUserPage);
                 return mPrivateEventListFragment;
             }
             else if (position == 2) {
-                mPublicEventListFragment = (PublicEventListFragment)
+                mPublicEventListFragment =
                         PublicEventListFragment.newInstance(mUserLogin, false);
                 return mPublicEventListFragment;
             }

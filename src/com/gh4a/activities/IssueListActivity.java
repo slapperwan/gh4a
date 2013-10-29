@@ -82,6 +82,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity implements O
                 stopProgressDialog(mProgressDialog);
                 mLabels = result.getData();
                 showLabelsDialog();
+                getSupportLoaderManager().destroyLoader(0);
             }
         }
     };
@@ -97,6 +98,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity implements O
                 stopProgressDialog(mProgressDialog);
                 mMilestones = result.getData();
                 showMilestonesDialog();
+                getSupportLoaderManager().destroyLoader(1);
             }
         }
     };
@@ -112,6 +114,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity implements O
                 stopProgressDialog(mProgressDialog);
                 mAssignees = result.getData();
                 showAssigneesDialog();
+                getSupportLoaderManager().destroyLoader(2);
             }
         }
     };
@@ -150,11 +153,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity implements O
         
         setContentView(R.layout.view_pager);
 
-        getSupportLoaderManager().initLoader(0, null, mLabelCallback);
-        getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
-        getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
         getSupportLoaderManager().initLoader(3, null, mIsCollaboratorCallback);
-        getSupportLoaderManager().getLoader(3).forceLoad();
 
         mActionBar = getSupportActionBar();
         updateTitle();
@@ -316,7 +315,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity implements O
         case R.id.labels:
             if (mLabels == null) {
                 mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-                getSupportLoaderManager().getLoader(0).forceLoad();
+                getSupportLoaderManager().initLoader(0, null, mLabelCallback);
             }
             else {
                 showLabelsDialog();
@@ -325,7 +324,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity implements O
         case R.id.milestones:
             if (mMilestones == null) {
                 mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-                getSupportLoaderManager().getLoader(1).forceLoad();
+                getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
             }
             else {
                 showMilestonesDialog();
@@ -334,7 +333,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity implements O
         case R.id.assignees:
             if (mAssignees == null) {
                 mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-                getSupportLoaderManager().getLoader(2).forceLoad();
+                getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
             }
             else {
                 showAssigneesDialog();

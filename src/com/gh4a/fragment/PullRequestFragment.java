@@ -21,6 +21,7 @@ import java.util.Locale;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.PullRequest;
+import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.IssueService;
 
 import android.app.Activity;
@@ -46,7 +47,6 @@ import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.activities.EditCommentActivity;
-import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.adapter.CommentAdapter;
 import com.gh4a.loader.IssueCommentsLoader;
 import com.gh4a.loader.LoaderCallbacks;
@@ -59,7 +59,8 @@ import com.gh4a.utils.UiUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
-public class PullRequestFragment extends BaseFragment implements CommentAdapter.OnEditComment {
+public class PullRequestFragment extends BaseFragment implements
+        CommentAdapter.OnEditComment, OnClickListener {
     private static final int REQUEST_EDIT = 1000;
 
     private String mRepoOwner;
@@ -75,8 +76,8 @@ public class PullRequestFragment extends BaseFragment implements CommentAdapter.
         }
         @Override
         public void onResultReady(LoaderResult<PullRequest> result) {
-            if (!checkForError(result)) {
-                hideLoading();
+            hideLoading();
+            if (!result.handleError(getActivity())) {
                 fillData(result.getData());
             }
         }
@@ -88,10 +89,8 @@ public class PullRequestFragment extends BaseFragment implements CommentAdapter.
         }
         @Override
         public void onResultReady(LoaderResult<List<Comment>> result) {
-            // FIXME
-            PullRequestActivity activity = (PullRequestActivity) getSherlockActivity();
-            if (!checkForError(result)) {
-                activity.stopProgressDialog(activity.mProgressDialog);
+            hideLoading();
+            if (!result.handleError(getActivity())) {
                 fillDiscussion(result.getData());
             }
         }
@@ -120,8 +119,7 @@ public class PullRequestFragment extends BaseFragment implements CommentAdapter.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.pull_request, container, false);
-        return v;
+        return inflater.inflate(R.layout.pull_request, container, false);
     }
     
     @Override
@@ -134,17 +132,11 @@ public class PullRequestFragment extends BaseFragment implements CommentAdapter.
         }
         
         getLoaderManager().initLoader(0, null, mPullRequestCallback);
-        getLoaderManager().getLoader(0).forceLoad();
-        
         getLoaderManager().initLoader(1, null, mCommentCallback);
     }
     
     private void fillData(final PullRequest pullRequest) {
-        //load comments
-        getLoaderManager().getLoader(1).forceLoad();
-        
         final Gh4Application app = Gh4Application.get(getActivity());
-        
         View v = getView();
         ListView lvComments = (ListView) v.findViewById(R.id.list_view);
         
@@ -154,80 +146,105 @@ public class PullRequestFragment extends BaseFragment implements CommentAdapter.
         mHeader.setClickable(false);
         lvComments.addHeaderView(mHeader, null, true);
 
-        TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
         mCommentAdapter = new CommentAdapter(getSherlockActivity(), mRepoOwner, this);
         lvComments.setAdapter(mCommentAdapter);
         
-        ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
-        if (pullRequest.getUser() != null) {
+        User user = pullRequest.getUser();
+        if (user != null) {
             AQuery aq = new AQuery(getSherlockActivity());
-            aq.id(R.id.iv_gravatar).image(GravatarUtils.getGravatarUrl(pullRequest.getUser().getGravatarId()), 
+            aq.id(R.id.iv_gravatar).image(GravatarUtils.getGravatarUrl(user.getGravatarId()), 
                     true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
-            
-            ivGravatar.setOnClickListener(new OnClickListener() {
-    
-                @Override
-                public void onClick(View arg0) {
-                    app.openUserInfoActivity(getSherlockActivity(),
-                            pullRequest.getUser().getLogin(), pullRequest.getUser().getName());
-                }
-            });
+            View gravatar = mHeader.findViewById(R.id.iv_gravatar);
+            gravatar.setOnClickListener(this);
+            gravatar.setTag(user);
         }
         
-        TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
-        TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
-        TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
-        
-        TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
-        tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
-        
+        TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
+        tvCommentTitle.setText(getString(R.string.issue_comment_title) + " (" + pullRequest.getComments() + ")");
         tvCommentTitle.setTypeface(app.boldCondensed);
-        tvCommentTitle.setTextColor(getResources().getColor(R.color.highlight));
-        tvCommentTitle.setText(getResources().getString(R.string.issue_comment_title) + " (" + pullRequest.getComments() + ")");
-        
+
+        TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
         tvState.setText(pullRequest.getState());
         tvState.setTextColor(Color.WHITE);
         if ("closed".equals(pullRequest.getState())) {
             tvState.setBackgroundResource(R.drawable.default_red_box);
             tvState.setText(getString(R.string.closed).toUpperCase(Locale.getDefault()));
-        }
-        else {
+        } else {
             tvState.setBackgroundResource(R.drawable.default_green_box);
             tvState.setText(getString(R.string.open).toUpperCase(Locale.getDefault()));
         }
+
+        TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
+        tvExtra.setText(getString(R.string.issue_open_by_user,
+                pullRequest.getUser() != null ? pullRequest.getUser().getLogin() : "",
+                Gh4Application.pt.format(pullRequest.getCreatedAt())));
+        
+        TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
         tvTitle.setText(pullRequest.getTitle());
         tvTitle.setTypeface(app.boldCondensed);
         
+        TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
         String body = pullRequest.getBodyHtml();
+        tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
         if (!StringUtils.isBlank(body)) {
             HttpImageGetter imageGetter = new HttpImageGetter(getSherlockActivity());
             body = HtmlUtils.format(body).toString();
             imageGetter.bind(tvDesc, body, pullRequest.getId());
         }
-        tvExtra.setText(getResources().getString(R.string.issue_open_by_user,
-                pullRequest.getUser() != null ? pullRequest.getUser().getLogin() : "",
-                Gh4Application.pt.format(pullRequest.getCreatedAt())));
         
         ImageView ivComment = (ImageView) v.findViewById(R.id.iv_comment);
         if (Gh4Application.THEME == R.style.DefaultTheme) {
             ivComment.setImageResource(R.drawable.social_send_now_dark);
         }
         ivComment.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-        ivComment.setPadding(5, 2, 5, 2);
-        ivComment.setOnClickListener(new OnClickListener() {
-            
-            @Override
-            public void onClick(View v) {
-                EditText etComment = (EditText) PullRequestFragment.this.getView().findViewById(R.id.et_comment);
-                String text = etComment.getText() == null ? null : etComment.getText().toString();
-                if (!StringUtils.isBlank(text)) {
-                    new CommentIssueTask(text).execute();
-                }
-                UiUtils.hideImeForView(getActivity().getCurrentFocus());
-            }
-        });
+        ivComment.setOnClickListener(this);
     }
     
+
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+        if (id == R.id.iv_gravatar) {
+            User user = (User) v.getTag();
+            Gh4Application.get(getActivity()).openUserInfoActivity(getActivity(),
+                    user.getLogin(), user.getName());
+        } else if (id == R.id.iv_comment) {
+            EditText etComment = (EditText) getView().findViewById(R.id.et_comment);
+            String text = etComment.getText() == null ? null : etComment.getText().toString();
+            if (!StringUtils.isBlank(text)) {
+                new CommentIssueTask(text).execute();
+            }
+            UiUtils.hideImeForView(getActivity().getCurrentFocus());
+        }
+    }
+
+    private void fillDiscussion(List<Comment> comments) {
+        if (comments != null && !comments.isEmpty()) {
+            mCommentAdapter.clear();
+            mCommentAdapter.addAll(comments);
+            mCommentAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_EDIT && resultCode == Activity.RESULT_OK) {
+            getLoaderManager().restartLoader(1, null, mCommentCallback);
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void editComment(Comment comment) {
+        Intent intent = new Intent(getActivity(), EditCommentActivity.class);
+        
+        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        intent.putExtra(Constants.Comment.ID, comment.getId());
+        intent.putExtra(Constants.Comment.BODY, comment.getBody());
+        startActivityForResult(intent, REQUEST_EDIT);
+    }
+
     private class CommentIssueTask extends ProgressDialogTask<Void> {
         private String mText;
 
@@ -249,7 +266,6 @@ public class PullRequestFragment extends BaseFragment implements CommentAdapter.
             ToastUtils.showMessage(mContext, R.string.issue_success_comment);
             //reload comments
             getLoaderManager().restartLoader(1, null, mCommentCallback);
-            getLoaderManager().getLoader(1).forceLoad();
             
             EditText etComment = (EditText) getView().findViewById(R.id.et_comment);
             etComment.setText(null);
@@ -260,43 +276,5 @@ public class PullRequestFragment extends BaseFragment implements CommentAdapter.
         protected void onError(Exception e) {
             ToastUtils.showMessage(mContext, R.string.issue_error_comment);
         }
-    }
-
-    private void fillDiscussion(List<Comment> comments) {
-        if (comments != null && !comments.isEmpty()) {
-            mCommentAdapter.clear();
-            mCommentAdapter.addAll(comments);
-            mCommentAdapter.notifyDataSetChanged();
-        }
-    }
-
-    private boolean checkForError(LoaderResult<?> result) {
-        // FIXME
-        PullRequestActivity activity = (PullRequestActivity) getSherlockActivity();
-        if (!result.handleError(activity)) {
-            hideLoading();
-            activity.stopProgressDialog(activity.mProgressDialog);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_EDIT && resultCode == Activity.RESULT_OK) {
-            getLoaderManager().getLoader(1).forceLoad();
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    public void editComment(Comment comment) {
-        Intent intent = new Intent(getActivity(), EditCommentActivity.class);
-        
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-        intent.putExtra(Constants.Comment.ID, comment.getId());
-        intent.putExtra(Constants.Comment.BODY, comment.getBody());
-        startActivityForResult(intent, REQUEST_EDIT);
     }
 }

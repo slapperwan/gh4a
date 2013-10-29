@@ -6,9 +6,8 @@ import android.view.MenuItem;
 import com.gh4a.Constants;
 
 public class PrivateEventListFragment extends EventListFragment {
-
-    public static EventListFragment newInstance(String login, boolean isPrivate) {
-        EventListFragment f = new PrivateEventListFragment();
+    public static PrivateEventListFragment newInstance(String login, boolean isPrivate) {
+        PrivateEventListFragment f = new PrivateEventListFragment();
 
         Bundle args = new Bundle();
         args.putString(Constants.User.USER_LOGIN, login);
@@ -25,12 +24,10 @@ public class PrivateEventListFragment extends EventListFragment {
     
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        if(item.getGroupId() == 1) { 
+        if (item.getGroupId() == 1) { 
             open(item);
             return true;
         }
-        else {
-            return false;
-        }
+        return false;
     }
 }

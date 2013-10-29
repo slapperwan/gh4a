@@ -1,6 +1,6 @@
 package com.gh4a.activities;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -25,8 +25,8 @@ import com.gh4a.R;
 import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 
-public class CommitHistoryActivity extends BaseSherlockFragmentActivity 
-    implements LoaderManager.LoaderCallbacks<List<RepositoryCommit>>, OnItemClickListener, OnScrollListener {
+public class CommitHistoryActivity extends BaseSherlockFragmentActivity implements
+    LoaderManager.LoaderCallbacks<Collection<RepositoryCommit>>, OnItemClickListener, OnScrollListener {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -61,7 +61,6 @@ public class CommitHistoryActivity extends BaseSherlockFragmentActivity
         loadData();
         
         getSupportLoaderManager().initLoader(0, null, this);
-        getSupportLoaderManager().getLoader(0).forceLoad();
     }
     
     public void loadData() {
@@ -71,7 +70,7 @@ public class CommitHistoryActivity extends BaseSherlockFragmentActivity
                 mRef, mFilePath);
     }
     
-    protected void fillData(List<RepositoryCommit> commits) {
+    protected void fillData(Collection<RepositoryCommit> commits) {
         if (commits != null && commits.size() > 0) {
             mCommitAdapter.addAll(commits);
         }
@@ -95,12 +94,8 @@ public class CommitHistoryActivity extends BaseSherlockFragmentActivity
     public void onScroll(AbsListView view, int firstVisible, int visibleCount, int totalCount) {
         boolean loadMore = firstVisible + visibleCount >= totalCount;
 
-        if(loadMore) {
-            if (getLoaderManager().getLoader(0) != null
-                    && isLoadCompleted) {
-                isLoadCompleted = false;
-                getLoaderManager().getLoader(0).forceLoad();
-            }
+        if(loadMore && isLoadCompleted) {
+            getSupportLoaderManager().restartLoader(0, null, this);
         }
     }
 
@@ -111,21 +106,19 @@ public class CommitHistoryActivity extends BaseSherlockFragmentActivity
     }
 
     @Override
-    public Loader<List<RepositoryCommit>> onCreateLoader(int id, Bundle args) {
+    public Loader<Collection<RepositoryCommit>> onCreateLoader(int id, Bundle args) {
         return new PageIteratorLoader<RepositoryCommit>(this, mDataIterator);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<RepositoryCommit>> loader,
-            List<RepositoryCommit> commits) {
+    public void onLoadFinished(Loader<Collection<RepositoryCommit>> loader,
+            Collection<RepositoryCommit> commits) {
         isLoadCompleted = true;
         hideLoading();
         fillData(commits);
     }
 
     @Override
-    public void onLoaderReset(Loader<List<RepositoryCommit>> arg0) {
-        // TODO Auto-generated method stub
-        
+    public void onLoaderReset(Loader<Collection<RepositoryCommit>> loader) {
     }
 }

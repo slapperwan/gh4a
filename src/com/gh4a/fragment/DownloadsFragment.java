@@ -10,40 +10,18 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
 
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.adapter.DownloadAdapter;
+import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.DownloadsLoader;
-import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.UiUtils;
 
-public class DownloadsFragment extends BaseFragment implements OnItemClickListener {
+public class DownloadsFragment extends ListDataBaseFragment<Download> {
     private String mRepoOwner;
     private String mRepoName;
-    private ListView mListView;
-    private DownloadAdapter mAdapter;
-
-    private LoaderCallbacks<List<Download>> mDownloadsCallback = new LoaderCallbacks<List<Download>>() {
-        @Override
-        public Loader<LoaderResult<List<Download>>> onCreateLoader(int id, Bundle args) {
-            return new DownloadsLoader(getSherlockActivity(), mRepoOwner, mRepoName);
-        }
-        @Override
-        public void onResultReady(LoaderResult<List<Download>> result) {
-            hideLoading();
-            if (!result.handleError(getActivity())) {
-                fillData(result.getData());
-            }
-        }
-    };
 
     public static DownloadsFragment newInstance(String repoOwner, String repoName) {
         DownloadsFragment f = new DownloadsFragment();
@@ -62,35 +40,12 @@ public class DownloadsFragment extends BaseFragment implements OnItemClickListen
     }
     
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.generic_list, container, false);
-        mListView = (ListView) v.findViewById(R.id.list_view);
-        return v;
-    }
-    
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        
-        mAdapter = new DownloadAdapter(getSherlockActivity());
-        mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener(this);
-        
-        showLoading();
-        
-        getLoaderManager().initLoader(0, null, mDownloadsCallback);
-        getLoaderManager().getLoader(0).forceLoad();
+    protected RootAdapter<Download> onCreateAdapter() {
+        return new DownloadAdapter(getSherlockActivity());
     }
 
-    public void fillData(List<Download> downloads) {
-        mAdapter.addAll(downloads);
-        mAdapter.notifyDataSetChanged();
-    }
-    
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, final int position, long id) {
-        final Download download = (Download) mAdapter.getItem(position);
+    public void onItemClick(final Download download) {
         AlertDialog.Builder builder = UiUtils.createDialogBuilder(getActivity());
         builder.setTitle(R.string.download_file_title);
         builder.setMessage(getString(R.string.download_file_message, download.getName()));
@@ -102,5 +57,10 @@ public class DownloadsFragment extends BaseFragment implements OnItemClickListen
         });
         builder.setNegativeButton(R.string.cancel, null);
         builder.show();
+    }
+
+    @Override
+    public Loader<LoaderResult<List<Download>>> onCreateLoader(int id, Bundle args) {
+        return new DownloadsLoader(getSherlockActivity(), mRepoOwner, mRepoName);
     }
 }

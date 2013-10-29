@@ -93,7 +93,7 @@ public class WikiListActivity extends BaseSherlockFragmentActivity {
             }
         });
 
-        getSupportLoaderManager().initLoader(0, null, mFeedCallback).forceLoad();
+        getSupportLoaderManager().initLoader(0, null, mFeedCallback);
     }
 
     private void fillData(List<Feed> result) {

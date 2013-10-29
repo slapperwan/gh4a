@@ -122,7 +122,6 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
         actionBar.setDisplayHomeAsUpEnabled(true);
         
         getSupportLoaderManager().initLoader(0, null, mLabelCallback);
-        getSupportLoaderManager().getLoader(0).forceLoad();
     }
 
     @Override
@@ -267,7 +266,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
 
         @Override
         protected void onSuccess(Void result) {
-            getSupportLoaderManager().restartLoader(0, null, mLabelCallback).forceLoad();
+            getSupportLoaderManager().restartLoader(0, null, mLabelCallback);
         }
     }
     
@@ -298,7 +297,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
 
         @Override
         protected void onSuccess(Void result) {
-            getSupportLoaderManager().restartLoader(0, null, mLabelCallback).forceLoad();
+            getSupportLoaderManager().restartLoader(0, null, mLabelCallback);
         }
         
         @Override
@@ -332,7 +331,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
 
         @Override
         protected void onSuccess(Void result) {
-            getSupportLoaderManager().restartLoader(0, null, mLabelCallback).forceLoad();
+            getSupportLoaderManager().restartLoader(0, null, mLabelCallback);
             mAddedLabel = null;
         }
         

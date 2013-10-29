@@ -82,7 +82,6 @@ public class DownloadBranchesFragment extends BaseFragment implements OnItemClic
         showLoading();
         
         getLoaderManager().initLoader(0, null, mBranchCallback);
-        getLoaderManager().getLoader(0).forceLoad();
     }
 
     public void fillData(List<RepositoryBranch> branches) {

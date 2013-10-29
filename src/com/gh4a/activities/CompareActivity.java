@@ -88,7 +88,6 @@ public class CompareActivity extends BaseSherlockFragmentActivity implements OnI
         mListView.setOnItemClickListener(this);
         
         getSupportLoaderManager().initLoader(0, null, mCompareCallback);
-        getSupportLoaderManager().getLoader(0).forceLoad();
     }
     
     @Override

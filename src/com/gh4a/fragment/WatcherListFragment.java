@@ -15,37 +15,21 @@
  */
 package com.gh4a.fragment;
 
-import java.util.List;
-
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.WatcherService;
 
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
-import com.gh4a.R;
+import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.UserAdapter;
-import com.gh4a.loader.PageIteratorLoader;
 
-public class WatcherListFragment extends BaseFragment 
-    implements LoaderManager.LoaderCallbacks<List<User>>, OnItemClickListener {
-
+public class WatcherListFragment extends PagedDataBaseFragment<User> {
     private String mRepoOwner;
     private String mRepoName;
-    private ListView mListView;
-    private UserAdapter mAdapter;
-    private PageIterator<User> mDataIterator;
     
     public static WatcherListFragment newInstance(String repoOwner, String repoName) {
         WatcherListFragment f = new WatcherListFragment();
@@ -66,61 +50,20 @@ public class WatcherListFragment extends BaseFragment
     }
     
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.generic_list, container, false);
-        mListView = (ListView) v.findViewById(R.id.list_view);
-        return v;
+    protected RootAdapter<User> onCreateAdapter() {
+        return new UserAdapter(getSherlockActivity(), false);
     }
     
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        
-        mAdapter = new UserAdapter(getSherlockActivity(), false);
-        mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener(this);
-        
-        loadData();
-
-        getLoaderManager().initLoader(0, null, this);
-        getLoaderManager().getLoader(0).forceLoad();
-    }
-    
-    private void loadData() {
-        WatcherService watcherService = (WatcherService)
-                Gh4Application.get(getActivity()).getService(Gh4Application.WATCHER_SERVICE);
-        mDataIterator = watcherService.pageWatchers(new RepositoryId(mRepoOwner, mRepoName));
-    }
-
-    private void fillData(List<User> users) {
-        mAdapter.addAll(users);
-        mAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+    protected void onItemClick(User user) {
         Gh4Application app = Gh4Application.get(getActivity());
-        User user = (User) adapterView.getAdapter().getItem(position);
         app.openUserInfoActivity(getActivity(), user.getLogin(), user.getName());
     }
 
     @Override
-    public Loader<List<User>> onCreateLoader(int id, Bundle args) {
-        return new PageIteratorLoader<User>(getSherlockActivity(), mDataIterator);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<List<User>> loader, List<User> users) {
-        hideLoading();
-        if (users != null) {
-            fillData(users);
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<List<User>> users) {
-        // TODO Auto-generated method stub
-        
+    protected PageIterator<User> onCreateIterator() {
+        WatcherService watcherService = (WatcherService)
+                Gh4Application.get(getActivity()).getService(Gh4Application.WATCHER_SERVICE);
+        return watcherService.pageWatchers(new RepositoryId(mRepoOwner, mRepoName));
     }
 }

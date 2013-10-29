@@ -102,6 +102,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
                 stopProgressDialog(mProgressDialog);
                 mAllMilestone = result.getData();
                 showMilestonesDialog();
+                getSupportLoaderManager().destroyLoader(1);
             }
         }
     };
@@ -117,6 +118,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
                 stopProgressDialog(mProgressDialog);
                 mAllAssignee = result.getData();
                 showAssigneesDialog();
+                getSupportLoaderManager().destroyLoader(2);
             }
         }
     };
@@ -131,7 +133,6 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
             LinearLayout collaboratorLayout = (LinearLayout) findViewById(R.id.for_collaborator);
             if (result.getData()) {
                 collaboratorLayout.setVisibility(View.VISIBLE);
-                getSupportLoaderManager().getLoader(0).forceLoad();
             }
             else {
                 collaboratorLayout.setVisibility(View.GONE);
@@ -148,7 +149,6 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
         public void onResultReady(LoaderResult<Issue> result) {
             hideLoading();
             mEditIssue = result.getData();
-            getSupportLoaderManager().getLoader(4).forceLoad();
             fillIssueData();
         }
     };
@@ -202,18 +202,13 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
         collaboratorLayout.setVisibility(View.GONE);
 
         getSupportLoaderManager().initLoader(0, null, mLabelCallback);
-        getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
-        getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
         getSupportLoaderManager().initLoader(4, null, mIsCollaboratorCallback);
         
         if (mEditMode) {
             showLoading();
             getSupportLoaderManager().initLoader(3, null, mIssueCallback);
-            getSupportLoaderManager().getLoader(3).forceLoad();
-        }
-        else {
+        } else {
             hideLoading();
-            getSupportLoaderManager().getLoader(4).forceLoad();
         }
     }
     
@@ -256,7 +251,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
     public void showMilestonesDialog(View v) {
         if (mAllMilestone == null) {
             mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-            getSupportLoaderManager().getLoader(1).forceLoad();
+            getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
         }
         else {
             showMilestonesDialog();
@@ -266,7 +261,7 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
     public void showAssigneesDialog(View v) {
         if (mAllAssignee == null) {
             mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-            getSupportLoaderManager().getLoader(2).forceLoad();
+            getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
         }
         else {
             showAssigneesDialog();

@@ -22,49 +22,21 @@ import org.eclipse.egit.github.core.RepositoryCommit;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
 
 import com.gh4a.Constants;
-import com.gh4a.R;
-import com.gh4a.activities.BaseSherlockFragmentActivity;
 import com.gh4a.activities.CommitActivity;
 import com.gh4a.adapter.CommitAdapter;
-import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.RepositoryCommitsLoader;
 
-public class PullRequestCommitListFragment extends BaseFragment implements OnItemClickListener {
+public class PullRequestCommitListFragment extends ListDataBaseFragment<RepositoryCommit> {
     private String mRepoOwner;
     private String mRepoName;
     private int mPullRequestNumber;
-    private ListView mListView;
-    private CommitAdapter mAdapter;
 
-    private LoaderCallbacks<List<RepositoryCommit>> mCommitCallback =
-            new LoaderCallbacks<List<RepositoryCommit>>() {
-
-        @Override
-        public Loader<LoaderResult<List<RepositoryCommit>>> onCreateLoader(int id, Bundle args) {
-            return new RepositoryCommitsLoader(getSherlockActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
-        }
-
-        @Override
-        public void onResultReady(LoaderResult<List<RepositoryCommit>> result) {
-            hideLoading();
-
-            if (!result.handleError(getActivity())) {
-                fillData(result.getData());
-            }
-        }
-    };
-
-    public static PullRequestCommitListFragment newInstance(String repoOwner, String repoName, int pullRequestNumber) {
-        
+    public static PullRequestCommitListFragment newInstance(String repoOwner,
+            String repoName, int pullRequestNumber) {
         PullRequestCommitListFragment f = new PullRequestCommitListFragment();
 
         Bundle args = new Bundle();
@@ -85,40 +57,13 @@ public class PullRequestCommitListFragment extends BaseFragment implements OnIte
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.generic_list, container, false);
-        mListView = (ListView) v.findViewById(R.id.list_view);
-        return v;
-    }
-    
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        
-        mAdapter = new CommitAdapter(getSherlockActivity());
-        mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener(this);
-        
-        getLoaderManager().initLoader(0, null, mCommitCallback);
-        getLoaderManager().getLoader(0).forceLoad();
-    }
-    
-    private void fillData(List<RepositoryCommit> commits) {
-        // FIXME
-        BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) getSherlockActivity();
-        activity.hideLoading();
-        if (commits != null && !commits.isEmpty()) {
-            mAdapter.clear();
-            mAdapter.addAll(commits);
-            mAdapter.notifyDataSetChanged();
-            mListView.setSelection(0);
-        }
+    protected RootAdapter<RepositoryCommit> onCreateAdapter() {
+        return new CommitAdapter(getSherlockActivity());
     }
 
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        RepositoryCommit commit = (RepositoryCommit) adapterView.getAdapter().getItem(position);
-        Intent intent = new Intent().setClass(getSherlockActivity(), CommitActivity.class);
+    @Override
+    protected void onItemClick(RepositoryCommit commit) {
+        Intent intent = new Intent(getSherlockActivity(), CommitActivity.class);
         
         intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
@@ -126,5 +71,10 @@ public class PullRequestCommitListFragment extends BaseFragment implements OnIte
         intent.putExtra(Constants.Object.TREE_SHA, commit.getCommit().getTree().getSha());
 
         startActivity(intent);
+    }
+
+    @Override
+    public Loader<LoaderResult<List<RepositoryCommit>>> onCreateLoader(int id, Bundle args) {
+        return new RepositoryCommitsLoader(getSherlockActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
     }
 }

@@ -19,6 +19,8 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.GollumPage;
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.event.CommitCommentPayload;
@@ -38,58 +40,39 @@ import org.eclipse.egit.github.core.service.EventService;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
-import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.CompareActivity;
 import com.gh4a.activities.WikiListActivity;
 import com.gh4a.adapter.FeedAdapter;
-import com.gh4a.loader.PageIteratorLoader;
+import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.StringUtils;
 
-public abstract class EventListFragment extends BaseFragment 
-    implements LoaderManager.LoaderCallbacks<List<Event>>, OnItemClickListener, OnScrollListener {
-
-    static final int MENU_USER = 1;
-    static final int MENU_REPO = 2;
-    static final int MENU_OPEN_ISSUES = 4;
-    static final int MENU_ISSUE = 5;
-    static final int MENU_COMMENT_IN_BROWSER = 6;
-    static final int MENU_GIST = 7;
-    static final int MENU_FILE = 8;
-    static final int MENU_FORKED_REPO = 9;
-    static final int MENU_WIKI_IN_BROWSER = 10;
-    static final int MENU_PULL_REQ = 11;
-    static final int MENU_COMPARE = 12;
-    static final int MENU_COMMENT_COMMIT = 99;
-    static final int MENU_PUSH_COMMIT_START = 100;
-    static final int MENU_PUSH_COMMIT_END = 300;
+public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
+    private static final int MENU_USER = 1;
+    private static final int MENU_REPO = 2;
+    private static final int MENU_OPEN_ISSUES = 4;
+    private static final int MENU_ISSUE = 5;
+    private static final int MENU_GIST = 6;
+    private static final int MENU_FILE = 7;
+    private static final int MENU_FORKED_REPO = 8;
+    private static final int MENU_WIKI_IN_BROWSER = 9;
+    private static final int MENU_PULL_REQ = 10;
+    private static final int MENU_COMPARE = 11;
+    private static final int MENU_COMMENT_COMMIT = 12;
+    private static final int MENU_PUSH_COMMIT_START = 100;
     
     private String mLogin;
     private boolean mIsPrivate;
-    private ListView mListView;
     private FeedAdapter mAdapter;
-    protected PageIterator<Event> mDataIterator;
-    private boolean isLoadMore;
-    private boolean isLoadCompleted;
-    private TextView mLoadingView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -97,129 +80,27 @@ public abstract class EventListFragment extends BaseFragment
         mLogin = getArguments().getString(Constants.User.USER_LOGIN);
         mIsPrivate = getArguments().getBoolean(Constants.Event.IS_PRIVATE);
     }
-    
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.generic_list, container, false);
-        mListView = (ListView) v.findViewById(R.id.list_view);
-        return v;
+    protected RootAdapter<Event> onCreateAdapter() {
+        return new FeedAdapter(getSherlockActivity());
     }
     
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        
-        LayoutInflater vi = getSherlockActivity().getLayoutInflater();
-        mLoadingView = (TextView) vi.inflate(R.layout.row_simple, null);
-        mLoadingView.setText(R.string.loading_msg);
-        mLoadingView.setTextColor(getResources().getColor(R.color.highlight));
-        
-        mAdapter = new FeedAdapter(getSherlockActivity());
-        mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener(this);
-        mListView.setOnScrollListener(this);
-        registerForContextMenu(mListView);
-        
-    }
-    
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (!isLoadCompleted) {
-            refresh();
-        }
-    }
-    
-    public void loadData() {
+    protected PageIterator<Event> onCreateIterator() {
         EventService eventService = (EventService)
                 Gh4Application.get(getActivity()).getService(Gh4Application.EVENT_SERVICE);
         if (mIsPrivate) {
-            mDataIterator = eventService.pageUserReceivedEvents(mLogin, true);
+            return eventService.pageUserReceivedEvents(mLogin, true);
         }
-        else {
-            mDataIterator = eventService.pageUserEvents(mLogin, false);
-        }
-    }
-    
-    public void refresh() {
-        isLoadMore = false;
-        loadData();
-        if (getLoaderManager().getLoader(0) == null) {
-            getLoaderManager().initLoader(0, null, this);
-        }
-        else {
-            getLoaderManager().restartLoader(0, null, this);
-        }
-        getLoaderManager().getLoader(0).forceLoad();
-    }
-    
-    private void fillData(List<Event> events) {
-        SherlockFragmentActivity activity = getSherlockActivity();
-        activity.invalidateOptionsMenu();
-        if (events != null && !events.isEmpty()) {
-            if (mListView.getFooterViewsCount() == 0) {
-                mListView.addFooterView(mLoadingView);
-                mListView.setAdapter(mAdapter);
-            }
-            if (isLoadMore) {
-                mAdapter.addAll(mAdapter.getCount(), events);
-                mAdapter.notifyDataSetChanged();
-            }
-            else {
-                mAdapter.clear();
-                mAdapter.addAll(events);
-                mAdapter.notifyDataSetChanged();
-                mListView.setSelection(0);
-            }
-        }
-        else {
-            mListView.removeFooterView(mLoadingView);
-        }
-    }
-    
-    @Override
-    public Loader<List<Event>> onCreateLoader(int id, Bundle args) {
-        return new PageIteratorLoader<Event>(getSherlockActivity(), mDataIterator);
+        return eventService.pageUserEvents(mLogin, false);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Event>> loader, List<Event> events) {
-        isLoadCompleted = true;
-        hideLoading();
-        fillData(events);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<List<Event>> arg0) {
-        // TODO Auto-generated method stub
-        
-    }
-    
-    @Override
-    public void onScroll(AbsListView view, int firstVisible, int visibleCount, int totalCount) {
-
-        boolean loadMore = firstVisible + visibleCount >= totalCount;
-
-        if(loadMore) {
-            if (getLoaderManager().getLoader(0) != null
-                    && isLoadCompleted) {
-                isLoadMore = true;
-                isLoadCompleted = false;
-                getLoaderManager().getLoader(0).forceLoad();
-            }
-        }
-    }
-    
-    @Override
-    public void onScrollStateChanged(AbsListView view, int scrollState) {}
-    
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        Event event = (Event) adapterView.getAdapter().getItem(position);
+    protected void onItemClick(Event event) {
         Gh4Application context = Gh4Application.get(getActivity());
         
-        if (event == null || event.getPayload() == null) {
+        if (event.getPayload() == null) {
             return;
         }
         
@@ -259,21 +140,17 @@ public abstract class EventListFragment extends BaseFragment
                         intent.putExtra(Constants.Repository.HEAD, payload.getHead());
                         intent.putExtra(Constants.Repository.BASE, payload.getBefore());
                         startActivity(intent);
-                    }
-                    // only 1 commit, then show the commit details
-                    else if (commits.size() == 1) {
+                    } else if (commits.size() == 1) {
+                        // only 1 commit, then show the commit details
                         context.openCommitInfoActivity(getSherlockActivity(), repoOwner, repoName,
                                 payload.getCommits().get(0).getSha(), 0);
-                    }
-                    else {
+                    } else {
                         context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
                     }
-                }
-                else {
+                } else {
                     context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
                 }
-            }
-            else {
+            } else {
                 context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
             }
         }
@@ -283,8 +160,7 @@ public abstract class EventListFragment extends BaseFragment
             if (eventRepo != null) {
                 IssuesPayload payload = (IssuesPayload) event.getPayload();
                 context.openIssueActivity(getSherlockActivity(), repoOwner, repoName, payload.getIssue().getNumber());
-            }
-            else {
+            } else {
                 context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
             }
         }
@@ -293,8 +169,7 @@ public abstract class EventListFragment extends BaseFragment
         else if (Event.TYPE_WATCH.equals(eventType)) {
             if (eventRepo != null) {
                 context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
-            }
-            else {
+            } else {
                 context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
             }
         }
@@ -303,8 +178,7 @@ public abstract class EventListFragment extends BaseFragment
         else if (Event.TYPE_CREATE.equals(eventType)) {
             if (eventRepo != null) {
                 context.openRepositoryInfoActivity(this.getSherlockActivity(), repoOwner, repoName, 0);
-            }
-            else {
+            } else {
                 context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
             }
         }
@@ -315,8 +189,7 @@ public abstract class EventListFragment extends BaseFragment
                 PullRequestPayload payload = (PullRequestPayload) event.getPayload();
                 int pullRequestNumber = payload.getNumber();
                 context.openPullRequestActivity(getSherlockActivity(), repoOwner, repoName, pullRequestNumber);
-            }
-            else {
+            } else {
                 context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
             }
         }
@@ -335,8 +208,7 @@ public abstract class EventListFragment extends BaseFragment
                 CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
                 context.openCommitInfoActivity(getSherlockActivity(), repoOwner, repoName, 
                         payload.getComment().getCommitId(), 0);
-            }
-            else {
+            } else {
                 context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
             }
         }
@@ -345,8 +217,7 @@ public abstract class EventListFragment extends BaseFragment
         else if (Event.TYPE_DELETE.equals(eventType)) {
             if (eventRepo != null) {
                 context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
-            }
-            else {
+            } else {
                 context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
             }
         }
@@ -356,8 +227,7 @@ public abstract class EventListFragment extends BaseFragment
             if (eventRepo != null) {
                 DownloadPayload payload = (DownloadPayload) event.getPayload();
                 context.openBrowser(getSherlockActivity(), payload.getDownload().getHtmlUrl());
-            }
-            else {
+            } else {
                 context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
             }
         }
@@ -368,8 +238,7 @@ public abstract class EventListFragment extends BaseFragment
             Repository forkee = payload.getForkee();
             if (forkee != null) {
                 context.openRepositoryInfoActivity(getSherlockActivity(), forkee);
-            }
-            else {
+            } else {
                 context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
             }
         }
@@ -378,8 +247,7 @@ public abstract class EventListFragment extends BaseFragment
         else if (Event.TYPE_FORK_APPLY.equals(eventType)) {
             if (eventRepo != null) {
                 context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
-            }
-            else {
+            } else {
                 context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
             }
         }
@@ -400,8 +268,7 @@ public abstract class EventListFragment extends BaseFragment
         else if (Event.TYPE_PUBLIC.equals(eventType)) {
             if (eventRepo != null) {
                 context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
-            }
-            else {
+            } else {
                 context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
             }
         }
@@ -410,8 +277,7 @@ public abstract class EventListFragment extends BaseFragment
         else if (Event.TYPE_MEMBER.equals(eventType)) {
             if (eventRepo != null) {
                 context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
-            }
-            else {
+            } else {
                 context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
             }
         }
@@ -434,23 +300,22 @@ public abstract class EventListFragment extends BaseFragment
         else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
             if (eventRepo != null) {
                 IssueCommentPayload payload = (IssueCommentPayload) event.getPayload();
-                if (payload.getIssue() != null) {
-                    if (payload.getIssue().getPullRequest() != null) {
-                        if (payload.getIssue().getPullRequest().getHtmlUrl() != null) {
-                            context.openPullRequestActivity(getSherlockActivity(), repoOwner, repoName, payload.getIssue().getNumber());
-                        }
-                        else {
-                            context.openIssueActivity(getSherlockActivity(), repoOwner, repoName, payload.getIssue().getNumber(),
-                                    payload.getIssue().getState()); 
-                        }
+                Issue issue = payload.getIssue();
+                PullRequest request = issue != null ? issue.getPullRequest() : null;
+
+                if (request != null) {
+                    if (request.getHtmlUrl() != null) {
+                        context.openPullRequestActivity(getSherlockActivity(),
+                                repoOwner, repoName, issue.getNumber());
+                    } else {
+                        context.openIssueActivity(getSherlockActivity(),
+                                repoOwner, repoName, issue.getNumber(), issue.getState()); 
                     }
-                    else {
-                        context.openIssueActivity(getSherlockActivity(), repoOwner, repoName, payload.getIssue().getNumber(),
-                                payload.getIssue().getState()); 
-                    }
+                } else if (issue != null) {
+                    context.openIssueActivity(getSherlockActivity(), repoOwner, repoName,
+                            issue.getNumber(), issue.getState()); 
                 }
-            }
-            else {
+            } else {
                 context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
             }
         }
@@ -483,33 +348,26 @@ public abstract class EventListFragment extends BaseFragment
             String eventType = event.getType();
             EventRepository eventRepo = event.getRepo();
             String[] repoNamePart = eventRepo.getName().split("/");
-            String repoOwner = null;
-            String repoName = null;
-            if (repoNamePart.length == 2) {
-                repoOwner = repoNamePart[0];
-                repoName = repoNamePart[1];
-            }
+            String repoOwner = repoNamePart.length == 2 ? repoNamePart[0] : null;
 
             menu.setHeaderTitle(R.string.go_to);
 
             /** Common menu */
             menu.add(groupId, MENU_USER, Menu.NONE, getString(R.string.menu_user, event.getActor().getLogin()));
             if (repoOwner != null) {
-                menu.add(groupId, MENU_REPO, Menu.NONE, getString(R.string.menu_repo, repoOwner + "/" + repoName));
+                menu.add(groupId, MENU_REPO, Menu.NONE, getString(R.string.menu_repo, eventRepo.getName()));
             }
 
             /** PushEvent extra menu for commits */
-            if (Event.TYPE_PUSH.equals(eventType)) {
-                if (repoOwner != null) {
-                    PushPayload payload = (PushPayload) event.getPayload();
-                    menu.add(groupId, MENU_COMPARE, Menu.NONE,
-                            getString(R.string.menu_compare, payload.getHead()));
-                    
-                    List<Commit> commits = payload.getCommits();
-                    for (int i = 0; i < commits.size(); i++) {
-                        menu.add(groupId, MENU_PUSH_COMMIT_START + i, Menu.NONE,
-                                getString(R.string.menu_commit, commits.get(i).getSha()));
-                    }
+            if (Event.TYPE_PUSH.equals(eventType) && repoOwner != null) {
+                PushPayload payload = (PushPayload) event.getPayload();
+                menu.add(groupId, MENU_COMPARE, Menu.NONE,
+                        getString(R.string.menu_compare, payload.getHead()));
+
+                List<Commit> commits = payload.getCommits();
+                for (int i = 0; i < commits.size(); i++) {
+                    menu.add(groupId, MENU_PUSH_COMMIT_START + i, Menu.NONE,
+                            getString(R.string.menu_commit, commits.get(i).getSha()));
                 }
             }
 
@@ -530,12 +388,10 @@ public abstract class EventListFragment extends BaseFragment
             }
 
             /** CommitCommentEvent */
-            else if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
-                if (repoOwner != null) {
-                    CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
-                    menu.add(groupId, MENU_COMMENT_COMMIT, Menu.NONE,
-                            getString(R.string.menu_commit, payload.getComment().getCommitId().substring(0, 7)));
-                }
+            else if (Event.TYPE_COMMIT_COMMENT.equals(eventType) && repoOwner != null) {
+                CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
+                menu.add(groupId, MENU_COMMENT_COMMIT, Menu.NONE,
+                        getString(R.string.menu_commit, payload.getComment().getCommitId().substring(0, 7)));
             }
 
             /** GistEvent */
@@ -606,7 +462,7 @@ public abstract class EventListFragment extends BaseFragment
             app.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
         }
         /** Commit item */
-        else if (id >= MENU_PUSH_COMMIT_START && id <= MENU_PUSH_COMMIT_END || id == MENU_COMMENT_COMMIT) {
+        else if (id >= MENU_PUSH_COMMIT_START || id == MENU_COMMENT_COMMIT) {
             if (repoOwner != null) {
                 String sha = null;
                 if (Event.TYPE_PUSH.equals(event.getType())) {
@@ -618,8 +474,7 @@ public abstract class EventListFragment extends BaseFragment
                 if (sha != null) {
                     app.openCommitInfoActivity(getSherlockActivity(), repoOwner, repoName, sha, 0);
                 }
-            }
-            else {
+            } else {
                 app.notFoundMessage(getSherlockActivity(), R.plurals.repository);
             }
         }
@@ -644,8 +499,7 @@ public abstract class EventListFragment extends BaseFragment
             if (repoOwner != null) {
                 DownloadPayload payload = (DownloadPayload) event.getPayload();
                 app.openBrowser(getSherlockActivity(), payload.getDownload().getHtmlUrl());
-            }
-            else {
+            } else {
                 app.notFoundMessage(getSherlockActivity(), R.plurals.repository);
             }
         }
@@ -655,8 +509,7 @@ public abstract class EventListFragment extends BaseFragment
             Repository forkee = payload.getForkee();
             if (forkee != null) {
                 app.openRepositoryInfoActivity(getSherlockActivity(), forkee);
-            }
-            else {
+            } else {
                 app.notFoundMessage(getSherlockActivity(), R.plurals.repository);
             }
         }
@@ -688,5 +541,4 @@ public abstract class EventListFragment extends BaseFragment
         }
         return true;
     }
-    
 }

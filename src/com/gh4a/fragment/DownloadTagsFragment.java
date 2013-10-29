@@ -80,9 +80,7 @@ public class DownloadTagsFragment extends BaseFragment implements OnItemClickLis
         mListView.setOnItemClickListener(this);
         
         showLoading();
-        
         getLoaderManager().initLoader(0, null, mTagCallback);
-        getLoaderManager().getLoader(0).forceLoad();
     }
 
     public void fillData(List<RepositoryTag> tags) {

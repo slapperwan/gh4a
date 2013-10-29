@@ -92,7 +92,6 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
             if (!result.handleError(IssueActivity.this)) {
                 mIssue = result.getData();
                 mIssueState = mIssue.getState();
-                getSupportLoaderManager().getLoader(1).forceLoad();
                 fillData();
             }
             else {
@@ -161,15 +160,11 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         }
         
         getSupportLoaderManager().initLoader(0, null, mIssueCallback);
-        getSupportLoaderManager().getLoader(0).forceLoad();
-        
         getSupportLoaderManager().initLoader(1, null, mCollaboratorCallback);
         getSupportLoaderManager().initLoader(2, null, mCommentCallback);
     }
 
     private void fillData() {
-        getSupportLoaderManager().getLoader(2).forceLoad();
-
         final Gh4Application app = Gh4Application.get(this);
         
         ListView lvComments = (ListView) findViewById(R.id.list_view);
@@ -444,7 +439,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_EDIT && resultCode == Activity.RESULT_OK) {
-            getSupportLoaderManager().getLoader(2).forceLoad();
+            getSupportLoaderManager().restartLoader(2, null, mCommentCallback);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -519,7 +514,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         protected void onSuccess(Void result) {
             ToastUtils.showMessage(mContext, R.string.issue_success_comment);
             //reload comments
-            getSupportLoaderManager().getLoader(2).forceLoad();
+            getSupportLoaderManager().restartLoader(2, null, mCommentCallback);
             
             EditText etComment = (EditText) findViewById(R.id.et_comment);
             etComment.setText(null);

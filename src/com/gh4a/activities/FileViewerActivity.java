@@ -111,7 +111,6 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity {
         
         showLoading();
         getSupportLoaderManager().initLoader(0, null, mFileCallback);
-        getSupportLoaderManager().getLoader(0).forceLoad();
     }
 
     @SuppressLint("SetJavaScriptEnabled")

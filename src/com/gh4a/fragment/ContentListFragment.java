@@ -47,7 +47,6 @@ public class ContentListFragment extends BaseFragment implements OnItemClickList
     private ListView mListView;
     public FileAdapter mAdapter;
     private ParentCallback mCallback;
-    private boolean mDataLoaded;
 
     public interface ParentCallback {
         public void onModuleMapFound(ContentListFragment fragment);
@@ -64,7 +63,6 @@ public class ContentListFragment extends BaseFragment implements OnItemClickList
         @Override
         public void onResultReady(LoaderResult<List<RepositoryContents>> result) {
             hideLoading();
-            mDataLoaded = true;
             if (!result.handleError(getActivity())) {
                 fillData(result.getData());
                 for (RepositoryContents content : result.getData()) {
@@ -136,26 +134,11 @@ public class ContentListFragment extends BaseFragment implements OnItemClickList
                     (ArrayList<RepositoryContents>) getArguments().getSerializable("CONTENTS");
             if (contents != null) {
                 mAdapter.addAll(contents);
-                mDataLoaded = true;
             }
         }
         mListView.setAdapter(mAdapter);
-    }
-    
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (!mDataLoaded) {
-            if (getLoaderManager().getLoader(0) == null) {
-                getLoaderManager().initLoader(0, null, mContentsListCallback);
-            }
-            else {
-                getLoaderManager().restartLoader(0, null, mContentsListCallback);
-            }
-            getLoaderManager().getLoader(0).forceLoad();
-        }
-        else {
-            hideLoading();
+        if (mAdapter.getObjects().isEmpty()) {
+            getLoaderManager().initLoader(0, null, mContentsListCallback);
         }
     }
     

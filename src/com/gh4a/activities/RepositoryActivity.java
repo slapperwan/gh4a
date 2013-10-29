@@ -101,6 +101,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
                 stopProgressDialog(mProgressDialog);
                 mBranches = result.getData();
                 showBranchesDialog();
+                getSupportLoaderManager().destroyLoader(LOADER_BRANCHES);
             }
         }
     };
@@ -117,6 +118,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
                 stopProgressDialog(mProgressDialog);
                 mTags = (List<RepositoryTag>) result.getData();
                 showTagsDialog();
+                getSupportLoaderManager().destroyLoader(LOADER_TAGS);
             }
         }
     };
@@ -216,14 +218,12 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
         showLoading();
 
         getSupportLoaderManager().initLoader(LOADER_REPO, null, mRepoCallback);
-        getSupportLoaderManager().initLoader(LOADER_BRANCHES, null, mBranchCallback);
-        getSupportLoaderManager().initLoader(LOADER_TAGS, null, mTagCallback);
         getSupportLoaderManager().initLoader(LOADER_WATCHING, null, mWatchCallback);
         getSupportLoaderManager().initLoader(LOADER_STARRING, null, mStarCallback);
 
-        getSupportLoaderManager().getLoader(LOADER_REPO).forceLoad();
-        getSupportLoaderManager().getLoader(LOADER_WATCHING).forceLoad();
-        getSupportLoaderManager().getLoader(LOADER_STARRING).forceLoad();
+        getSupportLoaderManager().getLoader(LOADER_REPO);
+        getSupportLoaderManager().getLoader(LOADER_WATCHING);
+        getSupportLoaderManager().getLoader(LOADER_STARRING);
 
         mAdapter = new RepositoryAdapter(getSupportFragmentManager());
     }
@@ -301,13 +301,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
     public void onModuleMapFound(ContentListFragment fragment) {
         if (!mDirStack.isEmpty() && mDirStack.get(0) == fragment) {
             LoaderManager lm = getSupportLoaderManager();
-            if (lm.getLoader(LOADER_MODULEMAP) == null) {
-                lm.initLoader(LOADER_MODULEMAP, null, mGitModuleCallback);
-            }
-            else {
-                lm.restartLoader(LOADER_MODULEMAP, null, mGitModuleCallback);
-            }
-            lm.getLoader(LOADER_MODULEMAP).forceLoad();
+            lm.restartLoader(LOADER_MODULEMAP, null, mGitModuleCallback);
         }
     }
 
@@ -421,7 +415,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
             case R.id.branches:
                 if (mBranches == null) {
                     mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-                    getSupportLoaderManager().getLoader(LOADER_BRANCHES).forceLoad();
+                    getSupportLoaderManager().initLoader(LOADER_BRANCHES, null, mBranchCallback);
                 }
                 else {
                     showBranchesDialog();
@@ -430,7 +424,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
             case R.id.tags:
                 if (mTags == null) {
                     mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-                    getSupportLoaderManager().getLoader(LOADER_TAGS).forceLoad();
+                    getSupportLoaderManager().initLoader(LOADER_TAGS, null, mTagCallback);
                 }
                 else {
                     showTagsDialog();
@@ -523,7 +517,6 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
         mContentCache.clear();
         showLoading();
         getSupportLoaderManager().restartLoader(LOADER_REPO, null, mRepoCallback);
-        getSupportLoaderManager().getLoader(LOADER_REPO).forceLoad();
     }
 
     private boolean checkForError(LoaderResult<?> result) {

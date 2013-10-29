@@ -79,7 +79,7 @@ public class GistActivity extends BaseSherlockFragmentActivity {
         mActionBar.setSubtitle(mUserLogin);
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
-        getSupportLoaderManager().initLoader(0, null, mGistCallback).forceLoad();
+        getSupportLoaderManager().initLoader(0, null, mGistCallback);
     }
     
     private void fillData(final Gist gist) {

@@ -74,7 +74,7 @@ public class GistListActivity extends BaseSherlockFragmentActivity implements On
         mActionBar.setSubtitle(mUserLogin);
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
-        getSupportLoaderManager().initLoader(0, null, mGistsCallback).forceLoad();
+        getSupportLoaderManager().initLoader(0, null, mGistsCallback);
     }
     
     private void fillData(List<Gist> gists) {

@@ -69,6 +69,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:textColor="@color/highlight"
             android:textAppearance="?android:attr/textAppearanceMedium" />
         <View 
             android:layout_width="fill_parent"

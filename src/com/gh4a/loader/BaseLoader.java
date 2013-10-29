@@ -10,6 +10,7 @@ public abstract class BaseLoader<T> extends AsyncTaskLoader<LoaderResult<T>> {
 
     public BaseLoader(Context context) {
         super(context);
+        onContentChanged();
     }
 
     @Override
@@ -23,5 +24,17 @@ public abstract class BaseLoader<T> extends AsyncTaskLoader<LoaderResult<T>> {
         }
     }
     
+    @Override
+    protected void onStartLoading() {
+        if (takeContentChanged()) {
+            forceLoad();
+        }
+    }
+
+    @Override
+    protected void onStopLoading() {
+        cancelLoad();
+    }
+
     public abstract T doLoadInBackground() throws Exception;
 }
