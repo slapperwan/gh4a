@@ -18,7 +18,7 @@ import com.gh4a.loader.LoaderResult;
 
 public abstract class ListDataBaseFragment<T> extends BaseFragment implements
         OnItemClickListener, LoaderCallbacks<LoaderResult<List<T>>> {
-    private ListView mListView;
+    protected ListView mListView;
     private RootAdapter<T> mAdapter;
 
     @Override

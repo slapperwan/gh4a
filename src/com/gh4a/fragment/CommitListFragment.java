@@ -32,15 +32,25 @@ import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.StringUtils;
 
 public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> {
-    private Repository mRepository;
+    private String mRepoOwner;
+    private String mRepoName;
     private String mRef;
+    private String mFilePath;
     
-    public static CommitListFragment newInstance(Repository repository, String ref) {
+    public static CommitListFragment newInstance(Repository repo, String ref) {
+        return newInstance(repo.getOwner().getLogin(), repo.getName(),
+                StringUtils.isBlank(ref) ? repo.getMasterBranch() : ref, null);
+    }
+
+    public static CommitListFragment newInstance(String repoOwner, String repoName,
+            String ref, String filePath) {
         CommitListFragment f = new CommitListFragment();
 
         Bundle args = new Bundle();
+        args.putString(Constants.Repository.REPO_OWNER, repoOwner);
+        args.putString(Constants.Repository.REPO_NAME, repoName);
         args.putString(Constants.Object.REF, ref);
-        args.putSerializable("REPOSITORY", repository);
+        args.putString(Constants.Object.PATH, filePath);
         f.setArguments(args);
         
         return f;
@@ -49,11 +59,10 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepository = (Repository) getArguments().getSerializable("REPOSITORY");
+        mRepoOwner = getArguments().getString(Constants.Repository.REPO_OWNER);
+        mRepoName = getArguments().getString(Constants.Repository.REPO_NAME);
         mRef = getArguments().getString(Constants.Object.REF);
-        if (StringUtils.isBlank(mRef)) {
-            mRef = mRepository.getMasterBranch();
-        }
+        mFilePath = getArguments().getString(Constants.Object.PATH);
     }
 
     @Override
@@ -79,6 +88,6 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
         CommitService commitService = (CommitService)
                 Gh4Application.get(getActivity()).getService(Gh4Application.COMMIT_SERVICE);
         return commitService.pageCommits(
-                new RepositoryId(mRepository.getOwner().getLogin(), mRepository.getName()), mRef, null);
+                new RepositoryId(mRepoOwner, mRepoName), mRef, mFilePath);
     }
 }

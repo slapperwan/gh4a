@@ -15,6 +15,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 import com.gh4a.Constants;
@@ -56,8 +57,11 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View v = super.onCreateView(inflater, container, savedInstanceState);
-        
+        View v = inflater.inflate(R.layout.commit_comment_list, container, false);
+
+        mListView = (ListView) v.findViewById(R.id.list_view);
+        mListView.setOnItemClickListener(this);
+
         RelativeLayout rlComment = (RelativeLayout) v.findViewById(R.id.rl_comment);
         if (!Gh4Application.get(getActivity()).isAuthorized()) {
             rlComment.setVisibility(View.GONE);
