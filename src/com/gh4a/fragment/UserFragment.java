@@ -137,11 +137,6 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
         getLoaderManager().initLoader(0, null, mUserCallback);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
     public void refresh() {
         getLoaderManager().restartLoader(0, null, mUserCallback);
     }
@@ -278,7 +273,6 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
             } else {
                 intent = new Intent(getActivity(), FollowerFollowingListActivity.class);
                 intent.putExtra("FIND_FOLLOWERS", true);
-                startActivity(intent);
             }
         } else if (id == R.id.cell_following) {
             intent = new Intent(getActivity(), FollowerFollowingListActivity.class);

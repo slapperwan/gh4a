@@ -93,6 +93,8 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
                 mIssue = result.getData();
                 mIssueState = mIssue.getState();
                 fillData();
+                getSupportLoaderManager().initLoader(1, null, mCollaboratorCallback);
+                getSupportLoaderManager().initLoader(2, null, mCommentCallback);
             }
             else {
                 invalidateOptionsMenu();
@@ -160,8 +162,6 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         }
         
         getSupportLoaderManager().initLoader(0, null, mIssueCallback);
-        getSupportLoaderManager().initLoader(1, null, mCollaboratorCallback);
-        getSupportLoaderManager().initLoader(2, null, mCommentCallback);
     }
 
     private void fillData() {
