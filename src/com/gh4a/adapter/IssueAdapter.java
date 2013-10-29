@@ -69,7 +69,6 @@ public class IssueAdapter extends RootAdapter<Issue> implements OnClickListener 
             
             viewHolder.llLabels = (LinearLayout) v.findViewById(R.id.ll_labels);
             viewHolder.tvNumber = (TextView) v.findViewById(R.id.tv_number);
-            viewHolder.tvState = (TextView) v.findViewById(R.id.tv_state);
             viewHolder.ivAssignee = (ImageView) v.findViewById(R.id.iv_assignee);
             viewHolder.tvComments = (TextView) v.findViewById(R.id.tv_comments);
             viewHolder.tvMilestone = (TextView) v.findViewById(R.id.tv_milestone);
@@ -88,14 +87,6 @@ public class IssueAdapter extends RootAdapter<Issue> implements OnClickListener 
 
         viewHolder.ivGravatar.setTag(issue);
         
-        viewHolder.tvState.setText(issue.getState());
-        if ("closed".equals(issue.getState())) {
-            viewHolder.tvState.setBackgroundResource(R.drawable.default_red_box);
-        }
-        else {
-            viewHolder.tvState.setBackgroundResource(R.drawable.default_green_box);
-        }
-
         viewHolder.tvNumber.setText(String.valueOf(issue.getNumber()));
         viewHolder.llLabels.removeAllViews();
 
@@ -157,7 +148,6 @@ public class IssueAdapter extends RootAdapter<Issue> implements OnClickListener 
         public TextView tvExtra;
         public LinearLayout llLabels;
         public TextView tvNumber;
-        public TextView tvState;
         public ImageView ivAssignee;
         public TextView tvComments;
         public TextView tvMilestone;
