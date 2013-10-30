@@ -279,7 +279,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
         
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            if (position == 1) {
+            if (position == 1 || position == 2) {
                 super.destroyItem(container, position, object);
             }
         }
@@ -291,6 +291,8 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
                         !TextUtils.equals(mDirStack.peek(), mContentListFragment.getPath())) {
                     return POSITION_NONE;
                 }
+            } else if (object instanceof CommitListFragment && mCommitListFragment == null) {
+                return POSITION_NONE;
             }
             return POSITION_UNCHANGED;
         }
@@ -510,7 +512,6 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
     }
     
     private void refreshFragment() {
-        mRepositoryFragment = null;
         mContentListFragment = null;
         mCommitListFragment = null;
         mGitModuleMap = null;
