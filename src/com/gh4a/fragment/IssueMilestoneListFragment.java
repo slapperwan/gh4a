@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 
 import com.gh4a.Constants;
+import com.gh4a.R;
 import com.gh4a.activities.IssueMilestoneEditActivity;
 import com.gh4a.adapter.MilestoneAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -57,12 +58,17 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
     
     @Override
     protected RootAdapter<Milestone> onCreateAdapter() {
-        return new MilestoneAdapter(getSherlockActivity());
+        return new MilestoneAdapter(getActivity());
     }
-    
+
+    @Override
+    protected int getEmptyTextResId() {
+        return R.string.no_milestones_found;
+    }
+
     @Override
     protected void onItemClick(Milestone milestone) {
-        Intent intent = new Intent(getSherlockActivity(), IssueMilestoneEditActivity.class);
+        Intent intent = new Intent(getActivity(), IssueMilestoneEditActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
         intent.putExtra(Constants.Milestone.NUMBER, milestone.getNumber());
@@ -71,6 +77,6 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
 
     @Override
     public Loader<LoaderResult<List<Milestone>>> onCreateLoader(int id, Bundle args) {
-        return new MilestoneListLoader(getSherlockActivity(), mRepoOwner, mRepoName, mState);
+        return new MilestoneListLoader(getActivity(), mRepoOwner, mRepoName, mState);
     }
 }

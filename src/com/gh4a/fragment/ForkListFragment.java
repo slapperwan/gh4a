@@ -24,6 +24,7 @@ import android.os.Bundle;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.R;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
 
@@ -51,9 +52,14 @@ public class ForkListFragment extends PagedDataBaseFragment<Repository> {
     
     @Override
     protected RootAdapter<Repository> onCreateAdapter() {
-        return new RepositoryAdapter(getSherlockActivity());
+        return new RepositoryAdapter(getActivity());
     }
     
+    @Override
+    protected int getEmptyTextResId() {
+        return R.string.no_forks_found;
+    }
+
     @Override
     protected void onItemClick(Repository repo) {
         Gh4Application app = Gh4Application.get(getActivity());

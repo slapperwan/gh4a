@@ -20,6 +20,7 @@ import java.util.Collection;
 import org.eclipse.egit.github.core.client.PageIterator;
 
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
@@ -27,8 +28,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -36,9 +35,8 @@ import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 
-public abstract class PagedDataBaseFragment<T> extends BaseFragment implements
-        LoaderManager.LoaderCallbacks<Collection<T>>, OnItemClickListener, OnScrollListener {
-    private ListView mListView;
+public abstract class PagedDataBaseFragment<T> extends ListFragment implements
+        LoaderManager.LoaderCallbacks<Collection<T>>, OnScrollListener {
     private RootAdapter<T> mAdapter;
     private boolean mLoadMore;
     private boolean mIsLoadCompleted;
@@ -47,10 +45,7 @@ public abstract class PagedDataBaseFragment<T> extends BaseFragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.generic_list, container, false);
-        mListView = (ListView) v.findViewById(R.id.list_view);
-        mListView.setOnItemClickListener(this);
-        mListView.setOnScrollListener(this);
+        View v = super.onCreateView(inflater, container, savedInstanceState);
         return v;
     }
     
@@ -58,30 +53,36 @@ public abstract class PagedDataBaseFragment<T> extends BaseFragment implements
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        LayoutInflater vi = getSherlockActivity().getLayoutInflater();
+        LayoutInflater vi = getActivity().getLayoutInflater();
         mLoadingView = (TextView) vi.inflate(R.layout.row_simple, null);
         mLoadingView.setText(R.string.loading_msg);
         mLoadingView.setTextColor(getResources().getColor(R.color.highlight));
         
         mAdapter = onCreateAdapter();
-        mListView.setAdapter(mAdapter);
+
+        getListView().setOnScrollListener(this);
+        setEmptyText(getString(getEmptyTextResId()));
+        setListAdapter(mAdapter);
+        setListShown(false);
         
         getLoaderManager().initLoader(0, null, this);
     }
 
     public void refresh() {
         mLoadMore = false;
+        setListShown(false);
         getLoaderManager().restartLoader(0, null, this);
     }
     
     protected void fillData(Collection<T> data) {
+        ListView listView = getListView();
         if (data == null || data.isEmpty()) {
-            mListView.removeFooterView(mLoadingView);
+            listView.removeFooterView(mLoadingView);
             return;
         }
-        if (mListView.getFooterViewsCount() == 0) {
-            mListView.addFooterView(mLoadingView);
-            mListView.setAdapter(mAdapter);
+        if (listView.getFooterViewsCount() == 0) {
+            listView.addFooterView(mLoadingView);
+            setListAdapter(mAdapter);
         }
         if (!mLoadMore) {
             mAdapter.clear();
@@ -89,7 +90,7 @@ public abstract class PagedDataBaseFragment<T> extends BaseFragment implements
         onAddData(mAdapter, data);
         mAdapter.notifyDataSetChanged();
         if (!mLoadMore) {
-            mListView.setSelection(0);
+            listView.setSelection(0);
         }
     }
 
@@ -99,13 +100,13 @@ public abstract class PagedDataBaseFragment<T> extends BaseFragment implements
 
     @Override
     public Loader<Collection<T>> onCreateLoader(int id, Bundle args) {
-        return new PageIteratorLoader<T>(getSherlockActivity(), onCreateIterator()); 
+        return new PageIteratorLoader<T>(getActivity(), onCreateIterator()); 
     }
 
     @Override
     public void onLoadFinished(Loader<Collection<T>> loader, Collection<T> events) {
         mIsLoadCompleted = true;
-        hideLoading();
+        setListShown(true);
         fillData(events);
         getActivity().invalidateOptionsMenu();
     }
@@ -130,10 +131,11 @@ public abstract class PagedDataBaseFragment<T> extends BaseFragment implements
     }
     
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+    public void onListItemClick(ListView listView, View view, int position, long id) {
         onItemClick(mAdapter.getItem(position));
     }
-    
+
+    protected abstract int getEmptyTextResId();
     protected abstract RootAdapter<T> onCreateAdapter();
     protected abstract PageIterator<T> onCreateIterator();
     protected abstract void onItemClick(T item);

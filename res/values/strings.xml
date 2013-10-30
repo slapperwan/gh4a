@@ -74,7 +74,6 @@
     <string name="download_extradata">%1$s\u00a0\u00a0\u00a0%2$d downloads\u00a0\u00a0\u00a0created %3$s</string>
     <string name="gist_extradata">%1$s\u00a0\u00a0\u00a0%2$s</string>
     <string name="go_to">Go to</string>
-    <string name="no_repos_found">No repositories found.</string>
     <string name="fail_view_diff">Unable to view diff</string>
     <string name="forked_from">forked from %1$s</string>
     <string name="enter_username_toast">Please enter your user name instead of your email address</string>
@@ -104,7 +103,26 @@
         <item quantity="one">File</item>
         <item quantity="other">Files</item>
     </plurals>
-    
+
+    <string name="no_blogs_found">No blogs found.</string>
+    <string name="no_comments_found">Nobody has commented so far.</string>
+    <string name="no_files_found">No files found.</string>
+    <string name="no_trends_found">No trending repositories found.</string>
+    <string name="no_commits_in_pullrequest_found">This pull request doesn\'t contain any commits.</string>
+    <string name="no_downloads_found">This repository doesn\'t provide any downloads.</string>
+    <string name="no_milestones_found">This repository doesn\'t have any configured milestone.</string>
+    <string name="no_commits_found">No commits found.</string>
+    <string name="no_followers_found">No followers found.</string>
+    <string name="no_forks_found">This repository wasn\'t forked yet.</string>
+    <string name="no_issues_found">No issues were reported so far.</string>
+    <string name="no_events_found">No events found.</string>
+    <string name="no_pull_requests_found">No pull requests were opened so far.</string>
+    <string name="no_repos_found">No repositories found.</string>
+    <string name="no_starred_repos_found">No repositories were starred yet.</string>
+    <string name="no_watched_repos_found">No repositories are being watched yet.</string>
+    <string name="no_watchers_found">Nobody is watching this repository yet.</string>
+    <string name="no_stargazers_found">Nobody has starred this repository yet.</string>
+
     <!-- Activity event -->
     <string name="event_push_title">%1$s pushed to %2$s at %3$s</string>
     <string name="event_watch_title">%1$s starred %2$s</string>

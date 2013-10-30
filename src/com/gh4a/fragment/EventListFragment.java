@@ -83,9 +83,14 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
 
     @Override
     protected RootAdapter<Event> onCreateAdapter() {
-        return new FeedAdapter(getSherlockActivity());
+        return new FeedAdapter(getActivity());
     }
     
+    @Override
+    protected int getEmptyTextResId() {
+        return R.string.no_events_found;
+    }
+
     @Override
     protected PageIterator<Event> onCreateIterator() {
         EventService eventService = (EventService)
@@ -142,16 +147,16 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
                         startActivity(intent);
                     } else if (commits.size() == 1) {
                         // only 1 commit, then show the commit details
-                        context.openCommitInfoActivity(getSherlockActivity(), repoOwner, repoName,
+                        context.openCommitInfoActivity(getActivity(), repoOwner, repoName,
                                 payload.getCommits().get(0).getSha(), 0);
                     } else {
-                        context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
+                        context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, 0);
                     }
                 } else {
-                    context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
+                    context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, 0);
                 }
             } else {
-                context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
+                context.notFoundMessage(getActivity(), R.plurals.repository);
             }
         }
 
@@ -159,27 +164,27 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         else if (Event.TYPE_ISSUES.equals(eventType)) {
             if (eventRepo != null) {
                 IssuesPayload payload = (IssuesPayload) event.getPayload();
-                context.openIssueActivity(getSherlockActivity(), repoOwner, repoName, payload.getIssue().getNumber());
+                context.openIssueActivity(getActivity(), repoOwner, repoName, payload.getIssue().getNumber());
             } else {
-                context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
+                context.notFoundMessage(getActivity(), R.plurals.repository);
             }
         }
 
         /** WatchEvent */
         else if (Event.TYPE_WATCH.equals(eventType)) {
             if (eventRepo != null) {
-                context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
+                context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, 0);
             } else {
-                context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
+                context.notFoundMessage(getActivity(), R.plurals.repository);
             }
         }
 
         /** CreateEvent */
         else if (Event.TYPE_CREATE.equals(eventType)) {
             if (eventRepo != null) {
-                context.openRepositoryInfoActivity(this.getSherlockActivity(), repoOwner, repoName, 0);
+                context.openRepositoryInfoActivity(this.getActivity(), repoOwner, repoName, 0);
             } else {
-                context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
+                context.notFoundMessage(getActivity(), R.plurals.repository);
             }
         }
 
@@ -188,9 +193,9 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             if (eventRepo != null) {
                 PullRequestPayload payload = (PullRequestPayload) event.getPayload();
                 int pullRequestNumber = payload.getNumber();
-                context.openPullRequestActivity(getSherlockActivity(), repoOwner, repoName, pullRequestNumber);
+                context.openPullRequestActivity(getActivity(), repoOwner, repoName, pullRequestNumber);
             } else {
-                context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
+                context.notFoundMessage(getActivity(), R.plurals.repository);
             }
         }
 
@@ -198,7 +203,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         else if (Event.TYPE_FOLLOW.equals(eventType)) {
             FollowPayload payload = (FollowPayload) event.getPayload();
             if (payload.getTarget() != null) {
-                context.openUserInfoActivity(getSherlockActivity(), payload.getTarget().getLogin(), null);
+                context.openUserInfoActivity(getActivity(), payload.getTarget().getLogin(), null);
             }
         }
 
@@ -206,19 +211,19 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         else if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
             if (eventRepo != null) {
                 CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
-                context.openCommitInfoActivity(getSherlockActivity(), repoOwner, repoName, 
+                context.openCommitInfoActivity(getActivity(), repoOwner, repoName, 
                         payload.getComment().getCommitId(), 0);
             } else {
-                context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
+                context.notFoundMessage(getActivity(), R.plurals.repository);
             }
         }
 
         /** DeleteEvent */
         else if (Event.TYPE_DELETE.equals(eventType)) {
             if (eventRepo != null) {
-                context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
+                context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, 0);
             } else {
-                context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
+                context.notFoundMessage(getActivity(), R.plurals.repository);
             }
         }
 
@@ -226,9 +231,9 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
             if (eventRepo != null) {
                 DownloadPayload payload = (DownloadPayload) event.getPayload();
-                context.openBrowser(getSherlockActivity(), payload.getDownload().getHtmlUrl());
+                context.openBrowser(getActivity(), payload.getDownload().getHtmlUrl());
             } else {
-                context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
+                context.notFoundMessage(getActivity(), R.plurals.repository);
             }
         }
 
@@ -237,24 +242,24 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             ForkPayload payload = (ForkPayload) event.getPayload();
             Repository forkee = payload.getForkee();
             if (forkee != null) {
-                context.openRepositoryInfoActivity(getSherlockActivity(), forkee);
+                context.openRepositoryInfoActivity(getActivity(), forkee);
             } else {
-                context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
+                context.notFoundMessage(getActivity(), R.plurals.repository);
             }
         }
 
         /** ForkEvent */
         else if (Event.TYPE_FORK_APPLY.equals(eventType)) {
             if (eventRepo != null) {
-                context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
+                context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, 0);
             } else {
-                context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
+                context.notFoundMessage(getActivity(), R.plurals.repository);
             }
         }
 
         /** GollumEvent */
         else if (Event.TYPE_GOLLUM.equals(eventType)) {
-            Intent intent = new Intent().setClass(getSherlockActivity(), WikiListActivity.class);
+            Intent intent = new Intent(getActivity(), WikiListActivity.class);
             intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
             intent.putExtra(Constants.Repository.REPO_NAME, repoName);
             GollumPayload payload = (GollumPayload) event.getPayload();
@@ -267,18 +272,18 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         /** PublicEvent */
         else if (Event.TYPE_PUBLIC.equals(eventType)) {
             if (eventRepo != null) {
-                context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
+                context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, 0);
             } else {
-                context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
+                context.notFoundMessage(getActivity(), R.plurals.repository);
             }
         }
         
         /** MemberEvent */
         else if (Event.TYPE_MEMBER.equals(eventType)) {
             if (eventRepo != null) {
-                context.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
+                context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, 0);
             } else {
-                context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
+                context.notFoundMessage(getActivity(), R.plurals.repository);
             }
         }
         
@@ -291,8 +296,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
                 login = payload.getGist().getUser().getLogin(); 
             }
             if (!StringUtils.isBlank(login)) {
-                context.openGistActivity(getSherlockActivity(), login,
-                        payload.getGist().getId(), 0);
+                context.openGistActivity(getActivity(), login, payload.getGist().getId(), 0);
             }
         }
         
@@ -305,25 +309,25 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
 
                 if (request != null) {
                     if (request.getHtmlUrl() != null) {
-                        context.openPullRequestActivity(getSherlockActivity(),
+                        context.openPullRequestActivity(getActivity(),
                                 repoOwner, repoName, issue.getNumber());
                     } else {
-                        context.openIssueActivity(getSherlockActivity(),
+                        context.openIssueActivity(getActivity(),
                                 repoOwner, repoName, issue.getNumber(), issue.getState()); 
                     }
                 } else if (issue != null) {
-                    context.openIssueActivity(getSherlockActivity(), repoOwner, repoName,
+                    context.openIssueActivity(getActivity(), repoOwner, repoName,
                             issue.getNumber(), issue.getState()); 
                 }
             } else {
-                context.notFoundMessage(getSherlockActivity(), R.plurals.repository);
+                context.notFoundMessage(getActivity(), R.plurals.repository);
             }
         }
         
         /** PullRequestReviewComment */
         else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
             PullRequestReviewCommentPayload payload = (PullRequestReviewCommentPayload) event.getPayload();
-            context.openCommitInfoActivity(getSherlockActivity(), repoOwner, repoName, 
+            context.openCommitInfoActivity(getActivity(), repoOwner, repoName, 
                     payload.getComment().getCommitId(), 0);
         }
     }
@@ -455,11 +459,11 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
 
         /** User item */
         if (id == MENU_USER) {
-            app.openUserInfoActivity(getSherlockActivity(), repoOwner, null);
+            app.openUserInfoActivity(getActivity(), repoOwner, null);
         }
         /** Repo item */
         else if (id == MENU_REPO) {
-            app.openRepositoryInfoActivity(getSherlockActivity(), repoOwner, repoName, 0);
+            app.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, 0);
         }
         /** Commit item */
         else if (id >= MENU_PUSH_COMMIT_START || id == MENU_COMMENT_COMMIT) {
@@ -472,35 +476,35 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
                     sha = ((CommitCommentPayload) event.getPayload()).getComment().getCommitId();
                 }
                 if (sha != null) {
-                    app.openCommitInfoActivity(getSherlockActivity(), repoOwner, repoName, sha, 0);
+                    app.openCommitInfoActivity(getActivity(), repoOwner, repoName, sha, 0);
                 }
             } else {
-                app.notFoundMessage(getSherlockActivity(), R.plurals.repository);
+                app.notFoundMessage(getActivity(), R.plurals.repository);
             }
         }
         /** Open issues item */
         else if (id == MENU_OPEN_ISSUES) {
-            app.openIssueListActivity(getSherlockActivity(), repoOwner, repoName,
+            app.openIssueListActivity(getActivity(), repoOwner, repoName,
                     Constants.Issue.ISSUE_STATE_OPEN);
         }
         /** Issue item */
         else if (id == MENU_ISSUE) {
             IssuesPayload payload = (IssuesPayload) event.getPayload();
-            app.openIssueActivity(getSherlockActivity(), repoOwner, repoName, payload.getIssue().getNumber());
+            app.openIssueActivity(getActivity(), repoOwner, repoName, payload.getIssue().getNumber());
         }
         /** Gist item */
         else if (id == MENU_GIST) {
             GistPayload payload = (GistPayload) event.getPayload();
-            app.openGistActivity(getSherlockActivity(), payload.getGist().getUser().getLogin(),
+            app.openGistActivity(getActivity(), payload.getGist().getUser().getLogin(),
                     payload.getGist().getId(), 0);
         }
         /** Download item */
         else if (id == MENU_FILE) {
             if (repoOwner != null) {
                 DownloadPayload payload = (DownloadPayload) event.getPayload();
-                app.openBrowser(getSherlockActivity(), payload.getDownload().getHtmlUrl());
+                app.openBrowser(getActivity(), payload.getDownload().getHtmlUrl());
             } else {
-                app.notFoundMessage(getSherlockActivity(), R.plurals.repository);
+                app.notFoundMessage(getActivity(), R.plurals.repository);
             }
         }
         /** Fork item */
@@ -508,9 +512,9 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             ForkPayload payload = (ForkPayload) event.getPayload();
             Repository forkee = payload.getForkee();
             if (forkee != null) {
-                app.openRepositoryInfoActivity(getSherlockActivity(), forkee);
+                app.openRepositoryInfoActivity(getActivity(), forkee);
             } else {
-                app.notFoundMessage(getSherlockActivity(), R.plurals.repository);
+                app.notFoundMessage(getActivity(), R.plurals.repository);
             }
         }
         /** Wiki item */
@@ -518,13 +522,13 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             GollumPayload payload = (GollumPayload) event.getPayload();
             List<GollumPage> pages = payload.getPages();
             if (pages != null && !pages.isEmpty()) {//TODO: now just open the first page
-                app.openBrowser(getSherlockActivity(), pages.get(0).getHtmlUrl());                
+                app.openBrowser(getActivity(), pages.get(0).getHtmlUrl());                
             }
         }
         /** Pull Request item */
         else if (id == MENU_PULL_REQ) {
             PullRequestPayload payload = (PullRequestPayload) event.getPayload();
-            app.openPullRequestActivity(getSherlockActivity(), repoOwner, repoName, payload.getNumber());
+            app.openPullRequestActivity(getActivity(), repoOwner, repoName, payload.getNumber());
         }
         
         else if (id == MENU_COMPARE) {

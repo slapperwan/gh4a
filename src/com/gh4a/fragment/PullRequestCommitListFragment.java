@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 
 import com.gh4a.Constants;
+import com.gh4a.R;
 import com.gh4a.activities.CommitActivity;
 import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -58,12 +59,17 @@ public class PullRequestCommitListFragment extends ListDataBaseFragment<Reposito
 
     @Override
     protected RootAdapter<RepositoryCommit> onCreateAdapter() {
-        return new CommitAdapter(getSherlockActivity());
+        return new CommitAdapter(getActivity());
+    }
+
+    @Override
+    protected int getEmptyTextResId() {
+        return R.string.no_commits_in_pullrequest_found;
     }
 
     @Override
     protected void onItemClick(RepositoryCommit commit) {
-        Intent intent = new Intent(getSherlockActivity(), CommitActivity.class);
+        Intent intent = new Intent(getActivity(), CommitActivity.class);
         
         intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
@@ -75,6 +81,6 @@ public class PullRequestCommitListFragment extends ListDataBaseFragment<Reposito
 
     @Override
     public Loader<LoaderResult<List<RepositoryCommit>>> onCreateLoader(int id, Bundle args) {
-        return new RepositoryCommitsLoader(getSherlockActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
+        return new RepositoryCommitsLoader(getActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
     }
 }

@@ -24,6 +24,7 @@ import android.os.Bundle;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.UserAdapter;
 
@@ -51,9 +52,14 @@ public class StargazerListFragment extends PagedDataBaseFragment<User> {
     
     @Override
     protected RootAdapter<User> onCreateAdapter() {
-        return new UserAdapter(getSherlockActivity(), false);
+        return new UserAdapter(getActivity(), false);
     }
     
+    @Override
+    protected int getEmptyTextResId() {
+        return R.string.no_stargazers_found;
+    }
+
     @Override
     protected void onItemClick(User user) {
         Gh4Application app = Gh4Application.get(getActivity());

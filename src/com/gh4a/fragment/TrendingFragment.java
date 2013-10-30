@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 
 import com.gh4a.Gh4Application;
+import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.TrendAdapter;
 import com.gh4a.holder.Trend;
@@ -48,14 +49,19 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
     
     @Override
     protected RootAdapter<Trend> onCreateAdapter() {
-        return new TrendAdapter(getSherlockActivity());
+        return new TrendAdapter(getActivity());
     }
-    
+
+    @Override
+    protected int getEmptyTextResId() {
+        return R.string.no_trends_found;
+    }
+
     @Override
     protected void onItemClick(Trend trend) {
         Gh4Application app = Gh4Application.get(getActivity());
         String[] repos = trend.getTitle().split("/");
-        app.openRepositoryInfoActivity(getSherlockActivity(), repos[0].trim(), repos[1].trim(), 0);
+        app.openRepositoryInfoActivity(getActivity(), repos[0].trim(), repos[1].trim(), 0);
     }
 
     @Override

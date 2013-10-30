@@ -4,13 +4,13 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.ListFragment;
 import android.widget.ArrayAdapter;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.fragment.BaseFragment;
 import com.gh4a.fragment.RepositoryListFragment;
 import com.gh4a.fragment.StarredRepositoryListFragment;
 import com.gh4a.fragment.WatchedRepositoryListFragment;
@@ -70,7 +70,7 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
     
     @Override
     public boolean onNavigationItemSelected(int position, long itemId) {
-        BaseFragment fragment = null;
+        ListFragment fragment = null;
         if (mUserLogin.equals(Gh4Application.get(this).getAuthLogin())) {
             switch (position) {
             case 0:

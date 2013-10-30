@@ -28,6 +28,7 @@ import android.os.Bundle;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.R;
 import com.gh4a.activities.IssueActivity;
 import com.gh4a.adapter.IssueAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -57,12 +58,17 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
 
     @Override
     protected RootAdapter<Issue> onCreateAdapter() {
-        return new IssueAdapter(getSherlockActivity());
+        return new IssueAdapter(getActivity());
+    }
+
+    @Override
+    protected int getEmptyTextResId() {
+        return R.string.no_issues_found;
     }
     
     @Override
     protected void onItemClick(Issue issue) {
-        Intent intent = new Intent(getSherlockActivity(), IssueActivity.class);
+        Intent intent = new Intent(getActivity(), IssueActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
         intent.putExtra(Constants.Issue.ISSUE_NUMBER, issue.getNumber());

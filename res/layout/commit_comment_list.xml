@@ -5,16 +5,13 @@
     android:layout_height="fill_parent"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true" >
-    <ProgressBar
-        android:id="@+id/pb"
-        style="@style/LoadingProgress"
-        android:layout_centerHorizontal="true" />
-    <ListView
-        android:id="@+id/list_view"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_above="@+id/divider" >
-    </ListView>
+
+    <FrameLayout
+        android:id="@+id/list_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/divider" />
+
     <View
         android:id="@+id/divider"
         android:layout_width="match_parent"
@@ -22,7 +19,8 @@
         android:layout_above="@+id/comment"
         android:layout_marginBottom="5dp"
         android:background="#ff0099cc" />
-	<LinearLayout
+
+    <LinearLayout
         android:id="@id/comment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

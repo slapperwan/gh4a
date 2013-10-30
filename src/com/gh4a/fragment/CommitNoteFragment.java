@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ListView;
+import android.widget.FrameLayout;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -54,10 +54,11 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View listContent = super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.commit_comment_list, container, false);
 
-        mListView = (ListView) v.findViewById(R.id.list_view);
-        mListView.setOnItemClickListener(this);
+        FrameLayout listContainer = (FrameLayout) v.findViewById(R.id.list_container);
+        listContainer.addView(listContent);
 
         if (!Gh4Application.get(getActivity()).isAuthorized()) {
             v.findViewById(R.id.comment).setVisibility(View.GONE);
@@ -71,7 +72,12 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
     @Override
     protected RootAdapter<CommitComment> onCreateAdapter() {
-        return new CommitNoteAdapter(getSherlockActivity());
+        return new CommitNoteAdapter(getActivity());
+    }
+
+    @Override
+    protected int getEmptyTextResId() {
+        return R.string.no_comments_found;
     }
 
     @Override
@@ -80,7 +86,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
     @Override
     public Loader<LoaderResult<List<CommitComment>>> onCreateLoader(int id, Bundle args) {
-        return new CommitCommentListLoader(getSherlockActivity(), mRepoOwner, mRepoName, mObjectSha);
+        return new CommitCommentListLoader(getActivity(), mRepoOwner, mRepoName, mObjectSha);
     }
 
     @Override

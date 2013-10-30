@@ -26,6 +26,7 @@ import android.os.Bundle;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.R;
 import com.gh4a.activities.CommitActivity;
 import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -67,12 +68,17 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
 
     @Override
     protected RootAdapter<RepositoryCommit> onCreateAdapter() {
-        return new CommitAdapter(getSherlockActivity());
+        return new CommitAdapter(getActivity());
     }
-    
+
+    @Override
+    protected int getEmptyTextResId() {
+        return R.string.no_commits_found;
+    }
+
     @Override
     protected void onItemClick(RepositoryCommit commit) {
-        Intent intent = new Intent(getSherlockActivity(), CommitActivity.class);
+        Intent intent = new Intent(getActivity(), CommitActivity.class);
         String[] urlPart = commit.getUrl().split("/");
         
         intent.putExtra(Constants.Repository.REPO_OWNER, urlPart[4]);

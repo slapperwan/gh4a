@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 
 import com.gh4a.Constants;
+import com.gh4a.R;
 import com.gh4a.activities.BlogActivity;
 import com.gh4a.adapter.CommonFeedAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -39,12 +40,17 @@ public class BlogListFragment extends ListDataBaseFragment<Feed> {
 
     @Override
     protected RootAdapter<Feed> onCreateAdapter() {
-        return new CommonFeedAdapter(getSherlockActivity());
+        return new CommonFeedAdapter(getActivity());
+    }
+
+    @Override
+    protected int getEmptyTextResId() {
+        return R.string.no_blogs_found;
     }
 
     @Override
     public void onItemClick(Feed blog) {
-        Intent intent = new Intent(getSherlockActivity(), BlogActivity.class);
+        Intent intent = new Intent(getActivity(), BlogActivity.class);
         intent.putExtra(Constants.Blog.TITLE, blog.getTitle());
         intent.putExtra(Constants.Blog.CONTENT, blog.getContent());
         intent.putExtra(Constants.Blog.LINK, blog.getLink());

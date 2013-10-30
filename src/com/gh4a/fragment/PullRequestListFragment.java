@@ -24,6 +24,7 @@ import android.os.Bundle;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.R;
 import com.gh4a.adapter.PullRequestAdapter;
 import com.gh4a.adapter.RootAdapter;
 
@@ -54,14 +55,18 @@ public class PullRequestListFragment extends PagedDataBaseFragment<PullRequest> 
 
     @Override
     protected void onItemClick(PullRequest pullRequest) {
-        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
-        app.openPullRequestActivity(getSherlockActivity(), mRepoOwner,
-                mRepoName, pullRequest.getNumber());
+        Gh4Application.get(getActivity()).openPullRequestActivity(getActivity(),
+                mRepoOwner, mRepoName, pullRequest.getNumber());
     }
 
     @Override
     protected RootAdapter<PullRequest> onCreateAdapter() {
-        return new PullRequestAdapter(getSherlockActivity());
+        return new PullRequestAdapter(getActivity());
+    }
+
+    @Override
+    protected int getEmptyTextResId() {
+        return R.string.no_pull_requests_found;
     }
 
     @Override

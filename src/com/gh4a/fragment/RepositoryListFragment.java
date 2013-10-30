@@ -28,6 +28,7 @@ import android.os.Bundle;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.R;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -57,7 +58,12 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     
     @Override
     protected RootAdapter<Repository> onCreateAdapter() {
-        return new RepositoryAdapter(getSherlockActivity());
+        return new RepositoryAdapter(getActivity());
+    }
+
+    @Override
+    protected int getEmptyTextResId() {
+        return R.string.no_repos_found;
     }
 
     @Override

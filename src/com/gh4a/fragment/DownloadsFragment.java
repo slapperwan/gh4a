@@ -41,7 +41,12 @@ public class DownloadsFragment extends ListDataBaseFragment<Download> {
     
     @Override
     protected RootAdapter<Download> onCreateAdapter() {
-        return new DownloadAdapter(getSherlockActivity());
+        return new DownloadAdapter(getActivity());
+    }
+
+    @Override
+    protected int getEmptyTextResId() {
+        return R.string.no_downloads_found;
     }
 
     @Override
@@ -61,6 +66,6 @@ public class DownloadsFragment extends ListDataBaseFragment<Download> {
 
     @Override
     public Loader<LoaderResult<List<Download>>> onCreateLoader(int id, Bundle args) {
-        return new DownloadsLoader(getSherlockActivity(), mRepoOwner, mRepoName);
+        return new DownloadsLoader(getActivity(), mRepoOwner, mRepoName);
     }
 }

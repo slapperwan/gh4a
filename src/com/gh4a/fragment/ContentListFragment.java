@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 
 import com.gh4a.Constants;
+import com.gh4a.R;
 import com.gh4a.adapter.FileAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.ContentListLoader;
@@ -80,9 +81,14 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
     
     @Override
     protected RootAdapter<RepositoryContents> onCreateAdapter() {
-        return new FileAdapter(getSherlockActivity());
+        return new FileAdapter(getActivity());
     }
-    
+
+    @Override
+    protected int getEmptyTextResId() {
+        return R.string.no_files_found;
+    }
+
     public String getPath() {
         return mPath;
     }
@@ -100,7 +106,7 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
 
     @Override
     public Loader<LoaderResult<List<RepositoryContents>>> onCreateLoader(int id, Bundle args) {
-        ContentListLoader loader = new ContentListLoader(getSherlockActivity(),
+        ContentListLoader loader = new ContentListLoader(getActivity(),
                 mRepository.getOwner().getLogin(), mRepository.getName(), mPath, mRef);
         @SuppressWarnings("unchecked")
         ArrayList<RepositoryContents> contents =
