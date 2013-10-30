@@ -38,7 +38,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
@@ -120,18 +119,20 @@ public class PullRequestFragment extends BaseFragment implements
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.pull_request, container, false);
+        
+        if (!Gh4Application.get(getActivity()).isAuthorized()) {
+            v.findViewById(R.id.comment).setVisibility(View.GONE);
+            v.findViewById(R.id.divider).setVisibility(View.GONE);
+        }
+
         mListView = (ListView) v.findViewById(R.id.list_view);
+
         return v;
     }
     
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        
-        RelativeLayout rlComment = (RelativeLayout) getView().findViewById(R.id.rl_comment);
-        if (!Gh4Application.get(getActivity()).isAuthorized()) {
-            rlComment.setVisibility(View.GONE);
-        }
         
         mCommentAdapter = new CommentAdapter(getSherlockActivity(), mRepoOwner, this);
 

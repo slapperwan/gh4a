@@ -245,6 +245,7 @@
     <string name="commit_sha">Commit - %1$s</string>
     <string name="commit_comment">Commented on %1$s</string>
     <string name="commit_compare">Compare View</string>
+	<string name="commit_comment_hint">Comment on this commit</string>
 
     <!-- Issue -->
     <plurals name="issue">
@@ -336,12 +337,14 @@
     <string name="issue_comment_body">Body</string>
     <string name="issue_comment_updated_at">Updated at</string>
     <string name="issue_comment_user">User</string>
-    
+	<string name="issue_comment_hint">Comment on this issue</string>
+
     <!-- Pull Request -->
     <string name="pull_request_title">Pull Request</string>
     <string name="pull_request_comments">Discussion</string>
     <string name="pull_requests">Pull Requests</string>
-    
+	<string name="pull_request_comment_hint">Comment on this pull request</string>
+
     <!-- Object -->
     <string name="object_tree">Tree</string>
     <string name="object_view_file_at">View file @ %1$s</string>

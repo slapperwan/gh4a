@@ -155,9 +155,9 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
-        RelativeLayout tlComment = (RelativeLayout) findViewById(R.id.rl_comment);
         if (!Gh4Application.get(this).isAuthorized()) {
-            tlComment.setVisibility(View.GONE);
+            findViewById(R.id.comment).setVisibility(View.GONE);
+            findViewById(R.id.divider).setVisibility(View.GONE);
         }
         
         mListView = (ListView) findViewById(R.id.list_view);
@@ -179,11 +179,11 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         mListView.addHeaderView(mHeader, null, false);
         mListView.setAdapter(mCommentAdapter);
         
-        RelativeLayout rlComment = (RelativeLayout) findViewById(R.id.rl_comment);
         if (!Gh4Application.get(this).isAuthorized()) {
-            rlComment.setVisibility(View.GONE);
+            findViewById(R.id.comment).setVisibility(View.GONE);
+            findViewById(R.id.divider).setVisibility(View.GONE);
         }
-
+        
         TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
 
         ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);

@@ -62,9 +62,9 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         mListView = (ListView) v.findViewById(R.id.list_view);
         mListView.setOnItemClickListener(this);
 
-        RelativeLayout rlComment = (RelativeLayout) v.findViewById(R.id.rl_comment);
         if (!Gh4Application.get(getActivity()).isAuthorized()) {
-            rlComment.setVisibility(View.GONE);
+            v.findViewById(R.id.comment).setVisibility(View.GONE);
+            v.findViewById(R.id.divider).setVisibility(View.GONE);
         }
         
         ImageView ivComment = (ImageView) v.findViewById(R.id.iv_comment);
