@@ -24,58 +24,24 @@ import org.eclipse.egit.github.core.RepositoryContents;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
 
 import com.gh4a.Constants;
-import com.gh4a.R;
 import com.gh4a.adapter.FileAdapter;
+import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.ContentListLoader;
-import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
 
-public class ContentListFragment extends BaseFragment implements OnItemClickListener {
-
+public class ContentListFragment extends ListDataBaseFragment<RepositoryContents> {
     private Repository mRepository;
     public String mPath;
     public String mRef;
-    private ListView mListView;
-    public FileAdapter mAdapter;
     private ParentCallback mCallback;
 
     public interface ParentCallback {
-        public void onModuleMapFound(ContentListFragment fragment);
+        public void onContentsLoaded(ContentListFragment fragment, List<RepositoryContents> contents);
         public void onTreeSelected(ContentListFragment fragment, RepositoryContents content, String ref);
     }
-
-    private LoaderCallbacks<List<RepositoryContents>> mContentsListCallback =
-            new LoaderCallbacks<List<RepositoryContents>>() {
-        @Override
-        public Loader<LoaderResult<List<RepositoryContents>>> onCreateLoader(int id, Bundle args) {
-            return new ContentListLoader(getSherlockActivity(), mRepository.getOwner().getLogin(),
-                    mRepository.getName(), mPath, mRef);
-        }
-        @Override
-        public void onResultReady(LoaderResult<List<RepositoryContents>> result) {
-            hideLoading();
-            if (!result.handleError(getActivity())) {
-                fillData(result.getData());
-                for (RepositoryContents content : result.getData()) {
-                    if (RepositoryContents.TYPE_FILE.equals(content.getType())) {
-                        if (content.getName().equals(".gitmodules")) {
-                            mCallback.onModuleMapFound(ContentListFragment.this);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    };
 
     public static ContentListFragment newInstance(Repository repository,
             String path, ArrayList<RepositoryContents> contents, String ref) {
@@ -103,67 +69,45 @@ public class ContentListFragment extends BaseFragment implements OnItemClickList
     }
     
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.generic_list, container, false);
-        mListView = (ListView) v.findViewById(R.id.list_view);
-        mListView.setOnItemClickListener(this);
-        
-        return v;
-    }
-    
-    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
             mCallback = (ParentCallback) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnTreeSelectedListener");
+            throw new ClassCastException(activity + " must implement OnTreeSelectedListener");
         }
     }
     
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        if (mAdapter == null) {
-            mAdapter = new FileAdapter(getSherlockActivity());
-            @SuppressWarnings("unchecked")
-            ArrayList<RepositoryContents> contents =
-                    (ArrayList<RepositoryContents>) getArguments().getSerializable("CONTENTS");
-            if (contents != null) {
-                mAdapter.addAll(contents);
-            }
-        }
-        mListView.setAdapter(mAdapter);
-        if (mAdapter.getObjects().isEmpty()) {
-            getLoaderManager().initLoader(0, null, mContentsListCallback);
-        }
+    protected RootAdapter<RepositoryContents> onCreateAdapter() {
+        return new FileAdapter(getSherlockActivity());
     }
     
-    private void fillData(List<RepositoryContents> entries) {
-        if (entries != null && entries.size() > 0) {
-            mAdapter.clear();
-            mAdapter.addAll(entries);
-        }
-        mAdapter.notifyDataSetChanged();
-    }
-
     public String getPath() {
         return mPath;
     }
 
-    public List<RepositoryContents> getContents() {
-        if (mAdapter == null) {
-            return new ArrayList<RepositoryContents>();
-        }
-        return mAdapter.getObjects();
+    @Override
+    protected void onAddData(RootAdapter<RepositoryContents> adapter, List<RepositoryContents> data) {
+        super.onAddData(adapter, data);
+        mCallback.onContentsLoaded(this, data);
     }
 
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        RepositoryContents content = (RepositoryContents) adapterView.getAdapter().getItem(position);
+    protected void onItemClick(RepositoryContents content) {
         mCallback.onTreeSelected(this, content, mRef);
+    }
+
+    @Override
+    public Loader<LoaderResult<List<RepositoryContents>>> onCreateLoader(int id, Bundle args) {
+        ContentListLoader loader = new ContentListLoader(getSherlockActivity(),
+                mRepository.getOwner().getLogin(), mRepository.getName(), mPath, mRef);
+        @SuppressWarnings("unchecked")
+        ArrayList<RepositoryContents> contents =
+                (ArrayList<RepositoryContents>) getArguments().getSerializable("CONTENTS");
+        if (contents != null) {
+            loader.prefillData(contents);
+        }
+        return loader;
     }
 }

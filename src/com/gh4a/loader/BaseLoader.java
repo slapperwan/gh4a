@@ -7,10 +7,17 @@ import android.util.Log;
 import com.gh4a.Constants;
 
 public abstract class BaseLoader<T> extends AsyncTaskLoader<LoaderResult<T>> {
+    private T mPrefilledData;
 
     public BaseLoader(Context context) {
         super(context);
         onContentChanged();
+    }
+
+    public void prefillData(T data) {
+        if (!isStarted()) {
+            mPrefilledData = data;
+        }
     }
 
     @Override
@@ -27,7 +34,13 @@ public abstract class BaseLoader<T> extends AsyncTaskLoader<LoaderResult<T>> {
     @Override
     protected void onStartLoading() {
         if (takeContentChanged()) {
-            forceLoad();
+            if (mPrefilledData == null) {
+                forceLoad();
+            } else {
+                LoaderResult<T> result = new LoaderResult<T>(mPrefilledData);
+                deliverResult(result);
+                mPrefilledData = null;
+            }
         }
     }
 

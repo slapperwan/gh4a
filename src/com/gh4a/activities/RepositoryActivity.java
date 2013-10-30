@@ -25,6 +25,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -158,7 +159,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
     private RepositoryAdapter mAdapter;
     private ViewPager mPager;
     private ActionBar mActionBar;
-    private Stack<ContentListFragment> mDirStack;
+    private Stack<String> mDirStack;
     private Repository mRepository;
     private List<RepositoryBranch> mBranches;
     private List<RepositoryTag> mTags;
@@ -182,7 +183,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
-        mDirStack = new Stack<ContentListFragment>();
+        mDirStack = new Stack<String>();
         mContentCache = new LinkedHashMap<String, ArrayList<RepositoryContents>>() {
             private static final long serialVersionUID = -2379579224736389357L;
             @Override
@@ -256,14 +257,12 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
             if (position == 1) {
-                if (mContentListFragment == null) {
-                    mContentListFragment = ContentListFragment.newInstance(mRepository, null,
-                            mContentCache.get(null), mSelectedRef);
-                    mDirStack.add(mContentListFragment);
+                if (mDirStack.isEmpty()) {
+                    mDirStack.push(null);
                 }
-                else {
-                    mContentListFragment = mDirStack.peek();
-                }
+                String path = mDirStack.peek();
+                mContentListFragment = ContentListFragment.newInstance(mRepository, path,
+                            mContentCache.get(path), mSelectedRef);
                 return mContentListFragment;
             }
             
@@ -288,8 +287,8 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
         @Override
         public int getItemPosition(Object object) {
             if (object instanceof ContentListFragment) {
-                if (mDirStack.isEmpty() || mContentListFragment == null
-                        || mContentListFragment != mDirStack.peek()) {
+                if (mDirStack.isEmpty() ||
+                        !TextUtils.equals(mDirStack.peek(), mContentListFragment.getPath())) {
                     return POSITION_NONE;
                 }
             }
@@ -298,10 +297,18 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
     }
 
     @Override
-    public void onModuleMapFound(ContentListFragment fragment) {
-        if (!mDirStack.isEmpty() && mDirStack.get(0) == fragment) {
-            LoaderManager lm = getSupportLoaderManager();
-            lm.restartLoader(LOADER_MODULEMAP, null, mGitModuleCallback);
+    public void onContentsLoaded(ContentListFragment fragment, List<RepositoryContents> contents) {
+        mContentCache.put(fragment.getPath(), new ArrayList<RepositoryContents>(contents));
+        if (fragment.getPath() == null) {
+            for (RepositoryContents content : contents) {
+                if (RepositoryContents.TYPE_FILE.equals(content.getType())) {
+                    if (content.getName().equals(".gitmodules")) {
+                        LoaderManager lm = getSupportLoaderManager();
+                        lm.restartLoader(LOADER_MODULEMAP, null, mGitModuleCallback);
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -311,7 +318,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
         if (RepositoryContents.TYPE_DIR.equals(content.getType())) {
             mAdapter.mContent = content;
             mSelectedRef = ref;
-            mDirStack.push(ContentListFragment.newInstance(mRepository, path, mContentCache.get(path), mSelectedRef));
+            mDirStack.push(path);
             mAdapter.notifyDataSetChanged();
         }
         else if (mGitModuleMap != null && mGitModuleMap.get(path) != null) {
@@ -337,9 +344,7 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
     @Override
     public void onBackPressed() {
         if (mPager != null && mPager.getCurrentItem() == 1 && mDirStack.size() > 1) {
-            ContentListFragment fragment = mDirStack.pop();
-            mContentCache.put(fragment.getPath(),
-                    new ArrayList<RepositoryContents>(fragment.getContents()));
+            mDirStack.pop();
             mAdapter.notifyDataSetChanged();
         }
         else {

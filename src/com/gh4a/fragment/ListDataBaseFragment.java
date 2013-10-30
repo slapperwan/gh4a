@@ -42,11 +42,11 @@ public abstract class ListDataBaseFragment<T> extends BaseFragment implements
         getLoaderManager().initLoader(0, null, this);
     }
 
-    private void fillData(List<T> data) {
-        mAdapter.addAll(data);
-        mAdapter.notifyDataSetChanged();
+    protected void onAddData(RootAdapter<T> adapter, List<T> data) {
+        adapter.addAll(data);
+        adapter.notifyDataSetChanged();
     }
-    
+
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, final int position, long id) {
         onItemClick(mAdapter.getItem(position));
@@ -56,7 +56,7 @@ public abstract class ListDataBaseFragment<T> extends BaseFragment implements
     public void onLoadFinished(Loader<LoaderResult<List<T>>> loader, LoaderResult<List<T>> result) {
         hideLoading();
         if (!result.handleError(getActivity())) {
-            fillData(result.getData());
+            onAddData(mAdapter, result.getData());
         }
     }
 
