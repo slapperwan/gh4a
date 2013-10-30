@@ -15,6 +15,7 @@
  */
 package com.gh4a.activities;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.net.Uri;
@@ -24,7 +25,6 @@ import android.text.TextUtils;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
-
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -74,6 +74,7 @@ public class DiffViewerActivity extends BaseSherlockFragmentActivity {
         }
     }
         
+    @SuppressLint("SetJavaScriptEnabled")
     private boolean initWebView(String fileName) {
         WebSettings s = mWebView.getSettings();
         
@@ -111,16 +112,13 @@ public class DiffViewerActivity extends BaseSherlockFragmentActivity {
         for (String line : lines) {
             if (line.startsWith("@@")) {
                 line = "<div style=\"background-color: #EAF2F5;\">" + line + "</div>";
-            }
-            else if (line.startsWith("+")) {
-                line = "<div style=\"background-color: #DDFFDD; border-color: #00AA00;\">" + line
-                        + "</div>";
-            }
-            else if (line.startsWith("-")) {
-                line = "<div style=\"background-color: #FFDDDD; border-color: #CC0000;\">" + line
-                        + "</div>";
-            }
-            else {
+            } else if (line.startsWith("+")) {
+                line = "<div style=\"background-color: #DDFFDD; border-color: #00AA00;\">"
+                        + line + "</div>";
+            } else if (line.startsWith("-")) {
+                line = "<div style=\"background-color: #FFDDDD; border-color: #CC0000;\">"
+                        + line + "</div>";
+            } else {
                 line = "<div>" + line + "</div>";
             }
             content.append(line);
@@ -173,7 +171,7 @@ public class DiffViewerActivity extends BaseSherlockFragmentActivity {
                 doSearch();
                 return true;
             case 10:
-                Intent intent = new Intent().setClass(this, FileViewerActivity.class);
+                Intent intent = new Intent(this, FileViewerActivity.class);
                 intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
                 intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                 intent.putExtra(Constants.Object.PATH, mFilePath);
