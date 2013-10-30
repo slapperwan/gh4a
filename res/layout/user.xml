@@ -88,7 +88,8 @@
                         android:id="@+id/cell_org_members"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1" >
+                        android:layout_weight="1"
+                        android:background="?attr/selectableItemBackground" >
                         <TableRow>
                             <TextView
                                 android:id="@+id/tv_members_count"
@@ -110,7 +111,8 @@
                         android:id="@+id/cell_followers"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1" >
+                        android:layout_weight="1"
+                        android:background="?attr/selectableItemBackground" >
                         <TableRow>
                             <TextView
                                 android:id="@+id/tv_followers_count"
@@ -131,7 +133,8 @@
                         android:id="@+id/cell_following"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1" >
+                        android:layout_weight="1"
+                        android:background="?attr/selectableItemBackground" >
                         <TableRow>
                             <TextView
                                 android:id="@+id/tv_following_count"
@@ -152,7 +155,8 @@
                         android:id="@+id/cell_repos"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1" >
+                        android:layout_weight="1"
+                        android:background="?attr/selectableItemBackground" >
                         <TableRow>
                             <TextView
                                 android:id="@+id/tv_repos_count"
@@ -173,7 +177,8 @@
                         android:id="@+id/cell_gists"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1" >
+                        android:layout_weight="1"
+                        android:background="?attr/selectableItemBackground" >
                         <TableRow>
                             <TextView
                                 android:id="@+id/tv_gists_count"

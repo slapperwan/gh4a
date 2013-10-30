@@ -129,13 +129,6 @@ public class DiffViewerActivity extends BaseSherlockFragmentActivity {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.download_menu, menu);
         
-        if (Gh4Application.THEME != R.style.LightTheme) {
-            menu.findItem(R.id.download).setIcon(R.drawable.download_dark);
-            menu.findItem(R.id.browser).setIcon(R.drawable.web_site_dark);
-            menu.findItem(R.id.search).setIcon(R.drawable.action_search_dark);
-            menu.findItem(R.id.share).setIcon(R.drawable.social_share_dark);
-        }
-        
         menu.removeItem(R.id.download);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
             menu.removeItem(R.id.search);

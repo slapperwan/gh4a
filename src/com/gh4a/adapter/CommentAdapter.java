@@ -67,8 +67,6 @@ public class CommentAdapter extends RootAdapter<Comment> implements OnClickListe
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
             
             viewHolder.ivEdit = (ImageView) v.findViewById(R.id.iv_edit);
-            viewHolder.ivEdit.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-            viewHolder.ivEdit.setPadding(10, 5, 10, 5);
             if (Gh4Application.THEME != R.style.DefaultTheme) {
                 viewHolder.ivEdit.setImageResource(R.drawable.content_edit);  
             }

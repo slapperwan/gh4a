@@ -216,10 +216,6 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.accept_cancel, menu);
-        if (Gh4Application.THEME != R.style.LightTheme) {
-            menu.getItem(0).setIcon(R.drawable.navigation_cancel_dark);
-            menu.getItem(1).setIcon(R.drawable.navigation_accept_dark);
-        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -407,7 +403,6 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
             final View rowView = getLayoutInflater().inflate(R.layout.row_issue_create_label, null);
             View viewColor = (View) rowView.findViewById(R.id.view_color);
             viewColor.setBackgroundColor(Color.parseColor("#" + label.getColor()));
-            //viewColor.setPadding(10, 10, 10, 10);
             
             final TextView tvLabel = (TextView) rowView.findViewById(R.id.tv_title);
             tvLabel.setTypeface(app.condensed);

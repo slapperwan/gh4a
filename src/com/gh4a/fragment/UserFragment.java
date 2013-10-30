@@ -167,25 +167,16 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
         
         if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
             tlFollowers.setOnClickListener(this);
-            
-            TextView tvFollowers = (TextView) v.findViewById(R.id.tv_followers_label);
-            tvFollowers.setText(R.string.user_followers);
-            tlFollowers.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-            
             tlOrgMembers.setVisibility(View.GONE);
         } else {
             TextView tvMemberCount = (TextView) v.findViewById(R.id.tv_members_count);
             tvMemberCount.setTypeface(boldCondensed);
 
             tlOrgMembers.setOnClickListener(this);
-            tlOrgMembers.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-            
             tlFollowers.setVisibility(View.GONE);
         }
         
-        TableLayout tlRepos = (TableLayout) v.findViewById(R.id.cell_repos);
-        tlRepos.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-        tlRepos.setOnClickListener(this);
+        v.findViewById(R.id.cell_repos).setOnClickListener(this);
         
         TextView tvReposCount = (TextView) v.findViewById(R.id.tv_repos_count);
         tvReposCount.setTypeface(boldCondensed);
@@ -241,7 +232,6 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
             countView.setText(String.valueOf(count));
         
             layout.setOnClickListener(this);
-            layout.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
         } else {
             layout.setVisibility(View.GONE);
         }
@@ -310,13 +300,10 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
         
         int count = mTopRepos != null ? mTopRepos.size() : 0;
         LayoutInflater inflater = getLayoutInflater(null);
-        int padding = getResources().getDimensionPixelSize(R.dimen.org_member_list_padding);
 
         for (int i = 0; i < count; i++) {
             final Repository repo = mTopRepos.get(i); 
-            View rowView = inflater.inflate(R.layout.row_simple_3, null);
-            rowView.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-            rowView.setPadding(0, padding, 0, padding);
+            View rowView = inflater.inflate(R.layout.top_repo, null);
             rowView.setOnClickListener(this);
             rowView.setTag(repo);
 
@@ -363,17 +350,14 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
         LinearLayout llOrg = (LinearLayout) v.findViewById(R.id.ll_org);
         int count = mOrgs != null ? mOrgs.size() : 0;
         LayoutInflater inflater = getLayoutInflater(null);
-        int padding = getResources().getDimensionPixelSize(R.dimen.top_repo_list_padding);
 
         llOrg.removeAllViews();
         llOrgs.setVisibility(count > 0 ? View.VISIBLE : View.GONE);
 
         for (int i = 0; i < count; i++) {
             User org = mOrgs.get(i);
-            View rowView = inflater.inflate(R.layout.row_simple, null);
+            View rowView = inflater.inflate(R.layout.selectable_label, null);
             
-            rowView.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-            rowView.setPadding(0, padding, 0, padding);
             rowView.setOnClickListener(this);
             rowView.setTag(org);
                 

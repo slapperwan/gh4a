@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/refresh" 
-        android:icon="@drawable/navigation_refresh"
+        android:icon="?attr/refreshIcon"
         android:showAsAction="always" />
     <item android:id="@+id/follow" 
         android:showAsAction="always" />

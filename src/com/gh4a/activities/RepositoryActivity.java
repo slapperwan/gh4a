@@ -356,10 +356,6 @@ public class RepositoryActivity extends BaseSherlockFragmentActivity implements 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.repo_menu, menu);
-        
-        if (Gh4Application.THEME != R.style.LightTheme) {
-            menu.findItem(R.id.refresh).setIcon(R.drawable.navigation_refresh_dark);
-        }
         return super.onCreateOptionsMenu(menu);
     }
 

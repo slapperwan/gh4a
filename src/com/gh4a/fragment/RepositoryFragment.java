@@ -125,7 +125,6 @@ public class RepositoryFragment extends BaseFragment implements  OnClickListener
             if (parent != null) {
                 tvParentRepo.setText(app.getString(R.string.forked_from,
                         parent.getOwner().getLogin() + "/" + parent.getName()));
-                tvParentRepo.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
                 tvParentRepo.setOnClickListener(this);
                 tvParentRepo.setTag(parent);
             }
@@ -137,30 +136,25 @@ public class RepositoryFragment extends BaseFragment implements  OnClickListener
         fillTextView(v, R.id.tv_language,R.string.repo_language, mRepository.getLanguage(), app);
         fillTextView(v, R.id.tv_url, 0, mRepository.getHtmlUrl(), app);
 
-        TableLayout tlStargazers = (TableLayout) v.findViewById(R.id.cell_stargazers);
-        tlStargazers.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-        tlStargazers.setOnClickListener(this);
+        v.findViewById(R.id.cell_stargazers).setOnClickListener(this);
+        v.findViewById(R.id.cell_forks).setOnClickListener(this);
+        v.findViewById(R.id.cell_pull_requests).setOnClickListener(this);
         
         TextView tvStargazersCount = (TextView) v.findViewById(R.id.tv_stargazers_count);
         tvStargazersCount.setText(String.valueOf(mRepository.getWatchers()));
         tvStargazersCount.setTypeface(boldCondensed);
         
-        TableLayout tlForks = (TableLayout) v.findViewById(R.id.cell_forks);
-        tlForks.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-        tlForks.setOnClickListener(this);
-        
         TextView tvForksCount = (TextView) v.findViewById(R.id.tv_forks_count);
         tvForksCount.setTypeface(boldCondensed);
         tvForksCount.setText(String.valueOf(mRepository.getForks()));
         
-        TableLayout tlIssues = (TableLayout) v.findViewById(R.id.cell_issues);
         TextView tvIssues = (TextView) v.findViewById(R.id.tv_issues_label);
         TextView tvIssuesCount = (TextView) v.findViewById(R.id.tv_issues_count);
+        TableLayout tlIssues = (TableLayout) v.findViewById(R.id.cell_issues);
         
         if (mRepository.isHasIssues()) {
             tlIssues.setVisibility(View.VISIBLE);
             tlIssues.setOnClickListener(this);
-            tlIssues.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
             
             tvIssues.setVisibility(View.VISIBLE);
             
@@ -173,10 +167,6 @@ public class RepositoryFragment extends BaseFragment implements  OnClickListener
             tvIssues.setVisibility(View.GONE);
             tvIssuesCount.setVisibility(View.GONE);
         }
-        
-        TableLayout tlPullRequests = (TableLayout) v.findViewById(R.id.cell_pull_requests);
-        tlPullRequests.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-        tlPullRequests.setOnClickListener(this);
         
         TextView tvPullRequestsCount = (TextView) v.findViewById(R.id.tv_pull_requests_count);
         tvPullRequestsCount.setTypeface(boldCondensed);
@@ -198,7 +188,6 @@ public class RepositoryFragment extends BaseFragment implements  OnClickListener
     private void initOtherTextView(View parent, int id, Gh4Application app) {
         TextView view = (TextView) parent.findViewById(id);
 
-        view.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
         view.setOnClickListener(this);
         view.setTypeface(app.boldCondensed);
     }

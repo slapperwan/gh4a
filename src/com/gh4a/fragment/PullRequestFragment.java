@@ -35,7 +35,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -194,12 +193,7 @@ public class PullRequestFragment extends BaseFragment implements
             imageGetter.bind(tvDesc, body, pullRequest.getId());
         }
         
-        ImageView ivComment = (ImageView) v.findViewById(R.id.iv_comment);
-        if (Gh4Application.THEME == R.style.DefaultTheme) {
-            ivComment.setImageResource(R.drawable.social_send_now_dark);
-        }
-        ivComment.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-        ivComment.setOnClickListener(this);
+        v.findViewById(R.id.iv_comment).setOnClickListener(this);
     }
     
 

@@ -14,9 +14,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -45,7 +43,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         f.setArguments(args);
         return f;
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,10 +51,9 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         mRepoName = getArguments().getString(Constants.Repository.REPO_NAME);
         mObjectSha = getArguments().getString(Constants.Object.OBJECT_SHA);
     }
-    
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.commit_comment_list, container, false);
 
         mListView = (ListView) v.findViewById(R.id.list_view);
@@ -66,17 +63,12 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
             v.findViewById(R.id.comment).setVisibility(View.GONE);
             v.findViewById(R.id.divider).setVisibility(View.GONE);
         }
-        
-        ImageView ivComment = (ImageView) v.findViewById(R.id.iv_comment);
-        if (Gh4Application.THEME == R.style.DefaultTheme) {
-            ivComment.setImageResource(R.drawable.social_send_now_dark);
-        }
-        ivComment.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-        ivComment.setOnClickListener(this);
-        
+
+        v.findViewById(R.id.iv_comment).setOnClickListener(this);
+
         return v;
     }
-    
+
     @Override
     protected RootAdapter<CommitComment> onCreateAdapter() {
         return new CommitNoteAdapter(getSherlockActivity());
@@ -95,13 +87,13 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     public void onClick(View v) {
         EditText etComment = (EditText) getView().findViewById(R.id.et_comment);
         String text = etComment.getText() == null ? null : etComment.getText().toString();
-        
+
         if (!StringUtils.isBlank(text)) {
             new CommentCommitTask(text).execute();
         }
         UiUtils.hideImeForView(getActivity().getCurrentFocus());
     }
-    
+
     private class CommentCommitTask extends ProgressDialogTask<Void> {
         private String mText;
 
@@ -112,8 +104,8 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
         @Override
         protected Void run() throws IOException {
-            CommitService commitService = (CommitService)
-                    Gh4Application.get(mContext).getService(Gh4Application.COMMIT_SERVICE);
+            CommitService commitService = (CommitService) Gh4Application.get(mContext).getService(
+                    Gh4Application.COMMIT_SERVICE);
             CommitComment commitComment = new CommitComment();
             commitComment.setBody(mText);
             commitService.addComment(new RepositoryId(mRepoOwner, mRepoName), mObjectSha, commitComment);
@@ -123,7 +115,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         @Override
         protected void onSuccess(Void result) {
             getLoaderManager().restartLoader(0, null, CommitNoteFragment.this);
-            
+
             EditText etComment = (EditText) getView().findViewById(R.id.et_comment);
             etComment.setText(null);
             etComment.clearFocus();

@@ -215,13 +215,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         
         TextView tvMilestone = (TextView) mHeader.findViewById(R.id.tv_milestone);
         
-        ImageView ivComment = (ImageView) findViewById(R.id.iv_comment);
-        if (Gh4Application.THEME == R.style.DefaultTheme) {
-            ivComment.setImageResource(R.drawable.social_send_now_dark);
-        }
-        ivComment.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-        ivComment.setPadding(5, 2, 5, 2);
-        ivComment.setOnClickListener(this);
+        findViewById(R.id.iv_comment).setOnClickListener(this);
 
         tvExtra.setText(mIssue.getUser().getLogin() + "\n" + Gh4Application.pt.format(mIssue.getCreatedAt()));
         tvState.setTextColor(Color.WHITE);
@@ -287,27 +281,18 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         
         if (labels != null && !labels.isEmpty()) {
             showInfoBox = true;
+            LayoutInflater inflater = getLayoutInflater();
             for (Label label : labels) {
-                TextView tvLabel = new TextView(this);
-                tvLabel.setSingleLine(true);
+                TextView tvLabel = (TextView) inflater.inflate(R.layout.issue_label, null);
+                int color = Color.parseColor("#" + label.getColor());
+                boolean dark = Color.red(color) + Color.green(color) + Color.blue(color) < 383;
+
                 tvLabel.setText(label.getName());
-                tvLabel.setTextAppearance(this, R.style.default_text_small);
-                tvLabel.setBackgroundColor(Color.parseColor("#" + label.getColor()));
-                tvLabel.setPadding(5, 2, 5, 2);
-                int r = Color.red(Color.parseColor("#" + label.getColor()));
-                int g = Color.green(Color.parseColor("#" + label.getColor()));
-                int b = Color.blue(Color.parseColor("#" + label.getColor()));
-                if (r + g + b < 383) {
-                    tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_dark));
-                }
-                else {
-                    tvLabel.setTextColor(getResources().getColor(android.R.color.primary_text_light));
-                }
-                llLabels.addView(tvLabel);
+                tvLabel.setBackgroundColor(color);
+                tvLabel.setTextColor(getResources().getColor(
+                        dark ? android.R.color.primary_text_dark : android.R.color.primary_text_light));
                 
-                View v = new View(this);
-                v.setLayoutParams(new LayoutParams(5, LayoutParams.WRAP_CONTENT));
-                llLabels.addView(v);
+                llLabels.addView(tvLabel);
             }
         }
         else {

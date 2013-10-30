@@ -218,29 +218,17 @@ public class IssueListActivity extends BaseSherlockFragmentActivity implements O
     }
     
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.clear();
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.issues_menu, menu);
-        if ("open".equals(mState)) {
-            menu.getItem(4).setTitle(R.string.issue_view_closed_issues);
-        }
-        else {
-            menu.getItem(4).setTitle(R.string.issue_view_open_issues);
-        }
+        menu.findItem(R.id.view_open_closed).setTitle("open".equals(mState)
+                ? R.string.issue_view_closed_issues : R.string.issue_view_open_issues);
         if (!isCollaborator) {
             menu.removeItem(R.id.view_labels);
             menu.removeItem(R.id.view_milestones);
         }
         
-        if (Gh4Application.THEME != R.style.LightTheme) {
-            menu.getItem(0).setIcon(R.drawable.navigation_expand_dark);
-            menu.getItem(1).setIcon(R.drawable.collections_labels_dark);
-            menu.getItem(2).setIcon(R.drawable.collections_view_as_list_dark);
-            menu.getItem(3).setIcon(R.drawable.social_person_dark);
-        }
-        
-        return super.onPrepareOptionsMenu(menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override

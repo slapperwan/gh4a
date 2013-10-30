@@ -45,7 +45,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/titletextcolor"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:background="?attr/selectableItemBackground" />
             <View
                 android:id="@+id/separator"
                 android:layout_width="fill_parent"
@@ -78,7 +79,8 @@
                     android:id="@+id/cell_issues"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1" >
+                    android:layout_weight="1"
+                    android:background="?attr/selectableItemBackground" >
                     <TableRow>
                         <TextView
                             android:id="@+id/tv_issues_count"
@@ -100,7 +102,8 @@
                     android:id="@+id/cell_stargazers"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1" >
+                    android:layout_weight="1"
+                    android:background="?attr/selectableItemBackground" >
                     <TableRow>
                         <TextView
                             android:id="@+id/tv_stargazers_count"
@@ -121,7 +124,8 @@
                     android:id="@+id/cell_forks"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1" >
+                    android:layout_weight="1"
+                    android:background="?attr/selectableItemBackground" >
                     <TableRow>
                         <TextView
                             android:id="@+id/tv_forks_count"
@@ -142,7 +146,8 @@
                     android:id="@+id/cell_pull_requests"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1" >
+                    android:layout_weight="1"
+                    android:background="?attr/selectableItemBackground" >
                     <TableRow>
                         <TextView
                             android:id="@+id/tv_pull_requests_count"
@@ -234,37 +239,29 @@
                 android:id="@+id/tv_contributors_label"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/repo_contributors"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp" />
+                style="@style/SelectableLabel"
+                android:text="@string/repo_contributors" />
             
             <TextView
                 android:id="@+id/tv_collaborators_label"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/repo_collaborators"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp" />
+                style="@style/SelectableLabel"
+                android:text="@string/repo_collaborators" />
             
             <TextView
                 android:id="@+id/tv_wiki_label"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/recent_wiki"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp" />
+                style="@style/SelectableLabel"
+                android:text="@string/recent_wiki" />
             
             <TextView
                 android:id="@+id/tv_downloads_label"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/downloads"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp" />
+                style="@style/SelectableLabel"
+                android:text="@string/downloads" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

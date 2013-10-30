@@ -135,9 +135,6 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.create_new, menu);
-        if (Gh4Application.THEME != R.style.LightTheme) {
-            menu.getItem(0).setIcon(R.drawable.content_new_dark);
-        }
         return super.onCreateOptionsMenu(menu);
     }
 

@@ -45,6 +45,7 @@
             android:layout_height="40dp"
             android:layout_gravity="bottom"
             android:src="@drawable/social_send_now"
+            android:background="?attr/selectableItemBackground"
             android:scaleType="centerInside" />
 
     </LinearLayout>

@@ -15,7 +15,6 @@
  */
 package com.gh4a.activities;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import org.eclipse.egit.github.core.Gist;
@@ -40,10 +39,10 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
 
-public class GistActivity extends BaseSherlockFragmentActivity {
-
+public class GistActivity extends BaseSherlockFragmentActivity implements OnClickListener {
     private String mGistId;
     private String mUserLogin;
+    private Gist mGist;
 
     private LoaderCallbacks<Gist> mGistCallback = new LoaderCallbacks<Gist>() {
         @Override
@@ -83,6 +82,8 @@ public class GistActivity extends BaseSherlockFragmentActivity {
     }
     
     private void fillData(final Gist gist) {
+        mGist = gist;
+
         TextView tvDesc = (TextView) findViewById(R.id.tv_desc);
         if (StringUtils.isBlank(gist.getDescription())) {
             tvDesc.setVisibility(View.GONE);
@@ -99,33 +100,27 @@ public class GistActivity extends BaseSherlockFragmentActivity {
 
         Map<String, GistFile> files = gist.getFiles();
         if (files != null) {
-            Iterator<String> iter = files.keySet().iterator();
-            while (iter.hasNext()) {
-                String key = iter.next();
-                final GistFile gistFile = files.get(key);
-                TextView tvFilename = new TextView(getApplicationContext());
+            for (GistFile gistFile : files.values()) {
+                TextView tvFilename = new TextView(this, null, R.style.SelectableLabel);
                 SpannableString content = new SpannableString(gistFile.getFilename());
                 content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
                 tvFilename.setText(content);
                 tvFilename.setTextColor(getResources().getColor(R.color.highlight));
-                tvFilename.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-                tvFilename.setTextAppearance(this, android.R.attr.textAppearanceMedium);
-                tvFilename.setPadding(0, 8, 0, 8);
-                tvFilename.setOnClickListener(new OnClickListener() {
-
-                    @Override
-                    public void onClick(View arg0) {
-                        Intent intent = new Intent().setClass(GistActivity.this,
-                                GistViewerActivity.class);
-                        intent.putExtra(Constants.User.USER_LOGIN, gist.getUser().getLogin());
-                        intent.putExtra(Constants.Gist.FILENAME, gistFile.getFilename());
-                        intent.putExtra(Constants.Gist.ID, gist.getId());
-                        startActivity(intent);
-                    }
-                });
+                tvFilename.setOnClickListener(this);
+                tvFilename.setTag(gistFile);
                 llFiles.addView(tvFilename);
             }
         }
+    }
+
+    @Override
+    public void onClick(View view) {
+        Intent intent = new Intent(this, GistViewerActivity.class);
+        GistFile gist = (GistFile) view.getTag();
+        intent.putExtra(Constants.User.USER_LOGIN, mGist.getUser().getLogin());
+        intent.putExtra(Constants.Gist.FILENAME, gist.getFilename());
+        intent.putExtra(Constants.Gist.ID, mGist.getId());
+        startActivity(intent);
     }
     
     @Override

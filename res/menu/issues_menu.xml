@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/sort"
-        android:icon="@drawable/navigation_expand" 
+        android:icon="?attr/expandIcon"
         android:showAsAction="always" />
     
     <item android:id="@+id/labels"
-        android:icon="@drawable/collections_labels" 
+        android:icon="?attr/labelListIcon"
         android:showAsAction="always" />
     
     <item android:id="@+id/milestones"
-        android:icon="@drawable/collections_view_as_list" 
+        android:icon="?attr/milestoneListIcon"
         android:showAsAction="always" />
     
     <item android:id="@+id/assignees"
-        android:icon="@drawable/social_person" 
+        android:icon="?attr/personIcon"
         android:showAsAction="always" />
     
     <item android:id="@+id/view_open_closed" 

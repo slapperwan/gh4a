@@ -146,9 +146,6 @@ public class UserActivity extends BaseSherlockFragmentActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.user_menu, menu);
-        if (Gh4Application.THEME != R.style.LightTheme) {
-            menu.findItem(R.id.refresh).setIcon(R.drawable.navigation_refresh_dark);
-        }
         return true;
     }
 
