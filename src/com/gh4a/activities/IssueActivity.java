@@ -75,6 +75,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
     private String mRepoName;
     private int mIssueNumber;
     private String mIssueState;
+    private ListView mListView;
     private CommentAdapter mCommentAdapter;
     private boolean isCollaborator;
     private boolean isCreator;
@@ -92,9 +93,9 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
             if (!result.handleError(IssueActivity.this)) {
                 mIssue = result.getData();
                 mIssueState = mIssue.getState();
+                isCreator = mIssue.getUser().getLogin().equals(
+                        Gh4Application.get(IssueActivity.this).getAuthLogin());
                 fillData();
-                getSupportLoaderManager().initLoader(1, null, mCollaboratorCallback);
-                getSupportLoaderManager().initLoader(2, null, mCommentCallback);
             }
             else {
                 invalidateOptionsMenu();
@@ -124,8 +125,6 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         public void onResultReady(LoaderResult<Boolean> result) {
             if (!result.handleError(IssueActivity.this)) {
                 isCollaborator = result.getData();
-                isCreator = mIssue.getUser().getLogin().equals(
-                        Gh4Application.get(IssueActivity.this).getAuthLogin());
                 invalidateOptionsMenu();
             }
         }
@@ -161,19 +160,24 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
             tlComment.setVisibility(View.GONE);
         }
         
+        mListView = (ListView) findViewById(R.id.list_view);
+        mCommentAdapter = new CommentAdapter(this, mRepoOwner, this);
+
         getSupportLoaderManager().initLoader(0, null, mIssueCallback);
+        getSupportLoaderManager().initLoader(1, null, mCollaboratorCallback);
+        getSupportLoaderManager().initLoader(2, null, mCommentCallback);
     }
 
     private void fillData() {
         final Gh4Application app = Gh4Application.get(this);
         
-        ListView lvComments = (ListView) findViewById(R.id.list_view);
         // set details inside listview header
         LayoutInflater infalter = getLayoutInflater();
-        LinearLayout mHeader = (LinearLayout) infalter.inflate(R.layout.issue_header, lvComments, false);
+        LinearLayout mHeader = (LinearLayout) infalter.inflate(R.layout.issue_header, mListView, false);
         mHeader.setClickable(false);
         
-        lvComments.addHeaderView(mHeader, null, false);
+        mListView.addHeaderView(mHeader, null, false);
+        mListView.setAdapter(mCommentAdapter);
         
         RelativeLayout rlComment = (RelativeLayout) findViewById(R.id.rl_comment);
         if (!Gh4Application.get(this).isAuthorized()) {
@@ -181,8 +185,6 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         }
 
         TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
-        mCommentAdapter = new CommentAdapter(this, mRepoOwner, this);
-        lvComments.setAdapter(mCommentAdapter);
 
         ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
         aq.id(R.id.iv_gravatar).image(GravatarUtils.getGravatarUrl(mIssue.getUser().getGravatarId()),

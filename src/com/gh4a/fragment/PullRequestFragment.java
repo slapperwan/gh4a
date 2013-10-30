@@ -67,6 +67,7 @@ public class PullRequestFragment extends BaseFragment implements
     private String mRepoName;
     private int mPullRequestNumber;
     private LinearLayout mHeader;
+    private ListView mListView;
     private CommentAdapter mCommentAdapter;
 
     private LoaderCallbacks<PullRequest> mPullRequestCallback = new LoaderCallbacks<PullRequest>() {
@@ -89,7 +90,6 @@ public class PullRequestFragment extends BaseFragment implements
         }
         @Override
         public void onResultReady(LoaderResult<List<Comment>> result) {
-            hideLoading();
             if (!result.handleError(getActivity())) {
                 fillDiscussion(result.getData());
             }
@@ -119,7 +119,9 @@ public class PullRequestFragment extends BaseFragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.pull_request, container, false);
+        View v = inflater.inflate(R.layout.pull_request, container, false);
+        mListView = (ListView) v.findViewById(R.id.list_view);
+        return v;
     }
     
     @Override
@@ -131,6 +133,8 @@ public class PullRequestFragment extends BaseFragment implements
             rlComment.setVisibility(View.GONE);
         }
         
+        mCommentAdapter = new CommentAdapter(getSherlockActivity(), mRepoOwner, this);
+
         getLoaderManager().initLoader(0, null, mPullRequestCallback);
         getLoaderManager().initLoader(1, null, mCommentCallback);
     }
@@ -138,17 +142,14 @@ public class PullRequestFragment extends BaseFragment implements
     private void fillData(final PullRequest pullRequest) {
         final Gh4Application app = Gh4Application.get(getActivity());
         View v = getView();
-        ListView lvComments = (ListView) v.findViewById(R.id.list_view);
         
         // set details inside listview header
         LayoutInflater inflater = LayoutInflater.from(getSherlockActivity());
-        mHeader = (LinearLayout) inflater.inflate(R.layout.pull_request_header, lvComments, false);
+        mHeader = (LinearLayout) inflater.inflate(R.layout.pull_request_header, mListView, false);
         mHeader.setClickable(false);
-        lvComments.addHeaderView(mHeader, null, true);
+        mListView.addHeaderView(mHeader, null, true);
+        mListView.setAdapter(mCommentAdapter);
 
-        mCommentAdapter = new CommentAdapter(getSherlockActivity(), mRepoOwner, this);
-        lvComments.setAdapter(mCommentAdapter);
-        
         User user = pullRequest.getUser();
         if (user != null) {
             AQuery aq = new AQuery(getSherlockActivity());
