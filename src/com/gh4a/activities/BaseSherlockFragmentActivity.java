@@ -97,8 +97,12 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         case R.id.about:
             openAboutDialog();
             return true;
+        case R.id.explore:
+            intent = new Intent(this, ExploreActivity.class);
+            startActivity(intent);
+            return true;
         case R.id.search:
-            intent = new Intent().setClass(this, SearchActivity.class);
+            intent = new Intent(this, SearchActivity.class);
             startActivity(intent);
             return true;
         case R.id.bookmarks:

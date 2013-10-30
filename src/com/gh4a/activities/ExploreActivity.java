@@ -54,7 +54,11 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
-        mExploreItem = getIntent().getExtras().getInt("exploreItem");
+        if (getIntent().getExtras() != null) {
+            mExploreItem = getIntent().getExtras().getInt("exploreItem", 0);
+        } else {
+            mExploreItem = 0;
+        }
         
         if (!isOnline()) {
             setErrorView();

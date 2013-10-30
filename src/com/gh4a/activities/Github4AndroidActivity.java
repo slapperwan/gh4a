@@ -23,17 +23,15 @@ import org.eclipse.egit.github.core.Authorization;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.OAuthService;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -46,19 +44,6 @@ import com.gh4a.utils.UiUtils;
  * The Github4Android activity.
  */
 public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
-
-    /** The EditText for user login. */
-    protected EditText mEtUserLogin;
-
-    /** The EditText for password. */
-    protected EditText mEtPassword;
-
-    protected ProgressDialog mProgressDialog;
-
-    /*
-     * (non-Javadoc)
-     * @see android.app.Activity#onCreate(android.os.Bundle)
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
@@ -73,27 +58,40 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
         setContentView(R.layout.main);
         
         BugSenseHandler.setup(this, "6e1b031");
-        
-        mEtUserLogin = (EditText) findViewById(R.id.et_username_main);
-        mEtPassword = (EditText) findViewById(R.id.et_password_main);
+    }
 
-        final Button btnLogin = (Button) findViewById(R.id.btn_login);
-        btnLogin.setOnClickListener(new OnClickListener() {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        boolean result = super.onCreateOptionsMenu(menu);
+        menu.findItem(R.id.login).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        return result;
+    }
 
-            @Override
-            public void onClick(View v) {
-                UiUtils.hideImeForView(btnLogin);
-                String username = mEtUserLogin.getText().toString();
-                String password = mEtPassword.getText().toString();
-                if (!StringUtils.checkEmail(username)) {
-                    new LoginTask(username, password).execute();
-                }
-                else {
-                    Toast.makeText(Github4AndroidActivity.this,
-                            getString(R.string.enter_username_toast), Toast.LENGTH_LONG).show();
-                }
-            }
-        });
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.login) {
+            doLogin();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void doLogin() {
+        EditText loginView = (EditText) findViewById(R.id.et_username_main);
+        EditText passwordView = (EditText) findViewById(R.id.et_password_main);
+
+        UiUtils.hideImeForView(loginView);
+        UiUtils.hideImeForView(passwordView);
+
+        String username = loginView.getText().toString();
+        String password = passwordView.getText().toString();
+
+        if (!StringUtils.checkEmail(username)) {
+            new LoginTask(username, password).execute();
+        } else {
+            Toast.makeText(Github4AndroidActivity.this,
+                    getString(R.string.enter_username_toast), Toast.LENGTH_LONG).show();
+        }
     }
 
     private class LoginTask extends ProgressDialogTask<Authorization> {
@@ -150,7 +148,7 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
             editor.commit();
             
             Gh4Application.get(mContext).openUserInfoActivity(mContext,
-                    mUserName.trim(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    mUserName, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
             finish();
         }
     }
