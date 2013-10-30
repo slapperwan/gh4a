@@ -499,7 +499,8 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         SharedPreferences sharedPreferences = getSharedPreferences(Constants.PREF_NAME,
                 MODE_PRIVATE);
         Editor editor = sharedPreferences.edit();
-        editor.clear();
+        editor.remove(Constants.User.USER_LOGIN);
+        editor.remove(Constants.User.USER_AUTH_TOKEN);
         editor.commit();
 
         Intent intent = new Intent(this, Github4AndroidActivity.class);
