@@ -107,6 +107,7 @@ public abstract class PagedDataBaseFragment<T> extends BaseFragment implements
         mIsLoadCompleted = true;
         hideLoading();
         fillData(events);
+        getActivity().invalidateOptionsMenu();
     }
 
     @Override

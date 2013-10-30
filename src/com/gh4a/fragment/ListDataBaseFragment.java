@@ -58,6 +58,7 @@ public abstract class ListDataBaseFragment<T> extends BaseFragment implements
         if (!result.handleError(getActivity())) {
             onAddData(mAdapter, result.getData());
         }
+        getActivity().invalidateOptionsMenu();
     }
 
     @Override

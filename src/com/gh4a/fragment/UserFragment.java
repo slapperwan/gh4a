@@ -71,6 +71,7 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
                 mUser = (User) result.getData();
                 fillData();
             }
+            getSherlockActivity().invalidateOptionsMenu();
         }
     };
 
@@ -230,7 +231,6 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
         
         getLoaderManager().initLoader(1, null, mRepoListCallback);
         getLoaderManager().initLoader(2, null, mOrganizationCallback);
-        getSherlockActivity().invalidateOptionsMenu();
     }
 
     private void fillCountIfUser(View parent, int layoutId, int countId, int count, Gh4Application app) {
