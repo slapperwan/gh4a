@@ -95,8 +95,8 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity {
         mPath = getIntent().getStringExtra(Constants.Object.PATH);
         mRef = getIntent().getStringExtra(Constants.Object.REF);
         mSha = getIntent().getStringExtra(Constants.Object.OBJECT_SHA);
-        mName = getIntent().getStringExtra(Constants.Object.NAME);
-        
+        mName = FileUtils.getFileName(mPath);
+
         if (!isOnline()) {
             setErrorView();
             return;
@@ -137,7 +137,8 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity {
 
         mWebView.setWebViewClient(mWebViewClient);
         if (FileUtils.isImage(mName)) {
-            String htmlImage = StringUtils.highlightImage("https://github.com/" + mRepoOwner + "/" + mRepoName + "/raw/" + mRef + "/" + mPath);
+            String htmlImage = StringUtils.highlightImage(
+                    "https://github.com/" + mRepoOwner + "/" + mRepoName + "/raw/" + mRef + "/" + mPath);
             mWebView.loadDataWithBaseURL("file:///android_asset/", htmlImage, "text/html", "utf-8", "");
         }
         else {
@@ -179,7 +180,8 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity {
             case R.id.share:
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
                 shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_file_subject, mName, mRepoOwner + "/" + mRepoName));
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT,
+                        getString(R.string.share_file_subject, mName, mRepoOwner + "/" + mRepoName));
                 shareIntent.putExtra(Intent.EXTRA_TEXT,  blobUrl);
                 shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
@@ -188,13 +190,14 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity {
                 doSearch();
                 return true;
             case 10:
-                Intent intent = new Intent().setClass(FileViewerActivity.this, CommitHistoryActivity.class);
+                Intent intent = new Intent(FileViewerActivity.this, CommitHistoryActivity.class);
                 intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
                 intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                 intent.putExtra(Constants.Object.PATH, mPath);
                 intent.putExtra(Constants.Object.REF, mRef);
                 intent.putExtra(Constants.Object.OBJECT_SHA, mSha);
                 startActivity(intent);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

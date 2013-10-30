@@ -40,8 +40,8 @@ public class ContributorListActivity extends UserListActivity {
     }
 
     @Override
-    protected String getTitleBar() {
-        return getResources().getString(R.string.repo_contributors);
+    protected String getActionBarTitle() {
+        return getString(R.string.repo_contributors);
     }
     
     @Override

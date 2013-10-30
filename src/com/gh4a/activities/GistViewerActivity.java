@@ -16,7 +16,7 @@
 package com.gh4a.activities;
 
 import org.eclipse.egit.github.core.Gist;
-
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,7 +24,6 @@ import android.support.v4.content.Loader;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-
 import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -35,11 +34,9 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
 
 public class GistViewerActivity extends BaseSherlockFragmentActivity {
-
     private String mUserLogin;
-    private String mFilename;
+    private String mFileName;
     private String mGistId;
-    private String mData;
 
     private LoaderCallbacks<Gist> mGistCallback = new LoaderCallbacks<Gist>() {
         @Override
@@ -49,18 +46,32 @@ public class GistViewerActivity extends BaseSherlockFragmentActivity {
         @Override
         public void onResultReady(LoaderResult<Gist> result) {
             if (!result.handleError(GistViewerActivity.this)) {
-                fillData(result.getData().getFiles().get(mFilename).getContent(), true);
+                fillData(result.getData().getFiles().get(mFileName).getContent(), true);
             }
         }
     };
 
+    private WebViewClient mWebViewClient = new WebViewClient() {
+        @Override
+        public void onPageFinished(WebView webView, String url) {
+            hideLoading();
+        }
+        
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
+            return true;
+        }
+    };
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         mUserLogin = getIntent().getExtras().getString(Constants.User.USER_LOGIN);
-        mFilename = getIntent().getExtras().getString(Constants.Gist.FILENAME);
+        mFileName = getIntent().getExtras().getString(Constants.Gist.FILENAME);
         mGistId = getIntent().getExtras().getString(Constants.Gist.ID);
         
         if (!isOnline()) {
@@ -71,13 +82,14 @@ public class GistViewerActivity extends BaseSherlockFragmentActivity {
         setContentView(R.layout.web_viewer);
         
         ActionBar mActionBar = getSupportActionBar();
-        mActionBar.setTitle(mFilename);
+        mActionBar.setTitle(mFileName);
         mActionBar.setDisplayHomeAsUpEnabled(true);
         
         showLoading();
         getSupportLoaderManager().initLoader(0, null, mGistCallback);
     }
     
+    @SuppressLint("SetJavaScriptEnabled")
     private void fillData(String data, boolean highlight) {
         WebView webView = (WebView) findViewById(R.id.web_view);
 
@@ -92,28 +104,12 @@ public class GistViewerActivity extends BaseSherlockFragmentActivity {
         s.setJavaScriptEnabled(true);
         s.setUseWideViewPort(true);
 
-        webView.setWebViewClient(webViewClient);
+        webView.setWebViewClient(mWebViewClient);
 
-        mData = data;
-        String highlighted = StringUtils.highlightSyntax(mData, highlight, mFilename);
+        String highlighted = StringUtils.highlightSyntax(data, highlight, mFileName);
         webView.loadDataWithBaseURL("file:///android_asset/", highlighted, "text/html", "utf-8", "");
     }
 
-    private WebViewClient webViewClient = new WebViewClient() {
-
-        @Override
-        public void onPageFinished(WebView webView, String url) {
-            hideLoading();
-        }
-        
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            startActivity(intent);
-            return true;
-        }
-    };
-    
     @Override
     protected void navigateUp() {
         Gh4Application.get(this).openGistActivity(this, mUserLogin, mGistId, Intent.FLAG_ACTIVITY_CLEAR_TOP);

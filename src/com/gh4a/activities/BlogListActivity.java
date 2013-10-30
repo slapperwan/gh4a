@@ -42,14 +42,14 @@ public class BlogListActivity extends BaseSherlockFragmentActivity {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.explore_menu, menu);
         menu.removeItem(R.id.refresh);
-        menu.findItem(R.id.blog).setVisible(false);
+        menu.removeItem(R.id.blog);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     protected void navigateUp() {
         if (!Gh4Application.get(this).isAuthorized()) {
-            Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+            Intent intent = new Intent(this, Github4AndroidActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
@@ -65,12 +65,12 @@ public class BlogListActivity extends BaseSherlockFragmentActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.pub_timeline:
-                Intent intent = new Intent().setClass(this, TimelineActivity.class);
+                Intent intent = new Intent(this, TimelineActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;
             case R.id.trend:
-                intent = new Intent().setClass(this, TrendingActivity.class);
+                intent = new Intent(this, TrendingActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;

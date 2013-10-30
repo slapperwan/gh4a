@@ -28,10 +28,22 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 
 public class BlogActivity extends BaseSherlockFragmentActivity {
-
     private String mTitle;
     private String mContent;
-    
+
+    private WebViewClient mWebViewClient = new WebViewClient() {
+        @Override
+        public void onPageFinished(WebView webView, String url) {
+        }
+        
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
+            return true;
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
@@ -52,16 +64,15 @@ public class BlogActivity extends BaseSherlockFragmentActivity {
     
     @Override
     protected void navigateUp() {
-        Intent intent = new Intent().setClass(this, BlogListActivity.class);
+        Intent intent = new Intent(this, BlogListActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
 
     private void fillData() {
-        
         WebView webView = (WebView) findViewById(R.id.web_view);
-
         WebSettings s = webView.getSettings();
+
         s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
         s.setUseWideViewPort(false);
         s.setAllowFileAccess(true);
@@ -72,23 +83,7 @@ public class BlogActivity extends BaseSherlockFragmentActivity {
         s.setSupportMultipleWindows(true);
         s.setJavaScriptEnabled(true);
 
-        webView.setWebViewClient(webViewClient);
+        webView.setWebViewClient(mWebViewClient);
         webView.loadDataWithBaseURL("https://github.com", mContent, "text/html", "utf-8", null);
     }
-
-    /** The web view client. */
-    private WebViewClient webViewClient = new WebViewClient() {
-
-        @Override
-        public void onPageFinished(WebView webView, String url) {
-        }
-        
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            startActivity(intent);
-            return true;
-        }
-    };
-
 }

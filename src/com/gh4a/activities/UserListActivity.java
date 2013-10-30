@@ -72,7 +72,7 @@ public abstract class UserListActivity extends BaseSherlockFragmentActivity impl
         setRequestData();
         
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(getTitleBar());
+        actionBar.setTitle(getActionBarTitle());
         actionBar.setSubtitle(getSubTitle());
         actionBar.setDisplayHomeAsUpEnabled(true);
         
@@ -98,13 +98,8 @@ public abstract class UserListActivity extends BaseSherlockFragmentActivity impl
         mSearchKey = getIntent().getExtras().getString("searchKey");
     }
 
-    protected String getTitleBar() {
-        return null;
-    }
-    
-    protected String getSubTitle() {
-        return null;
-    }
+    protected abstract String getActionBarTitle();
+    protected abstract String getSubTitle();
     
     protected boolean getShowExtraData() {
         return true;

@@ -85,19 +85,13 @@ public class GistActivity extends BaseSherlockFragmentActivity implements OnClic
         mGist = gist;
 
         TextView tvDesc = (TextView) findViewById(R.id.tv_desc);
-        if (StringUtils.isBlank(gist.getDescription())) {
-            tvDesc.setVisibility(View.GONE);
-        }
-        else {
-            tvDesc.setText(gist.getDescription());
-            tvDesc.setVisibility(View.VISIBLE);
-        }
+        tvDesc.setText(gist.getDescription());
+        tvDesc.setVisibility(StringUtils.isBlank(gist.getDescription()) ? View.GONE : View.VISIBLE);
         
         TextView tvCreatedAt = (TextView) findViewById(R.id.tv_created_at);
         tvCreatedAt.setText(Gh4Application.pt.format(gist.getCreatedAt()));
         
         LinearLayout llFiles = (LinearLayout) findViewById(R.id.ll_files);
-
         Map<String, GistFile> files = gist.getFiles();
         if (files != null) {
             for (GistFile gistFile : files.values()) {

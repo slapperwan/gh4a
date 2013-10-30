@@ -37,7 +37,6 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 
 public class GistListActivity extends BaseSherlockFragmentActivity implements OnItemClickListener {
-
     private String mUserLogin;
 
     private LoaderCallbacks<List<Gist>> mGistsCallback = new LoaderCallbacks<List<Gist>>() {
@@ -85,8 +84,7 @@ public class GistListActivity extends BaseSherlockFragmentActivity implements On
         if (gists != null && !gists.isEmpty()) {
             adapter.addAll(gists);
             listView.setAdapter(adapter);
-        }
-        else {
+        } else {
             Gh4Application.get(this).notFoundMessage(this, R.plurals.gist);
         }
     }

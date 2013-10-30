@@ -41,7 +41,7 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
         mText = data.getString(Constants.Comment.BODY);
         
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(getResources().getString(R.string.issue_comment_title) + " " + mCommentId);
+        actionBar.setTitle(getString(R.string.issue_comment_title) + " " + mCommentId);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
         mEditText = (EditText) findViewById(R.id.et_text);
@@ -75,12 +75,12 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
             AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
             builder.setMessage(R.string.delete_comment_message);
             builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
                 public void onClick(DialogInterface dialog, int whichButton) {
                     new DeleteCommentTask(mCommentId).execute();
                 }
             });
             builder.setNegativeButton(R.string.cancel, null);
-            
             builder.show();
             return true;
         }

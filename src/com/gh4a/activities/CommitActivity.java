@@ -18,9 +18,9 @@ package com.gh4a.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
@@ -55,7 +55,8 @@ public class CommitActivity extends BaseSherlockFragmentActivity {
         setContentView(R.layout.view_pager);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(getResources().getQuantityString(R.plurals.commit, 1) + " " + mObjectSha.substring(0, 7));
+        actionBar.setTitle(getResources().getQuantityString(R.plurals.commit, 1)
+                + " " + mObjectSha.substring(0, 7));
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
@@ -64,8 +65,7 @@ public class CommitActivity extends BaseSherlockFragmentActivity {
         });
     }
 
-    public class ThisPageAdapter extends FragmentStatePagerAdapter {
-
+    private class ThisPageAdapter extends FragmentStatePagerAdapter {
         public ThisPageAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -76,17 +76,12 @@ public class CommitActivity extends BaseSherlockFragmentActivity {
         }
 
         @Override
-        public android.support.v4.app.Fragment getItem(int position) {
+        public Fragment getItem(int position) {
             if (position == 1) {
                 return CommitNoteFragment.newInstance(mRepoOwner, mRepoName, mObjectSha);
-            }
-            else {
+            } else {
                 return CommitFragment.newInstance(mRepoOwner, mRepoName, mObjectSha);
             }
-        }
-        
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
         }
     }
     

@@ -26,7 +26,6 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.IssueService;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -35,12 +34,10 @@ import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -67,7 +64,6 @@ import com.github.mobile.util.HttpImageGetter;
 
 public class IssueActivity extends BaseSherlockFragmentActivity implements
         OnClickListener, CommentAdapter.OnEditComment {
-
     private static final int REQUEST_EDIT = 1000;
 
     private Issue mIssue;
@@ -75,12 +71,9 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
     private String mRepoName;
     private int mIssueNumber;
     private String mIssueState;
-    private ListView mListView;
     private CommentAdapter mCommentAdapter;
-    private boolean isCollaborator;
-    private boolean isCreator;
-    private ProgressDialog mProgressDialog;
-    private AQuery aq;
+    private boolean mIsCollaborator;
+    private AQuery mAq;
 
     private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>() {
         @Override
@@ -90,15 +83,11 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         @Override
         public void onResultReady(LoaderResult<Issue> result) {
             hideLoading();
+            invalidateOptionsMenu();
             if (!result.handleError(IssueActivity.this)) {
                 mIssue = result.getData();
                 mIssueState = mIssue.getState();
-                isCreator = mIssue.getUser().getLogin().equals(
-                        Gh4Application.get(IssueActivity.this).getAuthLogin());
                 fillData();
-            }
-            else {
-                invalidateOptionsMenu();
             }
         }
     };
@@ -124,7 +113,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         @Override
         public void onResultReady(LoaderResult<Boolean> result) {
             if (!result.handleError(IssueActivity.this)) {
-                isCollaborator = result.getData();
+                mIsCollaborator = result.getData();
                 invalidateOptionsMenu();
             }
         }
@@ -148,10 +137,10 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         
         setContentView(R.layout.issue);
 
-        aq = new AQuery(this);
+        mAq = new AQuery(this);
         
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(getResources().getString(R.string.issue) + " #" + mIssueNumber);
+        actionBar.setTitle(getString(R.string.issue) + " #" + mIssueNumber);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
@@ -160,7 +149,6 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
             findViewById(R.id.divider).setVisibility(View.GONE);
         }
         
-        mListView = (ListView) findViewById(R.id.list_view);
         mCommentAdapter = new CommentAdapter(this, mRepoOwner, this);
 
         getSupportLoaderManager().initLoader(0, null, mIssueCallback);
@@ -172,116 +160,91 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         final Gh4Application app = Gh4Application.get(this);
         
         // set details inside listview header
-        LayoutInflater infalter = getLayoutInflater();
-        LinearLayout mHeader = (LinearLayout) infalter.inflate(R.layout.issue_header, mListView, false);
-        mHeader.setClickable(false);
+        LayoutInflater inflater = getLayoutInflater();
+        ListView listView = (ListView) findViewById(R.id.list_view);
         
-        mListView.addHeaderView(mHeader, null, false);
-        mListView.setAdapter(mCommentAdapter);
+        LinearLayout header = (LinearLayout) inflater.inflate(R.layout.issue_header, listView, false);
+        header.setClickable(false);
+        
+        listView.addHeaderView(header, null, false);
+        listView.setAdapter(mCommentAdapter);
         
         if (!Gh4Application.get(this).isAuthorized()) {
             findViewById(R.id.comment).setVisibility(View.GONE);
             findViewById(R.id.divider).setVisibility(View.GONE);
         }
         
-        TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
-
-        ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
-        aq.id(R.id.iv_gravatar).image(GravatarUtils.getGravatarUrl(mIssue.getUser().getGravatarId()),
-                true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), AQuery.FADE_IN);
-        
-        ivGravatar.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View arg0) {
-                app.openUserInfoActivity(IssueActivity.this,
-                        mIssue.getUser().getLogin(), null);
-            }
-        });
-
-        TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
-        TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
-        TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
-        TextView tvDescTitle = (TextView) mHeader.findViewById(R.id.desc_title);
-        tvDescTitle.setTypeface(app.boldCondensed);
-        tvDescTitle.setTextColor(getResources().getColor(R.color.highlight));
-        
+        TextView tvCommentTitle = (TextView) header.findViewById(R.id.comment_title);
         tvCommentTitle.setTypeface(app.boldCondensed);
         tvCommentTitle.setTextColor(getResources().getColor(R.color.highlight));
-        tvCommentTitle.setText(getResources().getString(R.string.issue_comments) + " (" + mIssue.getComments() + ")");
+        tvCommentTitle.setText(getString(R.string.issue_comments) + " (" + mIssue.getComments() + ")");
         
-        TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
-        tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
-        
-        TextView tvMilestone = (TextView) mHeader.findViewById(R.id.tv_milestone);
-        
-        findViewById(R.id.iv_comment).setOnClickListener(this);
+        ImageView ivGravatar = (ImageView) header.findViewById(R.id.iv_gravatar);
+        mAq.id(R.id.iv_gravatar).image(GravatarUtils.getGravatarUrl(mIssue.getUser().getGravatarId()),
+                true, false, 0, 0, mAq.getCachedImage(R.drawable.default_avatar), AQuery.FADE_IN);
+        ivGravatar.setOnClickListener(this);
 
+        TextView tvExtra = (TextView) header.findViewById(R.id.tv_extra);
         tvExtra.setText(mIssue.getUser().getLogin() + "\n" + Gh4Application.pt.format(mIssue.getCreatedAt()));
+        
+        TextView tvState = (TextView) header.findViewById(R.id.tv_state);
         tvState.setTextColor(Color.WHITE);
-        if ("closed".equals(mIssue.getState())) {
+        if (Constants.Issue.ISSUE_STATE_CLOSED.equals(mIssue.getState())) {
             tvState.setBackgroundResource(R.drawable.default_red_box);
             tvState.setText(getString(R.string.closed).toUpperCase(Locale.getDefault()));
-        }
-        else {
+        } else {
             tvState.setBackgroundResource(R.drawable.default_green_box);
             tvState.setText(getString(R.string.open).toUpperCase(Locale.getDefault()));
         }
+        
+        TextView tvTitle = (TextView) header.findViewById(R.id.tv_title);
         tvTitle.setText(mIssue.getTitle());
         tvTitle.setTypeface(app.boldCondensed);
         
-        boolean showInfoBox = false;
-        if (mIssue.getAssignee() != null) {
-            showInfoBox = true;
-            TextView tvAssignee = (TextView) mHeader.findViewById(R.id.tv_assignee);
-            tvAssignee.setText(getString(R.string.issue_assignee, mIssue.getAssignee().getLogin()));
-            tvAssignee.setVisibility(View.VISIBLE);
-            tvAssignee.setOnClickListener(new OnClickListener() {
-                
-                @Override
-                public void onClick(View arg0) {
-                    app.openUserInfoActivity(IssueActivity.this,
-                            mIssue.getAssignee().getLogin(), null);
-                }
-            });
-            
-            ImageView ivAssignee = (ImageView) mHeader.findViewById(R.id.iv_assignee);
-            
-            aq.id(R.id.iv_assignee).image(GravatarUtils.getGravatarUrl(mIssue.getAssignee().getGravatarId()),
-                    true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), AQuery.FADE_IN);
-            
-            ivAssignee.setVisibility(View.VISIBLE);
-            ivAssignee.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(View arg0) {
-                    Gh4Application.get(IssueActivity.this).openUserInfoActivity(IssueActivity.this,
-                            mIssue.getAssignee().getLogin(), null);
-                }
-            });
-        }
+        TextView tvDescTitle = (TextView) header.findViewById(R.id.desc_title);
+        tvDescTitle.setTypeface(app.boldCondensed);
+        tvDescTitle.setTextColor(getResources().getColor(R.color.highlight));
         
-        if (mIssue.getMilestone() != null) {
-            showInfoBox = true;
-            tvMilestone.setText(getString(R.string.issue_milestone, mIssue.getMilestone().getTitle()));
-        }
-        else {
-            tvMilestone.setVisibility(View.GONE);
-        }
-        
+        TextView tvDesc = (TextView) header.findViewById(R.id.tv_desc);
         String body = mIssue.getBodyHtml();
         if (!StringUtils.isBlank(body)) {
             HttpImageGetter imageGetter = new HttpImageGetter(this);
             body = HtmlUtils.format(body).toString();
             imageGetter.bind(tvDesc, body, mIssue.getNumber());
         }
+        tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
+        
+        findViewById(R.id.iv_comment).setOnClickListener(this);
+
+        boolean showInfoBox = false;
+        TextView tvMilestone = (TextView) header.findViewById(R.id.tv_milestone);
+        if (mIssue.getMilestone() != null) {
+            showInfoBox = true;
+            tvMilestone.setText(getString(R.string.issue_milestone, mIssue.getMilestone().getTitle()));
+        } else {
+            tvMilestone.setVisibility(View.GONE);
+        }
+        
+        if (mIssue.getAssignee() != null) {
+            showInfoBox = true;
+            TextView tvAssignee = (TextView) header.findViewById(R.id.tv_assignee);
+            tvAssignee.setText(getString(R.string.issue_assignee, mIssue.getAssignee().getLogin()));
+            tvAssignee.setVisibility(View.VISIBLE);
+            tvAssignee.setOnClickListener(this);
+            
+            ImageView ivAssignee = (ImageView) header.findViewById(R.id.iv_assignee);
+            mAq.id(R.id.iv_assignee).image(GravatarUtils.getGravatarUrl(mIssue.getAssignee().getGravatarId()),
+                    true, false, 0, 0, mAq.getCachedImage(R.drawable.default_avatar), AQuery.FADE_IN);
+            ivAssignee.setVisibility(View.VISIBLE);
+            ivAssignee.setOnClickListener(this);
+        }
+        
         
         LinearLayout llLabels = (LinearLayout) findViewById(R.id.ll_labels);
         List<Label> labels = mIssue.getLabels();
         
         if (labels != null && !labels.isEmpty()) {
             showInfoBox = true;
-            LayoutInflater inflater = getLayoutInflater();
             for (Label label : labels) {
                 TextView tvLabel = (TextView) inflater.inflate(R.layout.issue_label, null);
                 int color = Color.parseColor("#" + label.getColor());
@@ -294,52 +257,46 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
                 
                 llLabels.addView(tvLabel);
             }
-        }
-        else {
+        } else {
             llLabels.setVisibility(View.GONE);
         }
         
-        TextView tvPull = (TextView) mHeader.findViewById(R.id.tv_pull);
-        if (mIssue.getPullRequest() != null
-                && mIssue.getPullRequest().getDiffUrl() != null) {
+        TextView tvPull = (TextView) header.findViewById(R.id.tv_pull);
+        if (mIssue.getPullRequest() != null && mIssue.getPullRequest().getDiffUrl() != null) {
             showInfoBox = true;
             tvPull.setVisibility(View.VISIBLE);
             tvPull.setOnClickListener(this);
         }
         
         if (!showInfoBox) {
-            RelativeLayout rl = (RelativeLayout) mHeader.findViewById(R.id.info_box);
-            rl.setVisibility(View.GONE);
+            header.findViewById(R.id.info_box).setVisibility(View.GONE);
         }
     }
 
     protected void fillComments(List<Comment> comments) {
-        stopProgressDialog(mProgressDialog);
         mCommentAdapter.clear();
-        if (comments != null && comments.size() > 0) {
-            mCommentAdapter.notifyDataSetChanged();
-            for (Comment comment : comments) {
-                mCommentAdapter.add(comment);
-            }
+        if (comments != null) {
+            mCommentAdapter.addAll(comments);
         }
         mCommentAdapter.notifyDataSetChanged();
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu) {
         if (Gh4Application.get(this).isAuthorized()) {
-            menu.clear();
             MenuInflater inflater = getSupportMenuInflater();
             inflater.inflate(R.menu.issue_menu, menu);
 
-            if ("closed".equals(mIssueState)) {
+            if (Constants.Issue.ISSUE_STATE_CLOSED.equals(mIssueState)) {
                 menu.removeItem(R.id.issue_close);
-            }
-            else {
+            } else {
                 menu.removeItem(R.id.issue_reopen);
             }
             
-            if (!isCollaborator && !isCreator) {
+            boolean isCreator = mIssue != null &&
+                    mIssue.getUser().getLogin().equals(Gh4Application.get(this).getAuthLogin());
+
+            if (!mIsCollaborator && !isCreator) {
                 menu.removeItem(R.id.issue_close);
                 menu.removeItem(R.id.issue_reopen);
                 menu.removeItem(R.id.issue_edit);
@@ -397,7 +354,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         if (Gh4Application.get(this).isAuthorized()) {
             return true;
         }
-        Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+        Intent intent = new Intent(this, Github4AndroidActivity.class);
         startActivity(intent);
         finish();
         return false;
@@ -405,7 +362,15 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
     
     @Override
     public void onClick(View v) {
+        Gh4Application app = Gh4Application.get(this);
         switch (v.getId()) {
+        case R.id.iv_gravatar:
+            app.openUserInfoActivity(this, mIssue.getUser().getLogin(), null);
+            break;
+        case R.id.tv_assignee:
+        case R.id.iv_assignee:
+            app.openUserInfoActivity(this, mIssue.getAssignee().getLogin(), null);
+            break;
         case R.id.iv_comment:
             EditText etComment = (EditText) findViewById(R.id.et_comment);
             String comment = etComment.getText() == null ? null : etComment.getText().toString();
@@ -415,10 +380,7 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
             UiUtils.hideImeForView(getCurrentFocus());
             break;
         case R.id.tv_pull:
-            Gh4Application.get(this).openPullRequestActivity(this,
-                    mRepoOwner, mRepoName, mIssueNumber);
-            break;
-        default:
+            app.openPullRequestActivity(this, mRepoOwner, mRepoName, mIssueNumber);
             break;
         }
     }

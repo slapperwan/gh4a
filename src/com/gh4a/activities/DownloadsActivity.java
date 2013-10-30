@@ -3,7 +3,6 @@ package com.gh4a.activities;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.Constants;
@@ -14,7 +13,6 @@ import com.gh4a.fragment.DownloadTagsFragment;
 import com.gh4a.fragment.DownloadsFragment;
 
 public class DownloadsActivity extends BaseSherlockFragmentActivity {
-
     private String mRepoOwner;
     private String mRepoName;
     
@@ -44,8 +42,7 @@ public class DownloadsActivity extends BaseSherlockFragmentActivity {
         });
     }
     
-    public class ThisPageAdapter extends FragmentStatePagerAdapter {
-
+    private class ThisPageAdapter extends FragmentStatePagerAdapter {
         public ThisPageAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -57,20 +54,13 @@ public class DownloadsActivity extends BaseSherlockFragmentActivity {
 
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
-            if (position == 0) {
+            if (position == 1) {
+                return DownloadBranchesFragment.newInstance(mRepoOwner, mRepoName);
+            } else if (position == 2) {
+                return DownloadTagsFragment.newInstance(mRepoOwner, mRepoName);
+            } else {
                 return DownloadsFragment.newInstance(mRepoOwner, mRepoName);
             }
-            else if (position == 1) {
-                return DownloadBranchesFragment.newInstance(mRepoOwner, mRepoName);
-            }
-            else if (position == 2) {
-                return DownloadTagsFragment.newInstance(mRepoOwner, mRepoName);
-            }
-            return null;
-        }
-        
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
         }
     }
     

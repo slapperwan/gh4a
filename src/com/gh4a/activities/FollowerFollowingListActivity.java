@@ -17,9 +17,9 @@ package com.gh4a.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.Constants;
@@ -55,8 +55,7 @@ public class FollowerFollowingListActivity extends BaseSherlockFragmentActivity 
         });
     }
 
-    public class ThisPageAdapter extends FragmentStatePagerAdapter {
-
+    private class ThisPageAdapter extends FragmentStatePagerAdapter {
         public ThisPageAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -67,14 +66,9 @@ public class FollowerFollowingListActivity extends BaseSherlockFragmentActivity 
         }
 
         @Override
-        public android.support.v4.app.Fragment getItem(int position) {
+        public Fragment getItem(int position) {
             return FollowersFollowingListFragment.newInstance(
-                    FollowerFollowingListActivity.this.mUserLogin,
-                    position == 0);
-        }
-        
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
+                    FollowerFollowingListActivity.this.mUserLogin, position == 0);
         }
     }
     

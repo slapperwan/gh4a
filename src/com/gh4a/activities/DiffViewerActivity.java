@@ -42,7 +42,6 @@ public class DiffViewerActivity extends BaseSherlockFragmentActivity {
     private String mSha;
     private String mDiff;
     private String mFilePath;
-    private String mFilename;
 
     private WebView mWebView;
 
@@ -60,16 +59,24 @@ public class DiffViewerActivity extends BaseSherlockFragmentActivity {
         mDiff = data.getString(Constants.Commit.DIFF);
         mFilePath = data.getString(Constants.Object.PATH);
 
-        mFilename = FileUtils.getFileName(mFilePath);
+        String fileName = FileUtils.getFileName(mFilePath);
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(mFilename);
+        actionBar.setTitle(fileName);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
         mWebView = (WebView) findViewById(R.id.web_view);
         hideLoading();
 
+        if (!initWebView(fileName)) {
+            Toast.makeText(this, getString(R.string.fail_view_diff), Toast.LENGTH_SHORT).show();
+            finish();
+        }
+    }
+        
+    private boolean initWebView(String fileName) {
         WebSettings s = mWebView.getSettings();
+        
         s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
         s.setUseWideViewPort(true);
         s.setAllowFileAccess(true);
@@ -80,19 +87,18 @@ public class DiffViewerActivity extends BaseSherlockFragmentActivity {
         s.setSupportMultipleWindows(true);
         s.setJavaScriptEnabled(true);
         
-        if (FileUtils.isImage(mFilename)) {
-            String htmlImage = StringUtils.highlightImage("https://github.com/" + mRepoOwner + "/" + mRepoName + "/raw/" + mSha + "/" + mFilePath);
+        if (FileUtils.isImage(fileName)) {
+            String htmlImage = StringUtils.highlightImage(
+                    "https://github.com/" + mRepoOwner + "/" + mRepoName + "/raw/" + mSha + "/" + mFilePath);
             mWebView.loadDataWithBaseURL("file:///android_asset/", htmlImage, "text/html", "utf-8", "");
+        } else if (mDiff != null) {
+            String formatted = highlightSyntax();
+            mWebView.loadDataWithBaseURL("file:///android_asset/", formatted, "text/html", "utf-8", "");
+        } else {
+            return false;
         }
-        else {
-            if (mDiff != null) {
-                String formatted = highlightSyntax();
-                mWebView.loadDataWithBaseURL("file:///android_asset/", formatted, "text/html", "utf-8", "");
-            }
-            else {
-                Toast.makeText(this, getString(R.string.fail_view_diff), Toast.LENGTH_SHORT).show();
-            }
-        }
+        
+        return true;
     }
     
     private String highlightSyntax() {
@@ -172,7 +178,6 @@ public class DiffViewerActivity extends BaseSherlockFragmentActivity {
                 intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                 intent.putExtra(Constants.Object.PATH, mFilePath);
                 intent.putExtra(Constants.Object.REF, mSha);
-                intent.putExtra(Constants.Object.NAME, mFilename);
                 intent.putExtra(Constants.Object.OBJECT_SHA, mSha);
                 startActivity(intent);
                 return true;

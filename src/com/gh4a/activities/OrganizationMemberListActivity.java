@@ -29,7 +29,6 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.OrganizationMemberListLoader;
 
 public class OrganizationMemberListActivity extends UserListActivity {
-
     protected String mUserLogin;
 
     @Override
@@ -38,8 +37,8 @@ public class OrganizationMemberListActivity extends UserListActivity {
     }
 
     @Override
-    protected String getTitleBar() {
-        return getResources().getString(R.string.members);
+    protected String getActionBarTitle() {
+        return getString(R.string.members);
     }
 
     @Override
@@ -56,7 +55,6 @@ public class OrganizationMemberListActivity extends UserListActivity {
     protected Loader<LoaderResult<List<User>>> getUserListLoader() {
         return new OrganizationMemberListLoader(this, mUserLogin);
     }
-    
 
     @Override
     protected void navigateUp() {

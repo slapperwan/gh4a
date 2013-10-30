@@ -40,8 +40,8 @@ public class CollaboratorListActivity extends UserListActivity {
     }
 
     @Override
-    protected String getTitleBar() {
-        return getResources().getString(R.string.repo_collaborators);
+    protected String getActionBarTitle() {
+        return getString(R.string.repo_collaborators);
     }
     
     @Override

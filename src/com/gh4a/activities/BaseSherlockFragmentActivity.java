@@ -25,12 +25,12 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -116,7 +116,7 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
     protected void navigateUp() {
     }
 
-    public void openAboutDialog() {
+    private void openAboutDialog() {
         Dialog dialog = new Dialog(this);
 
         dialog.setContentView(R.layout.about_dialog);
@@ -128,13 +128,11 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             String versionName = packageInfo.versionName;
             dialog.setTitle(getResources().getString(R.string.app_name) + " v" + versionName);
-        } 
-        catch (PackageManager.NameNotFoundException e) {
+        }  catch (PackageManager.NameNotFoundException e) {
             dialog.setTitle(getResources().getString(R.string.app_name));
         }
         
-        Button btnByEmail = (Button) dialog.findViewById(R.id.btn_by_email);
-        btnByEmail.setOnClickListener(new OnClickListener() {
+        dialog.findViewById(R.id.btn_by_email).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent sendIntent = new Intent(Intent.ACTION_SEND);
@@ -144,18 +142,17 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
             }
         });
         
-        Button btnByGh4a = (Button) dialog.findViewById(R.id.btn_by_gh4a);
-        btnByGh4a.setOnClickListener(new OnClickListener() {
+        dialog.findViewById(R.id.btn_by_gh4a).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (Gh4Application.get(BaseSherlockFragmentActivity.this).isAuthorized()) {
-                    Intent intent = new Intent(BaseSherlockFragmentActivity.this, IssueCreateActivity.class);
-                    intent.putExtra(Constants.Repository.REPO_OWNER, getResources().getString(R.string.my_username));
-                    intent.putExtra(Constants.Repository.REPO_NAME, getResources().getString(R.string.my_repo));
+                Context context = BaseSherlockFragmentActivity.this;
+                if (Gh4Application.get(context).isAuthorized()) {
+                    Intent intent = new Intent(context, IssueCreateActivity.class);
+                    intent.putExtra(Constants.Repository.REPO_OWNER, getString(R.string.my_username));
+                    intent.putExtra(Constants.Repository.REPO_NAME, getString(R.string.my_repo));
                     startActivity(intent);
-                }
-                else {
-                    ToastUtils.showMessage(BaseSherlockFragmentActivity.this, R.string.login_prompt);
+                } else {
+                    ToastUtils.showMessage(context, R.string.login_prompt);
                 }
             }
         });
@@ -166,14 +163,11 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
     public void showLoading() {
         if (findViewById(R.id.pager) != null) {
             findViewById(R.id.pager).setVisibility(View.INVISIBLE);
-        }
-        else if (findViewById(R.id.web_view) != null) {
+        } else if (findViewById(R.id.web_view) != null) {
             findViewById(R.id.web_view).setVisibility(View.INVISIBLE);
-        }
-        else if (findViewById(R.id.list_view) != null) {
+        } else if (findViewById(R.id.list_view) != null) {
             findViewById(R.id.list_view).setVisibility(View.INVISIBLE);
-        }
-        else if (findViewById(R.id.main_content) != null) {
+        } else if (findViewById(R.id.main_content) != null) {
             findViewById(R.id.main_content).setVisibility(View.INVISIBLE);
         }
         if (findViewById(R.id.pb) != null) {
@@ -184,17 +178,13 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
     public void hideLoading() {
         if (findViewById(R.id.pager) != null) {
             findViewById(R.id.pager).setVisibility(View.VISIBLE);
-        }
-        else if (findViewById(R.id.list_view) != null) {
+        } else if (findViewById(R.id.list_view) != null) {
             findViewById(R.id.list_view).setVisibility(View.VISIBLE);
-        }
-        else if (findViewById(R.id.main_content) != null) {
+        } else if (findViewById(R.id.main_content) != null) {
             findViewById(R.id.main_content).setVisibility(View.VISIBLE);
-        }
-        else if (findViewById(R.id.web_view) != null) {
+        } else if (findViewById(R.id.web_view) != null) {
             findViewById(R.id.web_view).setVisibility(View.VISIBLE);
         }
-        
         if (findViewById(R.id.pb) != null) {
             findViewById(R.id.pb).setVisibility(View.GONE);
         }
@@ -212,32 +202,25 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
     
     public boolean isOnline() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm.getActiveNetworkInfo() != null
-                && cm.getActiveNetworkInfo().isAvailable()
-                && cm.getActiveNetworkInfo().isConnected()) {
-            return true;
-        } else {
-            return false;
-        }
+        NetworkInfo info = cm.getActiveNetworkInfo();
+        return info != null && info.isAvailable() && info.isConnected();
     }
     
     public void setErrorView() {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.error);
-        Button btnHome = (Button) findViewById(R.id.btn_home);
-        btnHome.setOnClickListener(new OnClickListener() {
-            
+        
+        findViewById(R.id.btn_home).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Context context = BaseSherlockFragmentActivity.this;
                 Gh4Application app = Gh4Application.get(context);
                 if (app.isAuthorized()) {
-                    app.openUserInfoActivity(context, 
-                            app.getAuthLogin(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
-                }
-                else {
-                    Intent intent = new Intent().setClass(context, Github4AndroidActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_NEW_TASK);
+                    app.openUserInfoActivity(context, app.getAuthLogin(), null,
+                            Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                } else {
+                    Intent intent = new Intent(context, Github4AndroidActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                 }
             }
