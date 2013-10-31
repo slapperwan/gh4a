@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
+import com.devspark.progressfragment.ProgressFragment;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -25,14 +26,13 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.GravatarUtils;
-import com.gh4a.utils.ToastUtils;
 
-public class CommitFragment extends BaseFragment implements OnClickListener {
-
+public class CommitFragment extends ProgressFragment implements OnClickListener {
     private String mRepoOwner;
     private String mRepoName;
     private String mObjectSha;
     private RepositoryCommit mCommit;
+    private View mContentView;
 
     private LoaderCallbacks<RepositoryCommit> mCommitCallback = new LoaderCallbacks<RepositoryCommit>() {
         @Override
@@ -42,12 +42,12 @@ public class CommitFragment extends BaseFragment implements OnClickListener {
 
         @Override
         public void onResultReady(LoaderResult<RepositoryCommit> result) {
-            hideLoading();
-            if (result.isSuccess()) {
+            setContentShown(true);
+            if (!result.handleError(getActivity())) {
                 mCommit = result.getData();
                 fillData();
             } else {
-                ToastUtils.showError(getActivity());
+                setContentEmpty(true);
             }
         }
     };
@@ -74,29 +74,32 @@ public class CommitFragment extends BaseFragment implements OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.commit, container, false);
+        mContentView = inflater.inflate(R.layout.commit, null);
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
     
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        showLoading();
+        
+        setContentView(mContentView);
+        setContentShown(false);
+
         getLoaderManager().initLoader(0, null, mCommitCallback);
     }
 
     private void fillData() {
-        final View v = getView();
         final Activity activity = getActivity();
         final Gh4Application app = Gh4Application.get(activity);
         final AQuery aq = new AQuery(activity);
-        final LayoutInflater inflater = LayoutInflater.from(activity);
+        final LayoutInflater inflater = getLayoutInflater(null);
         
-        LinearLayout llChanged = (LinearLayout) v.findViewById(R.id.ll_changed);
-        LinearLayout llAdded = (LinearLayout) v.findViewById(R.id.ll_added);
-        LinearLayout llDeleted = (LinearLayout) v.findViewById(R.id.ll_deleted);
+        LinearLayout llChanged = (LinearLayout) mContentView.findViewById(R.id.ll_changed);
+        LinearLayout llAdded = (LinearLayout) mContentView.findViewById(R.id.ll_added);
+        LinearLayout llDeleted = (LinearLayout) mContentView.findViewById(R.id.ll_deleted);
         int added = 0, changed = 0, deleted = 0;
         
-        ImageView ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
+        ImageView ivGravatar = (ImageView) mContentView.findViewById(R.id.iv_gravatar);
         
         aq.id(R.id.iv_gravatar).image(
                 GravatarUtils.getGravatarUrl(CommitUtils.getAuthorGravatarId(activity, mCommit)), 
@@ -108,10 +111,10 @@ public class CommitFragment extends BaseFragment implements OnClickListener {
             ivGravatar.setTag(login);
         }
         
-        TextView tvMessage = (TextView) v.findViewById(R.id.tv_message);
+        TextView tvMessage = (TextView) mContentView.findViewById(R.id.tv_message);
         tvMessage.setText(mCommit.getCommit().getMessage());
         
-        TextView tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+        TextView tvExtra = (TextView) mContentView.findViewById(R.id.tv_extra);
         tvExtra.setText(CommitUtils.getAuthorName(app, mCommit)
                 + " "
                 + Gh4Application.pt.format(mCommit.getCommit().getAuthor().getDate()));
@@ -146,25 +149,25 @@ public class CommitFragment extends BaseFragment implements OnClickListener {
         if (added == 0) {
             llAdded.setVisibility(View.GONE);
         } else {
-            TextView tvAddedTitle = (TextView) v.findViewById(R.id.commit_added);
+            TextView tvAddedTitle = (TextView) mContentView.findViewById(R.id.commit_added);
             tvAddedTitle.setTypeface(app.boldCondensed);
         }
         if (changed == 0) {
             llChanged.setVisibility(View.GONE);
         } else {
-            TextView tvChangeTitle = (TextView) v.findViewById(R.id.commit_changed);
+            TextView tvChangeTitle = (TextView) mContentView.findViewById(R.id.commit_changed);
             tvChangeTitle.setTypeface(app.boldCondensed);
         }
         if (deleted == 0) {
             llDeleted.setVisibility(View.GONE);
         } else {
-            TextView tvDeletedTitle = (TextView) v.findViewById(R.id.commit_deleted);
+            TextView tvDeletedTitle = (TextView) mContentView.findViewById(R.id.commit_deleted);
             tvDeletedTitle.setTypeface(app.boldCondensed);
         }
         
-        TextView tvSummary = (TextView) v.findViewById(R.id.tv_desc);
-        tvSummary.setText(String.format(getResources().getString(R.string.commit_summary),
-                mCommit.getFiles().size(), mCommit.getStats().getAdditions(), mCommit.getStats().getDeletions()));
+        TextView tvSummary = (TextView) mContentView.findViewById(R.id.tv_desc);
+        tvSummary.setText(getString(R.string.commit_summary, mCommit.getFiles().size(),
+                mCommit.getStats().getAdditions(), mCommit.getStats().getDeletions()));
     }
 
     @Override

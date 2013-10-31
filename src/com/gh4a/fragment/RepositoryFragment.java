@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+import com.devspark.progressfragment.ProgressFragment;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -44,19 +45,22 @@ import com.gh4a.utils.StringUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
-public class RepositoryFragment extends BaseFragment implements  OnClickListener {
+public class RepositoryFragment extends ProgressFragment implements OnClickListener {
     private Repository mRepository;
+    private View mContentView;
 
     private LoaderCallbacks<String> mReadmeCallback = new LoaderCallbacks<String>() {
         @Override
         public Loader<LoaderResult<String>> onCreateLoader(int id, Bundle args) {
-            return new ReadmeLoader(getSherlockActivity(),
+            return new ReadmeLoader(getActivity(),
                     mRepository.getOwner().getLogin(), mRepository.getName());
         }
         @Override
         public void onResultReady(LoaderResult<String> result) {
-            hideLoading(R.id.pb_readme, R.id.readme);
+            View v = getView();
             fillReadme(result.getData());
+            v.findViewById(R.id.pb_readme).setVisibility(View.GONE);
+            v.findViewById(R.id.readme).setVisibility(View.VISIBLE);
         }
     };
 
@@ -79,43 +83,40 @@ public class RepositoryFragment extends BaseFragment implements  OnClickListener
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.repository, container, false);
+        mContentView = inflater.inflate(R.layout.repository, null);
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
     
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        
-        fillData();
-        
-        Gh4Application app = (Gh4Application) getActivity().getApplicationContext();
-        Typeface boldCondensed = app.boldCondensed;
-        
-        TextView tvReadmeTitle = (TextView) getView().findViewById(R.id.readme_title);
-        tvReadmeTitle.setTypeface(boldCondensed);
-        tvReadmeTitle.setTextColor(getResources().getColor(R.color.highlight));
 
-        showLoading(R.id.pb_readme, R.id.readme);
+        setContentView(mContentView);
+        fillData();
+        setContentShownNoAnimation(true);
+
         getLoaderManager().initLoader(0, null, mReadmeCallback);
     }
 
     private void fillData() {
-        View v = getView();
-        final Gh4Application app = (Gh4Application) getActivity().getApplicationContext();
+        final Gh4Application app = Gh4Application.get(getActivity());
         Typeface boldCondensed = app.boldCondensed;
         Typeface condensed = app.condensed;
         Typeface italic = app.italic;
-        
-        TextView tvOwner = (TextView) v.findViewById(R.id.tv_login);
+
+        TextView tvReadmeTitle = (TextView) mContentView.findViewById(R.id.readme_title);
+        tvReadmeTitle.setTypeface(boldCondensed);
+
+        TextView tvOwner = (TextView) mContentView.findViewById(R.id.tv_login);
         tvOwner.setText(mRepository.getOwner().getLogin());
         tvOwner.setTypeface(boldCondensed);
         tvOwner.setOnClickListener(this);
 
-        TextView tvRepoName = (TextView) v.findViewById(R.id.tv_name);
-        tvRepoName.setText(mRepository.getName());
+        TextView tvRepoName = (TextView) mContentView.findViewById(R.id.tv_name);
+        tvRepoName.setText("/" + mRepository.getName());
         tvRepoName.setTypeface(boldCondensed);
         
-        TextView tvParentRepo = (TextView) v.findViewById(R.id.tv_parent);
+        TextView tvParentRepo = (TextView) mContentView.findViewById(R.id.tv_parent);
         
         if (mRepository.isFork()) {
             tvParentRepo.setVisibility(View.VISIBLE);
@@ -132,25 +133,25 @@ public class RepositoryFragment extends BaseFragment implements  OnClickListener
             tvParentRepo.setVisibility(View.GONE);
         }
 
-        fillTextView(v, R.id.tv_desc, 0, mRepository.getDescription(), app);
-        fillTextView(v, R.id.tv_language,R.string.repo_language, mRepository.getLanguage(), app);
-        fillTextView(v, R.id.tv_url, 0, mRepository.getHtmlUrl(), app);
+        fillTextView(R.id.tv_desc, 0, mRepository.getDescription(), app);
+        fillTextView(R.id.tv_language,R.string.repo_language, mRepository.getLanguage(), app);
+        fillTextView(R.id.tv_url, 0, mRepository.getHtmlUrl(), app);
 
-        v.findViewById(R.id.cell_stargazers).setOnClickListener(this);
-        v.findViewById(R.id.cell_forks).setOnClickListener(this);
-        v.findViewById(R.id.cell_pull_requests).setOnClickListener(this);
+        mContentView.findViewById(R.id.cell_stargazers).setOnClickListener(this);
+        mContentView.findViewById(R.id.cell_forks).setOnClickListener(this);
+        mContentView.findViewById(R.id.cell_pull_requests).setOnClickListener(this);
         
-        TextView tvStargazersCount = (TextView) v.findViewById(R.id.tv_stargazers_count);
+        TextView tvStargazersCount = (TextView) mContentView.findViewById(R.id.tv_stargazers_count);
         tvStargazersCount.setText(String.valueOf(mRepository.getWatchers()));
         tvStargazersCount.setTypeface(boldCondensed);
         
-        TextView tvForksCount = (TextView) v.findViewById(R.id.tv_forks_count);
+        TextView tvForksCount = (TextView) mContentView.findViewById(R.id.tv_forks_count);
         tvForksCount.setTypeface(boldCondensed);
         tvForksCount.setText(String.valueOf(mRepository.getForks()));
         
-        TextView tvIssues = (TextView) v.findViewById(R.id.tv_issues_label);
-        TextView tvIssuesCount = (TextView) v.findViewById(R.id.tv_issues_count);
-        TableLayout tlIssues = (TableLayout) v.findViewById(R.id.cell_issues);
+        TextView tvIssues = (TextView) mContentView.findViewById(R.id.tv_issues_label);
+        TextView tvIssuesCount = (TextView) mContentView.findViewById(R.id.tv_issues_count);
+        TableLayout tlIssues = (TableLayout) mContentView.findViewById(R.id.cell_issues);
         
         if (mRepository.isHasIssues()) {
             tlIssues.setVisibility(View.VISIBLE);
@@ -161,39 +162,38 @@ public class RepositoryFragment extends BaseFragment implements  OnClickListener
             tvIssuesCount.setTypeface(boldCondensed);
             tvIssuesCount.setText(String.valueOf(mRepository.getOpenIssues()));
             tvIssuesCount.setVisibility(View.VISIBLE);
-        }
-        else {
+        } else {
             tlIssues.setVisibility(View.GONE);
             tvIssues.setVisibility(View.GONE);
             tvIssuesCount.setVisibility(View.GONE);
         }
         
-        TextView tvPullRequestsCount = (TextView) v.findViewById(R.id.tv_pull_requests_count);
+        TextView tvPullRequestsCount = (TextView) mContentView.findViewById(R.id.tv_pull_requests_count);
         tvPullRequestsCount.setTypeface(boldCondensed);
         
-        TextView tvPullRequests = (TextView) v.findViewById(R.id.tv_pull_requests_label);
+        TextView tvPullRequests = (TextView) mContentView.findViewById(R.id.tv_pull_requests_label);
         tvPullRequests.setTypeface(condensed);
         
         if (!mRepository.isHasWiki()) {
-            v.findViewById(R.id.tv_wiki_label).setVisibility(View.GONE);
+            mContentView.findViewById(R.id.tv_wiki_label).setVisibility(View.GONE);
         }
 
-        initOtherTextView(v, R.id.tv_wiki_label, app);
-        initOtherTextView(v, R.id.tv_contributors_label, app);
-        initOtherTextView(v, R.id.tv_collaborators_label, app);
-        initOtherTextView(v, R.id.other_info, app);
-        initOtherTextView(v, R.id.tv_downloads_label, app);
+        initOtherTextView(R.id.tv_wiki_label, app);
+        initOtherTextView(R.id.tv_contributors_label, app);
+        initOtherTextView(R.id.tv_collaborators_label, app);
+        initOtherTextView(R.id.other_info, app);
+        initOtherTextView(R.id.tv_downloads_label, app);
     }
 
-    private void initOtherTextView(View parent, int id, Gh4Application app) {
-        TextView view = (TextView) parent.findViewById(id);
+    private void initOtherTextView(int id, Gh4Application app) {
+        TextView view = (TextView) mContentView.findViewById(id);
 
         view.setOnClickListener(this);
         view.setTypeface(app.boldCondensed);
     }
 
-    private void fillTextView(View parent, int id, int stringId, String text, Gh4Application app) {
-        TextView view = (TextView) parent.findViewById(id);
+    private void fillTextView(int id, int stringId, String text, Gh4Application app) {
+        TextView view = (TextView) mContentView.findViewById(id);
         
         if (!StringUtils.isBlank(text)) {
             view.setText(stringId != 0 ? getString(stringId, text) : text);
@@ -220,7 +220,7 @@ public class RepositoryFragment extends BaseFragment implements  OnClickListener
             tvReadme.setMovementMethod(LinkMovementMethod.getInstance());
 
             readme = HtmlUtils.format(readme).toString();
-            HttpImageGetter imageGetter = new HttpImageGetter(getSherlockActivity());
+            HttpImageGetter imageGetter = new HttpImageGetter(getActivity());
             imageGetter.bind(tvReadme, readme, mRepository.getId());
         } else {
             tvReadme.setText(R.string.repo_no_readme);

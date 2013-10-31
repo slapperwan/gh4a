@@ -37,6 +37,7 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
+import com.devspark.progressfragment.ProgressFragment;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -52,26 +53,28 @@ import com.gh4a.loader.UserLoader;
 import com.gh4a.utils.GravatarUtils;
 import com.gh4a.utils.StringUtils;
 
-public class UserFragment extends BaseFragment implements  OnClickListener {
+public class UserFragment extends ProgressFragment implements  OnClickListener {
     private String mUserLogin;
     private String mUserName;
     private User mUser;
-    private List<Repository> mTopRepos;
-    private List<User> mOrgs;
+    private View mContentView;
 
+    
     private LoaderCallbacks<User> mUserCallback = new LoaderCallbacks<User>() {
         @Override
         public Loader<LoaderResult<User>> onCreateLoader(int id, Bundle args) {
-            return new UserLoader(getSherlockActivity(), mUserLogin);
+            return new UserLoader(getActivity(), mUserLogin);
         }
         @Override
         public void onResultReady(LoaderResult<User> result) {
-            if (!checkForError(result)) {
-                hideLoading();
+            if (!result.handleError(getActivity())) {
                 mUser = (User) result.getData();
                 fillData();
+            } else {
+                setContentEmpty(true);
             }
-            getSherlockActivity().invalidateOptionsMenu();
+            setContentShown(true);
+            getActivity().invalidateOptionsMenu();
         }
     };
 
@@ -80,15 +83,15 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
         public Loader<LoaderResult<List<Repository>>> onCreateLoader(int id, Bundle args) {
             Map<String, String> filterData = new HashMap<String, String>();
             filterData.put("sort", "pushed");
-            return new RepositoryListLoader(getSherlockActivity(), mUserLogin,
+            return new RepositoryListLoader(getActivity(), mUserLogin,
                     mUser.getType(), filterData, 5);
         }
         @Override
         public void onResultReady(LoaderResult<List<Repository>> result) {
-            if (!checkForError(result)) {
-                hideLoading(R.id.pb_top_repos, 0);
-                mTopRepos = (List<Repository>) result.getData();
-                fillTopRepos();
+            getView().findViewById(R.id.pb_top_repos).setVisibility(View.GONE);
+            if (!result.handleError(getActivity())) {
+                fillTopRepos(result.getData());
+                getView().findViewById(R.id.ll_top_repos).setVisibility(View.VISIBLE);
             }
         }
     };
@@ -96,12 +99,11 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
     private LoaderCallbacks<List<User>> mOrganizationCallback = new LoaderCallbacks<List<User>>() {
         @Override
         public Loader<LoaderResult<List<User>>> onCreateLoader(int id, Bundle args) {
-            return new OrganizationListLoader(getSherlockActivity(), mUserLogin);
+            return new OrganizationListLoader(getActivity(), mUserLogin);
         }
         @Override
         public void onResultReady(LoaderResult<List<User>> result) {
-            mOrgs = result.getData();
-            fillOrganizations();
+            fillOrganizations(result.getData());
         }
     };
 
@@ -126,59 +128,61 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.user, container, false);
-        return v;
+        mContentView = inflater.inflate(R.layout.user, null);
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
     
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        
-        showLoading();
+
+        setContentView(mContentView);
+        setContentShown(false);
+
         getLoaderManager().initLoader(0, null, mUserCallback);
     }
 
     public void refresh() {
+        setContentShown(false);
         getLoaderManager().restartLoader(0, null, mUserCallback);
     }
 
     private void fillData() {
-        View v = getView();
-        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
+        Gh4Application app = (Gh4Application) getActivity().getApplication();
         Typeface boldCondensed = app.boldCondensed;
         Typeface regular = app.regular;
         
-        AQuery aq = new AQuery(getSherlockActivity());
+        AQuery aq = new AQuery(getActivity());
         aq.id(R.id.iv_gravatar).image(GravatarUtils.getGravatarUrl(mUser.getGravatarId()), 
                 true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), AQuery.FADE_IN);
 
-        TextView tvName = (TextView) v.findViewById(R.id.tv_name);
+        TextView tvName = (TextView) mContentView.findViewById(R.id.tv_name);
         tvName.setTypeface(boldCondensed);
         
-        TextView tvCreated = (TextView) v.findViewById(R.id.tv_created_at);
+        TextView tvCreated = (TextView) mContentView.findViewById(R.id.tv_created_at);
         tvCreated.setTypeface(regular);
         
-        TextView tvFollowersCount = (TextView) v.findViewById(R.id.tv_followers_count);
+        TextView tvFollowersCount = (TextView) mContentView.findViewById(R.id.tv_followers_count);
         tvFollowersCount.setTypeface(boldCondensed);
         tvFollowersCount.setText(String.valueOf(mUser.getFollowers()));
         
-        TableLayout tlOrgMembers = (TableLayout) v.findViewById(R.id.cell_org_members);
-        TableLayout tlFollowers = (TableLayout) v.findViewById(R.id.cell_followers);
+        TableLayout tlOrgMembers = (TableLayout) mContentView.findViewById(R.id.cell_org_members);
+        TableLayout tlFollowers = (TableLayout) mContentView.findViewById(R.id.cell_followers);
         
         if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
             tlFollowers.setOnClickListener(this);
             tlOrgMembers.setVisibility(View.GONE);
         } else {
-            TextView tvMemberCount = (TextView) v.findViewById(R.id.tv_members_count);
+            TextView tvMemberCount = (TextView) mContentView.findViewById(R.id.tv_members_count);
             tvMemberCount.setTypeface(boldCondensed);
 
             tlOrgMembers.setOnClickListener(this);
             tlFollowers.setVisibility(View.GONE);
         }
         
-        v.findViewById(R.id.cell_repos).setOnClickListener(this);
+        mContentView.findViewById(R.id.cell_repos).setOnClickListener(this);
         
-        TextView tvReposCount = (TextView) v.findViewById(R.id.tv_repos_count);
+        TextView tvReposCount = (TextView) mContentView.findViewById(R.id.tv_repos_count);
         tvReposCount.setTypeface(boldCondensed);
         
         if (mUserLogin.equals(Gh4Application.get(getActivity()).getAuthLogin())) {
@@ -188,9 +192,9 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
         }
         
         //hide gists repos if organization
-        fillCountIfUser(v, R.id.cell_gists, R.id.tv_gists_count, mUser.getPublicGists(), app);
+        fillCountIfUser(R.id.cell_gists, R.id.tv_gists_count, mUser.getPublicGists(), app);
         //hide following if organization
-        fillCountIfUser(v, R.id.cell_following, R.id.tv_following_count, mUser.getFollowing(), app);
+        fillCountIfUser(R.id.cell_following, R.id.tv_following_count, mUser.getFollowing(), app);
         
         tvName.setText(StringUtils.isBlank(mUser.getName()) ? mUser.getLogin() : mUser.getName());
         if (Constants.User.USER_TYPE_ORG.equals(mUser.getType())) {
@@ -207,16 +211,15 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
             tvCreated.setVisibility(View.GONE);
         }
 
-        fillTextView(v, R.id.tv_email, mUser.getEmail(), app);
-        fillTextView(v, R.id.tv_website, mUser.getBlog(), app);
-        fillTextView(v, R.id.tv_company, mUser.getCompany(), app);
-        fillTextView(v, R.id.tv_location, mUser.getLocation(), app);
+        fillTextView(R.id.tv_email, mUser.getEmail(), app);
+        fillTextView(R.id.tv_website, mUser.getBlog(), app);
+        fillTextView(R.id.tv_company, mUser.getCompany(), app);
+        fillTextView(R.id.tv_location, mUser.getLocation(), app);
         
-        TextView tvPubRepo = (TextView) v.findViewById(R.id.tv_pub_repos_label);
+        TextView tvPubRepo = (TextView) mContentView.findViewById(R.id.tv_pub_repos_label);
         tvPubRepo.setTypeface(boldCondensed);
-        tvPubRepo.setTextColor(getResources().getColor(R.color.highlight));
         
-        TextView tvOrgs = (TextView) v.findViewById(R.id.tv_orgs);
+        TextView tvOrgs = (TextView) mContentView.findViewById(R.id.tv_orgs);
         tvOrgs.setTypeface(boldCondensed);
         tvOrgs.setTextColor(getResources().getColor(R.color.highlight));
         
@@ -224,10 +227,10 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
         getLoaderManager().initLoader(2, null, mOrganizationCallback);
     }
 
-    private void fillCountIfUser(View parent, int layoutId, int countId, int count, Gh4Application app) {
-        TableLayout layout = (TableLayout) parent.findViewById(layoutId);
+    private void fillCountIfUser(int layoutId, int countId, int count, Gh4Application app) {
+        TableLayout layout = (TableLayout) mContentView.findViewById(layoutId);
         if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
-            TextView countView = (TextView) parent.findViewById(countId);
+            TextView countView = (TextView) mContentView.findViewById(countId);
             countView.setTypeface(app.boldCondensed);
             countView.setText(String.valueOf(count));
         
@@ -237,8 +240,8 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
         }
     }
 
-    private void fillTextView(View parent, int id, String text, Gh4Application app) {
-        TextView view = (TextView) parent.findViewById(id);
+    private void fillTextView(int id, String text, Gh4Application app) {
+        TextView view = (TextView) mContentView.findViewById(id);
         if (!StringUtils.isBlank(text)) {
             view.setTypeface(app.regular);
             view.setText(text);
@@ -248,10 +251,7 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see android.view.View.OnClickListener#onClick(android.view.View)
-     */
+    @Override
     public void onClick(View view) {
         int id = view.getId();
         Intent intent = null;
@@ -275,12 +275,12 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
             intent = new Intent(getActivity(), OrganizationMemberListActivity.class);
             intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
         } else if (view.getTag() instanceof Repository) {
-            Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
-            app.openRepositoryInfoActivity(getSherlockActivity(), (Repository) view.getTag());
+            Gh4Application app = Gh4Application.get(getActivity());
+            app.openRepositoryInfoActivity(getActivity(), (Repository) view.getTag());
         } else if (view.getTag() instanceof User) {
-            Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
+            Gh4Application app = Gh4Application.get(getActivity());
             User user = (User) view.getTag();
-            app.openUserInfoActivity(getSherlockActivity(), user.getLogin(), null);
+            app.openUserInfoActivity(getActivity(), user.getLogin(), null);
         }
         if (intent != null) {
             intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
@@ -290,19 +290,18 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
         }
     }
 
-    public void fillTopRepos() {
-        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
+    public void fillTopRepos(List<Repository> topRepos) {
+        Gh4Application app = Gh4Application.get(getActivity());
         Typeface boldCondensed = app.boldCondensed;
         
-        View v = getView();
-        LinearLayout ll = (LinearLayout) v.findViewById(R.id.ll_top_repos);
+        LinearLayout ll = (LinearLayout) mContentView.findViewById(R.id.ll_top_repos);
         ll.removeAllViews();
         
-        int count = mTopRepos != null ? mTopRepos.size() : 0;
+        int count = topRepos != null ? topRepos.size() : 0;
         LayoutInflater inflater = getLayoutInflater(null);
 
         for (int i = 0; i < count; i++) {
-            final Repository repo = mTopRepos.get(i); 
+            final Repository repo = topRepos.get(i); 
             View rowView = inflater.inflate(R.layout.top_repo, null);
             rowView.setOnClickListener(this);
             rowView.setTag(repo);
@@ -333,29 +332,29 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
         Button btnMore = (Button) getView().findViewById(R.id.btn_repos);
         if (count > 0) {
             btnMore.setOnClickListener(this);
+            btnMore.setVisibility(View.VISIBLE);
         } else {
-            btnMore.setVisibility(View.GONE);
-            TextView noRepos = new TextView(getSherlockActivity());
+            TextView noRepos = new TextView(getActivity());
             noRepos.setText(R.string.no_repos_found);
             ll.addView(noRepos);
         }
     }
     
-    public void fillOrganizations() {
-        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
+    public void fillOrganizations(List<User> organizations) {
+        Gh4Application app = Gh4Application.get(getActivity());
         Typeface boldCondensed = app.boldCondensed;
         
         View v = getView();
         LinearLayout llOrgs = (LinearLayout) v.findViewById(R.id.ll_orgs);
         LinearLayout llOrg = (LinearLayout) v.findViewById(R.id.ll_org);
-        int count = mOrgs != null ? mOrgs.size() : 0;
+        int count = organizations != null ? organizations.size() : 0;
         LayoutInflater inflater = getLayoutInflater(null);
 
         llOrg.removeAllViews();
         llOrgs.setVisibility(count > 0 ? View.VISIBLE : View.GONE);
 
         for (int i = 0; i < count; i++) {
-            User org = mOrgs.get(i);
+            User org = organizations.get(i);
             View rowView = inflater.inflate(R.layout.selectable_label, null);
             
             rowView.setOnClickListener(this);
@@ -377,14 +376,5 @@ public class UserFragment extends BaseFragment implements  OnClickListener {
         }
         TextView tvFollowersCount = (TextView) getView().findViewById(R.id.tv_followers_count);
         tvFollowersCount.setText(String.valueOf(mUser.getFollowers()));
-    }
-    
-    private boolean checkForError(LoaderResult<?> result) {
-        if (result.handleError(getActivity())) {
-            hideLoading(R.id.pb_top_repos, 0);
-            hideLoading();
-            return true;
-        }
-        return false;
     }
 }

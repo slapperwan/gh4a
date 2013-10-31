@@ -72,6 +72,7 @@ Open Source Libraries
 * [ActionBarSherlock](https://github.com/JakeWharton/ActionBarSherlock)
 * [ViewPagerIndicator](https://github.com/JakeWharton/Android-ViewPagerIndicator)
 * [HoloColorPicker](https://github.com/LarsWerkman/HoloColorPicker)
+* [ProgressFragment](https://github.com/johnkil/Android-ProgressFragment)
 * [Android Query](http://code.google.com/p/android-query/)
 
 Contributions

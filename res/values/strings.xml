@@ -98,6 +98,9 @@
     <string name="bookmark_user">Bookmark user</string>
     <string name="bookmark_repo">Bookmark repo</string>
     <string name="ellipse" translatable="false">\u2026</string>
+    <string name="view_more">View more</string>
+    <string name="pull">Pull</string>
+    <string name="requests">Requests</string>
 
     <plurals name="file">
         <item quantity="one">File</item>
