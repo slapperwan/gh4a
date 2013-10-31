@@ -25,7 +25,7 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 
-public class SimpleStringAdapter extends RootAdapter<String> {
+public class SimpleStringAdapter<T> extends RootAdapter<T> {
     public SimpleStringAdapter(Context context) {
         super(context);
     }
@@ -49,11 +49,15 @@ public class SimpleStringAdapter extends RootAdapter<String> {
             viewHolder = (ViewHolder) v.getTag();
         }
         
-        viewHolder.tvTitle.setText(mObjects.get(position));
+        viewHolder.tvTitle.setText(objectToString(mObjects.get(position)));
         
         return v;
     }
-    
+
+    protected String objectToString(T object) {
+        return object.toString();
+    }
+
     private static class ViewHolder {
         public TextView tvTitle;
     }

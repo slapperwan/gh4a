@@ -35,6 +35,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -46,6 +47,7 @@ import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.activities.EditCommentActivity;
 import com.gh4a.adapter.CommentAdapter;
+import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.IssueCommentsLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
@@ -57,7 +59,7 @@ import com.gh4a.utils.UiUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
-public class PullRequestFragment extends BaseFragment implements
+public class PullRequestFragment extends ListDataBaseFragment<Comment> implements
         CommentAdapter.OnEditComment, OnClickListener {
     private static final int REQUEST_EDIT = 1000;
 
@@ -65,31 +67,17 @@ public class PullRequestFragment extends BaseFragment implements
     private String mRepoName;
     private int mPullRequestNumber;
     private LinearLayout mHeader;
-    private ListView mListView;
-    private CommentAdapter mCommentAdapter;
 
     private LoaderCallbacks<PullRequest> mPullRequestCallback = new LoaderCallbacks<PullRequest>() {
         @Override
         public Loader<LoaderResult<PullRequest>> onCreateLoader(int id, Bundle args) {
-            return new PullRequestLoader(getSherlockActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
+            return new PullRequestLoader(getActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
         }
         @Override
         public void onResultReady(LoaderResult<PullRequest> result) {
-            hideLoading();
+            setListShown(true);
             if (!result.handleError(getActivity())) {
                 fillData(result.getData());
-            }
-        }
-    };
-    private LoaderCallbacks<List<Comment>> mCommentCallback = new LoaderCallbacks<List<Comment>>() {
-        @Override
-        public Loader<LoaderResult<List<Comment>>> onCreateLoader(int id, Bundle args) {
-            return new IssueCommentsLoader(getSherlockActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
-        }
-        @Override
-        public void onResultReady(LoaderResult<List<Comment>> result) {
-            if (!result.handleError(getActivity())) {
-                fillDiscussion(result.getData());
             }
         }
     };
@@ -117,42 +105,49 @@ public class PullRequestFragment extends BaseFragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
+        View listContent = super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.pull_request, container, false);
         
+        FrameLayout listContainer = (FrameLayout) v.findViewById(R.id.list_container);
+        listContainer.addView(listContent);
+
         if (!Gh4Application.get(getActivity()).isAuthorized()) {
             v.findViewById(R.id.comment).setVisibility(View.GONE);
             v.findViewById(R.id.divider).setVisibility(View.GONE);
         }
-
-        mListView = (ListView) v.findViewById(R.id.list_view);
 
         return v;
     }
     
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
+        mHeader = (LinearLayout) getLayoutInflater(savedInstanceState).inflate(
+                R.layout.pull_request_header, getListView(), false);
+        mHeader.setClickable(false);
+        getListView().addHeaderView(mHeader, null, true);
+
         super.onActivityCreated(savedInstanceState);
         
-        mCommentAdapter = new CommentAdapter(getSherlockActivity(), mRepoOwner, this);
-
-        getLoaderManager().initLoader(0, null, mPullRequestCallback);
-        getLoaderManager().initLoader(1, null, mCommentCallback);
+        getLoaderManager().initLoader(1, null, mPullRequestCallback);
     }
-    
+
+    @Override
+    protected RootAdapter<Comment> onCreateAdapter() {
+        return new CommentAdapter(getActivity(), mRepoOwner, this);
+    }
+
+    @Override
+    protected int getEmptyTextResId() {
+        return 0;
+    }
+
     private void fillData(final PullRequest pullRequest) {
         final Gh4Application app = Gh4Application.get(getActivity());
         View v = getView();
         
-        // set details inside listview header
-        LayoutInflater inflater = LayoutInflater.from(getSherlockActivity());
-        mHeader = (LinearLayout) inflater.inflate(R.layout.pull_request_header, mListView, false);
-        mHeader.setClickable(false);
-        mListView.addHeaderView(mHeader, null, true);
-        mListView.setAdapter(mCommentAdapter);
-
         User user = pullRequest.getUser();
         if (user != null) {
-            AQuery aq = new AQuery(getSherlockActivity());
+            AQuery aq = new AQuery(getActivity());
             aq.id(R.id.iv_gravatar).image(GravatarUtils.getGravatarUrl(user.getGravatarId()), 
                     true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
             View gravatar = mHeader.findViewById(R.id.iv_gravatar);
@@ -167,7 +162,7 @@ public class PullRequestFragment extends BaseFragment implements
         TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
         tvState.setText(pullRequest.getState());
         tvState.setTextColor(Color.WHITE);
-        if ("closed".equals(pullRequest.getState())) {
+        if (Constants.Issue.ISSUE_STATE_CLOSED.equals(pullRequest.getState())) {
             tvState.setBackgroundResource(R.drawable.default_red_box);
             tvState.setText(getString(R.string.closed).toUpperCase(Locale.getDefault()));
         } else {
@@ -188,7 +183,7 @@ public class PullRequestFragment extends BaseFragment implements
         String body = pullRequest.getBodyHtml();
         tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
         if (!StringUtils.isBlank(body)) {
-            HttpImageGetter imageGetter = new HttpImageGetter(getSherlockActivity());
+            HttpImageGetter imageGetter = new HttpImageGetter(getActivity());
             body = HtmlUtils.format(body).toString();
             imageGetter.bind(tvDesc, body, pullRequest.getId());
         }
@@ -214,20 +209,21 @@ public class PullRequestFragment extends BaseFragment implements
         }
     }
 
-    private void fillDiscussion(List<Comment> comments) {
-        if (comments != null && !comments.isEmpty()) {
-            mCommentAdapter.clear();
-            mCommentAdapter.addAll(comments);
-            mCommentAdapter.notifyDataSetChanged();
-        }
+    @Override
+    public Loader<LoaderResult<List<Comment>>> onCreateLoader(int id, Bundle args) {
+        return new IssueCommentsLoader(getActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_EDIT && resultCode == Activity.RESULT_OK) {
-            getLoaderManager().restartLoader(1, null, mCommentCallback);
+            refresh();
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onItemClick(Comment comment) {
     }
 
     @Override
@@ -261,7 +257,7 @@ public class PullRequestFragment extends BaseFragment implements
         protected void onSuccess(Void result) {
             ToastUtils.showMessage(mContext, R.string.issue_success_comment);
             //reload comments
-            getLoaderManager().restartLoader(1, null, mCommentCallback);
+            refresh();
             
             EditText etComment = (EditText) getView().findViewById(R.id.et_comment);
             etComment.setText(null);

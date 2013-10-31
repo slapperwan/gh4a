@@ -10,43 +10,19 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
 
 import com.gh4a.Constants;
 import com.gh4a.R;
+import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.SimpleStringAdapter;
 import com.gh4a.loader.BranchListLoader;
-import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.UiUtils;
 
-public class DownloadBranchesFragment extends BaseFragment implements OnItemClickListener {
+public class DownloadBranchesFragment extends ListDataBaseFragment<RepositoryBranch> {
     private String mRepoOwner;
     private String mRepoName;
-    private ListView mListView;
-    private List<RepositoryBranch> mBranches;
-    private SimpleStringAdapter mAdapter;
     
-    private LoaderCallbacks<List<RepositoryBranch>> mBranchCallback =
-            new LoaderCallbacks<List<RepositoryBranch>>() {
-        @Override
-        public Loader<LoaderResult<List<RepositoryBranch>>> onCreateLoader(int id, Bundle args) {
-            return new BranchListLoader(getSherlockActivity(), mRepoOwner, mRepoName);
-        }
-        @Override
-        public void onResultReady(LoaderResult<List<RepositoryBranch>> result) {
-            hideLoading();
-            if (!result.handleError(getActivity())) {
-                fillData(result.getData());
-            }
-        }
-    };
-
     public static DownloadBranchesFragment newInstance(String repoOwner, String repoName) {
         DownloadBranchesFragment f = new DownloadBranchesFragment();
         Bundle args = new Bundle();
@@ -64,41 +40,32 @@ public class DownloadBranchesFragment extends BaseFragment implements OnItemClic
     }
     
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.generic_list, container, false);
-        mListView = (ListView) v.findViewById(R.id.list_view);
-        return v;
-    }
-    
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        
-        mAdapter = new SimpleStringAdapter(getSherlockActivity());
-        mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener(this);
-        
-        showLoading();
-        
-        getLoaderManager().initLoader(0, null, mBranchCallback);
+    protected RootAdapter<RepositoryBranch> onCreateAdapter() {
+        return new SimpleStringAdapter<RepositoryBranch>(getActivity()) {
+            @Override
+            protected String objectToString(RepositoryBranch branch) {
+                return branch.getName();
+            }
+        };
     }
 
-    public void fillData(List<RepositoryBranch> branches) {
-        mBranches = branches;
-        for (RepositoryBranch branch : branches) {
-            mAdapter.add(branch.getName());
-        }
-        mAdapter.notifyDataSetChanged();
-    }
-    
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, final int position, long id) {
-        final RepositoryBranch branch = mBranches.get(position);
+    protected int getEmptyTextResId() {
+        return R.string.no_branches_found;
+    }
+
+    @Override
+    public Loader<LoaderResult<List<RepositoryBranch>>> onCreateLoader(int id, Bundle args) {
+        return new BranchListLoader(getActivity(), mRepoOwner, mRepoName);
+    }
+
+    @Override
+    public void onItemClick(final RepositoryBranch branch) {
         AlertDialog.Builder builder = UiUtils.createDialogBuilder(getActivity());
         builder.setTitle(R.string.download_file_title);
         builder.setMessage(getString(R.string.download_file_message, branch.getName()));
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
             public void onClick(DialogInterface dialog, int whichButton) {
                 String url = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/zipball/" + branch.getName();
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));

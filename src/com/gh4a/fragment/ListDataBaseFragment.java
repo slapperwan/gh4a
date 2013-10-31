@@ -22,11 +22,19 @@ public abstract class ListDataBaseFragment<T> extends ListFragment implements
 
         mAdapter = onCreateAdapter();
 
-        setEmptyText(getString(getEmptyTextResId()));
+        int emptyResId = getEmptyTextResId();
+        if (emptyResId != 0) {
+            setEmptyText(getString(emptyResId));
+        }
+
         setListAdapter(mAdapter);
         setListShown(false);
         
         getLoaderManager().initLoader(0, null, this);
+    }
+
+    public void refresh() {
+        getLoaderManager().restartLoader(0, null, this);
     }
 
     protected void onAddData(RootAdapter<T> adapter, List<T> data) {

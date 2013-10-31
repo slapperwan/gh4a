@@ -122,6 +122,8 @@
     <string name="no_watched_repos_found">No repositories are being watched yet.</string>
     <string name="no_watchers_found">Nobody is watching this repository yet.</string>
     <string name="no_stargazers_found">Nobody has starred this repository yet.</string>
+    <string name="no_tags_found">No tags were created in this repository yet.</string>
+    <string name="no_branches_found">No branches were created in this repository yet.</string>
 
     <!-- Activity event -->
     <string name="event_push_title">%1$s pushed to %2$s at %3$s</string>
