@@ -30,6 +30,7 @@ import android.widget.ListView;
 import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.CommonFeedAdapter;
 import com.gh4a.holder.Feed;
@@ -37,7 +38,7 @@ import com.gh4a.loader.FeedLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 
-public class WikiListActivity extends BaseSherlockFragmentActivity {
+public class WikiListActivity extends LoadingFragmentActivity {
     
     private String mUserLogin;
     private String mRepoName;
@@ -51,13 +52,15 @@ public class WikiListActivity extends BaseSherlockFragmentActivity {
         }
         @Override
         public void onResultReady(LoaderResult<List<Feed>> result) {
-            hideLoading();
+            setContentEmpty(true);
             if (result.getException() instanceof SAXException) {
                 Gh4Application.get(WikiListActivity.this).notFoundMessage(WikiListActivity.this,
                         getString(R.string.recent_wiki));
             } else if (!result.handleError(WikiListActivity.this)) {
                 fillData(result.getData());
+                setContentEmpty(false);
             }
+            setContentShown(true);
         }
     };
 
@@ -75,6 +78,7 @@ public class WikiListActivity extends BaseSherlockFragmentActivity {
         }
         
         setContentView(R.layout.generic_list);
+        setContentShown(false);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.recent_wiki);

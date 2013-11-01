@@ -1,91 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:layout_margin="0dp"
-    android:padding="0dp">
-    <FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    <LinearLayout
+        android:id="@+id/main_content"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-        <ProgressBar
-            android:id="@+id/pb"
-            style="@style/LoadingProgress" />
-        <LinearLayout
-            android:id="@+id/main_content"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
+        <EditText
+            android:id="@+id/et_title"
+            android:layout_height="wrap_content"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_marginBottom="10dp"
+            android:hint="@string/issue_title" />
+        <EditText
+            android:id="@+id/et_desc"
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:layout_marginBottom="10dp"
+            android:gravity="top"
+            android:minLines="5"
+            android:inputType="textMultiLine|textCapSentences"
+            android:hint="@string/issue_body" />
+        <LinearLayout
+            android:id="@+id/for_collaborator"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical" >
-            <EditText
-                android:id="@+id/et_title"
+            <EditText 
+                android:id="@+id/et_milestone"
+                android:layout_width="fill_parent" 
                 android:layout_height="wrap_content"
-                android:layout_width="fill_parent"
                 android:layout_marginBottom="10dp"
-                android:hint="@string/issue_title" />
-            <EditText
-                android:id="@+id/et_desc"
+                android:hint="@string/issue_milestone"
+                android:cursorVisible="false" 
+                android:focusable="false" 
+                android:focusableInTouchMode="false"             
+                android:onClick="showMilestonesDialog" />
+            <EditText 
+                android:id="@+id/et_assignee"
+                android:layout_width="fill_parent" 
                 android:layout_height="wrap_content"
-                android:layout_width="fill_parent"
                 android:layout_marginBottom="10dp"
-                android:gravity="top"
-                android:minLines="5"
-                android:inputType="textMultiLine|textCapSentences"
-                android:hint="@string/issue_body" />
+                android:hint="@string/issue_assignee"
+                android:cursorVisible="false" 
+                android:focusable="false" 
+                android:focusableInTouchMode="false"             
+                android:onClick="showAssigneesDialog" />
             <LinearLayout
-                android:id="@+id/for_collaborator"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="vertical"
+                android:layout_marginTop="10dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp">
+                <TextView
+                    android:id="@+id/tv_issue_label_add"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/issue_label_add" />
+                <View 
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:background="#ff0099cc" />
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="10dp" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/ll_labels"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" >
-                <EditText 
-                    android:id="@+id/et_milestone"
-                    android:layout_width="fill_parent" 
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:hint="@string/issue_milestone"
-                    android:cursorVisible="false" 
-                    android:focusable="false" 
-                    android:focusableInTouchMode="false"             
-                    android:onClick="showMilestonesDialog" />
-                <EditText 
-                    android:id="@+id/et_assignee"
-                    android:layout_width="fill_parent" 
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:hint="@string/issue_assignee"
-                    android:cursorVisible="false" 
-                    android:focusable="false" 
-                    android:focusableInTouchMode="false"             
-                    android:onClick="showAssigneesDialog" />
-                <LinearLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:orientation="vertical"
-                    android:layout_marginTop="10dp"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="16dp">
-                    <TextView
-                        android:id="@+id/tv_issue_label_add"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:text="@string/issue_label_add" />
-                    <View 
-                        android:layout_width="fill_parent"
-                        android:layout_height="1dp"
-                        android:background="#ff0099cc" />
-                    <View
-                        android:layout_width="fill_parent"
-                        android:layout_height="10dp" />
-                </LinearLayout>
-                <LinearLayout
-                    android:id="@+id/ll_labels"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="16dp"
-                    android:orientation="vertical">
-                </LinearLayout>
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:orientation="vertical">
             </LinearLayout>
         </LinearLayout>
-    </FrameLayout>
+    </LinearLayout>
 </ScrollView>

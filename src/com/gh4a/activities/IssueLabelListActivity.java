@@ -42,6 +42,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.adapter.IssueLabelAdapter;
@@ -51,7 +52,7 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 
-public class IssueLabelListActivity extends BaseSherlockFragmentActivity implements OnItemClickListener {
+public class IssueLabelListActivity extends LoadingFragmentActivity implements OnItemClickListener {
     private String mRepoOwner;
     private String mRepoName;
     private ActionMode mActionMode;
@@ -66,7 +67,6 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
         }
         @Override
         public void onResultReady(LoaderResult<List<Label>> result) {
-            hideLoading();
             stopProgressDialog(mProgressDialog);
             UiUtils.hideImeForView(getCurrentFocus());
             if (!result.handleError(IssueLabelListActivity.this)) {
@@ -75,7 +75,10 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
                     mAdapter.add(label);
                 }
                 mAdapter.notifyDataSetChanged();
+            } else {
+                setContentEmpty(true);
             }
+            setContentShown(true);
         }
     };
 
@@ -111,6 +114,7 @@ public class IssueLabelListActivity extends BaseSherlockFragmentActivity impleme
         }
         
         setContentView(R.layout.issue_label_list);
+        setContentShown(false);
 
         ListView listView = (ListView) findViewById(R.id.main_content);
         listView.setAdapter(mAdapter);

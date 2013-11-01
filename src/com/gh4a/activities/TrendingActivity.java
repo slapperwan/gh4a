@@ -3,25 +3,29 @@ package com.gh4a.activities
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.view.ViewGroup;
+import android.support.v4.app.Fragment;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Gh4Application;
+import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.TrendingFragment;
 
-public class TrendingActivity extends BaseSherlockFragmentActivity {
+public class TrendingActivity extends LoadingFragmentPagerActivity {
 
     private static final String TODAY = "http://github-trends.oscardelben.com/explore/today.xml";
     private static final String WEEK = "http://github-trends.oscardelben.com/explore/week.xml";
     private static final String MONTH = "http://github-trends.oscardelben.com/explore/month.xml";
     private static final String FOREVER = "http://github-trends.oscardelben.com/explore/forever.xml";
     
+    private static final int[] TITLES = new int[] {
+        R.string.trend_today, R.string.trend_month,
+        R.string.trend_month, R.string.trend_forever
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
@@ -34,12 +38,25 @@ public class TrendingActivity extends BaseSherlockFragmentActivity {
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        setupPager(new ThisPageAdapter(getSupportFragmentManager()), new int[] {
-            R.string.trend_today, R.string.trend_month,
-            R.string.trend_month, R.string.trend_forever
-        });
+        setupPager();
     }
     
+    @Override
+    protected int[] getTabTitleResIds() {
+        return TITLES;
+    }
+
+    @Override
+    protected Fragment getFragment(int position) {
+        switch (position) {
+            case 0: return TrendingFragment.newInstance(TODAY);
+            case 1: return TrendingFragment.newInstance(WEEK);
+            case 2: return TrendingFragment.newInstance(MONTH);
+            case 3: return TrendingFragment.newInstance(FOREVER);
+        }
+        return null;
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
@@ -84,37 +101,5 @@ public class TrendingActivity extends BaseSherlockFragmentActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-    
-    public class ThisPageAdapter extends FragmentStatePagerAdapter {
-
-        public ThisPageAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public int getCount() {
-            return 4;
-        }
-
-        @Override
-        public android.support.v4.app.Fragment getItem(int position) {
-            if (position == 1) {
-                return TrendingFragment.newInstance(WEEK);
-            }
-            else if (position == 2) {
-                return TrendingFragment.newInstance(MONTH);
-            }
-            else if (position == 3) {
-                return TrendingFragment.newInstance(FOREVER);
-            }
-            else {
-                return TrendingFragment.newInstance(TODAY);
-            }
-        }
-        
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-        }
     }
 }

@@ -37,6 +37,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.loader.ContentLoader;
 import com.gh4a.loader.LoaderCallbacks;
@@ -44,7 +45,7 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 
-public class FileViewerActivity extends BaseSherlockFragmentActivity {
+public class FileViewerActivity extends LoadingFragmentActivity {
     protected String mRepoOwner;
     protected String mRepoName;
     private String mPath;
@@ -57,7 +58,7 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity {
     private WebViewClient mWebViewClient = new WebViewClient() {
         @Override
         public void onPageFinished(WebView webView, String url) {
-            hideLoading();
+            setContentShown(true);
         }
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -75,13 +76,15 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity {
         }
         @Override
         public void onResultReady(LoaderResult<List<RepositoryContents>> result) {
-            hideLoading();
+            setContentEmpty(true);
             if (!result.handleError(FileViewerActivity.this)) {
                 List<RepositoryContents> data = result.getData();
                 if (data != null && !data.isEmpty()) {
                     loadContent(data.get(0));
+                    setContentEmpty(false);
                 }
             }
+            setContentShown(true);
         }
     };
 
@@ -103,13 +106,13 @@ public class FileViewerActivity extends BaseSherlockFragmentActivity {
         }
         
         setContentView(R.layout.web_viewer);
+        setContentShown(false);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(mName);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
-        showLoading();
         getSupportLoaderManager().initLoader(0, null, mFileCallback);
     }
 

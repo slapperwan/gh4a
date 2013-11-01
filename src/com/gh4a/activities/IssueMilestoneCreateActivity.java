@@ -69,7 +69,6 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
         }
         setContentView(R.layout.issue_create_milestone);
 
-        hideLoading();
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.issue_milestone_new);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);

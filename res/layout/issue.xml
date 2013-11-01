@@ -5,18 +5,14 @@
     android:layout_height="fill_parent"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true" >
-    <ProgressBar
-        android:id="@+id/pb"
-        style="@style/LoadingProgress"
-        android:layout_centerHorizontal="true" />
+
     <ListView
         android:id="@+id/list_view"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:padding="0dp"
         android:layout_above="@+id/divider"
-        android:fastScrollEnabled="true" >
-    </ListView>
+        android:fastScrollEnabled="true" />
 
     <View
         android:id="@+id/divider"
@@ -53,4 +49,5 @@
             android:scaleType="centerInside" />
 
     </LinearLayout>
+
 </RelativeLayout>

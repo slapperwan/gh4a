@@ -19,11 +19,12 @@ import android.widget.ListView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.Gh4Application;
+import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.BookmarkAdapter;
 import com.gh4a.db.BookmarksProvider.Columns;
 
-public class BookmarkListActivity extends BaseSherlockFragmentActivity implements
+public class BookmarkListActivity extends LoadingFragmentActivity implements
         AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, LoaderCallbacks<Cursor> {
     private static final String TAG = "BookmarkListActivity";
 
@@ -36,6 +37,7 @@ public class BookmarkListActivity extends BaseSherlockFragmentActivity implement
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.generic_list);
+        setContentShown(false);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.bookmarks);
@@ -89,7 +91,7 @@ public class BookmarkListActivity extends BaseSherlockFragmentActivity implement
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mAdapter.swapCursor(data);
-        hideLoading();
+        setContentShown(true);
     }
 
     @Override

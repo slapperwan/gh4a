@@ -16,6 +16,7 @@
 package com.gh4a.activities;
 
 import org.eclipse.egit.github.core.Gist;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
@@ -24,16 +25,18 @@ import android.support.v4.content.Loader;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
 import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.loader.GistLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
 
-public class GistViewerActivity extends BaseSherlockFragmentActivity {
+public class GistViewerActivity extends LoadingFragmentActivity {
     private String mUserLogin;
     private String mFileName;
     private String mGistId;
@@ -47,6 +50,9 @@ public class GistViewerActivity extends BaseSherlockFragmentActivity {
         public void onResultReady(LoaderResult<Gist> result) {
             if (!result.handleError(GistViewerActivity.this)) {
                 fillData(result.getData().getFiles().get(mFileName).getContent(), true);
+            } else {
+                setContentEmpty(true);
+                setContentShown(true);
             }
         }
     };
@@ -54,7 +60,7 @@ public class GistViewerActivity extends BaseSherlockFragmentActivity {
     private WebViewClient mWebViewClient = new WebViewClient() {
         @Override
         public void onPageFinished(WebView webView, String url) {
-            hideLoading();
+            setContentShown(true);
         }
         
         @Override
@@ -80,12 +86,12 @@ public class GistViewerActivity extends BaseSherlockFragmentActivity {
         }
         
         setContentView(R.layout.web_viewer);
-        
+        setContentShown(false);
+
         ActionBar mActionBar = getSupportActionBar();
         mActionBar.setTitle(mFileName);
         mActionBar.setDisplayHomeAsUpEnabled(true);
         
-        showLoading();
         getSupportLoaderManager().initLoader(0, null, mGistCallback);
     }
     

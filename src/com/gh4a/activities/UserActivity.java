@@ -11,11 +11,9 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
-import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
@@ -25,6 +23,7 @@ import com.bugsense.trace.BugSenseHandler;
 import com.gh4a.BackgroundTask;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.db.BookmarksProvider;
 import com.gh4a.fragment.PrivateEventListFragment;
@@ -36,8 +35,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
 
-public class UserActivity extends BaseSherlockFragmentActivity {
-
+public class UserActivity extends LoadingFragmentPagerActivity {
     public String mUserLogin;
     public String mUserName;
     private boolean mIsLoginUserPage;
@@ -47,7 +45,15 @@ public class UserActivity extends BaseSherlockFragmentActivity {
     private PublicEventListFragment mPublicEventListFragment;
     private RepositoryIssueListFragment mRepositoryIssueListFragment;
     public Boolean mIsFollowing;
-    
+
+    private static final int[] TITLES_SELF = new int[] {
+        R.string.about, R.string.user_news_feed,
+        R.string.user_your_actions, R.string.issues
+    };
+    private static final int[] TITLES_OTHER = new int[] {
+        R.string.about, R.string.user_public_activity
+    };
+
     private LoaderCallbacks<Boolean> mIsFollowingCallback = new LoaderCallbacks<Boolean>() {
         @Override
         public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
@@ -84,62 +90,43 @@ public class UserActivity extends BaseSherlockFragmentActivity {
         if (mIsLoginUserPage) {
             actionBar.setDisplayShowHomeEnabled(false);
             actionBar.setDisplayShowTitleEnabled(false);
-            mPager = setupPager(new UserAdapter(getSupportFragmentManager()), new int[] {
-                R.string.about, R.string.user_news_feed,
-                R.string.user_your_actions, R.string.issues
-             });
-        }
-        else {
+        } else {
             actionBar.setTitle(mUserLogin);
             actionBar.setDisplayHomeAsUpEnabled(true);
-            mPager = setupPager(new UserAdapter(getSupportFragmentManager()), new int[] {
-                R.string.about, R.string.user_public_activity
-             });
         }
+        setupPager();
 
         if (!mUserLogin.equals(Gh4Application.get(this).getAuthLogin())) {
             getSupportLoaderManager().initLoader(4, null, mIsFollowingCallback);
         }
     }
     
-    public class UserAdapter extends FragmentStatePagerAdapter {
+    @Override
+    protected int[] getTabTitleResIds() {
+        return mIsLoginUserPage ? TITLES_SELF : TITLES_OTHER;
+    }
 
-        public UserAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public int getCount() {
-            return mIsLoginUserPage ? 4 : 2;
-        }
-
-        @Override
-        public android.support.v4.app.Fragment getItem(int position) {
-            if (position == 1) {
+    @Override
+    protected Fragment getFragment(int position) {
+        switch (position) {
+            case 0:
+                mUserFragment = UserFragment.newInstance(mUserLogin, mUserName);
+                return mUserFragment;
+            case 1:
                 mPrivateEventListFragment = 
                         PrivateEventListFragment.newInstance(mUserLogin, mIsLoginUserPage);
                 return mPrivateEventListFragment;
-            }
-            else if (position == 2) {
+            case 2:
                 mPublicEventListFragment =
                         PublicEventListFragment.newInstance(mUserLogin, false);
                 return mPublicEventListFragment;
-            }
-            else if (position == 3) {
+            case 3:
                 Map<String, String> filterData = new HashMap<String, String>();
                 filterData.put("filter", "subscribed");
                 mRepositoryIssueListFragment = RepositoryIssueListFragment.newInstance(filterData);
                 return mRepositoryIssueListFragment;
-            }
-            else {
-                mUserFragment = UserFragment.newInstance(mUserLogin, mUserName);
-                return mUserFragment;
-            }
         }
-        
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-        }
+        return null;
     }
 
     @Override
@@ -324,5 +311,4 @@ public class UserActivity extends BaseSherlockFragmentActivity {
             invalidateOptionsMenu();
         }
     }
-
 }

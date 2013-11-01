@@ -33,13 +33,14 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.loader.GistLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
 
-public class GistActivity extends BaseSherlockFragmentActivity implements OnClickListener {
+public class GistActivity extends LoadingFragmentActivity implements OnClickListener {
     private String mGistId;
     private String mUserLogin;
     private Gist mGist;
@@ -51,10 +52,12 @@ public class GistActivity extends BaseSherlockFragmentActivity implements OnClic
         }
         @Override
         public void onResultReady(LoaderResult<Gist> result) {
-            hideLoading();
             if (!result.handleError(GistActivity.this)) {
                 fillData(result.getData());
+            } else {
+                setContentEmpty(true);
             }
+            setContentShown(true);
         }
     };
 
@@ -72,6 +75,7 @@ public class GistActivity extends BaseSherlockFragmentActivity implements OnClic
         }
         
         setContentView(R.layout.gist);
+        setContentShown(false);
         
         ActionBar mActionBar = getSupportActionBar();
         mActionBar.setTitle(getString(R.string.gist_title, mGistId));

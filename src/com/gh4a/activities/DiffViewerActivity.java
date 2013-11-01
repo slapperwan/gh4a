@@ -25,6 +25,7 @@ import android.text.TextUtils;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
+
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -36,7 +37,6 @@ import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 
 public class DiffViewerActivity extends BaseSherlockFragmentActivity {
-
     private String mRepoOwner;
     private String mRepoName;
     private String mSha;
@@ -66,7 +66,6 @@ public class DiffViewerActivity extends BaseSherlockFragmentActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         
         mWebView = (WebView) findViewById(R.id.web_view);
-        hideLoading();
 
         if (!initWebView(fileName)) {
             Toast.makeText(this, getString(R.string.fail_view_diff), Toast.LENGTH_SHORT).show();

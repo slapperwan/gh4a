@@ -41,6 +41,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.loader.LoaderCallbacks;
@@ -50,7 +51,7 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 
-public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity {
+public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
     private String mRepoOwner;
     private String mRepoName;
     private int mMilestoneNumber;
@@ -64,12 +65,13 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity {
         }
         @Override
         public void onResultReady(LoaderResult<Milestone> result) {
-            hideLoading();
-
             if (!result.handleError(IssueMilestoneEditActivity.this)) {
                 mMilestone = result.getData();
                 fillData();
+            } else {
+                setContentEmpty(true);
             }
+            setContentShown(true);
         }
     };
     
@@ -93,14 +95,14 @@ public class IssueMilestoneEditActivity extends BaseSherlockFragmentActivity {
             finish();
         }
         setContentView(R.layout.issue_create_milestone);
-        
+        setContentShown(false);
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.issue_milestone_edit);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
-        showLoading();
         getSupportLoaderManager().initLoader(0, null, mMilestoneCallback);
     }
     

@@ -19,8 +19,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
@@ -28,15 +26,20 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.CommitFragment;
 import com.gh4a.fragment.CommitNoteFragment;
 
-public class CommitActivity extends BaseSherlockFragmentActivity {
+public class CommitActivity extends LoadingFragmentPagerActivity {
     private String mRepoOwner;
     private String mRepoName;
     private String mObjectSha;
     
+    private static final int[] TITLES = new int[] {
+        R.string.commits, R.string.issue_comments
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
@@ -60,28 +63,20 @@ public class CommitActivity extends BaseSherlockFragmentActivity {
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
         
-        setupPager(new ThisPageAdapter(getSupportFragmentManager()), new int[] {
-            R.string.commits, R.string.issue_comments
-        });
+        setupPager();
     }
 
-    private class ThisPageAdapter extends FragmentStatePagerAdapter {
-        public ThisPageAdapter(FragmentManager fm) {
-            super(fm);
-        }
+    @Override
+    protected int[] getTabTitleResIds() {
+        return TITLES;
+    }
 
-        @Override
-        public int getCount() {
-            return 2;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            if (position == 1) {
-                return CommitNoteFragment.newInstance(mRepoOwner, mRepoName, mObjectSha);
-            } else {
-                return CommitFragment.newInstance(mRepoOwner, mRepoName, mObjectSha);
-            }
+    @Override
+    protected Fragment getFragment(int position) {
+        if (position == 1) {
+            return CommitNoteFragment.newInstance(mRepoOwner, mRepoName, mObjectSha);
+        } else {
+            return CommitFragment.newInstance(mRepoOwner, mRepoName, mObjectSha);
         }
     }
     

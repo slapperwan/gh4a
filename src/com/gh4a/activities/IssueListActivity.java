@@ -29,8 +29,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -41,6 +40,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueListByCommentsFragment;
 import com.gh4a.fragment.IssueListBySubmittedFragment;
@@ -54,12 +54,10 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
 import com.gh4a.utils.UiUtils;
 
-public class IssueListActivity extends BaseSherlockFragmentActivity implements OnClickListener {
-
+public class IssueListActivity extends LoadingFragmentPagerActivity implements OnClickListener {
     private String mRepoOwner;
     private String mRepoName;
     private String mState;
-    private ThisPageAdapter mAdapter;
     private IssueListFragment mUpdateFragment;
     private IssueListFragment mCommentFragment;
     private IssueListFragment mSubmitFragment;
@@ -70,6 +68,10 @@ public class IssueListActivity extends BaseSherlockFragmentActivity implements O
     private List<Label> mLabels;
     private List<Milestone> mMilestones;
     private List<User> mAssignees;
+
+    private static final int[] TITLES = new int[] {
+        R.string.issues_submitted, R.string.issues_updated, R.string.issues_comments
+    };
 
     private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
         @Override
@@ -160,61 +162,46 @@ public class IssueListActivity extends BaseSherlockFragmentActivity implements O
         mActionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         mActionBar.setDisplayHomeAsUpEnabled(true);
         
-        mAdapter = new ThisPageAdapter(getSupportFragmentManager());
-        setupPager(mAdapter, new int[] {
-            R.string.issues_submitted, R.string.issues_updated, R.string.issues_comments
-        });
+        setupPager();
     }
 
     private void updateTitle() {
         if (mState == null || "open".equals(mState)) {
             mActionBar.setTitle(R.string.issue_open);
-        }
-        else {
+        } else {
             mActionBar.setTitle(R.string.issue_closed);
         }
     }
-    
-    public class ThisPageAdapter extends FragmentStatePagerAdapter {
 
-        public ThisPageAdapter(FragmentManager fm) {
-            super(fm);
-        }
+    @Override
+    protected int[] getTabTitleResIds() {
+        return TITLES;
+    }
 
-        @Override
-        public int getCount() {
-            return 3;
+    @Override
+    protected Fragment getFragment(int position) {
+        if (position == 1) {
+            mUpdateFragment = IssueListByUpdatedFragment.newInstance(mRepoOwner, mRepoName, mFilterData);
+            return mUpdateFragment;
+        } else if (position == 2) {
+            mCommentFragment = IssueListByCommentsFragment.newInstance(mRepoOwner, mRepoName, mFilterData);
+            return mCommentFragment;
+        } else {
+            mSubmitFragment = IssueListBySubmittedFragment.newInstance(mRepoOwner, mRepoName, mFilterData);
+            return mSubmitFragment;
         }
+    }
 
-        @Override
-        public android.support.v4.app.Fragment getItem(int position) {
-            if (position == 1) {
-                mUpdateFragment = IssueListByUpdatedFragment.newInstance(mRepoOwner, mRepoName, mFilterData);
-                return mUpdateFragment;
-            }
-            else if (position == 2) {
-                mCommentFragment = IssueListByCommentsFragment.newInstance(mRepoOwner, mRepoName, mFilterData);
-                return mCommentFragment;
-            }
-            else {
-                mSubmitFragment = IssueListBySubmittedFragment.newInstance(mRepoOwner, mRepoName, mFilterData);
-                return mSubmitFragment;
-            }
+    @Override
+    protected boolean fragmentNeedsRefresh(Fragment object) {
+        if (object instanceof IssueListByUpdatedFragment && mUpdateFragment != object) {
+            return true;
+        } else if (object instanceof IssueListByCommentsFragment && mUpdateFragment != object) {
+            return true;
+        } else if (object instanceof IssueListBySubmittedFragment && mSubmitFragment != object) {
+            return true;
         }
-        
-        @Override
-        public int getItemPosition(Object object) {
-            if (object instanceof IssueListByUpdatedFragment && mUpdateFragment != object) {
-                return POSITION_NONE;
-            }
-            else if (object instanceof IssueListByCommentsFragment && mUpdateFragment != object) {
-                return POSITION_NONE;
-            }
-            else if (object instanceof IssueListBySubmittedFragment && mSubmitFragment != object) {
-                return POSITION_NONE;
-            }
-            return POSITION_UNCHANGED;
-        }
+        return false;
     }
     
     @Override
@@ -344,7 +331,7 @@ public class IssueListActivity extends BaseSherlockFragmentActivity implements O
         mSubmitFragment = null;
         mUpdateFragment = null;
         mCommentFragment = null;
-        mAdapter.notifyDataSetChanged();
+        invalidateFragments();
     }
     
     private void showLabelsDialog() {

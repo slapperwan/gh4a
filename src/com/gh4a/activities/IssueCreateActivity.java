@@ -44,6 +44,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.loader.CollaboratorListLoader;
@@ -57,7 +58,7 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 
-public class IssueCreateActivity extends BaseSherlockFragmentActivity {
+public class IssueCreateActivity extends LoadingFragmentActivity {
     private String mRepoOwner;
     private String mRepoName;
     private ActionBar mActionBar;
@@ -84,7 +85,8 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
         }
         @Override
         public void onResultReady(LoaderResult<List<Label>> result) {
-            if (!checkForError(result)) {
+            stopProgressDialog(mProgressDialog);
+            if (!result.handleError(IssueCreateActivity.this)) {
                 mAllLabel = result.getData();
                 fillLabels();
             }
@@ -98,8 +100,8 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
         }
         @Override
         public void onResultReady(LoaderResult<List<Milestone>> result) {
-            if (!checkForError(result)) {
-                stopProgressDialog(mProgressDialog);
+            stopProgressDialog(mProgressDialog);
+            if (!result.handleError(IssueCreateActivity.this)) {
                 mAllMilestone = result.getData();
                 showMilestonesDialog();
                 getSupportLoaderManager().destroyLoader(1);
@@ -114,8 +116,8 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
         }
         @Override
         public void onResultReady(LoaderResult<List<User>> result) {
-            if (!checkForError(result)) {
-                stopProgressDialog(mProgressDialog);
+            stopProgressDialog(mProgressDialog);
+            if (!result.handleError(IssueCreateActivity.this)) {
                 mAllAssignee = result.getData();
                 showAssigneesDialog();
                 getSupportLoaderManager().destroyLoader(2);
@@ -147,9 +149,13 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
         }
         @Override
         public void onResultReady(LoaderResult<Issue> result) {
-            hideLoading();
-            mEditIssue = result.getData();
-            fillIssueData();
+            if (!result.handleError(IssueCreateActivity.this)) {
+                mEditIssue = result.getData();
+                fillIssueData();
+            } else {
+                setContentEmpty(true);
+            }
+            setContentShown(true);
         }
     };
     
@@ -205,11 +211,9 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
         getSupportLoaderManager().initLoader(4, null, mIsCollaboratorCallback);
         
         if (mEditMode) {
-            showLoading();
             getSupportLoaderManager().initLoader(3, null, mIssueCallback);
-        } else {
-            hideLoading();
         }
+        setContentShown(!mEditMode);
     }
     
     @Override
@@ -494,14 +498,5 @@ public class IssueCreateActivity extends BaseSherlockFragmentActivity {
             mTvSelectedAssignee.setText(getString(
                     R.string.issue_assignee, mSelectedAssignee.getLogin()));
         }
-    }
-
-    private boolean checkForError(LoaderResult<?> result) {
-        if (result.handleError(IssueCreateActivity.this)) {
-            hideLoading();
-            stopProgressDialog(mProgressDialog);
-            return true;
-        }
-        return false;
     }
 }

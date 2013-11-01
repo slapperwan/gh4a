@@ -26,15 +26,10 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.Tab;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -160,36 +155,6 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         dialog.show();
     }
 
-    public void showLoading() {
-        if (findViewById(R.id.pager) != null) {
-            findViewById(R.id.pager).setVisibility(View.INVISIBLE);
-        } else if (findViewById(R.id.web_view) != null) {
-            findViewById(R.id.web_view).setVisibility(View.INVISIBLE);
-        } else if (findViewById(R.id.list_view) != null) {
-            findViewById(R.id.list_view).setVisibility(View.INVISIBLE);
-        } else if (findViewById(R.id.main_content) != null) {
-            findViewById(R.id.main_content).setVisibility(View.INVISIBLE);
-        }
-        if (findViewById(R.id.pb) != null) {
-            findViewById(R.id.pb).setVisibility(View.VISIBLE);
-        }
-    }
-    
-    public void hideLoading() {
-        if (findViewById(R.id.pager) != null) {
-            findViewById(R.id.pager).setVisibility(View.VISIBLE);
-        } else if (findViewById(R.id.list_view) != null) {
-            findViewById(R.id.list_view).setVisibility(View.VISIBLE);
-        } else if (findViewById(R.id.main_content) != null) {
-            findViewById(R.id.main_content).setVisibility(View.VISIBLE);
-        } else if (findViewById(R.id.web_view) != null) {
-            findViewById(R.id.web_view).setVisibility(View.VISIBLE);
-        }
-        if (findViewById(R.id.pb) != null) {
-            findViewById(R.id.pb).setVisibility(View.GONE);
-        }
-    }
-    
     public ProgressDialog showProgressDialog(String message, boolean cancelable) {
         return ProgressDialog.show(this, "", message, cancelable);
     }
@@ -235,54 +200,6 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         cv.put(BookmarksProvider.Columns.EXTRA, extraData);
         if (getContentResolver().insert(BookmarksProvider.Columns.CONTENT_URI, cv) != null) {
             ToastUtils.showMessage(this, R.string.bookmark_saved);
-        }
-    }
-
-    public ViewPager setupPager(PagerAdapter adapter, int[] titleResIds) {
-        final ActionBar actionBar = getSupportActionBar();
-        ViewPager pager = (ViewPager) findViewById(R.id.pager);
-        pager.setAdapter(adapter);
-
-        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrollStateChanged(int state) {}
-
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
-
-            @Override
-            public void onPageSelected(int position) {
-                actionBar.getTabAt(position).select();
-            }
-        });
-
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        for (int i = 0; i < titleResIds.length; i++) {
-            actionBar.addTab(actionBar.newTab()
-                .setText(titleResIds[i])
-                .setTabListener(new TabListener(i, pager)));
-        }
-
-        return pager;
-    }
-
-    private static class TabListener implements ActionBar.TabListener {
-        private final int mTag;
-        private ViewPager mPager;
-
-        public TabListener(int tag, ViewPager pager) {
-            mTag = tag;
-            mPager = pager;
-        }
-
-        public void onTabSelected(Tab tab, FragmentTransaction ft) {
-            mPager.setCurrentItem(mTag);
-        }
-
-        public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-        }
-
-        public void onTabReselected(Tab tab, FragmentTransaction ft) {
         }
     }
 }

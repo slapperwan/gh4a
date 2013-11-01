@@ -17,9 +17,7 @@ package com.gh4a.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.view.ViewGroup;
+import android.support.v4.app.Fragment;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
@@ -27,14 +25,18 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueMilestoneListFragment;
 
-public class IssueMilestoneListActivity extends BaseSherlockFragmentActivity {
-
+public class IssueMilestoneListActivity extends LoadingFragmentPagerActivity {
     private String mRepoOwner;
     private String mRepoName;
-    
+
+    private static final int[] TITLES = new int[] {
+        R.string.open, R.string.closed
+    };
+
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
@@ -54,36 +56,18 @@ public class IssueMilestoneListActivity extends BaseSherlockFragmentActivity {
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        setupPager(new ThisPageAdapter(getSupportFragmentManager()), new int[] {
-            R.string.open, R.string.closed
-        });
+        setupPager();
     }
-    
-    public class ThisPageAdapter extends FragmentStatePagerAdapter {
 
-        public ThisPageAdapter(FragmentManager fm) {
-            super(fm);
-        }
+    @Override
+    protected int[] getTabTitleResIds() {
+        return TITLES;
+    }
 
-        @Override
-        public int getCount() {
-            return 2;
-        }
-
-        @Override
-        public android.support.v4.app.Fragment getItem(int position) {
-            if (position == 0) {
-                return IssueMilestoneListFragment.newInstance(mRepoOwner, mRepoName, "open");
-            }
-            else if (position == 1) {
-                return IssueMilestoneListFragment.newInstance(mRepoOwner, mRepoName, "closed");
-            }
-            return null;
-        }
-        
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-        }
+    @Override
+    protected Fragment getFragment(int position) {
+        return IssueMilestoneListFragment.newInstance(mRepoOwner, mRepoName,
+                position == 1 ? Constants.Issue.ISSUE_STATE_CLOSED : Constants.Issue.ISSUE_STATE_OPEN);
     }
     
     @Override

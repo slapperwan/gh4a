@@ -31,13 +31,14 @@ import android.widget.ListView;
 import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.loader.CommitCompareLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 
-public class CompareActivity extends BaseSherlockFragmentActivity implements OnItemClickListener {
+public class CompareActivity extends LoadingFragmentActivity implements OnItemClickListener {
     private String mRepoOwner;
     private String mRepoName;
     private String mBase;
@@ -53,15 +54,16 @@ public class CompareActivity extends BaseSherlockFragmentActivity implements OnI
         }
         @Override
         public void onResultReady(LoaderResult<RepositoryCommitCompare> result) {
-            hideLoading();
-
             if (!result.handleError(CompareActivity.this)) {
                 List<RepositoryCommit> commits = result.getData().getCommits();
                 if (commits != null && !commits.isEmpty()) {
                     mAdapter.addAll(commits);
                     mAdapter.notifyDataSetChanged();
                 }
+            } else {
+                setContentEmpty(true);
             }
+            setContentShown(true);
         }
     };
 
@@ -71,6 +73,8 @@ public class CompareActivity extends BaseSherlockFragmentActivity implements OnI
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.generic_list);
+        setContentShown(false);
+
         mListView = (ListView) findViewById(R.id.list_view);
         
         mRepoOwner = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);

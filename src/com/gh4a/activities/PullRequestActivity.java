@@ -17,23 +17,25 @@ package com.gh4a.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.view.ViewGroup;
+import android.support.v4.app.Fragment;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.PullRequestCommitListFragment;
 import com.gh4a.fragment.PullRequestFragment;
 
-public class PullRequestActivity extends BaseSherlockFragmentActivity {
-
+public class PullRequestActivity extends LoadingFragmentPagerActivity {
     private String mRepoOwner;
     private String mRepoName;
     private int mPullRequestNumber;
-    
+
+    private static final int[] TITLES = new int[] {
+        R.string.pull_request_comments, R.string.commits
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
@@ -56,37 +58,23 @@ public class PullRequestActivity extends BaseSherlockFragmentActivity {
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        setupPager(new ThisPageAdapter(getSupportFragmentManager()), new int[] {
-            R.string.pull_request_comments, R.string.commits
-        });
+        setupPager();
     }
 
-    public class ThisPageAdapter extends FragmentStatePagerAdapter {
+    @Override
+    protected int[] getTabTitleResIds() {
+        return TITLES;
+    }
 
-        public ThisPageAdapter(FragmentManager fm) {
-            super(fm);
+    @Override
+    protected Fragment getFragment(int position) {
+        if (position == 1) {
+            return PullRequestCommitListFragment.newInstance(mRepoOwner, mRepoName, mPullRequestNumber);
+        } else {
+            return PullRequestFragment.newInstance(mRepoOwner, mRepoName, mPullRequestNumber);
         }
-
-        @Override
-        public int getCount() {
-            return 2;
-        }
-
-        @Override
-        public android.support.v4.app.Fragment getItem(int position) {
-            if (position == 1) {
-                return PullRequestCommitListFragment.newInstance(mRepoOwner, mRepoName, mPullRequestNumber);
-            }
-            else {
-                return PullRequestFragment.newInstance(mRepoOwner, mRepoName, mPullRequestNumber);
-            }
-        }
+    }
         
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-        }
-    }
-    
     @Override
     protected void navigateUp() {
         Gh4Application.get(this).openPullRequestListActivity(this, mRepoOwner, mRepoName,

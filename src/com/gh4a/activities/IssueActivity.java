@@ -47,6 +47,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.androidquery.AQuery;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.adapter.CommentAdapter;
@@ -62,7 +63,7 @@ import com.gh4a.utils.UiUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
-public class IssueActivity extends BaseSherlockFragmentActivity implements
+public class IssueActivity extends LoadingFragmentActivity implements
         OnClickListener, CommentAdapter.OnEditComment {
     private static final int REQUEST_EDIT = 1000;
 
@@ -82,13 +83,15 @@ public class IssueActivity extends BaseSherlockFragmentActivity implements
         }
         @Override
         public void onResultReady(LoaderResult<Issue> result) {
-            hideLoading();
-            invalidateOptionsMenu();
             if (!result.handleError(IssueActivity.this)) {
                 mIssue = result.getData();
                 mIssueState = mIssue.getState();
                 fillData();
+            } else {
+                setContentEmpty(true);
             }
+            setContentShown(true);
+            invalidateOptionsMenu();
         }
     };
 

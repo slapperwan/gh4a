@@ -15,19 +15,20 @@
  */
 package com.gh4a.activities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-
 import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 
-public class WikiActivity extends BaseSherlockFragmentActivity {
+public class WikiActivity extends LoadingFragmentActivity {
 
     private String mUserLogin;
     private String mRepoName;
@@ -40,13 +41,13 @@ public class WikiActivity extends BaseSherlockFragmentActivity {
         super.onCreate(savedInstanceState);
         
         setContentView(R.layout.web_viewer);
-        
+        setContentShown(false);
+
         mUserLogin = getIntent().getStringExtra(Constants.Repository.REPO_OWNER);
         mRepoName = getIntent().getStringExtra(Constants.Repository.REPO_NAME);
         mTitle = getIntent().getStringExtra(Constants.Blog.TITLE);
         mContent = getIntent().getStringExtra(Constants.Blog.CONTENT);
 
-        hideLoading();
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(mTitle);
         actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
@@ -55,11 +56,11 @@ public class WikiActivity extends BaseSherlockFragmentActivity {
         fillData();
     }
     
+    @SuppressLint("SetJavaScriptEnabled")
     private void fillData() {
-        
         WebView webView = (WebView) findViewById(R.id.web_view);
-
         WebSettings s = webView.getSettings();
+
         s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
         s.setUseWideViewPort(false);
         s.setAllowFileAccess(true);
@@ -79,7 +80,7 @@ public class WikiActivity extends BaseSherlockFragmentActivity {
 
         @Override
         public void onPageFinished(WebView webView, String url) {
-            hideLoading();
+            setContentShown(true);
         }
         
         @Override
