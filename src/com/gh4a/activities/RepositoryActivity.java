@@ -23,7 +23,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -73,8 +72,8 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         public void onResultReady(LoaderResult<Repository> result) {
             if (!result.handleError(RepositoryActivity.this)) {
                 mRepository = result.getData();
-                initializePager();
                 invalidateOptionsMenu();
+                updateTitle();
             } else {
                 setContentEmpty(true);
             }
@@ -161,7 +160,6 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
 
     private String mRepoOwner;
     private String mRepoName;
-    private ViewPager mPager;
     private ActionBar mActionBar;
     private ProgressDialog mProgressDialog;
 
@@ -217,7 +215,6 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             return;
         }
         
-        setContentView(R.layout.view_pager); //XXX move
         setContentShown(false);
         
         mActionBar = getSupportActionBar();
@@ -227,20 +224,12 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         getSupportLoaderManager().initLoader(LOADER_REPO, null, mRepoCallback);
         getSupportLoaderManager().initLoader(LOADER_WATCHING, null, mWatchCallback);
         getSupportLoaderManager().initLoader(LOADER_STARRING, null, mStarCallback);
-
-        getSupportLoaderManager().getLoader(LOADER_REPO);
-        getSupportLoaderManager().getLoader(LOADER_WATCHING);
-        getSupportLoaderManager().getLoader(LOADER_STARRING);
     }
 
-    private void initializePager() {
-        if (mPager != null) {
-            invalidateFragments();
-        } else {
-            mPager = setupPager();
-        }
+    private void updateTitle() {
         mActionBar.setSubtitle(StringUtils.isBlank(mSelectBranchTag) ?
                 mRepository.getMasterBranch() : mSelectBranchTag);
+        invalidateFragments();
     }
 
     @Override
@@ -252,8 +241,11 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
     protected Fragment getFragment(int position) {
         switch (position) {
             case 0:
-                mRepositoryFragment = RepositoryFragment.newInstance(mRepository);
-                return mRepositoryFragment;
+                if (mRepository != null) {
+                    mRepositoryFragment = RepositoryFragment.newInstance(mRepository);
+                    return mRepositoryFragment;
+                }
+                break;
             case 1:
                 if (mDirStack.isEmpty()) {
                     mDirStack.push(null);
@@ -326,7 +318,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
     
     @Override
     public void onBackPressed() {
-        if (mPager != null && mPager.getCurrentItem() == 1 && mDirStack.size() > 1) {
+        if (getPager().getCurrentItem() == 1 && mDirStack.size() > 1) {
             mDirStack.pop();
             invalidateFragments();
         } else {

@@ -58,25 +58,21 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 
-public class IssueCreateActivity extends LoadingFragmentActivity {
+public class IssueCreateActivity extends LoadingFragmentActivity implements OnClickListener {
     private String mRepoOwner;
     private String mRepoName;
-    private ActionBar mActionBar;
+    private int mIssueNumber;
+
     private List<Label> mSelectedLabels;
     private Milestone mSelectedMilestone;
     private User mSelectedAssignee;
-    private EditText mEtTitle;
-    private EditText mEtDesc;
-    private TextView mTvSelectedMilestone;
-    private TextView mTvSelectedAssignee;
-    private List<Label> mAllLabel;
     private List<Milestone> mAllMilestone;
     private List<User> mAllAssignee;
-    private LinearLayout mLinearLayoutLabels;
-    private int mIssueNumber;
-    private boolean mEditMode; 
     private Issue mEditIssue;
+
     private ProgressDialog mProgressDialog;
+    private TextView mTvSelectedMilestone;
+    private TextView mTvSelectedAssignee;
 
     private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
         @Override
@@ -87,8 +83,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity {
         public void onResultReady(LoaderResult<List<Label>> result) {
             stopProgressDialog(mProgressDialog);
             if (!result.handleError(IssueCreateActivity.this)) {
-                mAllLabel = result.getData();
-                fillLabels();
+                fillLabels(result.getData());
             }
         }
     };
@@ -96,7 +91,8 @@ public class IssueCreateActivity extends LoadingFragmentActivity {
     private LoaderCallbacks<List<Milestone>> mMilestoneCallback = new LoaderCallbacks<List<Milestone>>() {
         @Override
         public Loader<LoaderResult<List<Milestone>>> onCreateLoader(int id, Bundle args) {
-            return new MilestoneListLoader(IssueCreateActivity.this, mRepoOwner, mRepoName, "open");
+            return new MilestoneListLoader(IssueCreateActivity.this,
+                    mRepoOwner, mRepoName, Constants.Issue.ISSUE_STATE_OPEN);
         }
         @Override
         public void onResultReady(LoaderResult<List<Milestone>> result) {
@@ -132,12 +128,8 @@ public class IssueCreateActivity extends LoadingFragmentActivity {
         }
         @Override
         public void onResultReady(LoaderResult<Boolean> result) {
-            LinearLayout collaboratorLayout = (LinearLayout) findViewById(R.id.for_collaborator);
-            if (result.getData()) {
-                collaboratorLayout.setVisibility(View.VISIBLE);
-            }
-            else {
-                collaboratorLayout.setVisibility(View.GONE);
+            if (!result.handleError(IssueCreateActivity.this)) {
+                findViewById(R.id.for_collaborator).setVisibility(result.getData() ? View.VISIBLE : View.GONE);
             }
         }
     };
@@ -170,9 +162,6 @@ public class IssueCreateActivity extends LoadingFragmentActivity {
         mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
         mIssueNumber = data.getInt(Constants.Issue.ISSUE_NUMBER);
-        if (mIssueNumber != 0) {
-            mEditMode = true;
-        }
         
         if (!isOnline()) {
             setErrorView();
@@ -186,36 +175,31 @@ public class IssueCreateActivity extends LoadingFragmentActivity {
         }
         setContentView(R.layout.issue_create);
 
-        mActionBar = getSupportActionBar();
-        mActionBar.setTitle(mEditMode ? getString(R.string.issue_edit_title, mIssueNumber)
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(isInEditMode() ? getString(R.string.issue_edit_title, mIssueNumber)
                 : getString(R.string.issue_create));
-        mActionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        mActionBar.setDisplayHomeAsUpEnabled(true);
-        
-        mEtTitle = (EditText) findViewById(R.id.et_title);
-        mEtDesc = (EditText) findViewById(R.id.et_desc);
-        
-        mLinearLayoutLabels = (LinearLayout) findViewById(R.id.ll_labels);
-        mTvSelectedMilestone = (EditText) findViewById(R.id.et_milestone);
-        
-        mTvSelectedAssignee = (EditText) findViewById(R.id.et_assignee);
+        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
+        actionBar.setDisplayHomeAsUpEnabled(true);
         
         TextView tvIssueLabelAdd = (TextView) findViewById(R.id.tv_issue_label_add);
         tvIssueLabelAdd.setTypeface(Gh4Application.get(this).boldCondensed);
         tvIssueLabelAdd.setTextColor(getResources().getColor(R.color.highlight));
-        
-        LinearLayout collaboratorLayout = (LinearLayout) findViewById(R.id.for_collaborator);
-        collaboratorLayout.setVisibility(View.GONE);
+
+        mTvSelectedMilestone = (TextView) findViewById(R.id.et_milestone);
+        mTvSelectedAssignee = (TextView) findViewById(R.id.et_assignee);
 
         getSupportLoaderManager().initLoader(0, null, mLabelCallback);
         getSupportLoaderManager().initLoader(4, null, mIsCollaboratorCallback);
-        
-        if (mEditMode) {
+        if (isInEditMode()) {
             getSupportLoaderManager().initLoader(3, null, mIssueCallback);
         }
-        setContentShown(!mEditMode);
+        setContentShown(!isInEditMode());
     }
-    
+
+    private boolean isInEditMode() {
+        return mIssueNumber != 0;
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
@@ -233,12 +217,13 @@ public class IssueCreateActivity extends LoadingFragmentActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.accept:
-            String title = mEtTitle.getText() == null ? null : mEtTitle.getText().toString();
+            EditText etTitle = (EditText) findViewById(R.id.et_title);
+            String title = etTitle.getText() == null ? null : etTitle.getText().toString();
             if (StringUtils.isBlank(title)) {
-                mEtTitle.setError(getString(R.string.issue_error_title));
-            }
-            else {
-                new SaveIssueTask(title, mEtDesc.getText().toString()).execute();
+                etTitle.setError(getString(R.string.issue_error_title));
+            } else {
+                EditText etDesc = (EditText) findViewById(R.id.et_desc);
+                new SaveIssueTask(title, etDesc.getText().toString()).execute();
             }
             return true;
         case R.id.cancel:
@@ -252,8 +237,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity {
         if (mAllMilestone == null) {
             mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
             getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
-        }
-        else {
+        } else {
             showMilestonesDialog();
         }
     }
@@ -262,8 +246,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity {
         if (mAllAssignee == null) {
             mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
             getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
-        }
-        else {
+        } else {
             showAssigneesDialog();
         }
     }
@@ -283,7 +266,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity {
             IssueService issueService = (IssueService)
                     Gh4Application.get(mContext).getService(Gh4Application.ISSUE_SERVICE);
                     
-            Issue issue = mEditMode ? mEditIssue : new Issue();
+            Issue issue = isInEditMode() ? mEditIssue : new Issue();
             issue.setTitle(mTitle);
             issue.setBody(mBody);
 
@@ -291,7 +274,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity {
             issue.setMilestone(mSelectedMilestone);
             issue.setAssignee(mSelectedAssignee);
 
-            if (mEditMode) {
+            if (isInEditMode()) {
                 mEditIssue = issueService.editIssue(mRepoOwner, mRepoName, issue);
             } else {
                 mEditIssue = issueService.createIssue(mRepoOwner, mRepoName, issue);
@@ -302,7 +285,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity {
         @Override
         protected void onSuccess(Void result) {
             ToastUtils.showMessage(mContext,
-                    mEditMode ? R.string.issue_success_edit : R.string.issue_success_create);
+                    isInEditMode() ? R.string.issue_success_edit : R.string.issue_success_create);
             Gh4Application.get(IssueCreateActivity.this).openIssueActivity(IssueCreateActivity.this, 
                     mRepoOwner, mRepoName, mEditIssue.getNumber(),
                     Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -335,8 +318,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity {
             public void onClick(DialogInterface dialog, int which) {
                 if (which == 0) {
                     mSelectedMilestone = null;
-                }
-                else {
+                } else {
                     mSelectedMilestone = mAllMilestone.get(which - 1);
                 }
             }
@@ -346,8 +328,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity {
                 if (mSelectedMilestone != null) {
                     mTvSelectedMilestone.setText(getString(
                             R.string.issue_milestone, mSelectedMilestone.getTitle()));
-                }
-                else {
+                } else {
                     mTvSelectedMilestone.setText(null);
                 }
             }
@@ -379,8 +360,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity {
             public void onClick(DialogInterface dialog, int which) {
                 if (which == 0) {
                     mSelectedAssignee = null;
-                }
-                else {
+                } else {
                     mSelectedAssignee = mAllAssignee.get(which - 1);
                 }
             }
@@ -390,8 +370,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity {
                 if (mSelectedAssignee != null) {
                     mTvSelectedAssignee.setText(getString(
                             R.string.issue_assignee, mSelectedAssignee.getLogin()));
-                }
-                else {
+                } else {
                     mTvSelectedAssignee.setText(null);
                 }
             }
@@ -400,10 +379,11 @@ public class IssueCreateActivity extends LoadingFragmentActivity {
         builder.show();
     }
     
-    public void fillLabels() {
-        final Gh4Application app = Gh4Application.get(this);
-        
-        for (final Label label : mAllLabel) {
+    public void fillLabels(List<Label> labels) {
+        Gh4Application app = Gh4Application.get(this);
+        LinearLayout labelLayout = (LinearLayout) findViewById(R.id.ll_labels);
+
+        for (final Label label : labels) {
             final View rowView = getLayoutInflater().inflate(R.layout.row_issue_create_label, null);
             View viewColor = (View) rowView.findViewById(R.id.view_color);
             viewColor.setBackgroundColor(Color.parseColor("#" + label.getColor()));
@@ -411,70 +391,54 @@ public class IssueCreateActivity extends LoadingFragmentActivity {
             final TextView tvLabel = (TextView) rowView.findViewById(R.id.tv_title);
             tvLabel.setTypeface(app.condensed);
             tvLabel.setText(label.getName());
-            tvLabel.setOnClickListener(new OnClickListener() {
-                
-                @Override
-                public void onClick(View v) {
-                    if (mSelectedLabels.contains(label)) {
-                        mSelectedLabels.remove(label);
-                        
-                        tvLabel.setTypeface(app.condensed);
-                        tvLabel.setBackgroundColor(0);
-                        if (Gh4Application.THEME == R.style.LightTheme) {
-                            tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_light));
-                        }
-                        else {
-                            tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_dark));                            
-                        }
-                    }
-                    else {
-                        mSelectedLabels.add(label);
-                        
-                        tvLabel.setTypeface(app.boldCondensed);
-                        tvLabel.setBackgroundColor(Color.parseColor("#" + label.getColor()));
-                        int r = Color.red(Color.parseColor("#" + label.getColor()));
-                        int g = Color.green(Color.parseColor("#" + label.getColor()));
-                        int b = Color.blue(Color.parseColor("#" + label.getColor()));
-                        if (r + g + b < 383) {
-                            tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_dark));
-                        }
-                        else {
-                            tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_light));
-                        }               
-                    }
-                }
-            });
+            tvLabel.setOnClickListener(this);
+            tvLabel.setTag(label);
             
-            if (mEditMode) {
-                if (mSelectedLabels.contains(label)) {
-                    tvLabel.setTypeface(app.boldCondensed);
-                    tvLabel.setBackgroundColor(Color.parseColor("#" + label.getColor()));
-                    int r = Color.red(Color.parseColor("#" + label.getColor()));
-                    int g = Color.green(Color.parseColor("#" + label.getColor()));
-                    int b = Color.blue(Color.parseColor("#" + label.getColor()));
-                    if (r + g + b < 383) {
-                        tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_dark));
-                    }
-                    else {
-                        tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_light));
-                    }           
-                }
-                else {
-                    tvLabel.setTypeface(app.condensed);
-                    tvLabel.setBackgroundColor(0);
-                    if (Gh4Application.THEME == R.style.LightTheme) {
-                        tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_light));
-                    }
-                    else {
-                        tvLabel.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_dark));                         
-                    }
-                }
+            if (isInEditMode()) {
+                handleLabelClick(tvLabel, label, mSelectedLabels.contains(label));
             }
             
-            mLinearLayoutLabels.addView(rowView);
+            labelLayout.addView(rowView);
         }
     }
-    
+
+    @Override
+    public void onClick(View view) {
+        if (view.getTag() instanceof Label) {
+            Label label = (Label) view.getTag();
+            TextView tvLabel = (TextView) view;
+
+            if (mSelectedLabels.contains(label)) {
+                mSelectedLabels.remove(label);
+                handleLabelClick(tvLabel, label, false);
+            } else {
+                mSelectedLabels.add(label);
+                handleLabelClick(tvLabel, label, true);
+            }
+        }
+    }
+
+    private void handleLabelClick(TextView tvLabel, Label label, boolean select) {
+        Gh4Application app = Gh4Application.get(this);
+        boolean isDark;
+        if (!select) {
+            mSelectedLabels.remove(label);
+            tvLabel.setTypeface(app.condensed);
+            tvLabel.setBackgroundColor(0);
+            isDark = Gh4Application.THEME != R.style.LightTheme;
+        } else {
+            int color = Color.parseColor("#" + label.getColor());
+
+            mSelectedLabels.add(label);
+            tvLabel.setTypeface(app.boldCondensed);
+            tvLabel.setBackgroundColor(color);
+            isDark = Color.red(color) + Color.green(color) + Color.blue(color) < 383;
+        }
+        tvLabel.setTextColor(getResources().getColor(isDark
+                ? R.color.abs__primary_text_holo_dark : R.color.abs__primary_text_holo_light));
+        
+    }
+
     private void fillIssueData() {
         EditText etTitle = (EditText) findViewById(R.id.et_title);
         etTitle.setText(mEditIssue.getTitle());
@@ -486,7 +450,6 @@ public class IssueCreateActivity extends LoadingFragmentActivity {
         mSelectedLabels.addAll(mEditIssue.getLabels());
         
         mSelectedMilestone = mEditIssue.getMilestone();
-        
         mSelectedAssignee = mEditIssue.getAssignee();
         
         if (mSelectedMilestone != null) {

@@ -13,7 +13,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
-import android.support.v4.view.ViewPager;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
@@ -39,7 +38,6 @@ public class UserActivity extends LoadingFragmentPagerActivity {
     public String mUserLogin;
     public String mUserName;
     private boolean mIsLoginUserPage;
-    private ViewPager mPager;
     private UserFragment mUserFragment;
     private PrivateEventListFragment mPrivateEventListFragment;
     private PublicEventListFragment mPublicEventListFragment;
@@ -69,22 +67,20 @@ public class UserActivity extends LoadingFragmentPagerActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
-        super.onCreate(savedInstanceState);
-        
+
         Bundle data = getIntent().getExtras();
         mUserLogin = data.getString(Constants.User.USER_LOGIN);
         mUserName = data.getString(Constants.User.USER_NAME);
+        mIsLoginUserPage = mUserLogin.equals(Gh4Application.get(this).getAuthLogin());
+        
+        super.onCreate(savedInstanceState);
         
         if (!isOnline()) {
             setErrorView();
             return;
         }
 
-        setContentView(R.layout.view_pager);
-
         BugSenseHandler.setup(this, "6e1b031");
-        
-        mIsLoginUserPage = mUserLogin.equals(Gh4Application.get(this).getAuthLogin());
         
         ActionBar actionBar = getSupportActionBar();
         if (mIsLoginUserPage) {
@@ -93,10 +89,6 @@ public class UserActivity extends LoadingFragmentPagerActivity {
         } else {
             actionBar.setTitle(mUserLogin);
             actionBar.setDisplayHomeAsUpEnabled(true);
-        }
-        setupPager();
-
-        if (!mUserLogin.equals(Gh4Application.get(this).getAuthLogin())) {
             getSupportLoaderManager().initLoader(4, null, mIsFollowingCallback);
         }
     }
@@ -138,31 +130,28 @@ public class UserActivity extends LoadingFragmentPagerActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        boolean isSelf = mUserLogin.equals(Gh4Application.get(this).getAuthLogin());
         boolean authorized = Gh4Application.get(this).isAuthorized();
 
         MenuItem logoutAction = menu.findItem(R.id.logout);
         logoutAction.setTitle(authorized ? R.string.logout : R.string.login);
-        logoutAction.setVisible(isSelf || !authorized);
+        logoutAction.setVisible(mIsLoginUserPage || !authorized);
 
         MenuItem followAction = menu.findItem(R.id.follow);
-        followAction.setVisible(!isSelf && authorized);
+        followAction.setVisible(!mIsLoginUserPage && authorized);
         if (followAction.isVisible()) {
             if (mIsFollowing == null) {
                 followAction.setActionView(R.layout.ab_loading);
                 followAction.expandActionView();
-            }
-            else if (mIsFollowing) {
+            } else if (mIsFollowing) {
                 followAction.setTitle(R.string.user_unfollow_action);
-            }
-            else {
+            } else {
                 followAction.setTitle(R.string.user_follow_action);
             }
         }
 
-        menu.findItem(R.id.bookmarks).setVisible(isSelf);
-        menu.findItem(R.id.share).setVisible(!isSelf);
-        menu.findItem(R.id.bookmark).setVisible(!isSelf);
+        menu.findItem(R.id.bookmarks).setVisible(mIsLoginUserPage);
+        menu.findItem(R.id.share).setVisible(!mIsLoginUserPage);
+        menu.findItem(R.id.bookmark).setVisible(!mIsLoginUserPage);
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -172,8 +161,7 @@ public class UserActivity extends LoadingFragmentPagerActivity {
         if (Gh4Application.get(this).isAuthorized()) {
             Gh4Application app = Gh4Application.get(this);
             app.openUserInfoActivity(this, app.getAuthLogin(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        }
-        else {
+        } else {
             Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP
                     |Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -187,20 +175,17 @@ public class UserActivity extends LoadingFragmentPagerActivity {
             case R.id.refresh:
                 item.setActionView(R.layout.ab_loading);
                 item.expandActionView();
-                int currentTab = mPager.getCurrentItem();
-                if (currentTab == 0 && mUserFragment != null) {
+                if (mUserFragment != null) {
                     mUserFragment.refresh();
-                } 
-                else if (currentTab == 1 && mPrivateEventListFragment != null) {
+                }
+                if (mPrivateEventListFragment != null) {
                     mPrivateEventListFragment.refresh();
                 }
-                else if (currentTab == 2 && mPublicEventListFragment != null) {
+                if (mPublicEventListFragment != null) {
                     mPublicEventListFragment.refresh();
                 }
-                else {
-                    if (mRepositoryIssueListFragment != null) {
-                        mRepositoryIssueListFragment.refresh();
-                    }
+                if (mRepositoryIssueListFragment != null) {
+                    mRepositoryIssueListFragment.refresh();
                 }
                 return true;
             case R.id.dark:
@@ -216,17 +201,17 @@ public class UserActivity extends LoadingFragmentPagerActivity {
                 saveTheme(R.style.LightDarkTheme);
                 return true;
             case R.id.pub_timeline:
-                Intent intent = new Intent().setClass(this, ExploreActivity.class);
+                Intent intent = new Intent(this, ExploreActivity.class);
                 intent.putExtra("exploreItem", 0);
                 startActivity(intent);
                 return true;
             case R.id.trend:
-                intent = new Intent().setClass(this, ExploreActivity.class);
+                intent = new Intent(this, ExploreActivity.class);
                 intent.putExtra("exploreItem", 1);
                 startActivity(intent);
                 return true;
             case R.id.blog:
-                intent = new Intent().setClass(this, ExploreActivity.class);
+                intent = new Intent(this, ExploreActivity.class);
                 intent.putExtra("exploreItem", 2);
                 startActivity(intent);
                 return true;

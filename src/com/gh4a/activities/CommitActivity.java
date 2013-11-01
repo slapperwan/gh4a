@@ -55,15 +55,11 @@ public class CommitActivity extends LoadingFragmentPagerActivity {
             return;
         }
         
-        setContentView(R.layout.view_pager);
-
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getResources().getQuantityString(R.plurals.commit, 1)
                 + " " + mObjectSha.substring(0, 7));
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
-        
-        setupPager();
     }
 
     @Override

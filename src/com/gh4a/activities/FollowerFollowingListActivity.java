@@ -47,13 +47,9 @@ public class FollowerFollowingListActivity extends LoadingFragmentPagerActivity 
             return;
         }
         
-        setContentView(R.layout.view_pager);
-        
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(mUserLogin);
         actionBar.setDisplayHomeAsUpEnabled(true);
-
-        setupPager();
     }
 
     @Override

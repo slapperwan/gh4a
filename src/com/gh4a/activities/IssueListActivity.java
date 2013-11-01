@@ -31,8 +31,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
-import android.view.View;
-import android.view.View.OnClickListener;
+import android.text.TextUtils;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
@@ -54,7 +53,7 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
 import com.gh4a.utils.UiUtils;
 
-public class IssueListActivity extends LoadingFragmentPagerActivity implements OnClickListener {
+public class IssueListActivity extends LoadingFragmentPagerActivity {
     private String mRepoOwner;
     private String mRepoName;
     private String mState;
@@ -63,7 +62,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity implements O
     private IssueListFragment mSubmitFragment;
     private ActionBar mActionBar;
     private Map<String, String> mFilterData;
-    private boolean isCollaborator;
+    private boolean mIsCollaborator;
     private ProgressDialog mProgressDialog;
     private List<Label> mLabels;
     private List<Milestone> mMilestones;
@@ -129,7 +128,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity implements O
         @Override
         public void onResultReady(LoaderResult<Boolean> result) {
             if (!checkForError(result)) {
-                isCollaborator = result.getData();
+                mIsCollaborator = result.getData();
                 invalidateOptionsMenu();
             }
         }
@@ -153,20 +152,16 @@ public class IssueListActivity extends LoadingFragmentPagerActivity implements O
             return;
         }
         
-        setContentView(R.layout.view_pager);
-
         getSupportLoaderManager().initLoader(3, null, mIsCollaboratorCallback);
 
         mActionBar = getSupportActionBar();
-        updateTitle();
         mActionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         mActionBar.setDisplayHomeAsUpEnabled(true);
-        
-        setupPager();
+        updateTitle();
     }
 
     private void updateTitle() {
-        if (mState == null || "open".equals(mState)) {
+        if (mState == null || Constants.Issue.ISSUE_STATE_OPEN.equals(mState)) {
             mActionBar.setTitle(R.string.issue_open);
         } else {
             mActionBar.setTitle(R.string.issue_closed);
@@ -208,9 +203,9 @@ public class IssueListActivity extends LoadingFragmentPagerActivity implements O
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.issues_menu, menu);
-        menu.findItem(R.id.view_open_closed).setTitle("open".equals(mState)
+        menu.findItem(R.id.view_open_closed).setTitle(Constants.Issue.ISSUE_STATE_OPEN.equals(mState)
                 ? R.string.issue_view_closed_issues : R.string.issue_view_open_issues);
-        if (!isCollaborator) {
+        if (!mIsCollaborator) {
             menu.removeItem(R.id.view_labels);
             menu.removeItem(R.id.view_milestones);
         }
@@ -228,12 +223,11 @@ public class IssueListActivity extends LoadingFragmentPagerActivity implements O
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.view_open_closed:
-            if ("open".equals(mState)) {
+            if (Constants.Issue.ISSUE_STATE_OPEN.equals(mState)) {
                 mState = Constants.Issue.ISSUE_STATE_CLOSED;
                 mFilterData.put("state", Constants.Issue.ISSUE_STATE_CLOSED);
                 item.setTitle(R.string.issue_view_open_issues);
-            }
-            else {
+            } else {
                 mState = Constants.Issue.ISSUE_STATE_OPEN;
                 mFilterData.put("state", Constants.Issue.ISSUE_STATE_OPEN);
                 item.setTitle(R.string.issue_view_closed_issues);
@@ -242,25 +236,24 @@ public class IssueListActivity extends LoadingFragmentPagerActivity implements O
             return true;
         case R.id.create_issue:
             if (Gh4Application.get(this).isAuthorized()) {
-                Intent intent = new Intent().setClass(this, IssueCreateActivity.class);
+                Intent intent = new Intent(this, IssueCreateActivity.class);
                 intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
                 intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                 startActivity(intent);
-            }
-            else {
-                Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+            } else {
+                Intent intent = new Intent(this, Github4AndroidActivity.class);
                 startActivity(intent);
                 finish();
             }
             return true;
         case R.id.view_labels:
-            Intent intent = new Intent().setClass(IssueListActivity.this, IssueLabelListActivity.class);
+            Intent intent = new Intent(this, IssueLabelListActivity.class);
             intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
             intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
             startActivity(intent);
             return true;
         case R.id.view_milestones:
-            intent = new Intent().setClass(IssueListActivity.this, IssueMilestoneListActivity.class);
+            intent = new Intent(this, IssueMilestoneListActivity.class);
             intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
             intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
             startActivity(intent);
@@ -270,17 +263,14 @@ public class IssueListActivity extends LoadingFragmentPagerActivity implements O
             if ("desc".equals(direction) || direction == null) {
                 if (Gh4Application.THEME == R.style.LightTheme) {
                     item.setIcon(R.drawable.navigation_collapse);
-                }
-                else {
+                } else {
                     item.setIcon(R.drawable.navigation_collapse_dark);
                 }
                 mFilterData.put("direction", "asc");
-            }
-            else {
+            } else {
                 if (Gh4Application.THEME == R.style.LightTheme) {
                     item.setIcon(R.drawable.navigation_expand);
-                }
-                else {
+                } else {
                     item.setIcon(R.drawable.navigation_expand_dark);
                 }
                 mFilterData.put("direction", "desc");
@@ -291,8 +281,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity implements O
             if (mLabels == null) {
                 mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
                 getSupportLoaderManager().initLoader(0, null, mLabelCallback);
-            }
-            else {
+            } else {
                 showLabelsDialog();
             }
             return true;
@@ -300,8 +289,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity implements O
             if (mMilestones == null) {
                 mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
                 getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
-            }
-            else {
+            } else {
                 showMilestonesDialog();
             }
             return true;
@@ -309,8 +297,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity implements O
             if (mAssignees == null) {
                 mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
                 getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
-            }
-            else {
+            } else {
                 showAssigneesDialog();
             }
             return true;
@@ -318,14 +305,6 @@ public class IssueListActivity extends LoadingFragmentPagerActivity implements O
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-        default:
-            break;
-        }
-    }
-    
     private void reloadIssueList() {
         updateTitle();
         mSubmitFragment = null;
@@ -336,25 +315,16 @@ public class IssueListActivity extends LoadingFragmentPagerActivity implements O
     
     private void showLabelsDialog() {
         String selectedLabels = mFilterData.get("labels");
-        String[] checkedLabels = new String[] {};
-        
-        if (selectedLabels != null) {
-            checkedLabels = selectedLabels.split(",");
-        }
+        String[] checkedLabels = selectedLabels != null ?
+                selectedLabels.split(",") : new String[] {};
         List<String> checkLabelStringList = Arrays.asList(checkedLabels);
         final boolean[] checkedItems = new boolean[mLabels.size()];
-
         final String[] allLabelArray = new String[mLabels.size()];
         
         for (int i = 0; i < mLabels.size(); i++) {
             Label l = mLabels.get(i);
             allLabelArray[i] = l.getName();
-            if(checkLabelStringList.contains(l.getName())) {
-                checkedItems[i] = true;
-            }
-            else {
-                checkedItems[i] = false;
-            }
+            checkedItems[i] = checkLabelStringList.contains(l.getName());
         }
         
         AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
@@ -389,8 +359,8 @@ public class IssueListActivity extends LoadingFragmentPagerActivity implements O
         milestoneIds[0] = 0;
         
         String checkedMilestoneNumber = mFilterData.get("milestone");
-        int checkedItem = checkedMilestoneNumber != null && !"".equals(checkedMilestoneNumber) ? 
-                 Integer.parseInt(checkedMilestoneNumber) : 0;
+        int checkedItem = TextUtils.isEmpty(checkedMilestoneNumber)
+                ? 0 : Integer.parseInt(checkedMilestoneNumber);
         
         for (int i = 1; i <= mMilestones.size(); i++) {
             Milestone m = mMilestones.get(i - 1);
@@ -409,8 +379,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity implements O
             public void onClick(DialogInterface dialog, int which) {
                 if (which == 0) {
                     mFilterData.remove("milestone");
-                }
-                else {
+                } else {
                     mFilterData.put("milestone", String.valueOf(milestoneIds[which]));
                 }
             }
@@ -448,8 +417,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity implements O
             public void onClick(DialogInterface dialog, int which) {
                 if (which == 0) {
                     mFilterData.remove("assignee");
-                }
-                else {
+                } else {
                     mFilterData.put("assignee", assignees[which]);
                 }
             }

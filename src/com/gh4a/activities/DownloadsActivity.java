@@ -34,14 +34,10 @@ public class DownloadsActivity extends LoadingFragmentPagerActivity {
             return;
         }
         
-        setContentView(R.layout.view_pager);
-        
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.downloads);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
-
-        setupPager();
     }
 
     @Override

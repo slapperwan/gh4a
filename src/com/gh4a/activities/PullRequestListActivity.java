@@ -48,14 +48,10 @@ public class PullRequestListActivity extends LoadingFragmentPagerActivity {
             return;
         }
         
-        setContentView(R.layout.view_pager);
-
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.pull_requests);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
-
-        setupPager();
     }
 
     @Override

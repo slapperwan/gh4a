@@ -101,6 +101,8 @@
     <string name="view_more">View more</string>
     <string name="pull">Pull</string>
     <string name="requests">Requests</string>
+    <string name="issue_milestone_hint">Milestone</string>
+    <string name="issue_assignee_hint">Assignee</string>
 
     <plurals name="file">
         <item quantity="one">File</item>

@@ -49,14 +49,10 @@ public class IssueMilestoneListActivity extends LoadingFragmentPagerActivity {
             return;
         }
         
-        setContentView(R.layout.view_pager);
-        
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.issue_manage_milestones);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
-
-        setupPager();
     }
 
     @Override

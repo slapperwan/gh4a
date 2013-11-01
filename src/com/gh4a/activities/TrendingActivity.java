@@ -30,15 +30,11 @@ public class TrendingActivity extends LoadingFragmentPagerActivity {
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.view_pager);
         
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.trend);
         actionBar.setSubtitle(R.string.explore);
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         actionBar.setDisplayHomeAsUpEnabled(true);
-
-        setupPager();
     }
     
     @Override

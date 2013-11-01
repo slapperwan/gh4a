@@ -50,13 +50,9 @@ public class WatcherListActivity extends LoadingFragmentPagerActivity {
             return;
         }
         
-        setContentView(R.layout.view_pager);
-        
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
-
-        setupPager();
         actionBar.selectTab(actionBar.getTabAt(data.getInt("pos")));
     }
 

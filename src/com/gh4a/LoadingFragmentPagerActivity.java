@@ -12,22 +12,30 @@ import com.actionbarsherlock.app.ActionBar.Tab;
 
 public abstract class LoadingFragmentPagerActivity extends LoadingFragmentActivity {
     private FragmentAdapter mAdapter;
+    private ViewPager mPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAdapter = new FragmentAdapter();
+        setContentView(R.layout.view_pager);
+        mPager = setupPager();
     }
 
     protected void invalidateFragments() {
         mAdapter.notifyDataSetChanged();
     }
 
-    protected ViewPager setupPager() {
+    protected ViewPager getPager() {
+        return mPager;
+    }
+
+    private ViewPager setupPager() {
         final ActionBar actionBar = getSupportActionBar();
         int[] titleResIds = getTabTitleResIds();
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(mAdapter);
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
