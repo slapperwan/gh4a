@@ -16,16 +16,17 @@
     android:background="?attr/selectableItemBackground" >
     <TextView
         android:id="@+id/tv_title"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium" />
     <TextView
         android:id="@+id/tv_desc"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:maxLines="2"/>
+        android:singleLine="true"
+        android:ellipsize="end" />
     <TextView
         android:id="@+id/tv_extra"
         android:layout_width="wrap_content"

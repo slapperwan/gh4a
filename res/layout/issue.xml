@@ -1,25 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true" >
 
     <ListView
         android:id="@+id/list_view"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:padding="0dp"
-        android:layout_above="@+id/divider"
-        android:fastScrollEnabled="true" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/divider" />
 
     <View
         android:id="@+id/divider"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_above="@+id/comment"
-        android:background="#ff0099cc"
+        android:background="@color/highlight"
         android:layout_marginBottom="5dp" />
 
     <LinearLayout

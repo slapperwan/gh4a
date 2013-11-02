@@ -9,7 +9,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="?android:attr/listPreferredItemHeight"
     android:paddingTop="8dp"
@@ -28,7 +28,7 @@
         android:layout_toRightOf="@id/iv_gravatar" />
     <TextView
         android:id="@+id/tv_desc"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:maxLines="2"
@@ -37,7 +37,7 @@
         android:layout_below="@id/tv_sha" />
     <TextView
         android:id="@+id/tv_extra"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_toRightOf="@id/iv_gravatar"

@@ -23,7 +23,6 @@ import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.User;
 
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.text.format.DateFormat;
@@ -33,7 +32,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
@@ -52,6 +50,7 @@ import com.gh4a.loader.RepositoryListLoader;
 import com.gh4a.loader.UserLoader;
 import com.gh4a.utils.GravatarUtils;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.UiUtils;
 
 public class UserFragment extends ProgressFragment implements  OnClickListener {
     private String mUserLogin;
@@ -149,42 +148,38 @@ public class UserFragment extends ProgressFragment implements  OnClickListener {
 
     private void fillData() {
         Gh4Application app = (Gh4Application) getActivity().getApplication();
-        Typeface boldCondensed = app.boldCondensed;
-        Typeface regular = app.regular;
+
+        UiUtils.assignTypeface(mContentView, app.boldCondensed, new int[] {
+            R.id.tv_name, R.id.tv_followers_count, R.id.tv_members_count,
+            R.id.tv_repos_count, R.id.tv_gists_count, R.id.tv_following_count,
+            R.id.tv_pub_repos_label, R.id.tv_orgs
+        });
+        UiUtils.assignTypeface(mContentView, app.regular, new int[] {
+            R.id.tv_created_at, R.id.tv_email, R.id.tv_website,
+            R.id.tv_company, R.id.tv_location
+        });
         
         AQuery aq = new AQuery(getActivity());
         aq.id(R.id.iv_gravatar).image(GravatarUtils.getGravatarUrl(mUser.getGravatarId()), 
                 true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), AQuery.FADE_IN);
 
-        TextView tvName = (TextView) mContentView.findViewById(R.id.tv_name);
-        tvName.setTypeface(boldCondensed);
-        
-        TextView tvCreated = (TextView) mContentView.findViewById(R.id.tv_created_at);
-        tvCreated.setTypeface(regular);
-        
         TextView tvFollowersCount = (TextView) mContentView.findViewById(R.id.tv_followers_count);
-        tvFollowersCount.setTypeface(boldCondensed);
         tvFollowersCount.setText(String.valueOf(mUser.getFollowers()));
         
-        TableLayout tlOrgMembers = (TableLayout) mContentView.findViewById(R.id.cell_org_members);
-        TableLayout tlFollowers = (TableLayout) mContentView.findViewById(R.id.cell_followers);
+        View llOrgMembers = mContentView.findViewById(R.id.cell_org_members);
+        View llFollowers = mContentView.findViewById(R.id.cell_followers);
         
         if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
-            tlFollowers.setOnClickListener(this);
-            tlOrgMembers.setVisibility(View.GONE);
+            llFollowers.setOnClickListener(this);
+            llOrgMembers.setVisibility(View.GONE);
         } else {
-            TextView tvMemberCount = (TextView) mContentView.findViewById(R.id.tv_members_count);
-            tvMemberCount.setTypeface(boldCondensed);
-
-            tlOrgMembers.setOnClickListener(this);
-            tlFollowers.setVisibility(View.GONE);
+            llOrgMembers.setOnClickListener(this);
+            llFollowers.setVisibility(View.GONE);
         }
         
         mContentView.findViewById(R.id.cell_repos).setOnClickListener(this);
         
         TextView tvReposCount = (TextView) mContentView.findViewById(R.id.tv_repos_count);
-        tvReposCount.setTypeface(boldCondensed);
-        
         if (mUserLogin.equals(Gh4Application.get(getActivity()).getAuthLogin())) {
             tvReposCount.setText(String.valueOf(mUser.getTotalPrivateRepos() + mUser.getPublicRepos()));    
         } else {
@@ -192,10 +187,11 @@ public class UserFragment extends ProgressFragment implements  OnClickListener {
         }
         
         //hide gists repos if organization
-        fillCountIfUser(R.id.cell_gists, R.id.tv_gists_count, mUser.getPublicGists(), app);
+        fillCountIfUser(R.id.cell_gists, R.id.tv_gists_count, mUser.getPublicGists());
         //hide following if organization
-        fillCountIfUser(R.id.cell_following, R.id.tv_following_count, mUser.getFollowing(), app);
-        
+        fillCountIfUser(R.id.cell_following, R.id.tv_following_count, mUser.getFollowing());
+
+        TextView tvName = (TextView) mContentView.findViewById(R.id.tv_name);
         tvName.setText(StringUtils.isBlank(mUser.getName()) ? mUser.getLogin() : mUser.getName());
         if (Constants.User.USER_TYPE_ORG.equals(mUser.getType())) {
             tvName.append(" (");
@@ -203,6 +199,7 @@ public class UserFragment extends ProgressFragment implements  OnClickListener {
             tvName.append(")");
         }
 
+        TextView tvCreated = (TextView) mContentView.findViewById(R.id.tv_created_at);
         if (mUser.getCreatedAt() != null) {
             tvCreated.setText(getString(R.string.user_created_at,
                     DateFormat.getMediumDateFormat(getActivity()).format(mUser.getCreatedAt())));
@@ -211,39 +208,29 @@ public class UserFragment extends ProgressFragment implements  OnClickListener {
             tvCreated.setVisibility(View.GONE);
         }
 
-        fillTextView(R.id.tv_email, mUser.getEmail(), app);
-        fillTextView(R.id.tv_website, mUser.getBlog(), app);
-        fillTextView(R.id.tv_company, mUser.getCompany(), app);
-        fillTextView(R.id.tv_location, mUser.getLocation(), app);
-        
-        TextView tvPubRepo = (TextView) mContentView.findViewById(R.id.tv_pub_repos_label);
-        tvPubRepo.setTypeface(boldCondensed);
-        
-        TextView tvOrgs = (TextView) mContentView.findViewById(R.id.tv_orgs);
-        tvOrgs.setTypeface(boldCondensed);
-        tvOrgs.setTextColor(getResources().getColor(R.color.highlight));
+        fillTextView(R.id.tv_email, mUser.getEmail());
+        fillTextView(R.id.tv_website, mUser.getBlog());
+        fillTextView(R.id.tv_company, mUser.getCompany());
+        fillTextView(R.id.tv_location, mUser.getLocation());
         
         getLoaderManager().initLoader(1, null, mRepoListCallback);
         getLoaderManager().initLoader(2, null, mOrganizationCallback);
     }
 
-    private void fillCountIfUser(int layoutId, int countId, int count, Gh4Application app) {
-        TableLayout layout = (TableLayout) mContentView.findViewById(layoutId);
+    private void fillCountIfUser(int layoutId, int countId, int count) {
+        View layout = mContentView.findViewById(layoutId);
         if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
             TextView countView = (TextView) mContentView.findViewById(countId);
-            countView.setTypeface(app.boldCondensed);
             countView.setText(String.valueOf(count));
-        
             layout.setOnClickListener(this);
         } else {
             layout.setVisibility(View.GONE);
         }
     }
 
-    private void fillTextView(int id, String text, Gh4Application app) {
+    private void fillTextView(int id, String text) {
         TextView view = (TextView) mContentView.findViewById(id);
         if (!StringUtils.isBlank(text)) {
-            view.setTypeface(app.regular);
             view.setText(text);
             view.setVisibility(View.VISIBLE);
         } else {
@@ -292,7 +279,6 @@ public class UserFragment extends ProgressFragment implements  OnClickListener {
 
     public void fillTopRepos(List<Repository> topRepos) {
         Gh4Application app = Gh4Application.get(getActivity());
-        Typeface boldCondensed = app.boldCondensed;
         
         LinearLayout ll = (LinearLayout) mContentView.findViewById(R.id.ll_top_repos);
         ll.removeAllViews();
@@ -307,7 +293,7 @@ public class UserFragment extends ProgressFragment implements  OnClickListener {
             rowView.setTag(repo);
 
             TextView tvTitle = (TextView) rowView.findViewById(R.id.tv_title);
-            tvTitle.setTypeface(boldCondensed);
+            tvTitle.setTypeface(app.boldCondensed);
             tvTitle.setText(repo.getOwner().getLogin() + "/" + repo.getName());
 
             TextView tvDesc = (TextView) rowView.findViewById(R.id.tv_desc);
@@ -342,11 +328,8 @@ public class UserFragment extends ProgressFragment implements  OnClickListener {
     
     public void fillOrganizations(List<User> organizations) {
         Gh4Application app = Gh4Application.get(getActivity());
-        Typeface boldCondensed = app.boldCondensed;
-        
-        View v = getView();
-        LinearLayout llOrgs = (LinearLayout) v.findViewById(R.id.ll_orgs);
-        LinearLayout llOrg = (LinearLayout) v.findViewById(R.id.ll_org);
+        LinearLayout llOrgs = (LinearLayout) mContentView.findViewById(R.id.ll_orgs);
+        LinearLayout llOrg = (LinearLayout) mContentView.findViewById(R.id.ll_org);
         int count = organizations != null ? organizations.size() : 0;
         LayoutInflater inflater = getLayoutInflater(null);
 
@@ -361,7 +344,7 @@ public class UserFragment extends ProgressFragment implements  OnClickListener {
             rowView.setTag(org);
                 
             TextView tvTitle = (TextView) rowView.findViewById(R.id.tv_title);
-            tvTitle.setTypeface(boldCondensed);
+            tvTitle.setTypeface(app.boldCondensed);
             tvTitle.setText(org.getLogin());
 
             llOrg.addView(rowView);

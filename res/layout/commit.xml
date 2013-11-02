@@ -4,11 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
     <LinearLayout
-        android:id="@+id/main_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="8dp" >
+        android:padding="@dimen/content_padding" >
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
@@ -16,8 +15,8 @@
                 android:id="@+id/iv_gravatar"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginRight="8dp" />
+                android:layout_marginRight="8dp"
+                android:layout_centerVertical="true" />
             <TextView
                 android:id="@+id/tv_extra"
                 android:layout_width="match_parent"
@@ -38,13 +37,13 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall" 
             android:textStyle="italic"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="@dimen/overview_item_spacing" />
         <LinearLayout
             android:id="@+id/ll_changed"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp" >
+            android:layout_marginTop="@dimen/overview_item_spacing" >
             <TextView
                 android:id="@+id/commit_changed"
                 android:layout_width="wrap_content"
@@ -53,17 +52,17 @@
                 android:textColor="@color/highlight"
                 android:text="@string/commit_changed" />
             <View
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginBottom="8dp"
-                android:background="#ff0099cc" />
+                android:layout_marginBottom="@dimen/overview_header_spacing"
+                android:background="@color/highlight" />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/ll_added"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp" >
+            android:layout_marginTop="@dimen/overview_item_spacing" >
             <TextView
                 android:id="@+id/commit_added"
                 android:layout_width="wrap_content"
@@ -72,17 +71,17 @@
                 android:textColor="@color/highlight"
                 android:text="@string/commit_added" />
             <View
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginBottom="8dp"
-                android:background="#ff0099cc" />
+                android:layout_marginBottom="@dimen/overview_header_spacing"
+                android:background="@color/highlight" />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/ll_deleted"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp" >
+            android:layout_marginTop="@dimen/overview_item_spacing" >
             <TextView
                 android:id="@+id/commit_deleted"
                 android:layout_width="wrap_content"
@@ -91,10 +90,10 @@
                 android:textColor="@color/highlight"
                 android:text="@string/commit_deleted" />
             <View 
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginBottom="8dp"
-                android:background="#ff0099cc" />
+                android:layout_marginBottom="@dimen/overview_header_spacing"
+                android:background="@color/highlight" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

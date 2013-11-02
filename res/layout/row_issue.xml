@@ -2,17 +2,18 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp" >
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp" >
     <ImageView
         android:id="@+id/iv_comments"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
         android:paddingRight="5dp"
         android:src="@drawable/comments"
+        android:layout_centerVertical="true"
         android:layout_toLeftOf="@+id/tv_comments" />
     <TextView
         android:id="@id/tv_comments"
@@ -20,34 +21,31 @@
         android:layout_height="wrap_content"
         android:paddingRight="5dp"
         android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_centerVertical="true"
         android:layout_alignParentRight="true" />
-    <ImageView
-        android:id="@+id/iv_assignee"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginTop="5dp"
-        android:paddingRight="5dp"
-        android:layout_alignParentRight="true"
-        android:layout_below="@id/iv_comments" />
     <TextView
         android:id="@+id/tv_number"
-        android:layout_width="45dp"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:padding="2dp"
         android:singleLine="true"
         android:fontFamily="bold"
         android:textColor="@android:color/black"
         android:background="@color/issue_number_bg"
-        android:layout_marginTop="4dp"
         android:layout_marginRight="5dp" />
     <LinearLayout
         android:id="@+id/ll_labels"
-        android:layout_width="45dp"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_number"
         android:orientation="vertical"
-        android:layout_marginRight="5dp" >
-    </LinearLayout>
+        android:layout_marginRight="5dp" />
+    <ImageView
+        android:id="@+id/iv_assignee"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="5dp"
+        android:layout_below="@id/ll_labels" />
     <TextView
         android:id="@+id/tv_desc"
         android:layout_width="fill_parent"
@@ -57,20 +55,23 @@
         android:layout_toLeftOf="@id/iv_comments"
         android:maxLines="2"
         android:ellipsize="end" />
-    <TextView
+     <TextView
         android:id="@+id/tv_repo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_marginTop="4dp"
         android:layout_toRightOf="@id/ll_labels"
         android:layout_toLeftOf="@id/iv_comments"
         android:layout_below="@id/tv_desc"
         android:visibility="gone" />
+
     <TextView
         android:id="@+id/tv_milestone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_marginTop="4dp"
         android:layout_toRightOf="@id/ll_labels"
         android:layout_toLeftOf="@id/iv_comments"
         android:layout_below="@id/tv_repo"
@@ -80,13 +81,14 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginRight="5dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="4dp"
         android:layout_toRightOf="@id/ll_labels"
         android:layout_below="@id/tv_milestone" />
     <TextView
         android:id="@+id/tv_extra"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_toRightOf="@id/iv_gravatar"
         android:layout_below="@id/tv_milestone" />

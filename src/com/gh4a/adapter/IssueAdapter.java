@@ -52,7 +52,7 @@ public class IssueAdapter extends RootAdapter<Issue> implements OnClickListener 
 
         if (v == null) {
             v = inflater.inflate(R.layout.row_issue, null);
-            
+
             Gh4Application app = (Gh4Application) mContext.getApplicationContext();
             Typeface boldCondensed = app.boldCondensed;
             Typeface regular = app.regular;

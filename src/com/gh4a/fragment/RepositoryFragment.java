@@ -26,7 +26,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.TableLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.devspark.progressfragment.ProgressFragment;
@@ -42,6 +42,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.ReadmeLoader;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.UiUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
@@ -100,27 +101,30 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
 
     private void fillData() {
         final Gh4Application app = Gh4Application.get(getActivity());
-        Typeface boldCondensed = app.boldCondensed;
-        Typeface condensed = app.condensed;
-        Typeface italic = app.italic;
 
-        TextView tvReadmeTitle = (TextView) mContentView.findViewById(R.id.readme_title);
-        tvReadmeTitle.setTypeface(boldCondensed);
-
+        UiUtils.assignTypeface(mContentView, app.boldCondensed, new int[] {
+            R.id.readme_title, R.id.tv_login, R.id.tv_divider, R.id.tv_name,
+            R.id.tv_stargazers_count, R.id.tv_forks_count, R.id.tv_issues_count,
+            R.id.tv_pull_requests_count, R.id.tv_wiki_label, R.id.tv_contributors_label,
+            R.id.tv_collaborators_label, R.id.other_info, R.id.tv_downloads_label
+        });
+        UiUtils.assignTypeface(mContentView, app.italic, new int[] {
+            R.id.tv_parent
+        });
+        UiUtils.assignTypeface(mContentView, app.regular, new int[] {
+            R.id.tv_desc, R.id.tv_language, R.id.tv_url
+        });
+        
         TextView tvOwner = (TextView) mContentView.findViewById(R.id.tv_login);
         tvOwner.setText(mRepository.getOwner().getLogin());
-        tvOwner.setTypeface(boldCondensed);
         tvOwner.setOnClickListener(this);
 
         TextView tvRepoName = (TextView) mContentView.findViewById(R.id.tv_name);
-        tvRepoName.setText("/" + mRepository.getName());
-        tvRepoName.setTypeface(boldCondensed);
+        tvRepoName.setText(mRepository.getName());
         
         TextView tvParentRepo = (TextView) mContentView.findViewById(R.id.tv_parent);
-        
         if (mRepository.isFork()) {
             tvParentRepo.setVisibility(View.VISIBLE);
-            tvParentRepo.setTypeface(italic);
 
             Repository parent = mRepository.getParent();
             if (parent != null) {
@@ -133,72 +137,54 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
             tvParentRepo.setVisibility(View.GONE);
         }
 
-        fillTextView(R.id.tv_desc, 0, mRepository.getDescription(), app);
-        fillTextView(R.id.tv_language,R.string.repo_language, mRepository.getLanguage(), app);
-        fillTextView(R.id.tv_url, 0, mRepository.getHtmlUrl(), app);
+        fillTextView(R.id.tv_desc, 0, mRepository.getDescription());
+        fillTextView(R.id.tv_language,R.string.repo_language, mRepository.getLanguage());
+        fillTextView(R.id.tv_url, 0, mRepository.getHtmlUrl());
 
         mContentView.findViewById(R.id.cell_stargazers).setOnClickListener(this);
         mContentView.findViewById(R.id.cell_forks).setOnClickListener(this);
         mContentView.findViewById(R.id.cell_pull_requests).setOnClickListener(this);
+        mContentView.findViewById(R.id.tv_wiki_label).setOnClickListener(this);
+        mContentView.findViewById(R.id.tv_contributors_label).setOnClickListener(this);
+        mContentView.findViewById(R.id.tv_collaborators_label).setOnClickListener(this);
+        mContentView.findViewById(R.id.other_info).setOnClickListener(this);
+        mContentView.findViewById(R.id.tv_downloads_label).setOnClickListener(this);
         
         TextView tvStargazersCount = (TextView) mContentView.findViewById(R.id.tv_stargazers_count);
         tvStargazersCount.setText(String.valueOf(mRepository.getWatchers()));
-        tvStargazersCount.setTypeface(boldCondensed);
         
         TextView tvForksCount = (TextView) mContentView.findViewById(R.id.tv_forks_count);
-        tvForksCount.setTypeface(boldCondensed);
         tvForksCount.setText(String.valueOf(mRepository.getForks()));
         
         TextView tvIssues = (TextView) mContentView.findViewById(R.id.tv_issues_label);
         TextView tvIssuesCount = (TextView) mContentView.findViewById(R.id.tv_issues_count);
-        TableLayout tlIssues = (TableLayout) mContentView.findViewById(R.id.cell_issues);
+        LinearLayout llIssues = (LinearLayout) mContentView.findViewById(R.id.cell_issues);
         
         if (mRepository.isHasIssues()) {
-            tlIssues.setVisibility(View.VISIBLE);
-            tlIssues.setOnClickListener(this);
+            llIssues.setVisibility(View.VISIBLE);
+            llIssues.setOnClickListener(this);
             
             tvIssues.setVisibility(View.VISIBLE);
             
-            tvIssuesCount.setTypeface(boldCondensed);
             tvIssuesCount.setText(String.valueOf(mRepository.getOpenIssues()));
             tvIssuesCount.setVisibility(View.VISIBLE);
         } else {
-            tlIssues.setVisibility(View.GONE);
+            llIssues.setVisibility(View.GONE);
             tvIssues.setVisibility(View.GONE);
             tvIssuesCount.setVisibility(View.GONE);
         }
         
-        TextView tvPullRequestsCount = (TextView) mContentView.findViewById(R.id.tv_pull_requests_count);
-        tvPullRequestsCount.setTypeface(boldCondensed);
-        
-        TextView tvPullRequests = (TextView) mContentView.findViewById(R.id.tv_pull_requests_label);
-        tvPullRequests.setTypeface(condensed);
-        
         if (!mRepository.isHasWiki()) {
             mContentView.findViewById(R.id.tv_wiki_label).setVisibility(View.GONE);
         }
-
-        initOtherTextView(R.id.tv_wiki_label, app);
-        initOtherTextView(R.id.tv_contributors_label, app);
-        initOtherTextView(R.id.tv_collaborators_label, app);
-        initOtherTextView(R.id.other_info, app);
-        initOtherTextView(R.id.tv_downloads_label, app);
     }
 
-    private void initOtherTextView(int id, Gh4Application app) {
-        TextView view = (TextView) mContentView.findViewById(id);
-
-        view.setOnClickListener(this);
-        view.setTypeface(app.boldCondensed);
-    }
-
-    private void fillTextView(int id, int stringId, String text, Gh4Application app) {
+    private void fillTextView(int id, int stringId, String text) {
         TextView view = (TextView) mContentView.findViewById(id);
         
         if (!StringUtils.isBlank(text)) {
             view.setText(stringId != 0 ? getString(stringId, text) : text);
             view.setVisibility(View.VISIBLE);
-            view.setTypeface(app.regular);
         } else {
             view.setVisibility(View.GONE);
         }

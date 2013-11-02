@@ -139,6 +139,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
         }
         
         setContentView(R.layout.issue);
+        setContentShown(false);
 
         mAq = new AQuery(this);
         
@@ -160,15 +161,17 @@ public class IssueActivity extends LoadingFragmentActivity implements
     }
 
     private void fillData() {
-        final Gh4Application app = Gh4Application.get(this);
-        
         // set details inside listview header
         LayoutInflater inflater = getLayoutInflater();
         ListView listView = (ListView) findViewById(R.id.list_view);
         
         LinearLayout header = (LinearLayout) inflater.inflate(R.layout.issue_header, listView, false);
         header.setClickable(false);
-        
+
+        UiUtils.assignTypeface(header, Gh4Application.get(this).boldCondensed, new int[] {
+            R.id.comment_title, R.id.tv_title, R.id.desc_title 
+        });
+
         listView.addHeaderView(header, null, false);
         listView.setAdapter(mCommentAdapter);
         
@@ -178,7 +181,6 @@ public class IssueActivity extends LoadingFragmentActivity implements
         }
         
         TextView tvCommentTitle = (TextView) header.findViewById(R.id.comment_title);
-        tvCommentTitle.setTypeface(app.boldCondensed);
         tvCommentTitle.setTextColor(getResources().getColor(R.color.highlight));
         tvCommentTitle.setText(getString(R.string.issue_comments) + " (" + mIssue.getComments() + ")");
         
@@ -202,11 +204,6 @@ public class IssueActivity extends LoadingFragmentActivity implements
         
         TextView tvTitle = (TextView) header.findViewById(R.id.tv_title);
         tvTitle.setText(mIssue.getTitle());
-        tvTitle.setTypeface(app.boldCondensed);
-        
-        TextView tvDescTitle = (TextView) header.findViewById(R.id.desc_title);
-        tvDescTitle.setTypeface(app.boldCondensed);
-        tvDescTitle.setTextColor(getResources().getColor(R.color.highlight));
         
         TextView tvDesc = (TextView) header.findViewById(R.id.tv_desc);
         String body = mIssue.getBodyHtml();

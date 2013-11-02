@@ -65,11 +65,7 @@ public class CommentAdapter extends RootAdapter<Comment> implements OnClickListe
             viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
             viewHolder.tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
             viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-            
             viewHolder.ivEdit = (ImageView) v.findViewById(R.id.iv_edit);
-            if (Gh4Application.THEME != R.style.DefaultTheme) {
-                viewHolder.ivEdit.setImageResource(R.drawable.content_edit);  
-            }
             v.setTag(viewHolder);
         }
         else {

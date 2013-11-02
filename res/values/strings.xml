@@ -351,6 +351,7 @@
     <string name="issue_manage_milestones">Manage Milestones</string>
     <string name="issue_milestone_due_date">Due Date</string>
     <string name="issue_assignee">%1$s is assigned</string>
+    <string name="issue_desc">Description</string>
 
     <!-- Issue comment -->
     <plurals name="issue_comment">
@@ -369,6 +370,7 @@
     <string name="pull_request_comments">Discussion</string>
     <string name="pull_requests">Pull Requests</string>
 	<string name="pull_request_comment_hint">Comment on this pull request</string>
+    <string name="view_pull_request">View pull request</string>
 
     <!-- Object -->
     <string name="object_tree">Tree</string>
