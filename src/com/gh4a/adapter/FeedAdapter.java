@@ -45,6 +45,7 @@ import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.text.SpannableString;
 import android.text.TextUtils;
+import android.text.TextUtils.TruncateAt;
 import android.text.style.TextAppearanceSpan;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -167,6 +168,7 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
                     tvCommitMsg.setText(spannableSha);
                     tvCommitMsg.append(" " + commit.getMessage());
                     tvCommitMsg.setSingleLine(true);
+                    tvCommitMsg.setEllipsize(TruncateAt.END);
                     tvCommitMsg.setTextAppearance(mContext, android.R.style.TextAppearance_Small);
                     tvCommitMsg.setTypeface(regular);
                     viewHolder.llPushDesc.addView(tvCommitMsg);

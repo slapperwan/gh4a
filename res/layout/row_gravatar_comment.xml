@@ -10,10 +10,10 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="4dp"
-    android:paddingBottom="4dp"
     android:paddingLeft="@dimen/content_padding"
-    android:paddingRight="@dimen/content_padding" >
+    android:paddingRight="@dimen/content_padding"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp" >
     <com.gh4a.widget.FixedSizeImageView
         android:id="@+id/iv_gravatar"
         android:layout_width="40dp"

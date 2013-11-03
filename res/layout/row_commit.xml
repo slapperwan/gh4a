@@ -12,6 +12,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="?android:attr/listPreferredItemHeight"
+    android:paddingLeft="@dimen/content_padding"
+    android:paddingRight="@dimen/content_padding"
     android:paddingTop="8dp"
     android:paddingBottom="8dp" >
     <com.gh4a.widget.FixedSizeImageView

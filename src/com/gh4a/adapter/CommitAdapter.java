@@ -69,8 +69,14 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> implements OnCl
         GravatarHandler.assignGravatar(viewHolder.ivGravatar, commit.getAuthor());
         viewHolder.ivGravatar.setTag(commit);
 
+        String message = commit.getCommit().getMessage();
+        int pos = message.indexOf('\n');
+        if (pos > 0) {
+            message = message.substring(0, pos);
+        }
+
+        viewHolder.tvDesc.setText(message);
         viewHolder.tvSha.setText(commit.getSha().substring(0, 10));
-        viewHolder.tvDesc.setText(commit.getCommit().getMessage());
 
         Resources res = v.getResources();
         String extraData = String.format(res.getString(R.string.more_commit_data),

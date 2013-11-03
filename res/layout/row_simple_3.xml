@@ -11,8 +11,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
+    android:paddingLeft="@dimen/content_padding"
+    android:paddingRight="@dimen/content_padding"
     android:paddingTop="8dp"
     android:paddingBottom="8dp" >
     <TextView
