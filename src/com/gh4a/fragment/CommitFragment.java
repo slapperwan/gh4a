@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -105,14 +106,42 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
             ivGravatar.setOnClickListener(this);
             ivGravatar.setTag(login);
         }
-        
+
         TextView tvMessage = (TextView) mContentView.findViewById(R.id.tv_message);
-        tvMessage.setText(mCommit.getCommit().getMessage());
+        TextView tvTitle = (TextView) mContentView.findViewById(R.id.tv_title);
+
+        String message = mCommit.getCommit().getMessage();
+        int pos = message.indexOf('\n');
+        String title = pos > 0 ? message.substring(0, pos) : message;
+        int length = message.length();
+        while (pos > 0 && pos < length && Character.isWhitespace(message.charAt(pos))) {
+            pos++;
+        }
+        message = pos > 0 && pos < length ? message.substring(pos) : null;
+
+        tvTitle.setText(title);
+        if (message != null) {
+            tvMessage.setText(message);
+        } else {
+            tvMessage.setVisibility(View.GONE);
+        }
         
         TextView tvExtra = (TextView) mContentView.findViewById(R.id.tv_extra);
         tvExtra.setText(CommitUtils.getAuthorName(app, mCommit)
                 + " "
                 + Gh4Application.pt.format(mCommit.getCommit().getAuthor().getDate()));
+
+        if (mCommit.getAuthor() == null ||
+                !TextUtils.equals(mCommit.getAuthor().getLogin(), mCommit.getCommitter().getLogin())) {
+            ViewGroup committer = (ViewGroup) mContentView.findViewById(R.id.committer_info);
+            ImageView gravatar = (ImageView) committer.findViewById(R.id.iv_commit_gravatar);
+            TextView extra = (TextView) committer.findViewById(R.id.tv_commit_extra);
+
+            committer.setVisibility(View.VISIBLE);
+            GravatarHandler.assignGravatar(gravatar, mCommit.getCommitter());
+            extra.setText(getString(R.string.commit_details, CommitUtils.getCommitterName(app, mCommit),
+                    Gh4Application.pt.format(mCommit.getCommit().getCommitter().getDate())));
+        }
 
         for (CommitFile file : mCommit.getFiles()) {
             String status = file.getStatus();

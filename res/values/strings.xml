@@ -266,11 +266,12 @@
     <string name="commit_changed">Files Changed</string>
     <string name="commit_added">Files Added</string>
     <string name="commit_deleted">Files Deleted</string>
-    <string name="commit_summary">Showing %1$d changed files with %2$d additions and %3$d deletions.</string>
+    <string name="commit_summary">%1$d changed files with %2$d additions and %3$d deletions.</string>
     <string name="commit_sha">Commit - %1$s</string>
     <string name="commit_comment">Commented on %1$s</string>
     <string name="commit_compare">Compare View</string>
 	<string name="commit_comment_hint">Comment on this commit</string>
+	<string name="commit_details">Committed by %1$s %2$s</string>
 
     <!-- Issue -->
     <plurals name="issue">
