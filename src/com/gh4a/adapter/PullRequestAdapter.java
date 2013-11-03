@@ -27,17 +27,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.androidquery.AQuery;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.GravatarUtils;
+import com.gh4a.utils.GravatarHandler;
 
 public class PullRequestAdapter extends RootAdapter<PullRequest> implements OnClickListener {
-    private AQuery aq;
-    
     public PullRequestAdapter(Context context) {
         super(context);
-        aq = new AQuery(context);
     }
 
     @Override
@@ -68,23 +64,14 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> implements OnCl
         }
 
         final PullRequest pullRequest = mObjects.get(position);
-        String login;
+        final User user = pullRequest.getUser();
         
-        aq.recycle(v);
+        GravatarHandler.assignGravatar(viewHolder.ivGravatar, user);
         viewHolder.ivGravatar.setTag(pullRequest.getUser());
-        if (pullRequest.getUser() != null) {
-            aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(pullRequest.getUser().getGravatarId()), 
-                    true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
-            login = pullRequest.getUser().getLogin();
-        }
-        else {
-            aq.id(viewHolder.ivGravatar).image(R.drawable.default_avatar);
-            login = "";
-        }
 
         viewHolder.tvDesc.setText(pullRequest.getTitle());
         viewHolder.tvExtra.setText(mContext.getString(R.string.more_issue_data,
-                login, pt.format(pullRequest.getCreatedAt())));
+                user != null ? user.getLogin() : "", pt.format(pullRequest.getCreatedAt())));
 
         return v;
     }

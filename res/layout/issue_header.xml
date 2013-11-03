@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp" >
-            <ImageView
+            <com.gh4a.widget.FixedSizeImageView
                 android:id="@+id/iv_gravatar"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
@@ -54,7 +54,7 @@
             android:layout_alignParentTop="true"
             android:layout_marginBottom="2dp"
             android:textAppearance="?android:attr/textAppearanceSmall" />
-        <ImageView
+        <com.gh4a.widget.FixedSizeImageView
             android:id="@+id/iv_assignee"
             android:layout_width="30dp"
             android:layout_height="30dp"

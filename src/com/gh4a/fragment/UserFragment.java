@@ -31,10 +31,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.androidquery.AQuery;
 import com.devspark.progressfragment.ProgressFragment;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -48,7 +48,7 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.OrganizationListLoader;
 import com.gh4a.loader.RepositoryListLoader;
 import com.gh4a.loader.UserLoader;
-import com.gh4a.utils.GravatarUtils;
+import com.gh4a.utils.GravatarHandler;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
@@ -158,10 +158,9 @@ public class UserFragment extends ProgressFragment implements  OnClickListener {
             R.id.tv_created_at, R.id.tv_email, R.id.tv_website,
             R.id.tv_company, R.id.tv_location
         });
-        
-        AQuery aq = new AQuery(getActivity());
-        aq.id(R.id.iv_gravatar).image(GravatarUtils.getGravatarUrl(mUser.getGravatarId()), 
-                true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), AQuery.FADE_IN);
+
+        ImageView gravatar = (ImageView) mContentView.findViewById(R.id.iv_gravatar);
+        GravatarHandler.assignGravatar(gravatar, mUser);
 
         TextView tvFollowersCount = (TextView) mContentView.findViewById(R.id.tv_followers_count);
         tvFollowersCount.setText(String.valueOf(mUser.getFollowers()));

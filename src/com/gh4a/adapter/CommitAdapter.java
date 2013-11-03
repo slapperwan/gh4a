@@ -27,19 +27,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.androidquery.AQuery;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.CommitUtils;
-import com.gh4a.utils.GravatarUtils;
+import com.gh4a.utils.GravatarHandler;
 
 public class CommitAdapter extends RootAdapter<RepositoryCommit> implements OnClickListener {
-    
-    private AQuery aq;
-    
     public CommitAdapter(Context context) {
         super(context);
-        aq = new AQuery(context);
     }
 
     @Override
@@ -70,12 +65,8 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> implements OnCl
         }
 
         final RepositoryCommit commit = mObjects.get(position);
-        
-        aq.recycle(v);
-        aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(
-                CommitUtils.getAuthorGravatarId(mContext, commit)),
-                true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
 
+        GravatarHandler.assignGravatar(viewHolder.ivGravatar, commit.getAuthor());
         viewHolder.ivGravatar.setTag(commit);
 
         viewHolder.tvSha.setText(commit.getSha().substring(0, 10));

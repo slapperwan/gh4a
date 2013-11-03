@@ -26,18 +26,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.androidquery.AQuery;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.utils.GravatarHandler;
 import com.gh4a.utils.GravatarUtils;
 import com.gh4a.utils.StringUtils;
 
 public class SearchUserAdapter extends RootAdapter<SearchUser> implements OnClickListener {
-    private AQuery aq;
-    
     public SearchUserAdapter(Context context) {
         super(context);
-        aq = new AQuery(context);
     }
     
     @Override
@@ -70,17 +67,9 @@ public class SearchUserAdapter extends RootAdapter<SearchUser> implements OnClic
         }
 
         final SearchUser user = mObjects.get(position);
-        
-        aq.recycle(v);
 
-        viewHolder.ivGravatar.setTag(user);
-        if (!StringUtils.isBlank(user.getGravatarId())) {
-            aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(user.getGravatarId()), 
-                    true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
-        }
-        else {
-            aq.id(viewHolder.ivGravatar).image(R.drawable.default_avatar);
-        }
+        GravatarHandler.assignGravatar(viewHolder.ivGravatar,
+                GravatarUtils.getGravatarUrl(user.getGravatarId())); 
 
         viewHolder.tvTitle.setText(StringUtils.formatName(user.getLogin(), user.getName()));
         viewHolder.tvExtra.setText(mContext.getString(R.string.user_extra_data,

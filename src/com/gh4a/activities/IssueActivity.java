@@ -44,7 +44,6 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.androidquery.AQuery;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentActivity;
@@ -56,7 +55,7 @@ import com.gh4a.loader.IssueCommentListLoader;
 import com.gh4a.loader.IssueLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.utils.GravatarUtils;
+import com.gh4a.utils.GravatarHandler;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
@@ -74,7 +73,6 @@ public class IssueActivity extends LoadingFragmentActivity implements
     private String mIssueState;
     private CommentAdapter mCommentAdapter;
     private boolean mIsCollaborator;
-    private AQuery mAq;
 
     private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>() {
         @Override
@@ -141,8 +139,6 @@ public class IssueActivity extends LoadingFragmentActivity implements
         setContentView(R.layout.issue);
         setContentShown(false);
 
-        mAq = new AQuery(this);
-        
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getString(R.string.issue) + " #" + mIssueNumber);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
@@ -185,8 +181,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
         tvCommentTitle.setText(getString(R.string.issue_comments) + " (" + mIssue.getComments() + ")");
         
         ImageView ivGravatar = (ImageView) header.findViewById(R.id.iv_gravatar);
-        mAq.id(R.id.iv_gravatar).image(GravatarUtils.getGravatarUrl(mIssue.getUser().getGravatarId()),
-                true, false, 0, 0, mAq.getCachedImage(R.drawable.default_avatar), AQuery.FADE_IN);
+        GravatarHandler.assignGravatar(ivGravatar, mIssue.getUser());
         ivGravatar.setOnClickListener(this);
 
         TextView tvExtra = (TextView) header.findViewById(R.id.tv_extra);
@@ -233,8 +228,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
             tvAssignee.setOnClickListener(this);
             
             ImageView ivAssignee = (ImageView) header.findViewById(R.id.iv_assignee);
-            mAq.id(R.id.iv_assignee).image(GravatarUtils.getGravatarUrl(mIssue.getAssignee().getGravatarId()),
-                    true, false, 0, 0, mAq.getCachedImage(R.drawable.default_avatar), AQuery.FADE_IN);
+            GravatarHandler.assignGravatar(ivAssignee, mIssue.getAssignee());
             ivAssignee.setVisibility(View.VISIBLE);
             ivAssignee.setOnClickListener(this);
         }

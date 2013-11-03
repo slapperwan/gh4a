@@ -53,18 +53,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.androidquery.AQuery;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.GravatarUtils;
+import com.gh4a.utils.GravatarHandler;
 import com.gh4a.utils.StringUtils;
 
 public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
-    private AQuery aq;
-    
     public FeedAdapter(Context context) {
         super(context);
-        aq = new AQuery(context);
     }
 
     @Override
@@ -99,11 +95,8 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
 
         Event event = mObjects.get(position);
         final User actor = event.getActor();
-        
-        aq.recycle(v);
-        aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(actor.getGravatarId()), 
-                true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
 
+        GravatarHandler.assignGravatar(viewHolder.ivGravatar, actor);
         viewHolder.ivGravatar.setTag(actor);
 
         SpannableString createdAt = new SpannableString(pt.format(event.getCreatedAt()));

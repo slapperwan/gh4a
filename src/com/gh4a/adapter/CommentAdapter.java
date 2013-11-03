@@ -26,10 +26,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.androidquery.AQuery;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.GravatarUtils;
+import com.gh4a.utils.GravatarHandler;
 import com.github.mobile.util.HttpImageGetter;
 
 public class CommentAdapter extends RootAdapter<Comment> implements OnClickListener {
@@ -37,15 +36,13 @@ public class CommentAdapter extends RootAdapter<Comment> implements OnClickListe
         void editComment(Comment comment);
     }
 
-    private AQuery aq;
-    private HttpImageGetter imageGetter;
+    private HttpImageGetter mImageGetter;
     private OnEditComment mEditCallback;
     private String mRepoOwner;
 
     public CommentAdapter(Context context, String repoOwner, OnEditComment editCallback) {
         super(context);
-        imageGetter = new HttpImageGetter(mContext);
-        aq = new AQuery(context);
+        mImageGetter = new HttpImageGetter(mContext);
         mRepoOwner = repoOwner;
         mEditCallback = editCallback;
     }
@@ -75,14 +72,12 @@ public class CommentAdapter extends RootAdapter<Comment> implements OnClickListe
         final Comment comment = mObjects.get(position);
         String login = Gh4Application.get(mContext).getAuthLogin();
 
-        aq.recycle(v);
-        aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(comment.getUser().getGravatarId()), 
-                true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
+        GravatarHandler.assignGravatar(viewHolder.ivGravatar, comment.getUser());
 
         viewHolder.tvExtra.setText(comment.getUser().getLogin() + "\n" + pt.format(comment.getCreatedAt()));
 
         String body = comment.getBodyHtml();
-        imageGetter.bind(viewHolder.tvDesc, body, comment.getId());
+        mImageGetter.bind(viewHolder.tvDesc, body, comment.getId());
 
         viewHolder.ivGravatar.setTag(comment);
 

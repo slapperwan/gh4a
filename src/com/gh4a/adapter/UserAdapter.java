@@ -26,20 +26,17 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.androidquery.AQuery;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.GravatarUtils;
+import com.gh4a.utils.GravatarHandler;
 import com.gh4a.utils.StringUtils;
 
 public class UserAdapter extends RootAdapter<User> implements OnClickListener {
     private boolean mShowExtraData;
-    private AQuery aq;
     
     public UserAdapter(Context context, boolean showExtraData) {
         super(context);
         mShowExtraData = showExtraData;
-        aq = new AQuery(context);
     }
     
     @Override
@@ -72,27 +69,9 @@ public class UserAdapter extends RootAdapter<User> implements OnClickListener {
         }
 
         final User user = mObjects.get(position);
-        final String avatarUrl;
-        
-        if (!StringUtils.isBlank(user.getGravatarId())) {
-            avatarUrl = GravatarUtils.getGravatarUrl(user.getGravatarId());
-        } else if (!StringUtils.isBlank(user.getEmail())) {
-            avatarUrl = GravatarUtils.getGravatarUrl(StringUtils.md5Hex(user.getEmail()));
-        } else if (!StringUtils.isBlank(user.getAvatarUrl())) { 
-            avatarUrl = user.getAvatarUrl(); 
-        } else {
-            avatarUrl = null;
-        }
 
-        aq.recycle(v);
-
+        GravatarHandler.assignGravatar(viewHolder.ivGravatar, user);
         viewHolder.ivGravatar.setTag(user);
-        if (avatarUrl != null) {
-            aq.id(viewHolder.ivGravatar).image(avatarUrl, true, false,
-                    0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
-        } else {
-            aq.id(viewHolder.ivGravatar).image(R.drawable.default_avatar);
-        }
                 
         viewHolder.tvTitle.setText(StringUtils.formatName(user.getLogin(), user.getName()));
         viewHolder.tvExtra.setVisibility(mShowExtraData ? View.VISIBLE : View.GONE);

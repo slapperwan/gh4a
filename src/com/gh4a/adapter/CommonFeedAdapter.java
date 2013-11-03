@@ -25,23 +25,21 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.androidquery.AQuery;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.holder.Feed;
+import com.gh4a.utils.GravatarHandler;
 import com.gh4a.utils.GravatarUtils;
 
 public class CommonFeedAdapter extends RootAdapter<Feed> implements OnClickListener {
     private boolean mShowGravatar;
     private boolean mShowExtra;
     private int mRowLayout;
-    private AQuery aq;
     
     public CommonFeedAdapter(Context context) {
         super(context);
         mShowGravatar = true;//default true
         mShowExtra = true;//default true
-        aq = new AQuery(context);
     }
     
     public CommonFeedAdapter(Context context, boolean showGravatar, boolean showExtra, int rowLayout) {
@@ -88,12 +86,10 @@ public class CommonFeedAdapter extends RootAdapter<Feed> implements OnClickListe
 
         final Feed feed = mObjects.get(position);
         
-        aq.recycle(v);
-
         if (viewHolder.ivGravatar != null) {
             if (mShowGravatar) {
-                aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(feed.getGravatarId()), 
-                        true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
+                GravatarHandler.assignGravatar(viewHolder.ivGravatar,
+                        GravatarUtils.getGravatarUrl(feed.getGravatarId())); 
                 viewHolder.ivGravatar.setTag(feed);
                 viewHolder.ivGravatar.setVisibility(View.VISIBLE);
             }

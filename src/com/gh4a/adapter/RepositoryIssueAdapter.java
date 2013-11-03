@@ -31,17 +31,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.androidquery.AQuery;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.GravatarUtils;
+import com.gh4a.utils.GravatarHandler;
 
 public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> implements OnClickListener {
-    private AQuery aq;
-    
     public RepositoryIssueAdapter(Context context) {
         super(context);
-        aq = new AQuery(context);
     }
     
     @Override
@@ -80,11 +76,8 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
         }
 
         final RepositoryIssue issue = mObjects.get(position);
-        
-        aq.recycle(v);
-        aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(issue.getUser().getGravatarId()), 
-                true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
 
+        GravatarHandler.assignGravatar(viewHolder.ivGravatar, issue.getUser());
         viewHolder.ivGravatar.setTag(issue);
         viewHolder.tvNumber.setText(String.valueOf(issue.getNumber()));
 
@@ -123,10 +116,8 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
 
         if (issue.getAssignee() != null) {
             viewHolder.ivAssignee.setVisibility(View.VISIBLE);
-            aq.id(viewHolder.ivAssignee).image(GravatarUtils.getGravatarUrl(issue.getAssignee().getGravatarId()), 
-                    true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
-        }
-        else {
+            GravatarHandler.assignGravatar(viewHolder.ivAssignee, issue.getAssignee());
+        } else {
             viewHolder.ivAssignee.setVisibility(View.GONE);
         }
 

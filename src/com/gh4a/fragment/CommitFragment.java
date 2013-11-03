@@ -15,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.androidquery.AQuery;
 import com.devspark.progressfragment.ProgressFragment;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -25,7 +24,7 @@ import com.gh4a.loader.CommitLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.CommitUtils;
-import com.gh4a.utils.GravatarUtils;
+import com.gh4a.utils.GravatarHandler;
 
 public class CommitFragment extends ProgressFragment implements OnClickListener {
     private String mRepoOwner;
@@ -91,7 +90,6 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
     private void fillData() {
         final Activity activity = getActivity();
         final Gh4Application app = Gh4Application.get(activity);
-        final AQuery aq = new AQuery(activity);
         final LayoutInflater inflater = getLayoutInflater(null);
         
         LinearLayout llChanged = (LinearLayout) mContentView.findViewById(R.id.ll_changed);
@@ -100,10 +98,7 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
         int added = 0, changed = 0, deleted = 0;
         
         ImageView ivGravatar = (ImageView) mContentView.findViewById(R.id.iv_gravatar);
-        
-        aq.id(R.id.iv_gravatar).image(
-                GravatarUtils.getGravatarUrl(CommitUtils.getAuthorGravatarId(activity, mCommit)), 
-                true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
+        GravatarHandler.assignGravatar(ivGravatar, mCommit.getAuthor());
 
         String login = CommitUtils.getAuthorLogin(app, mCommit);
         if (login != null) {

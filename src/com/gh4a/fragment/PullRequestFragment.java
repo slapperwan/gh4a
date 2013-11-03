@@ -36,11 +36,10 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import com.androidquery.AQuery;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
@@ -52,7 +51,7 @@ import com.gh4a.loader.IssueCommentsLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestLoader;
-import com.gh4a.utils.GravatarUtils;
+import com.gh4a.utils.GravatarHandler;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
@@ -147,12 +146,10 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         
         User user = pullRequest.getUser();
         if (user != null) {
-            AQuery aq = new AQuery(getActivity());
-            aq.id(R.id.iv_gravatar).image(GravatarUtils.getGravatarUrl(user.getGravatarId()), 
-                    true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
-            View gravatar = mHeader.findViewById(R.id.iv_gravatar);
+            ImageView gravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
             gravatar.setOnClickListener(this);
             gravatar.setTag(user);
+            GravatarHandler.assignGravatar(gravatar, user);
         }
         
         TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);

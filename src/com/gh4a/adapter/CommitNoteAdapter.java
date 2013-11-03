@@ -26,22 +26,18 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.androidquery.AQuery;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.GravatarUtils;
+import com.gh4a.utils.GravatarHandler;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 public class CommitNoteAdapter extends RootAdapter<CommitComment> implements OnClickListener {
-
-    private HttpImageGetter imageGetter;
-    private AQuery aq;
+    private HttpImageGetter mImageGetter;
     
     public CommitNoteAdapter(Context context) {
         super(context);
-        imageGetter = new HttpImageGetter(context);
-        aq = new AQuery(context);
+        mImageGetter = new HttpImageGetter(context);
     }
 
     @Override
@@ -66,16 +62,14 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements OnC
         }
 
         final CommitComment comment = mObjects.get(position);
-        
-        aq.recycle(v);
-        aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(comment.getUser().getGravatarId()), 
-                true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
+
+        GravatarHandler.assignGravatar(viewHolder.ivGravatar, comment.getUser());
 
         viewHolder.ivGravatar.setTag(comment);
         viewHolder.tvExtra.setText(comment.getUser().getLogin() + "\n" + pt.format(comment.getCreatedAt()));
 
         String body = HtmlUtils.format(comment.getBodyHtml()).toString();
-        imageGetter.bind(viewHolder.tvDesc, body, comment.getId());
+        mImageGetter.bind(viewHolder.tvDesc, body, comment.getId());
 
         return v;
     }

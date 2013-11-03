@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,8 +36,6 @@ import android.text.TextUtils;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import com.androidquery.AQuery;
-import com.androidquery.callback.AjaxCallback;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.FileUtils;
@@ -208,14 +207,8 @@ public class HttpImageGetter implements ImageGetter {
     }
 
     private InputStream fetch(String urlString) throws MalformedURLException, IOException {
-        AQuery aq = new AQuery(context);
-        
-        AjaxCallback<InputStream> cb = new AjaxCallback<InputStream>();           
-        cb.url(urlString).type(InputStream.class);             
-        aq.sync(cb);
-                
-        InputStream is = cb.getResult();
-        return is;
+        URL url = new URL(urlString); 
+        return url.openStream();
     }
 
     public Drawable getDrawable(String source) {

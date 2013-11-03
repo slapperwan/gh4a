@@ -40,7 +40,7 @@
         android:layout_below="@id/tv_number"
         android:orientation="vertical"
         android:layout_marginRight="5dp" />
-    <ImageView
+    <com.gh4a.widget.FixedSizeImageView
         android:id="@+id/iv_assignee"
         android:layout_width="30dp"
         android:layout_height="30dp"
@@ -76,7 +76,7 @@
         android:layout_toLeftOf="@id/iv_comments"
         android:layout_below="@id/tv_repo"
         android:visibility="gone" />
-    <ImageView
+    <com.gh4a.widget.FixedSizeImageView
         android:id="@+id/iv_gravatar"
         android:layout_width="40dp"
         android:layout_height="40dp"
