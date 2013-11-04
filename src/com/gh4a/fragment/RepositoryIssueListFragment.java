@@ -80,7 +80,7 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Repositor
 
     @Override
     protected int getEmptyTextResId() {
-        return R.string.no_repos_found;
+        return R.string.no_issues_found;
     }
 
     @Override
