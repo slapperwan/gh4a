@@ -67,16 +67,10 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
                 R.layout.sherlock_spinner_item);
         list.setDropDownViewResource(R.layout.row_simple);
 
-        int initialPosition = 0;
-        if (getIntent().getExtras() != null) {
-            initialPosition = getIntent().getExtras().getInt("exploreItem", 0);
-        }
-        
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         mActionBar.setListNavigationCallbacks(list, this);
-        mActionBar.setSelectedNavigationItem(initialPosition);
         
-        setPageIndicator(initialPosition);
+        setPageIndicator(mActionBar.getSelectedNavigationIndex());
     }
     
     private void setPageIndicator(int position) {

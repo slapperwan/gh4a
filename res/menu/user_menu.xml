@@ -19,16 +19,7 @@
         android:showAsAction="never" />
     <item android:id="@+id/explore"
         android:title="@string/explore"
-        android:showAsAction="never">
-        <menu>
-            <item android:id="@+id/pub_timeline"
-                android:title="@string/pub_timeline" />
-            <item android:id="@+id/trend"
-                android:title="@string/trend" />
-            <item android:id="@+id/blog"
-                android:title="@string/blog" />
-        </menu>
-    </item>
+        android:showAsAction="never" />
     <item android:id="@+id/theme"
         android:title="@string/theme"
         android:showAsAction="never">

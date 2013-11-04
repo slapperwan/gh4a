@@ -200,21 +200,6 @@ public class UserActivity extends LoadingFragmentPagerActivity {
                 Gh4Application.THEME = R.style.LightDarkTheme;
                 saveTheme(R.style.LightDarkTheme);
                 return true;
-            case R.id.pub_timeline:
-                Intent intent = new Intent(this, ExploreActivity.class);
-                intent.putExtra("exploreItem", 0);
-                startActivity(intent);
-                return true;
-            case R.id.trend:
-                intent = new Intent(this, ExploreActivity.class);
-                intent.putExtra("exploreItem", 1);
-                startActivity(intent);
-                return true;
-            case R.id.blog:
-                intent = new Intent(this, ExploreActivity.class);
-                intent.putExtra("exploreItem", 2);
-                startActivity(intent);
-                return true;
             case R.id.follow:
                 item.setActionView(R.layout.ab_loading);
                 item.expandActionView();
