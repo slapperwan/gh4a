@@ -73,6 +73,7 @@ public class GravatarHandler {
         private void processResult(int requestId, Bitmap bitmap) {
             final Request request = sRequests.get(requestId);
             if (request != null && bitmap != null) {
+                sCache.put(request.url, bitmap);
                 for (ImageView view : request.views) {
                     view.setImageBitmap(bitmap);
                 }
@@ -101,17 +102,14 @@ public class GravatarHandler {
     }
     
     public static void assignGravatar(ImageView view, String url) {
-        if (url != null) {
-            synchronized (sCache) {
-                Bitmap cachedBitmap = sCache.get(url);
-                if (cachedBitmap != null) {
-                    view.setImageBitmap(cachedBitmap);
-                    return;
-                }
-            }
+        removeOldRequest(view);
+
+        Bitmap cachedBitmap = sCache.get(url);
+        if (cachedBitmap != null) {
+            view.setImageBitmap(cachedBitmap);
+            return;
         }
 
-        removeOldRequest(view);
         view.setImageResource(R.drawable.default_avatar);
 
         if (url == null) {
@@ -223,18 +221,14 @@ public class GravatarHandler {
             switch (msg.what) {
                 case MSG_LOAD:
                     String url = (String) msg.obj;
+                    Bitmap bitmap = null;
                     try {
-                        Bitmap bitmap = fetchBitmap(url);
-                        if (bitmap != null) {
-                            bitmap = getRoundedCornerBitmap(bitmap, bitmap.getWidth() / 20);
-                            synchronized (sCache) {
-                                sCache.put(url, bitmap);
-                            }
-                        }
-                        sHandler.obtainMessage(MSG_LOADED, msg.arg1, 0, bitmap).sendToTarget();
+                        bitmap = fetchBitmap(url);
+                        bitmap = getRoundedCornerBitmap(bitmap, bitmap.getWidth() / 20);
                     } catch (IOException e) {
                         Log.e(TAG, "Couldn't fetch gravatar from URL " + url, e);
                     }
+                    sHandler.obtainMessage(MSG_LOADED, msg.arg1, 0, bitmap).sendToTarget();
                     break;
             }
         }
