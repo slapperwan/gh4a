@@ -242,14 +242,15 @@ public class IssueActivity extends LoadingFragmentActivity implements
             for (Label label : labels) {
                 TextView tvLabel = (TextView) inflater.inflate(R.layout.issue_label, null);
                 int color = Color.parseColor("#" + label.getColor());
-                boolean dark = Color.red(color) + Color.green(color) + Color.blue(color) < 383;
 
                 tvLabel.setText(label.getName());
                 tvLabel.setBackgroundColor(color);
-                tvLabel.setTextColor(getResources().getColor(
-                        dark ? android.R.color.primary_text_dark : android.R.color.primary_text_light));
-                
-                llLabels.addView(tvLabel);
+                tvLabel.setTextColor(UiUtils.textColorForBackground(this, color));
+
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                params.rightMargin = getResources().getDimensionPixelSize(R.dimen.label_spacing);
+                llLabels.addView(tvLabel, params);
             }
         } else {
             llLabels.setVisibility(View.GONE);

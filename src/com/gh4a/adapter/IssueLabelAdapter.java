@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.gh4a.ColorPickerDialog;
 import com.gh4a.ColorPickerDialog.OnColorChangedListener;
+import com.gh4a.utils.UiUtils;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 
@@ -69,9 +70,7 @@ public class IssueLabelAdapter extends RootAdapter<Label> implements OnClickList
 
     private void assignColor(ViewHolder holder, String colorString) {
         int color = Color.parseColor("#" + colorString);
-        boolean dark = Color.red(color) + Color.green(color) + Color.blue(color) < 383;
-        int textColor = mContext.getResources().getColor(
-                dark ? R.color.abs__primary_text_holo_dark : R.color.abs__primary_text_holo_light);
+        int textColor = UiUtils.textColorForBackground(mContext, color);
 
         holder.color.setBackgroundColor(color);
         holder.editor.setBackgroundColor(color);

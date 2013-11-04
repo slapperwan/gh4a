@@ -5,31 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="?android:attr/listPreferredItemHeight"
-    android:paddingLeft="@dimen/content_padding"
     android:paddingRight="@dimen/content_padding"
     android:paddingTop="8dp"
     android:paddingBottom="8dp" >
-    <ImageView
-        android:id="@+id/iv_comments"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingRight="5dp"
-        android:src="@drawable/comments"
-        android:layout_centerVertical="true"
-        android:layout_toLeftOf="@+id/tv_comments" />
-    <TextView
-        android:id="@id/tv_comments"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingRight="5dp"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:layout_centerVertical="true"
-        android:layout_alignParentRight="true" />
     <TextView
         android:id="@+id/tv_number"
         android:layout_width="40dp"
         android:layout_height="wrap_content"
-        android:padding="2dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
         android:singleLine="true"
         android:fontFamily="bold"
         android:textColor="@android:color/black"
@@ -44,30 +30,41 @@
         android:layout_marginRight="5dp" />
     <com.gh4a.widget.FixedSizeImageView
         android:id="@+id/iv_assignee"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
         android:layout_marginTop="5dp"
+        android:layout_marginLeft="5dp"
         android:layout_below="@id/ll_labels" />
     <TextView
         android:id="@+id/tv_desc"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_toRightOf="@id/ll_labels"
-        android:layout_toLeftOf="@id/iv_comments"
-        android:maxLines="2"
+        android:layout_toRightOf="@id/tv_number"
+        android:layout_alignParentRight="true"
+        android:singleLine="true"
         android:ellipsize="end" />
-     <TextView
+    <TextView
+        android:id="@+id/tv_comments"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/tv_desc"
+        android:layout_gravity="center_vertical"
+        android:drawableLeft="@drawable/comments"
+        android:drawablePadding="5dp"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+    <TextView
         android:id="@+id/tv_repo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_marginTop="4dp"
         android:layout_toRightOf="@id/ll_labels"
-        android:layout_toLeftOf="@id/iv_comments"
+        android:layout_toLeftOf="@id/tv_comments"
         android:layout_below="@id/tv_desc"
         android:visibility="gone" />
-
     <TextView
         android:id="@+id/tv_milestone"
         android:layout_width="wrap_content"
@@ -75,7 +72,7 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_marginTop="4dp"
         android:layout_toRightOf="@id/ll_labels"
-        android:layout_toLeftOf="@id/iv_comments"
+        android:layout_toLeftOf="@id/tv_comments"
         android:layout_below="@id/tv_repo"
         android:visibility="gone" />
     <com.gh4a.widget.FixedSizeImageView
@@ -93,5 +90,6 @@
         android:layout_marginTop="4dp"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_toRightOf="@id/iv_gravatar"
+        android:layout_toLeftOf="@id/tv_comments"
         android:layout_below="@id/tv_milestone" />
 </RelativeLayout>

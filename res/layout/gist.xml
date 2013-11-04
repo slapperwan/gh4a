@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="@dimen/content_padding" >
         <TextView
             android:id="@+id/tv_desc"
             android:layout_width="match_parent"
@@ -22,7 +22,21 @@
         <LinearLayout
             android:id="@+id/ll_files"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="@dimen/overview_item_spacing" >
+            <TextView
+                android:id="@+id/files_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/highlight"
+                android:text="@string/gist_files" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="@dimen/overview_header_spacing"
+                android:background="@color/highlight" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

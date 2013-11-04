@@ -23,8 +23,6 @@ import org.eclipse.egit.github.core.GistFile;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.text.SpannableString;
-import android.text.style.UnderlineSpan;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.LinearLayout;
@@ -39,6 +37,7 @@ import com.gh4a.loader.GistLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.UiUtils;
 
 public class GistActivity extends LoadingFragmentActivity implements OnClickListener {
     private String mGistId;
@@ -76,6 +75,10 @@ public class GistActivity extends LoadingFragmentActivity implements OnClickList
         
         setContentView(R.layout.gist);
         setContentShown(false);
+
+        UiUtils.assignTypeface(this, Gh4Application.get(this).boldCondensed, new int[] {
+            R.id.tv_desc, R.id.files_title
+        });
         
         ActionBar mActionBar = getSupportActionBar();
         mActionBar.setTitle(getString(R.string.gist_title, mGistId));
@@ -97,17 +100,19 @@ public class GistActivity extends LoadingFragmentActivity implements OnClickList
         
         LinearLayout llFiles = (LinearLayout) findViewById(R.id.ll_files);
         Map<String, GistFile> files = gist.getFiles();
-        if (files != null) {
+        if (files != null && !files.isEmpty()) {
             for (GistFile gistFile : files.values()) {
-                TextView tvFilename = new TextView(this, null, R.style.SelectableLabel);
-                SpannableString content = new SpannableString(gistFile.getFilename());
-                content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-                tvFilename.setText(content);
-                tvFilename.setTextColor(getResources().getColor(R.color.highlight));
-                tvFilename.setOnClickListener(this);
-                tvFilename.setTag(gistFile);
-                llFiles.addView(tvFilename);
+                View rowView = getLayoutInflater().inflate(R.layout.selectable_label, null);
+                TextView tvTitle = (TextView) rowView.findViewById(R.id.tv_title);
+
+                tvTitle.setText(gistFile.getFilename());
+                tvTitle.setTextColor(getResources().getColor(R.color.highlight));
+                tvTitle.setOnClickListener(this);
+                tvTitle.setTag(gistFile);
+                llFiles.addView(tvTitle);
             }
+        } else {
+            llFiles.setVisibility(View.GONE);
         }
     }
 

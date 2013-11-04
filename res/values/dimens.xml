@@ -3,4 +3,7 @@
     <dimen name="content_padding">12dp</dimen>
     <dimen name="overview_item_spacing">12dp</dimen>
     <dimen name="overview_header_spacing">4dp</dimen>
+    <dimen name="label_badge_size">2dp</dimen>
+    <dimen name="label_badge_spacing">2dp</dimen>
+    <dimen name="label_spacing">5dp</dimen>
 </resources>

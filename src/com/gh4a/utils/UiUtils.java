@@ -6,6 +6,7 @@ import com.gh4a.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.ContextThemeWrapper;
 import android.view.View;
@@ -41,5 +42,19 @@ public class UiUtils {
             TextView textView = (TextView) parent.findViewById(id);
             textView.setTypeface(typeface);
         }
+    }
+    
+    public static int textColorForBackground(Context context, int backgroundColor) {
+        int red = Color.red(backgroundColor);
+        int green = Color.green(backgroundColor);
+        int blue = Color.blue(backgroundColor);
+        int min = Math.min(red, Math.min(green, blue));
+        int max = Math.max(red, Math.min(green, blue));
+        int luminance = (min + max) / 2;
+
+        if (luminance >= 128) {
+            return context.getResources().getColor(R.color.abs__primary_text_holo_light);
+        }
+        return context.getResources().getColor(R.color.abs__primary_text_holo_dark);
     }
 }

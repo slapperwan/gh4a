@@ -15,8 +15,7 @@
                 android:id="@+id/iv_gravatar"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:layout_marginRight="8dp"
-                android:layout_centerVertical="true" />
+                android:layout_marginRight="8dp" />
             <TextView
                 android:id="@+id/tv_name"
                 android:layout_width="wrap_content"

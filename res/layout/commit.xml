@@ -41,7 +41,8 @@
                 android:id="@+id/iv_commit_gravatar"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginRight="8dp" />
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="13dp" />
             <TextView
                 android:id="@+id/tv_commit_extra"
                 android:layout_width="match_parent"

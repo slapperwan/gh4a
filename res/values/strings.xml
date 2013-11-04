@@ -386,6 +386,7 @@
     <string name="gists">Gists</string>
     <string name="gist_public">Public Gist</string>
     <string name="gist_title">Gist %1$s</string>
+    <string name="gist_files">Files</string>
 
     <!-- Explore -->
     <string name="explore">Explore</string>

@@ -15,13 +15,9 @@
  */
 package com.gh4a.adapter;
 
-import java.util.List;
-
-import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.RepositoryIssue;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarHandler;
@@ -82,31 +79,13 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
         viewHolder.tvNumber.setText(String.valueOf(issue.getNumber()));
 
         viewHolder.tvState.setText(issue.getState());
-        if ("closed".equals(issue.getState())) {
+        if (Constants.Issue.ISSUE_STATE_CLOSED.equals(issue.getState())) {
             viewHolder.tvState.setBackgroundResource(R.drawable.default_red_box);
-        }
-        else {
+        } else {
             viewHolder.tvState.setBackgroundResource(R.drawable.default_green_box);
         }
 
-        viewHolder.llLabels.removeAllViews();
-
-        //show labels
-        List<Label> labels = issue.getLabels();
-        if (labels != null) {
-            for (Label label : labels) {
-                TextView tvLabel = (TextView) inflater.inflate(R.layout.issue_list_label,
-                        viewHolder.llLabels, false);
-                int color = Color.parseColor("#" + label.getColor());
-                boolean dark = Color.red(color) + Color.green(color) + Color.blue(color) < 383;
-
-                tvLabel.setText(label.getName());
-                tvLabel.setBackgroundColor(color);
-                tvLabel.setTextColor(v.getResources().getColor(
-                        dark ? android.R.color.primary_text_dark : android.R.color.primary_text_light));
-                viewHolder.llLabels.addView(tvLabel);
-            }
-        }
+        IssueAdapter.makeLabelBadges(viewHolder.llLabels, issue.getLabels());
 
         viewHolder.tvDesc.setText(issue.getTitle());
         viewHolder.tvExtra.setText(issue.getUser().getLogin() + "\n" + pt.format(issue.getCreatedAt()));
@@ -124,8 +103,7 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
         if (issue.getMilestone() != null) {
             viewHolder.tvMilestone.setVisibility(View.VISIBLE);
             viewHolder.tvMilestone.setText("Milestone : " + issue.getMilestone().getTitle());
-        }
-        else {
+        } else {
             viewHolder.tvMilestone.setVisibility(View.GONE);
         }
 

@@ -420,23 +420,20 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
 
     private void handleLabelClick(TextView tvLabel, Label label, boolean select) {
         Gh4Application app = Gh4Application.get(this);
-        boolean isDark;
         if (!select) {
             mSelectedLabels.remove(label);
             tvLabel.setTypeface(app.condensed);
             tvLabel.setBackgroundColor(0);
-            isDark = Gh4Application.THEME != R.style.LightTheme;
+            tvLabel.setTextColor(getResources().getColor(Gh4Application.THEME != R.style.LightTheme
+                    ? R.color.abs__primary_text_holo_dark : R.color.abs__primary_text_holo_light));
         } else {
             int color = Color.parseColor("#" + label.getColor());
 
             mSelectedLabels.add(label);
             tvLabel.setTypeface(app.boldCondensed);
             tvLabel.setBackgroundColor(color);
-            isDark = Color.red(color) + Color.green(color) + Color.blue(color) < 383;
+            tvLabel.setTextColor(UiUtils.textColorForBackground(this, color));
         }
-        tvLabel.setTextColor(getResources().getColor(isDark
-                ? R.color.abs__primary_text_holo_dark : R.color.abs__primary_text_holo_light));
-        
     }
 
     private void fillIssueData() {

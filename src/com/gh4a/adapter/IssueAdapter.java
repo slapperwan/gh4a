@@ -70,8 +70,7 @@ public class IssueAdapter extends RootAdapter<Issue> implements OnClickListener 
             viewHolder.tvMilestone = (TextView) v.findViewById(R.id.tv_milestone);
             
             v.setTag(viewHolder);
-        }
-        else {
+        } else {
             viewHolder = (ViewHolder) v.getTag();
         }
 
@@ -81,24 +80,8 @@ public class IssueAdapter extends RootAdapter<Issue> implements OnClickListener 
         viewHolder.ivGravatar.setTag(issue);
         
         viewHolder.tvNumber.setText(String.valueOf(issue.getNumber()));
-        viewHolder.llLabels.removeAllViews();
 
-        //show labels
-        List<Label> labels = issue.getLabels();
-        if (labels != null) {
-            for (Label label : labels) {
-                TextView tvLabel = (TextView) inflater.inflate(R.layout.issue_list_label,
-                        viewHolder.llLabels, false);
-                int color = Color.parseColor("#" + label.getColor());
-                boolean dark = Color.red(color) + Color.green(color) + Color.blue(color) < 383;
-
-                tvLabel.setText(label.getName());
-                tvLabel.setBackgroundColor(color);
-                tvLabel.setTextColor(v.getResources().getColor(
-                        dark ? android.R.color.primary_text_dark : android.R.color.primary_text_light));
-                viewHolder.llLabels.addView(tvLabel);
-            }
-        }
+        makeLabelBadges(viewHolder.llLabels, issue.getLabels());
 
         viewHolder.tvDesc.setText(issue.getTitle());
 
@@ -130,6 +113,37 @@ public class IssueAdapter extends RootAdapter<Issue> implements OnClickListener 
             Issue issue = (Issue) v.getTag();
             /** Open user activity */
             Gh4Application.get(mContext).openUserInfoActivity(mContext, issue.getUser().getLogin(), null);
+        }
+    }
+
+    /* package */ static void makeLabelBadges(LinearLayout badgeLayout, List<Label> labels) {
+        if (labels != null) {
+            int viewCount = badgeLayout.getChildCount();
+            int labelCount = labels.size();
+
+            for (int i = 0; i < labelCount; i++) {
+                View badge;
+                if (i < viewCount) {
+                    badge = badgeLayout.getChildAt(i);
+                } else {
+                    Context context = badgeLayout.getContext();
+                    int height = context.getResources().getDimensionPixelSize(R.dimen.label_badge_size);
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT, height);
+                    params.topMargin = context.getResources().getDimensionPixelSize(R.dimen.label_badge_spacing);
+
+                    badge = new View(context);
+                    badgeLayout.addView(badge, params);
+                }
+
+                badge.setBackgroundColor(Color.parseColor("#" + labels.get(i).getColor()));
+                badge.setVisibility(View.VISIBLE);
+            }
+            for (int i = labelCount; i < viewCount; i++) {
+                badgeLayout.getChildAt(i).setVisibility(View.GONE);
+            }
+        } else {
+            badgeLayout.setVisibility(View.GONE);
         }
     }
 
