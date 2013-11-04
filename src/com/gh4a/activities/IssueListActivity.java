@@ -260,21 +260,10 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
             return true;
         case R.id.sort:
             String direction = mFilterData.get("direction");
-            if ("desc".equals(direction) || direction == null) {
-                if (Gh4Application.THEME == R.style.LightTheme) {
-                    item.setIcon(R.drawable.navigation_collapse);
-                } else {
-                    item.setIcon(R.drawable.navigation_collapse_dark);
-                }
-                mFilterData.put("direction", "asc");
-            } else {
-                if (Gh4Application.THEME == R.style.LightTheme) {
-                    item.setIcon(R.drawable.navigation_expand);
-                } else {
-                    item.setIcon(R.drawable.navigation_expand_dark);
-                }
-                mFilterData.put("direction", "desc");
-            }
+            boolean isDesc = "desc".equals(direction) || direction == null;
+            item.setIcon(UiUtils.resolveDrawable(this, isDesc
+                    ? R.attr.collapseIcon : R.attr.expandIcon));
+            mFilterData.put("direction", isDesc ? "asc" : "desc");
             reloadIssueList();
             return true;
         case R.id.labels:

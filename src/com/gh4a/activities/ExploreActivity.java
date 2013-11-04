@@ -32,6 +32,7 @@ import com.gh4a.R;
 import com.gh4a.fragment.BlogListFragment;
 import com.gh4a.fragment.PublicTimelineFragment;
 import com.gh4a.fragment.TrendingFragment;
+import com.gh4a.utils.UiUtils;
 import com.viewpagerindicator.TitlePageIndicator;
 
 public class ExploreActivity extends BaseSherlockFragmentActivity implements ActionBar.OnNavigationListener {
@@ -150,8 +151,7 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
         menu.clear();
         if (mActionBar.getSelectedNavigationIndex() == 0) {
             menu.add(0, R.id.refresh, 0, getString(R.string.refresh))
-                .setIcon(Gh4Application.THEME != R.style.LightTheme ? 
-                        R.drawable.navigation_refresh_dark : R.drawable.navigation_refresh)
+                .setIcon(UiUtils.resolveDrawable(this, R.attr.refreshIcon))
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }
         return super.onCreateOptionsMenu(menu);

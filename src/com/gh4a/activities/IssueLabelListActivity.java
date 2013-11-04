@@ -184,14 +184,13 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
         
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            boolean isLight = Gh4Application.THEME == R.style.LightTheme;
             menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.save)
-                .setIcon(isLight ? R.drawable.content_save : R.drawable.content_save_dark)
+                .setIcon(UiUtils.resolveDrawable(IssueLabelListActivity.this, R.attr.saveIcon))
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
             if (mLabel != mAddedLabel) {
                 menu.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, R.string.delete)
-                    .setIcon(isLight ? R.drawable.content_discard: R.drawable.content_discard_dark)
+                    .setIcon(UiUtils.resolveDrawable(IssueLabelListActivity.this, R.attr.discardIcon))
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             }
             

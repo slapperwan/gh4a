@@ -36,9 +36,9 @@ import android.text.TextUtils;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.FileUtils;
+import com.gh4a.utils.UiUtils;
 
 /**
  * 
@@ -54,12 +54,8 @@ public class HttpImageGetter implements ImageGetter {
         private LoadingImageGetter(final Context context, final int size) {
             int imageSize = Math.round(context.getResources()
                     .getDisplayMetrics().density * size + 0.5F);
-            if (Gh4Application.THEME == R.style.DefaultTheme) {
-                image = context.getResources().getDrawable(R.drawable.content_picture_dark);    
-            }
-            else {
-                image = context.getResources().getDrawable(R.drawable.content_picture);
-            }
+            image = context.getResources().getDrawable(
+                    UiUtils.resolveDrawable(context, R.attr.contentPictureIcon));
             
             image.setBounds(0, 0, imageSize, imageSize);
         }

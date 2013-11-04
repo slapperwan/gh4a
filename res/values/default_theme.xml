@@ -11,12 +11,15 @@
     	<item name="discardIcon">@drawable/content_discard_dark</item>
     	<item name="acceptIcon">@drawable/navigation_accept_dark</item>
     	<item name="newIcon">@drawable/content_new_dark</item>
-    	<item name="refreshIcon">@drawable/navigation_refresh_dark</item>
+		<item name="refreshIcon">@drawable/navigation_refresh_dark</item>
+		<item name="collapseIcon">@drawable/navigation_collapse_dark</item>
     	<item name="expandIcon">@drawable/navigation_expand_dark</item>
     	<item name="labelListIcon">@drawable/collections_labels_dark</item>
     	<item name="milestoneListIcon">@drawable/collections_view_as_list_dark</item>
-    	<item name="personIcon">@drawable/social_person_dark</item>
-    	</style>
+        <item name="personIcon">@drawable/social_person_dark</item>
+		<item name="contentPictureIcon">@drawable/content_picture_dark</item>
+		<item name="saveIcon">@drawable/content_save_dark</item>
+    </style>
     
     <style name="LightTheme" parent="Theme.Sherlock.Light">
         <item name="sendIcon">@drawable/social_send_now</item>
@@ -30,10 +33,13 @@
     	<item name="acceptIcon">@drawable/navigation_accept</item>
     	<item name="newIcon">@drawable/content_new</item>
 	    <item name="refreshIcon">@drawable/navigation_refresh</item>
+		<item name="collapseIcon">@drawable/navigation_collapse</item>
     	<item name="expandIcon">@drawable/navigation_expand</item>
     	<item name="labelListIcon">@drawable/collections_labels</item>
     	<item name="milestoneListIcon">@drawable/collections_view_as_list</item>
     	<item name="personIcon">@drawable/social_person</item>
+        <item name="contentPictureIcon">@drawable/content_picture</item>
+		<item name="saveIcon">@drawable/content_save</item>
 	</style>
     
     <style name="LightDarkTheme" parent="Theme.Sherlock.Light.DarkActionBar">
@@ -48,10 +54,13 @@
     	<item name="acceptIcon">@drawable/navigation_accept_dark</item>
     	<item name="newIcon">@drawable/content_new_dark</item>
     	<item name="refreshIcon">@drawable/navigation_refresh_dark</item>
+		<item name="collapseIcon">@drawable/navigation_collapse_dark</item>
     	<item name="expandIcon">@drawable/navigation_expand_dark</item>
     	<item name="labelListIcon">@drawable/collections_labels_dark</item>
     	<item name="milestoneListIcon">@drawable/collections_view_as_list_dark</item>
     	<item name="personIcon">@drawable/social_person_dark</item>
+        <item name="contentPictureIcon">@drawable/content_picture</item>
+		<item name="saveIcon">@drawable/content_save_dark</item>
 	</style>
     
 </resources>

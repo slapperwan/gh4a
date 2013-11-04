@@ -6,6 +6,7 @@ import com.gh4a.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.ContextThemeWrapper;
@@ -56,5 +57,14 @@ public class UiUtils {
             return context.getResources().getColor(R.color.abs__primary_text_holo_light);
         }
         return context.getResources().getColor(R.color.abs__primary_text_holo_dark);
+    }
+
+    public static int resolveDrawable(Context context, int styledAttributeId) {
+        TypedArray a = context.getTheme().obtainStyledAttributes(Gh4Application.THEME, new int[] {
+            styledAttributeId
+        });
+        int resource = a.getResourceId(0, 0);
+        a.recycle();
+        return resource;
     }
 }

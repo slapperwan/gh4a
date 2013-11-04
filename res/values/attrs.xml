@@ -28,8 +28,11 @@
     <attr name="acceptIcon" format="reference" />
     <attr name="newIcon" format="reference" />
     <attr name="refreshIcon" format="reference" />
+    <attr name="collapseIcon" format="reference" />
     <attr name="expandIcon" format="reference" />
     <attr name="labelListIcon" format="reference" />
     <attr name="milestoneListIcon" format="reference" />
     <attr name="personIcon" format="reference" />
+    <attr name="contentPictureIcon" format="reference" />
+    <attr name="saveIcon" format="reference" />
 </resources>
