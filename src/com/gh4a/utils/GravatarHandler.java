@@ -139,7 +139,7 @@ public class GravatarHandler {
             sWorkerHandler = new WorkerHandler(sWorkerThread.getLooper());
         }
         Message msg = sWorkerHandler.obtainMessage(MSG_LOAD,
-                requestId, view.getWidth(), url);
+                requestId, view.getWidth(), request.url);
         msg.sendToTarget();
     }
 
