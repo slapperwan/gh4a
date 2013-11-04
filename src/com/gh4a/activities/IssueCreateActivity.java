@@ -141,12 +141,12 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
         }
         @Override
         public void onResultReady(LoaderResult<Issue> result) {
-            if (!result.handleError(IssueCreateActivity.this)) {
+            boolean success = !result.handleError(IssueCreateActivity.this);
+            if (success) {
                 mEditIssue = result.getData();
                 fillIssueData();
-            } else {
-                setContentEmpty(true);
             }
+            setContentEmpty(!success);
             setContentShown(true);
         }
     };

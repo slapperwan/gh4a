@@ -42,13 +42,13 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
 
         @Override
         public void onResultReady(LoaderResult<RepositoryCommit> result) {
-            setContentShown(true);
-            if (!result.handleError(getActivity())) {
+            boolean success = !result.handleError(getActivity());
+            if (success) {
                 mCommit = result.getData();
                 fillData();
-            } else {
-                setContentEmpty(true);
             }
+            setContentEmpty(!success);
+            setContentShown(true);
         }
     };
     

@@ -51,11 +51,11 @@ public class GistActivity extends LoadingFragmentActivity implements OnClickList
         }
         @Override
         public void onResultReady(LoaderResult<Gist> result) {
-            if (!result.handleError(GistActivity.this)) {
+            boolean success = !result.handleError(GistActivity.this);
+            if (success) {
                 fillData(result.getData());
-            } else {
-                setContentEmpty(true);
             }
+            setContentEmpty(!success);
             setContentShown(true);
         }
     };

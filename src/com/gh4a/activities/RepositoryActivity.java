@@ -70,15 +70,15 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
 
         @Override
         public void onResultReady(LoaderResult<Repository> result) {
-            if (!result.handleError(RepositoryActivity.this)) {
+            boolean success = !result.handleError(RepositoryActivity.this);
+            if (success) {
                 mRepository = result.getData();
-                invalidateOptionsMenu();
                 setTabsEnabled(true);
                 updateTitle();
-            } else {
-                setContentEmpty(true);
             }
+            setContentEmpty(!success);
             setContentShown(true);
+            invalidateOptionsMenu();
         }
     };
 

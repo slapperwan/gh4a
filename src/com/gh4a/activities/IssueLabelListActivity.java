@@ -67,17 +67,17 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
         }
         @Override
         public void onResultReady(LoaderResult<List<Label>> result) {
+            boolean success = !result.handleError(IssueLabelListActivity.this);
             stopProgressDialog(mProgressDialog);
             UiUtils.hideImeForView(getCurrentFocus());
-            if (!result.handleError(IssueLabelListActivity.this)) {
+            if (success) {
                 mAdapter.clear();
                 for (Label label : result.getData()) {
                     mAdapter.add(label);
                 }
                 mAdapter.notifyDataSetChanged();
-            } else {
-                setContentEmpty(true);
             }
+            setContentEmpty(!success);
             setContentShown(true);
         }
     };

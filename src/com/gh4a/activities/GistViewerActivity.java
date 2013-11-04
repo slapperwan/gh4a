@@ -48,12 +48,12 @@ public class GistViewerActivity extends LoadingFragmentActivity {
         }
         @Override
         public void onResultReady(LoaderResult<Gist> result) {
-            if (!result.handleError(GistViewerActivity.this)) {
+            boolean success = !result.handleError(GistViewerActivity.this);
+            if (success) {
                 fillData(result.getData().getFiles().get(mFileName).getContent(), true);
-            } else {
-                setContentEmpty(true);
-                setContentShown(true);
             }
+            setContentEmpty(!success);
+            setContentShown(true);
         }
     };
 

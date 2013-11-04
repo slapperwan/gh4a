@@ -81,13 +81,13 @@ public class IssueActivity extends LoadingFragmentActivity implements
         }
         @Override
         public void onResultReady(LoaderResult<Issue> result) {
-            if (!result.handleError(IssueActivity.this)) {
+            boolean success = !result.handleError(IssueActivity.this);
+            if (success) {
                 mIssue = result.getData();
                 mIssueState = mIssue.getState();
                 fillData();
-            } else {
-                setContentEmpty(true);
             }
+            setContentEmpty(!success);
             setContentShown(true);
             invalidateOptionsMenu();
         }

@@ -50,11 +50,11 @@ public abstract class UserListActivity extends LoadingFragmentActivity implement
 
         @Override
         public void onResultReady(LoaderResult<List<User>> result) {
-            if (!result.handleError(UserListActivity.this)) {
+            boolean success = !result.handleError(UserListActivity.this);
+            if (success) {
                 fillData(result.getData());
-            } else {
-                setContentEmpty(true);
             }
+            setContentEmpty(!success);
             setContentShown(true);
         }
     };

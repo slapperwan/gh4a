@@ -65,12 +65,12 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
         }
         @Override
         public void onResultReady(LoaderResult<Milestone> result) {
-            if (!result.handleError(IssueMilestoneEditActivity.this)) {
+            boolean success = !result.handleError(IssueMilestoneEditActivity.this);
+            if (success) {
                 mMilestone = result.getData();
                 fillData();
-            } else {
-                setContentEmpty(true);
             }
+            setContentEmpty(!success);
             setContentShown(true);
         }
     };

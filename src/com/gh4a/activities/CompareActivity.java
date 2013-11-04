@@ -54,14 +54,14 @@ public class CompareActivity extends LoadingFragmentActivity implements OnItemCl
         }
         @Override
         public void onResultReady(LoaderResult<RepositoryCommitCompare> result) {
+            setContentEmpty(true);
             if (!result.handleError(CompareActivity.this)) {
                 List<RepositoryCommit> commits = result.getData().getCommits();
                 if (commits != null && !commits.isEmpty()) {
                     mAdapter.addAll(commits);
                     mAdapter.notifyDataSetChanged();
+                    setContentEmpty(false);
                 }
-            } else {
-                setContentEmpty(true);
             }
             setContentShown(true);
         }

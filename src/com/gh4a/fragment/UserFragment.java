@@ -66,12 +66,12 @@ public class UserFragment extends ProgressFragment implements  OnClickListener {
         }
         @Override
         public void onResultReady(LoaderResult<User> result) {
-            if (!result.handleError(getActivity())) {
+            boolean success = !result.handleError(getActivity());
+            if (success) {
                 mUser = (User) result.getData();
                 fillData();
-            } else {
-                setContentEmpty(true);
             }
+            setContentEmpty(!success);
             setContentShown(true);
             getActivity().invalidateOptionsMenu();
         }

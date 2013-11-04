@@ -48,11 +48,11 @@ public class GistListActivity extends LoadingFragmentActivity implements OnItemC
 
         @Override
         public void onResultReady(LoaderResult<List<Gist>> result) {
-            if (!result.handleError(GistListActivity.this)) {
+            boolean success = !result.handleError(GistListActivity.this);
+            if (success) {
                 fillData(result.getData());
-            } else {
-                setContentEmpty(true);
             }
+            setContentEmpty(!success);
             setContentShown(true);
         }
     };
