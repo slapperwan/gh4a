@@ -2,8 +2,8 @@ package com.gh4a.loader;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
@@ -36,16 +36,12 @@ public class FeedLoader extends BaseLoader<List<Feed>> {
         BufferedInputStream bis = null;
         try {
             URL url = new URL(mUrl);
-            HttpURLConnection request = (HttpURLConnection) url.openConnection();
+            URLConnection request = (URLConnection) url.openConnection();
 
             if (request instanceof HttpsURLConnection) {
                 ((HttpsURLConnection) request).setHostnameVerifier(DO_NOT_VERIFY);
             }
 
-            request.setRequestMethod("GET");
-            request.setDoOutput(true);
-
-            request.connect();
             bis = new BufferedInputStream(request.getInputStream());
 
             SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -58,8 +54,7 @@ public class FeedLoader extends BaseLoader<List<Feed>> {
             if (bis != null) {
                 try {
                     bis.close();
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                 }
             }
         }
