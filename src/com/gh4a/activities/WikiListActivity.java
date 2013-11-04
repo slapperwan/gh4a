@@ -87,7 +87,7 @@ public class WikiListActivity extends LoadingFragmentActivity {
         
         mListView = (ListView) findViewById(R.id.list_view);
         //mListView.setOnScrollListener(new WikiScrollListener(this));
-        CommonFeedAdapter adapter = new CommonFeedAdapter(this, false, false, R.layout.row_simple_3);
+        CommonFeedAdapter adapter = new CommonFeedAdapter(this, false);
         mListView.setAdapter(adapter);
         mListView.setOnItemClickListener(new OnItemClickListener() {
             @Override

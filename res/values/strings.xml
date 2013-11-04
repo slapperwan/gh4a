@@ -72,6 +72,7 @@
     <string name="milestone_extradata">%1$d open\u00a0\u00a0\u00a0%2$d closed</string>
     <string name="milestone_extradata_due">%1$d open\u00a0\u00a0\u00a0%2$d closed\u00a0\u00a0\u00a0due on %3$s</string>
     <string name="download_extradata">%1$s\u00a0\u00a0\u00a0%2$d downloads\u00a0\u00a0\u00a0created %3$s</string>
+    <string name="feed_extradata">%1$s\u00a0\u00a0\u00a0%2$s</string>
     <string name="gist_extradata">%1$s\u00a0\u00a0\u00a0%2$s</string>
     <string name="go_to">Go to</string>
     <string name="fail_view_diff">Unable to view diff</string>

@@ -18,6 +18,7 @@ package com.gh4a.adapter;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.text.format.DateFormat;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,21 +32,11 @@ import com.gh4a.holder.Feed;
 import com.gh4a.utils.GravatarHandler;
 
 public class CommonFeedAdapter extends RootAdapter<Feed> implements OnClickListener {
-    private boolean mShowGravatar;
     private boolean mShowExtra;
-    private int mRowLayout;
     
-    public CommonFeedAdapter(Context context) {
+    public CommonFeedAdapter(Context context, boolean showExtra) {
         super(context);
-        mShowGravatar = true;//default true
-        mShowExtra = true;//default true
-    }
-    
-    public CommonFeedAdapter(Context context, boolean showGravatar, boolean showExtra, int rowLayout) {
-        this(context);
-        mShowGravatar = showGravatar;
         mShowExtra = showExtra;
-        mRowLayout = rowLayout;
     }
     
     @Override
@@ -54,8 +45,7 @@ public class CommonFeedAdapter extends RootAdapter<Feed> implements OnClickListe
         ViewHolder viewHolder = null;
 
         if (v == null) {
-            int layoutId = mRowLayout != 0 ? mRowLayout : R.layout.row_gravatar_3;
-            v = LayoutInflater.from(mContext).inflate(layoutId, parent, false);
+            v = LayoutInflater.from(mContext).inflate(R.layout.row_gravatar_3, parent, false);
             
             Gh4Application app = (Gh4Application) mContext.getApplicationContext();
             Typeface boldCondensed = app.boldCondensed;
@@ -64,9 +54,7 @@ public class CommonFeedAdapter extends RootAdapter<Feed> implements OnClickListe
             viewHolder = new ViewHolder();
             
             viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-            if (viewHolder.ivGravatar != null) {
-                viewHolder.ivGravatar.setOnClickListener(this);
-            }
+            viewHolder.ivGravatar.setOnClickListener(this);
             
             viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
             viewHolder.tvTitle.setTypeface(boldCondensed);
@@ -78,38 +66,31 @@ public class CommonFeedAdapter extends RootAdapter<Feed> implements OnClickListe
             viewHolder.tvExtra.setTextAppearance(mContext, R.style.default_text_micro);
             
             v.setTag(viewHolder);
-        }
-        else {
+        } else {
             viewHolder = (ViewHolder) v.getTag();
         }
 
         final Feed feed = mObjects.get(position);
         
-        if (viewHolder.ivGravatar != null) {
-            if (mShowGravatar) {
-                GravatarHandler.assignGravatar(viewHolder.ivGravatar, feed.getGravatarId());
-                viewHolder.ivGravatar.setTag(feed);
-                viewHolder.ivGravatar.setVisibility(View.VISIBLE);
-            }
-            else {
-                viewHolder.ivGravatar.setVisibility(View.GONE);
-            }
-        }
-
         String title = feed.getTitle();
         viewHolder.tvTitle.setText(title);
         viewHolder.tvTitle.setVisibility(title != null ? View.VISIBLE : View.GONE);
 
         viewHolder.tvDesc.setText(feed.getPreview());
-        viewHolder.tvDesc.setSingleLine(title != null || mShowExtra);
+        viewHolder.tvDesc.setGravity(mShowExtra ? Gravity.TOP : Gravity.CENTER_VERTICAL);
 
         if (mShowExtra) {
+            GravatarHandler.assignGravatar(viewHolder.ivGravatar, feed.getGravatarId());
+            viewHolder.ivGravatar.setTag(feed);
+            viewHolder.ivGravatar.setVisibility(View.VISIBLE);
+            
             String published = feed.getPublished() != null
-                    ? DateFormat.getMediumDateFormat(mContext).format(feed.getPublished()) : null;
-                    viewHolder.tvExtra.setText(feed.getAuthor() + (published != null ? " | " + published : ""));
-                    viewHolder.tvExtra.setVisibility(View.VISIBLE);
-        }
-        else {
+                    ? DateFormat.getMediumDateFormat(mContext).format(feed.getPublished()) : "";
+            viewHolder.tvExtra.setText(mContext.getString(R.string.feed_extradata,
+                    feed.getAuthor(), published));
+            viewHolder.tvExtra.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.ivGravatar.setVisibility(View.GONE);
             viewHolder.tvExtra.setVisibility(View.GONE);
         }
 

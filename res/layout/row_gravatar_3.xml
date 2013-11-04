@@ -6,12 +6,12 @@
             Description (Medium)
             Extra (Small)
  -->
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="?android:attr/listPreferredItemHeight"
+    android:orientation="horizontal"
     android:paddingLeft="@dimen/content_padding"
     android:paddingRight="@dimen/content_padding"
     android:paddingTop="8dp"
@@ -19,30 +19,31 @@
     <com.gh4a.widget.FixedSizeImageView
         android:id="@+id/iv_gravatar"
         android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_centerVertical="true"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
         android:layout_marginRight="8dp" />
-    <TextView
-        android:id="@+id/tv_title"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_toRightOf="@id/iv_gravatar"
-        android:layout_alignParentTop="true" />
-    <TextView
-        android:id="@+id/tv_extra"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="@style/default_text_micro"
-        android:layout_toRightOf="@id/iv_gravatar"
-        android:layout_alignParentBottom="true" />
-    <TextView
-        android:id="@+id/tv_desc"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:layout_toRightOf="@id/iv_gravatar"
-        android:layout_above="@id/tv_extra"
-        android:layout_below="@id/tv_title"
-        android:layout_alignWithParentIfMissing="true" />
-</RelativeLayout>
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/tv_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:maxLines="2"
+            android:ellipsize="end" />
+        <TextView
+            android:id="@+id/tv_extra"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/default_text_micro" />
+    </LinearLayout>
+</LinearLayout>

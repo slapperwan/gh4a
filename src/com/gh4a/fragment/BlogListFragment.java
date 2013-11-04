@@ -40,7 +40,7 @@ public class BlogListFragment extends ListDataBaseFragment<Feed> {
 
     @Override
     protected RootAdapter<Feed> onCreateAdapter() {
-        return new CommonFeedAdapter(getActivity());
+        return new CommonFeedAdapter(getActivity(), true);
     }
 
     @Override
