@@ -50,6 +50,10 @@ public class FollowerFollowingListActivity extends LoadingFragmentPagerActivity 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(mUserLogin);
         actionBar.setDisplayHomeAsUpEnabled(true);
+
+        if (!data.getBoolean("FIND_FOLLOWERS", true)) {
+            actionBar.selectTab(actionBar.getTabAt(1));
+        }
     }
 
     @Override
