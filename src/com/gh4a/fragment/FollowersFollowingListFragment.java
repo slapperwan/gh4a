@@ -56,7 +56,7 @@ public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> 
     
     @Override
     protected int getEmptyTextResId() {
-        return R.string.no_followers_found;
+        return mFindFollowers ? R.string.no_followers_found : R.string.no_following_found;
     }
 
     @Override

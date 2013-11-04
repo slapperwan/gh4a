@@ -118,6 +118,7 @@
     <string name="no_milestones_found">This repository doesn\'t have any configured milestone.</string>
     <string name="no_commits_found">No commits found.</string>
     <string name="no_followers_found">No followers found.</string>
+    <string name="no_following_found">No users are followed so far..</string>
     <string name="no_forks_found">This repository wasn\'t forked yet.</string>
     <string name="no_issues_found">No issues were reported so far.</string>
     <string name="no_events_found">No events found.</string>
