@@ -169,9 +169,10 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
         }
         
         if (!Gh4Application.get(this).isAuthorized()) {
-            Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+            Intent intent = new Intent(this, Github4AndroidActivity.class);
             startActivity(intent);
             finish();
+            return;
         }
         setContentView(R.layout.issue_create);
 

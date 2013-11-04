@@ -28,16 +28,13 @@ public class BrowseFilter extends BaseSherlockFragmentActivity {
                 || "contact".equals(first)
                 || "features".equals(first)) {//skip this
             
-        }
-        else if ("explore".equals(first)) {//https://github.com/explore
-            Intent intent = new Intent().setClass(this, ExploreActivity.class);
+        } else if ("explore".equals(first)) {//https://github.com/explore
+            Intent intent = new Intent(this, ExploreActivity.class);
             startActivity(intent);
-        }
-        else if ("blog".equals(first)) {//https://github.com/blog
-            Intent intent = new Intent().setClass(this, BlogListActivity.class);
+        } else if ("blog".equals(first)) {//https://github.com/blog
+            Intent intent = new Intent(this, BlogListActivity.class);
             startActivity(intent);
-        }
-        else {
+        } else {
             Gh4Application context = Gh4Application.get(this);
 
             // strip off extra data like line numbers etc.
@@ -54,11 +51,9 @@ public class BrowseFilter extends BaseSherlockFragmentActivity {
 
             if (repo == null && action == null) {
                 context.openUserInfoActivity(this, user, null);
-            }
-            else if (action == null) {
+            } else if (action == null) {
                 context.openRepositoryInfoActivity(this, user, repo, 0);
-            }
-            else if ("issues".equals(action)) {
+            } else if ("issues".equals(action)) {
                 if (!StringUtils.isBlank(id)) {
                     try {
                         context.openIssueActivity(this, user, repo, Integer.parseInt(id));
@@ -68,27 +63,21 @@ public class BrowseFilter extends BaseSherlockFragmentActivity {
                 } else {
                     context.openIssueListActivity(this, user, repo, Constants.Issue.ISSUE_STATE_OPEN);
                 }
-            }
-            else if ("pulls".equals(action)) {
+            } else if ("pulls".equals(action)) {
                 context.openPullRequestListActivity(this, user, repo, Constants.Issue.ISSUE_STATE_OPEN);
-            }
-            else if ("wiki".equals(action)) {
-                Intent intent = new Intent().setClass(this, WikiListActivity.class);
+            } else if ("wiki".equals(action)) {
+                Intent intent = new Intent(this, WikiListActivity.class);
                 intent.putExtra(Constants.Repository.REPO_OWNER, user);
                 intent.putExtra(Constants.Repository.REPO_NAME, repo);
                 startActivity(intent);
-            }
-            else if ("pull".equals(action) && !StringUtils.isBlank(id)) {
+            } else if ("pull".equals(action) && !StringUtils.isBlank(id)) {
                 try {
                     context.openPullRequestActivity(this, user, repo, Integer.parseInt(id));
+                } catch (NumberFormatException e) {
                 }
-                catch (NumberFormatException e) {
-                }
-            }
-            else if ("commit".equals(action) && !StringUtils.isBlank(id)) {
+            } else if ("commit".equals(action) && !StringUtils.isBlank(id)) {
                 context.openCommitInfoActivity(this, user, repo, id, 0);
-            }
-            else if ("blob".equals(action) && !StringUtils.isBlank(id) && parts.size() >= 5) {
+            } else if ("blob".equals(action) && !StringUtils.isBlank(id) && parts.size() >= 5) {
                 String fullPath = TextUtils.join("/", parts.subList(4, parts.size()));
                 context.openFileViewerActivity(this, user, repo, id, fullPath, uri.getLastPathSegment());
             }

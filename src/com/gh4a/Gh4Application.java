@@ -219,7 +219,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
      * @param issueNumber the issue number
      */
     public void openIssueActivity(Context context, String login, String repoName, int issueNumber) {
-        Intent intent = new Intent().setClass(context, IssueActivity.class);
+        Intent intent = new Intent(context, IssueActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, login);
         intent.putExtra(Constants.Repository.REPO_NAME, repoName);
         intent.putExtra(Constants.Issue.ISSUE_NUMBER, issueNumber);
@@ -237,7 +237,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
      */
     public void openIssueActivity(Context context, String login, String repoName, int issueNumber,
             String state) {
-        Intent intent = new Intent().setClass(context, IssueActivity.class);
+        Intent intent = new Intent(context, IssueActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, login);
         intent.putExtra(Constants.Repository.REPO_NAME, repoName);
         intent.putExtra(Constants.Issue.ISSUE_NUMBER, issueNumber);
@@ -254,7 +254,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
      */
     public void openIssueActivity(Context context, String login, String repoName, 
             int issueNumber, int flags) {
-        Intent intent = new Intent().setClass(context, IssueActivity.class);
+        Intent intent = new Intent(context, IssueActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, login);
         intent.putExtra(Constants.Repository.REPO_NAME, repoName);
         intent.putExtra(Constants.Issue.ISSUE_NUMBER, issueNumber);
@@ -272,7 +272,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
      */
     public void openIssueListActivity(Context context, String repoOwner, String repoName,
             String state) {
-        Intent intent = new Intent().setClass(context, IssueListActivity.class);
+        Intent intent = new Intent(context, IssueListActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, repoName);
         intent.putExtra(Constants.Issue.ISSUE_STATE, state);
@@ -281,7 +281,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     
     public void openIssueListActivity(Context context, String repoOwner, String repoName,
             String state, int flags) {
-        Intent intent = new Intent().setClass(context, IssueListActivity.class);
+        Intent intent = new Intent(context, IssueListActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, repoName);
         intent.putExtra(Constants.Issue.ISSUE_STATE, state);
@@ -297,7 +297,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
      */
     public void openRepositoryInfoActivity(Context context, Repository repository) {
         if (repository != null) {
-            Intent intent = new Intent().setClass(context, RepositoryActivity.class);
+            Intent intent = new Intent(context, RepositoryActivity.class);
             Bundle data = populateRepository(repository);
             intent.putExtra(Constants.DATA_BUNDLE, data);
             context.startActivity(intent);
@@ -315,7 +315,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
      * @param repoName the repo name
      */
     public void openRepositoryInfoActivity(Context context, String repoOwner, String repoName, int flags) {
-        Intent intent = new Intent().setClass(context, RepositoryActivity.class);
+        Intent intent = new Intent(context, RepositoryActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, repoName);
         if (flags != 0) {
@@ -332,7 +332,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
      * @param name the name
      */
     public void openUserInfoActivity(Context context, String login, String name) {
-        Intent intent = new Intent().setClass(context, UserActivity.class);
+        Intent intent = new Intent(context, UserActivity.class);
         intent.putExtra(Constants.User.USER_LOGIN, login);
         intent.putExtra(Constants.User.USER_NAME, name);
         context.startActivity(intent);
@@ -347,7 +347,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
      * @param flags the flags
      */
     public void openUserInfoActivity(Context context, String login, String name, int flags) {
-        Intent intent = new Intent().setClass(context, UserActivity.class);
+        Intent intent = new Intent(context, UserActivity.class);
         intent.putExtra(Constants.User.USER_LOGIN, login);
         intent.putExtra(Constants.User.USER_NAME, name);
         intent.setFlags(flags);
@@ -363,7 +363,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
      * @param sha the sha
      */
     public void openCommitInfoActivity(Context context, String login, String repoName, String sha, int flags) {
-        Intent intent = new Intent().setClass(context, CommitActivity.class);
+        Intent intent = new Intent(context, CommitActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, login);
         intent.putExtra(Constants.Repository.REPO_NAME, repoName);
         intent.putExtra(Constants.Object.OBJECT_SHA, sha);
@@ -375,7 +375,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
 
     public void openFileViewerActivity(Context context, String login, String repoName, String sha,
             String fullPath, String fileName) {
-        Intent intent = new Intent().setClass(this, FileViewerActivity.class);
+        Intent intent = new Intent(this, FileViewerActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, login);
         intent.putExtra(Constants.Repository.REPO_NAME, repoName);
         intent.putExtra(Constants.Object.PATH, fullPath);
@@ -395,7 +395,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
      */
     public void openPullRequestActivity(Context context, String repoOwner, String repoName,
             int pullRequestNumber) {
-        Intent intent = new Intent().setClass(context, PullRequestActivity.class);
+        Intent intent = new Intent(context, PullRequestActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, repoName);
         intent.putExtra(Constants.PullRequest.NUMBER, pullRequestNumber);
@@ -410,7 +410,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
      * @param repoName the repo name
      */
     public void openPullRequestListActivity(Context context, String repoOwner, String repoName, String state) {
-        Intent intent = new Intent().setClass(context, PullRequestListActivity.class);
+        Intent intent = new Intent(context, PullRequestListActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, repoName);
         intent.putExtra(Constants.PullRequest.STATE, state);
@@ -419,7 +419,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     
     public void openPullRequestListActivity(Context context, String repoOwner, String repoName, String state,
             int flags) {
-        Intent intent = new Intent().setClass(context, PullRequestListActivity.class);
+        Intent intent = new Intent(context, PullRequestListActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, repoName);
         intent.putExtra(Constants.PullRequest.STATE, state);
@@ -434,12 +434,12 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
      * @param url the url
      */
     public void openBrowser(Context context, String url) {
-        Intent browserIntent = new Intent("android.intent.action.VIEW", Uri.parse(url));
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         context.startActivity(browserIntent);
     }
 
     public void openGistActivity(Context context, String userLogin, String gistId, int flags) {
-        Intent intent = new Intent().setClass(context, GistActivity.class);
+        Intent intent = new Intent(context, GistActivity.class);
         intent.putExtra(Constants.User.USER_LOGIN, userLogin);
         intent.putExtra(Constants.Gist.ID, gistId);
         if (flags != 0) {

@@ -274,7 +274,7 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
 
         /** User item */
         if (object instanceof SearchUser) {
-            Intent intent = new Intent().setClass(SearchActivity.this, UserActivity.class);
+            Intent intent = new Intent(SearchActivity.this, UserActivity.class);
             SearchUser user = (SearchUser) object;
 
             intent.putExtra(Constants.User.USER_LOGIN, user.getLogin());

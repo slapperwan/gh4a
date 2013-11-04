@@ -52,7 +52,7 @@ public class TimelineActivity extends BaseSherlockFragmentActivity {
     @Override
     protected void navigateUp() {
         if (!Gh4Application.get(this).isAuthorized()) {
-            Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+            Intent intent = new Intent(this, Github4AndroidActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
@@ -68,12 +68,12 @@ public class TimelineActivity extends BaseSherlockFragmentActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.trend:
-                Intent intent = new Intent().setClass(this, TrendingActivity.class);
+                Intent intent = new Intent(this, TrendingActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;
             case R.id.blog:
-                intent = new Intent().setClass(this, BlogListActivity.class);
+                intent = new Intent(this, BlogListActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;

@@ -63,9 +63,10 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
         }
         
         if (!Gh4Application.get(this).isAuthorized()) {
-            Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+            Intent intent = new Intent(this, Github4AndroidActivity.class);
             startActivity(intent);
             finish();
+            return;
         }
         setContentView(R.layout.issue_create_milestone);
 
@@ -151,7 +152,7 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
     }
     
     private void openIssueMilestones() {
-        Intent intent = new Intent().setClass(this, IssueMilestoneListActivity.class);
+        Intent intent = new Intent(this, IssueMilestoneListActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

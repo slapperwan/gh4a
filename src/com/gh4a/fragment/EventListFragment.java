@@ -139,7 +139,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
                 
                 if (commits != null) {
                     if (commits.size() > 1) {
-                        Intent intent = new Intent().setClass(context, CompareActivity.class);
+                        Intent intent = new Intent(context, CompareActivity.class);
                         intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
                         intent.putExtra(Constants.Repository.REPO_NAME, repoName);
                         intent.putExtra(Constants.Repository.HEAD, payload.getHead());
@@ -535,7 +535,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             if (repoOwner != null) {
                 PushPayload payload = (PushPayload) event.getPayload();
                 
-                Intent intent = new Intent().setClass(app, CompareActivity.class);
+                Intent intent = new Intent(getActivity(), CompareActivity.class);
                 intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
                 intent.putExtra(Constants.Repository.REPO_NAME, repoName);
                 intent.putExtra(Constants.Repository.HEAD, payload.getHead());

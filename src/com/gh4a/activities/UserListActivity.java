@@ -111,7 +111,7 @@ public abstract class UserListActivity extends LoadingFragmentActivity implement
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         User user = (User) adapterView.getAdapter().getItem(position);
         if (!StringUtils.isBlank(user.getLogin())) {
-            Intent intent = new Intent().setClass(UserListActivity.this, UserActivity.class);
+            Intent intent = new Intent(UserListActivity.this, UserActivity.class);
             intent.putExtra(Constants.User.USER_LOGIN, (String) user.getLogin());
             intent.putExtra(Constants.User.USER_NAME, (String) user.getName());
             startActivity(intent);

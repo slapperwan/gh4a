@@ -128,7 +128,7 @@ public class GistActivity extends LoadingFragmentActivity implements OnClickList
     
     @Override
     protected void navigateUp() {
-        Intent intent = new Intent().setClass(this, GistListActivity.class);
+        Intent intent = new Intent(this, GistListActivity.class);
         intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);

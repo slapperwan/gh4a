@@ -93,7 +93,7 @@ public class WikiActivity extends LoadingFragmentActivity {
     
     @Override
     protected void navigateUp() {
-        Intent intent = new Intent().setClass(this, WikiListActivity.class);
+        Intent intent = new Intent(this, WikiListActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

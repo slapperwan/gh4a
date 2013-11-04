@@ -53,7 +53,7 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
      */
     @Override
     public boolean onSearchRequested() {
-        Intent intent = new Intent().setClass(getApplication(), SearchActivity.class);
+        Intent intent = new Intent(this, SearchActivity.class);
         startActivity(intent);
         return true;
     }
@@ -84,7 +84,7 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
             Gh4Application.get(this).logout();
             return true;
         case R.id.login:
-            Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+            Intent intent = new Intent(this, Github4AndroidActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP
                     |Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);

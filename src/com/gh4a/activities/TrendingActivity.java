@@ -65,12 +65,11 @@ public class TrendingActivity extends LoadingFragmentPagerActivity {
     @Override
     protected void navigateUp() {
         if (!Gh4Application.get(this).isAuthorized()) {
-            Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+            Intent intent = new Intent(this, Github4AndroidActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
-        }
-        else {
+        } else {
             Gh4Application app = Gh4Application.get(this);
             app.openUserInfoActivity(this, app.getAuthLogin(), null,
                     Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -81,17 +80,17 @@ public class TrendingActivity extends LoadingFragmentPagerActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.pub_timeline:
-                Intent intent = new Intent().setClass(this, TimelineActivity.class);
+                Intent intent = new Intent(this, TimelineActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;
             case R.id.trend:
-                intent = new Intent().setClass(this, TrendingActivity.class);
+                intent = new Intent(this, TrendingActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;
             case R.id.blog:
-                intent = new Intent().setClass(this, BlogListActivity.class);
+                intent = new Intent(this, BlogListActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;

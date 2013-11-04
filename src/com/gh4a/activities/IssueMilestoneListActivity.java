@@ -86,7 +86,7 @@ public class IssueMilestoneListActivity extends LoadingFragmentPagerActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.create_new:
-            Intent intent = new Intent().setClass(this, IssueMilestoneCreateActivity.class);
+            Intent intent = new Intent(this, IssueMilestoneCreateActivity.class);
             intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
             intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
             startActivity(intent);

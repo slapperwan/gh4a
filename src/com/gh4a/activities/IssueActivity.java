@@ -311,7 +311,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
         switch (item.getItemId()) {
             case R.id.issue_create:
                 if (checkForAuthOrExit()) {
-                    Intent intent = new Intent().setClass(this, IssueCreateActivity.class);
+                    Intent intent = new Intent(this, IssueCreateActivity.class);
                     intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
                     intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                     startActivity(intent);
@@ -319,7 +319,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
                 return true;
             case R.id.issue_edit:
                 if (checkForAuthOrExit()) {
-                    Intent intent = new Intent().setClass(this, IssueCreateActivity.class);
+                    Intent intent = new Intent(this, IssueCreateActivity.class);
                     intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
                     intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
                     intent.putExtra(Constants.Issue.ISSUE_NUMBER, mIssue.getNumber());

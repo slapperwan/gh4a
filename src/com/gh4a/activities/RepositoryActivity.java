@@ -308,7 +308,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
     }
     
     private void openFileViewer(RepositoryContents content, String ref) {
-        Intent intent = new Intent().setClass(this, FileViewerActivity.class);
+        Intent intent = new Intent(this, FileViewerActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
         intent.putExtra(Constants.Object.PATH, content.getPath());

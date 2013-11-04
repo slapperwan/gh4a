@@ -162,7 +162,7 @@ public class UserActivity extends LoadingFragmentPagerActivity {
             Gh4Application app = Gh4Application.get(this);
             app.openUserInfoActivity(this, app.getAuthLogin(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
         } else {
-            Intent intent = new Intent().setClass(this, Github4AndroidActivity.class);
+            Intent intent = new Intent(this, Github4AndroidActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP
                     |Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
