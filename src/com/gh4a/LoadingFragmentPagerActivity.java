@@ -30,6 +30,13 @@ public abstract class LoadingFragmentPagerActivity extends LoadingFragmentActivi
         return mPager;
     }
 
+    public void setTabsEnabled(boolean enabled) {
+        mPager.setEnabled(enabled);
+        if (enabled) {
+            mPager.setCurrentItem(getSupportActionBar().getSelectedTab().getPosition());
+        }
+    }
+
     private ViewPager setupPager() {
         final ActionBar actionBar = getSupportActionBar();
         int[] titleResIds = getTabTitleResIds();
@@ -107,7 +114,9 @@ public abstract class LoadingFragmentPagerActivity extends LoadingFragmentActivi
         }
 
         public void onTabSelected(Tab tab, FragmentTransaction ft) {
-            mPager.setCurrentItem(mTag);
+            if (mPager.isEnabled()) {
+                mPager.setCurrentItem(mTag);
+            }
         }
 
         public void onTabUnselected(Tab tab, FragmentTransaction ft) {

@@ -73,6 +73,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             if (!result.handleError(RepositoryActivity.this)) {
                 mRepository = result.getData();
                 invalidateOptionsMenu();
+                setTabsEnabled(true);
                 updateTitle();
             } else {
                 setContentEmpty(true);
@@ -216,7 +217,8 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         }
         
         setContentShown(false);
-        
+        setTabsEnabled(false);
+
         mActionBar = getSupportActionBar();
         mActionBar.setTitle(mRepoOwner + "/" + mRepoName);
         mActionBar.setDisplayHomeAsUpEnabled(true);
