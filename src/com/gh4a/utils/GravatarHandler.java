@@ -44,6 +44,7 @@ public class GravatarHandler {
     private static int sNextRequestId = 1;
 
     private static class Request {
+        String id;
         String url;
         ArrayList<ImageView> views;
     }
@@ -62,7 +63,9 @@ public class GravatarHandler {
             switch (msg.what) {
                 case MSG_LOADED:
                     processResult(msg.arg1, (Bitmap) msg.obj);
-                    sendEmptyMessageDelayed(MSG_DESTROY, 3000);
+                    if (sRequests.size() == 0) {
+                        sendEmptyMessageDelayed(MSG_DESTROY, 3000);
+                    }
                     break;
                 case MSG_DESTROY:
                     shutdownWorker();
@@ -73,7 +76,7 @@ public class GravatarHandler {
         private void processResult(int requestId, Bitmap bitmap) {
             final Request request = sRequests.get(requestId);
             if (request != null && bitmap != null) {
-                sCache.put(request.url, bitmap);
+                sCache.put(request.id, bitmap);
                 for (ImageView view : request.views) {
                     view.setImageBitmap(bitmap);
                 }
@@ -85,38 +88,37 @@ public class GravatarHandler {
     
     public static void assignGravatar(ImageView view, User user) {
         if (user == null) {
-            assignGravatar(view, (String) null);
+            assignGravatar(view, null, null);
             return;
         }
 
-        String avatarUrl = user.getAvatarUrl();
-        if (!TextUtils.isEmpty(avatarUrl)) {
-            assignGravatar(view, avatarUrl);
-            return;
-        }
         String gravatarId = user.getGravatarId();
         if (TextUtils.isEmpty(gravatarId)) {
             gravatarId = StringUtils.md5Hex(user.getEmail());
         }
-        assignGravatar(view, GravatarUtils.getGravatarUrl(gravatarId));
+        String avatarUrl = user.getAvatarUrl();
+        assignGravatar(view, gravatarId, avatarUrl);
     }
-    
-    public static void assignGravatar(ImageView view, String url) {
+
+    public static void assignGravatar(ImageView view, String gravatarId) {
+        assignGravatar(view, gravatarId, null);
+    }
+
+    private static void assignGravatar(ImageView view, String gravatarId, String url) {
         removeOldRequest(view);
 
-        Bitmap cachedBitmap = sCache.get(url);
+        Bitmap cachedBitmap = sCache.get(gravatarId);
         if (cachedBitmap != null) {
             view.setImageBitmap(cachedBitmap);
             return;
         }
 
         view.setImageResource(R.drawable.default_avatar);
-
-        if (url == null) {
+        if (gravatarId == null) {
             return;
         }
 
-        Request request = getRequestForUrl(url);
+        Request request = getRequestForId(gravatarId);
         if (request != null) {
             request.views.add(view);
             return;
@@ -124,7 +126,8 @@ public class GravatarHandler {
 
         int requestId = sNextRequestId++;
         request = new Request();
-        request.url = url;
+        request.id = gravatarId;
+        request.url = TextUtils.isEmpty(url) ? GravatarUtils.getGravatarUrl(gravatarId) : url;
         request.views = new ArrayList<ImageView>();
         request.views.add(view);
         sRequests.put(requestId, request);
@@ -140,11 +143,11 @@ public class GravatarHandler {
         msg.sendToTarget();
     }
 
-    private static Request getRequestForUrl(String url) {
+    private static Request getRequestForId(String gravatarId) {
         int count = sRequests.size();
         for (int i = 0; i < count; i++) {
             Request request = sRequests.valueAt(i);
-            if (request.url.equals(url)) {
+            if (request.id.equals(gravatarId)) {
                 return request;
             }
         }

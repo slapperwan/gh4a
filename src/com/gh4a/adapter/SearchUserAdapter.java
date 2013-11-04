@@ -29,7 +29,6 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarHandler;
-import com.gh4a.utils.GravatarUtils;
 import com.gh4a.utils.StringUtils;
 
 public class SearchUserAdapter extends RootAdapter<SearchUser> implements OnClickListener {
@@ -68,8 +67,7 @@ public class SearchUserAdapter extends RootAdapter<SearchUser> implements OnClic
 
         final SearchUser user = mObjects.get(position);
 
-        GravatarHandler.assignGravatar(viewHolder.ivGravatar,
-                GravatarUtils.getGravatarUrl(user.getGravatarId())); 
+        GravatarHandler.assignGravatar(viewHolder.ivGravatar, user.getGravatarId());
 
         viewHolder.tvTitle.setText(StringUtils.formatName(user.getLogin(), user.getName()));
         viewHolder.tvExtra.setText(mContext.getString(R.string.user_extra_data,

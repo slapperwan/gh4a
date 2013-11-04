@@ -29,7 +29,6 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.holder.Feed;
 import com.gh4a.utils.GravatarHandler;
-import com.gh4a.utils.GravatarUtils;
 
 public class CommonFeedAdapter extends RootAdapter<Feed> implements OnClickListener {
     private boolean mShowGravatar;
@@ -88,8 +87,7 @@ public class CommonFeedAdapter extends RootAdapter<Feed> implements OnClickListe
         
         if (viewHolder.ivGravatar != null) {
             if (mShowGravatar) {
-                GravatarHandler.assignGravatar(viewHolder.ivGravatar,
-                        GravatarUtils.getGravatarUrl(feed.getGravatarId())); 
+                GravatarHandler.assignGravatar(viewHolder.ivGravatar, feed.getGravatarId());
                 viewHolder.ivGravatar.setTag(feed);
                 viewHolder.ivGravatar.setVisibility(View.VISIBLE);
             }
