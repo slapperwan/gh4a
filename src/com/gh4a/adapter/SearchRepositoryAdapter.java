@@ -34,33 +34,29 @@ public class SearchRepositoryAdapter extends RootAdapter<SearchRepository> {
     }
 
     @Override
-    public View doGetView(int position, View convertView, ViewGroup parent) {
-        View v = convertView;
-        ViewHolder viewHolder = null;
+    protected View createView(LayoutInflater inflater, ViewGroup parent) {
+        View v = inflater.inflate(R.layout.row_simple_3, null);
+        ViewHolder viewHolder = new ViewHolder();
 
-        if (v == null) {
-            v = LayoutInflater.from(mContext).inflate(R.layout.row_simple_3, null);
+        Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+        Typeface boldCondensed = app.boldCondensed;
+        Typeface regular = app.regular;
 
-            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
-            Typeface boldCondensed = app.boldCondensed;
-            Typeface regular = app.regular;
-            
-            viewHolder = new ViewHolder();
-            viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-            viewHolder.tvTitle.setTypeface(boldCondensed);
-            
-            viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-            viewHolder.tvDesc.setTypeface(regular);
-            
-            viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+        viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
+        viewHolder.tvTitle.setTypeface(boldCondensed);
 
-            v.setTag(viewHolder);
-        }
-        else {
-            viewHolder = (ViewHolder) v.getTag();
-        }
+        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+        viewHolder.tvDesc.setTypeface(regular);
 
-        SearchRepository repository = mObjects.get(position);
+        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+
+        v.setTag(viewHolder);
+        return v;
+    }
+    
+    @Override
+    protected void bindView(View v, SearchRepository repository) {
+        ViewHolder viewHolder = (ViewHolder) v.getTag();
         
         viewHolder.tvTitle.setText(repository.getOwner() + "/" + repository.getName());
         
@@ -77,8 +73,6 @@ public class SearchRepositoryAdapter extends RootAdapter<SearchRepository> {
         viewHolder.tvExtra.setText(mContext.getString(R.string.repo_search_extradata,
                 language, StringUtils.toHumanReadbleFormat(repository.getSize()),
                 repository.getForks(), repository.getWatchers()));
-                
-        return v;
     }
 
     private static class ViewHolder {

@@ -37,33 +37,30 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> implements OnCl
     }
 
     @Override
-    public View doGetView(int position, View convertView, ViewGroup parent) {
-        View v = convertView;
-        ViewHolder viewHolder;
-        if (v == null) {
-            v = LayoutInflater.from(mContext).inflate(R.layout.row_gravatar_1, parent, false);
-            
-            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
-            Typeface boldCondensed = app.boldCondensed;
-            Typeface regular = app.regular;
-            
-            viewHolder = new ViewHolder();
-            viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-            viewHolder.ivGravatar.setOnClickListener(this);
+    protected View createView(LayoutInflater inflater, ViewGroup parent) {
+        View v = inflater.inflate(R.layout.row_gravatar_1, parent, false);
+        ViewHolder viewHolder = new ViewHolder();
 
-            viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_title);
-            viewHolder.tvDesc.setTypeface(boldCondensed);
-            
-            viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-            viewHolder.tvExtra.setTypeface(regular);
-            
-            v.setTag(viewHolder);
-        }
-        else {
-            viewHolder = (ViewHolder) v.getTag();
-        }
+        Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+        Typeface boldCondensed = app.boldCondensed;
+        Typeface regular = app.regular;
 
-        final PullRequest pullRequest = mObjects.get(position);
+        viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
+        viewHolder.ivGravatar.setOnClickListener(this);
+
+        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_title);
+        viewHolder.tvDesc.setTypeface(boldCondensed);
+
+        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+        viewHolder.tvExtra.setTypeface(regular);
+
+        v.setTag(viewHolder);
+        return v;
+    }
+    
+    @Override
+    protected void bindView(View v, PullRequest pullRequest) {
+        ViewHolder viewHolder = (ViewHolder) v.getTag();
         final User user = pullRequest.getUser();
         
         GravatarHandler.assignGravatar(viewHolder.ivGravatar, user);
@@ -72,8 +69,6 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> implements OnCl
         viewHolder.tvDesc.setText(pullRequest.getTitle());
         viewHolder.tvExtra.setText(mContext.getString(R.string.more_issue_data,
                 user != null ? user.getLogin() : "", pt.format(pullRequest.getCreatedAt())));
-
-        return v;
     }
 
     @Override

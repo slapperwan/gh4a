@@ -34,33 +34,30 @@ public class FileAdapter extends RootAdapter<RepositoryContents> {
     }
 
     @Override
-    public View doGetView(int position, View convertView, ViewGroup parent) {
-        View v = convertView;
-        ViewHolder holder;
+    protected View createView(LayoutInflater inflater, ViewGroup parent) {
+        View v = inflater.inflate(R.layout.row_file_manager, null);
+        ViewHolder holder = new ViewHolder();
         
-        if (v == null) {
-            v = LayoutInflater.from(mContext).inflate(R.layout.row_file_manager, null);
-            holder = new ViewHolder();
-            holder.icon = (ImageView) v.findViewById(R.id.iv_icon);
-            holder.fileName = (TextView) v.findViewById(R.id.tv_text);
-            v.setTag(holder);
-        } else {
-            holder = (ViewHolder) v.getTag();
-        }
+        holder.icon = (ImageView) v.findViewById(R.id.iv_icon);
+        holder.fileName = (TextView) v.findViewById(R.id.tv_text);
+        
+        v.setTag(holder);
+        return v;
+    }
+    
+    @Override
+    protected void bindView(View v, RepositoryContents content) {
+        ViewHolder holder = (ViewHolder) v.getTag();
 
-        RepositoryContents content = mObjects.get(position);
         holder.icon.setBackgroundResource(getIconId(content.getType(),
                 FileUtils.getFileExtension(content.getName())));
         holder.fileName.setText(content.getName());
-
-        return v;
     }
 
     private int getIconId(String type, String ext) {
         if (RepositoryContents.TYPE_DIR.equals(type)) {
             return R.drawable.folder;
-        }
-        else if (RepositoryContents.TYPE_FILE.equals(type)) {
+        } else if (RepositoryContents.TYPE_FILE.equals(type)) {
             if ("png".equalsIgnoreCase(ext) || "ico".equalsIgnoreCase(ext)
                     || "jpg".equalsIgnoreCase(ext) || "jpeg".equalsIgnoreCase(ext)
                     || "gif".equalsIgnoreCase(ext)) {

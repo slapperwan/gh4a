@@ -38,41 +38,36 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
     }
     
     @Override
-    public View doGetView(int position, View convertView, ViewGroup parent) {
-        View v = convertView;
-        ViewHolder viewHolder = null;
-        LayoutInflater inflater = LayoutInflater.from(mContext);
+    protected View createView(LayoutInflater inflater, ViewGroup parent) {
+        View v = inflater.inflate(R.layout.row_issue, null);
+        ViewHolder viewHolder = new ViewHolder();
 
-        if (v == null) {
-            v = inflater.inflate(R.layout.row_issue, null);
-            
-            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
-            Typeface boldCondensed = app.boldCondensed;
-            
-            viewHolder = new ViewHolder();
-            viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-            viewHolder.ivGravatar.setOnClickListener(this);
+        Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+        Typeface boldCondensed = app.boldCondensed;
 
-            viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-            viewHolder.tvDesc.setTypeface(boldCondensed);
-            
-            viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-            viewHolder.tvNumber = (TextView) v.findViewById(R.id.tv_number);
-            viewHolder.llLabels = (LinearLayout) v.findViewById(R.id.ll_labels);
-            viewHolder.tvState = (TextView) v.findViewById(R.id.tv_state);
-            viewHolder.ivAssignee = (ImageView) v.findViewById(R.id.iv_assignee);
-            viewHolder.tvComments = (TextView) v.findViewById(R.id.tv_comments);
-            viewHolder.tvRepo = (TextView) v.findViewById(R.id.tv_repo);
-            viewHolder.tvRepo.setVisibility(View.VISIBLE);
-            viewHolder.tvMilestone = (TextView) v.findViewById(R.id.tv_milestone);
-            
-            v.setTag(viewHolder);
-        }
-        else {
-            viewHolder = (ViewHolder) v.getTag();
-        }
+        viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
+        viewHolder.ivGravatar.setOnClickListener(this);
 
-        final RepositoryIssue issue = mObjects.get(position);
+        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+        viewHolder.tvDesc.setTypeface(boldCondensed);
+
+        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+        viewHolder.tvNumber = (TextView) v.findViewById(R.id.tv_number);
+        viewHolder.llLabels = (LinearLayout) v.findViewById(R.id.ll_labels);
+        viewHolder.tvState = (TextView) v.findViewById(R.id.tv_state);
+        viewHolder.ivAssignee = (ImageView) v.findViewById(R.id.iv_assignee);
+        viewHolder.tvComments = (TextView) v.findViewById(R.id.tv_comments);
+        viewHolder.tvRepo = (TextView) v.findViewById(R.id.tv_repo);
+        viewHolder.tvRepo.setVisibility(View.VISIBLE);
+        viewHolder.tvMilestone = (TextView) v.findViewById(R.id.tv_milestone);
+
+        v.setTag(viewHolder);
+        return v;
+    }
+    
+    @Override
+    protected void bindView(View v, RepositoryIssue issue) {
+        ViewHolder viewHolder = (ViewHolder) v.getTag();
 
         GravatarHandler.assignGravatar(viewHolder.ivGravatar, issue.getUser());
         viewHolder.ivGravatar.setTag(issue);
@@ -106,8 +101,6 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
         } else {
             viewHolder.tvMilestone.setVisibility(View.GONE);
         }
-
-        return v;
     }
 
     @Override

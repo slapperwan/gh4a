@@ -18,7 +18,6 @@ package com.gh4a.adapter;
 import org.eclipse.egit.github.core.RepositoryCommit;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,33 +37,29 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> implements OnCl
     }
 
     @Override
-    public View doGetView(int position, View convertView, ViewGroup parent) {
-        View v = convertView;
-        ViewHolder viewHolder;
-        if (v == null) {
-            v = LayoutInflater.from(mContext).inflate(R.layout.row_commit, null);
-            
-            Typeface boldCondensed = Gh4Application.get(mContext).boldCondensed;
-            
-            viewHolder = new ViewHolder();
-            viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-            viewHolder.tvDesc.setTypeface(boldCondensed);
-            
-            viewHolder.tvSha = (TextView) v.findViewById(R.id.tv_sha);
-            viewHolder.tvSha.setTypeface(Typeface.MONOSPACE);
-            
-            viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-            
-            viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-            viewHolder.ivGravatar.setOnClickListener(this);
+    protected View createView(LayoutInflater inflater, ViewGroup parent) {
+        View v = LayoutInflater.from(mContext).inflate(R.layout.row_commit, null);
+        ViewHolder viewHolder = new ViewHolder();
+        Typeface boldCondensed = Gh4Application.get(mContext).boldCondensed;
 
-            v.setTag(viewHolder);
-        }
-        else {
-            viewHolder = (ViewHolder) v.getTag();
-        }
+        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+        viewHolder.tvDesc.setTypeface(boldCondensed);
 
-        final RepositoryCommit commit = mObjects.get(position);
+        viewHolder.tvSha = (TextView) v.findViewById(R.id.tv_sha);
+        viewHolder.tvSha.setTypeface(Typeface.MONOSPACE);
+
+        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+
+        viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
+        viewHolder.ivGravatar.setOnClickListener(this);
+
+        v.setTag(viewHolder);
+        return v;
+    }
+    
+    @Override
+    protected void bindView(View v, RepositoryCommit commit) {
+        ViewHolder viewHolder = (ViewHolder) v.getTag();
 
         GravatarHandler.assignGravatar(viewHolder.ivGravatar, commit.getAuthor());
         viewHolder.ivGravatar.setTag(commit);
@@ -78,14 +73,9 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> implements OnCl
         viewHolder.tvDesc.setText(message);
         viewHolder.tvSha.setText(commit.getSha().substring(0, 10));
 
-        Resources res = v.getResources();
-        String extraData = String.format(res.getString(R.string.more_commit_data),
+        viewHolder.tvExtra.setText(mContext.getString(R.string.more_commit_data,
                 CommitUtils.getAuthorName(mContext, commit),
-                Gh4Application.pt.format(commit.getCommit().getAuthor().getDate()));
-
-        viewHolder.tvExtra.setText(extraData);
-
-        return v;
+                Gh4Application.pt.format(commit.getCommit().getAuthor().getDate())));
     }
 
     @Override

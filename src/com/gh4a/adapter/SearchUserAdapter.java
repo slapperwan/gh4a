@@ -37,43 +37,37 @@ public class SearchUserAdapter extends RootAdapter<SearchUser> implements OnClic
     }
     
     @Override
-    public View doGetView(int position, View convertView, ViewGroup parent) {
-        View v = convertView;
-        ViewHolder viewHolder = null;
-        
-        if (v == null) {
-            LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_gravatar_1, parent, false);
+    protected View createView(LayoutInflater inflater, ViewGroup parent) {
+        View v = inflater.inflate(R.layout.row_gravatar_1, parent);
+        ViewHolder viewHolder = new ViewHolder();
 
-            Gh4Application app = Gh4Application.get(mContext);
-            Typeface boldCondensed = app.boldCondensed;
-            Typeface italic = app.italic;
-            
-            viewHolder = new ViewHolder();
-            viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-            viewHolder.ivGravatar.setOnClickListener(this);
+        Gh4Application app = Gh4Application.get(mContext);
+        Typeface boldCondensed = app.boldCondensed;
+        Typeface italic = app.italic;
 
-            viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-            viewHolder.tvTitle.setTypeface(boldCondensed);
-            
-            viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-            viewHolder.tvExtra.setTypeface(italic);
-            
-            v.setTag(viewHolder);
-        }
-        else {
-            viewHolder = (ViewHolder) v.getTag();
-        }
+        viewHolder = new ViewHolder();
+        viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
+        viewHolder.ivGravatar.setOnClickListener(this);
 
-        final SearchUser user = mObjects.get(position);
+        viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
+        viewHolder.tvTitle.setTypeface(boldCondensed);
+
+        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+        viewHolder.tvExtra.setTypeface(italic);
+
+        v.setTag(viewHolder);
+        return v;
+    }
+    
+    @Override
+    protected void bindView(View v, SearchUser user) {
+        ViewHolder viewHolder = (ViewHolder) v.getTag();
 
         GravatarHandler.assignGravatar(viewHolder.ivGravatar, user.getGravatarId());
 
         viewHolder.tvTitle.setText(StringUtils.formatName(user.getLogin(), user.getName()));
         viewHolder.tvExtra.setText(mContext.getString(R.string.user_extra_data,
                 user.getFollowers(), user.getPublicRepos()));
-        
-        return v;
     }
 
     @Override

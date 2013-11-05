@@ -15,6 +15,8 @@
  */
 package com.gh4a.adapter;
 
+import java.util.Locale;
+
 import org.eclipse.egit.github.core.Repository;
 
 import android.content.Context;
@@ -22,47 +24,43 @@ import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
-public class RepositoryAdapter extends RootAdapter<Repository> {
-
+public class RepositoryAdapter extends RootAdapter<Repository> implements Filterable {
     public RepositoryAdapter(Context context) {
         super(context);
     }
 
     @Override
-    public View doGetView(int position, View convertView, ViewGroup parent) {
-        View v = convertView;
-        ViewHolder viewHolder = null;
+    protected View createView(LayoutInflater inflater, ViewGroup parent) {
+        View v = inflater.inflate(R.layout.row_simple_3, null);
+        ViewHolder viewHolder = new ViewHolder();
 
-        if (v == null) {
-            v = LayoutInflater.from(mContext).inflate(R.layout.row_simple_3, null);
+        Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+        Typeface boldCondensed = app.boldCondensed;
+        Typeface regular = app.regular;
 
-            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
-            Typeface boldCondensed = app.boldCondensed;
-            Typeface regular = app.regular;
-            
-            viewHolder = new ViewHolder();
-            viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-            viewHolder.tvTitle.setTypeface(boldCondensed);
-            
-            viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-            viewHolder.tvDesc.setTypeface(regular);
-            
-            viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-            viewHolder.tvExtra.setTextAppearance(mContext, R.style.default_text_micro);
-            
-            v.setTag(viewHolder);
-        }
-        else {
-            viewHolder = (ViewHolder) v.getTag();
-        }
+        viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
+        viewHolder.tvTitle.setTypeface(boldCondensed);
 
-        Repository repository = mObjects.get(position);
+        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+        viewHolder.tvDesc.setTypeface(regular);
+
+        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+        viewHolder.tvExtra.setTextAppearance(mContext, R.style.default_text_micro);
+
+        v.setTag(viewHolder);
+        return v;
+    }
+    
+    @Override
+    protected void bindView(View view, Repository repository) {
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
         
         if (viewHolder.tvTitle != null) {
             viewHolder.tvTitle.setText(repository.getOwner().getLogin() + "/" + repository.getName());
@@ -85,8 +83,6 @@ public class RepositoryAdapter extends RootAdapter<Repository> {
                     language, StringUtils.toHumanReadbleFormat(repository.getSize()),
                     repository.getForks(), repository.getWatchers()));
         }
-
-        return v;
     }
 
     private static class ViewHolder {

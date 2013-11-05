@@ -29,7 +29,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
@@ -84,10 +83,8 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
 
     private IssueLabelAdapter mAdapter = new IssueLabelAdapter(this) {
         @Override
-        public View doGetView(int position, View convertView, ViewGroup parent) {
-            View view = super.doGetView(position, convertView, parent);
+        protected void bindView(View view, Label label) {
             ViewHolder holder = (ViewHolder) view.getTag();
-            Label label = getItem(position);
 
             if (label == mAddedLabel && mShouldStartAdding) {
                 holder.editor.setHint(R.string.issue_label_new);
@@ -96,8 +93,6 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
             } else {
                 holder.editor.setHint(null);
             }
-
-            return view;
         }
     };
 

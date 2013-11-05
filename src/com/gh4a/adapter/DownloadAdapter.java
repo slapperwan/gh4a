@@ -26,50 +26,42 @@ public class DownloadAdapter extends RootAdapter<Download> {
     }
 
     @Override
-    public View doGetView(int position, View convertView, ViewGroup parent) {
-        View v = convertView;
-        ViewHolder viewHolder = null;
+    protected View createView(LayoutInflater inflater, ViewGroup parent) {
+        View v = inflater.inflate(R.layout.row_simple_3, null);
+        ViewHolder viewHolder = new ViewHolder();
 
-        if (v == null) {
-            v = LayoutInflater.from(mContext).inflate(R.layout.row_simple_3, null);
+        Typeface boldCondensed = Gh4Application.get(mContext).boldCondensed;
 
-            Typeface boldCondensed = Gh4Application.get(mContext).boldCondensed;
-            
-            viewHolder = new ViewHolder();
-            viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-            viewHolder.tvTitle.setTypeface(boldCondensed);
-            
-            viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-            
-            viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-            viewHolder.tvExtra.setTextAppearance(mContext, R.style.default_text_micro);
-            
-            v.setTag(viewHolder);
-        }
-        else {
-            viewHolder = (ViewHolder) v.getTag();
-        }
+        viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
+        viewHolder.tvTitle.setTypeface(boldCondensed);
 
-        Download download = mObjects.get(position);
+        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+
+        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+        viewHolder.tvExtra.setTextAppearance(mContext, R.style.default_text_micro);
+
+        v.setTag(viewHolder);
+        return v;
+    }
+    
+    @Override
+    protected void bindView(View v, Download download) {
+        ViewHolder viewHolder = (ViewHolder) v.getTag();
 
         viewHolder.tvTitle.setText(download.getName());
         if (!StringUtils.isBlank(download.getDescription())) {
             viewHolder.tvDesc.setVisibility(View.VISIBLE);
             viewHolder.tvDesc.setText(download.getDescription());
-        }
-        else {
+        } else {
             viewHolder.tvDesc.setVisibility(View.GONE);
         }
 
-        long now = System.currentTimeMillis();
-        String extraData = mContext.getString(R.string.download_extradata,
+        CharSequence created = DateUtils.getRelativeTimeSpanString(download.getCreatedAt().getTime(),
+                System.currentTimeMillis(), MINUTE_IN_MILLIS,
+                FORMAT_SHOW_DATE | FORMAT_SHOW_YEAR | FORMAT_NUMERIC_DATE);
+        viewHolder.tvExtra.setText(mContext.getString(R.string.download_extradata,
                 Formatter.formatFileSize(mContext, download.getSize()),
-                download.getDownloadCount(),
-                DateUtils.getRelativeTimeSpanString(download.getCreatedAt().getTime(), now,
-                        MINUTE_IN_MILLIS, FORMAT_SHOW_DATE | FORMAT_SHOW_YEAR | FORMAT_NUMERIC_DATE));
-        viewHolder.tvExtra.setText(extraData);
-
-        return v;
+                download.getDownloadCount(), created));
     }
 
     private static class ViewHolder {

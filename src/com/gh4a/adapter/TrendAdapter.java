@@ -30,30 +30,25 @@ public class TrendAdapter extends RootAdapter<Trend> {
     }
 
     @Override
-    public View doGetView(int position, View convertView, ViewGroup parent) {
-        View v = convertView;
-        ViewHolder viewHolder = null;
+    protected View createView(LayoutInflater inflater, ViewGroup parent) {
+        View v = inflater.inflate(R.layout.row_simple_3, null);
+        ViewHolder viewHolder = new ViewHolder();
 
-        if (v == null) {
-            v = LayoutInflater.from(mContext).inflate(R.layout.row_simple_3, null);
+        viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
+        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
 
-            viewHolder = new ViewHolder();
-            viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-            viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-            viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-            
-            v.setTag(viewHolder);
-        }
-        else {
-            viewHolder = (ViewHolder) v.getTag();
-        }
+        v.setTag(viewHolder);
+        return v;
+    }
+    
+    @Override
+    protected void bindView(View v, Trend trend) {
+        ViewHolder viewHolder = (ViewHolder) v.getTag();
 
-        final Trend trend = mObjects.get(position);
         viewHolder.tvTitle.setText(trend.getTitle());
         viewHolder.tvDesc.setText(trend.getDescription());
         viewHolder.tvExtra.setVisibility(View.GONE);
-
-        return v;
     }
 
     private static class ViewHolder {

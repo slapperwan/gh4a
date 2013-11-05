@@ -41,27 +41,25 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements OnC
     }
 
     @Override
-    public View doGetView(int position, View convertView, ViewGroup parent) {
-        View v = convertView;
-        ViewHolder viewHolder;
-        if (v == null) {
-            LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_gravatar_comment, null);
-            viewHolder = new ViewHolder();
-            viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-            viewHolder.ivGravatar.setOnClickListener(this);
-            viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-            viewHolder.tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
-            viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-            viewHolder.ivEdit = (ImageView) v.findViewById(R.id.iv_edit);
-            viewHolder.ivEdit.setVisibility(View.GONE);
-            v.setTag(viewHolder);
-        }
-        else {
-            viewHolder = (ViewHolder) v.getTag();
-        }
-
-        final CommitComment comment = mObjects.get(position);
+    protected View createView(LayoutInflater inflater, ViewGroup parent) {
+        View v = inflater.inflate(R.layout.row_gravatar_comment, null);
+        ViewHolder viewHolder = new ViewHolder();
+        
+        viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
+        viewHolder.ivGravatar.setOnClickListener(this);
+        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+        viewHolder.tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
+        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+        viewHolder.ivEdit = (ImageView) v.findViewById(R.id.iv_edit);
+        viewHolder.ivEdit.setVisibility(View.GONE);
+        
+        v.setTag(viewHolder);
+        return v;
+    }
+    
+    @Override
+    protected void bindView(View v, CommitComment comment) {
+        ViewHolder viewHolder = (ViewHolder) v.getTag();
 
         GravatarHandler.assignGravatar(viewHolder.ivGravatar, comment.getUser());
 
@@ -70,8 +68,6 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements OnC
 
         String body = HtmlUtils.format(comment.getBodyHtml()).toString();
         mImageGetter.bind(viewHolder.tvDesc, body, comment.getId());
-
-        return v;
     }
 
     @Override
@@ -90,7 +86,6 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements OnC
     }
     
     private static class ViewHolder {
-        
         public ImageView ivGravatar;
         public TextView tvDesc;
         public TextView tvExtra;

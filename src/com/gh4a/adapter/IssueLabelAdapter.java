@@ -23,49 +23,38 @@ public class IssueLabelAdapter extends RootAdapter<Label> implements OnClickList
     }
 
     @Override
-    public View doGetView(int position, View convertView, ViewGroup parent) {
-        final Label label = getItem(position);
-        ViewHolder holder;
+    protected View createView(LayoutInflater inflater, ViewGroup parent) {
+        View v = inflater.inflate(R.layout.row_issue_label, parent, false);
+        ViewHolder holder = new ViewHolder();
 
-        if (convertView == null) {
-            LayoutInflater inflater = LayoutInflater.from(mContext);
-            convertView = inflater.inflate(R.layout.row_issue_label, parent, false);
+        holder.color = v.findViewById(R.id.view_color);
+        holder.label = (TextView) v.findViewById(R.id.tv_title);
+        holder.editor = (EditText) v.findViewById(R.id.et_label);
+        
+        Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+        holder.label.setTypeface(app.condensed);
 
-            holder = new ViewHolder();
-            holder.color = convertView.findViewById(R.id.view_color);
-            holder.label = (TextView) convertView.findViewById(R.id.tv_title);
-            holder.editor = (EditText) convertView.findViewById(R.id.et_label);
-            convertView.setTag(holder);
-
-            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
-            holder.label.setTypeface(app.condensed);
-
-            ViewGroup colors = (ViewGroup) convertView.findViewById(R.id.colors);
-            int count = colors.getChildCount();
-            for (int i = 0; i < count; i++) {
-                View child = colors.getChildAt(i);
-                child.setOnClickListener(this);
-                if (child.getId() == R.id.custom) {
-                    holder.customColorButton = (TextView) child;
-                }
+        ViewGroup colors = (ViewGroup) v.findViewById(R.id.colors);
+        int count = colors.getChildCount();
+        for (int i = 0; i < count; i++) {
+            View child = colors.getChildAt(i);
+            child.setOnClickListener(this);
+            if (child.getId() == R.id.custom) {
+                holder.customColorButton = (TextView) child;
             }
-            colors.setTag(holder);
-        } else {
-            holder = (ViewHolder) convertView.getTag();
         }
+        colors.setTag(holder);
 
-        assignColor(holder, label.getColor());
-
-        holder.label.setText(label.getName());
-
-        return convertView;
+        v.setTag(holder);
+        return v;
     }
 
-    protected static class ViewHolder {
-        public View color;
-        public TextView label;
-        public EditText editor;
-        public TextView customColorButton;
+    @Override
+    protected void bindView(View v, Label label) {
+        ViewHolder holder = (ViewHolder) v.getTag();
+
+        assignColor(holder, label.getColor());
+        holder.label.setText(label.getName());
     }
 
     private void assignColor(ViewHolder holder, String colorString) {
@@ -95,5 +84,12 @@ public class IssueLabelAdapter extends RootAdapter<Label> implements OnClickList
         } else {
             assignColor(holder, (String) v.getTag());
         }
+    }
+
+    protected static class ViewHolder {
+        public View color;
+        public TextView label;
+        public EditText editor;
+        public TextView customColorButton;
     }
 }

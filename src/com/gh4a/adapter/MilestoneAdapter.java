@@ -36,67 +36,53 @@ public class MilestoneAdapter extends RootAdapter<Milestone> {
     }
 
     @Override
-    public View doGetView(int position, View convertView, ViewGroup parent) {
-        View v = convertView;
-        ViewHolder viewHolder = null;
+    protected View createView(LayoutInflater inflater, ViewGroup parent) {
+        View v = inflater.inflate(R.layout.row_simple_3, null);
+        ViewHolder viewHolder = new ViewHolder();
 
-        if (v == null) {
-            LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_simple_3, null);
+        Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+        Typeface boldCondensed = app.boldCondensed;
+        Typeface regular = app.regular;
 
-            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
-            Typeface boldCondensed = app.boldCondensed;
-            Typeface regular = app.regular;
-            
-            viewHolder = new ViewHolder();
-            viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-            viewHolder.tvTitle.setTypeface(boldCondensed);
-            
-            viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-            viewHolder.tvDesc.setTypeface(regular);
-            viewHolder.tvDesc.setMaxLines(2);
-            viewHolder.tvDesc.setEllipsize(TruncateAt.END);
-            
-            viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-            viewHolder.tvExtra.setTextAppearance(mContext, R.style.default_text_micro);
-            
-            v.setTag(viewHolder);
+        viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
+        viewHolder.tvTitle.setTypeface(boldCondensed);
+
+        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+        viewHolder.tvDesc.setTypeface(regular);
+        viewHolder.tvDesc.setMaxLines(2);
+        viewHolder.tvDesc.setEllipsize(TruncateAt.END);
+
+        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+        viewHolder.tvExtra.setTextAppearance(mContext, R.style.default_text_micro);
+
+        v.setTag(viewHolder);
+        return v;
+    }
+    
+    @Override
+    protected void bindView(View v, Milestone milestone) {
+        ViewHolder viewHolder = (ViewHolder) v.getTag();
+
+        viewHolder.tvTitle.setText(milestone.getTitle());
+
+        if (!StringUtils.isBlank(milestone.getDescription())) {
+            viewHolder.tvDesc.setVisibility(View.VISIBLE);
+            viewHolder.tvDesc.setText(milestone.getDescription());
         }
         else {
-            viewHolder = (ViewHolder) v.getTag();
+            viewHolder.tvDesc.setVisibility(View.GONE);
         }
 
-        Milestone milestone = mObjects.get(position);
-
-        if (viewHolder.tvTitle != null) {
-            viewHolder.tvTitle.setText(milestone.getTitle());
+        String extraData;
+        if (milestone.getDueOn() != null) {
+            extraData = mContext.getString(R.string.milestone_extradata_due,
+                    milestone.getClosedIssues(), milestone.getOpenIssues(),
+                    DateFormat.getMediumDateFormat(mContext).format(milestone.getDueOn()));
+        } else {
+            extraData = mContext.getString(R.string.milestone_extradata,
+                    milestone.getClosedIssues(), milestone.getOpenIssues());
         }
-
-        if (viewHolder.tvDesc != null) {
-            if (!StringUtils.isBlank(milestone.getDescription())) {
-                viewHolder.tvDesc.setVisibility(View.VISIBLE);
-                viewHolder.tvDesc.setText(milestone.getDescription());
-            }
-            else {
-                viewHolder.tvDesc.setVisibility(View.GONE);
-            }
-        }
-
-        if (viewHolder.tvExtra != null) {
-            String extraData;
-            if (milestone.getDueOn() != null) {
-                extraData = mContext.getString(R.string.milestone_extradata_due,
-                        milestone.getClosedIssues(), milestone.getOpenIssues(),
-                        DateFormat.getMediumDateFormat(mContext).format(milestone.getDueOn()));
-            } else {
-                extraData = mContext.getString(R.string.milestone_extradata,
-                        milestone.getClosedIssues(), milestone.getOpenIssues());
-            }
-
-            viewHolder.tvExtra.setText(extraData);
-        }
-
-        return v;
+        viewHolder.tvExtra.setText(extraData);
     }
 
     private static class ViewHolder {

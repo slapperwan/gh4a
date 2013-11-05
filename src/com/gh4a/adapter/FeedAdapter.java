@@ -65,37 +65,33 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
     }
 
     @Override
-    public View doGetView(int position, View convertView, ViewGroup parent) {
-        View v = convertView;
-        ViewHolder viewHolder = null;
+    protected View createView(LayoutInflater inflater, ViewGroup parent) {
+        View v = inflater.inflate(R.layout.feed_row, null);
+        ViewHolder viewHolder = new ViewHolder();
 
-        if (v == null) {
-            v = LayoutInflater.from(mContext).inflate(R.layout.feed_row, null);
-            
-            Gh4Application app = (Gh4Application) mContext.getApplicationContext();
-            Typeface boldCondensed = app.boldCondensed;
-            Typeface regular = app.regular;
+        Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+        Typeface boldCondensed = app.boldCondensed;
+        Typeface regular = app.regular;
 
-            viewHolder = new ViewHolder();
-            viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-            viewHolder.ivGravatar.setOnClickListener(this);
+        viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
+        viewHolder.ivGravatar.setOnClickListener(this);
 
-            viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-            viewHolder.tvTitle.setTypeface(boldCondensed);
-            
-            viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-            viewHolder.tvDesc.setTypeface(regular);
+        viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
+        viewHolder.tvTitle.setTypeface(boldCondensed);
 
-            viewHolder.llPushDesc = (ViewGroup) v.findViewById(R.id.ll_push_desc);
+        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+        viewHolder.tvDesc.setTypeface(regular);
 
-            v.setTag(viewHolder);
-        }
-        else {
-            viewHolder = (ViewHolder) v.getTag();
-        }
+        viewHolder.llPushDesc = (ViewGroup) v.findViewById(R.id.ll_push_desc);
 
-        Event event = mObjects.get(position);
-        final User actor = event.getActor();
+        v.setTag(viewHolder);
+        return v;
+    }
+    
+    @Override
+    protected void bindView(View v, Event event) {
+        ViewHolder viewHolder = (ViewHolder) v.getTag();
+        User actor = event.getActor();
 
         GravatarHandler.assignGravatar(viewHolder.ivGravatar, actor);
         viewHolder.ivGravatar.setTag(actor);
@@ -109,8 +105,6 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         String content = formatDescription(event, viewHolder);
         viewHolder.tvDesc.setText(content);
         viewHolder.tvDesc.setVisibility(content != null ? View.VISIBLE : View.GONE);
-
-        return v;
     }
 
     @Override

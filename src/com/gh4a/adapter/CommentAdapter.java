@@ -48,28 +48,25 @@ public class CommentAdapter extends RootAdapter<Comment> implements OnClickListe
     }
 
     @Override
-    public View doGetView(int position, View convertView, ViewGroup parent) {
-        View v = convertView;
-        ViewHolder viewHolder;
-        if (v == null) {
-            v = LayoutInflater.from(mContext).inflate(R.layout.row_gravatar_comment, null);
-            
-            viewHolder = new ViewHolder();
-            
-            viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-            viewHolder.ivGravatar.setOnClickListener(this);
-            
-            viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-            viewHolder.tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
-            viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-            viewHolder.ivEdit = (ImageView) v.findViewById(R.id.iv_edit);
-            v.setTag(viewHolder);
-        }
-        else {
-            viewHolder = (ViewHolder) v.getTag();
-        }
+    protected View createView(LayoutInflater inflater, ViewGroup parent) {
+        View v = LayoutInflater.from(mContext).inflate(R.layout.row_gravatar_comment, null);
+        ViewHolder viewHolder = new ViewHolder();
+
+        viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
+        viewHolder.ivGravatar.setOnClickListener(this);
+
+        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+        viewHolder.tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
+        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+        viewHolder.ivEdit = (ImageView) v.findViewById(R.id.iv_edit);
         
-        final Comment comment = mObjects.get(position);
+        v.setTag(viewHolder);
+        return v;
+    }
+    
+    @Override
+    protected void bindView(View v, Comment comment) {
+        ViewHolder viewHolder = (ViewHolder) v.getTag();
         String login = Gh4Application.get(mContext).getAuthLogin();
 
         GravatarHandler.assignGravatar(viewHolder.ivGravatar, comment.getUser());
@@ -85,12 +82,9 @@ public class CommentAdapter extends RootAdapter<Comment> implements OnClickListe
             viewHolder.ivEdit.setVisibility(View.VISIBLE);
             viewHolder.ivEdit.setTag(comment);
             viewHolder.ivEdit.setOnClickListener(this);
-        }
-        else {
+        } else {
             viewHolder.ivEdit.setVisibility(View.GONE);
         }
-
-        return v;
     }
 
     @Override
