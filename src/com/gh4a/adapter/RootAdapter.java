@@ -57,8 +57,8 @@ public abstract class RootAdapter<T> extends BaseAdapter implements Filterable {
                 results.count = mUnfilteredObjects.size();
             } else {
                 final ArrayList<T> filtered = new ArrayList<T>();
-                for (T object : mObjects) {
-                    if (!isFiltered(constraint, object)) {
+                for (T object : mUnfilteredObjects) {
+                    if (isFiltered(constraint, object)) {
                         filtered.add(object);
                     }
                 }
@@ -158,7 +158,7 @@ public abstract class RootAdapter<T> extends BaseAdapter implements Filterable {
     }
     
     protected boolean isFiltered(CharSequence filter, T object) {
-        return false;
+        return true;
     }
 
     @Override

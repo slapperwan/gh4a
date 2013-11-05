@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +42,7 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
     private boolean mLoadMore;
     private boolean mIsLoadCompleted;
     private TextView mLoadingView;
+    private String mCurrentFilter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,11 +63,19 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
         mAdapter = onCreateAdapter();
 
         getListView().setOnScrollListener(this);
+        getListView().setTextFilterEnabled(true);
         setEmptyText(getString(getEmptyTextResId()));
         setListAdapter(mAdapter);
         setListShown(false);
         
         getLoaderManager().initLoader(0, null, this);
+    }
+
+    public void setFilterText(String text) {
+        mCurrentFilter = text;
+        if (mAdapter != null) {
+            mAdapter.getFilter().filter(mCurrentFilter);
+        }
     }
 
     public void refresh() {
@@ -74,28 +84,29 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
         getLoaderManager().restartLoader(0, null, this);
     }
     
-    protected void fillData(Collection<T> data) {
+    private boolean fillData(boolean unpaged, Collection<T> data) {
         ListView listView = getListView();
         if (data == null || data.isEmpty()) {
             listView.removeFooterView(mLoadingView);
-            return;
+            return true;
         }
-        if (listView.getFooterViewsCount() == 0) {
+        if (getListView().getFooterViewsCount() == 0) {
             listView.addFooterView(mLoadingView);
             setListAdapter(mAdapter);
         }
-        if (!mLoadMore) {
+        if (!mLoadMore && !unpaged) {
             mAdapter.clear();
         }
         onAddData(mAdapter, data);
-        mAdapter.notifyDataSetChanged();
-        if (!mLoadMore) {
-            listView.setSelection(0);
-        }
+        return false;
     }
 
     protected void onAddData(RootAdapter<T> adapter, Collection<T> data) {
         adapter.addAll(data);
+    }
+
+    protected boolean shouldLoadUnpaged() {
+        return false;
     }
 
     @Override
@@ -105,10 +116,19 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
 
     @Override
     public void onLoadFinished(Loader<Collection<T>> loader, Collection<T> events) {
-        mIsLoadCompleted = true;
-        setListShown(true);
-        fillData(events);
-        getActivity().invalidateOptionsMenu();
+        boolean unpaged = shouldLoadUnpaged();
+        boolean noMoreData = fillData(unpaged, events);
+        if (noMoreData || !unpaged) {
+            mIsLoadCompleted = true;
+            setListShown(true);
+            getActivity().invalidateOptionsMenu();
+            mAdapter.notifyDataSetChanged();
+            if (!TextUtils.isEmpty(mCurrentFilter)) {
+                mAdapter.getFilter().filter(mCurrentFilter);
+            }
+        } else if (unpaged && !noMoreData) {
+            getLoaderManager().getLoader(0).forceLoad();
+        }
     }
 
     @Override

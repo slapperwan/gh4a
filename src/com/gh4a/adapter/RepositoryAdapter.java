@@ -85,6 +85,13 @@ public class RepositoryAdapter extends RootAdapter<Repository> implements Filter
         }
     }
 
+    @Override
+    protected boolean isFiltered(CharSequence filter, Repository repo) {
+        String lcFilter = filter.toString().toLowerCase(Locale.getDefault());
+        String name = repo.getName().toLowerCase(Locale.getDefault());
+        return name.contains(lcFilter);
+    }
+
     private static class ViewHolder {
         public TextView tvTitle;
         public TextView tvDesc;
