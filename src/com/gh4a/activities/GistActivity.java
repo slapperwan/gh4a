@@ -29,6 +29,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentActivity;
@@ -125,7 +127,30 @@ public class GistActivity extends LoadingFragmentActivity implements OnClickList
         intent.putExtra(Constants.Gist.ID, mGist.getId());
         startActivity(intent);
     }
-    
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(0, R.id.share, 0, getString(R.string.share))
+            .setIcon(UiUtils.resolveDrawable(this, R.attr.shareIcon))
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.share:
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT,
+                        getString(R.string.share_gist_subject, mGistId, mUserLogin));
+                shareIntent.putExtra(Intent.EXTRA_TEXT,  mGist.getHtmlUrl());
+                shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
+                startActivity(shareIntent);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     @Override
     protected void navigateUp() {
         Intent intent = new Intent(this, GistListActivity.class);

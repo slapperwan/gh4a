@@ -16,10 +16,13 @@
 package com.gh4a.activities;
 
 import org.eclipse.egit.github.core.Gist;
+import org.eclipse.egit.github.core.GistFile;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.webkit.WebSettings;
@@ -27,6 +30,9 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentActivity;
@@ -40,6 +46,9 @@ public class GistViewerActivity extends LoadingFragmentActivity {
     private String mUserLogin;
     private String mFileName;
     private String mGistId;
+    private GistFile mGistFile;
+
+    private WebView mWebView;
 
     private LoaderCallbacks<Gist> mGistCallback = new LoaderCallbacks<Gist>() {
         @Override
@@ -50,7 +59,8 @@ public class GistViewerActivity extends LoadingFragmentActivity {
         public void onResultReady(LoaderResult<Gist> result) {
             boolean success = !result.handleError(GistViewerActivity.this);
             if (success) {
-                fillData(result.getData().getFiles().get(mFileName).getContent(), true);
+                mGistFile = result.getData().getFiles().get(mFileName);
+                fillData(mGistFile.getContent(), true);
             }
             setContentEmpty(!success);
             setContentShown(true);
@@ -97,9 +107,9 @@ public class GistViewerActivity extends LoadingFragmentActivity {
     
     @SuppressLint("SetJavaScriptEnabled")
     private void fillData(String data, boolean highlight) {
-        WebView webView = (WebView) findViewById(R.id.web_view);
+        mWebView = (WebView) findViewById(R.id.web_view);
 
-        WebSettings s = webView.getSettings();
+        WebSettings s = mWebView.getSettings();
         s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
         s.setAllowFileAccess(true);
         s.setBuiltInZoomControls(true);
@@ -110,14 +120,49 @@ public class GistViewerActivity extends LoadingFragmentActivity {
         s.setJavaScriptEnabled(true);
         s.setUseWideViewPort(true);
 
-        webView.setWebViewClient(mWebViewClient);
+        mWebView.setWebViewClient(mWebViewClient);
 
         String highlighted = StringUtils.highlightSyntax(data, highlight, mFileName);
-        webView.loadDataWithBaseURL("file:///android_asset/", highlighted, "text/html", "utf-8", "");
+        mWebView.loadDataWithBaseURL("file:///android_asset/", highlighted, "text/html", "utf-8", "");
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getSupportMenuInflater();
+        inflater.inflate(R.menu.download_menu, menu);
+
+        menu.removeItem(R.id.download);
+        menu.removeItem(R.id.share);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+            menu.removeItem(R.id.search);
+        }
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     protected void navigateUp() {
         Gh4Application.get(this).openGistActivity(this, mUserLogin, mGistId, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.browser:
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mGistFile.getRawUrl()));
+                startActivity(browserIntent);
+                return true;
+            case R.id.search:
+                doSearch();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @TargetApi(11)
+    private void doSearch() {
+        if (mWebView != null) {
+            mWebView.showFindDialog(null, true);
+        }
     }
 }
