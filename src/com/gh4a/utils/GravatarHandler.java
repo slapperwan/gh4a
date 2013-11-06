@@ -104,7 +104,7 @@ public class GravatarHandler {
         assignGravatar(view, gravatarId, null);
     }
 
-    private static void assignGravatar(ImageView view, String gravatarId, String url) {
+    public static void assignGravatar(ImageView view, String gravatarId, String url) {
         removeOldRequest(view);
 
         Bitmap cachedBitmap = sCache.get(gravatarId);

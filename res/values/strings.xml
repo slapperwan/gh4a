@@ -110,6 +110,11 @@
         <item quantity="other">Files</item>
     </plurals>
 
+    <plurals name="contributor_extra_data">
+        <item quantity="one">%1$d contribution</item>
+        <item quantity="other">%1$d contributions</item>
+    </plurals>
+
     <string name="no_blogs_found">No blogs found.</string>
     <string name="no_comments_found">Nobody has commented so far.</string>
     <string name="no_files_found">No files found.</string>
@@ -131,6 +136,7 @@
     <string name="no_stargazers_found">Nobody has starred this repository yet.</string>
     <string name="no_tags_found">No tags were created in this repository yet.</string>
     <string name="no_branches_found">No branches were created in this repository yet.</string>
+    <string name="no_contributors_found">No contributions were made to this repository yet.</string>
 
     <!-- Activity event -->
     <string name="event_push_title">%1$s pushed to %2$s at %3$s</string>
