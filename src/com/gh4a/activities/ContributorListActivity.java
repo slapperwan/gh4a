@@ -30,6 +30,7 @@ public class ContributorListActivity extends BaseSherlockFragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
         
         Bundle extras = getIntent().getExtras();
@@ -47,6 +48,7 @@ public class ContributorListActivity extends BaseSherlockFragmentActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.repo_contributors);
         actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
+        actionBar.setDisplayHomeAsUpEnabled(true);
     }
     
     @Override
