@@ -40,16 +40,14 @@ public class PullRequestActivity extends LoadingFragmentPagerActivity {
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
-        
+        if (hasErrorView()) {
+            return;
+        }
+
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
         mPullRequestNumber = data.getInt(Constants.PullRequest.NUMBER);
-        
-        if (!isOnline()) {
-            setErrorView();
-            return;
-        }
         
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getResources().getString(R.string.pull_request_title) + " #" + mPullRequestNumber);

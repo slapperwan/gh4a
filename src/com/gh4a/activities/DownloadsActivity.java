@@ -24,15 +24,13 @@ public class DownloadsActivity extends LoadingFragmentPagerActivity {
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
-        
+        if (hasErrorView()) {
+            return;
+        }
+
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
-        
-        if (!isOnline()) {
-            setErrorView();
-            return;
-        }
         
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.downloads);

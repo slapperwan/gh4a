@@ -74,9 +74,7 @@ public class UserActivity extends LoadingFragmentPagerActivity {
         mIsLoginUserPage = mUserLogin.equals(Gh4Application.get(this).getAuthLogin());
         
         super.onCreate(savedInstanceState);
-        
-        if (!isOnline()) {
-            setErrorView();
+        if (hasErrorView()) {
             return;
         }
 

@@ -40,14 +40,12 @@ public class IssueMilestoneListActivity extends LoadingFragmentPagerActivity {
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
-        
-        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
-        
-        if (!isOnline()) {
-            setErrorView();
+        if (hasErrorView()) {
             return;
         }
+
+        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
+        mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
         
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.issue_manage_milestones);

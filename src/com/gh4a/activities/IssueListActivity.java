@@ -138,7 +138,10 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
-        
+        if (hasErrorView()) {
+            return;
+        }
+
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
@@ -147,11 +150,6 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         mFilterData = new HashMap<String, String>();
         mFilterData.put("state", mState);
 
-        if (!isOnline()) {
-            setErrorView();
-            return;
-        }
-        
         getSupportLoaderManager().initLoader(3, null, mIsCollaboratorCallback);
 
         mActionBar = getSupportActionBar();

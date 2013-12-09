@@ -30,7 +30,10 @@ public class TrendingActivity extends LoadingFragmentPagerActivity {
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
-        
+        if (hasErrorView()) {
+            return;
+        }
+
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.trend);
         actionBar.setSubtitle(R.string.explore);

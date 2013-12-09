@@ -19,23 +19,33 @@ public class LoadingFragmentActivity extends BaseSherlockFragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
-        super.setContentView(R.layout.fragment_progress);
+
+        if (!isOnline()) {
+            setErrorView();
+        } else {
+            super.setContentView(R.layout.fragment_progress);
+        }
     }
     
     @Override
     protected void onStart() {
-        ensureContent();
-        if (mContentView == null) {
-            throw new IllegalStateException("Content view must be initialized before");
+        if (!hasErrorView()) {
+            ensureContent();
+            if (mContentView == null) {
+                throw new IllegalStateException("Content view must be initialized before");
+            }
         }
         super.onStart();
     }
     
     public void setContentView(int layoutResId) {
-        LayoutInflater layoutInflater = LayoutInflater.from(this);
-        View contentView = layoutInflater.inflate(layoutResId, null);
-        setContentView(contentView);
+        if (layoutResId == R.layout.error) {
+            super.setContentView(layoutResId);
+        } else {
+            LayoutInflater layoutInflater = LayoutInflater.from(this);
+            View contentView = layoutInflater.inflate(layoutResId, null);
+            setContentView(contentView);
+        }
     }
 
     public void setContentView(View view) {

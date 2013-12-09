@@ -38,14 +38,12 @@ public class FollowerFollowingListActivity extends LoadingFragmentPagerActivity 
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
+        if (hasErrorView()) {
+            return;
+        }
 
         Bundle data = getIntent().getExtras();
         mUserLogin = data.getString(Constants.User.USER_LOGIN);
-        
-        if (!isOnline()) {
-            setErrorView();
-            return;
-        }
         
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(mUserLogin);

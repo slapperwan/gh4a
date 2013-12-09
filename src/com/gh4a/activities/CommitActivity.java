@@ -45,15 +45,14 @@ public class CommitActivity extends LoadingFragmentPagerActivity {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
+        if (hasErrorView()) {
+            return;
+        }
+
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
         mRepoName = data.getString(Constants.Repository.REPO_NAME);
         mObjectSha = data.getString(Constants.Object.OBJECT_SHA);
-        
-        if (!isOnline()) {
-            setErrorView();
-            return;
-        }
         
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getResources().getQuantityString(R.plurals.commit, 1)

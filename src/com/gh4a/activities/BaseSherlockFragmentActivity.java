@@ -45,6 +45,8 @@ import com.gh4a.utils.ToastUtils;
  * The Base activity.
  */
 public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
+    private boolean mHasErrorView = false;
+
     /**
      * Common function when device search button pressed, then open
      * SearchActivity.
@@ -165,13 +167,14 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         }
     }
     
-    public boolean isOnline() {
+    protected boolean isOnline() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = cm.getActiveNetworkInfo();
         return info != null && info.isAvailable() && info.isConnected();
     }
     
     public void setErrorView() {
+        mHasErrorView = true;
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.error);
         
@@ -190,6 +193,10 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
                 }
             }
         });
+    }
+
+    protected boolean hasErrorView() {
+        return mHasErrorView;
     }
 
     protected void saveBookmark(String name, int type, Intent intent, String extraData) {

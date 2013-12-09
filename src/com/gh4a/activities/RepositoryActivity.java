@@ -188,6 +188,9 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
+        if (hasErrorView()) {
+            return;
+        }
 
         mDirStack = new Stack<String>();
         mContentCache = new LinkedHashMap<String, ArrayList<RepositoryContents>>() {
@@ -202,18 +205,12 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         if (data != null) {
             mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
             mRepoName = data.getString(Constants.Repository.REPO_NAME);
-        }
-        else {
+        } else {
             Bundle bundle = getIntent().getExtras();
             mRepoOwner = bundle.getString(Constants.Repository.REPO_OWNER);
             mRepoName = bundle.getString(Constants.Repository.REPO_NAME);
             mSelectedRef = bundle.getString(Constants.Repository.SELECTED_REF);
             mSelectBranchTag = bundle.getString(Constants.Repository.SELECTED_BRANCHTAG_NAME);
-        }
-        
-        if (!isOnline()) {
-            setErrorView();
-            return;
         }
         
         setContentShown(false);

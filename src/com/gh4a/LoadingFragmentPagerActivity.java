@@ -17,6 +17,10 @@ public abstract class LoadingFragmentPagerActivity extends LoadingFragmentActivi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (hasErrorView()) {
+            return;
+        }
+
         mAdapter = new FragmentAdapter();
         setContentView(R.layout.view_pager);
         mPager = setupPager();
