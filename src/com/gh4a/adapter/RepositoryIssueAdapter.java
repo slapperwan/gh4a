@@ -27,7 +27,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarHandler;
@@ -54,7 +53,6 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
         viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
         viewHolder.tvNumber = (TextView) v.findViewById(R.id.tv_number);
         viewHolder.llLabels = (LinearLayout) v.findViewById(R.id.ll_labels);
-        viewHolder.tvState = (TextView) v.findViewById(R.id.tv_state);
         viewHolder.ivAssignee = (ImageView) v.findViewById(R.id.iv_assignee);
         viewHolder.tvComments = (TextView) v.findViewById(R.id.tv_comments);
         viewHolder.tvRepo = (TextView) v.findViewById(R.id.tv_repo);
@@ -72,13 +70,6 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
         GravatarHandler.assignGravatar(viewHolder.ivGravatar, issue.getUser());
         viewHolder.ivGravatar.setTag(issue);
         viewHolder.tvNumber.setText(String.valueOf(issue.getNumber()));
-
-        viewHolder.tvState.setText(issue.getState());
-        if (Constants.Issue.ISSUE_STATE_CLOSED.equals(issue.getState())) {
-            viewHolder.tvState.setBackgroundResource(R.drawable.default_red_box);
-        } else {
-            viewHolder.tvState.setBackgroundResource(R.drawable.default_green_box);
-        }
 
         IssueAdapter.makeLabelBadges(viewHolder.llLabels, issue.getLabels());
 
@@ -118,7 +109,6 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
         public TextView tvExtra;
         public TextView tvNumber;
         public LinearLayout llLabels;
-        public TextView tvState;
         public ImageView ivAssignee;
         public TextView tvComments;
         public TextView tvRepo;
