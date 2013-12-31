@@ -298,7 +298,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             invalidateFragments();
         } else if (mGitModuleMap != null && mGitModuleMap.get(path) != null) {
             String[] userRepo = mGitModuleMap.get(path).split("/");
-            Gh4Application.get(this).openRepositoryInfoActivity(this, userRepo[0], userRepo[1], 0);
+            Gh4Application.get(this).openRepositoryInfoActivity(this, userRepo[0], userRepo[1], null, 0);
         } else {
             openFileViewer(content, ref);
         }
@@ -386,8 +386,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
                 if (mBranches == null) {
                     mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
                     getSupportLoaderManager().initLoader(LOADER_BRANCHES, null, mBranchCallback);
-                }
-                else {
+                } else {
                     showBranchesDialog();
                 }
                 return true;
@@ -395,8 +394,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
                 if (mTags == null) {
                     mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
                     getSupportLoaderManager().initLoader(LOADER_TAGS, null, mTagCallback);
-                }
-                else {
+                } else {
                     showTagsDialog();
                 }
                 return true;

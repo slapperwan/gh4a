@@ -150,10 +150,10 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
                         context.openCommitInfoActivity(getActivity(), repoOwner, repoName,
                                 payload.getCommits().get(0).getSha(), 0);
                     } else {
-                        context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, 0);
+                        context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
                     }
                 } else {
-                    context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, 0);
+                    context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
                 }
             } else {
                 context.notFoundMessage(getActivity(), R.plurals.repository);
@@ -173,7 +173,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         /** WatchEvent */
         else if (Event.TYPE_WATCH.equals(eventType)) {
             if (eventRepo != null) {
-                context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, 0);
+                context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
             } else {
                 context.notFoundMessage(getActivity(), R.plurals.repository);
             }
@@ -182,7 +182,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         /** CreateEvent */
         else if (Event.TYPE_CREATE.equals(eventType)) {
             if (eventRepo != null) {
-                context.openRepositoryInfoActivity(this.getActivity(), repoOwner, repoName, 0);
+                context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
             } else {
                 context.notFoundMessage(getActivity(), R.plurals.repository);
             }
@@ -221,7 +221,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         /** DeleteEvent */
         else if (Event.TYPE_DELETE.equals(eventType)) {
             if (eventRepo != null) {
-                context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, 0);
+                context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
             } else {
                 context.notFoundMessage(getActivity(), R.plurals.repository);
             }
@@ -251,7 +251,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         /** ForkEvent */
         else if (Event.TYPE_FORK_APPLY.equals(eventType)) {
             if (eventRepo != null) {
-                context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, 0);
+                context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
             } else {
                 context.notFoundMessage(getActivity(), R.plurals.repository);
             }
@@ -272,7 +272,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         /** PublicEvent */
         else if (Event.TYPE_PUBLIC.equals(eventType)) {
             if (eventRepo != null) {
-                context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, 0);
+                context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
             } else {
                 context.notFoundMessage(getActivity(), R.plurals.repository);
             }
@@ -281,7 +281,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         /** MemberEvent */
         else if (Event.TYPE_MEMBER.equals(eventType)) {
             if (eventRepo != null) {
-                context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, 0);
+                context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
             } else {
                 context.notFoundMessage(getActivity(), R.plurals.repository);
             }
@@ -463,7 +463,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         }
         /** Repo item */
         else if (id == MENU_REPO) {
-            app.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, 0);
+            app.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
         }
         /** Commit item */
         else if (id >= MENU_PUSH_COMMIT_START || id == MENU_COMMENT_COMMIT) {

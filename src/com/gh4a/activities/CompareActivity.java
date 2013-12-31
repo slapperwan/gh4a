@@ -105,6 +105,6 @@ public class CompareActivity extends LoadingFragmentActivity implements OnItemCl
     @Override
     protected void navigateUp() {
         Gh4Application.get(this).openRepositoryInfoActivity(this,
-                mRepoOwner, mRepoName, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                mRepoOwner, mRepoName, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 }

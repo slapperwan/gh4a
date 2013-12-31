@@ -51,8 +51,9 @@ public class BrowseFilter extends BaseSherlockFragmentActivity {
 
             if (repo == null && action == null) {
                 context.openUserInfoActivity(this, user, null);
-            } else if (action == null) {
-                context.openRepositoryInfoActivity(this, user, repo, 0);
+            } else if (action == null || "tree".equals(action)) {
+                String ref = "tree".equals(action) ? id : null;
+                context.openRepositoryInfoActivity(this, user, repo, ref, 0);
             } else if ("issues".equals(action)) {
                 if (!StringUtils.isBlank(id)) {
                     try {

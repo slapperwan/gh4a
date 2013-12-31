@@ -61,7 +61,7 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
     protected void onItemClick(Trend trend) {
         Gh4Application app = Gh4Application.get(getActivity());
         String[] repos = trend.getTitle().split("/");
-        app.openRepositoryInfoActivity(getActivity(), repos[0].trim(), repos[1].trim(), 0);
+        app.openRepositoryInfoActivity(getActivity(), repos[0].trim(), repos[1].trim(), null, 0);
     }
 
     @Override

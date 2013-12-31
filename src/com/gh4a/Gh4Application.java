@@ -314,10 +314,13 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
      * @param repoOwner the repo owner
      * @param repoName the repo name
      */
-    public void openRepositoryInfoActivity(Context context, String repoOwner, String repoName, int flags) {
+    public void openRepositoryInfoActivity(Context context, String repoOwner, String repoName,
+            String ref, int flags) {
         Intent intent = new Intent(context, RepositoryActivity.class);
         intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
         intent.putExtra(Constants.Repository.REPO_NAME, repoName);
+        intent.putExtra(Constants.Repository.SELECTED_REF, ref);
+        intent.putExtra(Constants.Repository.SELECTED_BRANCHTAG_NAME, ref);
         if (flags != 0) {
             intent.setFlags(flags);
         }

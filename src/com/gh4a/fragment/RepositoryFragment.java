@@ -247,7 +247,7 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
         } else if (view.getTag() instanceof Repository) {
             Repository repo = (Repository) view.getTag();
             app.openRepositoryInfoActivity(getActivity(),
-                    repo.getOwner().getLogin(), repo.getName(), 0);
+                    repo.getOwner().getLogin(), repo.getName(), null, 0);
         }
 
         if (intent != null) {

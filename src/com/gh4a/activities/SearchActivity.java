@@ -272,19 +272,18 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
         ListAdapter listAdapter = mListViewResults.getAdapter();
         Object object = listAdapter.getItem(info.position);
 
-        /** User item */
         if (object instanceof SearchUser) {
+            /** User item */
             Intent intent = new Intent(SearchActivity.this, UserActivity.class);
             SearchUser user = (SearchUser) object;
 
             intent.putExtra(Constants.User.USER_LOGIN, user.getLogin());
             startActivity(intent);
-        }
-        /** Repo item */
-        else {
+        } else {
+            /** Repo item */
             SearchRepository repository = (SearchRepository) object;
             Gh4Application.get(this).openRepositoryInfoActivity(this,
-                    repository.getOwner(), repository.getName(), 0);
+                    repository.getOwner(), repository.getName(), null, 0);
         }
         return true;
     }
@@ -350,7 +349,7 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
         } else if (object instanceof SearchRepository) {
             SearchRepository repository = (SearchRepository) object;
             Gh4Application.get(this).openRepositoryInfoActivity(this,
-                    repository.getOwner(), repository.getName(), 0);
+                    repository.getOwner(), repository.getName(), null, 0);
         }
     }
 

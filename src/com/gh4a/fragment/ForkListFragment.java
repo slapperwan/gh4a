@@ -63,7 +63,8 @@ public class ForkListFragment extends PagedDataBaseFragment<Repository> {
     @Override
     protected void onItemClick(Repository repo) {
         Gh4Application app = Gh4Application.get(getActivity());
-        app.openRepositoryInfoActivity(getActivity(), repo.getOwner().getLogin(), repo.getName(), 0);
+        app.openRepositoryInfoActivity(getActivity(),
+                repo.getOwner().getLogin(), repo.getName(), null, 0);
     }
 
     @Override

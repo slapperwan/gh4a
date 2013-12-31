@@ -62,6 +62,6 @@ public class CollaboratorListActivity extends UserListActivity {
     @Override
     protected void navigateUp() {
         Gh4Application.get(this).openRepositoryInfoActivity(this,
-                mUserLogin, mRepoName, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                mUserLogin, mRepoName, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 }
