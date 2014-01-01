@@ -32,7 +32,6 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.bugsense.trace.BugSenseHandler;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
@@ -56,8 +55,6 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
             return;
         }
         setContentView(R.layout.main);
-        
-        BugSenseHandler.setup(this, "6e1b031");
     }
 
     @Override

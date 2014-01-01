@@ -18,7 +18,6 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.bugsense.trace.BugSenseHandler;
 import com.gh4a.BackgroundTask;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -78,8 +77,6 @@ public class UserActivity extends LoadingFragmentPagerActivity {
             return;
         }
 
-        BugSenseHandler.setup(this, "6e1b031");
-        
         ActionBar actionBar = getSupportActionBar();
         if (mIsLoginUserPage) {
             actionBar.setDisplayShowHomeEnabled(false);

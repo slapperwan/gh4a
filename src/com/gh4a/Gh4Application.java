@@ -54,6 +54,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.bugsense.trace.BugSenseHandler;
 import com.gh4a.activities.CommitActivity;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.GistActivity;
@@ -114,6 +115,8 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         THEME = sharedPreferences.getInt("THEME", R.style.DefaultTheme);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
         
+        BugSenseHandler.setup(this, "1e6a83ae");
+
         mClient = new DefaultClient();
         mClient.setOAuth2Token(getAuthToken());
         
