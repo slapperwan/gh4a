@@ -25,8 +25,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import com.gh4a.holder.Trend;
 
 /**
- * Github trending repos RSS provided by http://github-trends.oscardelben.com/ 
- * (https://github.com/oscardelben/github-trends)
+ * Github trending repos RSS provided by http://github-trends.ryotarai.info/
  */
 public class TrendHandler extends DefaultHandler {
 
@@ -54,6 +53,13 @@ public class TrendHandler extends DefaultHandler {
         
         if (localName.equalsIgnoreCase("item")) {
             mTrend = new Trend();
+            String about = attributes.getValue("rdf:about");
+            if (about != null) {
+                int pos = about.indexOf("://github.com/");
+                if (pos > 0) {
+                    mTrend.setRepo(about.substring(pos + 14));
+                }
+            }
         }
     }
 
@@ -63,14 +69,15 @@ public class TrendHandler extends DefaultHandler {
             if (localName.equalsIgnoreCase("title")) {
                 String title = mBuilder.toString().trim();
                 mTrend.setTitle(title);
-            }
-            else if (localName.equalsIgnoreCase("link")){
+            } else if (localName.equalsIgnoreCase("link")) {
                 mTrend.setLink(mBuilder.toString().trim());
-            }
-            else if (localName.equalsIgnoreCase("description")){
-                mTrend.setDescription(mBuilder.toString().trim());
-            }
-            else if (localName.equalsIgnoreCase("item")){
+            } else if (localName.equalsIgnoreCase("description")) {
+                String description = mBuilder.toString().replaceAll("\\n", "").trim();
+                if (description.endsWith("()")) {
+                    description = description.substring(0, description.length() - 2);
+                }
+                mTrend.setDescription(description);
+            } else if (localName.equalsIgnoreCase("item")) {
                 mTrends.add(mTrend);
             }
         }

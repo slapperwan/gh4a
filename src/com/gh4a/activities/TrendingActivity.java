@@ -15,15 +15,8 @@ import com.gh4a.R;
 import com.gh4a.fragment.TrendingFragment;
 
 public class TrendingActivity extends LoadingFragmentPagerActivity {
-
-    private static final String TODAY = "http://github-trends.oscardelben.com/explore/today.xml";
-    private static final String WEEK = "http://github-trends.oscardelben.com/explore/week.xml";
-    private static final String MONTH = "http://github-trends.oscardelben.com/explore/month.xml";
-    private static final String FOREVER = "http://github-trends.oscardelben.com/explore/forever.xml";
-    
     private static final int[] TITLES = new int[] {
-        R.string.trend_today, R.string.trend_month,
-        R.string.trend_month, R.string.trend_forever
+        R.string.trend_today, R.string.trend_month, R.string.trend_month
     };
 
     @Override
@@ -48,10 +41,9 @@ public class TrendingActivity extends LoadingFragmentPagerActivity {
     @Override
     protected Fragment getFragment(int position) {
         switch (position) {
-            case 0: return TrendingFragment.newInstance(TODAY);
-            case 1: return TrendingFragment.newInstance(WEEK);
-            case 2: return TrendingFragment.newInstance(MONTH);
-            case 3: return TrendingFragment.newInstance(FOREVER);
+            case 0: return TrendingFragment.newInstance(TrendingFragment.TYPE_DAILY);
+            case 1: return TrendingFragment.newInstance(TrendingFragment.TYPE_WEEKLY);
+            case 2: return TrendingFragment.newInstance(TrendingFragment.TYPE_MONTHLY);
         }
         return null;
     }

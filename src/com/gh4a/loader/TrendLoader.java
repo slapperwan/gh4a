@@ -47,8 +47,7 @@ public class TrendLoader extends BaseLoader<List<Trend>> {
             if (bis != null) {
                 try {
                     bis.close();
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     Log.e(Constants.LOG_TAG, e.getMessage(), e);
                 }
             }

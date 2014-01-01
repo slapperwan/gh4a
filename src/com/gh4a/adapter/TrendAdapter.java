@@ -46,7 +46,12 @@ public class TrendAdapter extends RootAdapter<Trend> {
     protected void bindView(View v, Trend trend) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
 
-        viewHolder.tvTitle.setText(trend.getTitle());
+        String[] repo = trend.getRepo();
+        if (repo != null) {
+            viewHolder.tvTitle.setText(repo[0] + "/" + repo[1]);
+        } else {
+            viewHolder.tvTitle.setText(trend.getTitle());
+        }
         viewHolder.tvDesc.setText(trend.getDescription());
         viewHolder.tvExtra.setVisibility(View.GONE);
     }
@@ -55,6 +60,5 @@ public class TrendAdapter extends RootAdapter<Trend> {
         public TextView tvTitle;
         public TextView tvDesc;
         public TextView tvExtra;
-
     }
 }

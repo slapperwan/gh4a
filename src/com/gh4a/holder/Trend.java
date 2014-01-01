@@ -18,6 +18,7 @@ package com.gh4a.holder;
 public class Trend {
 
     private String title;
+    private String repo;
     private String link;
     private String description;
     
@@ -26,6 +27,15 @@ public class Trend {
     }
     public void setTitle(String title) {
         this.title = title;
+    }
+    public String[] getRepo() {
+        if (repo == null) {
+            return null;
+        }
+        return repo.split("/");
+    }
+    public void setRepo(String repo) {
+        this.repo = repo;
     }
     public String getLink() {
         return link;

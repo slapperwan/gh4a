@@ -36,11 +36,6 @@ import com.gh4a.utils.UiUtils;
 import com.viewpagerindicator.TitlePageIndicator;
 
 public class ExploreActivity extends BaseSherlockFragmentActivity implements ActionBar.OnNavigationListener {
-    private static final String TODAY = "http://github-trends.oscardelben.com/explore/today.xml";
-    private static final String WEEK = "http://github-trends.oscardelben.com/explore/week.xml";
-    private static final String MONTH = "http://github-trends.oscardelben.com/explore/month.xml";
-    private static final String FOREVER = "http://github-trends.oscardelben.com/explore/forever.xml";
-
     private ActionBar mActionBar;
     private ThisPageAdapter mAdapter;
     private ViewPager mPager;
@@ -103,7 +98,7 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
 
         @Override
         public int getCount() {
-            return mActionBar.getSelectedNavigationIndex() == 1 ? 4 : 1;
+            return mActionBar.getSelectedNavigationIndex() == 1 ? 3 : 1;
         }
 
         @Override
@@ -116,14 +111,12 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
                 } else if (mode == 2) {
                     return BlogListFragment.newInstance();
                 } else {
-                    return TrendingFragment.newInstance(TODAY);
+                    return TrendingFragment.newInstance(TrendingFragment.TYPE_DAILY);
                 }
             } else if (position == 1) {
-                return TrendingFragment.newInstance(WEEK);
-            } else if (position == 2) {
-                return TrendingFragment.newInstance(MONTH);
+                return TrendingFragment.newInstance(TrendingFragment.TYPE_WEEKLY);
             } else {
-                return TrendingFragment.newInstance(FOREVER);
+                return TrendingFragment.newInstance(TrendingFragment.TYPE_MONTHLY);
             }
         }
         
@@ -133,10 +126,8 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
                 return getString(R.string.trend_today);
             } else if (position == 1) {
                 return getString(R.string.trend_week);
-            } else if (position == 2) {
-                return getString(R.string.trend_month);
             } else {
-                return getString(R.string.trend_forever);
+                return getString(R.string.trend_month);
             }
         }
     }

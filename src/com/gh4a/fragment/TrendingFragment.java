@@ -16,6 +16,7 @@
 package com.gh4a.fragment;
 
 import java.util.List;
+import java.util.Locale;
 
 import android.os.Bundle;
 import android.support.v4.content.Loader;
@@ -29,13 +30,18 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.TrendLoader;
 
 public class TrendingFragment extends ListDataBaseFragment<Trend> {
+    private static final String URL_TEMPLATE = "http://github-trends.ryotarai.info/rss/github_trends_all_%s.rss";
+    public static final String TYPE_DAILY = "daily";
+    public static final String TYPE_WEEKLY = "weekly";
+    public static final String TYPE_MONTHLY = "monthly";
+
     public String mUrl;
 
-    public static TrendingFragment newInstance(String url) {
+    public static TrendingFragment newInstance(String type) {
         TrendingFragment f = new TrendingFragment();
 
         Bundle args = new Bundle();
-        args.putString("url", url);
+        args.putString("url", String.format(Locale.US, URL_TEMPLATE, type));
         f.setArguments(args);
         
         return f;
@@ -60,8 +66,10 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
     @Override
     protected void onItemClick(Trend trend) {
         Gh4Application app = Gh4Application.get(getActivity());
-        String[] repos = trend.getTitle().split("/");
-        app.openRepositoryInfoActivity(getActivity(), repos[0].trim(), repos[1].trim(), null, 0);
+        String[] repo = trend.getRepo();
+        if (repo != null) {
+            app.openRepositoryInfoActivity(getActivity(), repo[0], repo[1], null, 0);
+        }
     }
 
     @Override
