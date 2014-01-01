@@ -1,5 +1,6 @@
 package com.gh4a.utils;
 
+import android.text.TextUtils;
 import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.CommitUser;
 import org.eclipse.egit.github.core.RepositoryCommit;
@@ -66,7 +67,20 @@ public class CommitUtils {
         }
         return null;
     }
-    
+
+    public static boolean authorEqualsCommitter(RepositoryCommit commit) {
+        if (commit.getCommitter() != null && commit.getAuthor() != null) {
+            return TextUtils.equals(commit.getCommitter().getLogin(), commit.getAuthor().getLogin());
+        }
+
+        CommitUser author = commit.getCommit().getAuthor();
+        CommitUser committer = commit.getCommit().getCommitter();
+        if (author.getEmail() != null && committer.getEmail() != null) {
+            return TextUtils.equals(author.getEmail(), committer.getEmail());
+        }
+        return TextUtils.equals(author.getName(), committer.getName());
+    }
+
     //Commit
     public static String getAuthorName(Context context, Commit commit) {
         if (commit.getAuthor() != null) {

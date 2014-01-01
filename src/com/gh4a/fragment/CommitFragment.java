@@ -7,7 +7,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -131,8 +130,7 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
                 + " "
                 + Gh4Application.pt.format(mCommit.getCommit().getAuthor().getDate()));
 
-        if (mCommit.getAuthor() == null ||
-                !TextUtils.equals(mCommit.getAuthor().getLogin(), mCommit.getCommitter().getLogin())) {
+        if (!CommitUtils.authorEqualsCommitter(mCommit)) {
             ViewGroup committer = (ViewGroup) mContentView.findViewById(R.id.committer_info);
             ImageView gravatar = (ImageView) committer.findViewById(R.id.iv_commit_gravatar);
             TextView extra = (TextView) committer.findViewById(R.id.tv_commit_extra);
