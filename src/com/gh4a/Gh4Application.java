@@ -114,8 +114,8 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
                 Constants.PREF_NAME, MODE_PRIVATE);
         THEME = sharedPreferences.getInt("THEME", R.style.DefaultTheme);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-        
-        BugSenseHandler.setup(this, "1e6a83ae");
+
+        BugSenseHandler.initAndStartSession(this, "1e6a83ae");
 
         mClient = new DefaultClient();
         mClient.setOAuth2Token(getAuthToken());
