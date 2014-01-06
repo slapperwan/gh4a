@@ -26,11 +26,14 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.text.Html.ImageGetter;
 import android.text.TextUtils;
 import android.view.WindowManager;
@@ -89,10 +92,27 @@ public class HttpImageGetter implements ImageGetter {
     public HttpImageGetter(Context context) {
         this.context = context;
         dir = context.getCacheDir();
-        width = ((WindowManager) context
-                .getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay()
-                .getWidth();
+
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        if (Build.VERSION.SDK_INT < 13) {
+            width = fetchDisplayWidthPreHoneycomb(wm);
+        } else {
+            width = fetchDisplayWidth(wm);
+        }
+
         loading = new LoadingImageGetter(context, 24);
+    }
+
+    @SuppressWarnings("deprecation")
+    private int fetchDisplayWidthPreHoneycomb(WindowManager wm) {
+        return wm.getDefaultDisplay().getWidth();
+    }
+
+    @TargetApi(13)
+    private int fetchDisplayWidth(WindowManager wm) {
+        Point size = new Point();
+        wm.getDefaultDisplay().getSize(size);
+        return size.x;
     }
 
     private HttpImageGetter show(final TextView view, final CharSequence html) {
