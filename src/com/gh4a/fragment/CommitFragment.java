@@ -141,7 +141,9 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
                     Gh4Application.pt.format(mCommit.getCommit().getCommitter().getDate())));
         }
 
-        for (CommitFile file : mCommit.getFiles()) {
+        int count = mCommit.getFiles() != null ? mCommit.getFiles().size() : 0;
+        for (int i = 0; i < count; i++) {
+            CommitFile file = mCommit.getFiles().get(i);
             String status = file.getStatus();
             final LinearLayout parent;
 
@@ -188,7 +190,7 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
         }
         
         TextView tvSummary = (TextView) mContentView.findViewById(R.id.tv_desc);
-        tvSummary.setText(getString(R.string.commit_summary, mCommit.getFiles().size(),
+        tvSummary.setText(getString(R.string.commit_summary, added + changed + deleted,
                 mCommit.getStats().getAdditions(), mCommit.getStats().getDeletions()));
     }
 
