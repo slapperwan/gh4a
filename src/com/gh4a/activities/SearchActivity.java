@@ -16,9 +16,10 @@
 package com.gh4a.activities;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
-import org.eclipse.egit.github.core.SearchRepository;
+import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.SearchUser;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.egit.github.core.service.UserService;
@@ -47,7 +48,7 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
-import com.gh4a.adapter.SearchRepositoryAdapter;
+import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.SearchUserAdapter;
 import com.gh4a.utils.StringUtils;
 
@@ -56,7 +57,7 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
         AdapterView.OnItemSelectedListener, AdapterView.OnItemClickListener {
 
     protected SearchUserAdapter mUserAdapter;
-    protected SearchRepositoryAdapter mRepoAdapter;
+    protected RepositoryAdapter mRepoAdapter;
     protected ListView mListViewResults;
 
     private Spinner mSearchType;
@@ -99,7 +100,7 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
     }
 
     protected void searchRepository(final String searchKey) {
-        mRepoAdapter = new SearchRepositoryAdapter(this);
+        mRepoAdapter = new RepositoryAdapter(this);
         mListViewResults.setAdapter(mRepoAdapter);
         new LoadRepositoryTask(searchKey).execute();
     }
@@ -169,7 +170,7 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
         }
     }
 
-    protected void fillRepositoriesData(List<SearchRepository> repos) {
+    protected void fillRepositoriesData(List<Repository> repos) {
         if (mRepoAdapter != null) {
             mRepoAdapter.clear();
             if (repos != null) {
@@ -189,7 +190,7 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
         }
     }
 
-    private class LoadRepositoryTask extends ProgressDialogTask<List<SearchRepository>> {
+    private class LoadRepositoryTask extends ProgressDialogTask<List<Repository>> {
         private String mQuery;
         
         public LoadRepositoryTask(String query) {
@@ -198,18 +199,21 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
         }
 
         @Override
-        protected List<SearchRepository> run() throws IOException {
+        protected List<Repository> run() throws IOException {
             if (StringUtils.isBlank(mQuery)) {
                 return null;
             }
 
             RepositoryService repoService = (RepositoryService)
                     Gh4Application.get(mContext).getService(Gh4Application.REPO_SERVICE);
-            return repoService.searchRepositories(mQuery, 1);
+            HashMap<String, String> params = new HashMap<String, String>();
+            params.put("fork", "true");
+
+            return repoService.searchRepositories(mQuery, params);
         }
 
         @Override
-        protected void onSuccess(List<SearchRepository> result) {
+        protected void onSuccess(List<Repository> result) {
             fillRepositoriesData(result);
         }
     }
@@ -256,7 +260,7 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
 
             /** Menu for repository */
             else {
-                SearchRepository repository = (SearchRepository) object;
+                Repository repository = (Repository) object;
                 menu.add(getString(R.string.menu_user, repository.getOwner()));
                 menu.add(getString(R.string.menu_repo, repository.getName()));
             }
@@ -281,9 +285,9 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
             startActivity(intent);
         } else {
             /** Repo item */
-            SearchRepository repository = (SearchRepository) object;
+            Repository repository = (Repository) object;
             Gh4Application.get(this).openRepositoryInfoActivity(this,
-                    repository.getOwner(), repository.getName(), null, 0);
+                    repository.getOwner().getLogin(), repository.getName(), null, 0);
         }
         return true;
     }
@@ -346,10 +350,10 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
             intent.putExtra(Constants.User.USER_LOGIN, (String) user.getLogin());
             intent.putExtra(Constants.User.USER_NAME, (String) user.getName());
             startActivity(intent);
-        } else if (object instanceof SearchRepository) {
-            SearchRepository repository = (SearchRepository) object;
+        } else if (object instanceof Repository) {
+            Repository repository = (Repository) object;
             Gh4Application.get(this).openRepositoryInfoActivity(this,
-                    repository.getOwner(), repository.getName(), null, 0);
+                    repository.getOwner().getLogin(), repository.getName(), null, 0);
         }
     }
 

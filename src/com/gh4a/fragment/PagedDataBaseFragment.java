@@ -84,29 +84,25 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
         getLoaderManager().restartLoader(0, null, this);
     }
     
-    private boolean fillData(boolean unpaged, Collection<T> data) {
+    private void fillData(Collection<T> data) {
         ListView listView = getListView();
         if (data == null || data.isEmpty()) {
             listView.removeFooterView(mLoadingView);
-            return true;
+            return;
         }
         if (getListView().getFooterViewsCount() == 0) {
             listView.addFooterView(mLoadingView);
             setListAdapter(mAdapter);
         }
-        if (!mLoadMore && !unpaged) {
+        if (!mLoadMore) {
             mAdapter.clear();
         }
         onAddData(mAdapter, data);
-        return false;
+        return;
     }
 
     protected void onAddData(RootAdapter<T> adapter, Collection<T> data) {
         adapter.addAll(data);
-    }
-
-    protected boolean shouldLoadUnpaged() {
-        return false;
     }
 
     @Override
@@ -116,18 +112,13 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
 
     @Override
     public void onLoadFinished(Loader<Collection<T>> loader, Collection<T> events) {
-        boolean unpaged = shouldLoadUnpaged();
-        boolean noMoreData = fillData(unpaged, events);
-        if (noMoreData || !unpaged) {
-            mIsLoadCompleted = true;
-            setListShown(true);
-            getActivity().invalidateOptionsMenu();
-            mAdapter.notifyDataSetChanged();
-            if (!TextUtils.isEmpty(mCurrentFilter)) {
-                mAdapter.getFilter().filter(mCurrentFilter);
-            }
-        } else if (unpaged && !noMoreData) {
-            getLoaderManager().getLoader(0).forceLoad();
+        fillData(events);
+        mIsLoadCompleted = true;
+        setListShown(true);
+        getActivity().invalidateOptionsMenu();
+        mAdapter.notifyDataSetChanged();
+        if (!TextUtils.isEmpty(mCurrentFilter)) {
+            mAdapter.getFilter().filter(mCurrentFilter);
         }
     }
 

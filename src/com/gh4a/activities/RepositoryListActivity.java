@@ -16,6 +16,7 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.RepositoryListFragment;
+import com.gh4a.fragment.RepositorySearchFragment;
 import com.gh4a.fragment.StarredRepositoryListFragment;
 import com.gh4a.fragment.WatchedRepositoryListFragment;
 
@@ -26,7 +27,7 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
     public String mUserType;
     
     private ActionBar mActionBar;
-    private RepositoryListFragment mSearchFragment;
+    private RepositorySearchFragment mSearchFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,7 +72,7 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
     private void addSearchFragment() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
-        mSearchFragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "all", true);
+        mSearchFragment = RepositorySearchFragment.newInstance(mUserLogin);
         mSearchFragment.setUserVisibleHint(false);
         ft.add(R.id.details, mSearchFragment, "search");
         ft.hide(mSearchFragment);
@@ -107,7 +108,8 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
         String visibleTag = visible ? "search" : "main";
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        
+
+        mSearchFragment.setQuery(null);
         mSearchFragment.setUserVisibleHint(visible);
         ft.hide(fm.findFragmentByTag(hiddenTag));
         ft.show(fm.findFragmentByTag(visibleTag));
@@ -124,14 +126,14 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
 
     @Override
     public boolean onQueryTextSubmit(String query) {
+        if (mSearchFragment != null) {
+            mSearchFragment.setQuery(query);
+        }
         return false;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        if (mSearchFragment != null) {
-            mSearchFragment.setFilterText(newText);
-        }
         return false;
     }
 
@@ -158,21 +160,21 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
         ListFragment fragment = null;
 
         if (position == 0) {
-            fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "all", false);
+            fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "all");
         } else if (position == 1) {
             fragment = WatchedRepositoryListFragment.newInstance(mUserLogin);
         } else if (position == 2) {
             fragment = StarredRepositoryListFragment.newInstance(mUserLogin);
         } else if (position == 3 && isSelf) {
-            fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "public", false);
+            fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "public");
         } else if (position == 4 && isSelf) {
-            fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "private", false);
+            fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "private");
         } else if ((position == 5 && isSelf) || (position == 3 && !isSelf)) {
-            fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "sources", false);
+            fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "sources");
         } else if ((position == 6 && isSelf) || (position == 4 && !isSelf)) {
-            fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "forks", false);
+            fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "forks");
         } else if ((position == 7 && isSelf) || (position == 5 && !isSelf)) {
-            fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "member", false);
+            fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "member");
         }
         
         if (fragment != null) {

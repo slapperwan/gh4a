@@ -36,17 +36,14 @@ import com.gh4a.adapter.RootAdapter;
 public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     private String mLogin;
     private String mRepoType;
-    private boolean mLoadUnpaged;
 
-    public static RepositoryListFragment newInstance(String login, String userType,
-            String repoType, boolean loadUnpaged) {
+    public static RepositoryListFragment newInstance(String login, String userType, String repoType) {
         RepositoryListFragment f = new RepositoryListFragment();
 
         Bundle args = new Bundle();
         args.putString(Constants.User.USER_LOGIN, login);
         args.putString(Constants.User.USER_TYPE, userType);
         args.putString(Constants.Repository.REPO_TYPE, repoType);
-        args.putBoolean("unpaged", loadUnpaged);
         f.setArguments(args);
         
         return f;
@@ -57,7 +54,6 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
         super.onCreate(savedInstanceState);
         mLogin = getArguments().getString(Constants.User.USER_LOGIN);
         mRepoType = getArguments().getString(Constants.Repository.REPO_TYPE);
-        mLoadUnpaged = getArguments().getBoolean("unpaged");
     }
     
     @Override
@@ -68,11 +64,6 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     @Override
     protected int getEmptyTextResId() {
         return R.string.no_repos_found;
-    }
-
-    @Override
-    protected boolean shouldLoadUnpaged() {
-        return mLoadUnpaged;
     }
 
     @Override

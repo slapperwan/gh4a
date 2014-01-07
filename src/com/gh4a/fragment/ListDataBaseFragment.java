@@ -34,6 +34,8 @@ public abstract class ListDataBaseFragment<T> extends ListFragment implements
     }
 
     public void refresh() {
+        setListShown(false);
+        mAdapter.clear();
         getLoaderManager().restartLoader(0, null, this);
     }
 
