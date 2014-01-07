@@ -19,7 +19,7 @@ import com.devspark.progressfragment.ProgressFragment;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.activities.DiffViewerActivity;
+import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.loader.CommitLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
@@ -205,9 +205,10 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
         } else {
             CommitFile file = (CommitFile) v.getTag();
 
-            Intent intent = new Intent(getActivity(), DiffViewerActivity.class);
+            Intent intent = new Intent(getActivity(), FileViewerActivity.class);
             intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
             intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+            intent.putExtra(Constants.Object.REF, mObjectSha);
             intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
             intent.putExtra(Constants.Commit.DIFF, file.getPatch());
             intent.putExtra(Constants.Object.PATH, file.getFilename());

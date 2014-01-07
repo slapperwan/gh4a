@@ -16,6 +16,8 @@
 
 package com.gh4a;
 
+import java.util.ArrayList;
+
 
 /**
  * The Interface Constants.
@@ -342,14 +344,29 @@ public interface Constants {
         public static final String ID = "Comment.id";
         public static final String BODY = "Comment.body";
     }
-    
-    public static String[] SKIP_PRETTIFY_EXT = {
-        "txt", "rdoc", "markdown", "md", "mdown", "mkdn", "mkd", "texttile", "org", "creole", "rst", "asciidoc", "pod", ""
-    };
-    
-    public static String[] MARKDOWN_EXT = {
-        "markdown", "md", "mdown", "mkdn", "mkd"
-    };
+
+    public static final ArrayList<String> SKIP_PRETTIFY_EXT = new ArrayList<String>() {
+        private static final long serialVersionUID = -9195888220037295330L;
+    {
+        add("txt");
+        add("rdoc");
+        add("texttile");
+        add("org");
+        add("creole");
+        add("rst");
+        add("asciidoc");
+        add("pod");
+        add("");
+    }};
+    public static final ArrayList<String> MARKDOWN_EXT = new ArrayList<String>() {
+        private static final long serialVersionUID = -3693714294514389145L;
+    {
+        add("markdown");
+        add("md");
+        add("mdown");
+        add("mkdn");
+        add("mkd");
+    }};
     
     public interface Event {
         public static final String IS_PRIVATE = "Event.isPrivate";

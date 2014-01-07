@@ -26,7 +26,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import android.text.TextUtils;
@@ -200,33 +199,29 @@ public class StringUtils {
     
     public static String highlightSyntax(String data, boolean highlight, String fileName) {
         String ext = FileUtils.getFileExtension(fileName);
-        
+        boolean highlighted = false;
+
         StringBuilder content = new StringBuilder();
         content.append("<html><head><title></title>");
         if (highlight) {
-            if (!Arrays.asList(Constants.SKIP_PRETTIFY_EXT).contains(ext)) {
+            if (Constants.MARKDOWN_EXT.contains(ext)) {
+                content.append("<script src='file:///android_asset/showdown.js' type='text/javascript'></script>");
+                content.append("<link href='file:///android_asset/markdown.css' rel='stylesheet' type='text/css'/>");
+                content.append("</head>");
+                content.append("<body>");
+                content.append("<div id='content'>");
+                highlighted = true;
+            } else if (!Constants.SKIP_PRETTIFY_EXT.contains(ext)) {
                 data = TextUtils.htmlEncode(data).replace("\r\n", "<br>").replace("\n", "<br>");
                 content.append("<link href='file:///android_asset/prettify.css' rel='stylesheet' type='text/css'/>");
                 content.append("<script src='file:///android_asset/prettify.js' type='text/javascript'></script>");
                 content.append("</head>");
                 content.append("<body onload='prettyPrint()'>");
                 content.append("<pre class='prettyprint linenums'>");
-            }
-            else if (Arrays.asList(Constants.MARKDOWN_EXT).contains(ext)) {
-                content.append("<script src='file:///android_asset/showdown.js' type='text/javascript'></script>");
-                content.append("<link href='file:///android_asset/markdown.css' rel='stylesheet' type='text/css'/>");
-                content.append("</head>");
-                content.append("<body>");
-                content.append("<div id='content'>");
-            }
-            else {
-                data = TextUtils.htmlEncode(data).replace("\r\n", "<br>").replace("\n", "<br>");
-                content.append("</head>");
-                content.append("<body>");
-                content.append("<pre>");
+                highlighted = true;
             }
         }
-        else {
+        if (!highlighted) {
             data = TextUtils.htmlEncode(data).replace("\r\n", "<br>").replace("\n", "<br>");
             content.append("</head>");
             content.append("<body>");
@@ -235,7 +230,7 @@ public class StringUtils {
         
         content.append(data);
         
-        if (Arrays.asList(Constants.MARKDOWN_EXT).contains(ext)){
+        if (Constants.MARKDOWN_EXT.contains(ext)) {
             content.append("</div>");
             
             content.append("<script>");

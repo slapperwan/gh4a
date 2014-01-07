@@ -27,6 +27,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.text.TextUtils;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -51,7 +52,8 @@ public class FileViewerActivity extends LoadingFragmentActivity {
     private String mPath;
     private String mRef;
     private String mSha;
-    private String mName;
+    private String mDiff;
+    private boolean mInDiffMode;
 
     private WebView mWebView;
 
@@ -93,12 +95,14 @@ public class FileViewerActivity extends LoadingFragmentActivity {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
-        mRepoOwner = getIntent().getStringExtra(Constants.Repository.REPO_OWNER);
-        mRepoName = getIntent().getStringExtra(Constants.Repository.REPO_NAME);
-        mPath = getIntent().getStringExtra(Constants.Object.PATH);
-        mRef = getIntent().getStringExtra(Constants.Object.REF);
-        mSha = getIntent().getStringExtra(Constants.Object.OBJECT_SHA);
-        mName = FileUtils.getFileName(mPath);
+        Bundle data = getIntent().getExtras();
+        mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
+        mRepoName = data.getString(Constants.Repository.REPO_NAME);
+        mPath = data.getString(Constants.Object.PATH);
+        mRef = data.getString(Constants.Object.REF);
+        mSha = data.getString(Constants.Object.OBJECT_SHA);
+        mDiff = data.getString(Constants.Commit.DIFF);
+        mInDiffMode = data.getString(Constants.Object.TREE_SHA) != null;
 
         if (!isOnline()) {
             setErrorView();
@@ -106,25 +110,22 @@ public class FileViewerActivity extends LoadingFragmentActivity {
         }
         
         setContentView(R.layout.web_viewer);
-        setContentShown(false);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(mName);
+        actionBar.setTitle(FileUtils.getFileName(mPath));
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
-        
-        getSupportLoaderManager().initLoader(0, null, mFileCallback);
+
+        if (mDiff != null) {
+            showDiff();
+        } else {
+            getSupportLoaderManager().initLoader(0, null, mFileCallback);
+            setContentShown(false);
+        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private void loadContent(RepositoryContents content) {
-        String data;
-        if (content.getContent() != null) {
-            data = new String(EncodingUtils.fromBase64(content.getContent()));
-        } else {
-            data = "";
-        }
-
+    private void setupWebView() {
         mWebView = (WebView) findViewById(R.id.web_view);
 
         WebSettings s = mWebView.getSettings();
@@ -139,14 +140,47 @@ public class FileViewerActivity extends LoadingFragmentActivity {
         s.setUseWideViewPort(true);
 
         mWebView.setWebViewClient(mWebViewClient);
-        if (FileUtils.isImage(mName)) {
-            String htmlImage = StringUtils.highlightImage(
-                    "https://github.com/" + mRepoOwner + "/" + mRepoName + "/raw/" + mRef + "/" + mPath);
-            mWebView.loadDataWithBaseURL("file:///android_asset/", htmlImage, "text/html", "utf-8", "");
+    }
+
+    private void showDiff() {
+        StringBuilder content = new StringBuilder();
+        content.append("<html><head><title></title>");
+        content.append("</head><body><pre>");
+
+        String encoded = TextUtils.htmlEncode(mDiff);
+        String[] lines = encoded.split("\n");
+        for (String line : lines) {
+            if (line.startsWith("@@")) {
+                line = "<div style=\"background-color: #EAF2F5;\">" + line + "</div>";
+            } else if (line.startsWith("+")) {
+                line = "<div style=\"background-color: #DDFFDD; border-color: #00AA00;\">"
+                        + line + "</div>";
+            } else if (line.startsWith("-")) {
+                line = "<div style=\"background-color: #FFDDDD; border-color: #CC0000;\">"
+                        + line + "</div>";
+            } else {
+                line = "<div>" + line + "</div>";
+            }
+            content.append(line);
         }
-        else {
-            String highlighted = StringUtils.highlightSyntax(data, true, mName);
-            mWebView.loadDataWithBaseURL("file:///android_asset/", highlighted, "text/html", "utf-8", "");
+        content.append("</pre></body></html>");
+
+        setupWebView();
+        mWebView.loadDataWithBaseURL("file:///android_asset/", content.toString(), null, "utf-8", null);
+    }
+
+    private void loadContent(RepositoryContents content) {
+        setupWebView();
+
+        String base64Data = content.getContent();
+        if (base64Data != null && FileUtils.isImage(mPath)) {
+            String imageUrl = "data:image/" + FileUtils.getFileExtension(mPath) + ";base64," + base64Data;
+            String htmlImage = StringUtils.highlightImage(imageUrl);
+            mWebView.loadDataWithBaseURL("file:///android_asset/", htmlImage, null, "utf-8", null);
+        } else {
+            String data = base64Data != null ? new String(EncodingUtils.fromBase64(base64Data)) : "";
+            String highlighted = StringUtils.highlightSyntax(data, true, mPath);
+            mWebView.loadDataWithBaseURL("file:///android_asset/", highlighted, null, "utf-8", null);
         }
     }
 
@@ -160,32 +194,49 @@ public class FileViewerActivity extends LoadingFragmentActivity {
             menu.removeItem(R.id.search);
         }
 
-        menu.add(0, 10, Menu.NONE, getString(R.string.history))
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        if (mDiff != null) {
+            menu.add(0, 11, Menu.NONE, getString(R.string.object_view_file_at, mSha.substring(0, 7)))
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        } else if (!mInDiffMode) {
+            menu.add(0, 10, Menu.NONE, getString(R.string.history))
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        }
         
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     protected void navigateUp() {
-        Gh4Application.get(this).openRepositoryInfoActivity(this,
-                mRepoOwner, mRepoName, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        if (mInDiffMode) {
+            Gh4Application.get(this).openCommitInfoActivity(this,
+                    mRepoOwner, mRepoName, mSha, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        } else {
+            Gh4Application.get(this).openRepositoryInfoActivity(this,
+                    mRepoOwner, mRepoName, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        String blobUrl = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/blob/" + mRef + "/" + mPath;
+        String urlBase = "https://github.com/" + mRepoOwner + "/" + mRepoName;
+        String url = mDiff != null ? urlBase + "/commit/" + mSha : "/blob/" + mRef + "/" + mPath;
+
         switch (item.getItemId()) {
             case R.id.browser:
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(blobUrl));
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 startActivity(browserIntent);
                 return true;
             case R.id.share:
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
                 shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_SUBJECT,
-                        getString(R.string.share_file_subject, mName, mRepoOwner + "/" + mRepoName));
-                shareIntent.putExtra(Intent.EXTRA_TEXT,  blobUrl);
+                if (mDiff != null) {
+                    shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_commit_subject,
+                            mSha.substring(0, 7), mRepoOwner + "/" + mRepoName));
+                } else {
+                    shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_file_subject,
+                            FileUtils.getFileName(mPath), mRepoOwner + "/" + mRepoName));
+                }
+                shareIntent.putExtra(Intent.EXTRA_TEXT,  url);
                 shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
                 return true;
@@ -193,13 +244,22 @@ public class FileViewerActivity extends LoadingFragmentActivity {
                 doSearch();
                 return true;
             case 10:
-                Intent intent = new Intent(FileViewerActivity.this, CommitHistoryActivity.class);
-                intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                intent.putExtra(Constants.Object.PATH, mPath);
-                intent.putExtra(Constants.Object.REF, mRef);
-                intent.putExtra(Constants.Object.OBJECT_SHA, mSha);
-                startActivity(intent);
+                Intent historyIntent = new Intent(this, CommitHistoryActivity.class);
+                historyIntent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+                historyIntent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                historyIntent.putExtra(Constants.Object.PATH, mPath);
+                historyIntent.putExtra(Constants.Object.REF, mRef);
+                historyIntent.putExtra(Constants.Object.OBJECT_SHA, mSha);
+                startActivity(historyIntent);
+                return true;
+            case 11:
+                Intent viewIntent = new Intent(this, FileViewerActivity.class);
+                viewIntent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
+                viewIntent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                viewIntent.putExtra(Constants.Object.PATH, mPath);
+                viewIntent.putExtra(Constants.Object.REF, mSha);
+                viewIntent.putExtra(Constants.Object.OBJECT_SHA, mSha);
+                startActivity(viewIntent);
                 return true;
         }
         return super.onOptionsItemSelected(item);
