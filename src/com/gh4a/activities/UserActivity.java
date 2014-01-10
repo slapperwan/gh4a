@@ -272,7 +272,9 @@ public class UserActivity extends LoadingFragmentPagerActivity {
         @Override
         protected void onSuccess(Void result) {
             mIsFollowing = !mIsFollowing;
-            mUserFragment.updateFollowingAction(mIsFollowing);
+            if (mUserFragment != null) {
+                mUserFragment.updateFollowingAction(mIsFollowing);
+            }
             invalidateOptionsMenu();
         }
     }
