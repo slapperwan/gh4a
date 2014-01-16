@@ -1,6 +1,7 @@
 package com.gh4a.loader;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryId;
@@ -26,6 +27,17 @@ public class TagListLoader extends BaseLoader<List<RepositoryTag>> {
     public List<RepositoryTag> doLoadInBackground() throws IOException {
         RepositoryService repoService = (RepositoryService)
                 Gh4Application.get(getContext()).getService(Gh4Application.REPO_SERVICE);
-        return repoService.getTags(new RepositoryId(mRepoOwner, mRepoName));
+        List<RepositoryTag> tags = repoService.getTags(new RepositoryId(mRepoOwner, mRepoName));
+        if (tags == null) {
+            return null;
+        }
+
+        ArrayList<RepositoryTag> result = new ArrayList<RepositoryTag>();
+        for (RepositoryTag tag : tags) {
+            if (tag != null) {
+                result.add(tag);
+            }
+        }
+        return result;
     }
 }

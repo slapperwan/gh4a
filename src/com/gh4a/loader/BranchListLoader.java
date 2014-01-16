@@ -1,6 +1,7 @@
 package com.gh4a.loader;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryBranch;
@@ -26,6 +27,17 @@ public class BranchListLoader extends BaseLoader<List<RepositoryBranch>> {
     public List<RepositoryBranch> doLoadInBackground() throws IOException {
         RepositoryService repoService = (RepositoryService)
                 Gh4Application.get(getContext()).getService(Gh4Application.REPO_SERVICE);
-        return repoService.getBranches(new RepositoryId(mRepoOwner, mRepoName));
+        List<RepositoryBranch> branches = repoService.getBranches(new RepositoryId(mRepoOwner, mRepoName));
+        if (branches == null) {
+            return null;
+        }
+
+        ArrayList<RepositoryBranch> result = new ArrayList<RepositoryBranch>();
+        for (RepositoryBranch branch : branches) {
+            if (branch != null) {
+                result.add(branch);
+            }
+        }
+        return result;
     }
 }
