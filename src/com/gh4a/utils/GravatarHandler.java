@@ -40,6 +40,8 @@ public class GravatarHandler {
         }
     };
     private static final int MAX_CACHE_SIZE = 100;
+    private static final int MAX_CACHED_IMAGE_SIZE = 60; /* dp - maximum gravatar view size used */
+    private static final float ROUND_CORNER_RADIUS = 0.05f; /* 5% */
 
     private static int sNextRequestId = 1;
 
@@ -49,6 +51,7 @@ public class GravatarHandler {
         ArrayList<ImageView> views;
     }
     private static final SparseArray<Request> sRequests = new SparseArray<Request>();
+    private static int sMaxImageSizePx = -1;
 
     private static final int MSG_LOAD = 1;
     private static final int MSG_LOADED = 2;
@@ -116,6 +119,11 @@ public class GravatarHandler {
         view.setImageResource(R.drawable.default_avatar);
         if (gravatarId == null) {
             return;
+        }
+
+        if (sMaxImageSizePx < 0) {
+            float density = view.getContext().getResources().getDisplayMetrics().density;
+            sMaxImageSizePx = Math.round(density * MAX_CACHED_IMAGE_SIZE);
         }
 
         Request request = getRequestForId(gravatarId);
@@ -186,14 +194,20 @@ public class GravatarHandler {
         return BitmapFactory.decodeByteArray(data, 0, data.length);
     }
 
-    private static Bitmap getRoundedCornerBitmap(Bitmap bitmap, int radius) {
-        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Config.ARGB_8888);
+    private static Bitmap getRoundedCornerResizedBitmap(Bitmap bitmap) {
+        float widthScale = (float) sMaxImageSizePx / (float) bitmap.getWidth();
+        float heightScale = (float) sMaxImageSizePx / (float) bitmap.getHeight();
+        float scaleFactor = Math.min(1, Math.min(widthScale, heightScale));
+        Bitmap output = Bitmap.createBitmap(Math.round(scaleFactor * bitmap.getWidth()),
+                Math.round(scaleFactor * bitmap.getHeight()), Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
 
         final int color = 0xff424242;
         final Paint paint = new Paint();
-        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        final Rect srcRect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        final Rect rect = new Rect(0, 0, output.getWidth(), output.getHeight());
         final RectF rectF = new RectF(rect);
+        final float radius = ROUND_CORNER_RADIUS * Math.max(output.getWidth(), output.getHeight());
 
         paint.setAntiAlias(true);
         canvas.drawARGB(0, 0, 0, 0);
@@ -201,7 +215,7 @@ public class GravatarHandler {
         canvas.drawRoundRect(rectF, radius, radius, paint);
 
         paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, rect, rect, paint);
+        canvas.drawBitmap(bitmap, srcRect, rect, paint);
 
         return output;
     }
@@ -227,7 +241,7 @@ public class GravatarHandler {
                     Bitmap bitmap = null;
                     try {
                         bitmap = fetchBitmap(url);
-                        bitmap = getRoundedCornerBitmap(bitmap, bitmap.getWidth() / 20);
+                        bitmap = getRoundedCornerResizedBitmap(bitmap);
                     } catch (IOException e) {
                         Log.e(TAG, "Couldn't fetch gravatar from URL " + url, e);
                     }
