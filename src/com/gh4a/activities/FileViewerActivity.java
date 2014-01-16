@@ -219,7 +219,7 @@ public class FileViewerActivity extends LoadingFragmentActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         String urlBase = "https://github.com/" + mRepoOwner + "/" + mRepoName;
-        String url = mDiff != null ? urlBase + "/commit/" + mSha : "/blob/" + mRef + "/" + mPath;
+        String url = mDiff != null ? urlBase + "/commit/" + mSha : urlBase + "/blob/" + mRef + "/" + mPath;
 
         switch (item.getItemId()) {
             case R.id.browser:
