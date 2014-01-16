@@ -190,8 +190,12 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
         }
         
         TextView tvSummary = (TextView) mContentView.findViewById(R.id.tv_desc);
-        tvSummary.setText(getString(R.string.commit_summary, added + changed + deleted,
-                mCommit.getStats().getAdditions(), mCommit.getStats().getDeletions()));
+        if (mCommit.getStats() != null) {
+            tvSummary.setText(getString(R.string.commit_summary, added + changed + deleted,
+                    mCommit.getStats().getAdditions(), mCommit.getStats().getDeletions()));
+        } else {
+            tvSummary.setVisibility(View.GONE);
+        }
     }
 
     @Override
