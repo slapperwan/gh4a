@@ -120,8 +120,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
         @Override
         protected void onSuccess(Void result) {
-            getLoaderManager().restartLoader(0, null, CommitNoteFragment.this);
-
+            refresh();
             EditText etComment = (EditText) getView().findViewById(R.id.et_comment);
             etComment.setText(null);
             etComment.clearFocus();
