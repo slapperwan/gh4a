@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.RequestException;
 import org.eclipse.egit.github.core.service.ContentsService;
 
 import android.content.Context;
@@ -29,6 +30,14 @@ public class ReadmeLoader extends BaseLoader<String> {
         client.setOAuth2Token(app.getAuthToken());
         
         ContentsService contentService = new ContentsService(client);
-        return contentService.getReadmeHtml(new RepositoryId(mRepoOwner, mRepoName));
+        try {
+            return contentService.getReadmeHtml(new RepositoryId(mRepoOwner, mRepoName));
+        } catch (RequestException e) {
+            /* don't spam logcat with 404 errors, those are normal */
+            if (e.getStatus() != 404) {
+                throw e;
+            }
+        }
+        return null;
     }
 }
