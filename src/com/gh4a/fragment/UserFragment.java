@@ -28,7 +28,6 @@ import android.support.v4.content.Loader;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -52,7 +51,7 @@ import com.gh4a.utils.GravatarHandler;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
-public class UserFragment extends ProgressFragment implements  OnClickListener {
+public class UserFragment extends ProgressFragment implements View.OnClickListener {
     private String mUserLogin;
     private String mUserName;
     private User mUser;
