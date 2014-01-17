@@ -356,7 +356,7 @@ public class UserFragment extends ProgressFragment implements  OnClickListener {
         } else {
             mUser.setFollowers(mUser.getFollowers() - 1);
         }
-        TextView tvFollowersCount = (TextView) getView().findViewById(R.id.tv_followers_count);
+        TextView tvFollowersCount = (TextView) mContentView.findViewById(R.id.tv_followers_count);
         tvFollowersCount.setText(String.valueOf(mUser.getFollowers()));
     }
 }

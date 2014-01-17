@@ -262,8 +262,7 @@ public class UserActivity extends LoadingFragmentPagerActivity {
                     Gh4Application.get(mContext).getService(Gh4Application.USER_SERVICE);
             if (mIsFollowing) {
                 userService.unfollow(mUserLogin);
-            }
-            else {
+            } else {
                 userService.follow(mUserLogin);
             }
             return null;
