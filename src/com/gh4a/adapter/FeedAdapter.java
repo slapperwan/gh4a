@@ -233,7 +233,10 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         /** DownloadEvent */
         else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
             DownloadPayload payload = (DownloadPayload) event.getPayload();
-            return payload.getDownload().getName();
+            if (payload.getDownload() != null) {
+                return payload.getDownload().getName();
+            }
+            return null;
         }
 
         /** GollumEvent */
