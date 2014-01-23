@@ -338,10 +338,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
      * @param name the name
      */
     public void openUserInfoActivity(Context context, String login, String name) {
-        Intent intent = new Intent(context, UserActivity.class);
-        intent.putExtra(Constants.User.USER_LOGIN, login);
-        intent.putExtra(Constants.User.USER_NAME, name);
-        context.startActivity(intent);
+        openUserInfoActivity(context, login, name, 0);
     }
     
     /**
@@ -353,10 +350,15 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
      * @param flags the flags
      */
     public void openUserInfoActivity(Context context, String login, String name, int flags) {
+        if (login == null) {
+            return;
+        }
         Intent intent = new Intent(context, UserActivity.class);
         intent.putExtra(Constants.User.USER_LOGIN, login);
         intent.putExtra(Constants.User.USER_NAME, name);
-        intent.setFlags(flags);
+        if (flags != 0) {
+            intent.setFlags(flags);
+        }
         context.startActivity(intent);
     }
 

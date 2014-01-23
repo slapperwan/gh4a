@@ -25,7 +25,6 @@ import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.egit.github.core.service.UserService;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -44,7 +43,6 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.widget.SearchView;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
@@ -278,11 +276,8 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
 
         if (object instanceof SearchUser) {
             /** User item */
-            Intent intent = new Intent(SearchActivity.this, UserActivity.class);
             SearchUser user = (SearchUser) object;
-
-            intent.putExtra(Constants.User.USER_LOGIN, user.getLogin());
-            startActivity(intent);
+            Gh4Application.get(this).openUserInfoActivity(this, user.getLogin(), user.getName());
         } else {
             /** Repo item */
             Repository repository = (Repository) object;
@@ -346,10 +341,7 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
 
         if (object instanceof SearchUser) {
             SearchUser user = (SearchUser) object;
-            Intent intent = new Intent(this, UserActivity.class);
-            intent.putExtra(Constants.User.USER_LOGIN, (String) user.getLogin());
-            intent.putExtra(Constants.User.USER_NAME, (String) user.getName());
-            startActivity(intent);
+            Gh4Application.get(this).openUserInfoActivity(this, user.getLogin(), user.getName());
         } else if (object instanceof Repository) {
             Repository repository = (Repository) object;
             Gh4Application.get(this).openRepositoryInfoActivity(this,

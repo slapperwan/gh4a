@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.User;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.view.View;
@@ -28,14 +27,12 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.UserAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.utils.StringUtils;
 
 public abstract class UserListActivity extends LoadingFragmentActivity implements OnItemClickListener {
     protected String mSearchKey;
@@ -110,11 +107,6 @@ public abstract class UserListActivity extends LoadingFragmentActivity implement
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         User user = (User) adapterView.getAdapter().getItem(position);
-        if (!StringUtils.isBlank(user.getLogin())) {
-            Intent intent = new Intent(UserListActivity.this, UserActivity.class);
-            intent.putExtra(Constants.User.USER_LOGIN, (String) user.getLogin());
-            intent.putExtra(Constants.User.USER_NAME, (String) user.getName());
-            startActivity(intent);
-        }
+        Gh4Application.get(this).openUserInfoActivity(this, user.getLogin(), user.getName());
     }
 }
