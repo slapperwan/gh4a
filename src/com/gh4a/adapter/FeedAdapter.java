@@ -39,6 +39,7 @@ import org.eclipse.egit.github.core.event.MemberPayload;
 import org.eclipse.egit.github.core.event.PullRequestPayload;
 import org.eclipse.egit.github.core.event.PullRequestReviewCommentPayload;
 import org.eclipse.egit.github.core.event.PushPayload;
+import org.eclipse.egit.github.core.event.ReleasePayload;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -277,6 +278,14 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
                     payload.getComment().getBody());
         }
 
+        /** ReleaseEvent */
+        else if (Event.TYPE_RELEASE.equals(eventType)) {
+            ReleasePayload payload = (ReleasePayload) event.getPayload();
+            if (payload.getRelease() != null) {
+                return payload.getRelease().getName();
+            }
+        }
+
         return null;
     }
 
@@ -435,9 +444,6 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
                 return res.getString(R.string.event_issue_comment,
                         actor.getLogin(), type, payload.getIssue().getNumber(), formatFromRepoName(eventRepo));
             }
-            else {
-                return "";
-            }
         }
 
         /** PullRequestReviewComment */
@@ -445,7 +451,12 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
             return res.getString(R.string.event_commit_comment_title,
                     actor.getLogin(), formatFromRepoName(eventRepo));
         }
-        
+
+        /** ReleaseEvent */
+        else if (Event.TYPE_RELEASE.equals(eventType)) {
+            return res.getString(R.string.event_release_title, actor.getLogin(),
+                    formatFromRepoName(eventRepo));
+        }
         return "";
     }
 

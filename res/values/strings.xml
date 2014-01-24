@@ -61,6 +61,7 @@
     <string name="home">Home</string>
     <string name="share">Share</string>
     <string name="downloads">Downloads</string>
+    <string name="releases">Releases</string>
     <string name="packages">Packages</string>
     <string name="need_profile_reload">Please reload your profile page by pressing \'Home\' button at the top left for the changes to take effect</string>
     <string name="login_prompt">Please login</string>
@@ -72,6 +73,7 @@
     <string name="milestone_extradata">%1$d open\u00a0\u00a0\u00a0%2$d closed</string>
     <string name="milestone_extradata_due">%1$d open\u00a0\u00a0\u00a0%2$d closed\u00a0\u00a0\u00a0due on %3$s</string>
     <string name="download_extradata">%1$s\u00a0\u00a0\u00a0%2$d downloads\u00a0\u00a0\u00a0created %3$s</string>
+    <string name="release_extradata">%1$s\u00a0\u00a0\u00a0created %2$s</string>
     <string name="feed_extradata">%1$s\u00a0\u00a0\u00a0%2$s</string>
     <string name="gist_extradata">%1$s\u00a0\u00a0\u00a0%2$s</string>
     <string name="go_to">Go to</string>
@@ -137,6 +139,7 @@
     <string name="no_tags_found">No tags were created in this repository yet.</string>
     <string name="no_branches_found">No branches were created in this repository yet.</string>
     <string name="no_contributors_found">No contributions were made to this repository yet.</string>
+    <string name="no_releases_found">No releases were created for this repository yet.</string>
 
     <!-- Activity event -->
     <string name="event_push_title">%1$s pushed to %2$s at %3$s</string>
@@ -157,8 +160,9 @@
     <string name="event_download_title">%1$s uploaded a file to %2$s</string>
     <string name="event_gollum_title">%1$s edited page in the %2$s wiki</string>
     <string name="event_public_title">%1$s open sourced %2$s</string>
+    <string name="event_release_title">%1$s created a release in %2$s</string>
     <string name="event_issue_comment">%1$s commented on %2$s %3$s on %4$s</string>
-    
+
     <string name="event_pull_request_desc">%1$s\n%2$d commits with %3$d additions and %4$d deletions</string>
     <string name="event_follow_desc">%1$s has %2$d repositories and %3$d followers</string>
     <string name="event_fork_desc">Forked repository is at %1$s</string>
@@ -278,8 +282,15 @@
     <string name="commit_sha">Commit - %1$s</string>
     <string name="commit_comment">Commented on %1$s</string>
     <string name="commit_compare">Compare View</string>
-	<string name="commit_comment_hint">Comment on this commit</string>
-	<string name="commit_details">Committed by %1$s %2$s</string>
+    <string name="commit_comment_hint">Comment on this commit</string>
+    <string name="commit_details">Committed by %1$s %2$s</string>
+
+    <!-- Release -->
+    <string name="release_details">Released by %1$s %2$s</string>
+    <string name="release_notes">Release notes</string>
+    <string name="release_type_final">Final release</string>
+    <string name="release_type_draft">Draft</string>
+    <string name="release_type_prerelease">Pre-release</string>
 
     <!-- Issue -->
     <plurals name="issue">

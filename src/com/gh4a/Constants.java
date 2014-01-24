@@ -345,6 +345,11 @@ public interface Constants {
         public static final String BODY = "Comment.body";
     }
 
+    public interface Release {
+        public static final String RELEASER = "Release.releaser";
+        public static final String RELEASE = "Release.release";
+    }
+
     public static final ArrayList<String> SKIP_PRETTIFY_EXT = new ArrayList<String>() {
         private static final long serialVersionUID = -9195888220037295330L;
     {

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@id/main_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/content_padding"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <com.gh4a.widget.FixedSizeImageView
+                android:id="@+id/iv_gravatar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="5dp" />
+            <TextView
+                android:id="@+id/tv_releaseinfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_toRightOf="@id/iv_gravatar" />
+            <TextView
+                android:id="@+id/tv_releasetype"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_toRightOf="@id/iv_gravatar"
+                android:layout_below="@id/tv_releaseinfo" />
+        </RelativeLayout>
+
+        <!-- Release notes section -->
+        <LinearLayout
+            android:id="@+id/release_notes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/overview_item_spacing"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/release_notes_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/highlight"
+                android:text="@string/release_notes" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="@dimen/overview_header_spacing"
+                android:background="@color/highlight" />
+            <ProgressBar
+                android:id="@+id/pb_releasenotes"
+                style="@style/LoadingProgress"
+                android:layout_width="20dp"
+                android:layout_height="20dp" />
+            <TextView
+                android:id="@+id/tv_release_notes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <!-- Downloads section -->
+        <TextView
+            android:id="@+id/downloads_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/overview_item_spacing"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/highlight"
+            android:text="@string/downloads" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="@dimen/overview_header_spacing"
+            android:background="@color/highlight" />
+
+        <ListView
+            android:id="@+id/downloads"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+</ScrollView>

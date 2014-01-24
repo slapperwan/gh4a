@@ -21,6 +21,7 @@ import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.GollumPage;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.PullRequest;
+import org.eclipse.egit.github.core.Release;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.event.CommitCommentPayload;
@@ -36,6 +37,7 @@ import org.eclipse.egit.github.core.event.IssuesPayload;
 import org.eclipse.egit.github.core.event.PullRequestPayload;
 import org.eclipse.egit.github.core.event.PullRequestReviewCommentPayload;
 import org.eclipse.egit.github.core.event.PushPayload;
+import org.eclipse.egit.github.core.event.ReleasePayload;
 import org.eclipse.egit.github.core.service.EventService;
 
 import android.content.Intent;
@@ -51,6 +53,7 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.CompareActivity;
+import com.gh4a.activities.ReleaseInfoActivity;
 import com.gh4a.activities.WikiListActivity;
 import com.gh4a.adapter.FeedAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -329,6 +332,20 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             PullRequestReviewCommentPayload payload = (PullRequestReviewCommentPayload) event.getPayload();
             context.openCommitInfoActivity(getActivity(), repoOwner, repoName, 
                     payload.getComment().getCommitId(), 0);
+        }
+
+        /** ReleaseEvent */
+        else if (Event.TYPE_RELEASE.equals(eventType)) {
+            ReleasePayload payload = (ReleasePayload) event.getPayload();
+            Release release = payload.getRelease();
+            if (release != null) {
+                Intent intent = new Intent(getActivity(), ReleaseInfoActivity.class);
+                intent.putExtra(Constants.Release.RELEASER, event.getActor());
+                intent.putExtra(Constants.Release.RELEASE, release);
+                intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
+                intent.putExtra(Constants.Repository.REPO_NAME, repoName);
+                startActivity(intent);
+            }
         }
     }
     

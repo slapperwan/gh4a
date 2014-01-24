@@ -36,6 +36,7 @@ import com.gh4a.R;
 import com.gh4a.activities.CollaboratorListActivity;
 import com.gh4a.activities.ContributorListActivity;
 import com.gh4a.activities.DownloadsActivity;
+import com.gh4a.activities.ReleaseListActivity;
 import com.gh4a.activities.WatcherListActivity;
 import com.gh4a.activities.WikiListActivity;
 import com.gh4a.loader.LoaderCallbacks;
@@ -106,7 +107,8 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
             R.id.readme_title, R.id.tv_login, R.id.tv_divider, R.id.tv_name,
             R.id.tv_stargazers_count, R.id.tv_forks_count, R.id.tv_issues_count,
             R.id.tv_pull_requests_count, R.id.tv_wiki_label, R.id.tv_contributors_label,
-            R.id.tv_collaborators_label, R.id.other_info, R.id.tv_downloads_label
+            R.id.tv_collaborators_label, R.id.other_info, R.id.tv_downloads_label,
+            R.id.tv_releases_label
         });
         UiUtils.assignTypeface(mContentView, app.italic, new int[] {
             R.id.tv_parent
@@ -149,6 +151,7 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
         mContentView.findViewById(R.id.tv_collaborators_label).setOnClickListener(this);
         mContentView.findViewById(R.id.other_info).setOnClickListener(this);
         mContentView.findViewById(R.id.tv_downloads_label).setOnClickListener(this);
+        mContentView.findViewById(R.id.tv_releases_label).setOnClickListener(this);
         
         TextView tvStargazersCount = (TextView) mContentView.findViewById(R.id.tv_stargazers_count);
         tvStargazersCount.setText(String.valueOf(mRepository.getWatchers()));
@@ -244,6 +247,8 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
             intent = new Intent(getActivity(), WikiListActivity.class);
         } else if (id == R.id.tv_downloads_label) {
             intent = new Intent(getActivity(), DownloadsActivity.class);
+        } else if (id == R.id.tv_releases_label) {
+            intent = new Intent(getActivity(), ReleaseListActivity.class);
         } else if (view.getTag() instanceof Repository) {
             Repository repo = (Repository) view.getTag();
             app.openRepositoryInfoActivity(getActivity(),

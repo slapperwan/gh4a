@@ -166,6 +166,12 @@
         <activity
             android:name=".activities.DownloadsActivity"
             android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activities.ReleaseListActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activities.ReleaseInfoActivity"
+            android:configChanges="orientation|screenSize" />
         <activity android:name="BrowseFilter">
             <intent-filter>
                 <action

@@ -76,7 +76,10 @@ public class LoadingFragmentActivity extends BaseSherlockFragmentActivity {
     public void setEmptyText(CharSequence text) {
         ensureContent();
         if (mEmptyView != null && mEmptyView instanceof TextView) {
-            ((TextView) mEmptyView).setText(text);
+            TextView emptyView = (TextView) mEmptyView;
+            emptyView.setText(text);
+            // align text size with support library's empty text
+            emptyView.setTextAppearance(this, android.R.style.TextAppearance_Small);
         } else {
             throw new IllegalStateException("Can't be used with a custom content view");
         }
