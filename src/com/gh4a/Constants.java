@@ -346,7 +346,6 @@ public interface Constants {
     }
 
     public interface Release {
-        public static final String RELEASER = "Release.releaser";
         public static final String RELEASE = "Release.release";
     }
 

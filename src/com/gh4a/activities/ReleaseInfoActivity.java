@@ -17,7 +17,6 @@ package com.gh4a.activities;
 
 import org.eclipse.egit.github.core.Download;
 import org.eclipse.egit.github.core.Release;
-import org.eclipse.egit.github.core.User;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -52,7 +51,6 @@ public class ReleaseInfoActivity extends LoadingFragmentActivity implements
     private String mRepoOwner;
     private String mRepoName;
     private Release mRelease;
-    private User mReleaser;
 
     private LoaderCallbacks<String> mBodyCallback = new LoaderCallbacks<String>() {
         @Override
@@ -77,7 +75,6 @@ public class ReleaseInfoActivity extends LoadingFragmentActivity implements
         mRepoOwner = extras.getString(Constants.Repository.REPO_OWNER);
         mRepoName = extras.getString(Constants.Repository.REPO_NAME);
         mRelease = (Release) extras.getSerializable(Constants.Release.RELEASE);
-        mReleaser = (User) extras.getSerializable(Constants.Release.RELEASER);
 
         fillData();
 
@@ -101,13 +98,10 @@ public class ReleaseInfoActivity extends LoadingFragmentActivity implements
         });
 
         ImageView gravatar = (ImageView) findViewById(R.id.iv_gravatar);
-        GravatarHandler.assignGravatar(gravatar, mReleaser);
-
-        // FIXME: this is wrong and should not be necessary if github provided releaser in release
-        String login = mReleaser != null ? mReleaser.getLogin() : mRepoOwner;
+        GravatarHandler.assignGravatar(gravatar, mRelease.getAuthor());
 
         TextView details = (TextView) findViewById(R.id.tv_releaseinfo);
-        details.setText(getString(R.string.release_details, login,
+        details.setText(getString(R.string.release_details, mRelease.getAuthor().getLogin(),
                 Gh4Application.pt.format(mRelease.getCreatedAt())));
 
         TextView releaseType = (TextView) findViewById(R.id.tv_releasetype);
