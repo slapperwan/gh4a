@@ -61,17 +61,7 @@ public class DownloadTagsFragment extends ListDataBaseFragment<RepositoryTag> {
 
     @Override
     public void onItemClick(final RepositoryTag tag) {
-        AlertDialog.Builder builder = UiUtils.createDialogBuilder(getActivity());
-        builder.setTitle(R.string.download_file_title);
-        builder.setMessage(getString(R.string.download_file_message, tag.getName()));
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int whichButton) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(tag.getZipballUrl()));
-                startActivity(browserIntent);
-            }
-        });
-        builder.setNegativeButton(R.string.cancel, null);
-        builder.show();
+        UiUtils.enqueueDownload(getActivity(), tag.getZipballUrl(), "application/zip",
+                mRepoName + "-" + tag.getName() + ".zip", null);
     }
 }

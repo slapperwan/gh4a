@@ -51,17 +51,8 @@ public class DownloadsFragment extends ListDataBaseFragment<Download> {
 
     @Override
     public void onItemClick(final Download download) {
-        AlertDialog.Builder builder = UiUtils.createDialogBuilder(getActivity());
-        builder.setTitle(R.string.download_file_title);
-        builder.setMessage(getString(R.string.download_file_message, download.getName()));
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(download.getHtmlUrl()));
-                startActivity(browserIntent);
-            }
-        });
-        builder.setNegativeButton(R.string.cancel, null);
-        builder.show();
+        UiUtils.enqueueDownload(getActivity(), download.getUrl(), download.getContentType(),
+                download.getName(), download.getDescription());
     }
 
     @Override

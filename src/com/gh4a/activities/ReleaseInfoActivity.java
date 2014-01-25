@@ -18,10 +18,7 @@ package com.gh4a.activities;
 import org.eclipse.egit.github.core.Download;
 import org.eclipse.egit.github.core.Release;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.text.method.LinkMovementMethod;
@@ -141,16 +138,7 @@ public class ReleaseInfoActivity extends LoadingFragmentActivity implements
         DownloadAdapter adapter = (DownloadAdapter) parent.getAdapter();
         final Download download = adapter.getItem(position);
 
-        AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
-        builder.setTitle(R.string.download_file_title);
-        builder.setMessage(getString(R.string.download_file_message, download.getName()));
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(download.getHtmlUrl()));
-                startActivity(browserIntent);
-            }
-        });
-        builder.setNegativeButton(R.string.cancel, null);
-        builder.show();
+        UiUtils.enqueueDownload(this, download.getUrl(), download.getContentType(),
+                download.getName(), download.getDescription());
     }
 }

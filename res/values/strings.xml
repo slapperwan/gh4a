@@ -80,8 +80,6 @@
     <string name="fail_view_diff">Unable to view diff</string>
     <string name="forked_from">forked from %1$s</string>
     <string name="enter_username_toast">Please enter your user name instead of your email address</string>
-    <string name="download_file_title">Download this file?</string>
-    <string name="download_file_message">The download of \'%1$s\' will be completed using the browser.</string>
     <string name="menu_user">User %1$s</string>
     <string name="menu_repo">Repo %1$s</string>
     <string name="menu_compare">Compare %1$s</string>

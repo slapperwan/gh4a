@@ -61,18 +61,7 @@ public class DownloadBranchesFragment extends ListDataBaseFragment<RepositoryBra
 
     @Override
     public void onItemClick(final RepositoryBranch branch) {
-        AlertDialog.Builder builder = UiUtils.createDialogBuilder(getActivity());
-        builder.setTitle(R.string.download_file_title);
-        builder.setMessage(getString(R.string.download_file_message, branch.getName()));
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int whichButton) {
-                String url = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/zipball/" + branch.getName();
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                startActivity(browserIntent);
-            }
-        });
-        builder.setNegativeButton(R.string.cancel, null);
-        builder.show();
+        String url = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/zipball/" + branch.getName();
+        UiUtils.enqueueDownload(getActivity(), url, "application/zip", mRepoName + "-" + branch.getName() + ".zip", null);
     }
 }

@@ -5,10 +5,13 @@ import com.gh4a.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
+import android.os.Environment;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -66,5 +69,24 @@ public class UiUtils {
         int resource = a.getResourceId(0, 0);
         a.recycle();
         return resource;
+    }
+
+    public static long enqueueDownload(Context context, String url, String mimeType,
+            String fileName, String description) {
+        Uri uri = Uri.parse(url).buildUpon()
+                .appendQueryParameter("access_token", Gh4Application.get(context).getAuthToken())
+                .build();
+        DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        DownloadManager.Request request = new DownloadManager.Request(uri);
+
+        request.addRequestHeader("Accept", "application/octet-stream")
+                .setDescription(description)
+                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
+
+        if (mimeType != null) {
+            request.setMimeType(mimeType);
+        }
+
+        return dm.enqueue(request);
     }
 }
