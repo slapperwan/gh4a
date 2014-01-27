@@ -16,18 +16,23 @@
 
 package com.gh4a;
 
+import android.annotation.SuppressLint;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 
 public class EventReceiver extends BroadcastReceiver {
+    @SuppressLint("InlinedApi")
     @Override
     public void onReceive(Context context, Intent intent) {
         if (DownloadManager.ACTION_NOTIFICATION_CLICKED.equals(intent.getAction())) {
             Intent downloadManagerIntent = new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS);
-            downloadManagerIntent.setFlags(
-                    Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            downloadManagerIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                downloadManagerIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            }
             context.startActivity(downloadManagerIntent);
         }
     }
