@@ -125,8 +125,6 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         String eventType = event.getType();
         EventRepository eventRepo = event.getRepo();
         
-        //if payload is a base class, return default eventtype.  Think that it is an old event which not supported
-        //by API v3.
         if (!(event.getPayload() instanceof EventPayload)) {
             return event.getType();
         }
@@ -262,8 +260,6 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         User actor = event.getActor();
         Resources res = mContext.getResources();
         
-        //if payload is a base class, return default eventtype.  Think that it is an old event which not supported
-        //by API v3.
         if (!(event.getPayload() instanceof EventPayload)) {
             return event.getType();
         }

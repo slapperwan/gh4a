@@ -70,13 +70,14 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
     private static final int MENU_OPEN_ISSUES = 4;
     private static final int MENU_ISSUE = 5;
     private static final int MENU_GIST = 6;
-    private static final int MENU_FILE = 7;
-    private static final int MENU_FORKED_REPO = 8;
-    private static final int MENU_WIKI_IN_BROWSER = 9;
-    private static final int MENU_PULL_REQ = 10;
-    private static final int MENU_COMPARE = 11;
-    private static final int MENU_COMMENT_COMMIT = 12;
-    private static final int MENU_PUSH_COMMIT_START = 100;
+    private static final int MENU_FORKED_REPO = 7;
+    private static final int MENU_WIKI_IN_BROWSER = 8;
+    private static final int MENU_PULL_REQ = 9;
+    private static final int MENU_COMPARE = 10;
+    private static final int MENU_COMMENT_COMMIT = 11;
+    private static final int MENU_DOWNLOAD_START = 100;
+    private static final int MENU_DOWNLOAD_END = 199;
+    private static final int MENU_PUSH_COMMIT_START = 200;
     
     private String mLogin;
     private boolean mIsPrivate;
@@ -97,8 +98,15 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        registerForContextMenu(getListView());
+    }
+
+    @Override
     protected RootAdapter<Event> onCreateAdapter() {
-        return new FeedAdapter(getActivity());
+        mAdapter = new FeedAdapter(getActivity());
+        return mAdapter;
     }
     
     @Override
@@ -119,13 +127,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
     @Override
     protected void onItemClick(Event event) {
         Gh4Application context = Gh4Application.get(getActivity());
-        
-        if (event.getPayload() == null) {
-            return;
-        }
-        
-        //if payload is a base class, return void.  Think that it is an old event which not supported
-        //by API v3.
+
         if (!(event.getPayload() instanceof EventPayload)) {
             return;
         }
@@ -281,16 +283,10 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         
-        if (v.getId() != R.id.list_view) {
-            return;
-        }
-
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         Event event = (Event) mAdapter.getItem(info.position);
         int groupId = getMenuGroupId();
 
-        //if payload is a base class, return void.  Think that it is an old event which not supported
-        //by API v3.
         if (!(event.getPayload() instanceof EventPayload)) {
             return;
         }
@@ -315,7 +311,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
 
         } else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
             DownloadPayload payload = (DownloadPayload) event.getPayload();
-            menu.add(groupId, MENU_FILE, Menu.NONE,
+            menu.add(groupId, MENU_DOWNLOAD_START, Menu.NONE,
                     getString(R.string.menu_file, payload.getDownload().getName()));
 
         } else if (Event.TYPE_FOLLOW.equals(eventType)) {
@@ -364,9 +360,17 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
                 menu.add(groupId, MENU_PUSH_COMMIT_START + i, Menu.NONE,
                         getString(R.string.menu_commit, commits.get(i).getSha()));
             }
-        }
 
-        // TODO: release event
+        } else if (Event.TYPE_RELEASE.equals(eventType)) {
+            ReleasePayload payload = (ReleasePayload) event.getPayload();
+            List<Download> downloads = payload.getRelease().getAssets();
+            int count = downloads != null ? downloads.size() : 0;
+
+            for (int i = 0; i < count; i++) {
+                menu.add(groupId, MENU_DOWNLOAD_START + i, Menu.NONE,
+                        getString(R.string.menu_file, downloads.get(i).getName()));
+            }
+        }
     }
     
     public boolean open(MenuItem item) {
@@ -414,14 +418,19 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             GistPayload payload = (GistPayload) event.getPayload();
             app.openGistActivity(getActivity(), payload.getGist().getUser().getLogin(),
                     payload.getGist().getId(), 0);
-        } else if (id == MENU_FILE) {
-            if (repoOwner != null) {
+        } else if (id >= MENU_DOWNLOAD_START && id <= MENU_DOWNLOAD_END) {
+            Download download = null;
+            if (Event.TYPE_RELEASE.equals(event.getType())) {
+                ReleasePayload payload = (ReleasePayload) event.getPayload();
+                int offset = id - MENU_DOWNLOAD_START;
+                download = payload.getRelease().getAssets().get(offset);
+            } else if (Event.TYPE_DOWNLOAD.equals(event.getType())) {
                 DownloadPayload payload = (DownloadPayload) event.getPayload();
-                Download download = payload.getDownload();
+                download = payload.getDownload();
+            }
+            if (download != null) {
                 UiUtils.enqueueDownload(getActivity(), download.getUrl(), download.getContentType(),
                         download.getName(), download.getDescription());
-            } else {
-                app.notFoundMessage(getActivity(), R.plurals.repository);
             }
         } else if (id == MENU_FORKED_REPO) {
             ForkPayload payload = (ForkPayload) event.getPayload();
