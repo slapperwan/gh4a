@@ -104,6 +104,10 @@
     <string name="requests">Requests</string>
     <string name="issue_milestone_hint">Milestone</string>
     <string name="issue_assignee_hint">Assignee</string>
+    <string name="download_mobile_warning_title">Mobile connection download</string>
+    <string name="download_mobile_warning_message">Do you want to download this file using your mobile connection?\nYou can also schedule it for download when you\'re using your Wi-Fi connection next time.</string>
+    <string name="download_now_button">Download now</string>
+    <string name="download_wifi_button">Download over Wi-Fi</string>
 
     <plurals name="file">
         <item quantity="one">File</item>

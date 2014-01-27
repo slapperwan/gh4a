@@ -3,14 +3,19 @@ package com.gh4a.utils;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.view.ContextThemeWrapper;
 import android.view.View;
@@ -71,22 +76,66 @@ public class UiUtils {
         return resource;
     }
 
-    public static long enqueueDownload(Context context, String url, String mimeType,
+    public static void enqueueDownload(Context context, String url, String mimeType,
             String fileName, String description) {
         Uri uri = Uri.parse(url).buildUpon()
                 .appendQueryParameter("access_token", Gh4Application.get(context).getAuthToken())
                 .build();
-        DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-        DownloadManager.Request request = new DownloadManager.Request(uri);
+        final DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        final DownloadManager.Request request = new DownloadManager.Request(uri);
 
         request.addRequestHeader("Accept", "application/octet-stream")
                 .setDescription(description)
-                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
+                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
+                .setAllowedOverRoaming(false);
 
         if (mimeType != null) {
             request.setMimeType(mimeType);
         }
 
-        return dm.enqueue(request);
+        if (!downloadNeedsWarning(context)) {
+            dm.enqueue(request);
+            return;
+        }
+
+        DialogInterface.OnClickListener buttonListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (which == DialogInterface.BUTTON_NEUTRAL) {
+                    restrictDownloadToWifi(request);
+                }
+                dm.enqueue(request);
+            }
+        };
+
+        createDialogBuilder(context)
+                .setTitle(R.string.download_mobile_warning_title)
+                .setMessage(R.string.download_mobile_warning_message)
+                .setPositiveButton(R.string.download_now_button, buttonListener)
+                .setNeutralButton(R.string.download_wifi_button, buttonListener)
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    @SuppressLint("NewApi")
+    private static boolean downloadNeedsWarning(Context context) {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            return cm.isActiveNetworkMetered();
+        }
+
+        NetworkInfo info = cm.getActiveNetworkInfo();
+        return info == null || info.getType() != ConnectivityManager.TYPE_WIFI;
+    }
+
+    @SuppressLint("NewApi")
+    private static void restrictDownloadToWifi(DownloadManager.Request request) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            request.setAllowedOverMetered(false);
+        } else {
+            request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI);
+        }
     }
 }
