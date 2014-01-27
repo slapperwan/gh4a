@@ -15,6 +15,7 @@
  */
 package com.gh4a.fragment;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.text.format.DateFormat;
+import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,16 +78,17 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
         }
     };
 
-    private LoaderCallbacks<List<Repository>> mRepoListCallback = new LoaderCallbacks<List<Repository>>() {
+    private LoaderCallbacks<Collection<Repository>> mRepoListCallback =
+            new LoaderCallbacks<Collection<Repository>>() {
         @Override
-        public Loader<LoaderResult<List<Repository>>> onCreateLoader(int id, Bundle args) {
+        public Loader<LoaderResult<Collection<Repository>>> onCreateLoader(int id, Bundle args) {
             Map<String, String> filterData = new HashMap<String, String>();
             filterData.put("sort", "pushed");
             return new RepositoryListLoader(getActivity(), mUserLogin,
                     mUser.getType(), filterData, 5);
         }
         @Override
-        public void onResultReady(LoaderResult<List<Repository>> result) {
+        public void onResultReady(LoaderResult<Collection<Repository>> result) {
             getView().findViewById(R.id.pb_top_repos).setVisibility(View.GONE);
             if (!result.handleError(getActivity())) {
                 fillTopRepos(result.getData());
@@ -275,46 +278,46 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
         }
     }
 
-    public void fillTopRepos(List<Repository> topRepos) {
+    public void fillTopRepos(Collection<Repository> topRepos) {
         Gh4Application app = Gh4Application.get(getActivity());
         
         LinearLayout ll = (LinearLayout) mContentView.findViewById(R.id.ll_top_repos);
         ll.removeAllViews();
         
-        int count = topRepos != null ? topRepos.size() : 0;
         LayoutInflater inflater = getLayoutInflater(null);
 
-        for (int i = 0; i < count; i++) {
-            final Repository repo = topRepos.get(i); 
-            View rowView = inflater.inflate(R.layout.top_repo, null);
-            rowView.setOnClickListener(this);
-            rowView.setTag(repo);
+        if (topRepos != null) {
+            for (Repository repo : topRepos) {
+                View rowView = inflater.inflate(R.layout.top_repo, null);
+                rowView.setOnClickListener(this);
+                rowView.setTag(repo);
 
-            TextView tvTitle = (TextView) rowView.findViewById(R.id.tv_title);
-            tvTitle.setTypeface(app.boldCondensed);
-            tvTitle.setText(repo.getOwner().getLogin() + "/" + repo.getName());
+                TextView tvTitle = (TextView) rowView.findViewById(R.id.tv_title);
+                tvTitle.setTypeface(app.boldCondensed);
+                tvTitle.setText(repo.getOwner().getLogin() + "/" + repo.getName());
 
-            TextView tvDesc = (TextView) rowView.findViewById(R.id.tv_desc);
-            tvDesc.setSingleLine(true);
-            if (!StringUtils.isBlank(repo.getDescription())) {
-                tvDesc.setVisibility(View.VISIBLE);
-                tvDesc.setText(repo.getDescription());
-            } else {
-                tvDesc.setVisibility(View.GONE);
+                TextView tvDesc = (TextView) rowView.findViewById(R.id.tv_desc);
+                tvDesc.setSingleLine(true);
+                if (!StringUtils.isBlank(repo.getDescription())) {
+                    tvDesc.setVisibility(View.VISIBLE);
+                    tvDesc.setText(repo.getDescription());
+                } else {
+                    tvDesc.setVisibility(View.GONE);
+                }
+
+                TextView tvExtra = (TextView) rowView.findViewById(R.id.tv_extra);
+                String language = repo.getLanguage() != null
+                        ? repo.getLanguage() : getString(R.string.unknown);
+                tvExtra.setText(getString(R.string.repo_search_extradata, language,
+                        Formatter.formatFileSize(getActivity(), repo.getSize()),
+                        repo.getForks(), repo.getWatchers()));
+
+                ll.addView(rowView);
             }
-
-            TextView tvExtra = (TextView) rowView.findViewById(R.id.tv_extra);
-            String language = repo.getLanguage() != null
-                    ? repo.getLanguage() : getString(R.string.unknown);
-            tvExtra.setText(getString(R.string.repo_search_extradata, language,
-                    StringUtils.toHumanReadbleFormat(repo.getSize()),
-                    repo.getForks(), repo.getWatchers()));
-
-            ll.addView(rowView);
         }
 
         Button btnMore = (Button) getView().findViewById(R.id.btn_repos);
-        if (count > 0) {
+        if (topRepos != null && !topRepos.isEmpty()) {
             btnMore.setOnClickListener(this);
             btnMore.setVisibility(View.VISIBLE);
         } else {

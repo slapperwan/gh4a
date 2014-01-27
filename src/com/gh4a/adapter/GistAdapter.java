@@ -60,8 +60,7 @@ public class GistAdapter  extends RootAdapter<Gist> {
         viewHolder.tvTitle.setText(gist.getId());
         if (StringUtils.isBlank(gist.getDescription())) {
             viewHolder.tvDesc.setVisibility(View.GONE);
-        }
-        else {
+        } else {
             viewHolder.tvDesc.setText(gist.getDescription());
             viewHolder.tvDesc.setVisibility(View.VISIBLE);
         }

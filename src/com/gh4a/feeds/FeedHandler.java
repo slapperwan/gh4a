@@ -71,22 +71,18 @@ public class FeedHandler extends DefaultHandler {
             if (localName.equalsIgnoreCase("title")) {
                 String title = mBuilder.toString().trim();
                 mFeed.setTitle(title);
-            }
-            else if (localName.equalsIgnoreCase("content")) {
+            } else if (localName.equalsIgnoreCase("content")) {
                 mFeed.setContent(mBuilder.toString().trim());
-            }
-            else if (localName.equalsIgnoreCase("name") && mAuthor) {
+            } else if (localName.equalsIgnoreCase("name") && mAuthor) {
                 mFeed.setAuthor(mBuilder.toString().trim());
                 mAuthor = false;
-            }
-            else if (localName.equalsIgnoreCase("published")) {
+            } else if (localName.equalsIgnoreCase("published")) {
                 try {
                     mFeed.setPublished(sdf.parse(mBuilder.toString().trim()));
                 }
                 catch (ParseException e) {
                 }
-            }
-            else if (localName.equalsIgnoreCase("entry")) {
+            } else if (localName.equalsIgnoreCase("entry")) {
                 mFeeds.add(mFeed);
                 mFeed = null;
             }

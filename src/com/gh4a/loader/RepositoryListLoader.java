@@ -1,7 +1,7 @@
 package com.gh4a.loader;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.egit.github.core.Repository;
@@ -11,7 +11,7 @@ import android.content.Context;
 
 import com.gh4a.Gh4Application;
 
-public class RepositoryListLoader extends BaseLoader<List<Repository>> {
+public class RepositoryListLoader extends BaseLoader<Collection<Repository>> {
     private String mLogin;
     private Map<String, String> mFilterData;
     private int mSize;
@@ -25,21 +25,19 @@ public class RepositoryListLoader extends BaseLoader<List<Repository>> {
     }
     
     @Override
-    public List<Repository> doLoadInBackground() throws IOException {
+    public Collection<Repository> doLoadInBackground() throws IOException {
         Gh4Application app = Gh4Application.get(getContext());
         RepositoryService repoService = (RepositoryService) app.getService(Gh4Application.REPO_SERVICE);
         if (mLogin.equals(app.getAuthLogin())) {
             if (mSize > 0) {
-                return (List<Repository>) repoService.pageRepositories(mFilterData, mSize).next();
-            }
-            else {
+                return repoService.pageRepositories(mFilterData, mSize).next();
+            } else {
                 return repoService.getRepositories(mFilterData);
             }
         } else {
             if (mSize > 0) {
-                return (List<Repository>) repoService.pageRepositories(mLogin, mFilterData, mSize).next();
-            }
-            else {
+                return repoService.pageRepositories(mLogin, mFilterData, mSize).next();
+            } else {
                 return repoService.getRepositories(mLogin, mFilterData);
             }
         }

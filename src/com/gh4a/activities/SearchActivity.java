@@ -250,14 +250,12 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
             Object object = listAdapter.getItem(info.position);
             menu.setHeaderTitle(R.string.go_to);
 
-            /** Menu for user */
             if (object instanceof SearchUser) {
+                /** Menu for user */
                 SearchUser user = (SearchUser) object;
                 menu.add(getString(R.string.menu_user, StringUtils.formatName(user.getLogin(), user.getName())));
-            }
-
-            /** Menu for repository */
-            else {
+            } else {
+                /** Menu for repository */
                 Repository repository = (Repository) object;
                 menu.add(getString(R.string.menu_user, repository.getOwner()));
                 menu.add(getString(R.string.menu_repo, repository.getName()));

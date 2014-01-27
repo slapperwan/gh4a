@@ -39,13 +39,13 @@ public class RssHandler extends DefaultHandler {
         }
         
         if (mYourActionFeed != null) {
-            if (localName.equalsIgnoreCase("thumbnail")){
+            if (localName.equalsIgnoreCase("thumbnail")) {
                 String gravatarUrl = attributes.getValue(2);
                 String[] gravatarUrlPart = gravatarUrl.split("/");
-                String gravatarId = gravatarUrl.substring(gravatarUrl.indexOf(gravatarUrlPart[4]), gravatarUrl.indexOf("?"));
+                String gravatarId = gravatarUrl.substring(gravatarUrl.indexOf(gravatarUrlPart[4]),
+                        gravatarUrl.indexOf("?"));
                 mYourActionFeed.setGravatarId(gravatarId);
-            }
-            else if (localName.equalsIgnoreCase("link")){
+            } else if (localName.equalsIgnoreCase("link")) {
                 String url = attributes.getValue(2);
                 String[] urlPart = url.split("/");
                 String owner = null;
@@ -54,8 +54,7 @@ public class RssHandler extends DefaultHandler {
                 if (urlPart.length > 4) {
                     owner = urlPart[3];
                     repoName = urlPart[4];
-                }
-                else if (urlPart.length > 3) {
+                } else if (urlPart.length > 3) {
                     owner = urlPart[3];
                 }
                 
@@ -80,27 +79,19 @@ public class RssHandler extends DefaultHandler {
                 int index2 = id.lastIndexOf("/");
                 
                 mYourActionFeed.setEvent(id.substring(index1 + 1, index2));
-            }
-            else if (localName.equalsIgnoreCase("title")){
+            } else if (localName.equalsIgnoreCase("title")) {
                 mYourActionFeed.setTitle(builder.toString().trim());
-            }
-            else if (localName.equalsIgnoreCase("content")){
-                //mYourActionFeed.setContent(builder.toString().trim());
+            } else if (localName.equalsIgnoreCase("content")) {
                 mYourActionFeed.setContent(formatContent(builder.toString().trim()));
-            }
-            else if (localName.equalsIgnoreCase("published")){
+            } else if (localName.equalsIgnoreCase("published")) {
                 mYourActionFeed.setPublished(builder.toString().trim());
-            }
-            else if (localName.equalsIgnoreCase("media")){
+            } else if (localName.equalsIgnoreCase("media")) {
                 mYourActionFeed.setPublished(builder.toString().trim());
-            }
-            else if (localName.equalsIgnoreCase("email")){
+            } else if (localName.equalsIgnoreCase("email")) {
                 mYourActionFeed.setEmail(builder.toString().trim());
-            }
-            else if (localName.equalsIgnoreCase("name")){
+            } else if (localName.equalsIgnoreCase("name")) {
                 mYourActionFeed.setAuthor(builder.toString().trim());
-            }
-            else if (localName.equalsIgnoreCase("entry")){
+            } else if (localName.equalsIgnoreCase("entry")) {
                 mYourActionFeeds.add(mYourActionFeed);
             }
         }
@@ -121,8 +112,7 @@ public class RssHandler extends DefaultHandler {
 //        }
 //        if (UserFeed.Type.PULL_REQUEST_EVENT.value().equals(event)) {
 //            content = content.replaceAll("\n", " ");
-//        }
-//        else if (UserFeed.Type.PUSH_EVENT.value().equals(event)) {
+//        } else if (UserFeed.Type.PUSH_EVENT.value().equals(event)) {
 //            StringBuilder sb = new StringBuilder();
 //            
 //            String[] commitDesc = content.split("\n");
@@ -131,18 +121,15 @@ public class RssHandler extends DefaultHandler {
 //                if (committedWord.length > 1) {
 //                    if (committedWord[1].equals("committed")) {
 //                        sb.append(committedWord[2]).append(" ");
-//                    }
-//                    else {
+//                    } else {
 //                        sb.append(str).append("\n");
 //                    }
-//                }
-//                else {
+//                } else {
 //                    sb.append(str).append("\n");
 //                }
 //            }
 //            content = sb.toString();
-//        }
-//        else if (UserFeed.Type.WATCH_EVENT.value().equals(event)) {
+//        } else if (UserFeed.Type.WATCH_EVENT.value().equals(event)) {
 //            int index = content.indexOf("\n");
 //            if (index != -1) {
 //                content = content.replaceAll(content.substring(0, index + 1), "");

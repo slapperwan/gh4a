@@ -62,37 +62,33 @@ public class FileUtils {
     
     public static String getFileExtension(String filename) {
         int mid = filename.lastIndexOf(".");
-        if (mid != -1) {
-            return filename.substring(mid + 1, filename.length());
-        }
-        else {
+        if (mid == -1) {
             return "";
         }
+
+        return filename.substring(mid + 1, filename.length());
     }
     
     public static String getFileName(String path) {
-        if (!StringUtils.isBlank(path)) {
-            int mid = path.lastIndexOf("/");
-            if (mid != -1) {
-                return path.substring(mid + 1, path.length());
-            }
-            else {
-                return path;
-            }
+        if (StringUtils.isBlank(path)) {
+            return "";
         }
-        return "";
+        int mid = path.lastIndexOf("/");
+        if (mid == -1) {
+            return path;
+        }
+        return path.substring(mid + 1, path.length());
     }
     
     public static boolean isImage(String filename) {
-        if (!StringUtils.isBlank(filename)) {
-            String ext = getFileExtension(filename);
-            
-            if (!StringUtils.isBlank(ext)) {
-                if (imageExts.contains(ext.toLowerCase(Locale.US))) {
-                    return true;
-                }
-            }
+        if (StringUtils.isBlank(filename)) {
+            return false;
         }
-        return false;
+        String ext = getFileExtension(filename);
+        if (StringUtils.isBlank(ext)) {
+            return false;
+        }
+
+        return imageExts.contains(ext.toLowerCase(Locale.US));
     }
 }

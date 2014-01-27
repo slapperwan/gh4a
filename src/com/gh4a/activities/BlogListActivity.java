@@ -53,8 +53,7 @@ public class BlogListActivity extends BaseSherlockFragmentActivity {
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             finish();
-        }
-        else {
+        } else {
             Gh4Application app = Gh4Application.get(this);
             app.openUserInfoActivity(this, app.getAuthLogin(), null,
                     Intent.FLAG_ACTIVITY_CLEAR_TOP);

@@ -304,8 +304,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
             Bundle data = populateRepository(repository);
             intent.putExtra(Constants.DATA_BUNDLE, data);
             context.startActivity(intent);
-        }
-        else {
+        } else {
             notFoundMessage(getApplicationContext(), R.plurals.repository);
         }
     }
@@ -433,17 +432,6 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         intent.putExtra(Constants.PullRequest.STATE, state);
         intent.setFlags(flags);
         context.startActivity(intent);
-    }
-
-    /**
-     * Open browser.
-     * 
-     * @param context the context
-     * @param url the url
-     */
-    public void openBrowser(Context context, String url) {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        context.startActivity(browserIntent);
     }
 
     public void openGistActivity(Context context, String userLogin, String gistId, int flags) {

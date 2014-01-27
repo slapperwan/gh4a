@@ -185,8 +185,7 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
             }
             if (tvTitle.getText() == null || StringUtils.isBlank(tvTitle.getText().toString())) {
                 ToastUtils.showMessage(this, R.string.issue_error_milestone_title);
-            }
-            else {
+            } else {
                 new AddIssueMilestonesTask(tvTitle.getText().toString(), desc, mDueOn).execute();
             }
             return true;

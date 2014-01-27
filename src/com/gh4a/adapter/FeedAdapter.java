@@ -28,6 +28,7 @@ import org.eclipse.egit.github.core.event.CreatePayload;
 import org.eclipse.egit.github.core.event.DeletePayload;
 import org.eclipse.egit.github.core.event.DownloadPayload;
 import org.eclipse.egit.github.core.event.Event;
+import org.eclipse.egit.github.core.event.EventPayload;
 import org.eclipse.egit.github.core.event.EventRepository;
 import org.eclipse.egit.github.core.event.FollowPayload;
 import org.eclipse.egit.github.core.event.ForkPayload;
@@ -126,7 +127,7 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         
         //if payload is a base class, return default eventtype.  Think that it is an old event which not supported
         //by API v3.
-        if (event.getPayload().getClass().getSimpleName().equals("EventPayload")) {
+        if (!(event.getPayload() instanceof EventPayload)) {
             return event.getType();
         }
         
@@ -134,8 +135,77 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         
         viewHolder.llPushDesc.setVisibility(View.GONE);
 
-        /** PushEvent */
-        if (Event.TYPE_PUSH.equals(eventType)) {
+        if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
+            CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
+
+            return res.getString(R.string.event_commit_comment_desc,
+                    payload.getComment().getCommitId().substring(0, 7),
+                    payload.getComment().getBody());
+
+        } else if (Event.TYPE_CREATE.equals(eventType)) {
+            CreatePayload payload = (CreatePayload) event.getPayload();
+            if ("repository".equals(payload.getRefType())) {
+                return res.getString(R.string.event_create_repo_desc, eventRepo.getName());
+            } else if ("branch".equals(payload.getRefType()) || "tag".equals(payload.getRefType())) {
+                return res.getString(R.string.event_create_branch_desc,
+                        payload.getRefType(), eventRepo.getName(), payload.getRef());
+            }
+
+        } else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
+            DownloadPayload payload = (DownloadPayload) event.getPayload();
+            if (payload.getDownload() != null) {
+                return payload.getDownload().getName();
+            }
+
+        } else if (Event.TYPE_FOLLOW.equals(eventType)) {
+            FollowPayload payload = (FollowPayload) event.getPayload();
+            User target = payload.getTarget();
+            if (target != null) {
+                return res.getString(R.string.event_follow_desc,
+                        target.getLogin(), target.getPublicRepos(), target.getFollowers());
+            }
+
+        } else if (Event.TYPE_FORK.equals(eventType)) {
+            ForkPayload payload = (ForkPayload) event.getPayload();
+            return res.getString(R.string.event_fork_desc, formatToRepoName(payload.getForkee()));
+
+        } else if (Event.TYPE_GOLLUM.equals(eventType)) {
+            GollumPayload payload = (GollumPayload) event.getPayload();
+            List<GollumPage> pages = payload.getPages();
+            if (pages != null && !pages.isEmpty()) {
+                return res.getString(R.string.event_gollum_desc, pages.get(0).getPageName());
+            }
+
+        } else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
+            IssueCommentPayload payload = (IssueCommentPayload) event.getPayload();
+            if (payload != null && payload.getComment() != null) {
+                return payload.getComment().getBody();
+            }
+
+        } else if (Event.TYPE_ISSUES.equals(eventType)) {
+            IssuesPayload eventPayload = (IssuesPayload) event.getPayload();
+            return eventPayload.getIssue().getTitle();
+
+        } else if (Event.TYPE_PUBLIC.equals(eventType)) {
+            return null;
+
+        } else if (Event.TYPE_PULL_REQUEST.equals(eventType)) {
+            PullRequestPayload payload = (PullRequestPayload) event.getPayload();
+            PullRequest pullRequest = payload.getPullRequest();
+
+            if (!StringUtils.isBlank(pullRequest.getTitle())) {
+                return res.getString(R.string.event_pull_request_desc,
+                        pullRequest.getTitle(), pullRequest.getCommits(),
+                        pullRequest.getAdditions(), pullRequest.getDeletions());
+            }
+
+        } else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
+            PullRequestReviewCommentPayload payload = (PullRequestReviewCommentPayload) event.getPayload();
+            return res.getString(R.string.event_commit_comment_desc,
+                    payload.getComment().getCommitId().substring(0, 7),
+                    payload.getComment().getBody());
+
+        } else if (Event.TYPE_PUSH.equals(eventType)) {
             viewHolder.llPushDesc.setVisibility(View.VISIBLE);
             viewHolder.llPushDesc.removeAllViews();
 
@@ -154,8 +224,7 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
                     if (eventRepo != null) {
                         spannableSha.setSpan(new TextAppearanceSpan(mContext,
                                 R.style.default_text_small_url), 0, spannableSha.length(), 0);
-                    }
-                    else {
+                    } else {
                         spannableSha = new SpannableString(mContext.getString(R.string.deleted));
                     }
                     
@@ -176,110 +245,8 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
                     viewHolder.llPushDesc.addView(tvMoreMsg);
                 }
             }
-            return null;
-        }
 
-        /** CommitCommentEvent */
-        else if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
-            CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
-
-            return res.getString(R.string.event_commit_comment_desc,
-                    payload.getComment().getCommitId().substring(0, 7), 
-                    payload.getComment().getBody());
-        }
-
-        /** PullRequestEvent */
-        else if (Event.TYPE_PULL_REQUEST.equals(eventType)) {
-            PullRequestPayload payload = (PullRequestPayload) event.getPayload();
-            PullRequest pullRequest = payload.getPullRequest();
-            
-            if (!StringUtils.isBlank(pullRequest.getTitle())) {
-                return res.getString(R.string.event_pull_request_desc,
-                        pullRequest.getTitle(), pullRequest.getCommits(),
-                        pullRequest.getAdditions(), pullRequest.getDeletions());
-            }
-            return null;
-        }
-
-        /** FollowEvent */
-        else if (Event.TYPE_FOLLOW.equals(eventType)) {
-            FollowPayload payload = (FollowPayload) event.getPayload();
-            User target = payload.getTarget();
-            if (target != null) {
-                return res.getString(R.string.event_follow_desc,
-                        target.getLogin(), target.getPublicRepos(), target.getFollowers());
-            }
-            return null;
-        }
-
-        /** ForkEvent */
-        else if (Event.TYPE_FORK.equals(eventType)) {
-            ForkPayload payload = (ForkPayload) event.getPayload();
-            return res.getString(R.string.event_fork_desc, formatToRepoName(payload.getForkee()));
-        }
-
-        /** CreateEvent */
-        else if (Event.TYPE_CREATE.equals(eventType)) {
-            CreatePayload payload = (CreatePayload) event.getPayload();
-            if ("repository".equals(payload.getRefType())) {
-                return res.getString(R.string.event_create_repo_desc, eventRepo.getName());
-            }
-            else if ("branch".equals(payload.getRefType()) || "tag".equals(payload.getRefType())) {
-                return res.getString(R.string.event_create_branch_desc,
-                        payload.getRefType(), eventRepo.getName(), payload.getRef());
-            }
-            return null;
-        }
-
-        /** DownloadEvent */
-        else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
-            DownloadPayload payload = (DownloadPayload) event.getPayload();
-            if (payload.getDownload() != null) {
-                return payload.getDownload().getName();
-            }
-            return null;
-        }
-
-        /** GollumEvent */
-        else if (Event.TYPE_GOLLUM.equals(eventType)) {
-            GollumPayload payload = (GollumPayload) event.getPayload();
-            List<GollumPage> pages = payload.getPages();
-            if (pages != null && !pages.isEmpty()) {
-                return res.getString(R.string.event_gollum_desc, pages.get(0).getPageName());
-            }
-            return null;
-        }
-
-        /** PublicEvent */
-        else if (Event.TYPE_PUBLIC.equals(eventType)) {
-            return null;
-        }
-        
-        /** IssuesEvent */
-        else if (Event.TYPE_ISSUES.equals(eventType)) {
-            IssuesPayload eventPayload = (IssuesPayload) event.getPayload();
-            return eventPayload.getIssue().getTitle();
-        }
-        
-        /** IssueCommentEvent */
-        else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
-            IssueCommentPayload payload = (IssueCommentPayload) event.getPayload();
-            if (payload != null && payload.getComment() != null) {
-                return payload.getComment().getBody();
-            }
-            return null;
-        }
-
-        /** PullRequestReviewComment */
-        else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
-            PullRequestReviewCommentPayload payload = (PullRequestReviewCommentPayload) event.getPayload();
-            return res.getString(R.string.event_commit_comment_desc,
-                    payload.getComment().getCommitId().substring(0, 7), 
-                    payload.getComment().getBody());
-        }
-
-        /** ReleaseEvent */
-        else if (Event.TYPE_RELEASE.equals(eventType)) {
+        } else if (Event.TYPE_RELEASE.equals(eventType)) {
             ReleasePayload payload = (ReleasePayload) event.getPayload();
             if (payload.getRelease() != null) {
                 return payload.getRelease().getName();
@@ -297,141 +264,74 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         
         //if payload is a base class, return default eventtype.  Think that it is an old event which not supported
         //by API v3.
-        if (event.getPayload().getClass().getSimpleName().equals("EventPayload")) {
+        if (!(event.getPayload() instanceof EventPayload)) {
             return event.getType();
         }
 
-        /** PushEvent */
-        if (Event.TYPE_PUSH.equals(eventType)) {
-            PushPayload payload = (PushPayload) event.getPayload();
-            String[] refPart = payload.getRef().split("/"); 
-            return res.getString(R.string.event_push_title,
-                    actor.getLogin(), refPart.length == 3 ? refPart[2] : payload.getRef(),
-                    formatFromRepoName(eventRepo));
-        }
-
-        /** IssuesEvent */
-        else if (Event.TYPE_ISSUES.equals(eventType)) {
-            IssuesPayload eventPayload = (IssuesPayload) event.getPayload();
-            return res.getString(R.string.event_issues_title,
-                    actor.getLogin(), eventPayload.getAction(),
-                    eventPayload.getIssue().getNumber(), formatFromRepoName(eventRepo)); 
-        }
-
-        /** CommitCommentEvent */
-        else if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
+        if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
             return res.getString(R.string.event_commit_comment_title,
                     actor.getLogin(), formatFromRepoName(eventRepo));
-        }
 
-        /** PullRequestEvent */
-        else if (Event.TYPE_PULL_REQUEST.equals(eventType)) {
-            PullRequestPayload payload = (PullRequestPayload) event.getPayload();
-            return res.getString(R.string.event_pull_request_title,
-                    actor.getLogin(), payload.getAction(),
-                    payload.getNumber(), formatFromRepoName(eventRepo));
-        }
-
-        /** WatchEvent */
-        else if (Event.TYPE_WATCH.equals(eventType)) {
-            return res.getString(R.string.event_watch_title,
-                    actor.getLogin(), formatFromRepoName(eventRepo));
-        }
-
-        /** GistEvent */
-        else if (Event.TYPE_GIST.equals(eventType)) {
-            GistPayload payload = (GistPayload) event.getPayload();
-            String login = actor.getLogin();
-            if (StringUtils.isBlank(login) && payload.getGist() != null
-                    && payload.getGist().getUser() != null) {
-                login = payload.getGist().getUser().getLogin(); 
-            }
-            
-            String id = payload.getGist() != null
-                    ? payload.getGist().getId() : mContext.getString(R.string.deleted);
-            return res.getString(R.string.event_gist_title,
-                    !StringUtils.isBlank(login) ? login : mContext.getString(R.string.unknown),
-                    payload.getAction(), id);
-        }
-
-        /** ForkEvent */
-        else if (Event.TYPE_FORK.equals(event.getType())) {
-            return res.getString(R.string.event_fork_title, 
-                    actor.getLogin(), formatFromRepoName(eventRepo));
-        }
-
-        /** ForkApplyEvent */
-        else if (Event.TYPE_FORK_APPLY.equals(eventType)) {
-            return res.getString(R.string.event_fork_apply_title,
-                    actor.getLogin(), formatFromRepoName(eventRepo));
-        }
-
-        /** FollowEvent */
-        else if (Event.TYPE_FOLLOW.equals(eventType)) {
-            FollowPayload payload = (FollowPayload) event.getPayload();
-            return res.getString(R.string.event_follow_title,
-                    actor.getLogin(), payload.getTarget().getLogin());
-        }
-
-        /** CreateEvent */
-        else if (Event.TYPE_CREATE.equals(eventType)) {
+        } else if (Event.TYPE_CREATE.equals(eventType)) {
             CreatePayload payload = (CreatePayload) event.getPayload();
             if ("repository".equals(payload.getRefType())) {
                 return res.getString(R.string.event_create_repo_title,
                         actor.getLogin(), formatFromRepoName(eventRepo));
-            }
-            else if ("branch".equals(payload.getRefType()) || "tag".equals(payload.getRefType())) {
+            } else if ("branch".equals(payload.getRefType()) || "tag".equals(payload.getRefType())) {
                 return res.getString(R.string.event_create_branch_title,
                         actor.getLogin(), payload.getRefType(), payload.getRef(),
                         formatFromRepoName(eventRepo));
-            }
-            else {
+            } else {
                 return actor.getLogin();
             }
-        }
 
-        /** DeleteEvent */
-        else if (Event.TYPE_DELETE.equals(eventType)) {
+        } else if (Event.TYPE_DELETE.equals(eventType)) {
             DeletePayload payload = (DeletePayload) event.getPayload();
             if ("repository".equals(payload.getRefType())) {
                 return res.getString(R.string.event_delete_repo_title,
                         actor.getLogin(), payload.getRef());
-            }
-            else {
+            } else {
                 return res.getString(R.string.event_delete_branch_title,
                         actor.getLogin(), payload.getRefType(), payload.getRef(),
                         formatFromRepoName(eventRepo));
             }
-        }
 
-        /** MemberEvent */
-        else if (Event.TYPE_MEMBER.equals(eventType)) {
-            MemberPayload payload = (MemberPayload) event.getPayload();
-            return res.getString(R.string.event_member_title,
-                    actor.getLogin(), payload.getMember() != null ? payload.getMember().getLogin() : "",
-                    formatFromRepoName(eventRepo));
-        }
-
-        /** DownloadEvent */
-        else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
+        } else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
             return res.getString(R.string.event_download_title,
                     actor.getLogin(), formatFromRepoName(eventRepo));
-        }
 
-        /** GollumEvent */
-        else if (Event.TYPE_GOLLUM.equals(eventType)) {
+        } else if (Event.TYPE_FOLLOW.equals(eventType)) {
+            FollowPayload payload = (FollowPayload) event.getPayload();
+            return res.getString(R.string.event_follow_title,
+                    actor.getLogin(), payload.getTarget().getLogin());
+
+        } else if (Event.TYPE_FORK.equals(event.getType())) {
+            return res.getString(R.string.event_fork_title,
+                    actor.getLogin(), formatFromRepoName(eventRepo));
+
+        } else if (Event.TYPE_FORK_APPLY.equals(eventType)) {
+            return res.getString(R.string.event_fork_apply_title,
+                    actor.getLogin(), formatFromRepoName(eventRepo));
+
+        } else if (Event.TYPE_GIST.equals(eventType)) {
+            GistPayload payload = (GistPayload) event.getPayload();
+            String login = actor.getLogin();
+            if (StringUtils.isBlank(login) && payload.getGist() != null
+                    && payload.getGist().getUser() != null) {
+                login = payload.getGist().getUser().getLogin();
+            }
+
+            String id = payload.getGist() != null
+                    ? payload.getGist().getId() : mContext.getString(R.string.deleted);
+                    return res.getString(R.string.event_gist_title,
+                            !StringUtils.isBlank(login) ? login : mContext.getString(R.string.unknown),
+                                    payload.getAction(), id);
+
+        } else if (Event.TYPE_GOLLUM.equals(eventType)) {
             return res.getString(R.string.event_gollum_title,
                     actor.getLogin(), formatFromRepoName(eventRepo));
-        }
 
-        /** PublicEvent */
-        else if (Event.TYPE_PUBLIC.equals(eventType)) {
-            return res.getString(R.string.event_public_title,
-                    actor.getLogin(), formatFromRepoName(eventRepo));
-        }
-        
-        /** IssueCommentEvent */
-        else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
+        } else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
             IssueCommentPayload payload = (IssueCommentPayload) event.getPayload();
             String type = mContext.getResources().getString(R.string.issue).toLowerCase(Locale.getDefault());
             if (payload.getIssue() != null) {
@@ -440,23 +340,52 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
                     type = mContext.getResources().getString(
                             R.string.pull_request_title).toLowerCase(Locale.getDefault());
                 }
-                
+
                 return res.getString(R.string.event_issue_comment,
                         actor.getLogin(), type, payload.getIssue().getNumber(), formatFromRepoName(eventRepo));
             }
-        }
+        } else if (Event.TYPE_ISSUES.equals(eventType)) {
+            IssuesPayload eventPayload = (IssuesPayload) event.getPayload();
+            return res.getString(R.string.event_issues_title,
+                    actor.getLogin(), eventPayload.getAction(),
+                    eventPayload.getIssue().getNumber(), formatFromRepoName(eventRepo));
 
-        /** PullRequestReviewComment */
-        else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
+        } else if (Event.TYPE_MEMBER.equals(eventType)) {
+            MemberPayload payload = (MemberPayload) event.getPayload();
+            return res.getString(R.string.event_member_title,
+                    actor.getLogin(), payload.getMember() != null ? payload.getMember().getLogin() : "",
+                            formatFromRepoName(eventRepo));
+
+        } else if (Event.TYPE_PUBLIC.equals(eventType)) {
+            return res.getString(R.string.event_public_title,
+                    actor.getLogin(), formatFromRepoName(eventRepo));
+
+        } else if (Event.TYPE_PULL_REQUEST.equals(eventType)) {
+            PullRequestPayload payload = (PullRequestPayload) event.getPayload();
+            return res.getString(R.string.event_pull_request_title,
+                    actor.getLogin(), payload.getAction(),
+                    payload.getNumber(), formatFromRepoName(eventRepo));
+
+        } else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
             return res.getString(R.string.event_commit_comment_title,
+                    actor.getLogin(), formatFromRepoName(eventRepo));
+
+        } else if (Event.TYPE_PUSH.equals(eventType)) {
+            PushPayload payload = (PushPayload) event.getPayload();
+            String[] refPart = payload.getRef().split("/");
+            return res.getString(R.string.event_push_title,
+                    actor.getLogin(), refPart.length == 3 ? refPart[2] : payload.getRef(),
+                            formatFromRepoName(eventRepo));
+
+        } else if (Event.TYPE_RELEASE.equals(eventType)) {
+            return res.getString(R.string.event_release_title, actor.getLogin(),
+                    formatFromRepoName(eventRepo));
+
+        } else if (Event.TYPE_WATCH.equals(eventType)) {
+            return res.getString(R.string.event_watch_title,
                     actor.getLogin(), formatFromRepoName(eventRepo));
         }
 
-        /** ReleaseEvent */
-        else if (Event.TYPE_RELEASE.equals(eventType)) {
-            return res.getString(R.string.event_release_title, actor.getLogin(),
-                    formatFromRepoName(eventRepo));
-        }
         return "";
     }
 

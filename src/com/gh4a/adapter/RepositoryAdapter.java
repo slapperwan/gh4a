@@ -21,6 +21,7 @@ import org.eclipse.egit.github.core.Repository;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,27 +63,20 @@ public class RepositoryAdapter extends RootAdapter<Repository> implements Filter
     protected void bindView(View view, Repository repository) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         
-        if (viewHolder.tvTitle != null) {
-            viewHolder.tvTitle.setText(repository.getOwner().getLogin() + "/" + repository.getName());
+        viewHolder.tvTitle.setText(repository.getOwner().getLogin() + "/" + repository.getName());
+
+        if (!StringUtils.isBlank(repository.getDescription())) {
+            viewHolder.tvDesc.setVisibility(View.VISIBLE);
+            viewHolder.tvDesc.setText(StringUtils.doTeaser(repository.getDescription()));
+        } else {
+            viewHolder.tvDesc.setVisibility(View.GONE);
         }
 
-        if (viewHolder.tvDesc != null) {
-            if (!StringUtils.isBlank(repository.getDescription())) {
-                viewHolder.tvDesc.setVisibility(View.VISIBLE);
-                viewHolder.tvDesc.setText(StringUtils.doTeaser(repository.getDescription()));
-            }
-            else {
-                viewHolder.tvDesc.setVisibility(View.GONE);
-            }
-        }
-
-        if (viewHolder.tvExtra != null) {
-            String language = repository.getLanguage() != null
-                    ? repository.getLanguage() : mContext.getString(R.string.unknown);
-            viewHolder.tvExtra.setText(mContext.getString(R.string.repo_search_extradata,
-                    language, StringUtils.toHumanReadbleFormat(repository.getSize()),
-                    repository.getForks(), repository.getWatchers()));
-        }
+        String language = repository.getLanguage() != null
+                ? repository.getLanguage() : mContext.getString(R.string.unknown);
+        viewHolder.tvExtra.setText(mContext.getString(R.string.repo_search_extradata,
+                language, Formatter.formatFileSize(mContext, repository.getSize()),
+                repository.getForks(), repository.getWatchers()));
     }
 
     @Override

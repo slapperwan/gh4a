@@ -24,8 +24,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.regex.Pattern;
 
 import android.text.TextUtils;
@@ -43,8 +41,7 @@ public class StringUtils {
             "(" +
             "\\." +
             "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
-            ")+"
-        );
+            ")+");
 
     /**
      * Checks if is blank.
@@ -53,7 +50,7 @@ public class StringUtils {
      * @return true, if is blank
      */
     public static boolean isBlank(String val) {
-        return val == null || (val != null && val.trim().equals(""));
+        return val == null || val.trim().isEmpty();
     }
 
     /**
@@ -63,28 +60,26 @@ public class StringUtils {
      * @return the string
      */
     public static String doTeaser(String text) {
-        if (!StringUtils.isBlank(text)) {
-            int indexNewLine = text.indexOf("\n");
-            int indexDot = text.indexOf(". ");
+        if (isBlank(text)) {
+            return "";
+        }
 
-            if (indexDot != -1 && indexNewLine != -1) {
-                if (indexDot > indexNewLine) {
-                    text = text.substring(0, indexNewLine);
-                }
-                else {
-                    text = text.substring(0, indexDot + 1);
-                }
-            }
-            else if (indexDot != -1) {
+        int indexNewLine = text.indexOf("\n");
+        int indexDot = text.indexOf(". ");
+
+        if (indexDot != -1 && indexNewLine != -1) {
+            if (indexDot > indexNewLine) {
+                text = text.substring(0, indexNewLine);
+            } else {
                 text = text.substring(0, indexDot + 1);
             }
-            else if (indexNewLine != -1) {
-                text = text.substring(0, indexNewLine);
-            }
-
-            return text;
+        } else if (indexDot != -1) {
+            text = text.substring(0, indexDot + 1);
+        } else if (indexNewLine != -1) {
+            text = text.substring(0, indexNewLine);
         }
-        return "";
+
+        return text;
     }
 
     /**
@@ -97,16 +92,14 @@ public class StringUtils {
         if (StringUtils.isBlank(s)) {
             return null;
         }
-        String result = null;
         try {
             MessageDigest md5 = MessageDigest.getInstance("MD5");
             byte[] digest = md5.digest(s.getBytes());
-            result = toHex(digest);
-        }
-        catch (NoSuchAlgorithmException e) {
+            return toHex(digest);
+        } catch (NoSuchAlgorithmException e) {
             // this won't happen, we know Java has MD5!
         }
-        return result;
+        return null;
     }
 
     /**
@@ -132,15 +125,11 @@ public class StringUtils {
      * @return the string
      */
     public static String formatName(String userLogin, String name) {
-        String formattedName;
+        if (StringUtils.isBlank(userLogin)) {
+            return name;
+        }
 
-        if (!StringUtils.isBlank(userLogin)) {
-            formattedName = userLogin + (!StringUtils.isBlank(name) ? " - " + name : "");
-        }
-        else {
-            formattedName = name;
-        }
-        return formattedName;
+        return userLogin + (!StringUtils.isBlank(name) ? " - " + name : "");
     }
 
     /**
@@ -157,46 +146,25 @@ public class StringUtils {
          * there's no more data to read. We use the StringWriter class to
          * produce the string.
          */
-        if (is != null) {
-            Writer writer = new StringWriter();
-
-            char[] buffer = new char[1024];
-            try {
-                Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-                int n;
-                while ((n = reader.read(buffer)) != -1) {
-                    writer.write(buffer, 0, n);
-                }
-            }
-            finally {
-                is.close();
-            }
-            return writer.toString();
-        }
-        else {
+        if (is == null) {
             return "";
         }
+
+        Writer writer = new StringWriter();
+
+        char[] buffer = new char[1024];
+        try {
+            Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            int n;
+            while ((n = reader.read(buffer)) != -1) {
+                writer.write(buffer, 0, n);
+            }
+        } finally {
+            is.close();
+        }
+        return writer.toString();
     }
 
-    public static String toHumanReadbleFormat(long size) {
-        NumberFormat nf = new DecimalFormat("0.#");
-        String s;
-        float f;
-        if (size / (1024 * 1024) > 0) {
-            f = size;
-            s = nf.format(f / (1024 * 1024)) + " GB";
-        }
-        else if (size / (1024) > 0) {
-            f = size;
-            s = nf.format(f / (1024)) + " MB";
-        }
-        else {
-            f = size;
-            s = nf.format(f) + " bytes";
-        }
-        return s;
-    }
-    
     public static String highlightSyntax(String data, boolean highlight, String fileName) {
         String ext = FileUtils.getFileExtension(fileName);
         boolean highlighted = false;
@@ -240,8 +208,7 @@ public class StringUtils {
             //content.append("html = html.replace(/>/g, '>\n').replace(/</g, '\n<').replace(/\n{2,}/g, '\n\n')");
             content.append("document.getElementById('content').innerHTML = html;");
             content.append("</script>");
-        }
-        else {
+        } else {
             content.append("</pre>");
         }
         

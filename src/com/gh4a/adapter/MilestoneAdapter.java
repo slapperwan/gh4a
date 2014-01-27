@@ -68,8 +68,7 @@ public class MilestoneAdapter extends RootAdapter<Milestone> {
         if (!StringUtils.isBlank(milestone.getDescription())) {
             viewHolder.tvDesc.setVisibility(View.VISIBLE);
             viewHolder.tvDesc.setText(milestone.getDescription());
-        }
-        else {
+        } else {
             viewHolder.tvDesc.setVisibility(View.GONE);
         }
 

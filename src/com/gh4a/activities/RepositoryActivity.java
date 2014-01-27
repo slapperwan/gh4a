@@ -498,8 +498,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
             if (mIsStarring) {
                 starService.unstar(repoId);
-            }
-            else {
+            } else {
                 starService.star(repoId);
             }
             return null;
@@ -527,8 +526,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
             if (mIsWatching) {
                 watcherService.unwatch(repoId);
-            }
-            else {
+            } else {
                 watcherService.watch(repoId);
             }
             return null;

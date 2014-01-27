@@ -142,8 +142,7 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
             }
             if (StringUtils.isBlank(title)) {
                 ToastUtils.showMessage(this, R.string.issue_error_milestone_title);
-            }
-            else {
+            } else {
                 new EditIssueMilestoneTask(title, desc).execute();
             }
         } else if (itemId == R.id.delete) {
