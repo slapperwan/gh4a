@@ -50,7 +50,6 @@ import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Resources;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Toast;
 
