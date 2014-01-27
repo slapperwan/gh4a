@@ -45,7 +45,7 @@ import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 public class ReleaseInfoActivity extends LoadingFragmentActivity implements
-        AdapterView.OnItemClickListener {
+        View.OnClickListener, AdapterView.OnItemClickListener {
     private String mRepoOwner;
     private String mRepoName;
     private Release mRelease;
@@ -116,27 +116,36 @@ public class ReleaseInfoActivity extends LoadingFragmentActivity implements
             releaseType.setText(R.string.release_type_final);
         }
 
-        ListView downloadsList = (ListView) findViewById(R.id.downloads);
-        DownloadAdapter adapter = new DownloadAdapter(this);
-        adapter.addAll(mRelease.getAssets());
-        downloadsList.setAdapter(adapter);
-        downloadsList.setOnItemClickListener(this);
+        TextView tag = (TextView) findViewById(R.id.tv_releasetag);
+        tag.setText(getString(R.string.release_tag, mRelease.getTagName()));
+        tag.setOnClickListener(this);
+
+        if (mRelease.getAssets() != null && !mRelease.getAssets().isEmpty()) {
+            ListView downloadsList = (ListView) findViewById(R.id.download_list);
+            DownloadAdapter adapter = new DownloadAdapter(this);
+            adapter.addAll(mRelease.getAssets());
+            downloadsList.setAdapter(adapter);
+            downloadsList.setOnItemClickListener(this);
+        } else {
+            findViewById(R.id.downloads).setVisibility(View.GONE);
+        }
     }
 
     private void fillNotes(String bodyHtml) {
+        TextView body = (TextView) findViewById(R.id.tv_release_notes);
+
         if (!StringUtils.isBlank(bodyHtml)) {
             HttpImageGetter imageGetter = new HttpImageGetter(this);
-            TextView body = (TextView) findViewById(R.id.tv_release_notes);
 
             bodyHtml = HtmlUtils.format(bodyHtml).toString();
             imageGetter.bind(body, bodyHtml, mRelease.getId());
-            body.setVisibility(View.VISIBLE);
             body.setMovementMethod(LinkMovementMethod.getInstance());
-
-            findViewById(R.id.pb_releasenotes).setVisibility(View.GONE);
         } else {
-            findViewById(R.id.release_notes).setVisibility(View.GONE);
+            body.setText(R.string.release_no_releasenotes);
         }
+
+        body.setVisibility(View.VISIBLE);
+        findViewById(R.id.pb_releasenotes).setVisibility(View.GONE);
     }
 
     @Override
@@ -146,5 +155,15 @@ public class ReleaseInfoActivity extends LoadingFragmentActivity implements
 
         UiUtils.enqueueDownload(this, download.getUrl(), download.getContentType(),
                 download.getName(), download.getDescription());
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.tv_releasetag:
+                Gh4Application.get(this).openRepositoryInfoActivity(this,
+                        mRepoOwner, mRepoName, mRelease.getTagName(), 0);
+                break;
+        }
     }
 }

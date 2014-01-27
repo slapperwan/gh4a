@@ -33,59 +33,66 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:layout_toRightOf="@id/iv_gravatar"
                 android:layout_below="@id/tv_releaseinfo" />
+            <TextView
+                android:id="@+id/tv_releasetag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/titletextcolor"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:background="?attr/selectableItemBackground"
+                android:layout_toRightOf="@id/iv_gravatar"
+                android:layout_below="@id/tv_releasetype" />
         </RelativeLayout>
 
         <!-- Release notes section -->
+        <TextView
+            android:id="@+id/release_notes_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/overview_item_spacing"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/highlight"
+            android:text="@string/release_notes" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="@dimen/overview_header_spacing"
+            android:background="@color/highlight" />
+        <ProgressBar
+            android:id="@+id/pb_releasenotes"
+            style="@style/LoadingProgress"
+            android:layout_width="20dp"
+            android:layout_height="20dp" />
+        <TextView
+            android:id="@+id/tv_release_notes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <!-- Downloads section -->
         <LinearLayout
-            android:id="@+id/release_notes"
+            android:id="@+id/downloads"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/overview_item_spacing"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/release_notes_title"
+                android:id="@+id/downloads_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@color/highlight"
-                android:text="@string/release_notes" />
+                android:text="@string/downloads" />
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
                 android:background="@color/highlight" />
-            <ProgressBar
-                android:id="@+id/pb_releasenotes"
-                style="@style/LoadingProgress"
-                android:layout_width="20dp"
-                android:layout_height="20dp" />
-            <TextView
-                android:id="@+id/tv_release_notes"
+            <ListView
+                android:id="@+id/download_list"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
+                android:layout_height="match_parent" />
         </LinearLayout>
-
-        <!-- Downloads section -->
-        <TextView
-            android:id="@+id/downloads_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/overview_item_spacing"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/highlight"
-            android:text="@string/downloads" />
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="@dimen/overview_header_spacing"
-            android:background="@color/highlight" />
-
-        <ListView
-            android:id="@+id/downloads"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
     </LinearLayout>
 </ScrollView>

@@ -285,10 +285,12 @@
 
     <!-- Release -->
     <string name="release_details">Released by %1$s %2$s</string>
+    <string name="release_tag">On tag %1$s</string>
     <string name="release_notes">Release notes</string>
     <string name="release_type_final">Final release</string>
     <string name="release_type_draft">Draft</string>
     <string name="release_type_prerelease">Pre-release</string>
+    <string name="release_no_releasenotes">No release notes were given.</string>
 
     <!-- Issue -->
     <plurals name="issue">
