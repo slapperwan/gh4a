@@ -347,6 +347,7 @@ public interface Constants {
 
     public interface Release {
         public static final String RELEASE = "Release.release";
+        public static final String RELEASER = "Release.releaser";
     }
 
     public static final ArrayList<String> SKIP_PRETTIFY_EXT = new ArrayList<String>() {
