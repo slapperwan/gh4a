@@ -12,9 +12,7 @@ import android.content.Context;
 import com.gh4a.Gh4Application;
 
 public class RepositoryListLoader extends BaseLoader<List<Repository>> {
-
     private String mLogin;
-    private String mType;
     private Map<String, String> mFilterData;
     private int mSize;
     
@@ -22,7 +20,6 @@ public class RepositoryListLoader extends BaseLoader<List<Repository>> {
             Map<String, String> filterData, int size) {
         super(context);
         this.mLogin = login;
-        this.mType = userType;
         this.mFilterData = filterData; 
         this.mSize = size;
     }
@@ -38,17 +35,7 @@ public class RepositoryListLoader extends BaseLoader<List<Repository>> {
             else {
                 return repoService.getRepositories(mFilterData);
             }
-        }
-        /*
-        else if (Constants.User.USER_TYPE_ORG.equals(mType)) {
-            if (mSize > 0) {
-                return (List<Repository>) repoService.pageOrgRepositories(mLogin, mFilterData, mSize).next();
-            }
-            else {
-                return repoService.getOrgRepositories(mLogin, mFilterData);
-            }
-        }*/
-        else {
+        } else {
             if (mSize > 0) {
                 return (List<Repository>) repoService.pageRepositories(mLogin, mFilterData, mSize).next();
             }
