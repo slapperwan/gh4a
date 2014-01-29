@@ -18,9 +18,6 @@ package com.gh4a.adapter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
-
-import org.ocpsoft.pretty.time.PrettyTime;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -37,10 +34,6 @@ import android.widget.Filterable;
  * @param <T> the generic type
  */
 public abstract class RootAdapter<T> extends BaseAdapter implements Filterable {
-
-    /** The Constant pt. */
-    protected static final PrettyTime pt = new PrettyTime(new Locale(""));
-
     /** The objects. */
     private List<T> mObjects;
     private List<T> mUnfilteredObjects;

@@ -105,7 +105,7 @@ public class ReleaseInfoActivity extends LoadingFragmentActivity implements
 
         TextView details = (TextView) findViewById(R.id.tv_releaseinfo);
         details.setText(getString(R.string.release_details, mReleaser.getLogin(),
-                Gh4Application.pt.format(mRelease.getCreatedAt())));
+                StringUtils.formatRelativeTime(this, mRelease.getCreatedAt(), true)));
 
         TextView releaseType = (TextView) findViewById(R.id.tv_releasetype);
         if (mRelease.isDraft()) {

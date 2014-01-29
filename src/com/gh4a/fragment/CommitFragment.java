@@ -25,6 +25,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.StringUtils;
 
 public class CommitFragment extends ProgressFragment implements OnClickListener {
     private String mRepoOwner;
@@ -126,9 +127,8 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
         }
         
         TextView tvExtra = (TextView) mContentView.findViewById(R.id.tv_extra);
-        tvExtra.setText(CommitUtils.getAuthorName(app, mCommit)
-                + " "
-                + Gh4Application.pt.format(mCommit.getCommit().getAuthor().getDate()));
+        tvExtra.setText(CommitUtils.getAuthorName(app, mCommit) + " "
+                + StringUtils.formatRelativeTime(activity, mCommit.getCommit().getAuthor().getDate(), true));
 
         if (!CommitUtils.authorEqualsCommitter(mCommit)) {
             ViewGroup committer = (ViewGroup) mContentView.findViewById(R.id.committer_info);
@@ -138,7 +138,7 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
             committer.setVisibility(View.VISIBLE);
             GravatarHandler.assignGravatar(gravatar, mCommit.getCommitter());
             extra.setText(getString(R.string.commit_details, CommitUtils.getCommitterName(app, mCommit),
-                    Gh4Application.pt.format(mCommit.getCommit().getCommitter().getDate())));
+                    StringUtils.formatRelativeTime(activity, mCommit.getCommit().getCommitter().getDate(), true)));
         }
 
         int count = mCommit.getFiles() != null ? mCommit.getFiles().size() : 0;

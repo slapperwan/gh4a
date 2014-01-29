@@ -98,7 +98,7 @@ public class GistActivity extends LoadingFragmentActivity implements OnClickList
         tvDesc.setVisibility(StringUtils.isBlank(gist.getDescription()) ? View.GONE : View.VISIBLE);
         
         TextView tvCreatedAt = (TextView) findViewById(R.id.tv_created_at);
-        tvCreatedAt.setText(Gh4Application.pt.format(gist.getCreatedAt()));
+        tvCreatedAt.setText(StringUtils.formatRelativeTime(this, gist.getCreatedAt(), true));
         
         LinearLayout llFiles = (LinearLayout) findViewById(R.id.ll_files);
         Map<String, GistFile> files = gist.getFiles();

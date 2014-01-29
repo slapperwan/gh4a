@@ -68,7 +68,7 @@ public class GistAdapter  extends RootAdapter<Gist> {
         String count = v.getResources().getQuantityString(R.plurals.file,
                 gist.getFiles().size(), gist.getFiles().size());
         viewHolder.tvExtra.setText(mContext.getString(R.string.gist_extradata,
-                pt.format(gist.getCreatedAt()), count));
+                StringUtils.formatRelativeTime(mContext, gist.getCreatedAt(), false), count));
     }
 
     private static class ViewHolder {

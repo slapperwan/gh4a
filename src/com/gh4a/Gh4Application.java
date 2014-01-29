@@ -40,7 +40,7 @@ import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.egit.github.core.service.StarService;
 import org.eclipse.egit.github.core.service.UserService;
 import org.eclipse.egit.github.core.service.WatcherService;
-import org.ocpsoft.pretty.time.PrettyTime;
+import org.ocpsoft.prettytime.PrettyTime;
 
 import android.app.Application;
 import android.content.Context;
@@ -48,6 +48,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -95,6 +96,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
 
     private GitHubClient mClient;
     private HashMap<String, GitHubService> mServices;
+    private PrettyTime mPt;
     
     /*
      * (non-Javadoc)
@@ -115,6 +117,8 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
         BugSenseHandler.initAndStartSession(this, "1e6a83ae");
+
+        mPt = new PrettyTime();
 
         mClient = new DefaultClient();
         mClient.setOAuth2Token(getAuthToken());
@@ -142,9 +146,16 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         return mServices.get(name);
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mPt = new PrettyTime(newConfig.locale);
+    }
 
-    /** The Constant pt. */
-    public static final PrettyTime pt = new PrettyTime();
+    public PrettyTime getPrettyTimeInstance() {
+        return mPt;
+    }
+
 
     /**
      * Populate Repository into Bundle.

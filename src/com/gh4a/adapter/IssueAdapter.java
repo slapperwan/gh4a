@@ -34,6 +34,7 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.StringUtils;
 
 public class IssueAdapter extends RootAdapter<Issue> implements OnClickListener {
     public IssueAdapter(Context context) {
@@ -81,7 +82,8 @@ public class IssueAdapter extends RootAdapter<Issue> implements OnClickListener 
 
         viewHolder.tvDesc.setText(issue.getTitle());
 
-        viewHolder.tvExtra.setText(issue.getUser().getLogin() + "\n" + pt.format(issue.getCreatedAt()));
+        viewHolder.tvExtra.setText(issue.getUser().getLogin() + "\n"
+                + StringUtils.formatRelativeTime(mContext, issue.getCreatedAt(), false));
         if (issue.getAssignee() != null) {
             viewHolder.ivAssignee.setVisibility(View.VISIBLE);
             GravatarHandler.assignGravatar(viewHolder.ivAssignee, issue.getAssignee());

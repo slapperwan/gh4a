@@ -29,6 +29,7 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.StringUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
@@ -64,7 +65,8 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements OnC
         GravatarHandler.assignGravatar(viewHolder.ivGravatar, comment.getUser());
 
         viewHolder.ivGravatar.setTag(comment);
-        viewHolder.tvExtra.setText(comment.getUser().getLogin() + "\n" + pt.format(comment.getCreatedAt()));
+        viewHolder.tvExtra.setText(comment.getUser().getLogin() + "\n"
+                + StringUtils.formatRelativeTime(mContext, comment.getCreatedAt(), true));
 
         String body = HtmlUtils.format(comment.getBodyHtml()).toString();
         mImageGetter.bind(viewHolder.tvDesc, body, comment.getId());

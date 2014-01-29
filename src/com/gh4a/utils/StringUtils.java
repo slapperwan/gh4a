@@ -24,11 +24,15 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.regex.Pattern;
 
+import android.content.Context;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 
 import com.gh4a.Constants;
+import com.gh4a.Gh4Application;
 
 /**
  * The Class StringUtils.
@@ -230,5 +234,16 @@ public class StringUtils {
     
     public static boolean checkEmail(String email) {
         return EMAIL_ADDRESS_PATTERN.matcher(email).matches();
+    }
+
+    public static CharSequence formatRelativeTime(Context context, Date date, boolean showDateIfLongAgo) {
+        long now = System.currentTimeMillis();
+        long time = date.getTime();
+        long duration = Math.abs(now - time);
+
+        if (showDateIfLongAgo && duration >= DateUtils.WEEK_IN_MILLIS) {
+            return DateUtils.getRelativeTimeSpanString(context, time, true);
+        }
+        return Gh4Application.get(context).getPrettyTimeInstance().format(date);
     }
 }

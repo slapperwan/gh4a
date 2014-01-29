@@ -30,6 +30,7 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.StringUtils;
 
 public class PullRequestAdapter extends RootAdapter<PullRequest> implements OnClickListener {
     public PullRequestAdapter(Context context) {
@@ -68,7 +69,8 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> implements OnCl
 
         viewHolder.tvDesc.setText(pullRequest.getTitle());
         viewHolder.tvExtra.setText(mContext.getString(R.string.more_issue_data,
-                user != null ? user.getLogin() : "", pt.format(pullRequest.getCreatedAt())));
+                user != null ? user.getLogin() : "",
+                StringUtils.formatRelativeTime(mContext, pullRequest.getCreatedAt(), true)));
     }
 
     @Override

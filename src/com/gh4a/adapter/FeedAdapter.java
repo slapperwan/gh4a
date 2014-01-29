@@ -98,7 +98,8 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         GravatarHandler.assignGravatar(viewHolder.ivGravatar, actor);
         viewHolder.ivGravatar.setTag(actor);
 
-        SpannableString createdAt = new SpannableString(pt.format(event.getCreatedAt()));
+        SpannableString createdAt = new SpannableString(
+                StringUtils.formatRelativeTime(mContext, event.getCreatedAt(), false));
         createdAt.setSpan(new TextAppearanceSpan(v.getContext(), R.style.default_text_small_italic),
                 0, createdAt.length(), 0);
 

@@ -185,7 +185,8 @@ public class IssueActivity extends LoadingFragmentActivity implements
         ivGravatar.setOnClickListener(this);
 
         TextView tvExtra = (TextView) header.findViewById(R.id.tv_extra);
-        tvExtra.setText(mIssue.getUser().getLogin() + "\n" + Gh4Application.pt.format(mIssue.getCreatedAt()));
+        tvExtra.setText(mIssue.getUser().getLogin() + "\n"
+                + StringUtils.formatRelativeTime(this, mIssue.getCreatedAt(), true));
         
         TextView tvState = (TextView) header.findViewById(R.id.tv_state);
         tvState.setTextColor(Color.WHITE);

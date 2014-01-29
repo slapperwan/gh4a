@@ -30,6 +30,7 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.StringUtils;
 
 public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> implements OnClickListener {
     public RepositoryIssueAdapter(Context context) {
@@ -74,7 +75,8 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
         IssueAdapter.makeLabelBadges(viewHolder.llLabels, issue.getLabels());
 
         viewHolder.tvDesc.setText(issue.getTitle());
-        viewHolder.tvExtra.setText(issue.getUser().getLogin() + "\n" + pt.format(issue.getCreatedAt()));
+        viewHolder.tvExtra.setText(issue.getUser().getLogin() + "\n"
+                + StringUtils.formatRelativeTime(mContext, issue.getCreatedAt(), true));
         viewHolder.tvComments.setText(String.valueOf(issue.getComments()));
         viewHolder.tvRepo.setText(mContext.getString(R.string.repo_issue_on,
                 issue.getRepository().getOwner().getLogin() + "/" + issue.getRepository().getName()));

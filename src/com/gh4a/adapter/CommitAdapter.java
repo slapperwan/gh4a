@@ -30,6 +30,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.StringUtils;
 
 public class CommitAdapter extends RootAdapter<RepositoryCommit> implements OnClickListener {
     public CommitAdapter(Context context) {
@@ -75,7 +76,7 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> implements OnCl
 
         viewHolder.tvExtra.setText(mContext.getString(R.string.more_commit_data,
                 CommitUtils.getAuthorName(mContext, commit),
-                Gh4Application.pt.format(commit.getCommit().getAuthor().getDate())));
+                StringUtils.formatRelativeTime(mContext, commit.getCommit().getAuthor().getDate(), false)));
     }
 
     @Override

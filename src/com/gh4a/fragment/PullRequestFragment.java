@@ -170,7 +170,7 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
         tvExtra.setText(getString(R.string.issue_open_by_user,
                 pullRequest.getUser() != null ? pullRequest.getUser().getLogin() : "",
-                Gh4Application.pt.format(pullRequest.getCreatedAt())));
+                StringUtils.formatRelativeTime(getActivity(), pullRequest.getCreatedAt(), true)));
         
         TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
         tvTitle.setText(pullRequest.getTitle());
