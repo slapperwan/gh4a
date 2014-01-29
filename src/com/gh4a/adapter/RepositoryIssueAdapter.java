@@ -30,6 +30,7 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
 public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> implements OnClickListener {
@@ -100,8 +101,7 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             RepositoryIssue issue = (RepositoryIssue) v.getTag();
-            /** Open user activity */
-            Gh4Application.get(mContext).openUserInfoActivity(mContext, issue.getUser().getLogin(), null);
+            IntentUtils.openUserInfoActivity(mContext, issue.getUser());
         }
     }
     

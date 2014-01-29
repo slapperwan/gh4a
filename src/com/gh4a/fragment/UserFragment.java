@@ -50,6 +50,7 @@ import com.gh4a.loader.OrganizationListLoader;
 import com.gh4a.loader.RepositoryListLoader;
 import com.gh4a.loader.UserLoader;
 import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
@@ -112,8 +113,8 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
         UserFragment f = new UserFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.User.USER_LOGIN, login);
-        args.putString(Constants.User.USER_NAME, name);
+        args.putString(Constants.User.LOGIN, login);
+        args.putString(Constants.User.NAME, name);
         f.setArguments(args);
         
         return f;
@@ -122,8 +123,8 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mUserLogin = getArguments().getString(Constants.User.USER_LOGIN);
-        mUserName = getArguments().getString(Constants.User.USER_NAME);
+        mUserLogin = getArguments().getString(Constants.User.LOGIN);
+        mUserName = getArguments().getString(Constants.User.NAME);
     }
 
     @Override
@@ -170,7 +171,7 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
         View llOrgMembers = mContentView.findViewById(R.id.cell_org_members);
         View llFollowers = mContentView.findViewById(R.id.cell_followers);
         
-        if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
+        if (Constants.User.TYPE_USER.equals(mUser.getType())) {
             llFollowers.setOnClickListener(this);
             llOrgMembers.setVisibility(View.GONE);
         } else {
@@ -194,9 +195,9 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
 
         TextView tvName = (TextView) mContentView.findViewById(R.id.tv_name);
         tvName.setText(StringUtils.isBlank(mUser.getName()) ? mUser.getLogin() : mUser.getName());
-        if (Constants.User.USER_TYPE_ORG.equals(mUser.getType())) {
+        if (Constants.User.TYPE_ORG.equals(mUser.getType())) {
             tvName.append(" (");
-            tvName.append(Constants.User.USER_TYPE_ORG);
+            tvName.append(Constants.User.TYPE_ORG); // FIXME
             tvName.append(")");
         }
 
@@ -220,7 +221,7 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
 
     private void fillCountIfUser(int layoutId, int countId, int count) {
         View layout = mContentView.findViewById(layoutId);
-        if (Constants.User.USER_TYPE_USER.equals(mUser.getType())) {
+        if (Constants.User.TYPE_USER.equals(mUser.getType())) {
             TextView countView = (TextView) mContentView.findViewById(countId);
             countView.setText(String.valueOf(count));
             layout.setOnClickListener(this);
@@ -245,9 +246,9 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
         Intent intent = null;
 
         if (id == R.id.cell_followers) {
-            if (Constants.User.USER_TYPE_ORG.equals(mUser.getType())) {
+            if (Constants.User.TYPE_ORG.equals(mUser.getType())) {
                 intent = new Intent(getActivity(), OrganizationMemberListActivity.class);
-                intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+                intent.putExtra(Constants.Repository.OWNER, mUserLogin);
             } else {
                 intent = new Intent(getActivity(), FollowerFollowingListActivity.class);
                 intent.putExtra("FIND_FOLLOWERS", true);
@@ -261,19 +262,17 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
             intent = new Intent(getActivity(), GistListActivity.class);
         } else if (id == R.id.cell_org_members) {
             intent = new Intent(getActivity(), OrganizationMemberListActivity.class);
-            intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
+            intent.putExtra(Constants.Repository.OWNER, mUserLogin);
         } else if (view.getTag() instanceof Repository) {
-            Gh4Application app = Gh4Application.get(getActivity());
-            app.openRepositoryInfoActivity(getActivity(), (Repository) view.getTag());
+            IntentUtils.openRepositoryInfoActivity(getActivity(), (Repository) view.getTag());
         } else if (view.getTag() instanceof User) {
-            Gh4Application app = Gh4Application.get(getActivity());
             User user = (User) view.getTag();
-            app.openUserInfoActivity(getActivity(), user.getLogin(), null);
+            IntentUtils.openUserInfoActivity(getActivity(), user);
         }
         if (intent != null) {
-            intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
-            intent.putExtra(Constants.User.USER_NAME, mUserName);
-            intent.putExtra(Constants.User.USER_TYPE, mUser.getType());
+            intent.putExtra(Constants.User.LOGIN, mUserLogin);
+            intent.putExtra(Constants.User.NAME, mUserName);
+            intent.putExtra(Constants.User.TYPE, mUser.getType());
             startActivity(intent);
         }
     }

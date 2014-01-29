@@ -41,9 +41,9 @@ public class PullRequestCommitListFragment extends ListDataBaseFragment<Reposito
         PullRequestCommitListFragment f = new PullRequestCommitListFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.Repository.REPO_OWNER, repoOwner);
-        args.putString(Constants.Repository.REPO_NAME, repoName);
-        args.putInt(Constants.Issue.ISSUE_NUMBER, pullRequestNumber);
+        args.putString(Constants.Repository.OWNER, repoOwner);
+        args.putString(Constants.Repository.NAME, repoName);
+        args.putInt(Constants.Issue.NUMBER, pullRequestNumber);
         f.setArguments(args);
         
         return f;
@@ -52,9 +52,9 @@ public class PullRequestCommitListFragment extends ListDataBaseFragment<Reposito
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.REPO_NAME);
-        mPullRequestNumber = getArguments().getInt(Constants.Issue.ISSUE_NUMBER);
+        mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
+        mRepoName = getArguments().getString(Constants.Repository.NAME);
+        mPullRequestNumber = getArguments().getInt(Constants.Issue.NUMBER);
     }
 
     @Override
@@ -71,8 +71,8 @@ public class PullRequestCommitListFragment extends ListDataBaseFragment<Reposito
     protected void onItemClick(RepositoryCommit commit) {
         Intent intent = new Intent(getActivity(), CommitActivity.class);
         
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+        intent.putExtra(Constants.Repository.NAME, mRepoName);
         intent.putExtra(Constants.Object.OBJECT_SHA, commit.getSha());
         intent.putExtra(Constants.Object.TREE_SHA, commit.getCommit().getTree().getSha());
 

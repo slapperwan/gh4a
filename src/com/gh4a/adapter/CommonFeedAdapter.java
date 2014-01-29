@@ -30,6 +30,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.holder.Feed;
 import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.IntentUtils;
 
 public class CommonFeedAdapter extends RootAdapter<Feed> implements OnClickListener {
     private boolean mShowExtra;
@@ -95,8 +96,7 @@ public class CommonFeedAdapter extends RootAdapter<Feed> implements OnClickListe
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             Feed feed = (Feed) v.getTag();
-            /** Open user activity */
-            Gh4Application.get(mContext).openUserInfoActivity(mContext, feed.getAuthor(), null);
+            IntentUtils.openUserInfoActivity(mContext, feed.getAuthor());
         }
     }
 

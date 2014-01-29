@@ -36,6 +36,7 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
@@ -50,7 +51,8 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
 
         Gh4Application app = Gh4Application.get(this);
         if (app.isAuthorized()) {
-            app.openUserInfoActivity(this, app.getAuthLogin(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            IntentUtils.openUserInfoActivity(this, app.getAuthLogin(),
+                    null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
             finish();
             return;
         }
@@ -140,12 +142,12 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
             SharedPreferences sharedPreferences = getSharedPreferences(
                     Constants.PREF_NAME, MODE_PRIVATE);
             Editor editor = sharedPreferences.edit();
-            editor.putString(Constants.User.USER_AUTH_TOKEN, result.getToken());
-            editor.putString(Constants.User.USER_LOGIN, mUserName);
+            editor.putString(Constants.User.AUTH_TOKEN, result.getToken());
+            editor.putString(Constants.User.LOGIN, mUserName);
             editor.commit();
             
-            Gh4Application.get(mContext).openUserInfoActivity(mContext,
-                    mUserName, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            IntentUtils.openUserInfoActivity(mContext, mUserName,
+                    null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
             finish();
         }
     }

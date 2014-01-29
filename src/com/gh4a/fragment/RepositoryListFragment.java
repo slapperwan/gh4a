@@ -23,15 +23,14 @@ import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.utils.IntentUtils;
 
 public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     private String mLogin;
@@ -41,9 +40,9 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
         RepositoryListFragment f = new RepositoryListFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.User.USER_LOGIN, login);
-        args.putString(Constants.User.USER_TYPE, userType);
-        args.putString(Constants.Repository.REPO_TYPE, repoType);
+        args.putString(Constants.User.LOGIN, login);
+        args.putString(Constants.User.TYPE, userType);
+        args.putString(Constants.Repository.TYPE, repoType);
         f.setArguments(args);
         
         return f;
@@ -52,8 +51,8 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mLogin = getArguments().getString(Constants.User.USER_LOGIN);
-        mRepoType = getArguments().getString(Constants.Repository.REPO_TYPE);
+        mLogin = getArguments().getString(Constants.User.LOGIN);
+        mRepoType = getArguments().getString(Constants.Repository.TYPE);
     }
     
     @Override
@@ -83,12 +82,7 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
 
     @Override
     protected void onItemClick(Repository repository) {
-        Gh4Application app = Gh4Application.get(getActivity());
-        
-        Intent intent = new Intent(getActivity(), RepositoryActivity.class);
-        Bundle data = app.populateRepository(repository);
-        intent.putExtra(Constants.DATA_BUNDLE, data);
-        startActivity(intent);
+        IntentUtils.openRepositoryInfoActivity(getActivity(), repository);
     }
 
     @Override

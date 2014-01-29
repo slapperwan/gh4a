@@ -10,8 +10,8 @@ public class PrivateEventListFragment extends EventListFragment {
         PrivateEventListFragment f = new PrivateEventListFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.User.USER_LOGIN, login);
-        args.putBoolean(Constants.Event.IS_PRIVATE, isPrivate);
+        args.putString(Constants.User.LOGIN, login);
+        args.putBoolean("private", isPrivate);
         f.setArguments(args);
         
         return f;

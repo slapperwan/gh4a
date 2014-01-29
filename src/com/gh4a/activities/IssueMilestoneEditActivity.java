@@ -47,6 +47,7 @@ import com.gh4a.R;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneLoader;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
@@ -80,8 +81,8 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
         
-        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
+        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.OWNER);
+        mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);
         mMilestoneNumber = getIntent().getExtras().getInt(Constants.Milestone.NUMBER);
         
         if (!isOnline()) {
@@ -109,8 +110,8 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
     
     private void openIssueMilestones() {
         Intent intent = new Intent(this, IssueMilestoneListActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+        intent.putExtra(Constants.Repository.NAME, mRepoName);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
@@ -124,8 +125,8 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
 
     @Override
     protected void navigateUp() {
-        Gh4Application.get(this).openIssueListActivity(this, mRepoOwner, mRepoName,
-                Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        IntentUtils.openIssueListActivity(this, mRepoOwner, mRepoName,
+                Constants.Issue.STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 
     @Override

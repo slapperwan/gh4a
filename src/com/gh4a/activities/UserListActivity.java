@@ -33,6 +33,7 @@ import com.gh4a.R;
 import com.gh4a.adapter.UserAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.IntentUtils;
 
 public abstract class UserListActivity extends LoadingFragmentActivity implements OnItemClickListener {
     protected String mSearchKey;
@@ -107,6 +108,6 @@ public abstract class UserListActivity extends LoadingFragmentActivity implement
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         User user = (User) adapterView.getAdapter().getItem(position);
-        Gh4Application.get(this).openUserInfoActivity(this, user.getLogin(), user.getName());
+        IntentUtils.openUserInfoActivity(this, user);
     }
 }

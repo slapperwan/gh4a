@@ -51,6 +51,7 @@ import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 
 public class IssueListActivity extends LoadingFragmentPagerActivity {
@@ -143,9 +144,9 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         }
 
         Bundle data = getIntent().getExtras();
-        mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
-        mRepoName = data.getString(Constants.Repository.REPO_NAME);
-        mState = data.getString(Constants.Issue.ISSUE_STATE);
+        mRepoOwner = data.getString(Constants.Repository.OWNER);
+        mRepoName = data.getString(Constants.Repository.NAME);
+        mState = data.getString(Constants.Issue.STATE);
         
         mFilterData = new HashMap<String, String>();
         mFilterData.put("state", mState);
@@ -159,7 +160,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
     }
 
     private void updateTitle() {
-        if (mState == null || Constants.Issue.ISSUE_STATE_OPEN.equals(mState)) {
+        if (mState == null || Constants.Issue.STATE_OPEN.equals(mState)) {
             mActionBar.setTitle(R.string.issue_open);
         } else {
             mActionBar.setTitle(R.string.issue_closed);
@@ -201,7 +202,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.issues_menu, menu);
-        menu.findItem(R.id.view_open_closed).setTitle(Constants.Issue.ISSUE_STATE_OPEN.equals(mState)
+        menu.findItem(R.id.view_open_closed).setTitle(Constants.Issue.STATE_OPEN.equals(mState)
                 ? R.string.issue_view_closed_issues : R.string.issue_view_open_issues);
         if (!mIsCollaborator) {
             menu.removeItem(R.id.view_labels);
@@ -213,30 +214,29 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
 
     @Override
     protected void navigateUp() {
-        Gh4Application.get(this).openRepositoryInfoActivity(this,
-                mRepoOwner, mRepoName, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        IntentUtils.openRepositoryInfoActivity(this, mRepoOwner, mRepoName,
+                null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.view_open_closed:
-            if (Constants.Issue.ISSUE_STATE_OPEN.equals(mState)) {
-                mState = Constants.Issue.ISSUE_STATE_CLOSED;
-                mFilterData.put("state", Constants.Issue.ISSUE_STATE_CLOSED);
+            if (Constants.Issue.STATE_OPEN.equals(mState)) {
+                mState = Constants.Issue.STATE_CLOSED;
                 item.setTitle(R.string.issue_view_open_issues);
             } else {
-                mState = Constants.Issue.ISSUE_STATE_OPEN;
-                mFilterData.put("state", Constants.Issue.ISSUE_STATE_OPEN);
+                mState = Constants.Issue.STATE_OPEN;
                 item.setTitle(R.string.issue_view_closed_issues);
             }
+            mFilterData.put("state", mState);
             reloadIssueList();
             return true;
         case R.id.create_issue:
             if (Gh4Application.get(this).isAuthorized()) {
                 Intent intent = new Intent(this, IssueCreateActivity.class);
-                intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-                intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+                intent.putExtra(Constants.Repository.NAME, mRepoName);
                 startActivity(intent);
             } else {
                 Intent intent = new Intent(this, Github4AndroidActivity.class);
@@ -246,14 +246,14 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
             return true;
         case R.id.view_labels:
             Intent intent = new Intent(this, IssueLabelListActivity.class);
-            intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-            intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+            intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+            intent.putExtra(Constants.Repository.NAME, mRepoName);
             startActivity(intent);
             return true;
         case R.id.view_milestones:
             intent = new Intent(this, IssueMilestoneListActivity.class);
-            intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-            intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+            intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+            intent.putExtra(Constants.Repository.NAME, mRepoName);
             startActivity(intent);
             return true;
         case R.id.sort:

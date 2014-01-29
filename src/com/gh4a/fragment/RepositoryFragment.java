@@ -42,6 +42,7 @@ import com.gh4a.activities.WikiListActivity;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.ReadmeLoader;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.github.mobile.util.HtmlUtils;
@@ -220,23 +221,22 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
     @Override
     public void onClick(View view) {
         int id = view.getId();
-        Gh4Application app = (Gh4Application) getActivity().getApplicationContext();
         String owner = mRepository.getOwner().getLogin();
         String name = mRepository.getName();
         Intent intent = null;
 
         if (id == R.id.tv_login) {
-            app.openUserInfoActivity(getActivity(), owner, null);
+            IntentUtils.openUserInfoActivity(getActivity(), mRepository.getOwner());
         } else if (id == R.id.cell_pull_requests) {
-            app.openPullRequestListActivity(getActivity(), owner, name,
-                    Constants.Issue.ISSUE_STATE_OPEN);
+            IntentUtils.openPullRequestListActivity(getActivity(), owner, name,
+                    Constants.Issue.STATE_OPEN);
         } else if (id == R.id.tv_contributors_label) {
             intent = new Intent(getActivity(), ContributorListActivity.class);
         } else if (id == R.id.tv_collaborators_label) {
             intent = new Intent(getActivity(), CollaboratorListActivity.class);
         } else if (id == R.id.cell_issues) {
-            app.openIssueListActivity(getActivity(), owner, name,
-                    Constants.Issue.ISSUE_STATE_OPEN);
+            IntentUtils.openIssueListActivity(getActivity(), owner, name,
+                    Constants.Issue.STATE_OPEN);
         } else if (id == R.id.cell_stargazers) {
             intent = new Intent(getActivity(), WatcherListActivity.class);
             intent.putExtra("pos", 0);
@@ -251,13 +251,12 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
             intent = new Intent(getActivity(), ReleaseListActivity.class);
         } else if (view.getTag() instanceof Repository) {
             Repository repo = (Repository) view.getTag();
-            app.openRepositoryInfoActivity(getActivity(),
-                    repo.getOwner().getLogin(), repo.getName(), null, 0);
+            IntentUtils.openRepositoryInfoActivity(getActivity(), repo);
         }
 
         if (intent != null) {
-            intent.putExtra(Constants.Repository.REPO_OWNER, owner);
-            intent.putExtra(Constants.Repository.REPO_NAME, name);
+            intent.putExtra(Constants.Repository.OWNER, owner);
+            intent.putExtra(Constants.Repository.NAME, name);
             startActivity(intent);
         }
     }

@@ -34,8 +34,8 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
 
 public class UserActivity extends LoadingFragmentPagerActivity {
-    public String mUserLogin;
-    public String mUserName;
+    private String mUserLogin;
+    private String mUserName;
     private boolean mIsLoginUserPage;
     private UserFragment mUserFragment;
     private PrivateEventListFragment mPrivateEventListFragment;
@@ -68,8 +68,8 @@ public class UserActivity extends LoadingFragmentPagerActivity {
         setTheme(Gh4Application.THEME);
 
         Bundle data = getIntent().getExtras();
-        mUserLogin = data.getString(Constants.User.USER_LOGIN);
-        mUserName = data.getString(Constants.User.USER_NAME);
+        mUserLogin = data.getString(Constants.User.LOGIN);
+        mUserName = data.getString(Constants.User.NAME);
         mIsLoginUserPage = mUserLogin.equals(Gh4Application.get(this).getAuthLogin());
         
         super.onCreate(savedInstanceState);
@@ -153,15 +153,7 @@ public class UserActivity extends LoadingFragmentPagerActivity {
 
     @Override
     protected void navigateUp() {
-        if (Gh4Application.get(this).isAuthorized()) {
-            Gh4Application app = Gh4Application.get(this);
-            app.openUserInfoActivity(this, app.getAuthLogin(), null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        } else {
-            Intent intent = new Intent(this, Github4AndroidActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP
-                    |Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-        }
+        goToToplevelActivity(0);
     }
 
     @Override
@@ -212,8 +204,8 @@ public class UserActivity extends LoadingFragmentPagerActivity {
                 return true;
             case R.id.bookmark:
                 Intent bookmarkIntent = new Intent(this, getClass());
-                bookmarkIntent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
-                bookmarkIntent.putExtra(Constants.User.USER_NAME, mUserName);
+                bookmarkIntent.putExtra(Constants.User.LOGIN, mUserLogin);
+                bookmarkIntent.putExtra(Constants.User.NAME, mUserName);
                 saveBookmark(mUserLogin, BookmarksProvider.Columns.TYPE_USER, bookmarkIntent, mUserName);
                 return true;
         }

@@ -48,8 +48,8 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
         CommitListFragment f = new CommitListFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.Repository.REPO_OWNER, repoOwner);
-        args.putString(Constants.Repository.REPO_NAME, repoName);
+        args.putString(Constants.Repository.OWNER, repoOwner);
+        args.putString(Constants.Repository.NAME, repoName);
         args.putString(Constants.Object.REF, ref);
         args.putString(Constants.Object.PATH, filePath);
         f.setArguments(args);
@@ -60,8 +60,8 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.REPO_NAME);
+        mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
+        mRepoName = getArguments().getString(Constants.Repository.NAME);
         mRef = getArguments().getString(Constants.Object.REF);
         mFilePath = getArguments().getString(Constants.Object.PATH);
     }
@@ -81,8 +81,8 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
         Intent intent = new Intent(getActivity(), CommitActivity.class);
         String[] urlPart = commit.getUrl().split("/");
         
-        intent.putExtra(Constants.Repository.REPO_OWNER, urlPart[4]);
-        intent.putExtra(Constants.Repository.REPO_NAME, urlPart[5]);
+        intent.putExtra(Constants.Repository.OWNER, urlPart[4]);
+        intent.putExtra(Constants.Repository.NAME, urlPart[5]);
         intent.putExtra(Constants.Object.OBJECT_SHA, commit.getSha());
         intent.putExtra(Constants.Object.TREE_SHA, commit.getCommit().getTree().getSha());
 

@@ -21,13 +21,13 @@ import java.util.Locale;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.TrendAdapter;
 import com.gh4a.holder.Trend;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.TrendLoader;
+import com.gh4a.utils.IntentUtils;
 
 public class TrendingFragment extends ListDataBaseFragment<Trend> {
     private static final String URL_TEMPLATE = "http://github-trends.ryotarai.info/rss/github_trends_all_%s.rss";
@@ -65,10 +65,9 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
 
     @Override
     protected void onItemClick(Trend trend) {
-        Gh4Application app = Gh4Application.get(getActivity());
         String[] repo = trend.getRepo();
         if (repo != null) {
-            app.openRepositoryInfoActivity(getActivity(), repo[0], repo[1], null, 0);
+            IntentUtils.openRepositoryInfoActivity(getActivity(), repo[0], repo[1], null, 0);
         }
     }
 

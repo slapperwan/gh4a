@@ -29,6 +29,7 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.github.mobile.util.HttpImageGetter;
 
@@ -93,7 +94,7 @@ public class CommentAdapter extends RootAdapter<Comment> implements OnClickListe
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             Comment comment = (Comment) v.getTag();
-            Gh4Application.get(mContext).openUserInfoActivity(mContext, comment.getUser().getLogin(), null);
+            IntentUtils.openUserInfoActivity(mContext, comment.getUser());
         } else if (v.getId() == R.id.iv_edit && mEditCallback != null) {
             Comment comment = (Comment) v.getTag();
             mEditCallback.editComment(comment);

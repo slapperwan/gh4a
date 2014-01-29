@@ -23,8 +23,8 @@ public class CommitHistoryActivity extends SherlockFragmentActivity {
 
         if (savedInstanceState == null) {
             CommitListFragment fragment = CommitListFragment.newInstance(
-                    extras.getString(Constants.Repository.REPO_OWNER),
-                    extras.getString(Constants.Repository.REPO_NAME),
+                    extras.getString(Constants.Repository.OWNER),
+                    extras.getString(Constants.Repository.NAME),
                     extras.getString(Constants.Object.REF),
                     filePath);
 

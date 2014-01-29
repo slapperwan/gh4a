@@ -23,17 +23,17 @@ import android.content.Intent;
 import android.support.v4.content.Loader;
 
 import com.gh4a.Constants;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.OrganizationMemberListLoader;
+import com.gh4a.utils.IntentUtils;
 
 public class OrganizationMemberListActivity extends UserListActivity {
     protected String mUserLogin;
 
     @Override
     protected void setRequestData() {
-        mUserLogin = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
+        mUserLogin = getIntent().getExtras().getString(Constants.Repository.OWNER);
     }
 
     @Override
@@ -58,6 +58,6 @@ public class OrganizationMemberListActivity extends UserListActivity {
 
     @Override
     protected void navigateUp() {
-        Gh4Application.get(this).openUserInfoActivity(this, mUserLogin, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        IntentUtils.openUserInfoActivity(this, mUserLogin, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 }

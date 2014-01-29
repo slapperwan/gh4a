@@ -42,15 +42,15 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mRepoOwner = getArguments().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.REPO_NAME);
+        mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
+        mRepoName = getArguments().getString(Constants.Repository.NAME);
         
         mFilterData = new HashMap<String, String>();
         
         Bundle args = getArguments();
         for (String key : args.keySet()) {
-            if (!key.equals(Constants.Repository.REPO_OWNER) 
-                    && !key.equals(Constants.Repository.REPO_NAME)) {
+            if (!key.equals(Constants.Repository.OWNER) 
+                    && !key.equals(Constants.Repository.NAME)) {
                 mFilterData.put(key, args.getString(key));
             }
         }
@@ -69,10 +69,10 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     @Override
     protected void onItemClick(Issue issue) {
         Intent intent = new Intent(getActivity(), IssueActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-        intent.putExtra(Constants.Issue.ISSUE_NUMBER, issue.getNumber());
-        intent.putExtra(Constants.Issue.ISSUE_STATE, issue.getState());
+        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+        intent.putExtra(Constants.Repository.NAME, mRepoName);
+        intent.putExtra(Constants.Issue.NUMBER, issue.getNumber());
+        intent.putExtra(Constants.Issue.STATE, issue.getState());
         startActivity(intent);
     }
 

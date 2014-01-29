@@ -44,6 +44,7 @@ import com.gh4a.loader.ContentLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.FileUtils;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
 public class FileViewerActivity extends LoadingFragmentActivity {
@@ -96,8 +97,8 @@ public class FileViewerActivity extends LoadingFragmentActivity {
         super.onCreate(savedInstanceState);
 
         Bundle data = getIntent().getExtras();
-        mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
-        mRepoName = data.getString(Constants.Repository.REPO_NAME);
+        mRepoOwner = data.getString(Constants.Repository.OWNER);
+        mRepoName = data.getString(Constants.Repository.NAME);
         mPath = data.getString(Constants.Object.PATH);
         mRef = data.getString(Constants.Object.REF);
         mSha = data.getString(Constants.Object.OBJECT_SHA);
@@ -208,11 +209,11 @@ public class FileViewerActivity extends LoadingFragmentActivity {
     @Override
     protected void navigateUp() {
         if (mInDiffMode) {
-            Gh4Application.get(this).openCommitInfoActivity(this,
-                    mRepoOwner, mRepoName, mSha, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            IntentUtils.openCommitInfoActivity(this, mRepoOwner, mRepoName,
+                    mSha, Intent.FLAG_ACTIVITY_CLEAR_TOP);
         } else {
-            Gh4Application.get(this).openRepositoryInfoActivity(this,
-                    mRepoOwner, mRepoName, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            IntentUtils.openRepositoryInfoActivity(this, mRepoOwner, mRepoName,
+                    null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
         }
     }
 
@@ -245,8 +246,8 @@ public class FileViewerActivity extends LoadingFragmentActivity {
                 return true;
             case 10:
                 Intent historyIntent = new Intent(this, CommitHistoryActivity.class);
-                historyIntent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-                historyIntent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                historyIntent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+                historyIntent.putExtra(Constants.Repository.NAME, mRepoName);
                 historyIntent.putExtra(Constants.Object.PATH, mPath);
                 historyIntent.putExtra(Constants.Object.REF, mRef);
                 historyIntent.putExtra(Constants.Object.OBJECT_SHA, mSha);
@@ -254,8 +255,8 @@ public class FileViewerActivity extends LoadingFragmentActivity {
                 return true;
             case 11:
                 Intent viewIntent = new Intent(this, FileViewerActivity.class);
-                viewIntent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-                viewIntent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                viewIntent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+                viewIntent.putExtra(Constants.Repository.NAME, mRepoName);
                 viewIntent.putExtra(Constants.Object.PATH, mPath);
                 viewIntent.putExtra(Constants.Object.REF, mSha);
                 viewIntent.putExtra(Constants.Object.OBJECT_SHA, mSha);

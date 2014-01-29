@@ -51,16 +51,7 @@ public class TimelineActivity extends BaseSherlockFragmentActivity {
 
     @Override
     protected void navigateUp() {
-        if (!Gh4Application.get(this).isAuthorized()) {
-            Intent intent = new Intent(this, Github4AndroidActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-        } else {
-            Gh4Application app = Gh4Application.get(this);
-            app.openUserInfoActivity(this, app.getAuthLogin(), null,
-                    Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        }
+        goToToplevelActivity(0);
     }
 
     @Override

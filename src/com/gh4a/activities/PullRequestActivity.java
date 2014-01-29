@@ -26,6 +26,7 @@ import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.PullRequestCommitListFragment;
 import com.gh4a.fragment.PullRequestFragment;
+import com.gh4a.utils.IntentUtils;
 
 public class PullRequestActivity extends LoadingFragmentPagerActivity {
     private String mRepoOwner;
@@ -45,8 +46,8 @@ public class PullRequestActivity extends LoadingFragmentPagerActivity {
         }
 
         Bundle data = getIntent().getExtras();
-        mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
-        mRepoName = data.getString(Constants.Repository.REPO_NAME);
+        mRepoOwner = data.getString(Constants.Repository.OWNER);
+        mRepoName = data.getString(Constants.Repository.NAME);
         mPullRequestNumber = data.getInt(Constants.PullRequest.NUMBER);
         
         ActionBar actionBar = getSupportActionBar();
@@ -71,7 +72,7 @@ public class PullRequestActivity extends LoadingFragmentPagerActivity {
         
     @Override
     protected void navigateUp() {
-        Gh4Application.get(this).openPullRequestListActivity(this, mRepoOwner, mRepoName,
-                Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        IntentUtils.openPullRequestListActivity(this, mRepoOwner, mRepoName,
+                Constants.Issue.STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 }

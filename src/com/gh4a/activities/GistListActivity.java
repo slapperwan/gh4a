@@ -36,6 +36,8 @@ import com.gh4a.adapter.GistAdapter;
 import com.gh4a.loader.GistListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.ToastUtils;
 
 public class GistListActivity extends LoadingFragmentActivity implements OnItemClickListener {
     private String mUserLogin;
@@ -62,7 +64,7 @@ public class GistListActivity extends LoadingFragmentActivity implements OnItemC
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
-        mUserLogin = getIntent().getExtras().getString(Constants.User.USER_LOGIN);
+        mUserLogin = getIntent().getExtras().getString(Constants.User.LOGIN);
         
         if (!isOnline()) {
             setErrorView();
@@ -89,18 +91,18 @@ public class GistListActivity extends LoadingFragmentActivity implements OnItemC
             adapter.addAll(gists);
             listView.setAdapter(adapter);
         } else {
-            Gh4Application.get(this).notFoundMessage(this, R.plurals.gist);
+            ToastUtils.notFoundMessage(this, R.plurals.gist);
         }
     }
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         Gist gist = (Gist) adapterView.getAdapter().getItem(position);
-        Gh4Application.get(this).openGistActivity(this, mUserLogin, gist.getId(), 0);
+        IntentUtils.openGistActivity(this, mUserLogin, gist.getId(), 0);
     }
     
     @Override
     protected void navigateUp() {
-        Gh4Application.get(this).openUserInfoActivity(this, mUserLogin, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        IntentUtils.openUserInfoActivity(this, mUserLogin, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 }

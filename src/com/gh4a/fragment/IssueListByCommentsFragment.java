@@ -13,8 +13,8 @@ public class IssueListByCommentsFragment extends IssueListFragment {
         
         IssueListByCommentsFragment f = new IssueListByCommentsFragment();
         Bundle args = new Bundle();
-        args.putString(Constants.Repository.REPO_OWNER, repoOwner);
-        args.putString(Constants.Repository.REPO_NAME, repoName);
+        args.putString(Constants.Repository.OWNER, repoOwner);
+        args.putString(Constants.Repository.NAME, repoName);
         args.putString("sort", "comments");
         
         if (filterData != null) {

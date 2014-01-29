@@ -29,6 +29,7 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
 public class SearchUserAdapter extends RootAdapter<SearchUser> implements OnClickListener {
@@ -74,10 +75,7 @@ public class SearchUserAdapter extends RootAdapter<SearchUser> implements OnClic
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             SearchUser user = (SearchUser) v.getTag();
-            if (!StringUtils.isBlank(user.getLogin())) {
-                Gh4Application.get(mContext).openUserInfoActivity(mContext,
-                        user.getLogin(), user.getLogin());
-            }
+            IntentUtils.openUserInfoActivity(mContext, user.getLogin(), user.getName());
         }
     }
 

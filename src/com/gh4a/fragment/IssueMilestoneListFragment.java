@@ -40,8 +40,8 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
         IssueMilestoneListFragment f = new IssueMilestoneListFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.Repository.REPO_OWNER, repoOwner);
-        args.putString(Constants.Repository.REPO_NAME, repoName);
+        args.putString(Constants.Repository.OWNER, repoOwner);
+        args.putString(Constants.Repository.NAME, repoName);
         args.putString(Constants.Milestone.STATE, state);
         f.setArguments(args);
         
@@ -51,8 +51,8 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.REPO_NAME);
+        mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
+        mRepoName = getArguments().getString(Constants.Repository.NAME);
         mState = getArguments().getString(Constants.Milestone.STATE);
     }
     
@@ -69,8 +69,8 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
     @Override
     protected void onItemClick(Milestone milestone) {
         Intent intent = new Intent(getActivity(), IssueMilestoneEditActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+        intent.putExtra(Constants.Repository.NAME, mRepoName);
         intent.putExtra(Constants.Milestone.NUMBER, milestone.getNumber());
         startActivity(intent);
     }

@@ -47,6 +47,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.RepositoryLoader;
 import com.gh4a.loader.TagListLoader;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
@@ -201,26 +202,30 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             }
         };
         
-        Bundle data = getIntent().getExtras().getBundle(Constants.DATA_BUNDLE);
-        if (data != null) {
-            mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
-            mRepoName = data.getString(Constants.Repository.REPO_NAME);
+        Bundle bundle = getIntent().getExtras();
+        if (bundle.containsKey(Constants.Repository.REPOSITORY)) {
+            mRepository = (Repository) bundle.getSerializable(Constants.Repository.REPOSITORY);
+            mRepoOwner = mRepository.getOwner().getLogin();
+            mRepoName = mRepository.getName();
         } else {
-            Bundle bundle = getIntent().getExtras();
-            mRepoOwner = bundle.getString(Constants.Repository.REPO_OWNER);
-            mRepoName = bundle.getString(Constants.Repository.REPO_NAME);
+            mRepoOwner = bundle.getString(Constants.Repository.OWNER);
+            mRepoName = bundle.getString(Constants.Repository.NAME);
             mSelectedRef = bundle.getString(Constants.Repository.SELECTED_REF);
             mSelectBranchTag = bundle.getString(Constants.Repository.SELECTED_BRANCHTAG_NAME);
         }
         
-        setContentShown(false);
-        setTabsEnabled(false);
-
         mActionBar = getSupportActionBar();
         mActionBar.setTitle(mRepoOwner + "/" + mRepoName);
         mActionBar.setDisplayHomeAsUpEnabled(true);
-        
-        getSupportLoaderManager().initLoader(LOADER_REPO, null, mRepoCallback);
+
+        if (mRepository == null) {
+            setContentShown(false);
+            setTabsEnabled(false);
+            getSupportLoaderManager().initLoader(LOADER_REPO, null, mRepoCallback);
+        } else {
+            updateTitle();
+        }
+
         getSupportLoaderManager().initLoader(LOADER_WATCHING, null, mWatchCallback);
         getSupportLoaderManager().initLoader(LOADER_STARRING, null, mStarCallback);
     }
@@ -298,7 +303,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             invalidateFragments();
         } else if (mGitModuleMap != null && mGitModuleMap.get(path) != null) {
             String[] userRepo = mGitModuleMap.get(path).split("/");
-            Gh4Application.get(this).openRepositoryInfoActivity(this, userRepo[0], userRepo[1], null, 0);
+            IntentUtils.openRepositoryInfoActivity(this, userRepo[0], userRepo[1], null, 0);
         } else {
             openFileViewer(content, ref);
         }
@@ -306,8 +311,8 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
     
     private void openFileViewer(RepositoryContents content, String ref) {
         Intent intent = new Intent(this, FileViewerActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+        intent.putExtra(Constants.Repository.NAME, mRepoName);
         intent.putExtra(Constants.Object.PATH, content.getPath());
         intent.putExtra(Constants.Object.REF, ref);
         intent.putExtra(Constants.Object.NAME, content.getName());
@@ -366,7 +371,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
 
     @Override
     protected void navigateUp() {
-        Gh4Application.get(this).openUserInfoActivity(this, mRepoOwner, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        IntentUtils.openUserInfoActivity(this, mRepoOwner, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 
     @Override
@@ -413,8 +418,8 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
                 return true;
             case R.id.bookmark:
                 Intent bookmarkIntent = new Intent(this, getClass());
-                bookmarkIntent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-                bookmarkIntent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                bookmarkIntent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+                bookmarkIntent.putExtra(Constants.Repository.NAME, mRepoName);
                 bookmarkIntent.putExtra(Constants.Repository.SELECTED_REF, mSelectedRef);
                 bookmarkIntent.putExtra(Constants.Repository.SELECTED_BRANCHTAG_NAME, mSelectBranchTag);
                 saveBookmark(mActionBar.getTitle().toString(), BookmarksProvider.Columns.TYPE_REPO,

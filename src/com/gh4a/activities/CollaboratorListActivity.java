@@ -23,10 +23,10 @@ import android.content.Intent;
 import android.support.v4.content.Loader;
 
 import com.gh4a.Constants;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.loader.CollaboratorListLoader;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.IntentUtils;
 
 public class CollaboratorListActivity extends UserListActivity {
 
@@ -35,8 +35,8 @@ public class CollaboratorListActivity extends UserListActivity {
 
     @Override
     protected void setRequestData() {
-        mUserLogin = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
+        mUserLogin = getIntent().getExtras().getString(Constants.Repository.OWNER);
+        mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class CollaboratorListActivity extends UserListActivity {
     
     @Override
     protected void navigateUp() {
-        Gh4Application.get(this).openRepositoryInfoActivity(this,
+        IntentUtils.openRepositoryInfoActivity(this,
                 mUserLogin, mRepoName, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 }

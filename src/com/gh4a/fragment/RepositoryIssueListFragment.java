@@ -56,8 +56,8 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Repositor
         
         Bundle args = getArguments();
         for (String key : args.keySet()) {
-            if (!key.equals(Constants.User.USER_LOGIN) 
-                    && !key.equals(Constants.Repository.REPO_NAME)) {
+            if (!key.equals(Constants.User.LOGIN) 
+                    && !key.equals(Constants.Repository.NAME)) {
                 mFilterData.put(key, args.getString(key));
             }
         }
@@ -66,10 +66,10 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Repositor
     @Override
     public void onItemClick(RepositoryIssue issue) {
         Intent intent = new Intent(getActivity(), IssueActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, issue.getRepository().getOwner().getLogin());
-        intent.putExtra(Constants.Repository.REPO_NAME, issue.getRepository().getName());
-        intent.putExtra(Constants.Issue.ISSUE_NUMBER, issue.getNumber());
-        intent.putExtra(Constants.Issue.ISSUE_STATE, issue.getState());
+        intent.putExtra(Constants.Repository.OWNER, issue.getRepository().getOwner().getLogin());
+        intent.putExtra(Constants.Repository.NAME, issue.getRepository().getName());
+        intent.putExtra(Constants.Issue.NUMBER, issue.getNumber());
+        intent.putExtra(Constants.Issue.STATE, issue.getState());
         startActivity(intent);
     }
 

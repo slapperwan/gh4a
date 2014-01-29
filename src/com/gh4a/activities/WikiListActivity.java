@@ -37,6 +37,8 @@ import com.gh4a.holder.Feed;
 import com.gh4a.loader.FeedLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.ToastUtils;
 
 public class WikiListActivity extends LoadingFragmentActivity {
     
@@ -54,8 +56,7 @@ public class WikiListActivity extends LoadingFragmentActivity {
         public void onResultReady(LoaderResult<List<Feed>> result) {
             setContentEmpty(true);
             if (result.getException() instanceof SAXException) {
-                Gh4Application.get(WikiListActivity.this).notFoundMessage(WikiListActivity.this,
-                        getString(R.string.recent_wiki));
+                ToastUtils.notFoundMessage(WikiListActivity.this, getString(R.string.recent_wiki));
             } else if (!result.handleError(WikiListActivity.this)) {
                 fillData(result.getData());
                 setContentEmpty(false);
@@ -69,8 +70,8 @@ public class WikiListActivity extends LoadingFragmentActivity {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
-        mUserLogin = getIntent().getStringExtra(Constants.Repository.REPO_OWNER);
-        mRepoName = getIntent().getStringExtra(Constants.Repository.REPO_NAME);
+        mUserLogin = getIntent().getStringExtra(Constants.Repository.OWNER);
+        mRepoName = getIntent().getStringExtra(Constants.Repository.NAME);
         
         if (!isOnline()) {
             setErrorView();
@@ -122,15 +123,15 @@ public class WikiListActivity extends LoadingFragmentActivity {
         Intent intent = new Intent(this, WikiActivity.class);
         intent.putExtra(Constants.Blog.TITLE, feed.getTitle());
         intent.putExtra(Constants.Blog.CONTENT, feed.getContent());
-        intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        intent.putExtra(Constants.Repository.OWNER, mUserLogin);
+        intent.putExtra(Constants.Repository.NAME, mRepoName);
         intent.putExtra(Constants.Blog.LINK, feed.getLink());
         startActivity(intent);
     }
 
     @Override
     protected void navigateUp() {
-        Gh4Application.get(this).openRepositoryInfoActivity(this,
-                mUserLogin, mRepoName, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        IntentUtils.openRepositoryInfoActivity(this, mUserLogin, mRepoName,
+                null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 }

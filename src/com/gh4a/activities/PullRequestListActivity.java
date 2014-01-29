@@ -25,6 +25,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.PullRequestListFragment;
+import com.gh4a.utils.IntentUtils;
 
 public class PullRequestListActivity extends LoadingFragmentPagerActivity {
 
@@ -43,8 +44,8 @@ public class PullRequestListActivity extends LoadingFragmentPagerActivity {
             return;
         }
 
-        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
+        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.OWNER);
+        mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);
         
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.pull_requests);
@@ -60,12 +61,12 @@ public class PullRequestListActivity extends LoadingFragmentPagerActivity {
     @Override
     protected Fragment getFragment(int position) {
         return PullRequestListFragment.newInstance(mRepoOwner, mRepoName,
-                position == 1 ? Constants.Issue.ISSUE_STATE_CLOSED : Constants.Issue.ISSUE_STATE_OPEN);
+                position == 1 ? Constants.Issue.STATE_CLOSED : Constants.Issue.STATE_OPEN);
     }
         
     @Override
     protected void navigateUp() {
-        Gh4Application.get(this).openRepositoryInfoActivity(this,
-                mRepoOwner, mRepoName, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        IntentUtils.openRepositoryInfoActivity(this, mRepoOwner, mRepoName,
+                null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 }

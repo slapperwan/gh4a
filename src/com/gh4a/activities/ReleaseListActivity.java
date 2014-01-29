@@ -35,6 +35,7 @@ import com.gh4a.adapter.ReleaseAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.ReleaseLoader;
+import com.gh4a.utils.IntentUtils;
 
 public class ReleaseListActivity extends LoadingFragmentActivity implements
         AdapterView.OnItemClickListener {
@@ -65,8 +66,8 @@ public class ReleaseListActivity extends LoadingFragmentActivity implements
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
-        mUserLogin = getIntent().getStringExtra(Constants.Repository.REPO_OWNER);
-        mRepoName = getIntent().getStringExtra(Constants.Repository.REPO_NAME);
+        mUserLogin = getIntent().getStringExtra(Constants.Repository.OWNER);
+        mRepoName = getIntent().getStringExtra(Constants.Repository.NAME);
 
         if (!isOnline()) {
             setErrorView();
@@ -100,7 +101,7 @@ public class ReleaseListActivity extends LoadingFragmentActivity implements
 
     @Override
     protected void navigateUp() {
-        Gh4Application.get(this).openRepositoryInfoActivity(this,
+        IntentUtils.openRepositoryInfoActivity(this,
                 mUserLogin, mRepoName, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 
@@ -108,8 +109,8 @@ public class ReleaseListActivity extends LoadingFragmentActivity implements
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Release release = mAdapter.getItem(position);
         Intent intent = new Intent(this, ReleaseInfoActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        intent.putExtra(Constants.Repository.OWNER, mUserLogin);
+        intent.putExtra(Constants.Repository.NAME, mRepoName);
         intent.putExtra(Constants.Release.RELEASE, release);
         startActivity(intent);
     }

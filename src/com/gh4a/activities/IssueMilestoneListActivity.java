@@ -28,6 +28,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueMilestoneListFragment;
+import com.gh4a.utils.IntentUtils;
 
 public class IssueMilestoneListActivity extends LoadingFragmentPagerActivity {
     private String mRepoOwner;
@@ -44,8 +45,8 @@ public class IssueMilestoneListActivity extends LoadingFragmentPagerActivity {
             return;
         }
 
-        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
+        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.OWNER);
+        mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);
         
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.issue_manage_milestones);
@@ -61,7 +62,7 @@ public class IssueMilestoneListActivity extends LoadingFragmentPagerActivity {
     @Override
     protected Fragment getFragment(int position) {
         return IssueMilestoneListFragment.newInstance(mRepoOwner, mRepoName,
-                position == 1 ? Constants.Issue.ISSUE_STATE_CLOSED : Constants.Issue.ISSUE_STATE_OPEN);
+                position == 1 ? Constants.Issue.STATE_CLOSED : Constants.Issue.STATE_OPEN);
     }
     
     @Override
@@ -76,8 +77,8 @@ public class IssueMilestoneListActivity extends LoadingFragmentPagerActivity {
 
     @Override
     protected void navigateUp() {
-        Gh4Application.get(this).openIssueListActivity(this, mRepoOwner, mRepoName,
-                Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        IntentUtils.openIssueListActivity(this, mRepoOwner, mRepoName,
+                Constants.Issue.STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 
     @Override
@@ -85,8 +86,8 @@ public class IssueMilestoneListActivity extends LoadingFragmentPagerActivity {
         switch (item.getItemId()) {
         case R.id.create_new:
             Intent intent = new Intent(this, IssueMilestoneCreateActivity.class);
-            intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-            intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+            intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+            intent.putExtra(Constants.Repository.NAME, mRepoName);
             startActivity(intent);
             return true;
         }

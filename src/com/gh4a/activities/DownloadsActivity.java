@@ -29,8 +29,8 @@ public class DownloadsActivity extends LoadingFragmentPagerActivity {
         }
 
         Bundle data = getIntent().getExtras();
-        mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
-        mRepoName = data.getString(Constants.Repository.REPO_NAME);
+        mRepoOwner = data.getString(Constants.Repository.OWNER);
+        mRepoName = data.getString(Constants.Repository.NAME);
         
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.downloads);

@@ -26,9 +26,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
@@ -76,9 +76,7 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements OnC
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             CommitComment comment = (CommitComment) v.getTag();
-            /** Open user activity */
-            Gh4Application.get(mContext).openUserInfoActivity(mContext,
-                    comment.getUser().getLogin(), null);
+            IntentUtils.openUserInfoActivity(mContext, comment.getUser());
         }
     }
 

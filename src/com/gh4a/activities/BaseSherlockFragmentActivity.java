@@ -39,6 +39,7 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.db.BookmarksProvider;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.ToastUtils;
 
 /**
@@ -145,8 +146,8 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
                 Context context = BaseSherlockFragmentActivity.this;
                 if (Gh4Application.get(context).isAuthorized()) {
                     Intent intent = new Intent(context, IssueCreateActivity.class);
-                    intent.putExtra(Constants.Repository.REPO_OWNER, getString(R.string.my_username));
-                    intent.putExtra(Constants.Repository.REPO_NAME, getString(R.string.my_repo));
+                    intent.putExtra(Constants.Repository.OWNER, getString(R.string.my_username));
+                    intent.putExtra(Constants.Repository.NAME, getString(R.string.my_repo));
                     startActivity(intent);
                 } else {
                     ToastUtils.showMessage(context, R.string.login_prompt);
@@ -181,18 +182,21 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         findViewById(R.id.btn_home).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Context context = BaseSherlockFragmentActivity.this;
-                Gh4Application app = Gh4Application.get(context);
-                if (app.isAuthorized()) {
-                    app.openUserInfoActivity(context, app.getAuthLogin(), null,
-                            Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                } else {
-                    Intent intent = new Intent(context, Github4AndroidActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                }
+                goToToplevelActivity(Intent.FLAG_ACTIVITY_NEW_TASK);
             }
         });
+    }
+
+    protected void goToToplevelActivity(int flags) {
+        Gh4Application app = Gh4Application.get(this);
+        if (app.isAuthorized()) {
+            IntentUtils.openUserInfoActivity(this, app.getAuthLogin(), null,
+                    Intent.FLAG_ACTIVITY_CLEAR_TOP | flags);
+        } else {
+            Intent intent = new Intent(this, Github4AndroidActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | flags);
+            startActivity(intent);
+        }
     }
 
     protected boolean hasErrorView() {

@@ -54,6 +54,7 @@ import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
@@ -92,7 +93,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
         @Override
         public Loader<LoaderResult<List<Milestone>>> onCreateLoader(int id, Bundle args) {
             return new MilestoneListLoader(IssueCreateActivity.this,
-                    mRepoOwner, mRepoName, Constants.Issue.ISSUE_STATE_OPEN);
+                    mRepoOwner, mRepoName, Constants.Issue.STATE_OPEN);
         }
         @Override
         public void onResultReady(LoaderResult<List<Milestone>> result) {
@@ -159,9 +160,9 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
         mSelectedLabels = new ArrayList<Label>();
         Bundle data = getIntent().getExtras();
         
-        mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
-        mRepoName = data.getString(Constants.Repository.REPO_NAME);
-        mIssueNumber = data.getInt(Constants.Issue.ISSUE_NUMBER);
+        mRepoOwner = data.getString(Constants.Repository.OWNER);
+        mRepoName = data.getString(Constants.Repository.NAME);
+        mIssueNumber = data.getInt(Constants.Issue.NUMBER);
         
         if (!isOnline()) {
             setErrorView();
@@ -210,8 +211,8 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
 
     @Override
     protected void navigateUp() {
-        Gh4Application.get(this).openIssueListActivity(this, mRepoOwner, mRepoName,
-                Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        IntentUtils.openIssueListActivity(this, mRepoOwner, mRepoName,
+                Constants.Issue.STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 
     @Override
@@ -287,9 +288,8 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
         protected void onSuccess(Void result) {
             ToastUtils.showMessage(mContext,
                     isInEditMode() ? R.string.issue_success_edit : R.string.issue_success_create);
-            Gh4Application.get(IssueCreateActivity.this).openIssueActivity(IssueCreateActivity.this, 
-                    mRepoOwner, mRepoName, mEditIssue.getNumber(),
-                    Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            IntentUtils.openIssueActivity(IssueCreateActivity.this, mRepoOwner, mRepoName,
+                    mEditIssue.getNumber(), Intent.FLAG_ACTIVITY_CLEAR_TOP);
         }
     }
     

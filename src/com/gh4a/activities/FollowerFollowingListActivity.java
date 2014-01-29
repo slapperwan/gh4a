@@ -25,6 +25,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.FollowersFollowingListFragment;
+import com.gh4a.utils.IntentUtils;
 
 public class FollowerFollowingListActivity extends LoadingFragmentPagerActivity {
 
@@ -43,7 +44,7 @@ public class FollowerFollowingListActivity extends LoadingFragmentPagerActivity 
         }
 
         Bundle data = getIntent().getExtras();
-        mUserLogin = data.getString(Constants.User.USER_LOGIN);
+        mUserLogin = data.getString(Constants.User.LOGIN);
         
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(mUserLogin);
@@ -67,6 +68,6 @@ public class FollowerFollowingListActivity extends LoadingFragmentPagerActivity 
     
     @Override
     protected void navigateUp() {
-        Gh4Application.get(this).openUserInfoActivity(this, mUserLogin, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        IntentUtils.openUserInfoActivity(this, mUserLogin, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 }

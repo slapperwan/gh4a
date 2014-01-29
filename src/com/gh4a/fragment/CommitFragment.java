@@ -25,6 +25,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
 public class CommitFragment extends ProgressFragment implements OnClickListener {
@@ -56,8 +57,8 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
         CommitFragment f = new CommitFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.Repository.REPO_OWNER, repoOwner);
-        args.putString(Constants.Repository.REPO_NAME, repoName);
+        args.putString(Constants.Repository.OWNER, repoOwner);
+        args.putString(Constants.Repository.NAME, repoName);
         args.putString(Constants.Object.OBJECT_SHA, objectSha);
         f.setArguments(args);
         return f;
@@ -66,8 +67,8 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.REPO_NAME);
+        mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
+        mRepoName = getArguments().getString(Constants.Repository.NAME);
         mObjectSha = getArguments().getString(Constants.Object.OBJECT_SHA);
     }
     
@@ -202,16 +203,13 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             String login = (String) v.getTag();
-            Activity activity = getActivity();
-            
-            /** Open user activity */
-            Gh4Application.get(activity).openUserInfoActivity(activity, login, null);
+            IntentUtils.openUserInfoActivity(getActivity(), login);
         } else {
             CommitFile file = (CommitFile) v.getTag();
 
             Intent intent = new Intent(getActivity(), FileViewerActivity.class);
-            intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-            intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+            intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+            intent.putExtra(Constants.Repository.NAME, mRepoName);
             intent.putExtra(Constants.Object.REF, mObjectSha);
             intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
             intent.putExtra(Constants.Commit.DIFF, file.getPatch());

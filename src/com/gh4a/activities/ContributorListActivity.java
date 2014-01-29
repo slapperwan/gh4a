@@ -23,6 +23,7 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.ContributorListFragment;
+import com.gh4a.utils.IntentUtils;
 
 public class ContributorListActivity extends BaseSherlockFragmentActivity {
     private String mUserLogin;
@@ -34,8 +35,8 @@ public class ContributorListActivity extends BaseSherlockFragmentActivity {
         super.onCreate(savedInstanceState);
         
         Bundle extras = getIntent().getExtras();
-        mUserLogin = extras.getString(Constants.Repository.REPO_OWNER);
-        mRepoName = extras.getString(Constants.Repository.REPO_NAME);
+        mUserLogin = extras.getString(Constants.Repository.OWNER);
+        mRepoName = extras.getString(Constants.Repository.NAME);
         
         if (savedInstanceState == null) {
             ContributorListFragment fragment = ContributorListFragment.newInstance(
@@ -53,7 +54,7 @@ public class ContributorListActivity extends BaseSherlockFragmentActivity {
     
     @Override
     protected void navigateUp() {
-        Gh4Application.get(this).openRepositoryInfoActivity(this,
-                mUserLogin, mRepoName, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        IntentUtils.openRepositoryInfoActivity(this, mUserLogin, mRepoName,
+                null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 }

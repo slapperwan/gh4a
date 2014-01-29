@@ -48,6 +48,7 @@ import com.gh4a.adapter.IssueLabelAdapter;
 import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 
@@ -100,8 +101,8 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
         
-        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
+        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.OWNER);
+        mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);
         
         if (!isOnline()) {
             setErrorView();
@@ -139,8 +140,8 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
 
     @Override
     protected void navigateUp() {
-        Gh4Application.get(this).openIssueListActivity(this, mRepoOwner, mRepoName,
-                Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        IntentUtils.openIssueListActivity(this, mRepoOwner, mRepoName,
+                Constants.Issue.STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 
     @Override

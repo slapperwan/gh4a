@@ -30,6 +30,7 @@ import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.CommitFragment;
 import com.gh4a.fragment.CommitNoteFragment;
+import com.gh4a.utils.IntentUtils;
 
 public class CommitActivity extends LoadingFragmentPagerActivity {
     private String mRepoOwner;
@@ -50,8 +51,8 @@ public class CommitActivity extends LoadingFragmentPagerActivity {
         }
 
         Bundle data = getIntent().getExtras();
-        mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
-        mRepoName = data.getString(Constants.Repository.REPO_NAME);
+        mRepoOwner = data.getString(Constants.Repository.OWNER);
+        mRepoName = data.getString(Constants.Repository.NAME);
         mObjectSha = data.getString(Constants.Object.OBJECT_SHA);
         
         ActionBar actionBar = getSupportActionBar();
@@ -88,7 +89,7 @@ public class CommitActivity extends LoadingFragmentPagerActivity {
 
     @Override
     protected void navigateUp() {
-        Gh4Application.get(this).openRepositoryInfoActivity(this,
+        IntentUtils.openRepositoryInfoActivity(this,
                 mRepoOwner, mRepoName, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
     @Override

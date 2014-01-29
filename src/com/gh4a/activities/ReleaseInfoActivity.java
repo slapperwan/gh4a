@@ -39,6 +39,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MarkdownLoader;
 import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.github.mobile.util.HtmlUtils;
@@ -71,8 +72,8 @@ public class ReleaseInfoActivity extends LoadingFragmentActivity implements
         setContentView(R.layout.release);
 
         Bundle extras = getIntent().getExtras();
-        mRepoOwner = extras.getString(Constants.Repository.REPO_OWNER);
-        mRepoName = extras.getString(Constants.Repository.REPO_NAME);
+        mRepoOwner = extras.getString(Constants.Repository.OWNER);
+        mRepoName = extras.getString(Constants.Repository.NAME);
         mRelease = (Release) extras.getSerializable(Constants.Release.RELEASE);
         mReleaser = mRelease.getAuthor();
         if (mReleaser == null) {
@@ -91,7 +92,7 @@ public class ReleaseInfoActivity extends LoadingFragmentActivity implements
 
     @Override
     protected void navigateUp() {
-        Gh4Application.get(this).openRepositoryInfoActivity(this,
+        IntentUtils.openRepositoryInfoActivity(this,
                 mRepoOwner, mRepoName, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 
@@ -161,7 +162,7 @@ public class ReleaseInfoActivity extends LoadingFragmentActivity implements
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.tv_releasetag:
-                Gh4Application.get(this).openRepositoryInfoActivity(this,
+                IntentUtils.openRepositoryInfoActivity(this,
                         mRepoOwner, mRepoName, mRelease.getTagName(), 0);
                 break;
         }

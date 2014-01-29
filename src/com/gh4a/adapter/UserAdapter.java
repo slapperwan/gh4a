@@ -29,6 +29,7 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
 public class UserAdapter extends RootAdapter<User> implements OnClickListener {
@@ -81,11 +82,7 @@ public class UserAdapter extends RootAdapter<User> implements OnClickListener {
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             User user = (User) v.getTag();
-            /** Open user activity */
-            if (!StringUtils.isBlank(user.getLogin())) {
-                Gh4Application.get(mContext).openUserInfoActivity(mContext,
-                        user.getLogin(), user.getLogin());
-            }
+            IntentUtils.openUserInfoActivity(mContext, user);
         }
     }
 

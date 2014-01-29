@@ -27,6 +27,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.UserAdapter;
+import com.gh4a.utils.IntentUtils;
 
 public class WatcherListFragment extends PagedDataBaseFragment<User> {
     private String mRepoOwner;
@@ -36,8 +37,8 @@ public class WatcherListFragment extends PagedDataBaseFragment<User> {
         WatcherListFragment f = new WatcherListFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.Repository.REPO_OWNER, repoOwner);
-        args.putString(Constants.Repository.REPO_NAME, repoName);
+        args.putString(Constants.Repository.OWNER, repoOwner);
+        args.putString(Constants.Repository.NAME, repoName);
         f.setArguments(args);
         
         return f;
@@ -46,8 +47,8 @@ public class WatcherListFragment extends PagedDataBaseFragment<User> {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.REPO_NAME);
+        mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
+        mRepoName = getArguments().getString(Constants.Repository.NAME);
     }
     
     @Override
@@ -62,8 +63,7 @@ public class WatcherListFragment extends PagedDataBaseFragment<User> {
 
     @Override
     protected void onItemClick(User user) {
-        Gh4Application app = Gh4Application.get(getActivity());
-        app.openUserInfoActivity(getActivity(), user.getLogin(), user.getName());
+        IntentUtils.openUserInfoActivity(getActivity(), user);
     }
 
     @Override

@@ -27,6 +27,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.adapter.PullRequestAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.utils.IntentUtils;
 
 public class PullRequestListFragment extends PagedDataBaseFragment<PullRequest> {
     private String mRepoOwner;
@@ -36,9 +37,9 @@ public class PullRequestListFragment extends PagedDataBaseFragment<PullRequest> 
     public static PullRequestListFragment newInstance(String repoOwner, String repoName, String state) {
         PullRequestListFragment f = new PullRequestListFragment();
         Bundle args = new Bundle();
-        args.putString(Constants.Repository.REPO_OWNER, repoOwner);
-        args.putString(Constants.Repository.REPO_NAME, repoName);
-        args.putString(Constants.Issue.ISSUE_STATE, state);
+        args.putString(Constants.Repository.OWNER, repoOwner);
+        args.putString(Constants.Repository.NAME, repoName);
+        args.putString(Constants.Issue.STATE, state);
         
         f.setArguments(args);
         return f;
@@ -48,15 +49,14 @@ public class PullRequestListFragment extends PagedDataBaseFragment<PullRequest> 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mRepoOwner = getArguments().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.REPO_NAME);
-        mState = getArguments().getString(Constants.Issue.ISSUE_STATE);
+        mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
+        mRepoName = getArguments().getString(Constants.Repository.NAME);
+        mState = getArguments().getString(Constants.Issue.STATE);
     }
 
     @Override
     protected void onItemClick(PullRequest pullRequest) {
-        Gh4Application.get(getActivity()).openPullRequestActivity(getActivity(),
-                mRepoOwner, mRepoName, pullRequest.getNumber());
+        IntentUtils.openPullRequestActivity(getActivity(), mRepoOwner, mRepoName, pullRequest.getNumber());
     }
 
     @Override

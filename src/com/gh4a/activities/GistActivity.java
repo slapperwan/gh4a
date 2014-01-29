@@ -68,7 +68,7 @@ public class GistActivity extends LoadingFragmentActivity implements OnClickList
         super.onCreate(savedInstanceState);
 
         mGistId = getIntent().getExtras().getString(Constants.Gist.ID);
-        mUserLogin = getIntent().getExtras().getString(Constants.User.USER_LOGIN);
+        mUserLogin = getIntent().getExtras().getString(Constants.User.LOGIN);
         
         if (!isOnline()) {
             setErrorView();
@@ -122,7 +122,7 @@ public class GistActivity extends LoadingFragmentActivity implements OnClickList
     public void onClick(View view) {
         Intent intent = new Intent(this, GistViewerActivity.class);
         GistFile gist = (GistFile) view.getTag();
-        intent.putExtra(Constants.User.USER_LOGIN, mGist.getUser().getLogin());
+        intent.putExtra(Constants.User.LOGIN, mGist.getUser().getLogin());
         intent.putExtra(Constants.Gist.FILENAME, gist.getFilename());
         intent.putExtra(Constants.Gist.ID, mGist.getId());
         startActivity(intent);
@@ -154,7 +154,7 @@ public class GistActivity extends LoadingFragmentActivity implements OnClickList
     @Override
     protected void navigateUp() {
         Intent intent = new Intent(this, GistListActivity.class);
-        intent.putExtra(Constants.User.USER_LOGIN, mUserLogin);
+        intent.putExtra(Constants.User.LOGIN, mUserLogin);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }

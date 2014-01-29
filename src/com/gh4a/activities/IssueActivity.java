@@ -56,6 +56,7 @@ import com.gh4a.loader.IssueLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
@@ -126,10 +127,10 @@ public class IssueActivity extends LoadingFragmentActivity implements
         super.onCreate(savedInstanceState);
 
         Bundle data = getIntent().getExtras();
-        mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
-        mRepoName = data.getString(Constants.Repository.REPO_NAME);
-        mIssueNumber = data.getInt(Constants.Issue.ISSUE_NUMBER);
-        mIssueState = data.getString(Constants.Issue.ISSUE_STATE);
+        mRepoOwner = data.getString(Constants.Repository.OWNER);
+        mRepoName = data.getString(Constants.Repository.NAME);
+        mIssueNumber = data.getInt(Constants.Issue.NUMBER);
+        mIssueState = data.getString(Constants.Issue.STATE);
         
         if (!isOnline()) {
             setErrorView();
@@ -190,7 +191,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
         
         TextView tvState = (TextView) header.findViewById(R.id.tv_state);
         tvState.setTextColor(Color.WHITE);
-        if (Constants.Issue.ISSUE_STATE_CLOSED.equals(mIssue.getState())) {
+        if (Constants.Issue.STATE_CLOSED.equals(mIssue.getState())) {
             tvState.setBackgroundResource(R.drawable.default_red_box);
             tvState.setText(getString(R.string.closed).toUpperCase(Locale.getDefault()));
         } else {
@@ -283,7 +284,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
             MenuInflater inflater = getSupportMenuInflater();
             inflater.inflate(R.menu.issue_menu, menu);
 
-            if (Constants.Issue.ISSUE_STATE_CLOSED.equals(mIssueState)) {
+            if (Constants.Issue.STATE_CLOSED.equals(mIssueState)) {
                 menu.removeItem(R.id.issue_close);
             } else {
                 menu.removeItem(R.id.issue_reopen);
@@ -303,8 +304,8 @@ public class IssueActivity extends LoadingFragmentActivity implements
 
     @Override
     protected void navigateUp() {
-        Gh4Application.get(this).openIssueListActivity(this, mRepoOwner, mRepoName,
-                Constants.Issue.ISSUE_STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        IntentUtils.openIssueListActivity(this, mRepoOwner, mRepoName,
+                Constants.Issue.STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 
     @Override
@@ -313,17 +314,17 @@ public class IssueActivity extends LoadingFragmentActivity implements
             case R.id.issue_create:
                 if (checkForAuthOrExit()) {
                     Intent intent = new Intent(this, IssueCreateActivity.class);
-                    intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-                    intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+                    intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+                    intent.putExtra(Constants.Repository.NAME, mRepoName);
                     startActivity(intent);
                 }
                 return true;
             case R.id.issue_edit:
                 if (checkForAuthOrExit()) {
                     Intent intent = new Intent(this, IssueCreateActivity.class);
-                    intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-                    intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                    intent.putExtra(Constants.Issue.ISSUE_NUMBER, mIssue.getNumber());
+                    intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+                    intent.putExtra(Constants.Repository.NAME, mRepoName);
+                    intent.putExtra(Constants.Issue.NUMBER, mIssue.getNumber());
                     startActivity(intent);
                 }
                 return true;
@@ -358,14 +359,13 @@ public class IssueActivity extends LoadingFragmentActivity implements
     
     @Override
     public void onClick(View v) {
-        Gh4Application app = Gh4Application.get(this);
         switch (v.getId()) {
         case R.id.iv_gravatar:
-            app.openUserInfoActivity(this, mIssue.getUser().getLogin(), null);
+            IntentUtils.openUserInfoActivity(this, mIssue.getUser());
             break;
         case R.id.tv_assignee:
         case R.id.iv_assignee:
-            app.openUserInfoActivity(this, mIssue.getAssignee().getLogin(), null);
+            IntentUtils.openUserInfoActivity(this, mIssue.getAssignee());
             break;
         case R.id.iv_comment:
             EditText etComment = (EditText) findViewById(R.id.et_comment);
@@ -376,7 +376,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
             UiUtils.hideImeForView(getCurrentFocus());
             break;
         case R.id.tv_pull:
-            app.openPullRequestActivity(this, mRepoOwner, mRepoName, mIssueNumber);
+            IntentUtils.openPullRequestActivity(this, mRepoOwner, mRepoName, mIssueNumber);
             break;
         }
     }
@@ -393,8 +393,8 @@ public class IssueActivity extends LoadingFragmentActivity implements
     public void editComment(Comment comment) {
         Intent intent = new Intent(this, EditCommentActivity.class);
         
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+        intent.putExtra(Constants.Repository.NAME, mRepoName);
         intent.putExtra(Constants.Comment.ID, comment.getId());
         intent.putExtra(Constants.Comment.BODY, comment.getBody());
         startActivityForResult(intent, REQUEST_EDIT);

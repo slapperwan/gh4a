@@ -12,8 +12,8 @@ public class IssueListByUpdatedFragment extends IssueListFragment {
         
         IssueListByUpdatedFragment f = new IssueListByUpdatedFragment();
         Bundle args = new Bundle();
-        args.putString(Constants.Repository.REPO_OWNER, repoOwner);
-        args.putString(Constants.Repository.REPO_NAME, repoName);
+        args.putString(Constants.Repository.OWNER, repoOwner);
+        args.putString(Constants.Repository.NAME, repoName);
         args.putString("sort", "updated");
         
         if (filterData != null) {

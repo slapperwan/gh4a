@@ -48,6 +48,7 @@ import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.SearchUserAdapter;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
 public class SearchActivity extends BaseSherlockFragmentActivity implements
@@ -275,12 +276,12 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
         if (object instanceof SearchUser) {
             /** User item */
             SearchUser user = (SearchUser) object;
-            Gh4Application.get(this).openUserInfoActivity(this, user.getLogin(), user.getName());
+            IntentUtils.openUserInfoActivity(this, user.getLogin(), user.getName());
         } else {
             /** Repo item */
             Repository repository = (Repository) object;
-            Gh4Application.get(this).openRepositoryInfoActivity(this,
-                    repository.getOwner().getLogin(), repository.getName(), null, 0);
+            IntentUtils.openRepositoryInfoActivity(this, repository.getOwner().getLogin(),
+                    repository.getName(), null, 0);
         }
         return true;
     }
@@ -339,11 +340,11 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
 
         if (object instanceof SearchUser) {
             SearchUser user = (SearchUser) object;
-            Gh4Application.get(this).openUserInfoActivity(this, user.getLogin(), user.getName());
+            IntentUtils.openUserInfoActivity(this, user.getLogin(), user.getName());
         } else if (object instanceof Repository) {
             Repository repository = (Repository) object;
-            Gh4Application.get(this).openRepositoryInfoActivity(this,
-                    repository.getOwner().getLogin(), repository.getName(), null, 0);
+            IntentUtils.openRepositoryInfoActivity(this, repository.getOwner().getLogin(),
+                    repository.getName(), null, 0);
         }
     }
 

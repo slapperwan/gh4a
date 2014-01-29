@@ -22,8 +22,8 @@ public class DownloadBranchesFragment extends ListDataBaseFragment<RepositoryBra
     public static DownloadBranchesFragment newInstance(String repoOwner, String repoName) {
         DownloadBranchesFragment f = new DownloadBranchesFragment();
         Bundle args = new Bundle();
-        args.putString(Constants.Repository.REPO_OWNER, repoOwner);
-        args.putString(Constants.Repository.REPO_NAME, repoName);
+        args.putString(Constants.Repository.OWNER, repoOwner);
+        args.putString(Constants.Repository.NAME, repoName);
         f.setArguments(args);
         return f;
     }
@@ -31,8 +31,8 @@ public class DownloadBranchesFragment extends ListDataBaseFragment<RepositoryBra
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.REPO_NAME);
+        mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
+        mRepoName = getArguments().getString(Constants.Repository.NAME);
     }
     
     @Override

@@ -30,6 +30,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
 public class CommitAdapter extends RootAdapter<RepositoryCommit> implements OnClickListener {
@@ -83,11 +84,7 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> implements OnCl
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             RepositoryCommit commit = (RepositoryCommit) v.getTag();
-            /** Open user activity */
-            String login = CommitUtils.getAuthorLogin(mContext, commit);
-            if (login != null) {
-                Gh4Application.get(mContext).openUserInfoActivity(mContext, login, null);
-            }
+            IntentUtils.openUserInfoActivity(mContext, CommitUtils.getAuthorLogin(mContext, commit));
         }
     }
 

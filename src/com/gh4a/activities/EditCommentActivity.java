@@ -35,8 +35,8 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
         setContentView(R.layout.edit_text);
         
         Bundle data = getIntent().getExtras();
-        mRepoOwner = data.getString(Constants.Repository.REPO_OWNER);
-        mRepoName = data.getString(Constants.Repository.REPO_NAME);
+        mRepoOwner = data.getString(Constants.Repository.OWNER);
+        mRepoName = data.getString(Constants.Repository.NAME);
         mCommentId = data.getLong(Constants.Comment.ID);
         mText = data.getString(Constants.Comment.BODY);
         

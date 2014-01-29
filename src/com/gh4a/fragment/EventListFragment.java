@@ -61,7 +61,9 @@ import com.gh4a.activities.ReleaseInfoActivity;
 import com.gh4a.activities.WikiListActivity;
 import com.gh4a.adapter.FeedAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 
 public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
@@ -93,8 +95,8 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mLogin = getArguments().getString(Constants.User.USER_LOGIN);
-        mIsPrivate = getArguments().getBoolean(Constants.Event.IS_PRIVATE);
+        mLogin = getArguments().getString(Constants.User.LOGIN);
+        mIsPrivate = getArguments().getBoolean("private");
     }
 
     @Override
@@ -146,20 +148,20 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         }
 
         if (Arrays.binarySearch(REPO_EVENTS, eventType) >= 0 && eventRepo == null) {
-            context.notFoundMessage(getActivity(), R.plurals.repository);
+            ToastUtils.notFoundMessage(getActivity(), R.plurals.repository);
             return;
         }
 
         if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
             CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
-            context.openCommitInfoActivity(getActivity(), repoOwner, repoName,
+            IntentUtils.openCommitInfoActivity(getActivity(), repoOwner, repoName,
                     payload.getComment().getCommitId(), 0);
 
         } else if (Event.TYPE_CREATE.equals(eventType)) {
-            context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
+            IntentUtils.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
 
         } else if (Event.TYPE_DELETE.equals(eventType)) {
-            context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
+            IntentUtils.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
 
         } else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
             DownloadPayload payload = (DownloadPayload) event.getPayload();
@@ -169,21 +171,19 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
 
         } else if (Event.TYPE_FOLLOW.equals(eventType)) {
             FollowPayload payload = (FollowPayload) event.getPayload();
-            if (payload.getTarget() != null) {
-                context.openUserInfoActivity(getActivity(), payload.getTarget().getLogin(), null);
-            }
+            IntentUtils.openUserInfoActivity(getActivity(), payload.getTarget());
 
         } else if (Event.TYPE_FORK.equals(eventType)) {
             ForkPayload payload = (ForkPayload) event.getPayload();
             Repository forkee = payload.getForkee();
             if (forkee != null) {
-                context.openRepositoryInfoActivity(getActivity(), forkee);
+                IntentUtils.openRepositoryInfoActivity(getActivity(), forkee);
             } else {
-                context.notFoundMessage(getActivity(), R.plurals.repository);
+                ToastUtils.notFoundMessage(getActivity(), R.plurals.repository);
             }
 
         } else if (Event.TYPE_FORK_APPLY.equals(eventType)) {
-            context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
+            IntentUtils.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
 
         } else if (Event.TYPE_GIST.equals(eventType)) {
             GistPayload payload = (GistPayload) event.getPayload();
@@ -193,13 +193,13 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
                 login = payload.getGist().getUser().getLogin();
             }
             if (!StringUtils.isBlank(login)) {
-                context.openGistActivity(getActivity(), login, payload.getGist().getId(), 0);
+                IntentUtils.openGistActivity(getActivity(), login, payload.getGist().getId(), 0);
             }
 
         } else if (Event.TYPE_GOLLUM.equals(eventType)) {
             Intent intent = new Intent(getActivity(), WikiListActivity.class);
-            intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
-            intent.putExtra(Constants.Repository.REPO_NAME, repoName);
+            intent.putExtra(Constants.Repository.OWNER, repoOwner);
+            intent.putExtra(Constants.Repository.NAME, repoName);
             GollumPayload payload = (GollumPayload) event.getPayload();
             if (!payload.getPages().isEmpty()) {
                 intent.putExtra(Constants.Object.OBJECT_SHA, payload.getPages().get(0).getSha());
@@ -212,30 +212,30 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             PullRequest request = issue != null ? issue.getPullRequest() : null;
 
             if (request != null && request.getHtmlUrl() != null) {
-                context.openPullRequestActivity(getActivity(),
+                IntentUtils.openPullRequestActivity(getActivity(),
                         repoOwner, repoName, issue.getNumber());
             } else if (issue != null) {
-                context.openIssueActivity(getActivity(), repoOwner, repoName,
+                IntentUtils.openIssueActivity(getActivity(), repoOwner, repoName,
                         issue.getNumber(), issue.getState());
             }
 
         } else if (Event.TYPE_ISSUES.equals(eventType)) {
             IssuesPayload payload = (IssuesPayload) event.getPayload();
-            context.openIssueActivity(getActivity(), repoOwner, repoName, payload.getIssue().getNumber());
+            IntentUtils.openIssueActivity(getActivity(), repoOwner, repoName, payload.getIssue().getNumber());
 
         } else if (Event.TYPE_MEMBER.equals(eventType)) {
-            context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
+            IntentUtils.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
 
         } else if (Event.TYPE_PUBLIC.equals(eventType)) {
-            context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
+            IntentUtils.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
 
         } else if (Event.TYPE_PULL_REQUEST.equals(eventType)) {
             PullRequestPayload payload = (PullRequestPayload) event.getPayload();
-            context.openPullRequestActivity(getActivity(), repoOwner, repoName, payload.getNumber());
+            IntentUtils.openPullRequestActivity(getActivity(), repoOwner, repoName, payload.getNumber());
 
         } else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
             PullRequestReviewCommentPayload payload = (PullRequestReviewCommentPayload) event.getPayload();
-            context.openCommitInfoActivity(getActivity(), repoOwner, repoName, 
+            IntentUtils.openCommitInfoActivity(getActivity(), repoOwner, repoName, 
                     payload.getComment().getCommitId(), 0);
 
         } else if (Event.TYPE_PUSH.equals(eventType)) {
@@ -246,18 +246,18 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
                 if (commits.size() > 1) {
                     // if commit > 1, then show compare activity
                     Intent intent = new Intent(context, CompareActivity.class);
-                    intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
-                    intent.putExtra(Constants.Repository.REPO_NAME, repoName);
+                    intent.putExtra(Constants.Repository.OWNER, repoOwner);
+                    intent.putExtra(Constants.Repository.NAME, repoName);
                     intent.putExtra(Constants.Repository.HEAD, payload.getHead());
                     intent.putExtra(Constants.Repository.BASE, payload.getBefore());
                     startActivity(intent);
                 } else {
                     // only 1 commit, then show the commit details
-                    context.openCommitInfoActivity(getActivity(), repoOwner, repoName,
+                    IntentUtils.openCommitInfoActivity(getActivity(), repoOwner, repoName,
                             payload.getCommits().get(0).getSha(), 0);
                 }
             } else {
-                context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
+                IntentUtils.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
             }
 
         } else if (Event.TYPE_RELEASE.equals(eventType)) {
@@ -267,13 +267,13 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
                 Intent intent = new Intent(getActivity(), ReleaseInfoActivity.class);
                 intent.putExtra(Constants.Release.RELEASE, release);
                 intent.putExtra(Constants.Release.RELEASER, event.getActor());
-                intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
-                intent.putExtra(Constants.Repository.REPO_NAME, repoName);
+                intent.putExtra(Constants.Repository.OWNER, repoOwner);
+                intent.putExtra(Constants.Repository.NAME, repoName);
                 startActivity(intent);
             }
 
         } else if (Event.TYPE_WATCH.equals(eventType)) {
-            context.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
+            IntentUtils.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
         }
     }
     
@@ -386,13 +386,12 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             repoName = repoNamePart[1];
         }
         
-        Gh4Application app = Gh4Application.get(getActivity());
         int id = item.getItemId();
 
         if (id == MENU_USER) {
-            app.openUserInfoActivity(getActivity(), repoOwner, null);
+            IntentUtils.openUserInfoActivity(getActivity(), repoOwner);
         } else if (id == MENU_REPO) {
-            app.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
+            IntentUtils.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
         } else if (id >= MENU_PUSH_COMMIT_START || id == MENU_COMMENT_COMMIT) {
             if (repoOwner != null) {
                 String sha = null;
@@ -403,20 +402,20 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
                     sha = ((CommitCommentPayload) event.getPayload()).getComment().getCommitId();
                 }
                 if (sha != null) {
-                    app.openCommitInfoActivity(getActivity(), repoOwner, repoName, sha, 0);
+                    IntentUtils.openCommitInfoActivity(getActivity(), repoOwner, repoName, sha, 0);
                 }
             } else {
-                app.notFoundMessage(getActivity(), R.plurals.repository);
+                ToastUtils.notFoundMessage(getActivity(), R.plurals.repository);
             }
         } else if (id == MENU_OPEN_ISSUES) {
-            app.openIssueListActivity(getActivity(), repoOwner, repoName,
-                    Constants.Issue.ISSUE_STATE_OPEN);
+            IntentUtils.openIssueListActivity(getActivity(), repoOwner, repoName,
+                    Constants.Issue.STATE_OPEN);
         } else if (id == MENU_ISSUE) {
             IssuesPayload payload = (IssuesPayload) event.getPayload();
-            app.openIssueActivity(getActivity(), repoOwner, repoName, payload.getIssue().getNumber());
+            IntentUtils.openIssueActivity(getActivity(), repoOwner, repoName, payload.getIssue().getNumber());
         } else if (id == MENU_GIST) {
             GistPayload payload = (GistPayload) event.getPayload();
-            app.openGistActivity(getActivity(), payload.getGist().getUser().getLogin(),
+            IntentUtils.openGistActivity(getActivity(), payload.getGist().getUser().getLogin(),
                     payload.getGist().getId(), 0);
         } else if (id >= MENU_DOWNLOAD_START && id <= MENU_DOWNLOAD_END) {
             Download download = null;
@@ -436,9 +435,9 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             ForkPayload payload = (ForkPayload) event.getPayload();
             Repository forkee = payload.getForkee();
             if (forkee != null) {
-                app.openRepositoryInfoActivity(getActivity(), forkee);
+                IntentUtils.openRepositoryInfoActivity(getActivity(), forkee);
             } else {
-                app.notFoundMessage(getActivity(), R.plurals.repository);
+                ToastUtils.notFoundMessage(getActivity(), R.plurals.repository);
             }
         } else if (id == MENU_WIKI_IN_BROWSER) {
             GollumPayload payload = (GollumPayload) event.getPayload();
@@ -449,14 +448,14 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             }
         } else if (id == MENU_PULL_REQ) {
             PullRequestPayload payload = (PullRequestPayload) event.getPayload();
-            app.openPullRequestActivity(getActivity(), repoOwner, repoName, payload.getNumber());
+            IntentUtils.openPullRequestActivity(getActivity(), repoOwner, repoName, payload.getNumber());
         } else if (id == MENU_COMPARE) {
             if (repoOwner != null) {
                 PushPayload payload = (PushPayload) event.getPayload();
                 
                 Intent intent = new Intent(getActivity(), CompareActivity.class);
-                intent.putExtra(Constants.Repository.REPO_OWNER, repoOwner);
-                intent.putExtra(Constants.Repository.REPO_NAME, repoName);
+                intent.putExtra(Constants.Repository.OWNER, repoOwner);
+                intent.putExtra(Constants.Repository.NAME, repoName);
                 intent.putExtra(Constants.Repository.HEAD, payload.getHead());
                 intent.putExtra(Constants.Repository.BASE, payload.getBefore());
                 startActivity(intent);

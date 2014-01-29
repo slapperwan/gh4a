@@ -52,6 +52,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestLoader;
 import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
@@ -85,9 +86,9 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         PullRequestFragment f = new PullRequestFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.Repository.REPO_OWNER, repoOwner);
-        args.putString(Constants.Repository.REPO_NAME, repoName);
-        args.putInt(Constants.Issue.ISSUE_NUMBER, pullRequestNumber);
+        args.putString(Constants.Repository.OWNER, repoOwner);
+        args.putString(Constants.Repository.NAME, repoName);
+        args.putInt(Constants.Issue.NUMBER, pullRequestNumber);
         f.setArguments(args);
         
         return f;
@@ -96,9 +97,9 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.REPO_NAME);
-        mPullRequestNumber = getArguments().getInt(Constants.Issue.ISSUE_NUMBER);
+        mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
+        mRepoName = getArguments().getString(Constants.Repository.NAME);
+        mPullRequestNumber = getArguments().getInt(Constants.Issue.NUMBER);
     }
     
     @Override
@@ -159,7 +160,7 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
         tvState.setText(pullRequest.getState());
         tvState.setTextColor(Color.WHITE);
-        if (Constants.Issue.ISSUE_STATE_CLOSED.equals(pullRequest.getState())) {
+        if (Constants.Issue.STATE_CLOSED.equals(pullRequest.getState())) {
             tvState.setBackgroundResource(R.drawable.default_red_box);
             tvState.setText(getString(R.string.closed).toUpperCase(Locale.getDefault()));
         } else {
@@ -194,8 +195,7 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         int id = v.getId();
         if (id == R.id.iv_gravatar) {
             User user = (User) v.getTag();
-            Gh4Application.get(getActivity()).openUserInfoActivity(getActivity(),
-                    user.getLogin(), user.getName());
+            IntentUtils.openUserInfoActivity(getActivity(), user);
         } else if (id == R.id.iv_comment) {
             EditText etComment = (EditText) getView().findViewById(R.id.et_comment);
             String text = etComment.getText() == null ? null : etComment.getText().toString();
@@ -227,8 +227,8 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
     public void editComment(Comment comment) {
         Intent intent = new Intent(getActivity(), EditCommentActivity.class);
         
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+        intent.putExtra(Constants.Repository.NAME, mRepoName);
         intent.putExtra(Constants.Comment.ID, comment.getId());
         intent.putExtra(Constants.Comment.BODY, comment.getBody());
         startActivityForResult(intent, REQUEST_EDIT);

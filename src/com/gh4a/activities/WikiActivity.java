@@ -43,8 +43,8 @@ public class WikiActivity extends LoadingFragmentActivity {
         setContentView(R.layout.web_viewer);
         setContentShown(false);
 
-        mUserLogin = getIntent().getStringExtra(Constants.Repository.REPO_OWNER);
-        mRepoName = getIntent().getStringExtra(Constants.Repository.REPO_NAME);
+        mUserLogin = getIntent().getStringExtra(Constants.Repository.OWNER);
+        mRepoName = getIntent().getStringExtra(Constants.Repository.NAME);
         mTitle = getIntent().getStringExtra(Constants.Blog.TITLE);
         mContent = getIntent().getStringExtra(Constants.Blog.CONTENT);
 
@@ -94,8 +94,8 @@ public class WikiActivity extends LoadingFragmentActivity {
     @Override
     protected void navigateUp() {
         Intent intent = new Intent(this, WikiListActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mUserLogin);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
+        intent.putExtra(Constants.Repository.OWNER, mUserLogin);
+        intent.putExtra(Constants.Repository.NAME, mRepoName);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }

@@ -35,8 +35,8 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
         super.onCreate(savedInstanceState);
 
         Bundle data = getIntent().getExtras();
-        mUserLogin = data.getString(Constants.User.USER_LOGIN);
-        mUserType = data.getString(Constants.User.USER_TYPE);
+        mUserLogin = data.getString(Constants.User.LOGIN);
+        mUserType = data.getString(Constants.User.TYPE);
         
         if (!isOnline()) {
             setErrorView();
@@ -52,7 +52,7 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
 
         Context context = mActionBar.getThemedContext();
         final int items;
-        if (Constants.User.USER_TYPE_ORG.equals(mUserType)) {
+        if (Constants.User.TYPE_ORG.equals(mUserType)) {
             items = R.array.repo_org_item;
         } else if (mUserLogin.equals(Gh4Application.get(this).getAuthLogin())) {
             items = R.array.repo_login_item;

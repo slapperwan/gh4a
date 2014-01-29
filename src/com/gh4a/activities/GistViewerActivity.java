@@ -40,6 +40,7 @@ import com.gh4a.R;
 import com.gh4a.loader.GistLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
 public class GistViewerActivity extends LoadingFragmentActivity {
@@ -86,7 +87,7 @@ public class GistViewerActivity extends LoadingFragmentActivity {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
-        mUserLogin = getIntent().getExtras().getString(Constants.User.USER_LOGIN);
+        mUserLogin = getIntent().getExtras().getString(Constants.User.LOGIN);
         mFileName = getIntent().getExtras().getString(Constants.Gist.FILENAME);
         mGistId = getIntent().getExtras().getString(Constants.Gist.ID);
         
@@ -142,7 +143,7 @@ public class GistViewerActivity extends LoadingFragmentActivity {
 
     @Override
     protected void navigateUp() {
-        Gh4Application.get(this).openGistActivity(this, mUserLogin, mGistId, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        IntentUtils.openGistActivity(this, mUserLogin, mGistId, Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 
     @Override

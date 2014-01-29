@@ -37,6 +37,7 @@ import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.loader.CommitCompareLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.IntentUtils;
 
 public class CompareActivity extends LoadingFragmentActivity implements OnItemClickListener {
     private String mRepoOwner;
@@ -77,8 +78,8 @@ public class CompareActivity extends LoadingFragmentActivity implements OnItemCl
 
         mListView = (ListView) findViewById(R.id.list_view);
         
-        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getIntent().getExtras().getString(Constants.Repository.REPO_NAME);
+        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.OWNER);
+        mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);
         mBase = getIntent().getExtras().getString(Constants.Repository.BASE);
         mHead = getIntent().getExtras().getString(Constants.Repository.HEAD);
         
@@ -97,14 +98,12 @@ public class CompareActivity extends LoadingFragmentActivity implements OnItemCl
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         RepositoryCommit commit = (RepositoryCommit) mAdapter.getItem(position);
-        
-        Gh4Application.get(this).openCommitInfoActivity(this, mRepoOwner, mRepoName, 
-                commit.getSha(), 0);        
+        IntentUtils.openCommitInfoActivity(this, mRepoOwner, mRepoName, commit.getSha(), 0);
     }
     
     @Override
     protected void navigateUp() {
-        Gh4Application.get(this).openRepositoryInfoActivity(this,
-                mRepoOwner, mRepoName, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        IntentUtils.openRepositoryInfoActivity(this, mRepoOwner, mRepoName,
+                null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 }

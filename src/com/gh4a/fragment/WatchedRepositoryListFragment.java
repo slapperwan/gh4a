@@ -19,15 +19,14 @@ import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.WatcherService;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.utils.IntentUtils;
 
 public class WatchedRepositoryListFragment extends PagedDataBaseFragment<Repository> {
     private String mLogin;
@@ -36,7 +35,7 @@ public class WatchedRepositoryListFragment extends PagedDataBaseFragment<Reposit
         WatchedRepositoryListFragment f = new WatchedRepositoryListFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.User.USER_LOGIN, login);
+        args.putString(Constants.User.LOGIN, login);
         f.setArguments(args);
         
         return f;
@@ -45,7 +44,7 @@ public class WatchedRepositoryListFragment extends PagedDataBaseFragment<Reposit
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mLogin = getArguments().getString(Constants.User.USER_LOGIN);
+        mLogin = getArguments().getString(Constants.User.LOGIN);
     }
     
     @Override
@@ -60,12 +59,7 @@ public class WatchedRepositoryListFragment extends PagedDataBaseFragment<Reposit
 
     @Override
     protected void onItemClick(Repository repository) {
-        Gh4Application app = Gh4Application.get(getActivity());
-        
-        Intent intent = new Intent(getActivity(), RepositoryActivity.class);
-        Bundle data = app.populateRepository(repository);
-        intent.putExtra(Constants.DATA_BUNDLE, data);
-        startActivity(intent);
+        IntentUtils.openRepositoryInfoActivity(getActivity(), repository);
     }
 
     @Override

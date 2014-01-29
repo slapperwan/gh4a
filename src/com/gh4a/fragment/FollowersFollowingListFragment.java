@@ -26,6 +26,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.UserAdapter;
+import com.gh4a.utils.IntentUtils;
 
 public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> {
     private String mLogin;
@@ -35,7 +36,7 @@ public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> 
         FollowersFollowingListFragment f = new FollowersFollowingListFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.User.USER_LOGIN, login);
+        args.putString(Constants.User.LOGIN, login);
         args.putBoolean("FIND_FOLLOWER", mFindFollowers);
         f.setArguments(args);
         
@@ -45,7 +46,7 @@ public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mLogin = getArguments().getString(Constants.User.USER_LOGIN);
+        mLogin = getArguments().getString(Constants.User.LOGIN);
         mFindFollowers = getArguments().getBoolean("FIND_FOLLOWER");
     }
     
@@ -61,8 +62,7 @@ public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> 
 
     @Override
     protected void onItemClick(User user) {
-        Gh4Application app = Gh4Application.get(getActivity());
-        app.openUserInfoActivity(getActivity(), user.getLogin(), user.getName());
+        IntentUtils.openUserInfoActivity(getActivity(), user);
     }
 
     @Override
