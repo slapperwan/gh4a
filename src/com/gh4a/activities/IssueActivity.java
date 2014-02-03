@@ -178,7 +178,6 @@ public class IssueActivity extends LoadingFragmentActivity implements
         }
         
         TextView tvCommentTitle = (TextView) header.findViewById(R.id.comment_title);
-        tvCommentTitle.setTextColor(getResources().getColor(R.color.highlight));
         tvCommentTitle.setText(getString(R.string.issue_comments) + " (" + mIssue.getComments() + ")");
         
         ImageView ivGravatar = (ImageView) header.findViewById(R.id.iv_gravatar);
@@ -190,7 +189,6 @@ public class IssueActivity extends LoadingFragmentActivity implements
                 + StringUtils.formatRelativeTime(this, mIssue.getCreatedAt(), true));
         
         TextView tvState = (TextView) header.findViewById(R.id.tv_state);
-        tvState.setTextColor(Color.WHITE);
         if (Constants.Issue.STATE_CLOSED.equals(mIssue.getState())) {
             tvState.setBackgroundResource(R.drawable.default_red_box);
             tvState.setText(getString(R.string.closed).toUpperCase(Locale.getDefault()));

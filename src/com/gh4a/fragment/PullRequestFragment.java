@@ -26,7 +26,6 @@ import org.eclipse.egit.github.core.service.IssueService;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.text.method.LinkMovementMethod;
@@ -122,9 +121,14 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         mHeader = (LinearLayout) getLayoutInflater(savedInstanceState).inflate(
-                R.layout.pull_request_header, getListView(), false);
+                R.layout.issue_header, getListView(), false);
         mHeader.setClickable(false);
+        mHeader.findViewById(R.id.info_box).setVisibility(View.GONE);
         getListView().addHeaderView(mHeader, null, true);
+
+        UiUtils.assignTypeface(mHeader, Gh4Application.get(getActivity()).boldCondensed, new int[] {
+            R.id.comment_title, R.id.tv_title, R.id.desc_title
+        });
 
         super.onActivityCreated(savedInstanceState);
         
@@ -144,22 +148,18 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
     private void fillData(final PullRequest pullRequest) {
         final Gh4Application app = Gh4Application.get(getActivity());
         View v = getView();
-        
+
         User user = pullRequest.getUser();
-        if (user != null) {
-            ImageView gravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
-            gravatar.setOnClickListener(this);
-            gravatar.setTag(user);
-            GravatarHandler.assignGravatar(gravatar, user);
-        }
+        ImageView gravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
+        gravatar.setOnClickListener(this);
+        gravatar.setTag(user);
+        GravatarHandler.assignGravatar(gravatar, user);
         
         TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
-        tvCommentTitle.setText(getString(R.string.issue_comment_title) + " (" + pullRequest.getComments() + ")");
-        tvCommentTitle.setTypeface(app.boldCondensed);
+        tvCommentTitle.setText(getString(R.string.issue_comments) + " (" + pullRequest.getComments() + ")");
 
         TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
         tvState.setText(pullRequest.getState());
-        tvState.setTextColor(Color.WHITE);
         if (Constants.Issue.STATE_CLOSED.equals(pullRequest.getState())) {
             tvState.setBackgroundResource(R.drawable.default_red_box);
             tvState.setText(getString(R.string.closed).toUpperCase(Locale.getDefault()));
@@ -169,9 +169,8 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         }
 
         TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
-        tvExtra.setText(getString(R.string.issue_open_by_user,
-                pullRequest.getUser() != null ? pullRequest.getUser().getLogin() : "",
-                StringUtils.formatRelativeTime(getActivity(), pullRequest.getCreatedAt(), true)));
+        tvExtra.setText(user.getLogin() + "\n"
+                + StringUtils.formatRelativeTime(getActivity(), pullRequest.getCreatedAt(), true));
         
         TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
         tvTitle.setText(pullRequest.getTitle());
