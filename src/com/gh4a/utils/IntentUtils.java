@@ -65,7 +65,11 @@ public class IntentUtils {
     public static void openRepositoryInfoActivity(Context context, Repository repository) {
         if (repository != null) {
             Intent intent = new Intent(context, RepositoryActivity.class);
-            intent.putExtra(Constants.Repository.REPOSITORY, repository);
+            // ideally, we'd be able to just pass the repository object into RepositoryActivity
+            // and wouldn't need any additional network activity there. Unfortunately, the
+            // repository objects returned from other API calls are incomplete :(
+            intent.putExtra(Constants.Repository.OWNER, repository.getOwner().getLogin());
+            intent.putExtra(Constants.Repository.NAME, repository.getName());
             context.startActivity(intent);
         } else {
             ToastUtils.notFoundMessage(context, R.plurals.repository);

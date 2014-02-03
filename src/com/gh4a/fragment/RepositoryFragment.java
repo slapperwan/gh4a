@@ -126,16 +126,13 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
         tvRepoName.setText(mRepository.getName());
         
         TextView tvParentRepo = (TextView) mContentView.findViewById(R.id.tv_parent);
-        if (mRepository.isFork()) {
-            tvParentRepo.setVisibility(View.VISIBLE);
-
+        if (mRepository.isFork() && mRepository.getParent() != null) {
             Repository parent = mRepository.getParent();
-            if (parent != null) {
-                tvParentRepo.setText(app.getString(R.string.forked_from,
-                        parent.getOwner().getLogin() + "/" + parent.getName()));
-                tvParentRepo.setOnClickListener(this);
-                tvParentRepo.setTag(parent);
-            }
+            tvParentRepo.setVisibility(View.VISIBLE);
+            tvParentRepo.setText(app.getString(R.string.forked_from,
+                    parent.getOwner().getLogin() + "/" + parent.getName()));
+            tvParentRepo.setOnClickListener(this);
+            tvParentRepo.setTag(parent);
         } else {
             tvParentRepo.setVisibility(View.GONE);
         }

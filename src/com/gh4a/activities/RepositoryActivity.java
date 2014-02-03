@@ -203,28 +203,18 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         };
         
         Bundle bundle = getIntent().getExtras();
-        if (bundle.containsKey(Constants.Repository.REPOSITORY)) {
-            mRepository = (Repository) bundle.getSerializable(Constants.Repository.REPOSITORY);
-            mRepoOwner = mRepository.getOwner().getLogin();
-            mRepoName = mRepository.getName();
-        } else {
-            mRepoOwner = bundle.getString(Constants.Repository.OWNER);
-            mRepoName = bundle.getString(Constants.Repository.NAME);
-            mSelectedRef = bundle.getString(Constants.Repository.SELECTED_REF);
-            mSelectBranchTag = bundle.getString(Constants.Repository.SELECTED_BRANCHTAG_NAME);
-        }
+        mRepoOwner = bundle.getString(Constants.Repository.OWNER);
+        mRepoName = bundle.getString(Constants.Repository.NAME);
+        mSelectedRef = bundle.getString(Constants.Repository.SELECTED_REF);
+        mSelectBranchTag = bundle.getString(Constants.Repository.SELECTED_BRANCHTAG_NAME);
         
         mActionBar = getSupportActionBar();
         mActionBar.setTitle(mRepoOwner + "/" + mRepoName);
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
-        if (mRepository == null) {
-            setContentShown(false);
-            setTabsEnabled(false);
-            getSupportLoaderManager().initLoader(LOADER_REPO, null, mRepoCallback);
-        } else {
-            updateTitle();
-        }
+        setContentShown(false);
+        setTabsEnabled(false);
+        getSupportLoaderManager().initLoader(LOADER_REPO, null, mRepoCallback);
 
         getSupportLoaderManager().initLoader(LOADER_WATCHING, null, mWatchCallback);
         getSupportLoaderManager().initLoader(LOADER_STARRING, null, mStarCallback);

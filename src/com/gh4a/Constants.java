@@ -38,7 +38,6 @@ public interface Constants {
     public interface Repository {
         public static final String NAME = "REPO_NAME";
         public static final String OWNER = "REPO_OWNER";
-        public static final String REPOSITORY = "REPO_REPOSITORY";
         public static final String BASE = "BASE";
         public static final String HEAD = "HEAD";
         public static final String SELECTED_REF = "SELECTED_REF";
