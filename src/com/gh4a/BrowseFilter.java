@@ -2,6 +2,8 @@ package com.gh4a;
 
 import java.util.List;
 
+import org.eclipse.egit.github.core.client.IGitHubConstants;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,17 +24,23 @@ public class BrowseFilter extends BaseSherlockFragmentActivity {
         List<String> parts = uri.getPathSegments();
 
         String first = parts.isEmpty() ? null : parts.get(0);
-        if (first == null
+        if (IGitHubConstants.HOST_GISTS.equals(uri.getHost())) {
+            if (parts.size() >= 2) {
+                IntentUtils.openGistActivity(this, parts.get(0), parts.get(1), 0);
+            } else {
+                startActivity(createBrowserIntent(uri));
+            }
+        } else if (first == null
                 || "languages".equals(first)
                 || "training".equals(first)
                 || "login".equals(first)
                 || "contact".equals(first)
-                || "features".equals(first)) {//skip this
-            
-        } else if ("explore".equals(first)) {//https://github.com/explore
+                || "features".equals(first)) {
+            startActivity(createBrowserIntent(uri));
+        } else if ("explore".equals(first)) {
             Intent intent = new Intent(this, ExploreActivity.class);
             startActivity(intent);
-        } else if ("blog".equals(first)) {//https://github.com/blog
+        } else if ("blog".equals(first)) {
             Intent intent = new Intent(this, BlogListActivity.class);
             startActivity(intent);
         } else {
@@ -76,11 +84,21 @@ public class BrowseFilter extends BaseSherlockFragmentActivity {
                 }
             } else if ("commit".equals(action) && !StringUtils.isBlank(id)) {
                 IntentUtils.openCommitInfoActivity(this, user, repo, id, 0);
+            } else if ("commits".equals(action) && !StringUtils.isBlank(id)) {
+                IntentUtils.openRepositoryInfoActivity(this, user, repo, id, 0);
             } else if ("blob".equals(action) && !StringUtils.isBlank(id) && parts.size() >= 5) {
                 String fullPath = TextUtils.join("/", parts.subList(4, parts.size()));
                 IntentUtils.openFileViewerActivity(this, user, repo, id, fullPath, uri.getLastPathSegment());
+            } else {
+                startActivity(createBrowserIntent(uri));
             }
         }
         finish();
+    }
+
+    private Intent createBrowserIntent(Uri uri) {
+        return new Intent(Intent.ACTION_VIEW)
+                .setData(uri)
+                .addCategory(Intent.CATEGORY_BROWSABLE);
     }
 }

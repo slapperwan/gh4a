@@ -178,23 +178,18 @@
                     android:name="android.intent.action.VIEW" />
                 <category
                     android:name="android.intent.category.DEFAULT" />
-                <category
-                    android:name="android.intent.category.BROWSABLE" />
-                <!-- Repo -->
                 <data
                     android:scheme="https"
-                    android:host="github.com"
-                    android:pathPattern="/.*/.*" />
+                    android:host="github.com" />
                 <data
                     android:scheme="https"
-                    android:host="github.com"
-                    android:pathPattern="/.*" />
-                <!-- Repo Issues -->
+                    android:host="gist.github.com" />
                 <data
-                    android:scheme="https"
-                    android:host="github.com"
-                    android:pathPattern="/.*/.*/issues" />
-                    
+                    android:scheme="http"
+                    android:host="github.com" />
+				<data
+                    android:scheme="http"
+                    android:host="gist.github.com" />
             </intent-filter>
         </activity>
         <provider
