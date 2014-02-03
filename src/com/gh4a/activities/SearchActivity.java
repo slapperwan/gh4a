@@ -222,6 +222,7 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
 
         public LoadUserTask(String query) {
             super(SearchActivity.this, 0, R.string.loading_msg);
+            mQuery = query;
         }
 
         @Override
