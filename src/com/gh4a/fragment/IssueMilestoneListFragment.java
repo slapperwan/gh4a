@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,7 +35,7 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
     private String mRepoOwner;
     private String mRepoName;
     private String mState;
-    
+
     public static IssueMilestoneListFragment newInstance(String repoOwner, String repoName, String state) {
         IssueMilestoneListFragment f = new IssueMilestoneListFragment();
 
@@ -44,7 +44,7 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
         args.putString(Constants.Repository.NAME, repoName);
         args.putString(Constants.Milestone.STATE, state);
         f.setArguments(args);
-        
+
         return f;
     }
 
@@ -55,7 +55,7 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
         mRepoName = getArguments().getString(Constants.Repository.NAME);
         mState = getArguments().getString(Constants.Milestone.STATE);
     }
-    
+
     @Override
     protected RootAdapter<Milestone> onCreateAdapter() {
         return new MilestoneAdapter(getActivity());

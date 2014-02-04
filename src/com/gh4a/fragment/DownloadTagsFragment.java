@@ -18,7 +18,7 @@ import com.gh4a.utils.UiUtils;
 public class DownloadTagsFragment extends ListDataBaseFragment<RepositoryTag> {
     private String mRepoOwner;
     private String mRepoName;
-    
+
     public static DownloadTagsFragment newInstance(String repoOwner, String repoName) {
         DownloadTagsFragment f = new DownloadTagsFragment();
         Bundle args = new Bundle();
@@ -27,14 +27,14 @@ public class DownloadTagsFragment extends ListDataBaseFragment<RepositoryTag> {
         f.setArguments(args);
         return f;
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
         mRepoName = getArguments().getString(Constants.Repository.NAME);
     }
-    
+
     @Override
     protected RootAdapter<RepositoryTag> onCreateAdapter() {
         return new SimpleStringAdapter<RepositoryTag>(getActivity()) {

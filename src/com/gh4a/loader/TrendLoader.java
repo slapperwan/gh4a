@@ -22,12 +22,12 @@ import com.gh4a.holder.Trend;
 
 public class TrendLoader extends BaseLoader<List<Trend>> {
     private String mUrl;
-    
+
     public TrendLoader(Context context, String url) {
         super(context);
         mUrl = url;
     }
-    
+
     @Override
     public List<Trend> doLoadInBackground() throws Exception {
         InputStream bis = null;
@@ -37,7 +37,7 @@ public class TrendLoader extends BaseLoader<List<Trend>> {
             HttpResponse response = httpClient.execute(pageGet);
 
             bis = response.getEntity().getContent();
-            
+
             SAXParserFactory factory = SAXParserFactory.newInstance();
             SAXParser parser = factory.newSAXParser();
             TrendHandler handler = new TrendHandler();

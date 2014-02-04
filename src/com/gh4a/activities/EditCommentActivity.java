@@ -33,23 +33,23 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.edit_text);
-        
+
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.OWNER);
         mRepoName = data.getString(Constants.Repository.NAME);
         mCommentId = data.getLong(Constants.Comment.ID);
         mText = data.getString(Constants.Comment.BODY);
-        
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getString(R.string.issue_comment_title) + " " + mCommentId);
         actionBar.setDisplayHomeAsUpEnabled(true);
-        
+
         mEditText = (EditText) findViewById(R.id.et_text);
         mEditText.setText(mText);
-        
+
         setResult(RESULT_CANCELED);
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
@@ -128,7 +128,7 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
         protected Void run() throws Exception {
             IssueService issueService = (IssueService)
                     Gh4Application.get(mContext).getService(Gh4Application.ISSUE_SERVICE);
-            
+
             issueService.deleteComment(new RepositoryId(mRepoOwner, mRepoName), mId);
             return null;
         }

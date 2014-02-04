@@ -11,7 +11,7 @@ import com.gh4a.Gh4Application;
 
 public class GistLoader extends BaseLoader<Gist> {
     private String mGistId;
-    
+
     public GistLoader(Context context, String gistId) {
         super(context);
         mGistId = gistId;

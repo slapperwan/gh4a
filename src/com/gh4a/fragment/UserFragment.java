@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -60,7 +60,7 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
     private User mUser;
     private View mContentView;
 
-    
+
     private LoaderCallbacks<User> mUserCallback = new LoaderCallbacks<User>() {
         @Override
         public Loader<LoaderResult<User>> onCreateLoader(int id, Bundle args) {
@@ -116,10 +116,10 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
         args.putString(Constants.User.LOGIN, login);
         args.putString(Constants.User.NAME, name);
         f.setArguments(args);
-        
+
         return f;
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,7 +133,7 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
         mContentView = inflater.inflate(R.layout.user, null);
         return super.onCreateView(inflater, container, savedInstanceState);
     }
-    
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -167,10 +167,10 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
 
         TextView tvFollowersCount = (TextView) mContentView.findViewById(R.id.tv_followers_count);
         tvFollowersCount.setText(String.valueOf(mUser.getFollowers()));
-        
+
         View llOrgMembers = mContentView.findViewById(R.id.cell_org_members);
         View llFollowers = mContentView.findViewById(R.id.cell_followers);
-        
+
         if (Constants.User.TYPE_USER.equals(mUser.getType())) {
             llFollowers.setOnClickListener(this);
             llOrgMembers.setVisibility(View.GONE);
@@ -178,16 +178,16 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
             llOrgMembers.setOnClickListener(this);
             llFollowers.setVisibility(View.GONE);
         }
-        
+
         mContentView.findViewById(R.id.cell_repos).setOnClickListener(this);
-        
+
         TextView tvReposCount = (TextView) mContentView.findViewById(R.id.tv_repos_count);
         if (mUserLogin.equals(Gh4Application.get(getActivity()).getAuthLogin())) {
-            tvReposCount.setText(String.valueOf(mUser.getTotalPrivateRepos() + mUser.getPublicRepos()));    
+            tvReposCount.setText(String.valueOf(mUser.getTotalPrivateRepos() + mUser.getPublicRepos()));
         } else {
             tvReposCount.setText(String.valueOf(mUser.getPublicRepos()));
         }
-        
+
         //hide gists repos if organization
         fillCountIfUser(R.id.cell_gists, R.id.tv_gists_count, mUser.getPublicGists());
         //hide following if organization
@@ -214,7 +214,7 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
         fillTextView(R.id.tv_website, mUser.getBlog());
         fillTextView(R.id.tv_company, mUser.getCompany());
         fillTextView(R.id.tv_location, mUser.getLocation());
-        
+
         getLoaderManager().initLoader(1, null, mRepoListCallback);
         getLoaderManager().initLoader(2, null, mOrganizationCallback);
     }
@@ -279,10 +279,10 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
 
     public void fillTopRepos(Collection<Repository> topRepos) {
         Gh4Application app = Gh4Application.get(getActivity());
-        
+
         LinearLayout ll = (LinearLayout) mContentView.findViewById(R.id.ll_top_repos);
         ll.removeAllViews();
-        
+
         LayoutInflater inflater = getLayoutInflater(null);
 
         if (topRepos != null) {
@@ -325,7 +325,7 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
             ll.addView(noRepos);
         }
     }
-    
+
     public void fillOrganizations(List<User> organizations) {
         Gh4Application app = Gh4Application.get(getActivity());
         LinearLayout llOrgs = (LinearLayout) mContentView.findViewById(R.id.ll_orgs);
@@ -339,10 +339,10 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
         for (int i = 0; i < count; i++) {
             User org = organizations.get(i);
             View rowView = inflater.inflate(R.layout.selectable_label, null);
-            
+
             rowView.setOnClickListener(this);
             rowView.setTag(org);
-                
+
             TextView tvTitle = (TextView) rowView.findViewById(R.id.tv_title);
             tvTitle.setTypeface(app.boldCondensed);
             tvTitle.setText(org.getLogin());

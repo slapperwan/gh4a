@@ -15,7 +15,7 @@ public class IssueCommentsLoader extends BaseLoader<List<Comment>> {
     private String mRepoOwner;
     private String mRepoName;
     private int mIssueNumber;
-    
+
     public IssueCommentsLoader(Context context, String repoOwner, String repoName, int issueNumber) {
         super(context);
         mRepoOwner = repoOwner;

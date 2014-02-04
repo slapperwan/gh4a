@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,12 +34,12 @@ import com.gh4a.utils.IntentUtils;
 
 public class CommonFeedAdapter extends RootAdapter<Feed> implements OnClickListener {
     private boolean mShowExtra;
-    
+
     public CommonFeedAdapter(Context context, boolean showExtra) {
         super(context);
         mShowExtra = showExtra;
     }
-    
+
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_gravatar_3, parent, false);
@@ -64,11 +64,11 @@ public class CommonFeedAdapter extends RootAdapter<Feed> implements OnClickListe
         v.setTag(viewHolder);
         return v;
     }
-    
+
     @Override
     protected void bindView(View v, Feed feed) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
-        
+
         String title = feed.getTitle();
         viewHolder.tvTitle.setText(title);
         viewHolder.tvTitle.setVisibility(title != null ? View.VISIBLE : View.GONE);
@@ -80,7 +80,7 @@ public class CommonFeedAdapter extends RootAdapter<Feed> implements OnClickListe
             GravatarHandler.assignGravatar(viewHolder.ivGravatar, feed.getGravatarId());
             viewHolder.ivGravatar.setTag(feed);
             viewHolder.ivGravatar.setVisibility(View.VISIBLE);
-            
+
             String published = feed.getPublished() != null
                     ? DateFormat.getMediumDateFormat(mContext).format(feed.getPublished()) : "";
             viewHolder.tvExtra.setText(mContext.getString(R.string.feed_extradata,

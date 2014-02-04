@@ -12,15 +12,15 @@ public class LoaderResult<T> {
     LoaderResult(T data) {
         mData = data;
     }
-    
+
     LoaderResult(Exception e) {
         mException = e;
     }
-    
+
     public T getData() {
         return mData;
     }
-    
+
     public boolean isSuccess() {
         return mException == null;
     }
@@ -40,7 +40,7 @@ public class LoaderResult<T> {
     public String getErrorMessage() {
         return mException != null ? mException.getMessage() : null;
     }
-    
+
     public boolean handleError(Context context) {
         if (isSuccess()) {
             return false;

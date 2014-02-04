@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,7 +35,7 @@ public class BlogActivity extends BaseSherlockFragmentActivity {
         @Override
         public void onPageFinished(WebView webView, String url) {
         }
-        
+
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -50,18 +50,18 @@ public class BlogActivity extends BaseSherlockFragmentActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.web_viewer);
-        
+
         mTitle = getIntent().getStringExtra(Constants.Blog.TITLE);
         mContent = getIntent().getStringExtra(Constants.Blog.CONTENT);
-        
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(mTitle);
         actionBar.setSubtitle(R.string.blog);
         actionBar.setDisplayHomeAsUpEnabled(false);
-        
+
         fillData();
     }
-    
+
     @Override
     protected void navigateUp() {
         Intent intent = new Intent(this, BlogListActivity.class);

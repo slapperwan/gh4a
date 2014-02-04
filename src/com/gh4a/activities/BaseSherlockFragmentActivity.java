@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -70,9 +70,9 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
             MenuInflater inflater = getSupportMenuInflater();
             inflater.inflate(R.menu.anon_menu, menu);
         }
-        return true;        
+        return true;
     }
-    
+
     /* (non-Javadoc)
      * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
      */
@@ -118,10 +118,10 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         Dialog dialog = new Dialog(this);
 
         dialog.setContentView(R.layout.about_dialog);
-        
+
         TextView tvCopyright = (TextView) dialog.findViewById(R.id.copyright);
         tvCopyright.setText("Copyright " + Calendar.getInstance().get(Calendar.YEAR) + " Azwan Adli");
-        
+
         try {
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             String versionName = packageInfo.versionName;
@@ -129,7 +129,7 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         }  catch (PackageManager.NameNotFoundException e) {
             dialog.setTitle(getResources().getString(R.string.app_name));
         }
-        
+
         dialog.findViewById(R.id.btn_by_email).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -139,7 +139,7 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
                 startActivity(Intent.createChooser(sendIntent, getString(R.string.send_email_title)));
             }
         });
-        
+
         dialog.findViewById(R.id.btn_by_gh4a).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -154,31 +154,31 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
                 }
             }
         });
-        
+
         dialog.show();
     }
 
     public ProgressDialog showProgressDialog(String message, boolean cancelable) {
         return ProgressDialog.show(this, "", message, cancelable);
     }
-    
+
     public void stopProgressDialog(ProgressDialog progressDialog) {
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
     }
-    
+
     protected boolean isOnline() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = cm.getActiveNetworkInfo();
         return info != null && info.isAvailable() && info.isConnected();
     }
-    
+
     public void setErrorView() {
         mHasErrorView = true;
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.error);
-        
+
         findViewById(R.id.btn_home).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

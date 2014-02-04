@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -65,12 +65,12 @@ public class GistListActivity extends LoadingFragmentActivity implements OnItemC
         super.onCreate(savedInstanceState);
 
         mUserLogin = getIntent().getExtras().getString(Constants.User.LOGIN);
-        
+
         if (!isOnline()) {
             setErrorView();
             return;
         }
-        
+
         setContentView(R.layout.generic_list);
         setContentShown(false);
 
@@ -81,7 +81,7 @@ public class GistListActivity extends LoadingFragmentActivity implements OnItemC
 
         getSupportLoaderManager().initLoader(0, null, mGistsCallback);
     }
-    
+
     private void fillData(List<Gist> gists) {
         ListView listView = (ListView) findViewById(R.id.list_view);
         listView.setOnItemClickListener(this);
@@ -100,7 +100,7 @@ public class GistListActivity extends LoadingFragmentActivity implements OnItemC
         Gist gist = (Gist) adapterView.getAdapter().getItem(position);
         IntentUtils.openGistActivity(this, mUserLogin, gist.getId(), 0);
     }
-    
+
     @Override
     protected void navigateUp() {
         IntentUtils.openUserInfoActivity(this, mUserLogin, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);

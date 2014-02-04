@@ -13,13 +13,13 @@ import com.gh4a.Constants;
 public class PageIteratorLoader<T> extends AsyncTaskLoader<Collection<T>> {
 
     private PageIterator<T> mPageIterator;
-    
+
     public PageIteratorLoader(Context context, PageIterator<T> pageIterator) {
         super(context);
         mPageIterator = pageIterator;
         onContentChanged();
     }
-    
+
     @Override
     public Collection<T> loadInBackground() {
         if (mPageIterator.hasNext()) {
@@ -31,7 +31,7 @@ public class PageIteratorLoader<T> extends AsyncTaskLoader<Collection<T>> {
         }
         return null;
     }
-    
+
     @Override
     protected void onStartLoading() {
         if (takeContentChanged()) {

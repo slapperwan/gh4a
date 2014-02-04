@@ -13,13 +13,13 @@ public class RepositoryLoader extends BaseLoader<Repository> {
 
     private String mRepoOwner;
     private String mRepoName;
-    
+
     public RepositoryLoader(Context context, String repoOwner, String repoName) {
         super(context);
         this.mRepoOwner = repoOwner;
         this.mRepoName = repoName;
     }
-    
+
     @Override
     public Repository doLoadInBackground() throws IOException {
         RepositoryService repoService = (RepositoryService)

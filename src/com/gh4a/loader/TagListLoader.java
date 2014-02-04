@@ -16,13 +16,13 @@ public class TagListLoader extends BaseLoader<List<RepositoryTag>> {
 
     private String mRepoOwner;
     private String mRepoName;
-    
+
     public TagListLoader(Context context, String repoOwner, String repoName) {
         super(context);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
     }
-    
+
     @Override
     public List<RepositoryTag> doLoadInBackground() throws IOException {
         RepositoryService repoService = (RepositoryService)

@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,7 +34,7 @@ public class SimpleStringAdapter<T> extends RootAdapter<T> {
     protected View createView(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_simple, null);
         ViewHolder viewHolder = new ViewHolder();
-            
+
         Gh4Application app = (Gh4Application) mContext.getApplicationContext();
         Typeface boldCondensed = app.boldCondensed;
 
@@ -42,7 +42,7 @@ public class SimpleStringAdapter<T> extends RootAdapter<T> {
         viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
         viewHolder.tvTitle.setTypeface(boldCondensed);
         v.setTag(viewHolder);
-        
+
         return v;
     }
 

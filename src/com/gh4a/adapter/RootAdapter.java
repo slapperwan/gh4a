@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,7 +30,7 @@ import android.widget.Filterable;
 
 /**
  * The Root adapter.
- * 
+ *
  * @param <T> the generic type
  */
 public abstract class RootAdapter<T> extends BaseAdapter implements Filterable {
@@ -71,7 +71,7 @@ public abstract class RootAdapter<T> extends BaseAdapter implements Filterable {
 
     /**
      * Instantiates a new root adapter.
-     * 
+     *
      * @param context the context
      * @param objects the objects
      */
@@ -119,27 +119,27 @@ public abstract class RootAdapter<T> extends BaseAdapter implements Filterable {
             convertView = createView(LayoutInflater.from(mContext), parent);
         }
         bindView(convertView, getItem(position));
-        
+
         return convertView;
     }
 
     /**
      * Adds the object.
-     * 
+     *
      * @param object the object
      */
     public void add(T object) {
         mUnfilteredObjects.add(object);
         mObjects.add(object);
     }
-    
+
     public void addAll(Collection<T> objects) {
         if (objects != null) {
             mUnfilteredObjects.addAll(objects);
             mObjects.addAll(objects);
         }
     }
-    
+
     public void remove(T object) {
         mUnfilteredObjects.remove(object);
         mObjects.remove(object);
@@ -149,7 +149,7 @@ public abstract class RootAdapter<T> extends BaseAdapter implements Filterable {
         mUnfilteredObjects.clear();
         mObjects.clear();
     }
-    
+
     protected boolean isFiltered(CharSequence filter, T object) {
         return true;
     }

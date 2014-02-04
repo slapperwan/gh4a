@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,12 +34,12 @@ import com.gh4a.utils.StringUtils;
 
 public class UserAdapter extends RootAdapter<User> implements OnClickListener {
     private boolean mShowExtraData;
-    
+
     public UserAdapter(Context context, boolean showExtraData) {
         super(context);
         mShowExtraData = showExtraData;
     }
-    
+
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_gravatar_1, parent, false);
@@ -62,14 +62,14 @@ public class UserAdapter extends RootAdapter<User> implements OnClickListener {
         v.setTag(viewHolder);
         return v;
     }
-    
+
     @Override
     protected void bindView(View v, User user) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
 
         GravatarHandler.assignGravatar(viewHolder.ivGravatar, user);
         viewHolder.ivGravatar.setTag(user);
-                
+
         viewHolder.tvTitle.setText(StringUtils.formatName(user.getLogin(), user.getName()));
         viewHolder.tvExtra.setVisibility(mShowExtraData ? View.VISIBLE : View.GONE);
         if (mShowExtraData) {

@@ -16,13 +16,13 @@ public class BranchListLoader extends BaseLoader<List<RepositoryBranch>> {
 
     private String mRepoOwner;
     private String mRepoName;
-    
+
     public BranchListLoader(Context context, String repoOwner, String repoName) {
         super(context);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
     }
-    
+
     @Override
     public List<RepositoryBranch> doLoadInBackground() throws IOException {
         RepositoryService repoService = (RepositoryService)

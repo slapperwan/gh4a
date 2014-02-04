@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -96,7 +96,7 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
     private class LoginTask extends ProgressDialogTask<Authorization> {
         private String mUserName;
         private String mPassword;
-        
+
         /**
          * Instantiates a new load repository list task.
          */
@@ -109,9 +109,9 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
         @Override
         protected Authorization run() throws IOException {
             GitHubClient client = new GitHubClient();
-            client.setCredentials(mUserName, mPassword); 
+            client.setCredentials(mUserName, mPassword);
             client.setUserAgent("Gh4a");
-                    
+
             Authorization auth = null;
             OAuthService authService = new OAuthService(client);
             List<Authorization> auths = authService.getAuthorizations();
@@ -121,7 +121,7 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
                     break;
                 }
             }
-                    
+
             if (auth == null) {
                 auth = new Authorization();
                 auth.setNote("Gh4a");
@@ -145,7 +145,7 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
             editor.putString(Constants.User.AUTH_TOKEN, result.getToken());
             editor.putString(Constants.User.LOGIN, mUserName);
             editor.commit();
-            
+
             IntentUtils.openUserInfoActivity(mContext, mUserName,
                     null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
             finish();

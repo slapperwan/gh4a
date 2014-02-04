@@ -16,7 +16,7 @@ public class RepositoryCommitsLoader extends BaseLoader<List<RepositoryCommit>> 
     private String mRepoOwner;
     private String mRepoName;
     private int mPullRequestNumber;
-    
+
     public RepositoryCommitsLoader(Context context, String repoOwner, String repoName, int pullRequestNumber) {
         super(context);
         mRepoOwner = repoOwner;

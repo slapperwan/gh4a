@@ -174,7 +174,7 @@
     <string name="event_commit_comment_desc">Comment in %1$s - %2$s</string>
     <string name="event_push_desc">%1$d more commits...</string>
     <string name="event_pull_request_review_comment_desc">Comment on %1$s in pull request %2$d</string>
-    
+
     <!-- User -->
     <plurals name="user">
         <item quantity="one">User</item>
@@ -383,20 +383,20 @@
     <string name="issue_comment_body">Body</string>
     <string name="issue_comment_updated_at">Updated at</string>
     <string name="issue_comment_user">User</string>
-	<string name="issue_comment_hint">Comment on this issue</string>
+    <string name="issue_comment_hint">Comment on this issue</string>
 
     <!-- Pull Request -->
     <string name="pull_request_title">Pull Request</string>
     <string name="pull_request_comments">Discussion</string>
     <string name="pull_requests">Pull Requests</string>
-	<string name="pull_request_comment_hint">Comment on this pull request</string>
+    <string name="pull_request_comment_hint">Comment on this pull request</string>
     <string name="view_pull_request">View pull request</string>
 
     <!-- Object -->
     <string name="object_tree">Tree</string>
     <string name="object_view_file_at">View file @ %1$s</string>
     <string name="object_view_history">History</string>
-    
+
     <!-- Gist -->
     <plurals name="gist">
         <item quantity="one">Gist</item>
@@ -409,22 +409,22 @@
 
     <!-- Explore -->
     <string name="explore">Explore</string>
-    
+
     <!-- Trending repos -->
     <string name="trend">Trending Repos</string>
     <string name="trend_today">Today</string>
     <string name="trend_week">Week</string>
     <string name="trend_month">Month</string>
-    
+
     <!-- GitHub Blog -->
     <string name="blog">GitHub Blog</string>
-    
+
     <!-- Recent Wiki Updates -->
     <string name="recent_wiki">Wiki</string>
-    
+
     <!-- GitHub Jobs -->
     <string name="jobs">GitHub Jobs</string>
-    
+
     <!-- Bookmarks -->
     <string name="remove_bookmark">Remove bookmark</string>
     <string name="remove_bookmark_confirm">Do you really want to remove this bookmark?</string>

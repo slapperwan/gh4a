@@ -71,7 +71,7 @@ public class UserActivity extends LoadingFragmentPagerActivity {
         mUserLogin = data.getString(Constants.User.LOGIN);
         mUserName = data.getString(Constants.User.NAME);
         mIsLoginUserPage = mUserLogin.equals(Gh4Application.get(this).getAuthLogin());
-        
+
         super.onCreate(savedInstanceState);
         if (hasErrorView()) {
             return;
@@ -87,7 +87,7 @@ public class UserActivity extends LoadingFragmentPagerActivity {
             getSupportLoaderManager().initLoader(4, null, mIsFollowingCallback);
         }
     }
-    
+
     @Override
     protected int[] getTabTitleResIds() {
         return mIsLoginUserPage ? TITLES_SELF : TITLES_OTHER;
@@ -100,7 +100,7 @@ public class UserActivity extends LoadingFragmentPagerActivity {
                 mUserFragment = UserFragment.newInstance(mUserLogin, mUserName);
                 return mUserFragment;
             case 1:
-                mPrivateEventListFragment = 
+                mPrivateEventListFragment =
                         PrivateEventListFragment.newInstance(mUserLogin, mIsLoginUserPage);
                 return mPrivateEventListFragment;
             case 2:
@@ -215,7 +215,7 @@ public class UserActivity extends LoadingFragmentPagerActivity {
         }
         return result;
     }
-    
+
     @SuppressLint("NewApi")
     private void saveTheme(int theme) {
         SharedPreferences sharedPreferences = getSharedPreferences(
@@ -223,10 +223,10 @@ public class UserActivity extends LoadingFragmentPagerActivity {
         Editor editor = sharedPreferences.edit();
         editor.putInt("THEME", theme);
         editor.commit();
-        
+
         recreate();
     }
-    
+
     @Override
     public void recreate() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
@@ -242,7 +242,7 @@ public class UserActivity extends LoadingFragmentPagerActivity {
             overridePendingTransition(0, 0);
         }
     }
-    
+
     private class UpdateFollowTask extends BackgroundTask<Void> {
         public UpdateFollowTask() {
             super(UserActivity.this);

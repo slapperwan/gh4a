@@ -17,7 +17,7 @@ import com.gh4a.Constants;
 public class FileUtils {
 
     static List<String> imageExts = new ArrayList<String>();
-    
+
     static {
         imageExts.add("png");
         imageExts.add("gif");
@@ -32,7 +32,7 @@ public class FileUtils {
             out = new FileOutputStream(file);
             int read = 0;
             byte[] bytes = new byte[1024];
-         
+
             while ((read = inputStream.read(bytes)) != -1) {
                 out.write(bytes, 0, read);
             }
@@ -59,7 +59,7 @@ public class FileUtils {
             }
         }
     }
-    
+
     public static String getFileExtension(String filename) {
         int mid = filename.lastIndexOf(".");
         if (mid == -1) {
@@ -68,7 +68,7 @@ public class FileUtils {
 
         return filename.substring(mid + 1, filename.length());
     }
-    
+
     public static String getFileName(String path) {
         if (StringUtils.isBlank(path)) {
             return "";
@@ -79,7 +79,7 @@ public class FileUtils {
         }
         return path.substring(mid + 1, path.length());
     }
-    
+
     public static boolean isImage(String filename) {
         if (StringUtils.isBlank(filename)) {
             return false;

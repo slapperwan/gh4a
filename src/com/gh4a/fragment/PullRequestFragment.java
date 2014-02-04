@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -89,10 +89,10 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         args.putString(Constants.Repository.NAME, repoName);
         args.putInt(Constants.Issue.NUMBER, pullRequestNumber);
         f.setArguments(args);
-        
+
         return f;
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,13 +100,13 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         mRepoName = getArguments().getString(Constants.Repository.NAME);
         mPullRequestNumber = getArguments().getInt(Constants.Issue.NUMBER);
     }
-    
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View listContent = super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.pull_request, container, false);
-        
+
         FrameLayout listContainer = (FrameLayout) v.findViewById(R.id.list_container);
         listContainer.addView(listContent);
 
@@ -117,7 +117,7 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
 
         return v;
     }
-    
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         mHeader = (LinearLayout) getLayoutInflater(savedInstanceState).inflate(
@@ -131,7 +131,7 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         });
 
         super.onActivityCreated(savedInstanceState);
-        
+
         getLoaderManager().initLoader(1, null, mPullRequestCallback);
     }
 
@@ -154,7 +154,7 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         gravatar.setOnClickListener(this);
         gravatar.setTag(user);
         GravatarHandler.assignGravatar(gravatar, user);
-        
+
         TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
         tvCommentTitle.setText(getString(R.string.issue_comments) + " (" + pullRequest.getComments() + ")");
 
@@ -171,11 +171,11 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
         tvExtra.setText(user.getLogin() + "\n"
                 + StringUtils.formatRelativeTime(getActivity(), pullRequest.getCreatedAt(), true));
-        
+
         TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
         tvTitle.setText(pullRequest.getTitle());
         tvTitle.setTypeface(app.boldCondensed);
-        
+
         TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
         String body = pullRequest.getBodyHtml();
         tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
@@ -184,10 +184,10 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
             body = HtmlUtils.format(body).toString();
             imageGetter.bind(tvDesc, body, pullRequest.getId());
         }
-        
+
         v.findViewById(R.id.iv_comment).setOnClickListener(this);
     }
-    
+
 
     @Override
     public void onClick(View v) {
@@ -225,7 +225,7 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
     @Override
     public void editComment(Comment comment) {
         Intent intent = new Intent(getActivity(), EditCommentActivity.class);
-        
+
         intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.NAME, mRepoName);
         intent.putExtra(Constants.Comment.ID, comment.getId());
@@ -254,7 +254,7 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
             ToastUtils.showMessage(mContext, R.string.issue_success_comment);
             //reload comments
             refresh();
-            
+
             EditText etComment = (EditText) getView().findViewById(R.id.et_comment);
             etComment.setText(null);
             etComment.clearFocus();

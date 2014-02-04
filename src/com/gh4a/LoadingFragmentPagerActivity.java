@@ -91,14 +91,14 @@ public abstract class LoadingFragmentPagerActivity extends LoadingFragmentActivi
         public Fragment getItem(int position) {
             return getFragment(position);
         }
-        
+
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
             if (fragmentNeedsRefresh((Fragment) object)) {
                 super.destroyItem(container, position, object);
             }
         }
-        
+
         @Override
         public int getItemPosition(Object object) {
             if (object instanceof Fragment && fragmentNeedsRefresh((Fragment) object)) {

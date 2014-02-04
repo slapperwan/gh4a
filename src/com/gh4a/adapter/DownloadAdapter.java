@@ -43,7 +43,7 @@ public class DownloadAdapter extends RootAdapter<Download> {
         v.setTag(viewHolder);
         return v;
     }
-    
+
     @Override
     protected void bindView(View v, Download download) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();

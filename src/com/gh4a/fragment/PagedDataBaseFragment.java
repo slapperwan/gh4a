@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,16 +50,16 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
         View v = super.onCreateView(inflater, container, savedInstanceState);
         return v;
     }
-    
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        
+
         LayoutInflater vi = getActivity().getLayoutInflater();
         mLoadingView = (TextView) vi.inflate(R.layout.row_simple, null);
         mLoadingView.setText(R.string.loading_msg);
         mLoadingView.setTextColor(getResources().getColor(R.color.highlight));
-        
+
         mAdapter = onCreateAdapter();
 
         getListView().setOnScrollListener(this);
@@ -67,7 +67,7 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
         setEmptyText(getString(getEmptyTextResId()));
         setListAdapter(mAdapter);
         setListShown(false);
-        
+
         getLoaderManager().initLoader(0, null, this);
     }
 
@@ -83,7 +83,7 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
         setListShown(false);
         getLoaderManager().restartLoader(0, null, this);
     }
-    
+
     private void fillData(Collection<T> data) {
         ListView listView = getListView();
         if (data == null || data.isEmpty()) {
@@ -107,7 +107,7 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
 
     @Override
     public Loader<Collection<T>> onCreateLoader(int id, Bundle args) {
-        return new PageIteratorLoader<T>(getActivity(), onCreateIterator()); 
+        return new PageIteratorLoader<T>(getActivity(), onCreateIterator());
     }
 
     @Override
@@ -125,7 +125,7 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
     @Override
     public void onLoaderReset(Loader<Collection<T>> loader) {
     }
-    
+
     @Override
     public void onScroll(AbsListView view, int firstVisible, int visibleCount, int totalCount) {
         boolean loadMore = firstVisible + visibleCount >= totalCount;
@@ -136,11 +136,11 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
             getLoaderManager().getLoader(0).forceLoad();
         }
     }
-    
+
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
     }
-    
+
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
         onItemClick(mAdapter.getItem(position));

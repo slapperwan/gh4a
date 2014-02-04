@@ -17,7 +17,7 @@ public class ContentLoader extends BaseLoader<List<RepositoryContents>> {
     private String mRepoName;
     private String mPath;
     private String mRef;
-    
+
     public ContentLoader(Context context, String repoOwner, String repoName, String path, String ref) {
         super(context);
         mRepoOwner = repoOwner;
@@ -25,7 +25,7 @@ public class ContentLoader extends BaseLoader<List<RepositoryContents>> {
         mPath = path;
         mRef = ref;
     }
-    
+
     @Override
     public List<RepositoryContents> doLoadInBackground() throws IOException {
         ContentsService contentService = (ContentsService)

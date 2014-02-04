@@ -29,7 +29,7 @@ public abstract class ListDataBaseFragment<T> extends ListFragment implements
 
         setListAdapter(mAdapter);
         setListShown(false);
-        
+
         getLoaderManager().initLoader(0, null, this);
     }
 

@@ -11,12 +11,12 @@ import com.gh4a.Gh4Application;
 public class IsFollowingUserLoader extends BaseLoader<Boolean> {
 
     private String mLogin;
-    
+
     public IsFollowingUserLoader(Context context, String login) {
         super(context);
         this.mLogin = login;
     }
-    
+
     @Override
     public Boolean doLoadInBackground() throws IOException {
         UserService userService = (UserService)

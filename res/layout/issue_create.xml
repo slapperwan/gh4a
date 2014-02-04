@@ -63,7 +63,7 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@color/highlight"
                     android:text="@string/issue_label_add" />
-                <View 
+                <View
                     android:layout_width="fill_parent"
                     android:layout_height="1dp"
                     android:background="#ff0099cc" />

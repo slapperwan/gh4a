@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,7 +35,7 @@ import com.github.mobile.util.HttpImageGetter;
 
 public class CommitNoteAdapter extends RootAdapter<CommitComment> implements OnClickListener {
     private HttpImageGetter mImageGetter;
-    
+
     public CommitNoteAdapter(Context context) {
         super(context);
         mImageGetter = new HttpImageGetter(context);
@@ -45,7 +45,7 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements OnC
     protected View createView(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_gravatar_comment, null);
         ViewHolder viewHolder = new ViewHolder();
-        
+
         viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
         viewHolder.ivGravatar.setOnClickListener(this);
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
@@ -53,11 +53,11 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements OnC
         viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
         viewHolder.ivEdit = (ImageView) v.findViewById(R.id.iv_edit);
         viewHolder.ivEdit.setVisibility(View.GONE);
-        
+
         v.setTag(viewHolder);
         return v;
     }
-    
+
     @Override
     protected void bindView(View v, CommitComment comment) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
@@ -84,7 +84,7 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements OnC
     public boolean isEnabled(int position) {
         return false;
     }
-    
+
     private static class ViewHolder {
         public ImageView ivGravatar;
         public TextView tvDesc;

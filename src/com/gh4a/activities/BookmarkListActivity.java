@@ -30,7 +30,7 @@ public class BookmarkListActivity extends LoadingFragmentActivity implements
 
     private ListView mListView;
     private BookmarkAdapter mAdapter;
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
@@ -51,7 +51,7 @@ public class BookmarkListActivity extends LoadingFragmentActivity implements
 
         getSupportLoaderManager().initLoader(0, null, this);
     }
-    
+
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Cursor cursor = (Cursor) mAdapter.getItem(position);

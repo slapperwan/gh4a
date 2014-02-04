@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -49,20 +49,20 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
     private String mRepoOwner;
     private String mRepoName;
     private Date mDueOn;
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
-        
+
         mRepoOwner = getIntent().getExtras().getString(Constants.Repository.OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);
-        
+
         if (!isOnline()) {
             setErrorView();
             return;
         }
-        
+
         if (!Gh4Application.get(this).isAuthorized()) {
             Intent intent = new Intent(this, Github4AndroidActivity.class);
             startActivity(intent);
@@ -77,12 +77,12 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
-    
+
     private class AddIssueMilestonesTask extends ProgressDialogTask<Void> {
         private String mTitle;
         private String mDesc;
         private Date mDueOn;
-        
+
         public AddIssueMilestonesTask(String title, String desc, Date dueOn) {
             super(IssueMilestoneCreateActivity.this, 0, R.string.saving_msg);
             mTitle = title;
@@ -94,12 +94,12 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
         protected Void run() throws IOException {
             MilestoneService milestoneService = (MilestoneService)
                     Gh4Application.get(mContext).getService(Gh4Application.MILESTONE_SERVICE);
-                    
+
             Milestone milestone = new Milestone();
             milestone.setTitle(mTitle);
             milestone.setDescription(mDesc);
             milestone.setDueOn(mDueOn);
-                    
+
             milestoneService.createMilestone(mRepoOwner, mRepoName, milestone);
             return null;
         }
@@ -112,14 +112,14 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
         @Override
         protected void onError(Exception e) {
             ToastUtils.showMessage(mContext, R.string.issue_error_create_milestone);
-        }    
+        }
     }
-    
+
     public void showDatePickerDialog(View v) {
         DialogFragment newFragment = new DatePickerFragment();
         newFragment.show(getSupportFragmentManager(), "datePicker");
     }
-    
+
     public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -127,16 +127,16 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
             int year = c.get(Calendar.YEAR);
             int month = c.get(Calendar.MONTH);
             int day = c.get(Calendar.DAY_OF_MONTH);
-            
+
             return new DatePickerDialog(getActivity(), this, year, month, day);
         }
-        
+
         public void onDateSet(DatePicker view, int year, int month, int day) {
             IssueMilestoneCreateActivity activity = (IssueMilestoneCreateActivity) getActivity();
             activity.setDueOn(year, month, day);
         }
     }
-    
+
     private void setDueOn(int year, int month, int day) {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.DAY_OF_MONTH, day);
@@ -145,13 +145,13 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
-        
+
         mDueOn = cal.getTime();
-        
+
         EditText etDueDate = (EditText) findViewById(R.id.et_due_date);
         etDueDate.setText(DateFormat.getMediumDateFormat(this).format(mDueOn));
     }
-    
+
     private void openIssueMilestones() {
         Intent intent = new Intent(this, IssueMilestoneListActivity.class);
         intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
@@ -159,7 +159,7 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
@@ -182,7 +182,7 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
 
             String desc = null;
             if (tvDesc.getText() != null) {
-                desc = tvDesc.getText().toString();    
+                desc = tvDesc.getText().toString();
             }
             if (tvTitle.getText() == null || StringUtils.isBlank(tvTitle.getText().toString())) {
                 ToastUtils.showMessage(this, R.string.issue_error_milestone_title);

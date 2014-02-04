@@ -13,7 +13,7 @@ public class PrivateEventListFragment extends EventListFragment {
         args.putString(Constants.User.LOGIN, login);
         args.putBoolean("private", isPrivate);
         f.setArguments(args);
-        
+
         return f;
     }
 
@@ -21,10 +21,10 @@ public class PrivateEventListFragment extends EventListFragment {
     public int getMenuGroupId() {
         return 1;
     }
-    
+
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        if (item.getGroupId() == 1) { 
+        if (item.getGroupId() == 1) {
             open(item);
             return true;
         }

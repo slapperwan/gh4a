@@ -30,7 +30,7 @@ public abstract class BaseLoader<T> extends AsyncTaskLoader<LoaderResult<T>> {
             return new LoaderResult<T>(e);
         }
     }
-    
+
     @Override
     protected void onStartLoading() {
         if (takeContentChanged()) {

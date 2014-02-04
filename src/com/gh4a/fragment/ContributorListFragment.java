@@ -18,7 +18,7 @@ import com.gh4a.utils.IntentUtils;
 public class ContributorListFragment extends ListDataBaseFragment<Contributor> {
     public static ContributorListFragment newInstance(String repoOwner, String repoName) {
         ContributorListFragment f = new ContributorListFragment();
-        
+
         Bundle args = new Bundle();
         args.putString(Constants.Repository.OWNER, repoOwner);
         args.putString(Constants.Repository.NAME, repoName);

@@ -25,7 +25,7 @@ public class FeedLoader extends BaseLoader<List<Feed>> {
             return true;
         }
     };
-    
+
     public FeedLoader(Context context, String url) {
         super(context);
         mUrl = url;

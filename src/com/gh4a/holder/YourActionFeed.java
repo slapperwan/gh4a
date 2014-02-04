@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,36 +22,36 @@ public class YourActionFeed {
 
     /** The id. */
     private String id;
-    
+
     /** The title. */
     private String title;
-    
+
     /** The published. */
     private String published;
-    
+
     /** The link. */
     private String link;
-    
+
     /** The author. */
     private String author;
-    
+
     /** The content. */
     private String content;
-    
+
     /** The gravatar id. */
     private String gravatarId;
-    
+
     /** The repo o wner. */
     private String repoOWner;
-    
+
     /** The repo name. */
     private String repoName;
-    
+
     /** The action path. */
     private String actionPath;
-    
+
     private String event;
-    
+
     private String email;
     /**
      * Gets the id.
@@ -61,7 +61,7 @@ public class YourActionFeed {
     public String getId() {
         return id;
     }
-    
+
     /**
      * Sets the id.
      *
@@ -70,7 +70,7 @@ public class YourActionFeed {
     public void setId(String id) {
         this.id = id;
     }
-    
+
     /**
      * Gets the title.
      *
@@ -79,7 +79,7 @@ public class YourActionFeed {
     public String getTitle() {
         return title;
     }
-    
+
     /**
      * Sets the title.
      *
@@ -88,7 +88,7 @@ public class YourActionFeed {
     public void setTitle(String title) {
         this.title = title;
     }
-    
+
     /**
      * Gets the published.
      *
@@ -97,7 +97,7 @@ public class YourActionFeed {
     public String getPublished() {
         return published;
     }
-    
+
     /**
      * Sets the published.
      *
@@ -106,7 +106,7 @@ public class YourActionFeed {
     public void setPublished(String published) {
         this.published = published;
     }
-    
+
     /**
      * Gets the link.
      *
@@ -115,7 +115,7 @@ public class YourActionFeed {
     public String getLink() {
         return link;
     }
-    
+
     /**
      * Sets the link.
      *
@@ -124,7 +124,7 @@ public class YourActionFeed {
     public void setLink(String link) {
         this.link = link;
     }
-    
+
     /**
      * Gets the author.
      *
@@ -133,7 +133,7 @@ public class YourActionFeed {
     public String getAuthor() {
         return author;
     }
-    
+
     /**
      * Sets the author.
      *
@@ -142,7 +142,7 @@ public class YourActionFeed {
     public void setAuthor(String author) {
         this.author = author;
     }
-    
+
     /**
      * Gets the content.
      *
@@ -151,7 +151,7 @@ public class YourActionFeed {
     public String getContent() {
         return content;
     }
-    
+
     /**
      * Sets the content.
      *
@@ -160,7 +160,7 @@ public class YourActionFeed {
     public void setContent(String content) {
         this.content = content;
     }
-    
+
     /**
      * Gets the gravatar id.
      *
@@ -169,7 +169,7 @@ public class YourActionFeed {
     public String getGravatarId() {
         return gravatarId;
     }
-    
+
     /**
      * Sets the gravatar id.
      *
@@ -178,7 +178,7 @@ public class YourActionFeed {
     public void setGravatarId(String gravatarId) {
         this.gravatarId = gravatarId;
     }
-    
+
     /**
      * Gets the repo o wner.
      *
@@ -187,7 +187,7 @@ public class YourActionFeed {
     public String getRepoOWner() {
         return repoOWner;
     }
-    
+
     /**
      * Sets the repo o wner.
      *
@@ -196,7 +196,7 @@ public class YourActionFeed {
     public void setRepoOWner(String repoOWner) {
         this.repoOWner = repoOWner;
     }
-    
+
     /**
      * Gets the repo name.
      *
@@ -205,7 +205,7 @@ public class YourActionFeed {
     public String getRepoName() {
         return repoName;
     }
-    
+
     /**
      * Sets the repo name.
      *
@@ -214,7 +214,7 @@ public class YourActionFeed {
     public void setRepoName(String repoName) {
         this.repoName = repoName;
     }
-    
+
     /**
      * Gets the action path.
      *
@@ -223,7 +223,7 @@ public class YourActionFeed {
     public String getActionPath() {
         return actionPath;
     }
-    
+
     /**
      * Sets the action path.
      *

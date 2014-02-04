@@ -15,13 +15,13 @@ public class ContributorListLoader extends BaseLoader<List<Contributor>> {
 
     private String mRepoOwner;
     private String mRepoName;
-    
+
     public ContributorListLoader(Context context, String repoOwner, String repoName) {
         super(context);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
     }
-    
+
     @Override
     public List<Contributor> doLoadInBackground() throws IOException {
         RepositoryService repoService = (RepositoryService)

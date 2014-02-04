@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -100,15 +100,15 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
-        
+
         mRepoOwner = getIntent().getExtras().getString(Constants.Repository.OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);
-        
+
         if (!isOnline()) {
             setErrorView();
             return;
         }
-        
+
         setContentView(R.layout.issue_label_list);
         setContentShown(false);
 
@@ -120,7 +120,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
         actionBar.setTitle(R.string.issue_manage_labels);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
-        
+
         getSupportLoaderManager().initLoader(0, null, mLabelCallback);
     }
 
@@ -177,7 +177,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
             itemContainer.findViewById(R.id.collapsed).setVisibility(View.GONE);
             itemContainer.findViewById(R.id.expanded).setVisibility(View.VISIBLE);
         }
-        
+
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.save)
@@ -189,7 +189,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
                     .setIcon(UiUtils.resolveDrawable(IssueLabelListActivity.this, R.attr.discardIcon))
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             }
-            
+
             return true;
         }
 
@@ -226,7 +226,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
             default:
                 break;
             }
-            
+
             mode.finish();
             return true;
         }
@@ -243,10 +243,10 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
             mAdapter.notifyDataSetChanged();
         }
     }
-    
+
     private class DeleteIssueLabelTask extends ProgressDialogTask<Void> {
         private String mLabelName;
-        
+
         public DeleteIssueLabelTask(String labelName) {
             super(IssueLabelListActivity.this, 0, R.string.deleting_msg);
             mLabelName = labelName;
@@ -265,12 +265,12 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
             getSupportLoaderManager().restartLoader(0, null, mLabelCallback);
         }
     }
-    
+
     private class EditIssueLabelTask extends ProgressDialogTask<Void> {
         private String mOldLabelName;
         private String mNewLabelName;
         private String mColor;
-        
+
         public EditIssueLabelTask(String oldLabelName, String newLabelName, String color) {
             super(IssueLabelListActivity.this, 0, R.string.saving_msg);
             mOldLabelName = oldLabelName;
@@ -295,7 +295,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
         protected void onSuccess(Void result) {
             getSupportLoaderManager().restartLoader(0, null, mLabelCallback);
         }
-        
+
         @Override
         protected void onError(Exception e) {
             ToastUtils.showMessage(mContext, R.string.issue_error_edit_label);
@@ -330,7 +330,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
             getSupportLoaderManager().restartLoader(0, null, mLabelCallback);
             mAddedLabel = null;
         }
-        
+
         @Override
         protected void onError(Exception e) {
             ToastUtils.showMessage(mContext, R.string.issue_error_create_label);

@@ -44,7 +44,7 @@ import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.UiUtils;
 
 /**
- * 
+ *
  * Original source https://github.com/github/android/blob/master/app/src/main/java/com/github/mobile/util/HttpImageGetter.java
  * Getter for an image
  */
@@ -59,7 +59,7 @@ public class HttpImageGetter implements ImageGetter {
                     .getDisplayMetrics().density * size + 0.5F);
             image = context.getResources().getDrawable(
                     UiUtils.resolveDrawable(context, R.attr.contentPictureIcon));
-            
+
             image.setBounds(0, 0, imageSize, imageSize);
         }
 
@@ -86,7 +86,7 @@ public class HttpImageGetter implements ImageGetter {
 
     /**
      * Create image getter for context
-     * 
+     *
      * @param context
      */
     public HttpImageGetter(Context context) {
@@ -138,7 +138,7 @@ public class HttpImageGetter implements ImageGetter {
 
     /**
      * Encode given HTML string and map it to the given id
-     * 
+     *
      * @param id
      * @param html
      * @return this image getter
@@ -160,7 +160,7 @@ public class HttpImageGetter implements ImageGetter {
 
     /**
      * Bind text view to HTML string
-     * 
+     *
      * @param view
      * @param html
      * @param id
@@ -196,7 +196,7 @@ public class HttpImageGetter implements ImageGetter {
         asyncTask.execute(html, id, view);
         return this;
     }
-    
+
     public class ImageGetterAsyncTask extends AsyncTask<Object, Void, CharSequence> {
 
         String html;
@@ -223,7 +223,7 @@ public class HttpImageGetter implements ImageGetter {
     }
 
     private InputStream fetch(String urlString) throws MalformedURLException, IOException {
-        URL url = new URL(urlString); 
+        URL url = new URL(urlString);
         return url.openStream();
     }
 

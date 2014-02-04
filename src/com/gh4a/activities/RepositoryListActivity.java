@@ -25,7 +25,7 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
         SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener {
     public String mUserLogin;
     public String mUserType;
-    
+
     private ActionBar mActionBar;
     private RepositorySearchFragment mSearchFragment;
 
@@ -37,12 +37,12 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
         Bundle data = getIntent().getExtras();
         mUserLogin = data.getString(Constants.User.LOGIN);
         mUserType = data.getString(Constants.User.TYPE);
-        
+
         if (!isOnline()) {
             setErrorView();
             return;
         }
-        
+
         setContentView(R.layout.frame_layout);
 
         mActionBar = getSupportActionBar();
@@ -176,7 +176,7 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
         } else if ((position == 7 && isSelf) || (position == 5 && !isSelf)) {
             fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "member");
         }
-        
+
         if (fragment != null) {
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
@@ -190,7 +190,7 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
         }
         return true;
     }
-    
+
     @Override
     protected void navigateUp() {
         finish();

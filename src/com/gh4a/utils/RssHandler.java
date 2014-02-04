@@ -14,7 +14,7 @@ public class RssHandler extends DefaultHandler {
     private List<YourActionFeed> mYourActionFeeds;
     private YourActionFeed mYourActionFeed;
     private StringBuilder builder;
-    
+
     @Override
     public void characters(char[] ch, int start, int length)
             throws SAXException {
@@ -29,15 +29,15 @@ public class RssHandler extends DefaultHandler {
         builder = new StringBuilder();
     }
 
-    
+
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes)
             throws SAXException {
-        
+
         if (localName.equalsIgnoreCase("entry")) {
             mYourActionFeed = new YourActionFeed();
         }
-        
+
         if (mYourActionFeed != null) {
             if (localName.equalsIgnoreCase("thumbnail")) {
                 String gravatarUrl = attributes.getValue(2);
@@ -50,14 +50,14 @@ public class RssHandler extends DefaultHandler {
                 String[] urlPart = url.split("/");
                 String owner = null;
                 String repoName = null;
-                
+
                 if (urlPart.length > 4) {
                     owner = urlPart[3];
                     repoName = urlPart[4];
                 } else if (urlPart.length > 3) {
                     owner = urlPart[3];
                 }
-                
+
                 mYourActionFeed.setLink(url);
                 mYourActionFeed.setRepoOWner(owner);
                 mYourActionFeed.setRepoName(repoName);
@@ -74,10 +74,10 @@ public class RssHandler extends DefaultHandler {
             if (localName.equalsIgnoreCase("id")) {
                 String id = builder.toString();
                 mYourActionFeed.setId(id);
-                
+
                 int index1 = id.lastIndexOf(":");
                 int index2 = id.lastIndexOf("/");
-                
+
                 mYourActionFeed.setEvent(id.substring(index1 + 1, index2));
             } else if (localName.equalsIgnoreCase("title")) {
                 mYourActionFeed.setTitle(builder.toString().trim());
@@ -97,7 +97,7 @@ public class RssHandler extends DefaultHandler {
         }
         builder.setLength(0);
     }
-    
+
     private String formatContent(String content) {
         content = content.replaceAll("\\<.*?>","");
         content = content.replaceAll("[\\n]{2,}", "")
@@ -106,7 +106,7 @@ public class RssHandler extends DefaultHandler {
                 .replaceAll("[^\n][\\s]+$", "")
                 .replaceAll("&#47;", "/")
                 .replaceAll("&raquo;", "");
-        
+
 //        if (UserFeed.Type.FOLLOW_EVENT.value().equals(event)) {
 //            content = content.replaceAll("\n", " ");
 //        }
@@ -114,7 +114,7 @@ public class RssHandler extends DefaultHandler {
 //            content = content.replaceAll("\n", " ");
 //        } else if (UserFeed.Type.PUSH_EVENT.value().equals(event)) {
 //            StringBuilder sb = new StringBuilder();
-//            
+//
 //            String[] commitDesc = content.split("\n");
 //            for (String str : commitDesc) {
 //                String[] committedWord = str.split(" ");

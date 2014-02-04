@@ -21,7 +21,7 @@ public class ContributorAdapter extends RootAdapter<Contributor> implements OnCl
     public ContributorAdapter(Context context) {
         super(context);
     }
-    
+
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_gravatar_1, parent, false);
@@ -44,7 +44,7 @@ public class ContributorAdapter extends RootAdapter<Contributor> implements OnCl
         v.setTag(viewHolder);
         return v;
     }
-    
+
     @Override
     protected void bindView(View v, Contributor contributor) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
@@ -52,7 +52,7 @@ public class ContributorAdapter extends RootAdapter<Contributor> implements OnCl
         GravatarHandler.assignGravatar(viewHolder.ivGravatar,
                 contributor.getGravatarId(), contributor.getAvatarUrl());
         viewHolder.ivGravatar.setTag(contributor);
-                
+
         viewHolder.tvTitle.setText(StringUtils.formatName(contributor.getLogin(), contributor.getName()));
         viewHolder.tvExtra.setText(mContext.getResources().getQuantityString(R.plurals.contributor_extra_data,
                 contributor.getContributions(), contributor.getContributions()));

@@ -3,31 +3,31 @@
     <item android:id="@+id/sort"
         android:icon="?attr/expandIcon"
         android:showAsAction="always" />
-    
+
     <item android:id="@+id/labels"
         android:icon="?attr/labelListIcon"
         android:showAsAction="always" />
-    
+
     <item android:id="@+id/milestones"
         android:icon="?attr/milestoneListIcon"
         android:showAsAction="always" />
-    
+
     <item android:id="@+id/assignees"
         android:icon="?attr/personIcon"
         android:showAsAction="always" />
-    
-    <item android:id="@+id/view_open_closed" 
+
+    <item android:id="@+id/view_open_closed"
         android:title="@string/issue_view_closed_issues"
         android:showAsAction="never" />
-    
+
     <item android:id="@+id/view_labels"
         android:title="@string/issue_manage_labels"
         android:showAsAction="never" />
-    
+
     <item android:id="@+id/view_milestones"
          android:title="@string/issue_manage_milestones"
          android:showAsAction="never" />
-    
+
     <item android:id="@+id/create_issue"
          android:title="@string/issue_create"
          android:showAsAction="never" />

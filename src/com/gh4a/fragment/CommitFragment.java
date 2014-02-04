@@ -52,7 +52,7 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
             setContentShown(true);
         }
     };
-    
+
     public static CommitFragment newInstance(String repoOwner, String repoName, String objectSha) {
         CommitFragment f = new CommitFragment();
 
@@ -63,7 +63,7 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
         f.setArguments(args);
         return f;
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,18 +71,18 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
         mRepoName = getArguments().getString(Constants.Repository.NAME);
         mObjectSha = getArguments().getString(Constants.Object.OBJECT_SHA);
     }
-    
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         mContentView = inflater.inflate(R.layout.commit, null);
         return super.onCreateView(inflater, container, savedInstanceState);
     }
-    
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        
+
         setContentView(mContentView);
         setContentShown(false);
 
@@ -93,12 +93,12 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
         final Activity activity = getActivity();
         final Gh4Application app = Gh4Application.get(activity);
         final LayoutInflater inflater = getLayoutInflater(null);
-        
+
         LinearLayout llChanged = (LinearLayout) mContentView.findViewById(R.id.ll_changed);
         LinearLayout llAdded = (LinearLayout) mContentView.findViewById(R.id.ll_added);
         LinearLayout llDeleted = (LinearLayout) mContentView.findViewById(R.id.ll_deleted);
         int added = 0, changed = 0, deleted = 0;
-        
+
         ImageView ivGravatar = (ImageView) mContentView.findViewById(R.id.iv_gravatar);
         GravatarHandler.assignGravatar(ivGravatar, mCommit.getAuthor());
 
@@ -126,7 +126,7 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
         } else {
             tvMessage.setVisibility(View.GONE);
         }
-        
+
         TextView tvExtra = (TextView) mContentView.findViewById(R.id.tv_extra);
         tvExtra.setText(CommitUtils.getAuthorName(app, mCommit) + " "
                 + StringUtils.formatRelativeTime(activity, mCommit.getCommit().getAuthor().getDate(), true));
@@ -170,7 +170,7 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
             }
             parent.addView(fileNameView);
         }
-        
+
         if (added == 0) {
             llAdded.setVisibility(View.GONE);
         } else {
@@ -189,7 +189,7 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
             TextView tvDeletedTitle = (TextView) mContentView.findViewById(R.id.commit_deleted);
             tvDeletedTitle.setTypeface(app.boldCondensed);
         }
-        
+
         TextView tvSummary = (TextView) mContentView.findViewById(R.id.tv_desc);
         if (mCommit.getStats() != null) {
             tvSummary.setText(getString(R.string.commit_summary, added + changed + deleted,

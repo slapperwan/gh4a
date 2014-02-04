@@ -27,14 +27,14 @@ public class DownloadsFragment extends ListDataBaseFragment<Download> {
         f.setArguments(args);
         return f;
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
         mRepoName = getArguments().getString(Constants.Repository.NAME);
     }
-    
+
     @Override
     protected RootAdapter<Download> onCreateAdapter() {
         return new DownloadAdapter(getActivity());

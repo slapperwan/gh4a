@@ -16,7 +16,7 @@ public class CommitCompareLoader extends BaseLoader<RepositoryCommitCompare> {
     private String mRepoName;
     private String mBase;
     private String mHead;
-    
+
     public CommitCompareLoader(Context context, String repoOwner, String repoName,
             String base, String head) {
         super(context);
@@ -25,7 +25,7 @@ public class CommitCompareLoader extends BaseLoader<RepositoryCommitCompare> {
         mBase = base;
         mHead = head;
     }
-    
+
     @Override
     public RepositoryCommitCompare doLoadInBackground() throws IOException {
         CommitService commitService = (CommitService)

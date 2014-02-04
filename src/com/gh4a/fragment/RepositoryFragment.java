@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -73,10 +73,10 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
         Bundle args = new Bundle();
         args.putSerializable("REPOSITORY", repository);
         f.setArguments(args);
-        
+
         return f;
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,7 +89,7 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
         mContentView = inflater.inflate(R.layout.repository, null);
         return super.onCreateView(inflater, container, savedInstanceState);
     }
-    
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -117,14 +117,14 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
         UiUtils.assignTypeface(mContentView, app.regular, new int[] {
             R.id.tv_desc, R.id.tv_language, R.id.tv_url
         });
-        
+
         TextView tvOwner = (TextView) mContentView.findViewById(R.id.tv_login);
         tvOwner.setText(mRepository.getOwner().getLogin());
         tvOwner.setOnClickListener(this);
 
         TextView tvRepoName = (TextView) mContentView.findViewById(R.id.tv_name);
         tvRepoName.setText(mRepository.getName());
-        
+
         TextView tvParentRepo = (TextView) mContentView.findViewById(R.id.tv_parent);
         if (mRepository.isFork() && mRepository.getParent() != null) {
             Repository parent = mRepository.getParent();
@@ -150,23 +150,23 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
         mContentView.findViewById(R.id.other_info).setOnClickListener(this);
         mContentView.findViewById(R.id.tv_downloads_label).setOnClickListener(this);
         mContentView.findViewById(R.id.tv_releases_label).setOnClickListener(this);
-        
+
         TextView tvStargazersCount = (TextView) mContentView.findViewById(R.id.tv_stargazers_count);
         tvStargazersCount.setText(String.valueOf(mRepository.getWatchers()));
-        
+
         TextView tvForksCount = (TextView) mContentView.findViewById(R.id.tv_forks_count);
         tvForksCount.setText(String.valueOf(mRepository.getForks()));
-        
+
         TextView tvIssues = (TextView) mContentView.findViewById(R.id.tv_issues_label);
         TextView tvIssuesCount = (TextView) mContentView.findViewById(R.id.tv_issues_count);
         LinearLayout llIssues = (LinearLayout) mContentView.findViewById(R.id.cell_issues);
-        
+
         if (mRepository.isHasIssues()) {
             llIssues.setVisibility(View.VISIBLE);
             llIssues.setOnClickListener(this);
-            
+
             tvIssues.setVisibility(View.VISIBLE);
-            
+
             tvIssuesCount.setText(String.valueOf(mRepository.getOpenIssues()));
             tvIssuesCount.setVisibility(View.VISIBLE);
         } else {
@@ -174,7 +174,7 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
             tvIssues.setVisibility(View.GONE);
             tvIssuesCount.setVisibility(View.GONE);
         }
-        
+
         if (!mRepository.isHasWiki()) {
             mContentView.findViewById(R.id.tv_wiki_label).setVisibility(View.GONE);
         }
@@ -182,7 +182,7 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
 
     private void fillTextView(int id, int stringId, String text) {
         TextView view = (TextView) mContentView.findViewById(id);
-        
+
         if (!StringUtils.isBlank(text)) {
             view.setText(stringId != 0 ? getString(stringId, text) : text);
             view.setVisibility(View.VISIBLE);
@@ -200,7 +200,7 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
         }
         tvStargazersCount.setText(String.valueOf(mRepository.getWatchers()));
     }
-    
+
     public void fillReadme(String readme) {
         TextView tvReadme = (TextView) getView().findViewById(R.id.readme);
         if (readme != null) {
@@ -214,7 +214,7 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
             tvReadme.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
         }
     }
-    
+
     @Override
     public void onClick(View view) {
         int id = view.getId();

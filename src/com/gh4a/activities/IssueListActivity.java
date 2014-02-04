@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -147,7 +147,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         mRepoOwner = data.getString(Constants.Repository.OWNER);
         mRepoName = data.getString(Constants.Repository.NAME);
         mState = data.getString(Constants.Issue.STATE);
-        
+
         mFilterData = new HashMap<String, String>();
         mFilterData.put("state", mState);
 
@@ -197,7 +197,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         }
         return false;
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
@@ -208,7 +208,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
             menu.removeItem(R.id.view_labels);
             menu.removeItem(R.id.view_milestones);
         }
-        
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -299,7 +299,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         mCommentFragment = null;
         invalidateFragments();
     }
-    
+
     private void showLabelsDialog() {
         String selectedLabels = mFilterData.get("labels");
         String[] checkedLabels = selectedLabels != null ?
@@ -307,13 +307,13 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         List<String> checkLabelStringList = Arrays.asList(checkedLabels);
         final boolean[] checkedItems = new boolean[mLabels.size()];
         final String[] allLabelArray = new String[mLabels.size()];
-        
+
         for (int i = 0; i < mLabels.size(); i++) {
             Label l = mLabels.get(i);
             allLabelArray[i] = l.getName();
             checkedItems[i] = checkLabelStringList.contains(l.getName());
         }
-        
+
         AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
         builder.setCancelable(true);
         builder.setTitle(R.string.issue_filter_by_labels);
@@ -337,18 +337,18 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         builder.setNegativeButton(R.string.cancel, null);
         builder.show();
     }
-    
+
     private void showMilestonesDialog() {
         String[] milestones = new String[mMilestones.size() + 1];
         final int[] milestoneIds = new int[mMilestones.size() + 1];
-        
+
         milestones[0] = getResources().getString(R.string.issue_filter_by_any_milestone);
         milestoneIds[0] = 0;
-        
+
         String checkedMilestoneNumber = mFilterData.get("milestone");
         int checkedItem = TextUtils.isEmpty(checkedMilestoneNumber)
                 ? 0 : Integer.parseInt(checkedMilestoneNumber);
-        
+
         for (int i = 1; i <= mMilestones.size(); i++) {
             Milestone m = mMilestones.get(i - 1);
             milestones[i] = m.getTitle();
@@ -357,7 +357,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
                 checkedItem = i;
             }
         }
-        
+
         AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
         builder.setCancelable(true);
         builder.setTitle(R.string.issue_filter_by_milestone);
@@ -379,15 +379,15 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         builder.setNegativeButton(R.string.cancel, null);
         builder.show();
     }
-    
+
     private void showAssigneesDialog() {
         final String[] assignees = new String[mAssignees.size() + 1];
-        
+
         assignees[0] = getResources().getString(R.string.issue_filter_by_any_assignee);
-        
+
         String checkedAssignee = mFilterData.get("assignee");
         int checkedItem = 0;
-        
+
         for (int i = 1; i <= mAssignees.size(); i++) {
             User u = mAssignees.get(i - 1);
             assignees[i] = u.getLogin();
@@ -395,7 +395,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
                 checkedItem = i;
             }
         }
-        
+
         AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
         builder.setCancelable(true);
         builder.setTitle(R.string.issue_filter_by_assignee);

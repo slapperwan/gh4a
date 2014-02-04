@@ -15,15 +15,15 @@ public class RepositoryListLoader extends BaseLoader<Collection<Repository>> {
     private String mLogin;
     private Map<String, String> mFilterData;
     private int mSize;
-    
-    public RepositoryListLoader(Context context, String login, String userType, 
+
+    public RepositoryListLoader(Context context, String login, String userType,
             Map<String, String> filterData, int size) {
         super(context);
         this.mLogin = login;
-        this.mFilterData = filterData; 
+        this.mFilterData = filterData;
         this.mSize = size;
     }
-    
+
     @Override
     public Collection<Repository> doLoadInBackground() throws IOException {
         Gh4Application app = Gh4Application.get(getContext());

@@ -8,15 +8,15 @@ import com.gh4a.Constants;
 
 public class IssueListBySubmittedFragment extends IssueListFragment {
 
-    public static IssueListBySubmittedFragment newInstance(String repoOwner, String repoName, 
+    public static IssueListBySubmittedFragment newInstance(String repoOwner, String repoName,
             Map<String, String> filterData) {
-        
+
         IssueListBySubmittedFragment f = new IssueListBySubmittedFragment();
         Bundle args = new Bundle();
         args.putString(Constants.Repository.OWNER, repoOwner);
         args.putString(Constants.Repository.NAME, repoName);
         args.putString("sort", "created");
-        
+
         if (filterData != null) {
             for (String key : filterData.keySet()) {
                 args.putString(key, filterData.get(key));

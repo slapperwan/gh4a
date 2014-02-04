@@ -18,7 +18,7 @@ import com.gh4a.utils.UiUtils;
 public class DownloadBranchesFragment extends ListDataBaseFragment<RepositoryBranch> {
     private String mRepoOwner;
     private String mRepoName;
-    
+
     public static DownloadBranchesFragment newInstance(String repoOwner, String repoName) {
         DownloadBranchesFragment f = new DownloadBranchesFragment();
         Bundle args = new Bundle();
@@ -27,14 +27,14 @@ public class DownloadBranchesFragment extends ListDataBaseFragment<RepositoryBra
         f.setArguments(args);
         return f;
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
         mRepoName = getArguments().getString(Constants.Repository.NAME);
     }
-    
+
     @Override
     protected RootAdapter<RepositoryBranch> onCreateAdapter() {
         return new SimpleStringAdapter<RepositoryBranch>(getActivity()) {

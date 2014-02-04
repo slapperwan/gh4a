@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,10 +45,10 @@ public class PullRequestCommitListFragment extends ListDataBaseFragment<Reposito
         args.putString(Constants.Repository.NAME, repoName);
         args.putInt(Constants.Issue.NUMBER, pullRequestNumber);
         f.setArguments(args);
-        
+
         return f;
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,7 +70,7 @@ public class PullRequestCommitListFragment extends ListDataBaseFragment<Reposito
     @Override
     protected void onItemClick(RepositoryCommit commit) {
         Intent intent = new Intent(getActivity(), CommitActivity.class);
-        
+
         intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.NAME, mRepoName);
         intent.putExtra(Constants.Object.OBJECT_SHA, commit.getSha());

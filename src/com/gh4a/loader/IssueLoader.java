@@ -14,7 +14,7 @@ public class IssueLoader extends BaseLoader<Issue> {
     private String mRepoOwner;
     private String mRepoName;
     private int mIssueNumber;
-    
+
     public IssueLoader(Context context, String repoOwner, String repoName, int issueNumber) {
         super(context);
         mRepoOwner = repoOwner;

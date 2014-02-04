@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -109,7 +109,7 @@ public class FileViewerActivity extends LoadingFragmentActivity {
             setErrorView();
             return;
         }
-        
+
         setContentView(R.layout.web_viewer);
 
         ActionBar actionBar = getSupportActionBar();
@@ -189,7 +189,7 @@ public class FileViewerActivity extends LoadingFragmentActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.download_menu, menu);
-        
+
         menu.removeItem(R.id.download);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
             menu.removeItem(R.id.search);
@@ -202,7 +202,7 @@ public class FileViewerActivity extends LoadingFragmentActivity {
             menu.add(0, 10, Menu.NONE, getString(R.string.history))
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
         }
-        
+
         return super.onCreateOptionsMenu(menu);
     }
 

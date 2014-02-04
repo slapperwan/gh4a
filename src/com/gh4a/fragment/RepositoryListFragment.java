@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,17 +44,17 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
         args.putString(Constants.User.TYPE, userType);
         args.putString(Constants.Repository.TYPE, repoType);
         f.setArguments(args);
-        
+
         return f;
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mLogin = getArguments().getString(Constants.User.LOGIN);
         mRepoType = getArguments().getString(Constants.Repository.TYPE);
     }
-    
+
     @Override
     protected RootAdapter<Repository> onCreateAdapter() {
         return new RepositoryAdapter(getActivity());
@@ -76,7 +76,7 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
                 }
             }
         } else {
-            adapter.addAll(repositories);  
+            adapter.addAll(repositories);
         }
     }
 
@@ -89,7 +89,7 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     protected PageIterator<Repository> onCreateIterator() {
         Gh4Application app = Gh4Application.get(getActivity());
         RepositoryService repoService = (RepositoryService) app.getService(Gh4Application.REPO_SERVICE);
-            
+
         Map<String, String> filterData = new HashMap<String, String>();
         if ("sources".equals(mRepoType) || "forks".equals(mRepoType)) {
             filterData.put("type", "all");

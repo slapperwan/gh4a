@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -80,7 +80,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
     private static final int MENU_DOWNLOAD_START = 100;
     private static final int MENU_DOWNLOAD_END = 199;
     private static final int MENU_PUSH_COMMIT_START = 200;
-    
+
     private String mLogin;
     private boolean mIsPrivate;
     private FeedAdapter mAdapter;
@@ -110,7 +110,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         mAdapter = new FeedAdapter(getActivity());
         return mAdapter;
     }
-    
+
     @Override
     protected int getEmptyTextResId() {
         return R.string.no_events_found;
@@ -133,7 +133,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         if (!(event.getPayload() instanceof EventPayload)) {
             return;
         }
-        
+
         String eventType = event.getType();
         EventRepository eventRepo = event.getRepo();
         String repoOwner = "";
@@ -235,7 +235,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
 
         } else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
             PullRequestReviewCommentPayload payload = (PullRequestReviewCommentPayload) event.getPayload();
-            IntentUtils.openCommitInfoActivity(getActivity(), repoOwner, repoName, 
+            IntentUtils.openCommitInfoActivity(getActivity(), repoOwner, repoName,
                     payload.getComment().getCommitId(), 0);
 
         } else if (Event.TYPE_PUSH.equals(eventType)) {
@@ -276,13 +276,13 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             IntentUtils.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
         }
     }
-    
+
     public abstract int getMenuGroupId();
-    
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        
+
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         Event event = (Event) mAdapter.getItem(info.position);
         int groupId = getMenuGroupId();
@@ -372,11 +372,11 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             }
         }
     }
-    
+
     public boolean open(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info =
                 (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        
+
         Event event = (Event) mAdapter.getItem(info.position);
         String[] repoNamePart = event.getRepo().getName().split("/");
         String repoOwner = null;
@@ -385,7 +385,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             repoOwner = repoNamePart[0];
             repoName = repoNamePart[1];
         }
-        
+
         int id = item.getItemId();
 
         if (id == MENU_USER) {
@@ -452,7 +452,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         } else if (id == MENU_COMPARE) {
             if (repoOwner != null) {
                 PushPayload payload = (PushPayload) event.getPayload();
-                
+
                 Intent intent = new Intent(getActivity(), CompareActivity.class);
                 intent.putExtra(Constants.Repository.OWNER, repoOwner);
                 intent.putExtra(Constants.Repository.NAME, repoName);

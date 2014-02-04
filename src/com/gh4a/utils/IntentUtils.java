@@ -22,7 +22,7 @@ public class IntentUtils {
     public static void openIssueActivity(Context context, String login, String repoName, int issueNumber) {
         openIssueActivity(context, login, repoName, issueNumber, null);
     }
-    
+
     public static void openIssueActivity(Context context, String login, String repoName,
             int issueNumber, String state) {
         Intent intent = new Intent(context, IssueActivity.class);
@@ -34,8 +34,8 @@ public class IntentUtils {
         }
         context.startActivity(intent);
     }
-    
-    public static void openIssueActivity(Context context, String login, String repoName, 
+
+    public static void openIssueActivity(Context context, String login, String repoName,
             int issueNumber, int flags) {
         Intent intent = new Intent(context, IssueActivity.class);
         intent.putExtra(Constants.Repository.OWNER, login);
@@ -49,7 +49,7 @@ public class IntentUtils {
             String state) {
         openIssueListActivity(context, repoOwner, repoName, state, 0);
     }
-    
+
     public static void openIssueListActivity(Context context, String repoOwner, String repoName,
             String state, int flags) {
         Intent intent = new Intent(context, IssueListActivity.class);
@@ -61,7 +61,7 @@ public class IntentUtils {
         }
         context.startActivity(intent);
     }
-    
+
     public static void openRepositoryInfoActivity(Context context, Repository repository) {
         if (repository != null) {
             Intent intent = new Intent(context, RepositoryActivity.class);
@@ -92,11 +92,11 @@ public class IntentUtils {
     public static void openUserInfoActivity(Context context, String login) {
         openUserInfoActivity(context, login, null, 0);
     }
-    
+
     public static void openUserInfoActivity(Context context, String login, String name) {
         openUserInfoActivity(context, login, name, 0);
     }
-    
+
     public static void openUserInfoActivity(Context context, String login, String name, int flags) {
         if (login == null) {
             return;
@@ -154,7 +154,7 @@ public class IntentUtils {
                 String repoName, String state) {
         openPullRequestListActivity(context, repoOwner, repoName, state, 0);
     }
-    
+
     public static void openPullRequestListActivity(Context context, String repoOwner,
             String repoName, String state, int flags) {
         Intent intent = new Intent(context, PullRequestListActivity.class);

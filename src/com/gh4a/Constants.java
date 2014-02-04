@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -69,19 +69,19 @@ public interface Constants {
         public static final String TREE_SHA = "Object.TREE_SHA";
         public static final String REF = "Object.REF";
     }
-    
+
     public interface Gist {
         public static final String ID = "Gist.id";
         public static final String FILENAME = "Gist.filename";
     }
-    
+
     public interface Blog {
         public static final String BLOG = "Blog";
         public static final String CONTENT = "Blog.content";
         public static final String TITLE = "Blog.title";
         public static final String LINK = "Blog.link";
     }
-    
+
     public interface Bookmark {
         public static final int ADD = 100;
         public static final String NAME = "Bookmark.name";
@@ -91,12 +91,12 @@ public interface Constants {
         public static final String OBJECT_TYPE_ISSUE = "Issue";
         public static final String HIDE_ADD = "Bookmark.hideAdd";
     }
-    
+
     public interface Milestone {
         public static final String NUMBER = "Milestone.number";
         public static final String STATE = "Milestone.state";
     }
-    
+
     public interface Comment {
         public static final String ID = "Comment.id";
         public static final String BODY = "Comment.body";

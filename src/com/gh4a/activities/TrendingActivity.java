@@ -32,7 +32,7 @@ public class TrendingActivity extends LoadingFragmentPagerActivity {
         actionBar.setSubtitle(R.string.explore);
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
-    
+
     @Override
     protected int[] getTabTitleResIds() {
         return TITLES;

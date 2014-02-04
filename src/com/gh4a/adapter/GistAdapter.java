@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,15 +48,15 @@ public class GistAdapter  extends RootAdapter<Gist> {
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
         viewHolder.tvDesc.setTypeface(boldCondensed);
         viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-        
+
         v.setTag(viewHolder);
         return v;
     }
-    
+
     @Override
     protected void bindView(View v, Gist gist) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
-        
+
         viewHolder.tvTitle.setText(gist.getId());
         if (StringUtils.isBlank(gist.getDescription())) {
             viewHolder.tvDesc.setVisibility(View.GONE);

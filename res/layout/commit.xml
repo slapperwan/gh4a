@@ -56,11 +56,11 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:layout_marginTop="@dimen/overview_item_spacing" />
-		<TextView
+        <TextView
             android:id="@+id/tv_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall" 
+            android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="italic"
             android:layout_marginTop="@dimen/overview_item_spacing" />
         <LinearLayout
@@ -114,7 +114,7 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@color/highlight"
                 android:text="@string/commit_deleted" />
-            <View 
+            <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginBottom="@dimen/overview_header_spacing"

@@ -126,7 +126,7 @@
             android:layout_marginTop="@dimen/overview_item_spacing"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/highlight" />
-        <View 
+        <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginBottom="@dimen/overview_header_spacing"

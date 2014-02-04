@@ -20,7 +20,7 @@ public class FeedHandler extends DefaultHandler {
     private Feed mFeed;
     private StringBuilder mBuilder;
     private boolean mAuthor;
-    
+
     @Override
     public void characters(char[] ch, int start, int length)
             throws SAXException {
@@ -38,11 +38,11 @@ public class FeedHandler extends DefaultHandler {
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes)
             throws SAXException {
-        
+
         if (localName.equalsIgnoreCase("entry")) {
             mFeed = new Feed();
         }
-        
+
         if (mFeed != null) {
             if (localName.equalsIgnoreCase("author")) {
                 mAuthor = true;
@@ -89,7 +89,7 @@ public class FeedHandler extends DefaultHandler {
         }
         mBuilder.setLength(0);
     }
-    
+
     public List<Feed> getFeeds() {
         return mFeeds;
     }

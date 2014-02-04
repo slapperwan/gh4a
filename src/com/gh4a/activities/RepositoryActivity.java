@@ -171,7 +171,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
     private List<RepositoryTag> mTags;
     private String mSelectedRef;
     private String mSelectBranchTag;
-    
+
     private boolean mIsFinishLoadingWatching;
     private boolean mIsWatching;
     private boolean mIsFinishLoadingStarring;
@@ -180,7 +180,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
     private RepositoryFragment mRepositoryFragment;
     private ContentListFragment mContentListFragment;
     private CommitListFragment mCommitListFragment;
-    
+
     private Map<String, String> mGitModuleMap;
     private Map<String, ArrayList<RepositoryContents>> mContentCache;
     private static final int MAX_CACHE_ENTRIES = 100;
@@ -201,13 +201,13 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
                 return size() > MAX_CACHE_ENTRIES;
             }
         };
-        
+
         Bundle bundle = getIntent().getExtras();
         mRepoOwner = bundle.getString(Constants.Repository.OWNER);
         mRepoName = bundle.getString(Constants.Repository.NAME);
         mSelectedRef = bundle.getString(Constants.Repository.SELECTED_REF);
         mSelectBranchTag = bundle.getString(Constants.Repository.SELECTED_BRANCHTAG_NAME);
-        
+
         mActionBar = getSupportActionBar();
         mActionBar.setTitle(mRepoOwner + "/" + mRepoName);
         mActionBar.setDisplayHomeAsUpEnabled(true);
@@ -298,7 +298,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             openFileViewer(content, ref);
         }
     }
-    
+
     private void openFileViewer(RepositoryContents content, String ref) {
         Intent intent = new Intent(this, FileViewerActivity.class);
         intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
@@ -309,7 +309,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         intent.putExtra(Constants.Object.OBJECT_SHA, content.getSha());
         startActivity(intent);
     }
-    
+
     @Override
     public void onBackPressed() {
         if (getPager().getCurrentItem() == 1 && mDirStack.size() > 1) {
@@ -319,7 +319,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             super.onBackPressed();
         }
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
@@ -342,7 +342,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
                 watchAction.setTitle(R.string.repo_watch_action);
             }
         }
-        
+
         MenuItem starAction = menu.findItem(R.id.star);
         starAction.setVisible(authorized);
         if (authorized) {
@@ -418,13 +418,13 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         }
         return super.onOptionsItemSelected(item);
     }
-    
+
     private void showBranchesDialog() {
         String[] branchList = new String[mBranches.size()];
         for (int i = 0; i < mBranches.size(); i++) {
             branchList[i] = mBranches.get(i).getName();
         }
-        
+
         AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
         builder.setCancelable(true);
         builder.setTitle(R.string.repo_branches);
@@ -443,34 +443,34 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         builder.setNegativeButton(R.string.cancel, null);
         builder.show();
     }
-    
+
     private void showTagsDialog() {
         String[] tagList = new String[mTags.size()];
         for (int i = 0; i < mTags.size(); i++) {
             tagList[i] = mTags.get(i).getName();
         }
-        
+
         AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
         builder.setCancelable(true);
         builder.setTitle(R.string.repo_tags);
         builder.setSingleChoiceItems(tagList, -1, new DialogInterface.OnClickListener() {
-            
+
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 mSelectedRef = mTags.get(which).getCommit().getSha();
                 mSelectBranchTag = mTags.get(which).getName();
             }
         });
-        
+
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 refreshFragment();
             }
         });
-        
+
         builder.show();
     }
-    
+
     private void refreshFragment() {
         mContentListFragment = null;
         mCommitListFragment = null;

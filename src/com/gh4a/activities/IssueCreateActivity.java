@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -151,7 +151,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
             setContentShown(true);
         }
     };
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
@@ -159,16 +159,16 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
 
         mSelectedLabels = new ArrayList<Label>();
         Bundle data = getIntent().getExtras();
-        
+
         mRepoOwner = data.getString(Constants.Repository.OWNER);
         mRepoName = data.getString(Constants.Repository.NAME);
         mIssueNumber = data.getInt(Constants.Issue.NUMBER);
-        
+
         if (!isOnline()) {
             setErrorView();
             return;
         }
-        
+
         if (!Gh4Application.get(this).isAuthorized()) {
             Intent intent = new Intent(this, Github4AndroidActivity.class);
             startActivity(intent);
@@ -182,7 +182,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
                 : getString(R.string.issue_create));
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
-        
+
         TextView tvIssueLabelAdd = (TextView) findViewById(R.id.tv_issue_label_add);
         tvIssueLabelAdd.setTypeface(Gh4Application.get(this).boldCondensed);
         tvIssueLabelAdd.setTextColor(getResources().getColor(R.color.highlight));
@@ -234,7 +234,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
         }
         return super.onOptionsItemSelected(item);
     }
-    
+
     public void showMilestonesDialog(View v) {
         if (mAllMilestone == null) {
             mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
@@ -243,7 +243,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
             showMilestonesDialog();
         }
     }
-    
+
     public void showAssigneesDialog(View v) {
         if (mAllAssignee == null) {
             mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
@@ -252,11 +252,11 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
             showAssigneesDialog();
         }
     }
-    
+
     private class SaveIssueTask extends ProgressDialogTask<Void> {
         private String mTitle;
         private String mBody;
-        
+
         public SaveIssueTask(String title, String body) {
             super(IssueCreateActivity.this, 0, R.string.saving_msg);
             mTitle = title;
@@ -267,7 +267,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
         protected Void run() throws IOException {
             IssueService issueService = (IssueService)
                     Gh4Application.get(mContext).getService(Gh4Application.ISSUE_SERVICE);
-                    
+
             Issue issue = isInEditMode() ? mEditIssue : new Issue();
             issue.setTitle(mTitle);
             issue.setBody(mBody);
@@ -292,17 +292,17 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
                     mEditIssue.getNumber(), Intent.FLAG_ACTIVITY_CLEAR_TOP);
         }
     }
-    
+
     private void showMilestonesDialog() {
         final String[] milestones = new String[mAllMilestone.size() + 1];
-        
+
         milestones[0] = getResources().getString(R.string.issue_clear_milestone);
-        
+
         int checkedItem = 0;
         if (mSelectedMilestone != null) {
             checkedItem = mSelectedMilestone.getNumber();
         }
-        
+
         for (int i = 1; i <= mAllMilestone.size(); i++) {
             Milestone m = mAllMilestone.get(i - 1);
             milestones[i] = m.getTitle();
@@ -310,7 +310,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
                 checkedItem = i;
             }
         }
-        
+
         AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
         builder.setCancelable(true);
         builder.setTitle(R.string.issue_milestone);
@@ -337,13 +337,13 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
         builder.setNegativeButton(R.string.cancel, null);
         builder.show();
     }
-    
+
     private void showAssigneesDialog() {
         final String[] assignees = new String[mAllAssignee.size() + 1];
         assignees[0] = getResources().getString(R.string.issue_clear_assignee);
-        
+
         int checkedItem = 0;
-        
+
         for (int i = 1; i <= mAllAssignee.size(); i++) {
             User u = mAllAssignee.get(i - 1);
             assignees[i] = u.getLogin();
@@ -352,7 +352,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
                 checkedItem = i;
             }
         }
-        
+
         AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
         builder.setCancelable(true);
         builder.setTitle(R.string.issue_assignee);
@@ -379,7 +379,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
         builder.setNegativeButton(R.string.cancel, null);
         builder.show();
     }
-    
+
     public void fillLabels(List<Label> labels) {
         Gh4Application app = Gh4Application.get(this);
         LinearLayout labelLayout = (LinearLayout) findViewById(R.id.ll_labels);
@@ -388,17 +388,17 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
             final View rowView = getLayoutInflater().inflate(R.layout.row_issue_create_label, null);
             View viewColor = (View) rowView.findViewById(R.id.view_color);
             viewColor.setBackgroundColor(Color.parseColor("#" + label.getColor()));
-            
+
             final TextView tvLabel = (TextView) rowView.findViewById(R.id.tv_title);
             tvLabel.setTypeface(app.condensed);
             tvLabel.setText(label.getName());
             tvLabel.setOnClickListener(this);
             tvLabel.setTag(label);
-            
+
             if (isInEditMode()) {
                 handleLabelClick(tvLabel, label, mSelectedLabels.contains(label));
             }
-            
+
             labelLayout.addView(rowView);
         }
     }
@@ -440,21 +440,21 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
     private void fillIssueData() {
         EditText etTitle = (EditText) findViewById(R.id.et_title);
         etTitle.setText(mEditIssue.getTitle());
-        
+
         EditText etDesc = (EditText) findViewById(R.id.et_desc);
         etDesc.setText(mEditIssue.getBody());
-        
+
         mSelectedLabels = new ArrayList<Label>();
         mSelectedLabels.addAll(mEditIssue.getLabels());
-        
+
         mSelectedMilestone = mEditIssue.getMilestone();
         mSelectedAssignee = mEditIssue.getAssignee();
-        
+
         if (mSelectedMilestone != null) {
             mTvSelectedMilestone.setText(getString(
                     R.string.issue_milestone, mEditIssue.getMilestone().getTitle()));
         }
-        
+
         if (mSelectedAssignee != null) {
             mTvSelectedAssignee.setText(getString(
                     R.string.issue_assignee, mSelectedAssignee.getLogin()));

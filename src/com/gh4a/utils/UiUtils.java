@@ -52,7 +52,7 @@ public class UiUtils {
             textView.setTypeface(typeface);
         }
     }
-    
+
     public static int textColorForBackground(Context context, int backgroundColor) {
         int red = Color.red(backgroundColor);
         int green = Color.green(backgroundColor);

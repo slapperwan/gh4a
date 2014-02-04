@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,7 +37,7 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
     private String mRepoName;
     private String mRef;
     private String mFilePath;
-    
+
     public static CommitListFragment newInstance(Repository repo, String ref) {
         return newInstance(repo.getOwner().getLogin(), repo.getName(),
                 StringUtils.isBlank(ref) ? repo.getMasterBranch() : ref, null);
@@ -53,10 +53,10 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
         args.putString(Constants.Object.REF, ref);
         args.putString(Constants.Object.PATH, filePath);
         f.setArguments(args);
-        
+
         return f;
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,7 +80,7 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
     protected void onItemClick(RepositoryCommit commit) {
         Intent intent = new Intent(getActivity(), CommitActivity.class);
         String[] urlPart = commit.getUrl().split("/");
-        
+
         intent.putExtra(Constants.Repository.OWNER, urlPart[4]);
         intent.putExtra(Constants.Repository.NAME, urlPart[5]);
         intent.putExtra(Constants.Object.OBJECT_SHA, commit.getSha());

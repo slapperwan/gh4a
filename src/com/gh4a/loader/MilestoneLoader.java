@@ -14,14 +14,14 @@ public class MilestoneLoader extends BaseLoader<Milestone> {
     private String mRepoOwner;
     private String mRepoName;
     private int mNumber;
-    
+
     public MilestoneLoader(Context context, String repoOwner, String repoName, int number) {
         super(context);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
         mNumber = number;
     }
-    
+
     @Override
     public Milestone doLoadInBackground() throws IOException {
         MilestoneService milestoneService = (MilestoneService)

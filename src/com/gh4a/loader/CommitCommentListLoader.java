@@ -16,7 +16,7 @@ public class CommitCommentListLoader extends BaseLoader<List<CommitComment>> {
     private String mRepoOwner;
     private String mRepoName;
     private String mSha;
-    
+
     public CommitCommentListLoader(Context context, String repoOwner, String repoName, String sha) {
         super(context);
         mRepoOwner = repoOwner;

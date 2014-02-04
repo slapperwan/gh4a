@@ -30,7 +30,7 @@ public class IssueLabelAdapter extends RootAdapter<Label> implements OnClickList
         holder.color = v.findViewById(R.id.view_color);
         holder.label = (TextView) v.findViewById(R.id.tv_title);
         holder.editor = (EditText) v.findViewById(R.id.et_label);
-        
+
         Gh4Application app = (Gh4Application) mContext.getApplicationContext();
         holder.label.setTypeface(app.condensed);
 

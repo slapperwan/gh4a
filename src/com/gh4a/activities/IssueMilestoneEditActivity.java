@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -75,21 +75,21 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
             setContentShown(true);
         }
     };
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
-        
+
         mRepoOwner = getIntent().getExtras().getString(Constants.Repository.OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);
         mMilestoneNumber = getIntent().getExtras().getInt(Constants.Milestone.NUMBER);
-        
+
         if (!isOnline()) {
             setErrorView();
             return;
         }
-        
+
         if (!Gh4Application.get(this).isAuthorized()) {
             Intent intent = new Intent(this, Github4AndroidActivity.class);
             startActivity(intent);
@@ -104,10 +104,10 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
-        
+
         getSupportLoaderManager().initLoader(0, null, mMilestoneCallback);
     }
-    
+
     private void openIssueMilestones() {
         Intent intent = new Intent(this, IssueMilestoneListActivity.class);
         intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
@@ -115,7 +115,7 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
@@ -139,7 +139,7 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
             String title = tvTitle.getText() == null ? null : tvTitle.getText().toString();
             String desc = null;
             if (tvDesc.getText() != null) {
-                desc = tvDesc.getText().toString();    
+                desc = tvDesc.getText().toString();
             }
             if (StringUtils.isBlank(title)) {
                 ToastUtils.showMessage(this, R.string.issue_error_milestone_title);
@@ -160,15 +160,15 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-    
+
     private void fillData() {
         EditText tvTitle = (EditText) findViewById(R.id.et_title);
         EditText tvDesc = (EditText) findViewById(R.id.et_desc);
         EditText etDueDate = (EditText) findViewById(R.id.et_due_date);
-        
+
         tvTitle.setText(mMilestone.getTitle());
         tvDesc.setText(mMilestone.getDescription());
-        
+
         if (mMilestone.getDueOn() != null) {
             etDueDate.setText(DateFormat.getMediumDateFormat(this).format(mMilestone.getDueOn()));
         }
@@ -178,7 +178,7 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
         DialogFragment newFragment = new DatePickerFragment();
         newFragment.show(getSupportFragmentManager(), "datePicker");
     }
-    
+
     private void setDueOn(int year, int month, int day) {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.DAY_OF_MONTH, day);
@@ -187,9 +187,9 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
-        
+
         mMilestone.setDueOn(cal.getTime());
-        
+
         EditText etDueDate = (EditText) findViewById(R.id.et_due_date);
         etDueDate.setText(DateFormat.getMediumDateFormat(this).format(mMilestone.getDueOn()));
     }
@@ -197,7 +197,7 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
     private class EditIssueMilestoneTask extends ProgressDialogTask<Void> {
         private String mTitle;
         private String mDesc;
-        
+
         public EditIssueMilestoneTask(String title, String desc) {
             super(IssueMilestoneEditActivity.this, 0, R.string.saving_msg);
             mTitle = title;
@@ -220,16 +220,16 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
         protected void onSuccess(Void result) {
             openIssueMilestones();
         }
-        
+
         @Override
         protected void onError(Exception e) {
             ToastUtils.showMessage(mContext, R.string.issue_error_create_milestone);
         }
     }
-    
+
     private class DeleteIssueMilestoneTask extends ProgressDialogTask<Void> {
         private int mNumber;
-        
+
         public DeleteIssueMilestoneTask(int number) {
             super(IssueMilestoneEditActivity.this, 0, R.string.deleting_msg);
             mNumber = number;
@@ -239,7 +239,7 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
         protected Void run() throws IOException {
             MilestoneService milestoneService = (MilestoneService)
                     Gh4Application.get(mContext).getService(Gh4Application.MILESTONE_SERVICE);
-            milestoneService.deleteMilestone(mRepoOwner, mRepoName, mNumber); 
+            milestoneService.deleteMilestone(mRepoOwner, mRepoName, mNumber);
             return null;
         }
 
@@ -248,17 +248,17 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
             openIssueMilestones();
         }
     }
-    
+
     public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             final IssueMilestoneEditActivity activity = (IssueMilestoneEditActivity) getActivity();
             final Calendar c = Calendar.getInstance();
-            
+
             int year = c.get(Calendar.YEAR);
             int month = c.get(Calendar.MONTH);
             int day = c.get(Calendar.DAY_OF_MONTH);
-            
+
             if (activity.mMilestone.getDueOn() != null) {
                 c.setTime(activity.mMilestone.getDueOn());
                 year = c.get(Calendar.YEAR);
@@ -267,7 +267,7 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
             }
             return new DatePickerDialog(activity, this, year, month, day);
         }
-        
+
         public void onDateSet(DatePicker view, int year, int month, int day) {
             final IssueMilestoneEditActivity activity = (IssueMilestoneEditActivity) getActivity();
             activity.setDueOn(year, month, day);

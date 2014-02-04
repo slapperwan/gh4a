@@ -15,7 +15,7 @@ public class IssueListLoader extends BaseLoader<List<Issue>> {
 
     private String mLogin, mRepo;
     private Map<String, String> mFilterData;
-    
+
     public IssueListLoader(Context context, String login, String repo,
             Map<String, String> filterData) {
         super(context);

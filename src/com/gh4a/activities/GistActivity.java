@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -69,19 +69,19 @@ public class GistActivity extends LoadingFragmentActivity implements OnClickList
 
         mGistId = getIntent().getExtras().getString(Constants.Gist.ID);
         mUserLogin = getIntent().getExtras().getString(Constants.User.LOGIN);
-        
+
         if (!isOnline()) {
             setErrorView();
             return;
         }
-        
+
         setContentView(R.layout.gist);
         setContentShown(false);
 
         UiUtils.assignTypeface(this, Gh4Application.get(this).boldCondensed, new int[] {
             R.id.tv_desc, R.id.files_title
         });
-        
+
         ActionBar mActionBar = getSupportActionBar();
         mActionBar.setTitle(getString(R.string.gist_title, mGistId));
         mActionBar.setSubtitle(mUserLogin);
@@ -89,17 +89,17 @@ public class GistActivity extends LoadingFragmentActivity implements OnClickList
 
         getSupportLoaderManager().initLoader(0, null, mGistCallback);
     }
-    
+
     private void fillData(final Gist gist) {
         mGist = gist;
 
         TextView tvDesc = (TextView) findViewById(R.id.tv_desc);
         tvDesc.setText(gist.getDescription());
         tvDesc.setVisibility(StringUtils.isBlank(gist.getDescription()) ? View.GONE : View.VISIBLE);
-        
+
         TextView tvCreatedAt = (TextView) findViewById(R.id.tv_created_at);
         tvCreatedAt.setText(StringUtils.formatRelativeTime(this, gist.getCreatedAt(), true));
-        
+
         LinearLayout llFiles = (LinearLayout) findViewById(R.id.ll_files);
         Map<String, GistFile> files = gist.getFiles();
         if (files != null && !files.isEmpty()) {

@@ -16,7 +16,7 @@
     <attr name="textAppearanceSubtitle" format="reference" />
     <attr name="textAppearanceWhiteSmall" format="reference" />
     <attr name="textAppearanceMicro" format="reference" />
-    
+
     <attr name="sendIcon" format="reference" />
     <attr name="contentEditIcon" format="reference" />
     <attr name="downloadIcon" format="reference" />

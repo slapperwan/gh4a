@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -77,30 +77,30 @@ public class CompareActivity extends LoadingFragmentActivity implements OnItemCl
         setContentShown(false);
 
         mListView = (ListView) findViewById(R.id.list_view);
-        
+
         mRepoOwner = getIntent().getExtras().getString(Constants.Repository.OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);
         mBase = getIntent().getExtras().getString(Constants.Repository.BASE);
         mHead = getIntent().getExtras().getString(Constants.Repository.HEAD);
-        
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.commit_compare);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
-        
+
         mAdapter = new CommitAdapter(this);
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
-        
+
         getSupportLoaderManager().initLoader(0, null, mCompareCallback);
     }
-    
+
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         RepositoryCommit commit = (RepositoryCommit) mAdapter.getItem(position);
         IntentUtils.openCommitInfoActivity(this, mRepoOwner, mRepoName, commit.getSha(), 0);
     }
-    
+
     @Override
     protected void navigateUp() {
         IntentUtils.openRepositoryInfoActivity(this, mRepoOwner, mRepoName,

@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,7 +34,7 @@ import com.gh4a.adapter.RootAdapter;
 
 public class RepositoryIssueListFragment extends PagedDataBaseFragment<RepositoryIssue> {
     private Map<String, String> mFilterData;
-    
+
     public static RepositoryIssueListFragment newInstance(Map<String, String> filterData) {
         RepositoryIssueListFragment f = new RepositoryIssueListFragment();
 
@@ -47,16 +47,16 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Repositor
         f.setArguments(args);
         return f;
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mFilterData = new HashMap<String, String>();
-        
+
         Bundle args = getArguments();
         for (String key : args.keySet()) {
-            if (!key.equals(Constants.User.LOGIN) 
+            if (!key.equals(Constants.User.LOGIN)
                     && !key.equals(Constants.Repository.NAME)) {
                 mFilterData.put(key, args.getString(key));
             }

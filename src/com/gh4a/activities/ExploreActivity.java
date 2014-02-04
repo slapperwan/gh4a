@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,7 +40,7 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
     private ViewPager mPager;
     private TitlePageIndicator mIndicator;
     private PublicTimelineFragment mPublicTimeFragment;
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
@@ -50,13 +50,13 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
             setErrorView();
             return;
         }
-        
+
         setContentView(R.layout.explore);
-        
+
         mActionBar = getSupportActionBar();
         mActionBar.setDisplayShowTitleEnabled(false);
         mActionBar.setDisplayHomeAsUpEnabled(true);
-        
+
         ArrayAdapter<CharSequence> list = ArrayAdapter.createFromResource(
                 mActionBar.getThemedContext(), R.array.explore_item,
                 R.layout.sherlock_spinner_item);
@@ -64,18 +64,18 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
 
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         mActionBar.setListNavigationCallbacks(list, this);
-        
+
         setPageIndicator(mActionBar.getSelectedNavigationIndex());
     }
-    
+
     private void setPageIndicator(int position) {
         mAdapter = new ThisPageAdapter(getSupportFragmentManager());
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
         mPager.invalidate();
-        
+
         mIndicator = (TitlePageIndicator) findViewById(R.id.indicator);
-        
+
         if (Gh4Application.THEME != R.style.DefaultTheme) {
             mIndicator.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_light));
             mIndicator.setSelectedColor(getResources().getColor(R.color.abs__primary_text_holo_light));
@@ -85,11 +85,11 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
         boolean trending = position == 1;
         mIndicator.setVisibility(trending ? View.VISIBLE : View.GONE);
         mIndicator.setViewPager(mPager);
-        
+
         mIndicator.notifyDataSetChanged();
         mAdapter.notifyDataSetChanged();
     }
-    
+
     private class ThisPageAdapter extends FragmentStatePagerAdapter {
         public ThisPageAdapter(FragmentManager fm) {
             super(fm);
@@ -118,7 +118,7 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
                 return TrendingFragment.newInstance(TrendingFragment.TYPE_MONTHLY);
             }
         }
-        
+
         @Override
         public CharSequence getPageTitle(int position) {
             if (position == 0) {
@@ -136,7 +136,7 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
         setPageIndicator(itemPosition);
         return true;
     }
-    
+
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.clear();
         if (mActionBar.getSelectedNavigationIndex() == 0) {
@@ -160,7 +160,7 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
                 item.expandActionView();
                 if (mPublicTimeFragment != null) {
                     mPublicTimeFragment.refresh();
-                } 
+                }
                 return true;
         }
         return super.onOptionsItemSelected(item);

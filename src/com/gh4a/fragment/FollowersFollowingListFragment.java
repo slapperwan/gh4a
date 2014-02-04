@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,7 +31,7 @@ import com.gh4a.utils.IntentUtils;
 public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> {
     private String mLogin;
     private boolean mFindFollowers;
-    
+
     public static FollowersFollowingListFragment newInstance(String login, boolean mFindFollowers) {
         FollowersFollowingListFragment f = new FollowersFollowingListFragment();
 
@@ -39,22 +39,22 @@ public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> 
         args.putString(Constants.User.LOGIN, login);
         args.putBoolean("FIND_FOLLOWER", mFindFollowers);
         f.setArguments(args);
-        
+
         return f;
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mLogin = getArguments().getString(Constants.User.LOGIN);
         mFindFollowers = getArguments().getBoolean("FIND_FOLLOWER");
     }
-    
+
     @Override
     protected RootAdapter<User> onCreateAdapter() {
         return new UserAdapter(getActivity(), false);
     }
-    
+
     @Override
     protected int getEmptyTextResId() {
         return mFindFollowers ? R.string.no_followers_found : R.string.no_following_found;

@@ -59,7 +59,7 @@ public class GravatarHandler {
 
     private static HandlerThread sWorkerThread = null;
     private static Handler sWorkerHandler = null;
-    
+
     private static Handler sHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -88,7 +88,7 @@ public class GravatarHandler {
         }
     };
 
-    
+
     public static void assignGravatar(ImageView view, User user) {
         if (user == null) {
             assignGravatar(view, null, null);
@@ -139,7 +139,7 @@ public class GravatarHandler {
         request.views = new ArrayList<ImageView>();
         request.views.add(view);
         sRequests.put(requestId, request);
-        
+
         sHandler.removeMessages(MSG_DESTROY);
         if (sWorkerThread == null) {
             sWorkerThread = new HandlerThread("GravatarLoader");
@@ -178,14 +178,14 @@ public class GravatarHandler {
             }
         }
     }
-    
+
     private static Bitmap fetchBitmap(String url) throws IOException {
         URL realUrl = new URL(url);
         InputStream input = realUrl.openStream();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         byte[] buffer = new byte[2048];
         int read;
-        
+
         while ((read = input.read(buffer)) != -1) {
             output.write(buffer, 0, read);
         }

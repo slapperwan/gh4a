@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -49,7 +49,7 @@ public class StringUtils {
 
     /**
      * Checks if is blank.
-     * 
+     *
      * @param val the val
      * @return true, if is blank
      */
@@ -59,7 +59,7 @@ public class StringUtils {
 
     /**
      * Do teaser.
-     * 
+     *
      * @param text the text
      * @return the string
      */
@@ -88,7 +88,7 @@ public class StringUtils {
 
     /**
      * Md5 hex.
-     * 
+     *
      * @param s the s
      * @return the string
      */
@@ -108,7 +108,7 @@ public class StringUtils {
 
     /**
      * To hex.
-     * 
+     *
      * @param a the a
      * @return the string
      */
@@ -123,7 +123,7 @@ public class StringUtils {
 
     /**
      * Format name.
-     * 
+     *
      * @param userLogin the user login
      * @param name the name
      * @return the string
@@ -199,12 +199,12 @@ public class StringUtils {
             content.append("<body>");
             content.append("<pre>");
         }
-        
+
         content.append(data);
-        
+
         if (Constants.MARKDOWN_EXT.contains(ext)) {
             content.append("</div>");
-            
+
             content.append("<script>");
             content.append("var text = document.getElementById('content').innerHTML;");
             content.append("var converter = new Showdown.converter();");
@@ -215,12 +215,12 @@ public class StringUtils {
         } else {
             content.append("</pre>");
         }
-        
+
         content.append("</body></html>");
 
         return content.toString();
     }
-    
+
     public static String highlightImage(String imageUrl) {
         StringBuilder content = new StringBuilder();
         content.append("<html><body style=\"background-color:#dddddd;margin:auto\">");
@@ -228,10 +228,10 @@ public class StringUtils {
         content.append("<img src=\"" + imageUrl + "\" style=\"\"/>");
         content.append("</span>");
         content.append("</body></html>");
-        
+
         return content.toString();
     }
-    
+
     public static boolean checkEmail(String email) {
         return EMAIL_ADDRESS_PATTERN.matcher(email).matches();
     }

@@ -13,13 +13,13 @@ public class IsStarringLoader extends BaseLoader<Boolean> {
 
     private String mRepoOwner;
     private String mRepoName;
-    
+
     public IsStarringLoader(Context context, String repoOwner, String repoName) {
         super(context);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
     }
-    
+
     @Override
     public Boolean doLoadInBackground() throws IOException {
         StarService starService = (StarService)

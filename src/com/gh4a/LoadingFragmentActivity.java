@@ -26,7 +26,7 @@ public class LoadingFragmentActivity extends BaseSherlockFragmentActivity {
             super.setContentView(R.layout.fragment_progress);
         }
     }
-    
+
     @Override
     protected void onStart() {
         if (!hasErrorView()) {
@@ -37,7 +37,7 @@ public class LoadingFragmentActivity extends BaseSherlockFragmentActivity {
         }
         super.onStart();
     }
-    
+
     public void setContentView(int layoutResId) {
         if (layoutResId == R.layout.error) {
             super.setContentView(layoutResId);
@@ -68,7 +68,7 @@ public class LoadingFragmentActivity extends BaseSherlockFragmentActivity {
             throw new IllegalStateException("Can't be used with a custom content view");
         }
     }
-    
+
     public void setEmptyText(int resId) {
         setEmptyText(getString(resId));
     }
@@ -139,7 +139,7 @@ public class LoadingFragmentActivity extends BaseSherlockFragmentActivity {
             mContentView.setVisibility(View.VISIBLE);
         }
     }
-    
+
     private void ensureContent() {
         if (mContentContainer != null && mProgressContainer != null) {
             return;

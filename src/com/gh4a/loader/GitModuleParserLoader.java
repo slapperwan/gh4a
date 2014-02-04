@@ -21,7 +21,7 @@ public class GitModuleParserLoader extends BaseLoader<Map<String, String>> {
     private String mRepoName;
     private String mPath;
     private String mRef;
-    
+
     public GitModuleParserLoader(Context context, String repoOwner, String repoName, String path, String ref) {
         super(context);
         mRepoOwner = repoOwner;
@@ -29,7 +29,7 @@ public class GitModuleParserLoader extends BaseLoader<Map<String, String>> {
         mPath = path;
         mRef = ref;
     }
-    
+
     @Override
     public Map<String, String> doLoadInBackground() throws IOException {
         ContentsService contentService = (ContentsService)

@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,7 +36,7 @@ public class CommitActivity extends LoadingFragmentPagerActivity {
     private String mRepoOwner;
     private String mRepoName;
     private String mObjectSha;
-    
+
     private static final int[] TITLES = new int[] {
         R.string.commits, R.string.issue_comments
     };
@@ -54,7 +54,7 @@ public class CommitActivity extends LoadingFragmentPagerActivity {
         mRepoOwner = data.getString(Constants.Repository.OWNER);
         mRepoName = data.getString(Constants.Repository.NAME);
         mObjectSha = data.getString(Constants.Object.OBJECT_SHA);
-        
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getResources().getQuantityString(R.plurals.commit, 1)
                 + " " + mObjectSha.substring(0, 7));
@@ -75,12 +75,12 @@ public class CommitActivity extends LoadingFragmentPagerActivity {
             return CommitFragment.newInstance(mRepoOwner, mRepoName, mObjectSha);
         }
     }
-    
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.download_menu, menu);
-        
+
         menu.removeItem(R.id.download);
         menu.removeItem(R.id.search);
 

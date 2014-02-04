@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/refresh" 
+    <item android:id="@+id/refresh"
         android:icon="?attr/refreshIcon"
         android:showAsAction="always" />
-    <item android:id="@+id/star" 
+    <item android:id="@+id/star"
         android:showAsAction="always" />
-    <item android:id="@+id/watch" 
+    <item android:id="@+id/watch"
         android:showAsAction="always" />
-    <item android:id="@+id/branches" 
+    <item android:id="@+id/branches"
         android:title="@string/repo_branches"
         android:showAsAction="never" />
     <item android:id="@+id/tags"

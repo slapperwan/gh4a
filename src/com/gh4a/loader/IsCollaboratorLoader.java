@@ -13,13 +13,13 @@ public class IsCollaboratorLoader extends BaseLoader<Boolean> {
 
     private String mRepoOwner;
     private String mRepoName;
-    
+
     public IsCollaboratorLoader(Context context, String repoOwner, String repoName) {
         super(context);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
     }
-    
+
     @Override
     public Boolean doLoadInBackground() throws IOException {
         Gh4Application app = Gh4Application.get(getContext());

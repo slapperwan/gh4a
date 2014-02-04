@@ -12,12 +12,12 @@ import com.gh4a.Gh4Application;
 
 public class OrganizationListLoader extends BaseLoader<List<User>> {
     private String mUserLogin;
-    
+
     public OrganizationListLoader(Context context, String userLogin) {
         super(context);
         mUserLogin = userLogin;
     }
-    
+
     @Override
     public List<User> doLoadInBackground() throws IOException {
         OrganizationService orgService = (OrganizationService)

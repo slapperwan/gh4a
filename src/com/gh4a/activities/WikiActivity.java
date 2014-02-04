@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,12 +34,12 @@ public class WikiActivity extends LoadingFragmentActivity {
     private String mRepoName;
     private String mTitle;
     private String mContent;
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
-        
+
         setContentView(R.layout.web_viewer);
         setContentShown(false);
 
@@ -52,10 +52,10 @@ public class WikiActivity extends LoadingFragmentActivity {
         actionBar.setTitle(mTitle);
         actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
-        
+
         fillData();
     }
-    
+
     @SuppressLint("SetJavaScriptEnabled")
     private void fillData() {
         WebView webView = (WebView) findViewById(R.id.web_view);
@@ -82,7 +82,7 @@ public class WikiActivity extends LoadingFragmentActivity {
         public void onPageFinished(WebView webView, String url) {
             setContentShown(true);
         }
-        
+
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -90,7 +90,7 @@ public class WikiActivity extends LoadingFragmentActivity {
             return true;
         }
     };
-    
+
     @Override
     protected void navigateUp() {
         Intent intent = new Intent(this, WikiListActivity.class);

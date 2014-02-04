@@ -15,13 +15,13 @@ public class CollaboratorListLoader extends BaseLoader<List<User>> {
 
     private String mRepoOwner;
     private String mRepoName;
-    
+
     public CollaboratorListLoader(Context context, String repoOwner, String repoName) {
         super(context);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
     }
-    
+
     @Override
     public List<User> doLoadInBackground() throws IOException {
         CollaboratorService collabService = (CollaboratorService)

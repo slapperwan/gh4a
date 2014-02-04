@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -81,7 +81,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     private GitHubClient mClient;
     private HashMap<String, GitHubService> mServices;
     private PrettyTime mPt;
-    
+
     /*
      * (non-Javadoc)
      * @see android.app.Application#onCreate()
@@ -89,12 +89,12 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     @Override
     public void onCreate() {
         super.onCreate();
-        
+
         boldCondensed = Typeface.createFromAsset(getAssets(), "fonts/Roboto-BoldCondensed.ttf");
         condensed = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Condensed.ttf");
         regular = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Regular.ttf");
         italic = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Italic.ttf");
-        
+
         SharedPreferences sharedPreferences = getSharedPreferences(
                 Constants.PREF_NAME, MODE_PRIVATE);
         THEME = sharedPreferences.getInt("THEME", R.style.DefaultTheme);
@@ -106,7 +106,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
 
         mClient = new DefaultClient();
         mClient.setOAuth2Token(getAuthToken());
-        
+
         mServices = new HashMap<String, GitHubService>();
         mServices.put(STAR_SERVICE, new StarService(mClient));
         mServices.put(WATCHER_SERVICE, new WatcherService(mClient));
@@ -125,7 +125,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         mServices.put(EVENT_SERVICE, new EventService(mClient));
         mServices.put(MARKDOWN_SERVICE, new MarkdownService(mClient));
     }
-    
+
     public GitHubService getService(String name) {
         return mServices.get(name);
     }
@@ -148,7 +148,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         }
         return null;
     }
-    
+
     public String getAuthToken() {
         SharedPreferences sharedPreferences = getSharedPreferences(
                 Constants.PREF_NAME, Context.MODE_PRIVATE);
@@ -162,7 +162,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     public boolean isAuthorized() {
         return getAuthLogin() != null && getAuthToken() != null;
     }
-    
+
     public void logout() {
         SharedPreferences sharedPreferences = getSharedPreferences(Constants.PREF_NAME,
                 MODE_PRIVATE);
@@ -176,7 +176,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
                 | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
-    
+
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(Constants.User.AUTH_TOKEN)) {

@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -90,7 +90,7 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         v.setTag(viewHolder);
         return v;
     }
-    
+
     @Override
     protected void bindView(View v, Event event) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
@@ -122,13 +122,13 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
     private String formatDescription(Event event, ViewHolder viewHolder) {
         String eventType = event.getType();
         EventRepository eventRepo = event.getRepo();
-        
+
         if (!(event.getPayload() instanceof EventPayload)) {
             return event.getType();
         }
-        
+
         Resources res = mContext.getResources();
-        
+
         viewHolder.llPushDesc.setVisibility(View.GONE);
 
         if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
@@ -207,12 +207,12 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
 
             PushPayload payload = (PushPayload) event.getPayload();
             List<Commit> commits = payload.getCommits();
-            
+
             if (commits != null) {
                 Gh4Application app = (Gh4Application) mContext.getApplicationContext();
                 Typeface regular = app.regular;
                 Typeface italic = app.italic;
-                
+
                 for (int i = 0; i < commits.size() && i < 3; i++) {
                     Commit commit = commits.get(i);
                     SpannableString spannableSha = new SpannableString(commit.getSha().substring(0, 7));
@@ -223,7 +223,7 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
                     } else {
                         spannableSha = new SpannableString(mContext.getString(R.string.deleted));
                     }
-                    
+
                     TextView tvCommitMsg = new TextView(mContext);
                     tvCommitMsg.setText(spannableSha);
                     tvCommitMsg.append(" " + commit.getMessage());
@@ -257,7 +257,7 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         EventRepository eventRepo = event.getRepo();
         User actor = event.getActor();
         Resources res = mContext.getResources();
-        
+
         if (!(event.getPayload() instanceof EventPayload)) {
             return event.getType();
         }
@@ -396,7 +396,7 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         }
         return mContext.getString(R.string.deleted);
     }
-    
+
     /**
      * The Class ViewHolder.
      */

@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,7 +41,7 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.ToastUtils;
 
 public class WikiListActivity extends LoadingFragmentActivity {
-    
+
     private String mUserLogin;
     private String mRepoName;
     private ListView mListView;
@@ -72,12 +72,12 @@ public class WikiListActivity extends LoadingFragmentActivity {
 
         mUserLogin = getIntent().getStringExtra(Constants.Repository.OWNER);
         mRepoName = getIntent().getStringExtra(Constants.Repository.NAME);
-        
+
         if (!isOnline()) {
             setErrorView();
             return;
         }
-        
+
         setContentView(R.layout.generic_list);
         setContentShown(false);
 
@@ -85,7 +85,7 @@ public class WikiListActivity extends LoadingFragmentActivity {
         actionBar.setTitle(R.string.recent_wiki);
         actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
-        
+
         mListView = (ListView) findViewById(R.id.list_view);
         //mListView.setOnScrollListener(new WikiScrollListener(this));
         CommonFeedAdapter adapter = new CommonFeedAdapter(this, false);

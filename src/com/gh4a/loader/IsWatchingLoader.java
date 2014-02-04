@@ -13,13 +13,13 @@ public class IsWatchingLoader extends BaseLoader<Boolean> {
 
     private String mRepoOwner;
     private String mRepoName;
-    
+
     public IsWatchingLoader(Context context, String repoOwner, String repoName) {
         super(context);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
     }
-    
+
     @Override
     public Boolean doLoadInBackground() throws IOException {
         WatcherService watcherService = (WatcherService)

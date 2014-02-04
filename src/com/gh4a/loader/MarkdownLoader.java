@@ -12,13 +12,13 @@ public class MarkdownLoader extends BaseLoader<String> {
 
     private String mText;
     private String mMode;
-    
+
     public MarkdownLoader(Context context, String text, String mode) {
         super(context);
         mText = text;
         mMode = mode;
     }
-    
+
     @Override
     public String doLoadInBackground() throws IOException {
         MarkdownService markdownService = (MarkdownService)

@@ -14,13 +14,13 @@ public class LabelListLoader extends BaseLoader<List<Label>> {
 
     private String mRepoOwner;
     private String mRepoName;
-    
+
     public LabelListLoader(Context context, String repoOwner, String repoName) {
         super(context);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
     }
-    
+
     @Override
     public List<Label> doLoadInBackground() throws IOException {
         LabelService labelService = (LabelService)

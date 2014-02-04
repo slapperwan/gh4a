@@ -15,7 +15,7 @@ public class PullRequestLoader extends BaseLoader<PullRequest> {
     private String mRepoOwner;
     private String mRepoName;
     private int mPullRequestNumber;
-    
+
     public PullRequestLoader(Context context, String repoOwner, String repoName, int pullRequestNumber) {
         super(context);
         mRepoOwner = repoOwner;

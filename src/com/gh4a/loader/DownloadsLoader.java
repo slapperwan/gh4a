@@ -15,13 +15,13 @@ public class DownloadsLoader extends BaseLoader<List<Download>> {
 
     private String mRepoOwner;
     private String mRepoName;
-    
+
     public DownloadsLoader(Context context, String repoOwner, String repoName) {
         super(context);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
     }
-    
+
     @Override
     public List<Download> doLoadInBackground() throws IOException {
         DownloadService downloadService = (DownloadService)

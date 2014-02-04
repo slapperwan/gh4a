@@ -209,7 +209,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/SelectableLabel"
-			android:text="@string/releases" />
+            android:text="@string/releases" />
         <TextView
             android:id="@+id/tv_downloads_label"
             android:layout_width="match_parent"
