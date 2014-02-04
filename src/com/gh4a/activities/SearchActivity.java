@@ -50,6 +50,7 @@ import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.SearchUserAdapter;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.UiUtils;
 
 public class SearchActivity extends BaseSherlockFragmentActivity implements
         SearchView.OnQueryTextListener, SearchView.OnCloseListener,
@@ -79,8 +80,7 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         mSearchType = (Spinner) searchLayout.findViewById(R.id.search_type);
-        mSearchType.setAdapter(new SearchTypeAdapter(this,
-                Gh4Application.THEME == R.style.LightTheme));
+        mSearchType.setAdapter(new SearchTypeAdapter(this));
         mSearchType.setOnItemSelectedListener(this);
 
         mSearch = (SearchView) searchLayout.findViewById(R.id.search_view);
@@ -112,26 +112,27 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
 
     private static class SearchTypeAdapter extends BaseAdapter implements SpinnerAdapter {
         private Context mContext;
-        private boolean mLightTheme;
 
-        private static final int[][] RESOURCES = new int[][] {
-            { R.string.search_type_repo, R.drawable.search_repos, R.drawable.search_repos_dark },
-            { R.string.search_type_user, R.drawable.search_users, R.drawable.search_users_dark }
+        private final int[][] mResources = new int[][] {
+            { R.string.search_type_repo, R.attr.searchRepoIcon, 0 },
+            { R.string.search_type_user, R.attr.searchUserIcon, 0 }
         };
 
-        SearchTypeAdapter(Context context, boolean lightTheme) {
+        SearchTypeAdapter(Context context) {
             mContext = context;
-            mLightTheme = lightTheme;
+            for (int i = 0; i < mResources.length; i++) {
+                mResources[i][2] = UiUtils.resolveDrawable(context, mResources[i][1]);
+            }
         }
 
         @Override
         public int getCount() {
-            return RESOURCES.length;
+            return mResources.length;
         }
 
         @Override
         public CharSequence getItem(int position) {
-            return mContext.getString(RESOURCES[position][0]);
+            return mContext.getString(mResources[position][0]);
         }
 
         @Override
@@ -147,7 +148,7 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
             }
 
             ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
-            icon.setImageResource(RESOURCES[position][mLightTheme ? 1 : 2]);
+            icon.setImageResource(mResources[position][2]);
 
             return convertView;
         }
@@ -160,10 +161,10 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
             }
 
             ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
-            icon.setImageResource(RESOURCES[position][mLightTheme ? 1 : 2]);
+            icon.setImageResource(mResources[position][2]);
 
             TextView label = (TextView) convertView.findViewById(R.id.label);
-            label.setText(RESOURCES[position][0]);
+            label.setText(mResources[position][0]);
 
             return convertView;
         }

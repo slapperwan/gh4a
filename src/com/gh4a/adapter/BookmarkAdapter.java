@@ -9,14 +9,19 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.db.BookmarksProvider.Columns;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.UiUtils;
 
 public class BookmarkAdapter extends CursorAdapter {
+    private int mRepoIconResId;
+    private int mUserIconResId;
+
     public BookmarkAdapter(Context context) {
         super(context, null, 0);
+        mRepoIconResId = UiUtils.resolveDrawable(context, R.attr.searchRepoIcon);
+        mUserIconResId = UiUtils.resolveDrawable(context, R.attr.searchUserIcon);
     }
 
     @Override
@@ -25,16 +30,13 @@ public class BookmarkAdapter extends CursorAdapter {
         int type = cursor.getInt(cursor.getColumnIndexOrThrow(Columns.TYPE));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(Columns.NAME));
         String extraData = cursor.getString(cursor.getColumnIndexOrThrow(Columns.EXTRA));
-        boolean darkTheme = Gh4Application.THEME == R.style.DefaultTheme;
 
         switch (type) {
             case Columns.TYPE_REPO:
-                holder.icon.setImageResource(
-                        darkTheme ? R.drawable.search_repos_dark : R.drawable.search_repos);
+                holder.icon.setImageResource(mRepoIconResId);
                 break;
             case Columns.TYPE_USER:
-                holder.icon.setImageResource(
-                        darkTheme ? R.drawable.search_users_dark : R.drawable.search_users);
+                holder.icon.setImageResource(mUserIconResId);
                 break;
             default:
                 holder.icon.setImageDrawable(null);
