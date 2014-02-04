@@ -30,6 +30,8 @@ public class IssueLabelAdapter extends RootAdapter<Label> implements OnClickList
         holder.color = v.findViewById(R.id.view_color);
         holder.label = (TextView) v.findViewById(R.id.tv_title);
         holder.editor = (EditText) v.findViewById(R.id.et_label);
+        holder.collapsedContainer = v.findViewById(R.id.collapsed);
+        holder.expandedContainer = v.findViewById(R.id.expanded);
 
         Gh4Application app = (Gh4Application) mContext.getApplicationContext();
         holder.label.setTypeface(app.condensed);
@@ -69,6 +71,17 @@ public class IssueLabelAdapter extends RootAdapter<Label> implements OnClickList
         holder.editor.setTag(colorString);
     }
 
+    public void setExpanded(View v, boolean expanded) {
+        ViewHolder holder = (ViewHolder) v.getTag();
+        if (holder != null) {
+            holder.collapsedContainer.setVisibility(expanded ? View.GONE : View.VISIBLE);
+            holder.expandedContainer.setVisibility(expanded ? View.VISIBLE : View.GONE);
+            if (expanded) {
+                holder.editor.requestFocus();
+            }
+        }
+    }
+
     @Override
     public void onClick(View v) {
         final ViewHolder holder = (ViewHolder) ((View) v.getParent()).getTag();
@@ -91,5 +104,7 @@ public class IssueLabelAdapter extends RootAdapter<Label> implements OnClickList
         public TextView label;
         public EditText editor;
         public TextView customColorButton;
+        public View collapsedContainer;
+        public View expandedContainer;
     }
 }

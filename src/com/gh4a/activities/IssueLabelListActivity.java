@@ -28,6 +28,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.text.Editable;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -55,7 +56,7 @@ import com.gh4a.utils.UiUtils;
 public class IssueLabelListActivity extends LoadingFragmentActivity implements OnItemClickListener {
     private String mRepoOwner;
     private String mRepoName;
-    private ActionMode mActionMode;
+    private EditActionMode mActionMode;
     private ProgressDialog mProgressDialog;
     private Label mAddedLabel;
     private boolean mShouldStartAdding;
@@ -72,9 +73,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
             UiUtils.hideImeForView(getCurrentFocus());
             if (success) {
                 mAdapter.clear();
-                for (Label label : result.getData()) {
-                    mAdapter.add(label);
-                }
+                mAdapter.addAll(result.getData());
                 mAdapter.notifyDataSetChanged();
             }
             setContentEmpty(!success);
@@ -87,12 +86,23 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
         protected void bindView(View view, Label label) {
             ViewHolder holder = (ViewHolder) view.getTag();
 
+            super.bindView(view, label);
+
             if (label == mAddedLabel && mShouldStartAdding) {
                 holder.editor.setHint(R.string.issue_label_new);
-                mActionMode = startActionMode(new EditActionMode(label, view));
+                mActionMode = new EditActionMode(label, holder.editor);
+                startActionMode(mActionMode);
                 mShouldStartAdding = false;
             } else {
                 holder.editor.setHint(null);
+            }
+
+            Label editingLabel = mActionMode != null ? mActionMode.mLabel : null;
+            if (label.equals(editingLabel)) {
+                setExpanded(view, true);
+                mActionMode.setEditor(holder.editor);
+            } else {
+                setExpanded(view, false);
             }
         }
     };
@@ -127,7 +137,10 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (mActionMode == null) {
-            mActionMode = startActionMode(new EditActionMode(mAdapter.getItem(position), view));
+            mActionMode = new EditActionMode(mAdapter.getItem(position),
+                    (EditText) view.findViewById(R.id.et_label));
+            mAdapter.setExpanded(view, true);
+            startActionMode(mActionMode);
         }
     }
 
@@ -162,20 +175,21 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
 
     private final class EditActionMode implements ActionMode.Callback {
         private String mCurrentLabelName;
-        private View mItemContainer;
         private EditText mEditor;
         private Label mLabel;
 
-        public EditActionMode(Label label, View itemContainer) {
+        public EditActionMode(Label label, EditText editor) {
             mCurrentLabelName = label.getName();
-            mItemContainer = itemContainer;
+            mEditor = editor;
             mLabel = label;
 
-            mEditor = (EditText) itemContainer.findViewById(R.id.et_label);
             mEditor.setText(mCurrentLabelName);
+        }
 
-            itemContainer.findViewById(R.id.collapsed).setVisibility(View.GONE);
-            itemContainer.findViewById(R.id.expanded).setVisibility(View.VISIBLE);
+        public void setEditor(EditText editor) {
+            Editable currentText = mEditor.getText();
+            mEditor = editor;
+            mEditor.setText(currentText);
         }
 
         @Override
@@ -233,8 +247,6 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
-            mItemContainer.findViewById(R.id.collapsed).setVisibility(View.VISIBLE);
-            mItemContainer.findViewById(R.id.expanded).setVisibility(View.GONE);
             mActionMode = null;
             if (mLabel == mAddedLabel) {
                 mAdapter.remove(mLabel);
