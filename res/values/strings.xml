@@ -63,6 +63,7 @@
     <string name="downloads">Downloads</string>
     <string name="releases">Releases</string>
     <string name="packages">Packages</string>
+    <string name="no_browser_found">The link could not be opened: no browser was found on your device</string>
     <string name="need_profile_reload">Please reload your profile page by pressing \'Home\' button at the top left for the changes to take effect</string>
     <string name="login_prompt">Please login</string>
     <string name="error_toast">An error occured while fetching data</string>

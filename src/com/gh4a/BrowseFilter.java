@@ -1,10 +1,17 @@
 package com.gh4a;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.egit.github.core.client.IGitHubConstants;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageItemInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -15,6 +22,7 @@ import com.gh4a.activities.ExploreActivity;
 import com.gh4a.activities.WikiListActivity;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.ToastUtils;
 
 public class BrowseFilter extends BaseSherlockFragmentActivity {
 
@@ -28,7 +36,7 @@ public class BrowseFilter extends BaseSherlockFragmentActivity {
             if (parts.size() >= 2) {
                 IntentUtils.openGistActivity(this, parts.get(0), parts.get(1), 0);
             } else {
-                startActivity(createBrowserIntent(uri));
+                launchBrowser(uri);
             }
         } else if (first == null
                 || "languages".equals(first)
@@ -90,15 +98,62 @@ public class BrowseFilter extends BaseSherlockFragmentActivity {
                 String fullPath = TextUtils.join("/", parts.subList(4, parts.size()));
                 IntentUtils.openFileViewerActivity(this, user, repo, id, fullPath, uri.getLastPathSegment());
             } else {
-                startActivity(createBrowserIntent(uri));
+                launchBrowser(uri);
             }
         }
         finish();
     }
 
+    private void launchBrowser(Uri uri) {
+        Intent intent = createBrowserIntent(uri);
+        if (intent != null) {
+            startActivity(intent);
+        } else {
+            ToastUtils.showMessage(this, R.string.no_browser_found);
+        }
+    }
+
+    // We want to forward the URI to a browser, but our own intent filter matches
+    // the browser's intent filters. We therefore resolve the intent by ourselves,
+    // strip our own entry from the list and pass the result to the system's
+    // activity chooser.
     private Intent createBrowserIntent(Uri uri) {
-        return new Intent(Intent.ACTION_VIEW)
-                .setData(uri)
+        final Intent browserIntent = new Intent(Intent.ACTION_VIEW, uri)
                 .addCategory(Intent.CATEGORY_BROWSABLE);
+        final PackageManager pm = getPackageManager();
+        final List<ResolveInfo> activities = pm.queryIntentActivities(browserIntent,
+                PackageManager.MATCH_DEFAULT_ONLY);
+        final ArrayList<Intent> chooserIntents = new ArrayList<Intent>();
+
+        Collections.sort(activities, new ResolveInfo.DisplayNameComparator(pm));
+
+        for (ResolveInfo resInfo : activities) {
+            ActivityInfo info = resInfo.activityInfo;
+            if (!info.enabled || !info.exported) {
+                continue;
+            }
+            if (info.packageName.equals(getPackageName())) {
+                continue;
+            }
+
+            Intent targetIntent = new Intent(browserIntent);
+            targetIntent.setPackage(info.packageName);
+            chooserIntents.add(targetIntent);
+        }
+
+        if (chooserIntents.isEmpty()) {
+            return null;
+        }
+
+        final Intent lastIntent = chooserIntents.remove(chooserIntents.size() - 1);
+        if (chooserIntents.isEmpty()) {
+            // there was only one, no need to show the chooser
+            return lastIntent;
+        }
+
+        Intent chooserIntent = Intent.createChooser(lastIntent, null);
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS,
+                chooserIntents.toArray(new Intent[chooserIntents.size()]));
+        return chooserIntent;
     }
 }
