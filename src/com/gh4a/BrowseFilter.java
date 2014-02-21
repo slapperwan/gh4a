@@ -2,14 +2,12 @@ package com.gh4a;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.egit.github.core.client.IGitHubConstants;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageItemInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
