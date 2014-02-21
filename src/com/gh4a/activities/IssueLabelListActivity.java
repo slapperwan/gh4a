@@ -274,7 +274,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
 
         @Override
         protected void onSuccess(Void result) {
-            getSupportLoaderManager().restartLoader(0, null, mLabelCallback);
+            getSupportLoaderManager().getLoader(0).onContentChanged();
         }
     }
 
@@ -305,7 +305,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
 
         @Override
         protected void onSuccess(Void result) {
-            getSupportLoaderManager().restartLoader(0, null, mLabelCallback);
+            getSupportLoaderManager().getLoader(0).onContentChanged();
         }
 
         @Override
@@ -339,7 +339,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
 
         @Override
         protected void onSuccess(Void result) {
-            getSupportLoaderManager().restartLoader(0, null, mLabelCallback);
+            getSupportLoaderManager().getLoader(0).onContentChanged();
             mAddedLabel = null;
         }
 
