@@ -29,7 +29,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.devspark.progressfragment.ProgressFragment;
+import com.devspark.progressfragment.SherlockProgressFragment;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -48,7 +48,7 @@ import com.gh4a.utils.UiUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
-public class RepositoryFragment extends ProgressFragment implements OnClickListener {
+public class RepositoryFragment extends SherlockProgressFragment implements OnClickListener {
     private Repository mRepository;
     private View mContentView;
 

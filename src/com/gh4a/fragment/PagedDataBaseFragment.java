@@ -115,7 +115,7 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
         fillData(events);
         mIsLoadCompleted = true;
         setListShown(true);
-        getActivity().invalidateOptionsMenu();
+        getSherlockActivity().invalidateOptionsMenu();
         mAdapter.notifyDataSetChanged();
         if (!TextUtils.isEmpty(mCurrentFilter)) {
             mAdapter.getFilter().filter(mCurrentFilter);

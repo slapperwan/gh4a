@@ -59,7 +59,7 @@ public abstract class ListDataBaseFragment<T> extends ListFragment implements
         } else {
             setListShownNoAnimation(true);
         }
-        getActivity().invalidateOptionsMenu();
+        getSherlockActivity().invalidateOptionsMenu();
     }
 
     @Override

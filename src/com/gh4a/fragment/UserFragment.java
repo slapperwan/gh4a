@@ -36,7 +36,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.devspark.progressfragment.ProgressFragment;
+import com.devspark.progressfragment.SherlockProgressFragment;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -54,7 +54,7 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
-public class UserFragment extends ProgressFragment implements View.OnClickListener {
+public class UserFragment extends SherlockProgressFragment implements View.OnClickListener {
     private String mUserLogin;
     private String mUserName;
     private User mUser;
@@ -75,7 +75,7 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
             }
             setContentEmpty(!success);
             setContentShown(true);
-            getActivity().invalidateOptionsMenu();
+            getSherlockActivity().invalidateOptionsMenu();
         }
     };
 

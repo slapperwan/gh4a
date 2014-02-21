@@ -15,7 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.devspark.progressfragment.ProgressFragment;
+import com.devspark.progressfragment.SherlockProgressFragment;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -28,7 +28,7 @@ import com.gh4a.utils.GravatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
-public class CommitFragment extends ProgressFragment implements OnClickListener {
+public class CommitFragment extends SherlockProgressFragment implements OnClickListener {
     private String mRepoOwner;
     private String mRepoName;
     private String mObjectSha;
