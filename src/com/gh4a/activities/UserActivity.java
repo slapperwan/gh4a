@@ -2,18 +2,13 @@ package com.gh4a.activities;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.eclipse.egit.github.core.service.UserService;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
-
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -176,16 +171,13 @@ public class UserActivity extends LoadingFragmentPagerActivity {
                 }
                 return true;
             case R.id.dark:
-                Gh4Application.THEME = R.style.DefaultTheme;
-                saveTheme(R.style.DefaultTheme);
+                setThemeSetting(Constants.Theme.DARK);
                 return true;
             case R.id.light:
-                Gh4Application.THEME = R.style.LightTheme;
-                saveTheme(R.style.LightTheme);
+                setThemeSetting(Constants.Theme.LIGHT);
                 return true;
             case R.id.lightDark:
-                Gh4Application.THEME = R.style.LightDarkTheme;
-                saveTheme(R.style.LightDarkTheme);
+                setThemeSetting(Constants.Theme.LIGHTDARK);
                 return true;
             case R.id.follow:
                 item.setActionView(R.layout.ab_loading);
@@ -217,13 +209,8 @@ public class UserActivity extends LoadingFragmentPagerActivity {
     }
 
     @SuppressLint("NewApi")
-    private void saveTheme(int theme) {
-        SharedPreferences sharedPreferences = getSharedPreferences(
-                Constants.PREF_NAME, MODE_PRIVATE);
-        Editor editor = sharedPreferences.edit();
-        editor.putInt("THEME", theme);
-        editor.commit();
-
+    private void setThemeSetting(int theme) {
+        Gh4Application.get(this).setThemeSetting(theme);
         recreate();
     }
 
