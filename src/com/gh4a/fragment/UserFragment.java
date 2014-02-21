@@ -19,10 +19,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.User;
-
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
@@ -35,7 +34,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import com.devspark.progressfragment.SherlockProgressFragment;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -60,7 +58,6 @@ public class UserFragment extends SherlockProgressFragment implements View.OnCli
     private User mUser;
     private View mContentView;
 
-
     private LoaderCallbacks<User> mUserCallback = new LoaderCallbacks<User>() {
         @Override
         public Loader<LoaderResult<User>> onCreateLoader(int id, Bundle args) {
@@ -75,7 +72,7 @@ public class UserFragment extends SherlockProgressFragment implements View.OnCli
             }
             setContentEmpty(!success);
             setContentShown(true);
-            getSherlockActivity().invalidateOptionsMenu();
+            invalidateOptionsMenu();
         }
     };
 
@@ -147,6 +144,11 @@ public class UserFragment extends SherlockProgressFragment implements View.OnCli
     public void refresh() {
         setContentShown(false);
         getLoaderManager().getLoader(0).onContentChanged();
+    }
+
+    @SuppressLint("NewApi") // ABS has invalidateOptionsMenu()
+    private void invalidateOptionsMenu() {
+        getSherlockActivity().invalidateOptionsMenu();
     }
 
     private void fillData() {
