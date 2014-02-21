@@ -297,7 +297,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
                 menu.removeItem(R.id.issue_edit);
             }
         }
-        return super.onPrepareOptionsMenu(menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
