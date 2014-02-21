@@ -20,11 +20,15 @@ import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.MergeStatus;
 import org.eclipse.egit.github.core.PullRequest;
+import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.IssueService;
+import org.eclipse.egit.github.core.service.PullRequestService;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
@@ -39,6 +43,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
@@ -46,6 +53,7 @@ import com.gh4a.R;
 import com.gh4a.activities.EditCommentActivity;
 import com.gh4a.adapter.CommentAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.IssueCommentsLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
@@ -66,6 +74,8 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
     private String mRepoName;
     private int mPullRequestNumber;
     private LinearLayout mHeader;
+    private PullRequest mPullRequest;
+    private boolean mIsCollaborator;
 
     private LoaderCallbacks<PullRequest> mPullRequestCallback = new LoaderCallbacks<PullRequest>() {
         @Override
@@ -76,7 +86,23 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         public void onResultReady(LoaderResult<PullRequest> result) {
             setListShown(true);
             if (!result.handleError(getActivity())) {
-                fillData(result.getData());
+                mPullRequest = result.getData();
+                fillData();
+                invalidateOptionsMenu();
+            }
+        }
+    };
+
+    private LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>() {
+        @Override
+        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
+            return new IsCollaboratorLoader(getActivity(), mRepoOwner, mRepoName);
+        }
+        @Override
+        public void onResultReady(LoaderResult<Boolean> result) {
+            if (!result.handleError(getActivity())) {
+                mIsCollaborator = result.getData();
+                invalidateOptionsMenu();
             }
         }
     };
@@ -99,6 +125,36 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
         mRepoName = getArguments().getString(Constants.Repository.NAME);
         mPullRequestNumber = getArguments().getInt(Constants.Issue.NUMBER);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        Gh4Application app = Gh4Application.get(getActivity());
+        if (app.isAuthorized()) {
+            inflater.inflate(R.menu.pullrequest_menu, menu);
+
+            boolean isCreator = mPullRequest != null &&
+                    mPullRequest.getUser().getLogin().equals(app.getAuthLogin());
+            String state = mPullRequest != null ? mPullRequest.getState() : null;
+
+            if ((!mIsCollaborator && !isCreator) || Constants.Issue.STATE_CLOSED.equals(state)) {
+                menu.removeItem(R.id.pull_close);
+            }
+            if ((!mIsCollaborator && !isCreator) || Constants.Issue.STATE_OPEN.equals(state)) {
+                menu.removeItem(R.id.pull_reopen);
+            }
+            if (!mIsCollaborator || mPullRequest == null) {
+                menu.removeItem(R.id.pull_merge);
+            } else if (mPullRequest.isMerged()) {
+                MenuItem mergeItem = menu.findItem(R.id.pull_merge);
+                mergeItem.setTitle(R.string.pull_request_merged);
+                mergeItem.setEnabled(false);
+            } else if (!mPullRequest.isMergeable()) {
+                menu.findItem(R.id.pull_merge).setEnabled(false);
+            }
+        }
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -133,12 +189,14 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         super.onActivityCreated(savedInstanceState);
 
         getLoaderManager().initLoader(1, null, mPullRequestCallback);
+        getLoaderManager().initLoader(2, null, mCollaboratorCallback);
     }
 
     @Override
     public void refresh() {
         super.refresh();
         getLoaderManager().getLoader(1).onContentChanged();
+        getLoaderManager().getLoader(2).onContentChanged();
     }
 
     @Override
@@ -151,22 +209,47 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         return 0;
     }
 
-    private void fillData(final PullRequest pullRequest) {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.pull_merge:
+                showMergeDialog();
+                break;
+            case R.id.pull_close:
+            case R.id.pull_reopen:
+                new PullRequestOpenCloseTask(item.getItemId() == R.id.issue_reopen).execute();
+                break;
+            case R.id.share:
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_pull_subject,
+                        mPullRequestNumber, mPullRequest.getTitle(), mRepoOwner + "/" + mRepoName));
+                shareIntent.putExtra(Intent.EXTRA_TEXT,  mPullRequest.getHtmlUrl());
+                shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
+                startActivity(shareIntent);
+                break;
+            case R.id.refresh:
+                refresh();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void fillData() {
         final Gh4Application app = Gh4Application.get(getActivity());
         View v = getView();
 
-        User user = pullRequest.getUser();
+        User user = mPullRequest.getUser();
         ImageView gravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
         gravatar.setOnClickListener(this);
         gravatar.setTag(user);
         GravatarHandler.assignGravatar(gravatar, user);
 
         TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
-        tvCommentTitle.setText(getString(R.string.issue_comments) + " (" + pullRequest.getComments() + ")");
+        tvCommentTitle.setText(getString(R.string.issue_comments) + " (" + mPullRequest.getComments() + ")");
 
         TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
-        tvState.setText(pullRequest.getState());
-        if (Constants.Issue.STATE_CLOSED.equals(pullRequest.getState())) {
+        if (Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState())) {
             tvState.setBackgroundResource(R.drawable.default_red_box);
             tvState.setText(getString(R.string.closed).toUpperCase(Locale.getDefault()));
         } else {
@@ -176,24 +259,44 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
 
         TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
         tvExtra.setText(user.getLogin() + "\n"
-                + StringUtils.formatRelativeTime(getActivity(), pullRequest.getCreatedAt(), true));
+                + StringUtils.formatRelativeTime(getActivity(), mPullRequest.getCreatedAt(), true));
 
         TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
-        tvTitle.setText(pullRequest.getTitle());
+        tvTitle.setText(mPullRequest.getTitle());
         tvTitle.setTypeface(app.boldCondensed);
 
         TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
-        String body = pullRequest.getBodyHtml();
+        String body = mPullRequest.getBodyHtml();
         tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
         if (!StringUtils.isBlank(body)) {
             HttpImageGetter imageGetter = new HttpImageGetter(getActivity());
             body = HtmlUtils.format(body).toString();
-            imageGetter.bind(tvDesc, body, pullRequest.getId());
+            imageGetter.bind(tvDesc, body, mPullRequest.getId());
         }
 
         v.findViewById(R.id.iv_comment).setOnClickListener(this);
     }
 
+    private void showMergeDialog() {
+        String title = getString(R.string.pull_message_dialog_title, mPullRequestNumber);
+        View view = getLayoutInflater(null).inflate(R.layout.pull_merge_message_dialog, null);
+
+        final EditText editor = (EditText) view.findViewById(R.id.et_commit_message);
+        editor.setText(mPullRequest.getTitle());
+
+        UiUtils.createDialogBuilder(getActivity())
+                .setTitle(title)
+                .setView(view)
+                .setPositiveButton(getString(R.string.pull_request_merge), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String text = editor.getText() == null ? null : editor.getText().toString();
+                        new PullRequestMergeTask(text).execute();
+                    }
+                })
+                .setNegativeButton(getString(R.string.cancel), null)
+                .show();
+    }
 
     @Override
     public void onClick(View v) {
@@ -219,7 +322,8 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_EDIT && resultCode == Activity.RESULT_OK) {
-            refresh();
+            // no need to refresh pull request and collaborator status in that case
+            super.refresh();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -271,5 +375,73 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
             ToastUtils.showMessage(mContext, R.string.issue_error_comment);
         }
     }
-}
 
+    private class PullRequestOpenCloseTask extends ProgressDialogTask<PullRequest> {
+        private boolean mOpen;
+
+        public PullRequestOpenCloseTask(boolean open) {
+            super(getActivity(), 0, open ? R.string.opening_msg : R.string.closing_msg);
+            mOpen = open;
+        }
+
+        @Override
+        protected PullRequest run() throws IOException {
+            PullRequestService pullService = (PullRequestService)
+                    Gh4Application.get(mContext).getService(Gh4Application.PULL_SERVICE);
+            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+
+            PullRequest pullRequest = pullService.getPullRequest(repoId, mPullRequestNumber);
+            pullRequest.setState(mOpen ? Constants.Issue.STATE_OPEN : Constants.Issue.STATE_CLOSED);
+
+            return pullService.editPullRequest(repoId, pullRequest);
+        }
+
+        @Override
+        protected void onSuccess(PullRequest result) {
+            mPullRequest = result;
+            ToastUtils.showMessage(mContext,
+                    mOpen ? R.string.issue_success_reopen : R.string.issue_success_close);
+
+            fillData();
+            invalidateOptionsMenu();
+        }
+
+        @Override
+        protected void onError(Exception e) {
+            ToastUtils.showMessage(mContext, R.string.issue_error_close);
+        }
+    }
+
+    private class PullRequestMergeTask extends ProgressDialogTask<MergeStatus> {
+        private String mCommitMessage;
+
+        public PullRequestMergeTask(String commitMessage) {
+            super(getActivity(), 0, R.string.merging_msg);
+            mCommitMessage = commitMessage;
+        }
+
+        @Override
+        protected MergeStatus run() throws Exception {
+            PullRequestService pullService = (PullRequestService)
+                    Gh4Application.get(mContext).getService(Gh4Application.PULL_SERVICE);
+            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+
+            return pullService.merge(repoId, mPullRequestNumber, mCommitMessage);
+        }
+
+        @Override
+        protected void onSuccess(MergeStatus result) {
+            if (result.isMerged()) {
+                setListShown(false);
+                getLoaderManager().getLoader(1).onContentChanged();
+            } else {
+                ToastUtils.showMessage(mContext, R.string.pull_error_merge);
+            }
+        }
+
+        @Override
+        protected void onError(Exception e) {
+            ToastUtils.showMessage(mContext, R.string.pull_error_merge);
+        }
+    }
+}
