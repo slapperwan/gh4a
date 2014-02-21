@@ -81,7 +81,7 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
     public void refresh() {
         mLoadMore = false;
         setListShown(false);
-        getLoaderManager().restartLoader(0, null, this);
+        getLoaderManager().getLoader(0).onContentChanged();
     }
 
     private void fillData(Collection<T> data) {

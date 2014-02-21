@@ -136,6 +136,12 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
     }
 
     @Override
+    public void refresh() {
+        super.refresh();
+        getLoaderManager().getLoader(1).onContentChanged();
+    }
+
+    @Override
     protected RootAdapter<Comment> onCreateAdapter() {
         return new CommentAdapter(getActivity(), mRepoOwner, this);
     }

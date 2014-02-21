@@ -146,7 +146,7 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
 
     public void refresh() {
         setContentShown(false);
-        getLoaderManager().restartLoader(0, null, mUserCallback);
+        getLoaderManager().getLoader(0).onContentChanged();
     }
 
     private void fillData() {
