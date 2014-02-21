@@ -272,3 +272,4 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         }
     }
 }
+
