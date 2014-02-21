@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,123 +15,60 @@
  */
 package com.gh4a.fragment;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.UserService;
 
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
 
-import com.actionbarsherlock.app.SherlockFragment;
-import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.UserAdapter;
-import com.gh4a.loader.PageIteratorLoader;
+import com.gh4a.utils.IntentUtils;
 
-public class FollowersFollowingListFragment extends BaseFragment 
-    implements LoaderManager.LoaderCallbacks<List<User>>, OnItemClickListener {
-
+public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> {
     private String mLogin;
     private boolean mFindFollowers;
-    private ListView mListView;
-    private UserAdapter mAdapter;
-    private PageIterator<User> mDataIterator;
-    
+
     public static FollowersFollowingListFragment newInstance(String login, boolean mFindFollowers) {
         FollowersFollowingListFragment f = new FollowersFollowingListFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.User.USER_LOGIN, login);
+        args.putString(Constants.User.LOGIN, login);
         args.putBoolean("FIND_FOLLOWER", mFindFollowers);
         f.setArguments(args);
-        
+
         return f;
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mLogin = getArguments().getString(Constants.User.USER_LOGIN);
+        mLogin = getArguments().getString(Constants.User.LOGIN);
         mFindFollowers = getArguments().getBoolean("FIND_FOLLOWER");
     }
-    
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.generic_list, container, false);
-        mListView = (ListView) v.findViewById(R.id.list_view);
-        return v;
-    }
-    
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        
-        mAdapter = new UserAdapter(getSherlockActivity(), new ArrayList<User>(), 
-                R.layout.row_gravatar_1, false);
-        mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener(this);
-        
-        loadData();
 
-        getLoaderManager().initLoader(0, null, this);
-        getLoaderManager().getLoader(0).forceLoad();
-    }
-    
-    private void loadData() {
-        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        UserService userService = new UserService(client);
-        if (mFindFollowers) {
-            mDataIterator = userService.pageFollowers(mLogin);
-        } 
-        else {
-            mDataIterator = userService.pageFollowing(mLogin);
-        }
-    }
-
-    private void fillData(List<User> users) {
-        mAdapter.addAll(users);
-        mAdapter.notifyDataSetChanged();
+    @Override
+    protected RootAdapter<User> onCreateAdapter() {
+        return new UserAdapter(getActivity(), false);
     }
 
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        Gh4Application context = ((BaseSherlockFragmentActivity) getActivity()).getApplicationContext();
-        User user = (User) adapterView.getAdapter().getItem(position);
-        context.openUserInfoActivity(getActivity(), user.getLogin(), user.getName());
+    protected int getEmptyTextResId() {
+        return mFindFollowers ? R.string.no_followers_found : R.string.no_following_found;
     }
 
     @Override
-    public Loader<List<User>> onCreateLoader(int id, Bundle args) {
-        return new PageIteratorLoader<User>(getSherlockActivity(), mDataIterator);
+    protected void onItemClick(User user) {
+        IntentUtils.openUserInfoActivity(getActivity(), user);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<User>> loader, List<User> users) {
-        hideLoading();
-        if (users != null) {
-            fillData(users);
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<List<User>> users) {
-        // TODO Auto-generated method stub
-        
+    protected PageIterator<User> onCreateIterator() {
+        UserService userService = (UserService)
+                Gh4Application.get(getActivity()).getService(Gh4Application.USER_SERVICE);
+        return mFindFollowers ? userService.pageFollowers(mLogin) : userService.pageFollowing(mLogin);
     }
 }

@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,12 +15,9 @@
  */
 package com.gh4a.adapter;
 
-import java.util.List;
-
 import org.eclipse.egit.github.core.User;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,127 +26,69 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.androidquery.AQuery;
-import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.GravatarUtils;
+import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
-public class UserAdapter extends RootAdapter<User> {
-
-    private int mRowLayout;
+public class UserAdapter extends RootAdapter<User> implements OnClickListener {
     private boolean mShowExtraData;
-    private AQuery aq;
-    
-    public UserAdapter(Context context, List<User> objects) {
-        super(context, objects);
-        aq = new AQuery((BaseSherlockFragmentActivity) context);
-    }
 
-    public UserAdapter(Context context, List<User> objects, int rowLayout, boolean showExtraData) {
-        super(context, objects);
-        mRowLayout = rowLayout;
+    public UserAdapter(Context context, boolean showExtraData) {
+        super(context);
         mShowExtraData = showExtraData;
-        aq = new AQuery((BaseSherlockFragmentActivity) context);
     }
-    
+
     @Override
-    public View doGetView(int position, View convertView, ViewGroup parent) {
-        View v = convertView;
-        ViewHolder viewHolder = null;
+    protected View createView(LayoutInflater inflater, ViewGroup parent) {
+        View v = inflater.inflate(R.layout.row_gravatar_1, parent, false);
+        ViewHolder viewHolder = new ViewHolder();
+
         Gh4Application app = (Gh4Application) mContext.getApplicationContext();
-        
-        if (v == null) {
-            LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(mRowLayout, null);
+        Typeface boldCondensed = app.boldCondensed;
+        Typeface italic = app.italic;
 
-            
-            Typeface boldCondensed = app.boldCondensed;
-            Typeface regular = app.regular;
-            Typeface italic = app.italic;
-            
-            viewHolder = new ViewHolder();
-            viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-            
-            viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-            viewHolder.tvTitle.setTypeface(boldCondensed);
-            
-            viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-            if (viewHolder.tvDesc != null) {
-                viewHolder.tvDesc.setTypeface(regular);
-            }
-            
-            viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-            if (viewHolder.tvExtra != null) {
-                viewHolder.tvExtra.setTypeface(italic);
-            }
-            
-            v.setTag(viewHolder);
-        }
-        else {
-            viewHolder = (ViewHolder) v.getTag();
-        }
+        viewHolder = new ViewHolder();
+        viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
+        viewHolder.ivGravatar.setOnClickListener(this);
 
-        final User user = mObjects.get(position);
+        viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
+        viewHolder.tvTitle.setTypeface(boldCondensed);
 
-        if (user != null) {
-            aq.recycle(convertView);
-            if (viewHolder.ivGravatar != null) {
-                if (!StringUtils.isBlank(user.getGravatarId())) {
-                    aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(user.getGravatarId()), 
-                            true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
-                }
-                else if (!StringUtils.isBlank(user.getEmail())) {
-                    aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(StringUtils.md5Hex(user.getEmail())), 
-                            true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
-                }
-                else if (!StringUtils.isBlank(user.getAvatarUrl())) { 
-                    aq.id(viewHolder.ivGravatar).image(user.getAvatarUrl(), 
-                            true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
-                }
-                else {
-                    aq.id(viewHolder.ivGravatar).image(R.drawable.default_avatar);
-                }
-                
-                viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
+        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+        viewHolder.tvExtra.setTypeface(italic);
 
-                    @Override
-                    public void onClick(View v) {
-                        /** Open user activity */
-                        if (!StringUtils.isBlank(user.getLogin())) {
-                            Gh4Application context = (Gh4Application) v.getContext()
-                                    .getApplicationContext();
-                            context.openUserInfoActivity(v.getContext(), user.getLogin(), user
-                                    .getLogin());
-                        }
-                    }
-                });
-            }
-
-            if (viewHolder.tvTitle != null) {
-                viewHolder.tvTitle.setText(StringUtils.formatName(user.getLogin(), user.getName()));
-            }
-            
-            if (viewHolder.tvDesc != null) {
-                viewHolder.tvDesc.setText(StringUtils.formatName(user.getLogin(), user.getName()));
-            }
-
-            if (mShowExtraData && viewHolder.tvExtra != null) {
-                Resources res = v.getResources();
-                String extraData = String.format(res.getString(R.string.user_extra_data), user
-                            .getFollowers(), user.getPublicRepos());
-                viewHolder.tvExtra.setText(extraData);
-            }
-        }
+        v.setTag(viewHolder);
         return v;
+    }
+
+    @Override
+    protected void bindView(View v, User user) {
+        ViewHolder viewHolder = (ViewHolder) v.getTag();
+
+        GravatarHandler.assignGravatar(viewHolder.ivGravatar, user);
+        viewHolder.ivGravatar.setTag(user);
+
+        viewHolder.tvTitle.setText(StringUtils.formatName(user.getLogin(), user.getName()));
+        viewHolder.tvExtra.setVisibility(mShowExtraData ? View.VISIBLE : View.GONE);
+        if (mShowExtraData) {
+            viewHolder.tvExtra.setText(mContext.getString(R.string.user_extra_data,
+                    user.getFollowers(), user.getPublicRepos()));
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.iv_gravatar) {
+            User user = (User) v.getTag();
+            IntentUtils.openUserInfoActivity(mContext, user);
+        }
     }
 
     private static class ViewHolder {
         public TextView tvTitle;
         public ImageView ivGravatar;
-        public TextView tvDesc;
         public TextView tvExtra;
     }
-
 }

@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,12 +15,9 @@
  */
 package com.gh4a.adapter;
 
-import java.util.List;
-
 import org.eclipse.egit.github.core.RepositoryCommit;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,82 +26,66 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.androidquery.AQuery;
-import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.CommitUtils;
-import com.gh4a.utils.GravatarUtils;
+import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.StringUtils;
 
-public class CommitAdapter extends RootAdapter<RepositoryCommit> {
-    
-    private AQuery aq;
-    
-    public CommitAdapter(Context context, List<RepositoryCommit> objects) {
-        super(context, objects);
-        aq = new AQuery((BaseSherlockFragmentActivity) context);
+public class CommitAdapter extends RootAdapter<RepositoryCommit> implements OnClickListener {
+    public CommitAdapter(Context context) {
+        super(context);
     }
 
     @Override
-    public View doGetView(int position, View convertView, ViewGroup parent) {
-        View v = convertView;
-        ViewHolder viewHolder;
-        Gh4Application app = (Gh4Application) mContext.getApplicationContext();
-        if (v == null) {
-            LayoutInflater vi = (LayoutInflater) LayoutInflater.from(mContext);
-            v = vi.inflate(R.layout.row_commit, null);
-            
-            Typeface boldCondensed = app.boldCondensed;
-            
-            viewHolder = new ViewHolder();
-            viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-            viewHolder.tvDesc.setTypeface(boldCondensed);
-            
-            viewHolder.tvSha = (TextView) v.findViewById(R.id.tv_sha);
-            viewHolder.tvSha.setTypeface(Typeface.MONOSPACE);
-            
-            viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-            
-            viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
+    protected View createView(LayoutInflater inflater, ViewGroup parent) {
+        View v = LayoutInflater.from(mContext).inflate(R.layout.row_commit, null);
+        ViewHolder viewHolder = new ViewHolder();
+        Typeface boldCondensed = Gh4Application.get(mContext).boldCondensed;
 
-            v.setTag(viewHolder);
-        }
-        else {
-            viewHolder = (ViewHolder) v.getTag();
-        }
+        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+        viewHolder.tvDesc.setTypeface(boldCondensed);
 
-        final RepositoryCommit commit = mObjects.get(position);
-        if (commit != null) {
-            
-            aq.recycle(convertView);
-            aq.id(viewHolder.ivGravatar).image(GravatarUtils.getGravatarUrl(CommitUtils.getAuthorGravatarId(commit)), 
-                    true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
-            
-            viewHolder.ivGravatar.setOnClickListener(new OnClickListener() {
+        viewHolder.tvSha = (TextView) v.findViewById(R.id.tv_sha);
+        viewHolder.tvSha.setTypeface(Typeface.MONOSPACE);
 
-                @Override
-                public void onClick(View v) {
-                    /** Open user activity */
-                    if (CommitUtils.getAuthorLogin(commit) != null) {
-                        Gh4Application context = (Gh4Application) v.getContext()
-                                .getApplicationContext();
-                        context.openUserInfoActivity(v.getContext(), CommitUtils.getAuthorLogin(commit),
-                                null);
-                    }
-                }
-            });
+        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
 
-            viewHolder.tvSha.setText(commit.getSha().substring(0, 10));
-            viewHolder.tvDesc.setText(commit.getCommit().getMessage());
+        viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
+        viewHolder.ivGravatar.setOnClickListener(this);
 
-            Resources res = v.getResources();
-            String extraData = String.format(res.getString(R.string.more_commit_data),
-                    CommitUtils.getAuthorName(commit), 
-                    app.pt.format(CommitUtils.convertCommitDateTime(commit.getCommit().getAuthor().getDate())));
-
-            viewHolder.tvExtra.setText(extraData);
-        }
+        v.setTag(viewHolder);
         return v;
+    }
+
+    @Override
+    protected void bindView(View v, RepositoryCommit commit) {
+        ViewHolder viewHolder = (ViewHolder) v.getTag();
+
+        GravatarHandler.assignGravatar(viewHolder.ivGravatar, commit.getAuthor());
+        viewHolder.ivGravatar.setTag(commit);
+
+        String message = commit.getCommit().getMessage();
+        int pos = message.indexOf('\n');
+        if (pos > 0) {
+            message = message.substring(0, pos);
+        }
+
+        viewHolder.tvDesc.setText(message);
+        viewHolder.tvSha.setText(commit.getSha().substring(0, 10));
+
+        viewHolder.tvExtra.setText(mContext.getString(R.string.more_commit_data,
+                CommitUtils.getAuthorName(mContext, commit),
+                StringUtils.formatRelativeTime(mContext, commit.getCommit().getAuthor().getDate(), false)));
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.iv_gravatar) {
+            RepositoryCommit commit = (RepositoryCommit) v.getTag();
+            IntentUtils.openUserInfoActivity(mContext, CommitUtils.getAuthorLogin(mContext, commit));
+        }
     }
 
     private static class ViewHolder {

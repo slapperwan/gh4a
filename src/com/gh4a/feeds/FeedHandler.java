@@ -4,24 +4,23 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import android.util.Log;
-
-import com.gh4a.Constants;
 import com.gh4a.holder.Feed;
+import com.gh4a.utils.GravatarUtils;
 
 public class FeedHandler extends DefaultHandler {
 
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
     private List<Feed> mFeeds;
     private Feed mFeed;
     private StringBuilder mBuilder;
-    private boolean author;
-    
+    private boolean mAuthor;
+
     @Override
     public void characters(char[] ch, int start, int length)
             throws SAXException {
@@ -39,26 +38,20 @@ public class FeedHandler extends DefaultHandler {
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes)
             throws SAXException {
-        
+
         if (localName.equalsIgnoreCase("entry")) {
             mFeed = new Feed();
         }
-        
+
         if (mFeed != null) {
-            if (localName.equalsIgnoreCase("author")){
-                author = true;
-            }
-            
-            if (localName.equalsIgnoreCase("thumbnail")){
-                String gravatarUrl = attributes.getValue(0);
-                String[] gravatarUrlPart = gravatarUrl.split("/");
-                if (gravatarUrlPart.length > 3) {
-                    String gravatarId = gravatarUrl.substring(gravatarUrl.indexOf(gravatarUrlPart[4]), gravatarUrl.indexOf("?"));
-                    mFeed.setGravatarId(gravatarId);
+            if (localName.equalsIgnoreCase("author")) {
+                mAuthor = true;
+            } else if (localName.equalsIgnoreCase("thumbnail")) {
+                String gravatarUrl = attributes.getValue("url");
+                if (gravatarUrl != null) {
+                    mFeed.setGravatarId(GravatarUtils.extractGravatarId(gravatarUrl));
                 }
-            }
-            
-            if (localName.equalsIgnoreCase("link")){
+            } else if (localName.equalsIgnoreCase("link")) {
                 String url = attributes.getValue("href");
                 mFeed.setLink(url);
             }
@@ -68,34 +61,35 @@ public class FeedHandler extends DefaultHandler {
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
         if (mFeed != null) {
+            if (localName.equalsIgnoreCase("id")) {
+                String id = mBuilder.toString().trim();
+                int pos = id.lastIndexOf('/');
+                if (pos > 0) {
+                    mFeed.setId(id.substring(pos + 1));
+                }
+            }
             if (localName.equalsIgnoreCase("title")) {
                 String title = mBuilder.toString().trim();
                 mFeed.setTitle(title);
-            }
-            else if (localName.equalsIgnoreCase("content")) {
+            } else if (localName.equalsIgnoreCase("content")) {
                 mFeed.setContent(mBuilder.toString().trim());
-            }
-            else if (localName.equalsIgnoreCase("name") && author) {
+            } else if (localName.equalsIgnoreCase("name") && mAuthor) {
                 mFeed.setAuthor(mBuilder.toString().trim());
-                author = false;
-            }
-            else if (localName.equalsIgnoreCase("published")) {
+                mAuthor = false;
+            } else if (localName.equalsIgnoreCase("published")) {
                 try {
                     mFeed.setPublished(sdf.parse(mBuilder.toString().trim()));
                 }
                 catch (ParseException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
                 }
-                author = false;
-            }
-            else if (localName.equalsIgnoreCase("entry")) {
+            } else if (localName.equalsIgnoreCase("entry")) {
                 mFeeds.add(mFeed);
+                mFeed = null;
             }
         }
         mBuilder.setLength(0);
     }
-    
+
     public List<Feed> getFeeds() {
         return mFeeds;
     }

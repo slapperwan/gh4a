@@ -6,15 +6,14 @@ import android.view.MenuItem;
 import com.gh4a.Constants;
 
 public class PublicEventListFragment extends EventListFragment {
-
-    public static EventListFragment newInstance(String login, boolean isPrivate) {
-        EventListFragment f = new PublicEventListFragment();
+    public static PublicEventListFragment newInstance(String login, boolean isPrivate) {
+        PublicEventListFragment f = new PublicEventListFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.User.USER_LOGIN, login);
-        args.putBoolean(Constants.Event.IS_PRIVATE, isPrivate);
+        args.putString(Constants.User.LOGIN, login);
+        args.putBoolean("private", isPrivate);
         f.setArguments(args);
-        
+
         return f;
     }
 
@@ -22,15 +21,13 @@ public class PublicEventListFragment extends EventListFragment {
     public int getMenuGroupId() {
         return 2;
     }
-    
+
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        if(item.getGroupId() == 2) { 
+        if (item.getGroupId() == 2) {
             open(item);
             return true;
         }
-        else {
-            return false;
-        }
+        return false;
     }
 }

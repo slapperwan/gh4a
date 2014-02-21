@@ -1,22 +1,12 @@
 package com.gh4a.fragment;
 
-import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.RepositoryCommit;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.CommitService;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,262 +15,207 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.androidquery.AQuery;
-import com.gh4a.BaseSherlockFragmentActivity;
+import com.devspark.progressfragment.ProgressFragment;
 import com.gh4a.Constants;
-import com.gh4a.DiffViewerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.FileViewerActivity;
+import com.gh4a.loader.CommitLoader;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.CommitUtils;
-import com.gh4a.utils.GravatarUtils;
+import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.StringUtils;
 
-public class CommitFragment extends BaseFragment {
-
+public class CommitFragment extends ProgressFragment implements OnClickListener {
     private String mRepoOwner;
     private String mRepoName;
     private String mObjectSha;
- 
+    private RepositoryCommit mCommit;
+    private View mContentView;
+
+    private LoaderCallbacks<RepositoryCommit> mCommitCallback = new LoaderCallbacks<RepositoryCommit>() {
+        @Override
+        public Loader<LoaderResult<RepositoryCommit>> onCreateLoader(int id, Bundle args) {
+            return new CommitLoader(getActivity(), mRepoOwner, mRepoName, mObjectSha);
+        }
+
+        @Override
+        public void onResultReady(LoaderResult<RepositoryCommit> result) {
+            boolean success = !result.handleError(getActivity());
+            if (success) {
+                mCommit = result.getData();
+                fillData();
+            }
+            setContentEmpty(!success);
+            setContentShown(true);
+        }
+    };
+
     public static CommitFragment newInstance(String repoOwner, String repoName, String objectSha) {
         CommitFragment f = new CommitFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.Repository.REPO_OWNER, repoOwner);
-        args.putString(Constants.Repository.REPO_NAME, repoName);
+        args.putString(Constants.Repository.OWNER, repoOwner);
+        args.putString(Constants.Repository.NAME, repoName);
         args.putString(Constants.Object.OBJECT_SHA, objectSha);
         f.setArguments(args);
         return f;
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.REPO_NAME);
+        mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
+        mRepoName = getArguments().getString(Constants.Repository.NAME);
         mObjectSha = getArguments().getString(Constants.Object.OBJECT_SHA);
     }
-    
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.commit, container, false);
-        return v;
+        mContentView = inflater.inflate(R.layout.commit, null);
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
-    
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        showLoading();
-        new LoadCommitInfoTask(this).execute();
-    }
-    
-    private static class LoadCommitInfoTask extends AsyncTask<Void, Integer, RepositoryCommit> {
 
-        private WeakReference<CommitFragment> mTarget;
-        private boolean mException;
+        setContentView(mContentView);
+        setContentShown(false);
 
-        public LoadCommitInfoTask(CommitFragment fragment) {
-            mTarget = new WeakReference<CommitFragment>(fragment);
-        }
-
-        @Override
-        protected RepositoryCommit doInBackground(Void... params) {
-            if (mTarget.get() != null) {
-                try {
-                    CommitFragment fragment = mTarget.get();
-                    BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) fragment.getSherlockActivity();
-                    
-                    GitHubClient client = new GitHubClient();
-                    client.setOAuth2Token(activity.getAuthToken());
-                    CommitService commitService = new CommitService(client);
-                    return commitService.getCommit(new RepositoryId(fragment.mRepoOwner, fragment.mRepoName),
-                            fragment.mObjectSha);
-                }
-                catch (IOException e) {
-                    Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                    mException = true;
-                    return null;
-                }
-            }
-            else {
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected void onPostExecute(RepositoryCommit result) {
-            if (mTarget.get() != null) {
-                CommitFragment fragment = mTarget.get();
-                fragment.hideLoading();
-                BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) fragment.getSherlockActivity();
-                if (mException) {
-                    if (activity != null) {
-                        activity.showError();
-                    }
-                }
-                else {
-                    mTarget.get().fillData(result);
-                }
-            }
-        }
-
+        getLoaderManager().initLoader(0, null, mCommitCallback);
     }
 
-    private void fillData(final RepositoryCommit commit) {
-        if (getSherlockActivity() == null) {
-            return;
-        }
-        View v = getView();
-        final BaseSherlockFragmentActivity activity = (BaseSherlockFragmentActivity) getSherlockActivity();
-        final Gh4Application context = activity.getApplicationContext();
-        LinearLayout llChanged = (LinearLayout) v.findViewById(R.id.ll_changed);
-        LinearLayout llAdded = (LinearLayout) v.findViewById(R.id.ll_added);
-        LinearLayout llDeleted = (LinearLayout) v.findViewById(R.id.ll_deleted);
+    private void fillData() {
+        final Activity activity = getActivity();
+        final Gh4Application app = Gh4Application.get(activity);
+        final LayoutInflater inflater = getLayoutInflater(null);
 
-        ImageView ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-        
-        AQuery aq = new AQuery(getSherlockActivity());
-        aq.id(R.id.iv_gravatar).image(GravatarUtils.getGravatarUrl(CommitUtils.getAuthorGravatarId(commit)), 
-                true, false, 0, 0, aq.getCachedImage(R.drawable.default_avatar), 0);
-        
-        if (CommitUtils.getAuthorLogin(commit) != null) {
-            ivGravatar.setOnClickListener(new OnClickListener() {
-    
-                @Override
-                public void onClick(View v) {
-                    /** Open user activity */
-                    context.openUserInfoActivity(activity,
-                            CommitUtils.getAuthorLogin(commit), null);
-                }
-            });
-        }
-        
-        TextView tvMessage = (TextView) v.findViewById(R.id.tv_message);
-        TextView tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-        TextView tvSummary = (TextView) v.findViewById(R.id.tv_desc);
-        
-        TextView tvChangeTitle = (TextView) v.findViewById(R.id.commit_changed);
-        tvChangeTitle.setTypeface(context.boldCondensed);
-        tvChangeTitle.setTextColor(Color.parseColor("#0099cc"));
-        
-        TextView tvAddedTitle = (TextView) v.findViewById(R.id.commit_added);
-        tvAddedTitle.setTypeface(context.boldCondensed);
-        tvAddedTitle.setTextColor(Color.parseColor("#0099cc"));
-        
-        TextView tvDeletedTitle = (TextView) v.findViewById(R.id.commit_deleted);
-        tvDeletedTitle.setTypeface(context.boldCondensed);
-        tvDeletedTitle.setTextColor(Color.parseColor("#0099cc"));
-        
-        tvMessage.setText(commit.getCommit().getMessage());
-        
-        long now = System.currentTimeMillis();
-        
-        tvExtra.setText(CommitUtils.getAuthorName(commit)
-                + " "
-                + context.pt.format(CommitUtils.convertCommitDateTime(commit.getCommit().getAuthor().getDate())));
+        LinearLayout llChanged = (LinearLayout) mContentView.findViewById(R.id.ll_changed);
+        LinearLayout llAdded = (LinearLayout) mContentView.findViewById(R.id.ll_added);
+        LinearLayout llDeleted = (LinearLayout) mContentView.findViewById(R.id.ll_deleted);
+        int added = 0, changed = 0, deleted = 0;
 
-        List<CommitFile> addedFiles = new ArrayList<CommitFile>();
-        List<CommitFile> removedFiles = new ArrayList<CommitFile>();
-        List<CommitFile> modifiedFiles = new ArrayList<CommitFile>();
-        
-        //List<String> addedList = commit.getAdded();
-        List<CommitFile> commitFiles = commit.getFiles();
-        for (CommitFile commitFile : commitFiles) {
-            String status = commitFile.getStatus();
+        ImageView ivGravatar = (ImageView) mContentView.findViewById(R.id.iv_gravatar);
+        GravatarHandler.assignGravatar(ivGravatar, mCommit.getAuthor());
+
+        String login = CommitUtils.getAuthorLogin(app, mCommit);
+        if (login != null) {
+            ivGravatar.setOnClickListener(this);
+            ivGravatar.setTag(login);
+        }
+
+        TextView tvMessage = (TextView) mContentView.findViewById(R.id.tv_message);
+        TextView tvTitle = (TextView) mContentView.findViewById(R.id.tv_title);
+
+        String message = mCommit.getCommit().getMessage();
+        int pos = message.indexOf('\n');
+        String title = pos > 0 ? message.substring(0, pos) : message;
+        int length = message.length();
+        while (pos > 0 && pos < length && Character.isWhitespace(message.charAt(pos))) {
+            pos++;
+        }
+        message = pos > 0 && pos < length ? message.substring(pos) : null;
+
+        tvTitle.setText(title);
+        if (message != null) {
+            tvMessage.setText(message);
+        } else {
+            tvMessage.setVisibility(View.GONE);
+        }
+
+        TextView tvExtra = (TextView) mContentView.findViewById(R.id.tv_extra);
+        tvExtra.setText(CommitUtils.getAuthorName(app, mCommit) + " "
+                + StringUtils.formatRelativeTime(activity, mCommit.getCommit().getAuthor().getDate(), true));
+
+        if (!CommitUtils.authorEqualsCommitter(mCommit)) {
+            ViewGroup committer = (ViewGroup) mContentView.findViewById(R.id.committer_info);
+            ImageView gravatar = (ImageView) committer.findViewById(R.id.iv_commit_gravatar);
+            TextView extra = (TextView) committer.findViewById(R.id.tv_commit_extra);
+
+            committer.setVisibility(View.VISIBLE);
+            GravatarHandler.assignGravatar(gravatar, mCommit.getCommitter());
+            extra.setText(getString(R.string.commit_details, CommitUtils.getCommitterName(app, mCommit),
+                    StringUtils.formatRelativeTime(activity, mCommit.getCommit().getCommitter().getDate(), true)));
+        }
+
+        int count = mCommit.getFiles() != null ? mCommit.getFiles().size() : 0;
+        for (int i = 0; i < count; i++) {
+            CommitFile file = mCommit.getFiles().get(i);
+            String status = file.getStatus();
+            final LinearLayout parent;
+
             if ("added".equals(status)) {
-                addedFiles.add(commitFile);
+                parent = llAdded;
+                added++;
+            } else if ("modified".equals(status)) {
+                parent = llChanged;
+                changed++;
+            } else if ("removed".equals(status)) {
+                parent = llDeleted;
+                deleted++;
+            } else {
+                continue;
             }
-            else if ("modified".equals(status)) {
-                modifiedFiles.add(commitFile);
+
+            TextView fileNameView = (TextView) inflater.inflate(R.layout.commit_filename, parent, false);
+            fileNameView.setText(file.getFilename());
+            fileNameView.setTag(file);
+            if (parent != llDeleted) {
+                fileNameView.setTextColor(getResources().getColor(R.color.highlight));
+                fileNameView.setOnClickListener(this);
             }
-            else if ("removed".equals(status)) {
-                removedFiles.add(commitFile);
-            }
-        }
-        
-        for (final CommitFile file: addedFiles) {
-            TextView tvFilename = new TextView(context);
-            tvFilename.setText(file.getFilename());
-            tvFilename.setTypeface(Typeface.MONOSPACE);
-            tvFilename.setTextColor(Color.parseColor("#0099cc"));
-            tvFilename.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-            tvFilename.setPadding(0, 10, 0, 10);
-            tvFilename.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(View arg0) {
-                    Intent intent = new Intent().setClass(activity,
-                            DiffViewerActivity.class);
-                    intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-                    intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                    intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
-                    intent.putExtra(Constants.Commit.DIFF, file.getPatch());
-                    intent.putExtra(Constants.Object.PATH, file.getFilename());
-                    intent.putExtra(Constants.Object.TREE_SHA, commit.getCommit().getTree().getSha());
-                    startActivity(intent);
-                }
-            });
-            
-            llAdded.addView(tvFilename);
-        }
-        
-        for (final CommitFile file: removedFiles) {
-            TextView tvFilename = new TextView(context);
-            tvFilename.setText(file.getFilename());
-            tvFilename.setPadding(0, 10, 0, 10);
-            tvFilename.setTypeface(Typeface.MONOSPACE);
-            
-            llDeleted.addView(tvFilename);
+            parent.addView(fileNameView);
         }
 
-        for (final CommitFile file: modifiedFiles) {
-            TextView tvFilename = new TextView(context);
-            tvFilename.setText(file.getFilename());
-            tvFilename.setTypeface(Typeface.MONOSPACE);
-            tvFilename.setTextColor(Color.parseColor("#0099cc"));
-            tvFilename.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-            tvFilename.setPadding(0, 10, 0, 10);
-            tvFilename.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(View arg0) {
-                    Intent intent = new Intent().setClass(activity,
-                            DiffViewerActivity.class);
-                    intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-                    intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-                    intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
-                    intent.putExtra(Constants.Commit.DIFF, file.getPatch());
-                    intent.putExtra(Constants.Object.PATH, file.getFilename());
-                    intent.putExtra(Constants.Object.TREE_SHA, commit.getCommit().getTree().getSha());
-                    startActivity(intent);
-                }
-            });
-            
-            llChanged.addView(tvFilename);
+        if (added == 0) {
+            llAdded.setVisibility(View.GONE);
+        } else {
+            TextView tvAddedTitle = (TextView) mContentView.findViewById(R.id.commit_added);
+            tvAddedTitle.setTypeface(app.boldCondensed);
+        }
+        if (changed == 0) {
+            llChanged.setVisibility(View.GONE);
+        } else {
+            TextView tvChangeTitle = (TextView) mContentView.findViewById(R.id.commit_changed);
+            tvChangeTitle.setTypeface(app.boldCondensed);
+        }
+        if (deleted == 0) {
+            llDeleted.setVisibility(View.GONE);
+        } else {
+            TextView tvDeletedTitle = (TextView) mContentView.findViewById(R.id.commit_deleted);
+            tvDeletedTitle.setTypeface(app.boldCondensed);
         }
 
-        if (addedFiles.size() == 0) {
-            TextView tvFilename = new TextView(context);
-            tvFilename.setText(R.string.commit_no_files);
-            llAdded.addView(tvFilename);
+        TextView tvSummary = (TextView) mContentView.findViewById(R.id.tv_desc);
+        if (mCommit.getStats() != null) {
+            tvSummary.setText(getString(R.string.commit_summary, added + changed + deleted,
+                    mCommit.getStats().getAdditions(), mCommit.getStats().getDeletions()));
+        } else {
+            tvSummary.setVisibility(View.GONE);
         }
-        
-        if (removedFiles.size() == 0) {
-            TextView tvFilename = new TextView(context);
-            tvFilename.setText(R.string.commit_no_files);
-            llDeleted.addView(tvFilename);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.iv_gravatar) {
+            String login = (String) v.getTag();
+            IntentUtils.openUserInfoActivity(getActivity(), login);
+        } else {
+            CommitFile file = (CommitFile) v.getTag();
+
+            Intent intent = new Intent(getActivity(), FileViewerActivity.class);
+            intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+            intent.putExtra(Constants.Repository.NAME, mRepoName);
+            intent.putExtra(Constants.Object.REF, mObjectSha);
+            intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
+            intent.putExtra(Constants.Commit.DIFF, file.getPatch());
+            intent.putExtra(Constants.Object.PATH, file.getFilename());
+            intent.putExtra(Constants.Object.TREE_SHA, mCommit.getCommit().getTree().getSha());
+            startActivity(intent);
         }
-        
-        if (modifiedFiles.size() == 0) {
-            TextView tvFilename = new TextView(context);
-            tvFilename.setText(R.string.commit_no_files);
-            llChanged.addView(tvFilename);
-        }
-        
-        tvSummary.setText(String.format(getResources().getString(R.string.commit_summary),
-                commit.getFiles().size(), commit.getStats().getAdditions(), commit.getStats().getDeletions()));
     }
 }

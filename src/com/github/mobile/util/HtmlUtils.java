@@ -72,6 +72,8 @@ public class HtmlUtils {
 
     private static final String TAG_ROOT = "githubroot";
 
+    private static final String TAG_HTML = "html";
+
     private static final String ROOT_START = '<' + TAG_ROOT + '>';
 
     private static final String ROOT_END = "</" + TAG_ROOT + '>';
@@ -218,7 +220,7 @@ public class HtmlUtils {
                 return;
             }
 
-            if (TAG_ROOT.equalsIgnoreCase(tag) && !opening) {
+            if ((TAG_ROOT.equalsIgnoreCase(tag) || TAG_HTML.equalsIgnoreCase(tag)) && !opening) {
                 // Remove leading newlines
                 while (output.length() > 0 && output.charAt(0) == '\n')
                     output.delete(0, 1);

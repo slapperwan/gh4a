@@ -16,4 +16,25 @@
     <attr name="textAppearanceSubtitle" format="reference" />
     <attr name="textAppearanceWhiteSmall" format="reference" />
     <attr name="textAppearanceMicro" format="reference" />
+
+    <attr name="sendIcon" format="reference" />
+    <attr name="contentEditIcon" format="reference" />
+    <attr name="downloadIcon" format="reference" />
+    <attr name="searchIcon" format="reference" />
+    <attr name="shareIcon" format="reference" />
+    <attr name="webIcon" format="reference" />
+    <attr name="cancelIcon" format="reference" />
+    <attr name="discardIcon" format="reference" />
+    <attr name="acceptIcon" format="reference" />
+    <attr name="newIcon" format="reference" />
+    <attr name="refreshIcon" format="reference" />
+    <attr name="collapseIcon" format="reference" />
+    <attr name="expandIcon" format="reference" />
+    <attr name="labelListIcon" format="reference" />
+    <attr name="milestoneListIcon" format="reference" />
+    <attr name="personIcon" format="reference" />
+    <attr name="contentPictureIcon" format="reference" />
+    <attr name="saveIcon" format="reference" />
+    <attr name="searchUserIcon" format="reference" />
+    <attr name="searchRepoIcon" format="reference" />
 </resources>

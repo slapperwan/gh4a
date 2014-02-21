@@ -11,11 +11,12 @@
     <string name="more_issue_data">%1$s %2$s</string>
     <string name="more_issue_assignee">Assigned to %1$s</string>
     <string name="more_comment_data">by %1$s %2$s</string>
-    <string name="loading_msg">Loading...</string>
-    <string name="saving_msg">Saving...</string>
-    <string name="deleting_msg">Deleting...</string>
-    <string name="closing_msg">Closing...</string>
-    <string name="opening_msg">Opening...</string>
+    <string name="loading_msg">Loading\u2026</string>
+    <string name="saving_msg">Saving\u2026</string>
+    <string name="deleting_msg">Deleting\u2026</string>
+    <string name="closing_msg">Closing\u2026</string>
+    <string name="opening_msg">Opening\u2026</string>
+    <string name="authenticating">Authenticating\u2026</string>
     <string name="search">Search</string>
     <string name="activity">Activity</string>
     <string name="logout">Logout</string>
@@ -46,6 +47,8 @@
     <string name="view">View</string>
     <string name="readme">Readme</string>
     <string name="ok">@android:string/ok</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
     <string name="sort">Sort</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>
@@ -58,13 +61,89 @@
     <string name="home">Home</string>
     <string name="share">Share</string>
     <string name="downloads">Downloads</string>
+    <string name="releases">Releases</string>
     <string name="packages">Packages</string>
-    
+    <string name="no_browser_found">The link could not be opened: no browser was found on your device</string>
+    <string name="need_profile_reload">Please reload your profile page by pressing \'Home\' button at the top left for the changes to take effect</string>
+    <string name="login_prompt">Please login</string>
+    <string name="error_toast">An error occured while fetching data</string>
+    <string name="unknown">unknown</string>
+    <string name="history">History</string>
+    <string name="deleted">(deleted)</string>
+    <string name="repo_search_extradata">%1$s\u00a0\u00a0\u00a0%2$s\u00a0\u00a0\u00a0%3$d forks\u00a0\u00a0\u00a0%4$d watchers</string>
+    <string name="milestone_extradata">%1$d open\u00a0\u00a0\u00a0%2$d closed</string>
+    <string name="milestone_extradata_due">%1$d open\u00a0\u00a0\u00a0%2$d closed\u00a0\u00a0\u00a0due on %3$s</string>
+    <string name="download_extradata">%1$s\u00a0\u00a0\u00a0%2$d downloads\u00a0\u00a0\u00a0created %3$s</string>
+    <string name="release_extradata">%1$s\u00a0\u00a0\u00a0created %2$s</string>
+    <string name="feed_extradata">%1$s\u00a0\u00a0\u00a0%2$s</string>
+    <string name="gist_extradata">%1$s\u00a0\u00a0\u00a0%2$s</string>
+    <string name="go_to">Go to</string>
+    <string name="fail_view_diff">Unable to view diff</string>
+    <string name="forked_from">forked from %1$s</string>
+    <string name="enter_username_toast">Please enter your user name instead of your email address</string>
+    <string name="menu_user">User %1$s</string>
+    <string name="menu_repo">Repo %1$s</string>
+    <string name="menu_compare">Compare %1$s</string>
+    <string name="menu_commit">Commit %1$s</string>
+    <string name="menu_issue">Issue %1$d</string>
+    <string name="menu_gist">Gist %1$s</string>
+    <string name="menu_file">File %1$s</string>
+    <string name="menu_fork">Forked repo %1$s</string>
+    <string name="menu_wiki">Wiki in browser</string>
+    <string name="menu_pull">Pull request %1$d</string>
+    <string name="menu_issues">Open issues</string>
+    <string name="refresh">Refresh</string>
+    <string name="delete_comment_message">Delete this comment?</string>
+    <string name="please_wait">Please wait</string>
+    <string name="no_more_results">No more results</string>
+    <string name="auth_err_toast">Your API token may be invalid</string>
+    <string name="bookmark_user">Bookmark user</string>
+    <string name="bookmark_repo">Bookmark repo</string>
+    <string name="ellipse" translatable="false">\u2026</string>
+    <string name="view_more">View more</string>
+    <string name="pull">Pull</string>
+    <string name="requests">Requests</string>
+    <string name="issue_milestone_hint">Milestone</string>
+    <string name="issue_assignee_hint">Assignee</string>
+    <string name="download_mobile_warning_title">Mobile connection download</string>
+    <string name="download_mobile_warning_message">Do you want to download this file using your mobile connection?\nYou can also schedule it for download when you\'re using your Wi-Fi connection next time.</string>
+    <string name="download_now_button">Download now</string>
+    <string name="download_wifi_button">Download over Wi-Fi</string>
+
     <plurals name="file">
         <item quantity="one">File</item>
         <item quantity="other">Files</item>
     </plurals>
-    
+
+    <plurals name="contributor_extra_data">
+        <item quantity="one">%1$d contribution</item>
+        <item quantity="other">%1$d contributions</item>
+    </plurals>
+
+    <string name="no_blogs_found">No blogs found.</string>
+    <string name="no_comments_found">Nobody has commented so far.</string>
+    <string name="no_files_found">No files found.</string>
+    <string name="no_trends_found">No trending repositories found.</string>
+    <string name="no_commits_in_pullrequest_found">This pull request doesn\'t contain any commits.</string>
+    <string name="no_downloads_found">This repository doesn\'t provide any downloads.</string>
+    <string name="no_milestones_found">This repository doesn\'t have any configured milestone.</string>
+    <string name="no_commits_found">No commits found.</string>
+    <string name="no_followers_found">No followers found.</string>
+    <string name="no_following_found">No users are followed so far..</string>
+    <string name="no_forks_found">This repository wasn\'t forked yet.</string>
+    <string name="no_issues_found">No issues were reported so far.</string>
+    <string name="no_events_found">No events found.</string>
+    <string name="no_pull_requests_found">No pull requests were opened so far.</string>
+    <string name="no_repos_found">No repositories found.</string>
+    <string name="no_starred_repos_found">No repositories were starred yet.</string>
+    <string name="no_watched_repos_found">No repositories are being watched yet.</string>
+    <string name="no_watchers_found">Nobody is watching this repository yet.</string>
+    <string name="no_stargazers_found">Nobody has starred this repository yet.</string>
+    <string name="no_tags_found">No tags were created in this repository yet.</string>
+    <string name="no_branches_found">No branches were created in this repository yet.</string>
+    <string name="no_contributors_found">No contributions were made to this repository yet.</string>
+    <string name="no_releases_found">No releases were created for this repository yet.</string>
+
     <!-- Activity event -->
     <string name="event_push_title">%1$s pushed to %2$s at %3$s</string>
     <string name="event_watch_title">%1$s starred %2$s</string>
@@ -82,20 +161,21 @@
     <string name="event_pull_request_title">%1$s %2$s pull request %3$s on %4$s</string>
     <string name="event_member_title">%1$s added %2$s to %3$s</string>
     <string name="event_download_title">%1$s uploaded a file to %2$s</string>
-    <string name="event_gollum_title">%1$s %2$s %3$s in the %4$s wiki</string>
+    <string name="event_gollum_title">%1$s edited page in the %2$s wiki</string>
     <string name="event_public_title">%1$s open sourced %2$s</string>
+    <string name="event_release_title">%1$s created a release in %2$s</string>
     <string name="event_issue_comment">%1$s commented on %2$s %3$s on %4$s</string>
-    
+
     <string name="event_pull_request_desc">%1$s\n%2$d commits with %3$d additions and %4$d deletions</string>
     <string name="event_follow_desc">%1$s has %2$d repositories and %3$d followers</string>
     <string name="event_fork_desc">Forked repository is at %1$s</string>
     <string name="event_create_repo_desc">New repository is at %1$s</string>
     <string name="event_create_branch_desc">New %1$s is at %2$s/tree/%3$s</string>
     <string name="event_gollum_desc">View %1$s</string>
-    <string name="event_commit_comment_desc">Comment in </string>
+    <string name="event_commit_comment_desc">Comment in %1$s - %2$s</string>
     <string name="event_push_desc">%1$d more commits...</string>
     <string name="event_pull_request_review_comment_desc">Comment on %1$s in pull request %2$d</string>
-    
+
     <!-- User -->
     <plurals name="user">
         <item quantity="one">User</item>
@@ -152,7 +232,7 @@
     <string name="repo_homepage">Homepage</string>
     <string name="repo_forks">Forks</string>
     <string name="repo_size">Size</string>
-    <string name="repo_language">Language</string>
+    <string name="repo_language">Language %1$s</string>
     <string name="repo_followers">Followers</string>
     <string name="repo_created_at">Created at</string>
     <string name="repo_pushed_at">Pushed at</string>
@@ -183,7 +263,9 @@
     <string name="repo_collaborators">Collaborators</string>
     <string name="repo_files">Files</string>
     <string name="repo_short">Repos</string>
-    
+    <string name="repo_no_readme">No README file found</string>
+    <string name="repo_issue_on">on %1$s</string>
+
     <!-- Commit -->
     <plurals name="commit">
         <item quantity="one">Commit</item>
@@ -199,12 +281,21 @@
     <string name="commit_changed">Files Changed</string>
     <string name="commit_added">Files Added</string>
     <string name="commit_deleted">Files Deleted</string>
-    <string name="commit_summary">Showing %1$d changed files with %2$d additions and %3$d deletions.</string>
-    <!-- string name="commit_summary">%1$d changed | %2$d added | %3$d deleted</string-->
-    <string name="commit_no_files">No files</string>
+    <string name="commit_summary">%1$d changed files with %2$d additions and %3$d deletions.</string>
     <string name="commit_sha">Commit - %1$s</string>
     <string name="commit_comment">Commented on %1$s</string>
     <string name="commit_compare">Compare View</string>
+    <string name="commit_comment_hint">Comment on this commit</string>
+    <string name="commit_details">Committed by %1$s %2$s</string>
+
+    <!-- Release -->
+    <string name="release_details">Released by %1$s %2$s</string>
+    <string name="release_tag">On tag %1$s</string>
+    <string name="release_notes">Release notes</string>
+    <string name="release_type_final">Final release</string>
+    <string name="release_type_draft">Draft</string>
+    <string name="release_type_prerelease">Pre-release</string>
+    <string name="release_no_releasenotes">No release notes were given.</string>
 
     <!-- Issue -->
     <plurals name="issue">
@@ -229,6 +320,7 @@
     <string name="issue_error_title">Please enter a title</string>
     <string name="issue_success_create">Successful create issue</string>
     <string name="issue_edit">Edit Issue</string>
+    <string name="issue_edit_title">Edit Issue #%1$d</string>
     <string name="issue_success_edit">Successful edit issue</string>
     <string name="issue_error_edit">Cannot edit issue</string>
     <string name="issue_reopen">Reopen Issue</string>
@@ -243,6 +335,8 @@
     <string name="issue_manage_labels">Manage Labels</string>
     <string name="issue_view_milestones">Milestones</string>
     <string name="issue_manage_milestones">Manage Milestones</string>
+    <string name="issue_dialog_delete_title">Delete %1$s?</string>
+    <string name="issue_dialog_delete_message">Are you sure?</string>
     <string name="issue_success_comment">Successful create comment</string>
     <string name="issue_error_comment">Cannot create comment</string>
     <string name="issue_create_label">New Label</string>
@@ -263,10 +357,9 @@
     <string name="issue_labels">Labels</string>
     <string name="issue_label_name">Label name</string>
     <string name="issue_label_new">New Label</string>
-    <string name="issue_milestone">Milestone</string>
+    <string name="issue_milestone">Milestone: %1$s</string>
     <string name="issue_milestone_new">New Milestone</string>
     <string name="issue_milestone_edit">Edit Milestone</string>
-    <string name="issue_assignee">Assignee</string>
     <string name="issues_submitted">Submitted</string>
     <string name="issues_updated">Updated</string>
     <string name="issues_comments">Comments</string>
@@ -277,10 +370,9 @@
     <string name="issue_filter_by_any_assignee">Any assignee</string>
     <string name="issue_clear_milestone">No milestone</string>
     <string name="issue_clear_assignee">No assignee</string>
-    <string name="issue_open_by_user">by %1$s %2$s</string>
-    <string name="issue_manage_labels">Manage Labels</string>
-    <string name="issue_manage_milestones">Manage Milestones</string>
     <string name="issue_milestone_due_date">Due Date</string>
+    <string name="issue_assignee">%1$s is assigned</string>
+    <string name="issue_desc">Description</string>
 
     <!-- Issue comment -->
     <plurals name="issue_comment">
@@ -292,17 +384,20 @@
     <string name="issue_comment_body">Body</string>
     <string name="issue_comment_updated_at">Updated at</string>
     <string name="issue_comment_user">User</string>
-    
+    <string name="issue_comment_hint">Comment on this issue</string>
+
     <!-- Pull Request -->
     <string name="pull_request_title">Pull Request</string>
     <string name="pull_request_comments">Discussion</string>
     <string name="pull_requests">Pull Requests</string>
-    
+    <string name="pull_request_comment_hint">Comment on this pull request</string>
+    <string name="view_pull_request">View pull request</string>
+
     <!-- Object -->
     <string name="object_tree">Tree</string>
     <string name="object_view_file_at">View file @ %1$s</string>
     <string name="object_view_history">History</string>
-    
+
     <!-- Gist -->
     <plurals name="gist">
         <item quantity="one">Gist</item>
@@ -310,29 +405,45 @@
     </plurals>
     <string name="gists">Gists</string>
     <string name="gist_public">Public Gist</string>
-    <string name="gist_filename">Gist - %1$s</string>
-    
+    <string name="gist_title">Gist %1$s</string>
+    <string name="gist_files">Files</string>
+
     <!-- Explore -->
     <string name="explore">Explore</string>
-    
+
     <!-- Trending repos -->
     <string name="trend">Trending Repos</string>
     <string name="trend_today">Today</string>
     <string name="trend_week">Week</string>
     <string name="trend_month">Month</string>
-    <string name="trend_forever">Forever</string>
-    
+
     <!-- GitHub Blog -->
     <string name="blog">GitHub Blog</string>
-    
+
     <!-- Recent Wiki Updates -->
     <string name="recent_wiki">Wiki</string>
-    
+
     <!-- GitHub Jobs -->
     <string name="jobs">GitHub Jobs</string>
-    
+
     <!-- Bookmarks -->
     <string name="remove_bookmark">Remove bookmark</string>
     <string name="remove_bookmark_confirm">Do you really want to remove this bookmark?</string>
     <string name="bookmark_saved">Bookmark saved</string>
+
+    <!-- Search -->
+    <string name="search_type_repo">Repository</string>
+    <string name="search_type_user">User</string>
+    <string name="search_hint_repo">Search for repositories</string>
+    <string name="search_hint_user">Search for users</string>
+
+    <!-- Sharing -->
+    <string name="send_email_title">Select email application</string>
+    <string name="share_title">Share via</string>
+    <string name="share_file_subject">%1$s at %2$s</string>
+    <string name="share_gist_subject">Gist %1$s by %2$s</string>
+    <string name="share_issue_subject">Issue # %1$d (%2$s) at %3$s</string>
+    <string name="share_commit_subject">Commit #%1$s at %2$s</string>
+    <string name="share_user_subject">User %1$s (%2$s)</string>
+    <string name="share_user_subject_loginonly">User %1$s</string>
 </resources>

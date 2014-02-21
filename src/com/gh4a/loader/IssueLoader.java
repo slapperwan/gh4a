@@ -1,23 +1,20 @@
 package com.gh4a.loader;
 
 import java.io.IOException;
-import java.util.HashMap;
 
-import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.service.IssueService;
 
 import android.content.Context;
 
-import com.gh4a.Constants.LoaderResult;
-import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
 
-public class IssueLoader extends BaseLoader {
+public class IssueLoader extends BaseLoader<Issue> {
 
     private String mRepoOwner;
     private String mRepoName;
     private int mIssueNumber;
-    
+
     public IssueLoader(Context context, String repoOwner, String repoName, int issueNumber) {
         super(context);
         mRepoOwner = repoOwner;
@@ -26,11 +23,9 @@ public class IssueLoader extends BaseLoader {
     }
 
     @Override
-    public void doLoadInBackground(HashMap<Integer, Object> result) throws IOException {
-        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new DefaultClient();
-        client.setOAuth2Token(app.getAuthToken());
-        IssueService issueService = new IssueService(client);
-        result.put(LoaderResult.DATA, issueService.getIssue(mRepoOwner, mRepoName, mIssueNumber));
+    public Issue doLoadInBackground() throws IOException {
+        IssueService issueService = (IssueService)
+                Gh4Application.get(getContext()).getService(Gh4Application.ISSUE_SERVICE);
+        return issueService.getIssue(mRepoOwner, mRepoName, mIssueNumber);
     }
 }

@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,461 +15,246 @@
  */
 package com.gh4a.fragment;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.ref.WeakReference;
-
 import org.eclipse.egit.github.core.Repository;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.TableLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.gh4a.CollaboratorListActivity;
+import com.devspark.progressfragment.ProgressFragment;
 import com.gh4a.Constants;
-import com.gh4a.ContributorListActivity;
-import com.gh4a.DownloadsActivity;
 import com.gh4a.Gh4Application;
-import com.gh4a.IssueListActivity;
 import com.gh4a.R;
-import com.gh4a.RepositoryActivity;
-import com.gh4a.WatcherListActivity;
-import com.gh4a.WikiListActivity;
+import com.gh4a.activities.CollaboratorListActivity;
+import com.gh4a.activities.ContributorListActivity;
+import com.gh4a.activities.DownloadsActivity;
+import com.gh4a.activities.ReleaseListActivity;
+import com.gh4a.activities.WatcherListActivity;
+import com.gh4a.activities.WikiListActivity;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.ReadmeLoader;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.UiUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
-public class RepositoryFragment extends BaseFragment implements 
-    OnClickListener, LoaderManager.LoaderCallbacks<String> {
-
+public class RepositoryFragment extends ProgressFragment implements OnClickListener {
     private Repository mRepository;
-    private String mRepoOwner;
-    private String mRepoName;
-    private int mStargazerCount;
-    private boolean mDataLoaded;
-    
+    private View mContentView;
+
+    private LoaderCallbacks<String> mReadmeCallback = new LoaderCallbacks<String>() {
+        @Override
+        public Loader<LoaderResult<String>> onCreateLoader(int id, Bundle args) {
+            return new ReadmeLoader(getActivity(),
+                    mRepository.getOwner().getLogin(), mRepository.getName());
+        }
+        @Override
+        public void onResultReady(LoaderResult<String> result) {
+            View v = getView();
+            fillReadme(result.getData());
+            v.findViewById(R.id.pb_readme).setVisibility(View.GONE);
+            v.findViewById(R.id.readme).setVisibility(View.VISIBLE);
+        }
+    };
+
     public static RepositoryFragment newInstance(Repository repository) {
         RepositoryFragment f = new RepositoryFragment();
 
         Bundle args = new Bundle();
         args.putSerializable("REPOSITORY", repository);
         f.setArguments(args);
-        
+
         return f;
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mRepository = (Repository) getArguments().getSerializable("REPOSITORY");
-        mRepoOwner = mRepository.getOwner().getLogin();
-        mRepoName = mRepository.getName();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.repository, container, false);
-        return v;
+        mContentView = inflater.inflate(R.layout.repository, null);
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
-    
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        
+
+        setContentView(mContentView);
         fillData();
-        
-        RepositoryActivity repoActivity = (RepositoryActivity) getSherlockActivity();
-        
-        Gh4Application app = (Gh4Application) getActivity().getApplicationContext();
-        Typeface boldCondensed = app.boldCondensed;
-        
-        TextView tvReadmeTitle = (TextView) getView().findViewById(R.id.readme_title);
-        tvReadmeTitle.setTypeface(boldCondensed);
-        tvReadmeTitle.setTextColor(Color.parseColor("#0099cc"));
+        setContentShownNoAnimation(true);
 
-        showLoading(R.id.pb_readme, R.id.readme);
+        getLoaderManager().initLoader(0, null, mReadmeCallback);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (!mDataLoaded) {
-            if (getLoaderManager().getLoader(0) == null) {
-                getLoaderManager().initLoader(0, null, this);
-            }
-            else {
-                getLoaderManager().restartLoader(0, null, this);
-            }
-            getLoaderManager().getLoader(0).forceLoad();
-        }
-    }
-    
-    public void fillData() {
-        View v = getView();
-        final Gh4Application app = (Gh4Application) getActivity().getApplicationContext();
-        Typeface boldCondensed = app.boldCondensed;
-        Typeface condensed = app.condensed;
-        Typeface regular = app.regular;
-        Typeface italic = app.italic;
-        
-        TextView tvOwner = (TextView) v.findViewById(R.id.tv_login);
-        tvOwner.setText(mRepoOwner);
-        tvOwner.setTextColor(Color.parseColor("#0099cc"));
-        tvOwner.setTypeface(boldCondensed);
-        tvOwner.setOnClickListener(new OnClickListener() {
+    private void fillData() {
+        final Gh4Application app = Gh4Application.get(getActivity());
 
-            @Override
-            public void onClick(View v) {
-                app.openUserInfoActivity(getSherlockActivity(),
-                        mRepoOwner, null);
-            }
+        UiUtils.assignTypeface(mContentView, app.boldCondensed, new int[] {
+            R.id.readme_title, R.id.tv_login, R.id.tv_divider, R.id.tv_name,
+            R.id.tv_stargazers_count, R.id.tv_forks_count, R.id.tv_issues_count,
+            R.id.tv_pull_requests_count, R.id.tv_wiki_label, R.id.tv_contributors_label,
+            R.id.tv_collaborators_label, R.id.other_info, R.id.tv_downloads_label,
+            R.id.tv_releases_label
         });
-        TextView tvRepoName = (TextView) v.findViewById(R.id.tv_name);
-        tvRepoName.setText(mRepoName);
-        tvRepoName.setTypeface(boldCondensed);
-        
-        TextView tvParentRepo = (TextView) v.findViewById(R.id.tv_parent);
-        
-        TextView tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        tvDesc.setTypeface(regular);
-        
-        TextView tvUrl = (TextView) v.findViewById(R.id.tv_url);
-        tvUrl.setTypeface(regular);
-        
-        TextView tvLanguage = (TextView) v.findViewById(R.id.tv_language);
-        tvLanguage.setTypeface(regular);
-        
-        if (mRepository.isFork()) {
+        UiUtils.assignTypeface(mContentView, app.italic, new int[] {
+            R.id.tv_parent
+        });
+        UiUtils.assignTypeface(mContentView, app.regular, new int[] {
+            R.id.tv_desc, R.id.tv_language, R.id.tv_url
+        });
+
+        TextView tvOwner = (TextView) mContentView.findViewById(R.id.tv_login);
+        tvOwner.setText(mRepository.getOwner().getLogin());
+        tvOwner.setOnClickListener(this);
+
+        TextView tvRepoName = (TextView) mContentView.findViewById(R.id.tv_name);
+        tvRepoName.setText(mRepository.getName());
+
+        TextView tvParentRepo = (TextView) mContentView.findViewById(R.id.tv_parent);
+        if (mRepository.isFork() && mRepository.getParent() != null) {
+            Repository parent = mRepository.getParent();
             tvParentRepo.setVisibility(View.VISIBLE);
-            tvParentRepo.setTypeface(italic);
-
-            if (mRepository.getParent() != null) {
-                tvParentRepo.setText("forked from "
-                        + mRepository.getParent().getOwner().getLogin() 
-                        + "/" 
-                        + mRepository.getParent().getName());
-                tvParentRepo.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-                tvParentRepo.setOnClickListener(new OnClickListener() {
-
-                    @Override
-                    public void onClick(View arg0) {
-                        app.openRepositoryInfoActivity(getSherlockActivity(),
-                                mRepository.getParent().getOwner().getLogin(),
-                                mRepository.getParent().getName(), 0);
-                    }
-                });
-            }
-        }
-        else {
+            tvParentRepo.setText(app.getString(R.string.forked_from,
+                    parent.getOwner().getLogin() + "/" + parent.getName()));
+            tvParentRepo.setOnClickListener(this);
+            tvParentRepo.setTag(parent);
+        } else {
             tvParentRepo.setVisibility(View.GONE);
         }
-        
-        if (!StringUtils.isBlank(mRepository.getDescription())) {
-            tvDesc.setText(mRepository.getDescription());
-            tvDesc.setVisibility(View.VISIBLE);
-        }
-        else {
-            tvDesc.setVisibility(View.GONE);
-        }
-        
-        if (!StringUtils.isBlank(mRepository.getLanguage())) {
-            tvLanguage.setText(getResources().getString(R.string.repo_language) 
-                    + " " + mRepository.getLanguage());
-            tvLanguage.setVisibility(View.VISIBLE);
-        }
-        else {
-            tvLanguage.setVisibility(View.GONE);
-        }
-        
-        tvUrl.setText(mRepository.getHtmlUrl());
 
-        TableLayout tlStargazers = (TableLayout) v.findViewById(R.id.cell_stargazers);
-        tlStargazers.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-        tlStargazers.setOnClickListener(this);
-        
-        TextView tvStargazersCount = (TextView) v.findViewById(R.id.tv_stargazers_count);
-        mStargazerCount = mRepository.getWatchers();
-        tvStargazersCount.setText(String.valueOf(mStargazerCount));
-        tvStargazersCount.setTypeface(boldCondensed);
-        
-        TableLayout tlForks = (TableLayout) v.findViewById(R.id.cell_forks);
-        tlForks.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-        tlForks.setOnClickListener(this);
-        
-        TextView tvForksCount = (TextView) v.findViewById(R.id.tv_forks_count);
-        tvForksCount.setTypeface(boldCondensed);
+        fillTextView(R.id.tv_desc, 0, mRepository.getDescription());
+        fillTextView(R.id.tv_language,R.string.repo_language, mRepository.getLanguage());
+        fillTextView(R.id.tv_url, 0, mRepository.getHtmlUrl());
+
+        mContentView.findViewById(R.id.cell_stargazers).setOnClickListener(this);
+        mContentView.findViewById(R.id.cell_forks).setOnClickListener(this);
+        mContentView.findViewById(R.id.cell_pull_requests).setOnClickListener(this);
+        mContentView.findViewById(R.id.tv_wiki_label).setOnClickListener(this);
+        mContentView.findViewById(R.id.tv_contributors_label).setOnClickListener(this);
+        mContentView.findViewById(R.id.tv_collaborators_label).setOnClickListener(this);
+        mContentView.findViewById(R.id.other_info).setOnClickListener(this);
+        mContentView.findViewById(R.id.tv_downloads_label).setOnClickListener(this);
+        mContentView.findViewById(R.id.tv_releases_label).setOnClickListener(this);
+
+        TextView tvStargazersCount = (TextView) mContentView.findViewById(R.id.tv_stargazers_count);
+        tvStargazersCount.setText(String.valueOf(mRepository.getWatchers()));
+
+        TextView tvForksCount = (TextView) mContentView.findViewById(R.id.tv_forks_count);
         tvForksCount.setText(String.valueOf(mRepository.getForks()));
-        
-        TableLayout tlIssues = (TableLayout) v.findViewById(R.id.cell_issues);
-        tlIssues.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-        TextView tvIssues = (TextView) v.findViewById(R.id.tv_issues_label);
-        TextView tvIssuesCount = (TextView) v.findViewById(R.id.tv_issues_count);
-        
+
+        TextView tvIssues = (TextView) mContentView.findViewById(R.id.tv_issues_label);
+        TextView tvIssuesCount = (TextView) mContentView.findViewById(R.id.tv_issues_count);
+        LinearLayout llIssues = (LinearLayout) mContentView.findViewById(R.id.cell_issues);
+
         if (mRepository.isHasIssues()) {
-            tlIssues.setVisibility(View.VISIBLE);
-            tlIssues.setOnClickListener(this);
-            
+            llIssues.setVisibility(View.VISIBLE);
+            llIssues.setOnClickListener(this);
+
             tvIssues.setVisibility(View.VISIBLE);
-            
-            tvIssuesCount.setTypeface(boldCondensed);
+
             tvIssuesCount.setText(String.valueOf(mRepository.getOpenIssues()));
             tvIssuesCount.setVisibility(View.VISIBLE);
-        }
-        else {
-            tlIssues.setVisibility(View.GONE);
+        } else {
+            llIssues.setVisibility(View.GONE);
             tvIssues.setVisibility(View.GONE);
             tvIssuesCount.setVisibility(View.GONE);
         }
-        
-        TableLayout tlPullRequests = (TableLayout) v.findViewById(R.id.cell_pull_requests);
-        tlPullRequests.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-        tlPullRequests.setOnClickListener(this);
-        
-        TextView tvPullRequestsCount = (TextView) v.findViewById(R.id.tv_pull_requests_count);
-        tvPullRequestsCount.setTypeface(boldCondensed);
-        
-        TextView tvPullRequests = (TextView) v.findViewById(R.id.tv_pull_requests_label);
-        tvPullRequests.setTypeface(condensed);
-        
-        if (mRepository.isHasIssues()) {
-            tlIssues.setVisibility(View.VISIBLE);
-            tlIssues.setOnClickListener(this);
-            
-            tvIssues.setVisibility(View.VISIBLE);
-            
-            tvIssuesCount.setTypeface(boldCondensed);
-            tvIssuesCount.setText(String.valueOf(mRepository.getOpenIssues()));
-            tvIssuesCount.setVisibility(View.VISIBLE);
+
+        if (!mRepository.isHasWiki()) {
+            mContentView.findViewById(R.id.tv_wiki_label).setVisibility(View.GONE);
         }
-        else {
-            tlIssues.setVisibility(View.GONE);
-            tvIssues.setVisibility(View.GONE);
-            tvIssuesCount.setVisibility(View.GONE);
+    }
+
+    private void fillTextView(int id, int stringId, String text) {
+        TextView view = (TextView) mContentView.findViewById(id);
+
+        if (!StringUtils.isBlank(text)) {
+            view.setText(stringId != 0 ? getString(stringId, text) : text);
+            view.setVisibility(View.VISIBLE);
+        } else {
+            view.setVisibility(View.GONE);
         }
-        
-        TextView tvWiki = (TextView) v.findViewById(R.id.tv_wiki_label);
-        tvWiki.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-        tvWiki.setPadding(0, 16, 0, 16);
-        if (mRepository.isHasWiki()) {
-            tvWiki.setTypeface(boldCondensed);
-            tvWiki.setOnClickListener(this);
-            tvWiki.setVisibility(View.VISIBLE);
-        }
-        else {
-            tvWiki.setVisibility(View.GONE);
-        }
-        
-        TextView tvContributor = (TextView) v.findViewById(R.id.tv_contributors_label);
-        tvContributor.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-        tvContributor.setPadding(0, 16, 0, 16);
-        tvContributor.setOnClickListener(this);
-        tvContributor.setTypeface(boldCondensed);
-        
-        TextView tvCollaborators = (TextView) v.findViewById(R.id.tv_collaborators_label);
-        tvCollaborators.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-        tvCollaborators.setPadding(0, 16, 0, 16);
-        tvCollaborators.setOnClickListener(this);
-        tvCollaborators.setTypeface(boldCondensed);
-        
-        TextView tvOthers = (TextView) v.findViewById(R.id.other_info);
-        tvOthers.setTypeface(boldCondensed);
-        tvOthers.setTextColor(Color.parseColor("#0099cc"));
-        
-        TextView tvDownloads = (TextView) v.findViewById(R.id.tv_downloads_label);
-        tvDownloads.setBackgroundResource(R.drawable.abs__list_selector_holo_dark);
-        tvDownloads.setPadding(0, 16, 0, 16);
-        tvDownloads.setOnClickListener(this);
-        tvDownloads.setTypeface(boldCondensed);
     }
 
     public void updateStargazerCount(boolean starring) {
         TextView tvStargazersCount = (TextView) getView().findViewById(R.id.tv_stargazers_count);
         if (starring) {
-            tvStargazersCount.setText(String.valueOf(++mStargazerCount));
+            mRepository.setWatchers(mRepository.getWatchers() + 1);
+        } else {
+            mRepository.setWatchers(mRepository.getWatchers() - 1);
         }
-        else {
-            tvStargazersCount.setText(String.valueOf(--mStargazerCount));
-        }
+        tvStargazersCount.setText(String.valueOf(mRepository.getWatchers()));
     }
-    
-    private static class FillReadmeTask extends AsyncTask<InputStream, Void, String> {
 
-        private WeakReference<RepositoryFragment> mTarget;
-
-        public FillReadmeTask(RepositoryFragment activity) {
-            mTarget = new WeakReference<RepositoryFragment>(activity);
-        }
-
-        @Override
-        protected String doInBackground(InputStream... params) {
-            if (mTarget.get() != null && params[0] != null) {
-                try {
-                    return StringUtils.convertStreamToString(params[0]);
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            if (mTarget.get() != null) {
-                mTarget.get().showLoading(R.id.pb_readme, R.id.readme);
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            if (mTarget.get() != null) {
-                mTarget.get().hideLoading(R.id.pb_readme, R.id.readme);
-                mTarget.get().fillReadme(result);
-            }
-        }
-    }
-    
     public void fillReadme(String readme) {
+        TextView tvReadme = (TextView) getView().findViewById(R.id.readme);
         if (readme != null) {
-            if (getActivity() != null) {
-                TextView tvReadme = (TextView) getView().findViewById(R.id.readme);
-                tvReadme.setMovementMethod(LinkMovementMethod.getInstance());
-                
-                readme = HtmlUtils.format(readme).toString();
-                HttpImageGetter imageGetter = new HttpImageGetter(getSherlockActivity());
-                imageGetter.bind(tvReadme, readme, mRepository.getId());
-            }
-        }
-        else {
-            if (getView() != null) {
-                TextView tvReadme = (TextView) getView().findViewById(R.id.readme);
-                tvReadme.setText("README not found");
-                tvReadme.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
-            }
+            tvReadme.setMovementMethod(LinkMovementMethod.getInstance());
+
+            readme = HtmlUtils.format(readme).toString();
+            HttpImageGetter imageGetter = new HttpImageGetter(getActivity());
+            imageGetter.bind(tvReadme, readme, mRepository.getId());
+        } else {
+            tvReadme.setText(R.string.repo_no_readme);
+            tvReadme.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
         }
     }
-    
+
     @Override
     public void onClick(View view) {
         int id = view.getId();
-        Gh4Application app = (Gh4Application) getActivity().getApplicationContext();
-        
-        switch (id) {
-        case R.id.cell_pull_requests:
-            app.openPullRequestListActivity(getActivity(),
-                    mRepoOwner, mRepoName,
-                    Constants.Issue.ISSUE_STATE_OPEN);
-            break;
-        case R.id.tv_contributors_label:
-            getContributors(view);
-            break;
-        case R.id.tv_collaborators_label:
-            getCollaborators(view);
-            break;
-        case R.id.cell_issues:
-            app.openIssueListActivity(getActivity(),
-                    mRepoOwner, mRepoName,
-                    Constants.Issue.ISSUE_STATE_OPEN);
-            break;
-        case R.id.cell_stargazers:
-            getStargazers(view);
-            break;
-        case R.id.cell_forks:
-            getNetworks(view);
-            break;
-        case R.id.tv_wiki_label:
-            getWiki(view);
-            break;
-        case R.id.tv_downloads_label:
-            getDownloads(view);
-            break;
-        default:
-            break;
+        String owner = mRepository.getOwner().getLogin();
+        String name = mRepository.getName();
+        Intent intent = null;
+
+        if (id == R.id.tv_login) {
+            IntentUtils.openUserInfoActivity(getActivity(), mRepository.getOwner());
+        } else if (id == R.id.cell_pull_requests) {
+            IntentUtils.openPullRequestListActivity(getActivity(), owner, name,
+                    Constants.Issue.STATE_OPEN);
+        } else if (id == R.id.tv_contributors_label) {
+            intent = new Intent(getActivity(), ContributorListActivity.class);
+        } else if (id == R.id.tv_collaborators_label) {
+            intent = new Intent(getActivity(), CollaboratorListActivity.class);
+        } else if (id == R.id.cell_issues) {
+            IntentUtils.openIssueListActivity(getActivity(), owner, name,
+                    Constants.Issue.STATE_OPEN);
+        } else if (id == R.id.cell_stargazers) {
+            intent = new Intent(getActivity(), WatcherListActivity.class);
+            intent.putExtra("pos", 0);
+        } else if (id == R.id.cell_forks) {
+            intent = new Intent(getActivity(), WatcherListActivity.class);
+            intent.putExtra("pos", 2);
+        } else if (id == R.id.tv_wiki_label) {
+            intent = new Intent(getActivity(), WikiListActivity.class);
+        } else if (id == R.id.tv_downloads_label) {
+            intent = new Intent(getActivity(), DownloadsActivity.class);
+        } else if (id == R.id.tv_releases_label) {
+            intent = new Intent(getActivity(), ReleaseListActivity.class);
+        } else if (view.getTag() instanceof Repository) {
+            Repository repo = (Repository) view.getTag();
+            IntentUtils.openRepositoryInfoActivity(getActivity(), repo);
         }
-    }
 
-    public void getWiki(View view) {
-        Intent intent = new Intent().setClass(getActivity(), WikiListActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-        startActivity(intent);
-    }
-    
-    public void getStargazers(View view) {
-        Intent intent = new Intent().setClass(getActivity(), WatcherListActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-        intent.putExtra("pos", 0);
-        startActivity(intent);
-    }
-
-    public void getNetworks(View view) {
-        Intent intent = new Intent().setClass(getActivity(), WatcherListActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-        intent.putExtra("pos", 2);
-        startActivity(intent);
-    }
-
-    public void getOpenIssues(View view) {
-        Intent intent = new Intent().setClass(getActivity(), IssueListActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-        intent.putExtra(Constants.Issue.ISSUE_STATE, Constants.Issue.ISSUE_STATE_OPEN);
-        startActivity(intent);
-    }
-
-    public void getContributors(View view) {
-        Intent intent = new Intent().setClass(getActivity(), ContributorListActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-        startActivity(intent);
-    }
-    
-    public void getCollaborators(View view) {
-        Intent intent = new Intent().setClass(getActivity(), CollaboratorListActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-        startActivity(intent);
-    }
-    
-    public void getDownloads(View view) {
-        Intent intent = new Intent().setClass(getActivity(), DownloadsActivity.class);
-        intent.putExtra(Constants.Repository.REPO_OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.REPO_NAME, mRepoName);
-        startActivity(intent);
-    }
-
-    @Override
-    public Loader<String> onCreateLoader(int id, Bundle bundle) {
-        return new ReadmeLoader(getSherlockActivity(), mRepoOwner, mRepoName);            
-    }
-
-    @Override
-    public void onLoadFinished(Loader<String> loader, String readme) {
-        mDataLoaded = true;
-        hideLoading(R.id.pb_readme, R.id.readme);
-        if (readme != null) {
-            fillReadme(readme);
+        if (intent != null) {
+            intent.putExtra(Constants.Repository.OWNER, owner);
+            intent.putExtra(Constants.Repository.NAME, name);
+            startActivity(intent);
         }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<String> arg0) {
-        // TODO Auto-generated method stub
-        
     }
 }

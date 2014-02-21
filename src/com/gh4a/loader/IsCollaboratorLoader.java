@@ -1,35 +1,29 @@
 package com.gh4a.loader;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 
 import android.content.Context;
 
-import com.gh4a.Constants.LoaderResult;
 import com.gh4a.Gh4Application;
 
-public class IsCollaboratorLoader extends BaseLoader {
+public class IsCollaboratorLoader extends BaseLoader<Boolean> {
 
     private String mRepoOwner;
     private String mRepoName;
-    
+
     public IsCollaboratorLoader(Context context, String repoOwner, String repoName) {
         super(context);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
     }
-    
+
     @Override
-    public void doLoadInBackground(HashMap<Integer, Object> result) throws IOException {
-        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        CollaboratorService collabService = new CollaboratorService(client);
-        result.put(LoaderResult.DATA, 
-                collabService.isCollaborator(new RepositoryId(mRepoOwner, mRepoName), app.getAuthLogin()));
+    public Boolean doLoadInBackground() throws IOException {
+        Gh4Application app = Gh4Application.get(getContext());
+        CollaboratorService collabService = (CollaboratorService) app.getService(Gh4Application.COLLAB_SERVICE);
+        return collabService.isCollaborator(new RepositoryId(mRepoOwner, mRepoName), app.getAuthLogin());
     }
 }

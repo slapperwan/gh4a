@@ -22,28 +22,29 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.text.Html.ImageGetter;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import com.androidquery.AQuery;
-import com.androidquery.callback.AjaxCallback;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.FileUtils;
+import com.gh4a.utils.UiUtils;
 
 /**
- * 
+ *
  * Original source https://github.com/github/android/blob/master/app/src/main/java/com/github/mobile/util/HttpImageGetter.java
  * Getter for an image
  */
@@ -56,13 +57,9 @@ public class HttpImageGetter implements ImageGetter {
         private LoadingImageGetter(final Context context, final int size) {
             int imageSize = Math.round(context.getResources()
                     .getDisplayMetrics().density * size + 0.5F);
-            if (Gh4Application.THEME == R.style.DefaultTheme) {
-                image = context.getResources().getDrawable(R.drawable.content_picture_dark);    
-            }
-            else {
-                image = context.getResources().getDrawable(R.drawable.content_picture);
-            }
-            
+            image = context.getResources().getDrawable(
+                    UiUtils.resolveDrawable(context, R.attr.contentPictureIcon));
+
             image.setBounds(0, 0, imageSize, imageSize);
         }
 
@@ -89,16 +86,33 @@ public class HttpImageGetter implements ImageGetter {
 
     /**
      * Create image getter for context
-     * 
+     *
      * @param context
      */
     public HttpImageGetter(Context context) {
         this.context = context;
         dir = context.getCacheDir();
-        width = ((WindowManager) context
-                .getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay()
-                .getWidth();
+
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        if (Build.VERSION.SDK_INT < 13) {
+            width = fetchDisplayWidthPreHoneycomb(wm);
+        } else {
+            width = fetchDisplayWidth(wm);
+        }
+
         loading = new LoadingImageGetter(context, 24);
+    }
+
+    @SuppressWarnings("deprecation")
+    private int fetchDisplayWidthPreHoneycomb(WindowManager wm) {
+        return wm.getDefaultDisplay().getWidth();
+    }
+
+    @TargetApi(13)
+    private int fetchDisplayWidth(WindowManager wm) {
+        Point size = new Point();
+        wm.getDefaultDisplay().getSize(size);
+        return size.x;
     }
 
     private HttpImageGetter show(final TextView view, final CharSequence html) {
@@ -124,7 +138,7 @@ public class HttpImageGetter implements ImageGetter {
 
     /**
      * Encode given HTML string and map it to the given id
-     * 
+     *
      * @param id
      * @param html
      * @return this image getter
@@ -146,7 +160,7 @@ public class HttpImageGetter implements ImageGetter {
 
     /**
      * Bind text view to HTML string
-     * 
+     *
      * @param view
      * @param html
      * @param id
@@ -182,7 +196,7 @@ public class HttpImageGetter implements ImageGetter {
         asyncTask.execute(html, id, view);
         return this;
     }
-    
+
     public class ImageGetterAsyncTask extends AsyncTask<Object, Void, CharSequence> {
 
         String html;
@@ -209,14 +223,8 @@ public class HttpImageGetter implements ImageGetter {
     }
 
     private InputStream fetch(String urlString) throws MalformedURLException, IOException {
-        AQuery aq = new AQuery(context);
-        
-        AjaxCallback<InputStream> cb = new AjaxCallback<InputStream>();           
-        cb.url(urlString).type(InputStream.class);             
-        aq.sync(cb);
-                
-        InputStream is = cb.getResult();
-        return is;
+        URL url = new URL(urlString);
+        return url.openStream();
     }
 
     public Drawable getDrawable(String source) {

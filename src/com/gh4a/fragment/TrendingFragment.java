@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,101 +15,64 @@
  */
 package com.gh4a.fragment;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
 
-import com.gh4a.BaseSherlockFragmentActivity;
-import com.gh4a.ExploreActivity;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.TrendAdapter;
 import com.gh4a.holder.Trend;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.TrendLoader;
+import com.gh4a.utils.IntentUtils;
 
-public class TrendingFragment extends BaseFragment 
-    implements LoaderManager.LoaderCallbacks<List<Trend>>, OnItemClickListener {
+public class TrendingFragment extends ListDataBaseFragment<Trend> {
+    private static final String URL_TEMPLATE = "http://github-trends.ryotarai.info/rss/github_trends_all_%s.rss";
+    public static final String TYPE_DAILY = "daily";
+    public static final String TYPE_WEEKLY = "weekly";
+    public static final String TYPE_MONTHLY = "monthly";
 
     public String mUrl;
-    private ListView mListView;
-    public TrendAdapter mAdapter;
 
-    public static TrendingFragment newInstance(String url) {
+    public static TrendingFragment newInstance(String type) {
         TrendingFragment f = new TrendingFragment();
 
         Bundle args = new Bundle();
-        args.putString("url", url);
+        args.putString("url", String.format(Locale.US, URL_TEMPLATE, type));
         f.setArguments(args);
-        
+
         return f;
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mUrl = getArguments().getString("url");
     }
-    
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.generic_list, container, false);
-        mListView = (ListView) v.findViewById(R.id.list_view);
-        mListView.setOnItemClickListener(this);
-        return v;
-    }
-    
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mAdapter = new TrendAdapter(getSherlockActivity(), new ArrayList<Trend>());
-        mListView.setAdapter(mAdapter);
-        
-        getLoaderManager().initLoader(0, null, this);
-        getLoaderManager().getLoader(0).forceLoad();
-    }
-    
-    private void fillData(List<Trend> trends) {
-        ExploreActivity activity = (ExploreActivity) getSherlockActivity();
-        activity.invalidateOptionsMenu();
-        mAdapter.clear();
-        mAdapter.addAll(trends);
-        mAdapter.notifyDataSetChanged();
+    protected RootAdapter<Trend> onCreateAdapter() {
+        return new TrendAdapter(getActivity());
     }
 
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        Gh4Application context = ((BaseSherlockFragmentActivity) getActivity()).getApplicationContext();
-        
-        Trend trend = (Trend) adapterView.getAdapter().getItem(position);
-        String[] repos = trend.getTitle().split("/");
-        context.openRepositoryInfoActivity(getSherlockActivity(), repos[0].trim(), repos[1].trim(), 0);
+    protected int getEmptyTextResId() {
+        return R.string.no_trends_found;
     }
 
     @Override
-    public Loader<List<Trend>> onCreateLoader(int id, Bundle args) {
+    protected void onItemClick(Trend trend) {
+        String[] repo = trend.getRepo();
+        if (repo != null) {
+            IntentUtils.openRepositoryInfoActivity(getActivity(), repo[0], repo[1], null, 0);
+        }
+    }
+
+    @Override
+    public Loader<LoaderResult<List<Trend>>> onCreateLoader(int id, Bundle args) {
         return new TrendLoader(getActivity(), mUrl);
     }
-
-    @Override
-    public void onLoadFinished(Loader<List<Trend>> loader, List<Trend> trends) {
-        hideLoading();
-        fillData(trends);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<List<Trend>> arg0) {
-        // TODO Auto-generated method stub
-        
-    }
-
 }

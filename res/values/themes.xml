@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="DefaultTheme" parent="Theme.Sherlock">
+        <item name="sendIcon">@drawable/social_send_now_dark</item>
+        <item name="contentEditIcon">@drawable/content_edit_dark</item>
+        <item name="downloadIcon">@drawable/download_dark</item>
+        <item name="searchIcon">@drawable/action_search_dark</item>
+        <item name="shareIcon">@drawable/social_share_dark</item>
+        <item name="webIcon">@drawable/web_site_dark</item>
+        <item name="cancelIcon">@drawable/navigation_cancel_dark</item>
+        <item name="discardIcon">@drawable/content_discard_dark</item>
+        <item name="acceptIcon">@drawable/navigation_accept_dark</item>
+        <item name="newIcon">@drawable/content_new_dark</item>
+        <item name="refreshIcon">@drawable/navigation_refresh_dark</item>
+        <item name="collapseIcon">@drawable/navigation_collapse_dark</item>
+        <item name="expandIcon">@drawable/navigation_expand_dark</item>
+        <item name="labelListIcon">@drawable/collections_labels_dark</item>
+        <item name="milestoneListIcon">@drawable/collections_view_as_list_dark</item>
+        <item name="personIcon">@drawable/social_person_dark</item>
+        <item name="contentPictureIcon">@drawable/content_picture_dark</item>
+        <item name="saveIcon">@drawable/content_save_dark</item>
+        <item name="searchUserIcon">@drawable/search_users_dark</item>
+        <item name="searchRepoIcon">@drawable/search_repos_dark</item>
+    </style>
+
+    <style name="LightTheme" parent="Theme.Sherlock.Light">
+        <item name="sendIcon">@drawable/social_send_now</item>
+        <item name="contentEditIcon">@drawable/content_edit</item>
+        <item name="downloadIcon">@drawable/download</item>
+        <item name="searchIcon">@drawable/action_search</item>
+        <item name="shareIcon">@drawable/social_share</item>
+        <item name="webIcon">@drawable/web_site</item>
+        <item name="cancelIcon">@drawable/navigation_cancel</item>
+        <item name="discardIcon">@drawable/content_discard</item>
+        <item name="acceptIcon">@drawable/navigation_accept</item>
+        <item name="newIcon">@drawable/content_new</item>
+        <item name="refreshIcon">@drawable/navigation_refresh</item>
+        <item name="collapseIcon">@drawable/navigation_collapse</item>
+        <item name="expandIcon">@drawable/navigation_expand</item>
+        <item name="labelListIcon">@drawable/collections_labels</item>
+        <item name="milestoneListIcon">@drawable/collections_view_as_list</item>
+        <item name="personIcon">@drawable/social_person</item>
+        <item name="contentPictureIcon">@drawable/content_picture</item>
+        <item name="saveIcon">@drawable/content_save</item>
+        <item name="searchUserIcon">@drawable/search_users</item>
+        <item name="searchRepoIcon">@drawable/search_repos</item>
+    </style>
+
+    <style name="LightDarkTheme" parent="Theme.Sherlock.Light.DarkActionBar">
+        <item name="sendIcon">@drawable/social_send_now_dark</item>
+        <item name="contentEditIcon">@drawable/content_edit_dark</item>
+        <item name="downloadIcon">@drawable/download_dark</item>
+        <item name="searchIcon">@drawable/action_search_dark</item>
+        <item name="shareIcon">@drawable/social_share_dark</item>
+        <item name="webIcon">@drawable/web_site_dark</item>
+        <item name="cancelIcon">@drawable/navigation_cancel_dark</item>
+        <item name="discardIcon">@drawable/content_discard_dark</item>
+        <item name="acceptIcon">@drawable/navigation_accept_dark</item>
+        <item name="newIcon">@drawable/content_new_dark</item>
+        <item name="refreshIcon">@drawable/navigation_refresh_dark</item>
+        <item name="collapseIcon">@drawable/navigation_collapse_dark</item>
+        <item name="expandIcon">@drawable/navigation_expand_dark</item>
+        <item name="labelListIcon">@drawable/collections_labels_dark</item>
+        <item name="milestoneListIcon">@drawable/collections_view_as_list_dark</item>
+        <item name="personIcon">@drawable/social_person_dark</item>
+        <item name="contentPictureIcon">@drawable/content_picture</item>
+        <item name="saveIcon">@drawable/content_save_dark</item>
+        <item name="searchUserIcon">@drawable/search_users</item>
+        <item name="searchRepoIcon">@drawable/search_repos</item>
+    </style>
+
+</resources>

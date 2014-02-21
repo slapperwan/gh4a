@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="3dp"
+    android:textAppearance="@style/default_text_small"
+    android:singleLine="true" >
+</TextView>

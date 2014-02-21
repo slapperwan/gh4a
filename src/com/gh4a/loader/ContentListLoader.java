@@ -3,22 +3,19 @@ package com.gh4a.loader;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 
-import org.eclipse.egit.github.core.Content;
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.ContentService;
+import org.eclipse.egit.github.core.service.ContentsService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
 import android.content.Context;
 
-import com.gh4a.Constants.LoaderResult;
 import com.gh4a.Gh4Application;
 
-public class ContentListLoader extends BaseLoader {
+public class ContentListLoader extends BaseLoader<List<RepositoryContents>> {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -35,30 +32,28 @@ public class ContentListLoader extends BaseLoader {
     }
 
     @Override
-    public void doLoadInBackground(HashMap<Integer, Object> result)
-            throws IOException {
-        Gh4Application app = (Gh4Application) getContext()
-                .getApplicationContext();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
+    public List<RepositoryContents> doLoadInBackground() throws IOException {
+        Gh4Application app = Gh4Application.get(getContext());
+        ContentsService contentService = (ContentsService) app.getService(Gh4Application.CONTENTS_SERVICE);
+        RepositoryService repoService = (RepositoryService) app.getService(Gh4Application.REPO_SERVICE);
 
-        RepositoryService repoService = new RepositoryService(client);
-        ContentService contentService = new ContentService(client);
         if (mRef == null) {
             Repository repo = repoService.getRepository(mRepoOwner, mRepoName);
             mRef = repo.getMasterBranch();
         }
 
-        List<Content> contents = contentService.getContents(new RepositoryId(
+        List<RepositoryContents> contents = contentService.getContents(new RepositoryId(
                 mRepoOwner, mRepoName), mPath, mRef);
 
         if (contents != null && !contents.isEmpty()) {
-            Comparator<Content> comp = new Comparator<Content>() {
-                public int compare(Content c1, Content c2) {
-                    if ("dir".equals(c1.getType()) && !"dir".equals(c2.getType())) {
+            Comparator<RepositoryContents> comp = new Comparator<RepositoryContents>() {
+                public int compare(RepositoryContents c1, RepositoryContents c2) {
+                    boolean c1IsDir = RepositoryContents.TYPE_DIR.equals(c1.getType());
+                    boolean c2IsDir = RepositoryContents.TYPE_DIR.equals(c2.getType());
+                    if (c1IsDir && !c2IsDir) {
                         // Directory before non-directory
                         return -1;
-                    } else if (!"dir".equals(c1.getType()) && "dir".equals(c2.getType())) {
+                    } else if (!c1IsDir && c2IsDir) {
                         // Non-directory after directory
                         return 1;
                     } else {
@@ -70,8 +65,7 @@ public class ContentListLoader extends BaseLoader {
             };
             Collections.sort(contents, comp);
         }
-        
-        result.put(LoaderResult.DATA, contents);
-    }
 
+        return contents;
+    }
 }

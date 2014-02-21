@@ -8,7 +8,7 @@
         android:layout_height="wrap_content"
         android:text="@string/error_connection"
         android:layout_centerInParent="true"/>
-    <Button 
+    <Button
         android:id="@+id/btn_home"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

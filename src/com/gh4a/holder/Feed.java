@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,9 +25,10 @@ public class Feed {
     private String link;
     private String title;
     private String content;
+    private String preview;
     private String author;
     private String gravatarId;
-    
+
     public String getId() {
         return id;
     }
@@ -61,8 +62,20 @@ public class Feed {
     public String getContent() {
         return content;
     }
+    public String getPreview() {
+        return preview;
+    }
     public void setContent(String content) {
         this.content = content;
+        if (content != null) {
+            preview = content.length() > 2000 ? content.substring(0, 2000) : content;
+            preview = content.replaceAll("<(.|\n)*?>","");
+            if (preview.length() > 500) {
+                preview = preview.toString().substring(0,  500);
+            }
+        } else {
+            preview = null;
+        }
     }
     public String getAuthor() {
         return author;

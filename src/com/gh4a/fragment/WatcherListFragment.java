@@ -4,9 +4,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,118 +15,61 @@
  */
 package com.gh4a.fragment;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.WatcherService;
 
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
 
-import com.gh4a.BaseSherlockFragmentActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.UserAdapter;
-import com.gh4a.loader.PageIteratorLoader;
+import com.gh4a.utils.IntentUtils;
 
-public class WatcherListFragment extends BaseFragment 
-    implements LoaderManager.LoaderCallbacks<List<User>>, OnItemClickListener {
-
+public class WatcherListFragment extends PagedDataBaseFragment<User> {
     private String mRepoOwner;
     private String mRepoName;
-    private ListView mListView;
-    private UserAdapter mAdapter;
-    private PageIterator<User> mDataIterator;
-    
+
     public static WatcherListFragment newInstance(String repoOwner, String repoName) {
         WatcherListFragment f = new WatcherListFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.Repository.REPO_OWNER, repoOwner);
-        args.putString(Constants.Repository.REPO_NAME, repoName);
+        args.putString(Constants.Repository.OWNER, repoOwner);
+        args.putString(Constants.Repository.NAME, repoName);
         f.setArguments(args);
-        
+
         return f;
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString(Constants.Repository.REPO_OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.REPO_NAME);
-    }
-    
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.generic_list, container, false);
-        mListView = (ListView) v.findViewById(R.id.list_view);
-        return v;
-    }
-    
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        
-        mAdapter = new UserAdapter(getSherlockActivity(), new ArrayList<User>(), 
-                R.layout.row_gravatar_1, false);
-        mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener(this);
-        
-        loadData();
-
-        getLoaderManager().initLoader(0, null, this);
-        getLoaderManager().getLoader(0).forceLoad();
-    }
-    
-    private void loadData() {
-        Gh4Application app = (Gh4Application) getSherlockActivity().getApplication();
-        GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(app.getAuthToken());
-        WatcherService watcherService = new WatcherService(client);
-        mDataIterator = watcherService.pageWatchers(new RepositoryId(mRepoOwner, mRepoName));
-    }
-
-    private void fillData(List<User> users) {
-        mAdapter.addAll(users);
-        mAdapter.notifyDataSetChanged();
+        mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
+        mRepoName = getArguments().getString(Constants.Repository.NAME);
     }
 
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        Gh4Application context = ((BaseSherlockFragmentActivity) getActivity()).getApplicationContext();
-        User user = (User) adapterView.getAdapter().getItem(position);
-        context.openUserInfoActivity(getActivity(), user.getLogin(), user.getName());
+    protected RootAdapter<User> onCreateAdapter() {
+        return new UserAdapter(getActivity(), false);
     }
 
     @Override
-    public Loader<List<User>> onCreateLoader(int id, Bundle args) {
-        return new PageIteratorLoader<User>(getSherlockActivity(), mDataIterator);
+    protected int getEmptyTextResId() {
+        return R.string.no_watchers_found;
     }
 
     @Override
-    public void onLoadFinished(Loader<List<User>> loader, List<User> users) {
-        hideLoading();
-        if (users != null) {
-            fillData(users);
-        }
+    protected void onItemClick(User user) {
+        IntentUtils.openUserInfoActivity(getActivity(), user);
     }
 
     @Override
-    public void onLoaderReset(Loader<List<User>> users) {
-        // TODO Auto-generated method stub
-        
+    protected PageIterator<User> onCreateIterator() {
+        WatcherService watcherService = (WatcherService)
+                Gh4Application.get(getActivity()).getService(Gh4Application.WATCHER_SERVICE);
+        return watcherService.pageWatchers(new RepositoryId(mRepoOwner, mRepoName));
     }
 }

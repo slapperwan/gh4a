@@ -1,41 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ListView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/ll_search"
+    android:id="@+id/list_search"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical">
-    <LinearLayout
-        android:id="@+id/ll_spinner"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <EditText
-            android:id="@+id/et_search"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="4"
-            android:singleLine="true"
-            android:imeOptions="actionSearch"
-            android:hint="@string/search" />
-        <Spinner
-            android:id="@+id/spinner_language"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:entries="@array/languages_array"
-            android:layout_gravity="center_vertical|center_horizontal"
-            android:layout_weight="3" />
-        <ImageButton
-            android:text="@string/search"
-            android:id="@+id/btn_search"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:src="@drawable/action_search" />
-    </LinearLayout>
-    <ListView
-        android:id="@+id/list_search"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-    </ListView>
-</LinearLayout>
+    android:layout_height="fill_parent">
+</ListView>

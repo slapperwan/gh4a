@@ -1,124 +1,112 @@
 package com.gh4a.utils;
 
-import java.util.Calendar;
-import java.util.Date;
-
+import android.text.TextUtils;
 import org.eclipse.egit.github.core.Commit;
+import org.eclipse.egit.github.core.CommitUser;
 import org.eclipse.egit.github.core.RepositoryCommit;
+
+import com.gh4a.R;
+
+import android.content.Context;
 
 public class CommitUtils {
 
     //RepositoryCommit
-    public static String getAuthorName(RepositoryCommit repositoryCommit) {
-        if (repositoryCommit.getAuthor() != null) {
-            return repositoryCommit.getAuthor().getLogin();
+    public static String getAuthorName(Context context, RepositoryCommit commit) {
+        if (commit.getAuthor() != null) {
+            return commit.getAuthor().getLogin();
         }
-        else if (repositoryCommit.getCommit().getAuthor() != null) {
-            return repositoryCommit.getCommit().getAuthor().getName();
+        if (commit.getCommit().getAuthor() != null) {
+            return commit.getCommit().getAuthor().getName();
         }
-        else {
-            return "unknown";
-        }
+        return context.getString(R.string.unknown);
     }
-    
-    public static String getAuthorLogin(RepositoryCommit repositoryCommit) {
-        if (repositoryCommit.getAuthor() != null) {
-            return repositoryCommit.getAuthor().getLogin();
+
+    public static String getAuthorLogin(Context context, RepositoryCommit commit) {
+        if (commit.getAuthor() != null) {
+            return commit.getAuthor().getLogin();
         }
-        else {
-            return null;
-        }
+        return null;
     }
-    
-    public static String getCommitterName(RepositoryCommit repositoryCommit) {
-        if (repositoryCommit.getCommitter() != null) {
-            return repositoryCommit.getCommitter().getLogin();
+
+    public static String getCommitterName(Context context, RepositoryCommit commit) {
+        if (commit.getCommitter() != null) {
+            return commit.getCommitter().getLogin();
         }
-        else if (repositoryCommit.getCommit().getCommitter() != null) {
-            return repositoryCommit.getCommit().getCommitter().getName();
+        if (commit.getCommit().getCommitter() != null) {
+            return commit.getCommit().getCommitter().getName();
         }
-        else {
-            return "unknown";
-        }
+        return context.getString(R.string.unknown);
     }
-    
-    public static String getCommitterLogin(RepositoryCommit repositoryCommit) {
-        if (repositoryCommit.getCommitter() != null) {
-            return repositoryCommit.getCommitter().getLogin();
+
+    public static String getCommitterLogin(Context context, RepositoryCommit commit) {
+        if (commit.getCommitter() != null) {
+            return commit.getCommitter().getLogin();
         }
-        else {
-            return null;
-        }
+        return null;
     }
-    
-    public static String getAuthorGravatarId(RepositoryCommit repositoryCommit) {
-        if (repositoryCommit.getAuthor() != null) {
-            return repositoryCommit.getAuthor().getGravatarId();
+
+    public static String getAuthorGravatarId(Context context, RepositoryCommit commit) {
+        if (commit.getAuthor() != null) {
+            return commit.getAuthor().getGravatarId();
         }
-        else if (repositoryCommit.getCommit().getAuthor() != null
-                && repositoryCommit.getCommit().getAuthor().getEmail() != null) {
-            return StringUtils.md5Hex(repositoryCommit.getCommit().getAuthor().getEmail());
+        CommitUser author = commit.getCommit().getAuthor();
+        if (author != null && author.getEmail() != null) {
+            return StringUtils.md5Hex(author.getEmail());
         }
-        else {
-            return null;
-        }
+        return null;
     }
-    
-    public static String getCommitterGravatarId(RepositoryCommit repositoryCommit) {
-        if (repositoryCommit.getCommitter() != null) {
-            return repositoryCommit.getCommitter().getGravatarId();
+
+    public static String getCommitterGravatarId(Context context, RepositoryCommit commit) {
+        if (commit.getCommitter() != null) {
+            return commit.getCommitter().getGravatarId();
         }
-        else if (repositoryCommit.getCommit().getCommitter() != null
-                && repositoryCommit.getCommit().getCommitter().getEmail() != null) {
-            return StringUtils.md5Hex(repositoryCommit.getCommit().getCommitter().getEmail());
+        CommitUser committer = commit.getCommit().getCommitter();
+        if (committer != null && committer.getEmail() != null) {
+            return StringUtils.md5Hex(committer.getEmail());
         }
-        else {
-            return null;
-        }
+        return null;
     }
-    
+
+    public static boolean authorEqualsCommitter(RepositoryCommit commit) {
+        if (commit.getCommitter() != null && commit.getAuthor() != null) {
+            return TextUtils.equals(commit.getCommitter().getLogin(), commit.getAuthor().getLogin());
+        }
+
+        CommitUser author = commit.getCommit().getAuthor();
+        CommitUser committer = commit.getCommit().getCommitter();
+        if (author.getEmail() != null && committer.getEmail() != null) {
+            return TextUtils.equals(author.getEmail(), committer.getEmail());
+        }
+        return TextUtils.equals(author.getName(), committer.getName());
+    }
+
     //Commit
-    public static String getAuthorName(Commit commit) {
+    public static String getAuthorName(Context context, Commit commit) {
         if (commit.getAuthor() != null) {
             return commit.getAuthor().getName();
         }
-        else {
-            return "unknown";
-        }
+        return context.getString(R.string.unknown);
     }
-    
-    public static String getCommitterName(Commit commit) {
+
+    public static String getCommitterName(Context context, Commit commit) {
         if (commit.getCommitter() != null) {
             return commit.getCommitter().getName();
         }
-        else {
-            return "unknown";
-        }
+        return context.getString(R.string.unknown);
     }
-    
-    public static String getAuthorEmail(Commit commit) {
+
+    public static String getAuthorEmail(Context context, Commit commit) {
         if (commit.getAuthor() != null) {
             return commit.getAuthor().getEmail();
         }
-        else {
-            return null;
-        }
+        return null;
     }
-    
-    public static String getCommitterEmail(Commit commit) {
+
+    public static String getCommitterEmail(Context context, Commit commit) {
         if (commit.getCommitter() != null) {
             return commit.getCommitter().getEmail();
         }
-        else {
-            return null;
-        }
-    }
-    
-    public static Date convertCommitDateTime(Date date) {
-        Calendar c = Calendar.getInstance();
-        c.setTime(date);
-        //int offset = (c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET)) / (60000 * 60);
-        c.add(Calendar.HOUR_OF_DAY, 7);
-        return c.getTime();
+        return null;
     }
 }

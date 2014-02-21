@@ -1,51 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical">
-    <LinearLayout
-        android:id="@+id/main_content"
-        android:layout_width="fill_parent"
+    android:id="@+id/main_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/content_padding"
+    android:paddingRight="@dimen/content_padding" >
+
+    <EditText
+        android:id="@+id/et_username_main"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
-        <EditText
-            android:id="@+id/et_username_main"
-            android:layout_height="wrap_content"
-            android:layout_width="fill_parent"
-            android:hint="@string/user_username" 
-            android:singleLine="true" 
-            android:nextFocusDown="@+id/et_password_main"/>
-        <EditText
-            android:id="@id/et_password_main"
-            android:layout_height="wrap_content"
-            android:layout_width="fill_parent"
-            android:password="true"
-            android:hint="@string/user_password"
-            android:singleLine="true"
-            android:nextFocusDown="@+id/btn_login" />
-        <Button
-            android:text="@string/user_login"
-            android:id="@+id/btn_login"
-            android:layout_width="100dp"
-            android:gravity="center_vertical|center_horizontal"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|center_horizontal|center">
-        </Button>
-    </LinearLayout>
-    <!-- LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical"
-        android:layout_marginTop="20dp">
-        <TextView
-            android:id="@+id/tv_explore"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical|center_horizontal"
-            android:layout_gravity="center_vertical|center_horizontal|center"
-            android:textAppearance="?attr/textAppearanceUrl"
-            android:background="?attr/textAppearanceLink"
-            android:text="Explore Gh4a" />
-    </LinearLayout-->
-</LinearLayout>
+        android:layout_above="@+id/spacer"
+        android:layout_gravity="center"
+        android:hint="@string/user_username"
+        android:singleLine="true"
+        android:nextFocusDown="@+id/et_password_main"/>
+    <View
+        android:id="@+id/spacer"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_centerVertical="true" />
+    <EditText
+        android:id="@id/et_password_main"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_below="@+id/spacer"
+        android:inputType="textPassword"
+        android:hint="@string/user_password"
+        android:singleLine="true"
+        android:nextFocusDown="@+id/btn_login" />
+
+</RelativeLayout>

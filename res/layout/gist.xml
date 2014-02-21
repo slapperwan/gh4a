@@ -1,38 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:layout_margin="0dp"
-    android:padding="0dp">
-    <FrameLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-        <ProgressBar
-            android:id="@+id/pb"
-            style="@style/LoadingProgress" />
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    <LinearLayout
+        android:id="@+id/main_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="@dimen/content_padding" >
+        <TextView
+            android:id="@+id/tv_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+        <TextView
+            android:id="@+id/tv_created_at"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
         <LinearLayout
-            android:id="@+id/main_content"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:id="@+id/ll_files"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:layout_marginTop="@dimen/overview_item_spacing" >
             <TextView
-                android:id="@+id/tv_desc"
-                android:layout_width="fill_parent"
+                android:id="@+id/files_title"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-            <TextView
-                android:id="@+id/tv_created_at"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-            <LinearLayout
-                android:id="@+id/ll_files"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:orientation="vertical" >
-            </LinearLayout>
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/highlight"
+                android:text="@string/gist_files" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="@dimen/overview_header_spacing"
+                android:background="@color/highlight" />
         </LinearLayout>
-    </FrameLayout>
+    </LinearLayout>
 </ScrollView>
