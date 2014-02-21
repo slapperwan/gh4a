@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/pull_reopen"
+        android:title="@string/pull_request_reopen"
+        android:showAsAction="ifRoom|withText" />
+
+    <item android:id="@+id/pull_merge"
+        android:title="@string/pull_request_merge"
+        android:showAsAction="ifRoom|withText" />
+
+    <item android:id="@+id/pull_close"
+        android:title="@string/pull_request_close"
+        android:showAsAction="ifRoom|withText" />
+
+    <item android:id="@+id/share"
+        android:title="@string/share"
+        android:showAsAction="never" />
+</menu>
