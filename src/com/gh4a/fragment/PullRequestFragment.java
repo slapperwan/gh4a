@@ -189,6 +189,7 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
     public void refresh() {
         super.refresh();
         getLoaderManager().getLoader(1).onContentChanged();
+        getLoaderManager().getLoader(2).onContentChanged();
     }
 
     @Override
@@ -219,6 +220,9 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
                 shareIntent.putExtra(Intent.EXTRA_TEXT,  mPullRequest.getHtmlUrl());
                 shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
+                break;
+            case R.id.refresh:
+                refresh();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -314,7 +318,8 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_EDIT && resultCode == Activity.RESULT_OK) {
-            refresh();
+            // no need to refresh pull request and collaborator status in that case
+            super.refresh();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

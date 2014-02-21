@@ -341,6 +341,12 @@ public class IssueActivity extends LoadingFragmentActivity implements
                 shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
                 return true;
+            case R.id.refresh:
+                setContentShown(false);
+                getSupportLoaderManager().restartLoader(0, null, mIssueCallback);
+                getSupportLoaderManager().restartLoader(1, null, mCollaboratorCallback);
+                getSupportLoaderManager().restartLoader(2, null, mCommentCallback);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

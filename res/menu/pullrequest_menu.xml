@@ -15,4 +15,8 @@
     <item android:id="@+id/share"
         android:title="@string/share"
         android:showAsAction="never" />
+
+    <item android:id="@+id/refresh"
+        android:title="@string/refresh"
+        android:showAsAction="never" />
 </menu>
