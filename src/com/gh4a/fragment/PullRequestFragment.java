@@ -130,14 +130,18 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (Gh4Application.get(getActivity()).isAuthorized()) {
+        Gh4Application app = Gh4Application.get(getActivity());
+        if (app.isAuthorized()) {
             inflater.inflate(R.menu.pullrequest_menu, menu);
 
+            boolean isCreator = mPullRequest != null &&
+                    mPullRequest.getUser().getLogin().equals(app.getAuthLogin());
             String state = mPullRequest != null ? mPullRequest.getState() : null;
-            if (!mIsCollaborator || state == null || state.equals(Constants.Issue.STATE_CLOSED)) {
+
+            if ((!mIsCollaborator && !isCreator) || Constants.Issue.STATE_CLOSED.equals(state)) {
                 menu.removeItem(R.id.pull_close);
             }
-            if (!mIsCollaborator || state == null || state.equals(Constants.Issue.STATE_OPEN)) {
+            if ((!mIsCollaborator && !isCreator) || Constants.Issue.STATE_OPEN.equals(state)) {
                 menu.removeItem(R.id.pull_reopen);
             }
             if (!mIsCollaborator || mPullRequest == null) {
