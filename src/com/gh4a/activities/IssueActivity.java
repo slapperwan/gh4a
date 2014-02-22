@@ -343,9 +343,9 @@ public class IssueActivity extends LoadingFragmentActivity implements
                 return true;
             case R.id.refresh:
                 setContentShown(false);
-                getSupportLoaderManager().restartLoader(0, null, mIssueCallback);
-                getSupportLoaderManager().restartLoader(1, null, mCollaboratorCallback);
-                getSupportLoaderManager().restartLoader(2, null, mCommentCallback);
+                for (int i = 0; i < 3; i++) {
+                    getSupportLoaderManager().getLoader(i).onContentChanged();
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);
