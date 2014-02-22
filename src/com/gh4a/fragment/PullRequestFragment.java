@@ -22,7 +22,6 @@ import java.util.Locale;
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.MergeStatus;
 import org.eclipse.egit.github.core.PullRequest;
-import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.IssueService;
@@ -141,8 +140,12 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
             if (!mIsCollaborator || state == null || state.equals(Constants.Issue.STATE_OPEN)) {
                 menu.removeItem(R.id.pull_reopen);
             }
-            if (!mIsCollaborator || mPullRequest == null || mPullRequest.isMerged()) {
+            if (!mIsCollaborator || mPullRequest == null) {
                 menu.removeItem(R.id.pull_merge);
+            } else if (mPullRequest.isMerged()) {
+                MenuItem mergeItem = menu.findItem(R.id.pull_merge);
+                mergeItem.setTitle(R.string.pull_request_merged);
+                mergeItem.setEnabled(false);
             } else if (!mPullRequest.isMergeable()) {
                 menu.findItem(R.id.pull_merge).setEnabled(false);
             }
@@ -271,19 +274,16 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
     }
 
     private void showMergeDialog() {
-        Repository fromRepo = mPullRequest.getHead().getRepo();
-        String defaultMessage = getString(R.string.pull_merge_message_default,
-                mPullRequestNumber, fromRepo.getOwner().getLogin() + "/" + fromRepo.getName());
         String title = getString(R.string.pull_message_dialog_title, mPullRequestNumber);
-
         View view = getLayoutInflater(null).inflate(R.layout.pull_merge_message_dialog, null);
+
         final EditText editor = (EditText) view.findViewById(R.id.et_commit_message);
-        editor.setText(defaultMessage);
+        editor.setText(mPullRequest.getTitle());
 
         UiUtils.createDialogBuilder(getActivity())
                 .setTitle(title)
                 .setView(view)
-                .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+                .setPositiveButton(getString(R.string.pull_request_merge), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String text = editor.getText() == null ? null : editor.getText().toString();
