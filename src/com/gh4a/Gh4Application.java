@@ -95,10 +95,9 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         regular = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Regular.ttf");
         italic = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Italic.ttf");
 
-        SharedPreferences sharedPreferences = getSharedPreferences(
-                Constants.PREF_NAME, MODE_PRIVATE);
-        THEME = sharedPreferences.getInt("THEME", R.style.DefaultTheme);
-        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+        SharedPreferences prefs = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
+        selectTheme(prefs.getInt("theme", Constants.Theme.DARK));
+        prefs.registerOnSharedPreferenceChangeListener(this);
 
         BugSenseHandler.initAndStartSession(this, "1e6a83ae");
 
@@ -128,6 +127,31 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
 
     public GitHubService getService(String name) {
         return mServices.get(name);
+    }
+
+    public void setThemeSetting(int theme) {
+        if (selectTheme(theme)) {
+            SharedPreferences.Editor editor =
+                    getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit();
+            editor.putInt("theme", theme).apply();
+        }
+    }
+
+    private boolean selectTheme(int theme) {
+        switch (theme) {
+            case Constants.Theme.DARK:
+                THEME = R.style.DefaultTheme;
+                break;
+            case Constants.Theme.LIGHT:
+                THEME = R.style.LightTheme;
+                break;
+            case Constants.Theme.LIGHTDARK:
+                THEME = R.style.LightDarkTheme;
+                break;
+            default:
+                return false;
+        }
+        return true;
     }
 
     @Override

@@ -26,6 +26,12 @@ public interface Constants {
     public static final String PREF_NAME = "Gh4a-pref";
     public static final String LOG_TAG = "Gh4a";
 
+    public interface Theme {
+        public static final int DARK = 0;
+        public static final int LIGHT = 1;
+        public static final int LIGHTDARK = 2;
+    }
+
     public interface User {
         public static final String LOGIN = "USER_LOGIN";
         public static final String NAME = "USER_NAME";

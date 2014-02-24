@@ -1,18 +1,18 @@
 package com.gh4a.fragment;
 
 import java.util.List;
-
+import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.ListView;
 
+import com.actionbarsherlock.app.SherlockListFragment;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderResult;
 
-public abstract class ListDataBaseFragment<T> extends ListFragment implements
+public abstract class ListDataBaseFragment<T> extends SherlockListFragment implements
         LoaderCallbacks<LoaderResult<List<T>>> {
     private RootAdapter<T> mAdapter;
 
@@ -36,12 +36,17 @@ public abstract class ListDataBaseFragment<T> extends ListFragment implements
     public void refresh() {
         setListShown(false);
         mAdapter.clear();
-        getLoaderManager().restartLoader(0, null, this);
+        getLoaderManager().getLoader(0).onContentChanged();
     }
 
     protected void onAddData(RootAdapter<T> adapter, List<T> data) {
         adapter.addAll(data);
         adapter.notifyDataSetChanged();
+    }
+
+    @SuppressLint("NewApi") // ABS has invalidateOptionsMenu()
+    public void invalidateOptionsMenu() {
+        getSherlockActivity().invalidateOptionsMenu();
     }
 
     @Override
@@ -59,7 +64,7 @@ public abstract class ListDataBaseFragment<T> extends ListFragment implements
         } else {
             setListShownNoAnimation(true);
         }
-        getActivity().invalidateOptionsMenu();
+        invalidateOptionsMenu();
     }
 
     @Override

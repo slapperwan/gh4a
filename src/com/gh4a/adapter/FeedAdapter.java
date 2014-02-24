@@ -123,7 +123,7 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         String eventType = event.getType();
         EventRepository eventRepo = event.getRepo();
 
-        if (!(event.getPayload() instanceof EventPayload)) {
+        if (!hasValidPayload(event)) {
             return event.getType();
         }
 
@@ -258,7 +258,7 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         User actor = event.getActor();
         Resources res = mContext.getResources();
 
-        if (!(event.getPayload() instanceof EventPayload)) {
+        if (!hasValidPayload(event)) {
             return event.getType();
         }
 
@@ -381,6 +381,16 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         }
 
         return "";
+    }
+
+    public static boolean hasValidPayload(Event event) {
+        EventPayload payload = event.getPayload();
+        if (payload == null) {
+            return false;
+        }
+        // we only accept and work with derived classes; if the base class
+        // is returned, something went wrong during deserialization
+        return !EventPayload.class.equals(payload.getClass());
     }
 
     private String formatFromRepoName(EventRepository repository) {

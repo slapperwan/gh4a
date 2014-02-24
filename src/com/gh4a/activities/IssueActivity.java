@@ -297,7 +297,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
                 menu.removeItem(R.id.issue_edit);
             }
         }
-        return super.onPrepareOptionsMenu(menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -382,7 +382,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_EDIT && resultCode == Activity.RESULT_OK) {
-            getSupportLoaderManager().restartLoader(2, null, mCommentCallback);
+            getSupportLoaderManager().getLoader(2).onContentChanged();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -413,7 +413,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
             RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
 
             Issue issue = issueService.getIssue(repoId, mIssueNumber);
-            issue.setState(mOpen ? "open" : "closed");
+            issue.setState(mOpen ? Constants.Issue.STATE_OPEN : Constants.Issue.STATE_CLOSED);
 
             return issueService.editIssue(repoId, issue);
         }
@@ -421,7 +421,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
         @Override
         protected void onSuccess(Issue result) {
             mIssue = result;
-            mIssueState = mOpen ? "open" : "closed";
+            mIssueState = mIssue.getState();
             ToastUtils.showMessage(mContext,
                     mOpen ? R.string.issue_success_reopen : R.string.issue_success_close);
 
@@ -457,7 +457,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
         protected void onSuccess(Void result) {
             ToastUtils.showMessage(mContext, R.string.issue_success_comment);
             //reload comments
-            getSupportLoaderManager().restartLoader(2, null, mCommentCallback);
+            getSupportLoaderManager().getLoader(2).onContentChanged();
 
             EditText etComment = (EditText) findViewById(R.id.et_comment);
             etComment.setText(null);

@@ -16,11 +16,9 @@
 package com.gh4a.fragment;
 
 import java.util.Collection;
-
 import org.eclipse.egit.github.core.client.PageIterator;
-
+import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
@@ -32,11 +30,12 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.actionbarsherlock.app.SherlockListFragment;
 import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 
-public abstract class PagedDataBaseFragment<T> extends ListFragment implements
+public abstract class PagedDataBaseFragment<T> extends SherlockListFragment implements
         LoaderManager.LoaderCallbacks<Collection<T>>, OnScrollListener {
     private RootAdapter<T> mAdapter;
     private boolean mLoadMore;
@@ -71,6 +70,11 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
         getLoaderManager().initLoader(0, null, this);
     }
 
+    @SuppressLint("NewApi") // ABS has invalidateOptionsMenu()
+    public void invalidateOptionsMenu() {
+        getSherlockActivity().invalidateOptionsMenu();
+    }
+
     public void setFilterText(String text) {
         mCurrentFilter = text;
         if (mAdapter != null) {
@@ -81,7 +85,7 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
     public void refresh() {
         mLoadMore = false;
         setListShown(false);
-        getLoaderManager().restartLoader(0, null, this);
+        getLoaderManager().getLoader(0).onContentChanged();
     }
 
     private void fillData(Collection<T> data) {
@@ -115,7 +119,7 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
         fillData(events);
         mIsLoadCompleted = true;
         setListShown(true);
-        getActivity().invalidateOptionsMenu();
+        invalidateOptionsMenu();
         mAdapter.notifyDataSetChanged();
         if (!TextUtils.isEmpty(mCurrentFilter)) {
             mAdapter.getFilter().filter(mCurrentFilter);

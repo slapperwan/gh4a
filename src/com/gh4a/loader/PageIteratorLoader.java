@@ -21,6 +21,18 @@ public class PageIteratorLoader<T> extends AsyncTaskLoader<Collection<T>> {
     }
 
     @Override
+    public void onContentChanged() {
+        super.onContentChanged();
+        mPageIterator.reset();
+    }
+
+    @Override
+    protected void onReset() {
+        super.onReset();
+        mPageIterator.reset();
+    }
+
+    @Override
     public Collection<T> loadInBackground() {
         if (mPageIterator.hasNext()) {
             try {

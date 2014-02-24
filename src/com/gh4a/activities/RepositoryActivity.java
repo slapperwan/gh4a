@@ -478,7 +478,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         mDirStack.clear();
         mContentCache.clear();
         setContentShown(false);
-        getSupportLoaderManager().restartLoader(LOADER_REPO, null, mRepoCallback);
+        getSupportLoaderManager().getLoader(LOADER_REPO).onContentChanged();
     }
 
     private class UpdateStarTask extends BackgroundTask<Void> {
