@@ -84,10 +84,16 @@ public class UiUtils {
         final DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         final DownloadManager.Request request = new DownloadManager.Request(uri);
 
-        request.addRequestHeader("Accept", "application/octet-stream")
-                .setDescription(description)
-                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
-                .setAllowedOverRoaming(false);
+        request.addRequestHeader("Accept", "application/octet-stream");
+        request.setDescription(description);
+        request.setAllowedOverRoaming(false);
+
+        try {
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
+        } catch (IllegalStateException e) {
+            ToastUtils.showMessage(context, R.string.download_fail_no_storage_toast);
+            return;
+        }
 
         if (mimeType != null) {
             request.setMimeType(mimeType);
