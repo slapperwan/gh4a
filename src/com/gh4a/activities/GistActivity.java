@@ -70,8 +70,7 @@ public class GistActivity extends LoadingFragmentActivity implements OnClickList
         mGistId = getIntent().getExtras().getString(Constants.Gist.ID);
         mUserLogin = getIntent().getExtras().getString(Constants.User.LOGIN);
 
-        if (!isOnline()) {
-            setErrorView();
+        if (hasErrorView()) {
             return;
         }
 

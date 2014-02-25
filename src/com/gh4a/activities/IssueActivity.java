@@ -132,8 +132,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
         mIssueNumber = data.getInt(Constants.Issue.NUMBER);
         mIssueState = data.getString(Constants.Issue.STATE);
 
-        if (!isOnline()) {
-            setErrorView();
+        if (hasErrorView()) {
             return;
         }
 

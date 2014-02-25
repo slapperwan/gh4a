@@ -114,8 +114,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
         mRepoOwner = getIntent().getExtras().getString(Constants.Repository.OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);
 
-        if (!isOnline()) {
-            setErrorView();
+        if (hasErrorView()) {
             return;
         }
 

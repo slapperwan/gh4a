@@ -164,8 +164,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
         mRepoName = data.getString(Constants.Repository.NAME);
         mIssueNumber = data.getInt(Constants.Issue.NUMBER);
 
-        if (!isOnline()) {
-            setErrorView();
+        if (hasErrorView()) {
             return;
         }
 

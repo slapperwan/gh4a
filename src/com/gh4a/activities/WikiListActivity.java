@@ -73,8 +73,7 @@ public class WikiListActivity extends LoadingFragmentActivity {
         mUserLogin = getIntent().getStringExtra(Constants.Repository.OWNER);
         mRepoName = getIntent().getStringExtra(Constants.Repository.NAME);
 
-        if (!isOnline()) {
-            setErrorView();
+        if (hasErrorView()) {
             return;
         }
 
