@@ -85,8 +85,7 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
         mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);
         mMilestoneNumber = getIntent().getExtras().getInt(Constants.Milestone.NUMBER);
 
-        if (!isOnline()) {
-            setErrorView();
+        if (hasErrorView()) {
             return;
         }
 

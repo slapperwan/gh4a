@@ -66,8 +66,7 @@ public class GistListActivity extends LoadingFragmentActivity implements OnItemC
 
         mUserLogin = getIntent().getExtras().getString(Constants.User.LOGIN);
 
-        if (!isOnline()) {
-            setErrorView();
+        if (hasErrorView()) {
             return;
         }
 
