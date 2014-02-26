@@ -402,7 +402,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
                 shareIntent.setType("text/plain");
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, mRepoOwner + "/" + mRepoName);
-                shareIntent.putExtra(Intent.EXTRA_TEXT,  mRepository.getHtmlUrl());
+                shareIntent.putExtra(Intent.EXTRA_TEXT,  "https://github.com/" + mRepoOwner + "/" + mRepoName);
                 shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
                 return true;
