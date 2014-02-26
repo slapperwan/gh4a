@@ -105,8 +105,7 @@ public class FileViewerActivity extends LoadingFragmentActivity {
         mDiff = data.getString(Constants.Commit.DIFF);
         mInDiffMode = data.getString(Constants.Object.TREE_SHA) != null;
 
-        if (!isOnline()) {
-            setErrorView();
+        if (hasErrorView()) {
             return;
         }
 

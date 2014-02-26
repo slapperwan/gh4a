@@ -110,6 +110,7 @@
     <string name="download_mobile_warning_message">Do you want to download this file using your mobile connection?\nYou can also schedule it for download when you\'re using your Wi-Fi connection next time.</string>
     <string name="download_now_button">Download now</string>
     <string name="download_wifi_button">Download over Wi-Fi</string>
+    <string name="download_fail_no_storage_toast">The file could not be downloaded - the storage or SD card isn\'t available.</string>
 
     <plurals name="file">
         <item quantity="one">File</item>

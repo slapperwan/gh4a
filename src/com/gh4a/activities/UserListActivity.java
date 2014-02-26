@@ -62,8 +62,7 @@ public abstract class UserListActivity extends LoadingFragmentActivity implement
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
-        if (!isOnline()) {
-            setErrorView();
+        if (hasErrorView()) {
             return;
         }
 

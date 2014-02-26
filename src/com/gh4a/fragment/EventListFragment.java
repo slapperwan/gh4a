@@ -29,7 +29,6 @@ import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.event.CommitCommentPayload;
 import org.eclipse.egit.github.core.event.DownloadPayload;
 import org.eclipse.egit.github.core.event.Event;
-import org.eclipse.egit.github.core.event.EventPayload;
 import org.eclipse.egit.github.core.event.EventRepository;
 import org.eclipse.egit.github.core.event.FollowPayload;
 import org.eclipse.egit.github.core.event.ForkPayload;

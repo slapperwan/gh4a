@@ -91,8 +91,7 @@ public class GistViewerActivity extends LoadingFragmentActivity {
         mFileName = getIntent().getExtras().getString(Constants.Gist.FILENAME);
         mGistId = getIntent().getExtras().getString(Constants.Gist.ID);
 
-        if (!isOnline()) {
-            setErrorView();
+        if (hasErrorView()) {
             return;
         }
 
