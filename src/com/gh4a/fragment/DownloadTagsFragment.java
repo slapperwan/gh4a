@@ -58,6 +58,6 @@ public class DownloadTagsFragment extends ListDataBaseFragment<RepositoryTag> {
     @Override
     public void onItemClick(final RepositoryTag tag) {
         UiUtils.enqueueDownload(getActivity(), tag.getZipballUrl(), "application/zip",
-                mRepoName + "-" + tag.getName() + ".zip", null);
+                mRepoName + "-" + tag.getName() + ".zip", null, null);
     }
 }

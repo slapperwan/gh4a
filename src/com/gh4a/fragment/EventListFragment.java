@@ -165,8 +165,8 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         } else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
             DownloadPayload payload = (DownloadPayload) event.getPayload();
             Download download = payload.getDownload();
-            UiUtils.enqueueDownload(getActivity(), download.getUrl(), download.getContentType(),
-                    download.getName(), download.getDescription());
+            UiUtils.enqueueDownload(getActivity(), download.getHtmlUrl(), download.getContentType(),
+                    download.getName(), download.getDescription(), null);
 
         } else if (Event.TYPE_FOLLOW.equals(eventType)) {
             FollowPayload payload = (FollowPayload) event.getPayload();
@@ -427,8 +427,8 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
                 download = payload.getDownload();
             }
             if (download != null) {
-                UiUtils.enqueueDownload(getActivity(), download.getUrl(), download.getContentType(),
-                        download.getName(), download.getDescription());
+                UiUtils.enqueueDownload(getActivity(), download.getHtmlUrl(), download.getContentType(),
+                        download.getName(), download.getDescription(), null);
             }
         } else if (id == MENU_FORKED_REPO) {
             ForkPayload payload = (ForkPayload) event.getPayload();
