@@ -131,12 +131,13 @@
     <string name="no_milestones_found">This repository doesn\'t have any configured milestone.</string>
     <string name="no_commits_found">No commits found.</string>
     <string name="no_followers_found">No followers found.</string>
-    <string name="no_following_found">No users are followed so far..</string>
+    <string name="no_following_found">No users are followed so far.</string>
     <string name="no_forks_found">This repository wasn\'t forked yet.</string>
     <string name="no_issues_found">No issues were reported so far.</string>
     <string name="no_events_found">No events found.</string>
     <string name="no_pull_requests_found">No pull requests were opened so far.</string>
     <string name="no_repos_found">No repositories found.</string>
+    <string name="no_search_repos_found">No repositories found matching the criteria.</string>
     <string name="no_starred_repos_found">No repositories were starred yet.</string>
     <string name="no_watched_repos_found">No repositories are being watched yet.</string>
     <string name="no_watchers_found">Nobody is watching this repository yet.</string>

@@ -83,12 +83,17 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
     public boolean onCreateOptionsMenu(Menu menu) {
         getSupportMenuInflater().inflate(R.menu.repo_list_menu, menu);
 
-        MenuItem searchItem = menu.findItem(R.id.search);
-        searchItem.setOnActionExpandListener(this);
+        // We can only properly search the 'all repos' list
+        if (mActionBar.getSelectedNavigationIndex() == 0) {
+            MenuItem searchItem = menu.findItem(R.id.search);
+            searchItem.setOnActionExpandListener(this);
 
-        SearchView searchView = (SearchView) searchItem.getActionView();
-        searchView.setOnCloseListener(this);
-        searchView.setOnQueryTextListener(this);
+            SearchView searchView = (SearchView) searchItem.getActionView();
+            searchView.setOnCloseListener(this);
+            searchView.setOnQueryTextListener(this);
+        } else {
+            menu.removeItem(R.id.search);
+        }
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -188,6 +193,7 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
             ft.add(R.id.details, fragment, "main");
             ft.commit();
         }
+        super.invalidateOptionsMenu();
         return true;
     }
 
