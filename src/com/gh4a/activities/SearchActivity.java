@@ -62,6 +62,8 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
 
     private Spinner mSearchType;
     private SearchView mSearch;
+    private String mQuery;
+    private boolean mSubmitted;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -304,18 +306,24 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
         } else {
             searchRepository(query);
         }
+        mSubmitted = true;
         mSearch.clearFocus();
         return true;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
+        mQuery = newText;
+        mSubmitted = false;
         return false;
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         updateSearchTypeHint();
+        if (mSubmitted) {
+            onQueryTextSubmit(mQuery);
+        }
     }
 
     @Override
@@ -333,6 +341,8 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
             mRepoAdapter.clear();
             mRepoAdapter.notifyDataSetChanged();
         }
+        mQuery = null;
+        mSubmitted = false;
         return true;
     }
 
