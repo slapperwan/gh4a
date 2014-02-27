@@ -47,8 +47,8 @@ public class DownloadsFragment extends ListDataBaseFragment<Download> {
 
     @Override
     public void onItemClick(final Download download) {
-        UiUtils.enqueueDownload(getActivity(), download.getUrl(), download.getContentType(),
-                download.getName(), download.getDescription());
+        UiUtils.enqueueDownload(getActivity(), download.getHtmlUrl(), download.getContentType(),
+                download.getName(), download.getDescription(), null);
     }
 
     @Override

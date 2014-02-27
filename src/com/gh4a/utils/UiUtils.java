@@ -77,14 +77,16 @@ public class UiUtils {
     }
 
     public static void enqueueDownload(Context context, String url, String mimeType,
-            String fileName, String description) {
+            String fileName, String description, String mediaType) {
         Uri uri = Uri.parse(url).buildUpon()
                 .appendQueryParameter("access_token", Gh4Application.get(context).getAuthToken())
                 .build();
         final DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         final DownloadManager.Request request = new DownloadManager.Request(uri);
 
-        request.addRequestHeader("Accept", "application/octet-stream");
+        if (mediaType != null) {
+            request.addRequestHeader("Accept", mediaType);
+        }
         request.setDescription(description);
         request.setAllowedOverRoaming(false);
 
