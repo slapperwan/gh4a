@@ -214,8 +214,8 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
 
         setContentShown(false);
         setTabsEnabled(false);
-        getSupportLoaderManager().initLoader(LOADER_REPO, null, mRepoCallback);
 
+        getSupportLoaderManager().initLoader(LOADER_REPO, null, mRepoCallback);
         getSupportLoaderManager().initLoader(LOADER_WATCHING, null, mWatchCallback);
         getSupportLoaderManager().initLoader(LOADER_STARRING, null, mStarCallback);
     }
