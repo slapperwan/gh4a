@@ -35,6 +35,7 @@ import com.gh4a.utils.IntentUtils;
 public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     private String mLogin;
     private String mRepoType;
+    private boolean mIsOrg;
 
     public static RepositoryListFragment newInstance(String login, String userType, String repoType) {
         RepositoryListFragment f = new RepositoryListFragment();
@@ -53,6 +54,7 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
         super.onCreate(savedInstanceState);
         mLogin = getArguments().getString(Constants.User.LOGIN);
         mRepoType = getArguments().getString(Constants.Repository.TYPE);
+        mIsOrg = Constants.User.TYPE_ORG.equals(getArguments().getString(Constants.User.TYPE));
     }
 
     @Override
@@ -67,7 +69,7 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
 
     @Override
     protected void onAddData(RootAdapter<Repository> adapter, Collection<Repository> repositories) {
-        if ("sources".equals(mRepoType) || "forks".equals(mRepoType)) {
+        if (!mIsOrg && ("sources".equals(mRepoType) || "forks".equals(mRepoType))) {
             for (Repository repository : repositories) {
                 if ("sources".equals(mRepoType) && !repository.isFork()) {
                     adapter.add(repository);
@@ -88,15 +90,19 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     @Override
     protected PageIterator<Repository> onCreateIterator() {
         Gh4Application app = Gh4Application.get(getActivity());
+        boolean isSelf = mLogin.equals(app.getAuthLogin());
         RepositoryService repoService = (RepositoryService) app.getService(Gh4Application.REPO_SERVICE);
 
         Map<String, String> filterData = new HashMap<String, String>();
-        if ("sources".equals(mRepoType) || "forks".equals(mRepoType)) {
+        if (!mIsOrg && ("sources".equals(mRepoType) || "forks".equals(mRepoType))) {
             filterData.put("type", "all");
         } else {
             filterData.put("type", mRepoType);
         }
 
+        if (isSelf) {
+            return repoService.pageRepositories(filterData);
+        }
         return repoService.pageRepositories(mLogin, filterData);
     }
 }

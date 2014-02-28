@@ -35,28 +35,64 @@
         <!-- item>Public Discussion</item-->
         <!-- item>GitHub Jobs</item-->
     </string-array>
-    <string-array
-        name="repo_login_item">
+    <string-array name="repo_list_login_items">
         <item>All</item>
-        <item>Watched</item>
-        <item>Starred</item>
+        <item>Owner</item>
+        <item>Member</item>
         <item>Public</item>
         <item>Private</item>
         <item>Sources</item>
         <item>Forks</item>
-        <item>Member</item>
-    </string-array>
-    <string-array
-        name="repo_user_item">
-        <item>All</item>
         <item>Watched</item>
         <item>Starred</item>
+    </string-array>
+    <string-array name="repo_list_org_items">
+        <item>All</item>
+        <item>Member</item>
+        <item>Public</item>
+        <item>Private</item>
         <item>Sources</item>
         <item>Forks</item>
-        <item>Member</item>
+        <item>Watched</item>
+        <item>Starred</item>
     </string-array>
-    <string-array
-        name="repo_org_item">
+    <string-array name="repo_list_user_items">
         <item>All</item>
+        <item>Owner</item>
+        <item>Member</item>
+        <item>Sources</item>
+        <item>Forks</item>
+        <item>Watched</item>
+        <item>Starred</item>
+    </string-array>
+    <string-array name="repo_list_login_values" translatable="false">
+        <item>all</item>
+        <item>owner</item>
+        <item>member</item>
+        <item>public</item>
+        <item>private</item>
+        <item>sources</item>
+        <item>forks</item>
+        <item>watched</item>
+        <item>starred</item>
+    </string-array>
+    <string-array name="repo_list_org_values" translatable="false">
+        <item>all</item>
+        <item>member</item>
+        <item>public</item>
+        <item>private</item>
+        <item>sources</item>
+        <item>forks</item>
+        <item>watched</item>
+        <item>starred</item>
+    </string-array>
+    <string-array name="repo_list_user_values" trsnslatable="false">
+        <item>all</item>
+        <item>owner</item>
+        <item>member</item>
+        <item>sources</item>
+        <item>forks</item>
+        <item>watched</item>
+        <item>starred</item>
     </string-array>
 </resources>
