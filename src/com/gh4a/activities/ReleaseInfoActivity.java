@@ -155,7 +155,7 @@ public class ReleaseInfoActivity extends LoadingFragmentActivity implements
         final Download download = adapter.getItem(position);
 
         UiUtils.enqueueDownload(this, download.getUrl(), download.getContentType(),
-                download.getName(), download.getDescription());
+                download.getName(), download.getDescription(), "application/octet-stream");
     }
 
     @Override

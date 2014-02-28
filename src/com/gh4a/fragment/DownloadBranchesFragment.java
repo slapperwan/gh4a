@@ -58,6 +58,7 @@ public class DownloadBranchesFragment extends ListDataBaseFragment<RepositoryBra
     @Override
     public void onItemClick(final RepositoryBranch branch) {
         String url = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/zipball/" + branch.getName();
-        UiUtils.enqueueDownload(getActivity(), url, "application/zip", mRepoName + "-" + branch.getName() + ".zip", null);
+        UiUtils.enqueueDownload(getActivity(), url, "application/zip",
+                mRepoName + "-" + branch.getName() + ".zip", null, null);
     }
 }

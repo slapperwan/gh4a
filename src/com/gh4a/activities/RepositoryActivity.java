@@ -214,8 +214,8 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
 
         setContentShown(false);
         setTabsEnabled(false);
-        getSupportLoaderManager().initLoader(LOADER_REPO, null, mRepoCallback);
 
+        getSupportLoaderManager().initLoader(LOADER_REPO, null, mRepoCallback);
         getSupportLoaderManager().initLoader(LOADER_WATCHING, null, mWatchCallback);
         getSupportLoaderManager().initLoader(LOADER_STARRING, null, mStarCallback);
     }
@@ -235,11 +235,8 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
     protected Fragment getFragment(int position) {
         switch (position) {
             case 0:
-                if (mRepository != null) {
-                    mRepositoryFragment = RepositoryFragment.newInstance(mRepository);
-                    return mRepositoryFragment;
-                }
-                break;
+                mRepositoryFragment = RepositoryFragment.newInstance(mRepository);
+                return mRepositoryFragment;
             case 1:
                 if (mDirStack.isEmpty()) {
                     mDirStack.push(null);
@@ -402,7 +399,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
                 shareIntent.setType("text/plain");
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, mRepoOwner + "/" + mRepoName);
-                shareIntent.putExtra(Intent.EXTRA_TEXT,  mRepository.getHtmlUrl());
+                shareIntent.putExtra(Intent.EXTRA_TEXT,  "https://github.com/" + mRepoOwner + "/" + mRepoName);
                 shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
                 return true;

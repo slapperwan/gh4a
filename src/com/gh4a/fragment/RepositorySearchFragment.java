@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 
 import com.gh4a.Constants;
+import com.gh4a.R;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderResult;
@@ -43,7 +44,7 @@ public class RepositorySearchFragment extends ListDataBaseFragment<Repository> {
 
     @Override
     protected int getEmptyTextResId() {
-        return 0;
+        return R.string.no_search_repos_found;
     }
 
     @Override

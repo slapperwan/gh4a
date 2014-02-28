@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.client.RequestException;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
 import android.content.Context;
@@ -38,6 +39,21 @@ public class RepositorySearchLoader extends BaseLoader<List<Repository>> {
         params.put("fork", "true");
         params.put("user", mUserLogin);
 
-        return repoService.searchRepositories(mQuery, params);
+        List<Repository> result;
+
+        try {
+            result = repoService.searchRepositories(mQuery, params);
+        } catch (RequestException e) {
+            if (e.getStatus() == 422) {
+                // With that status code, Github wants to tell us there are no
+                // repositories to search in. Just pretend no error and return
+                // an empty list in that case.
+                result = new ArrayList<Repository>();
+            } else {
+                throw e;
+            }
+        }
+
+        return result;
     }
 }

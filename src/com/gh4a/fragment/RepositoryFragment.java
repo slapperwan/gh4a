@@ -19,6 +19,7 @@ import org.eclipse.egit.github.core.Repository;
 
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.text.method.LinkMovementMethod;
@@ -61,9 +62,9 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
         @Override
         public void onResultReady(LoaderResult<String> result) {
             View v = getView();
-            fillReadme(result.getData());
-            v.findViewById(R.id.pb_readme).setVisibility(View.GONE);
-            v.findViewById(R.id.readme).setVisibility(View.VISIBLE);
+            TextView readmeView = (TextView) v.findViewById(R.id.readme);
+            View progress = v.findViewById(R.id.pb_readme);
+            new FillReadmeTask(mRepository.getId(), readmeView, progress).execute(result.getData());
         }
     };
 
@@ -201,20 +202,6 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
         tvStargazersCount.setText(String.valueOf(mRepository.getWatchers()));
     }
 
-    public void fillReadme(String readme) {
-        TextView tvReadme = (TextView) getView().findViewById(R.id.readme);
-        if (readme != null) {
-            tvReadme.setMovementMethod(LinkMovementMethod.getInstance());
-
-            readme = HtmlUtils.format(readme).toString();
-            HttpImageGetter imageGetter = new HttpImageGetter(getActivity());
-            imageGetter.bind(tvReadme, readme, mRepository.getId());
-        } else {
-            tvReadme.setText(R.string.repo_no_readme);
-            tvReadme.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
-        }
-    }
-
     @Override
     public void onClick(View view) {
         int id = view.getId();
@@ -255,6 +242,43 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
             intent.putExtra(Constants.Repository.OWNER, owner);
             intent.putExtra(Constants.Repository.NAME, name);
             startActivity(intent);
+        }
+    }
+
+    private static class FillReadmeTask extends AsyncTask<String, Void, String> {
+        private Long mId;
+        private TextView mReadmeView;
+        private View mProgressView;
+        private HttpImageGetter mImageGetter;
+
+        public FillReadmeTask(long id, TextView readmeView, View progressView) {
+            mId = id;
+            mReadmeView = readmeView;
+            mProgressView = progressView;
+            mImageGetter = new HttpImageGetter(readmeView.getContext());
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            String readme = params[0];
+            if (readme != null) {
+                readme = HtmlUtils.format(readme).toString();
+                mImageGetter.encode(mId, readme);
+            }
+            return readme;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            if (result != null) {
+                mReadmeView.setMovementMethod(LinkMovementMethod.getInstance());
+                mImageGetter.bind(mReadmeView, result, mId);
+            } else {
+                mReadmeView.setText(R.string.repo_no_readme);
+                mReadmeView.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
+            }
+            mReadmeView.setVisibility(View.VISIBLE);
+            mProgressView.setVisibility(View.GONE);
         }
     }
 }
