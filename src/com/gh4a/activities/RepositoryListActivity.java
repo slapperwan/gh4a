@@ -28,6 +28,7 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
 
     private ActionBar mActionBar;
     private RepositorySearchFragment mSearchFragment;
+    private String[] mTypes;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,14 +52,20 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
         Context context = mActionBar.getThemedContext();
-        final int items;
-        if (Constants.User.TYPE_ORG.equals(mUserType)) {
-            items = R.array.repo_org_item;
-        } else if (mUserLogin.equals(Gh4Application.get(this).getAuthLogin())) {
-            items = R.array.repo_login_item;
+        final int items, values;
+
+        if (mUserLogin.equals(Gh4Application.get(this).getAuthLogin())) {
+            items = R.array.repo_list_login_items;
+            values = R.array.repo_list_login_values;
+        } else if (Constants.User.TYPE_ORG.equals(mUserType)) {
+            items = R.array.repo_list_org_items;
+            values = R.array.repo_list_org_values;
         } else {
-            items = R.array.repo_user_item;
+            items = R.array.repo_list_user_items;
+            values = R.array.repo_list_user_values;
         }
+
+        mTypes = getResources().getStringArray(values);
 
         ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(context,
                 R.layout.sherlock_spinner_item, getResources().getStringArray(items));
@@ -161,25 +168,17 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
 
     @Override
     public boolean onNavigationItemSelected(int position, long itemId) {
-        boolean isSelf = mUserLogin.equals(Gh4Application.get(this).getAuthLogin());
         ListFragment fragment = null;
 
-        if (position == 0) {
-            fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "all");
-        } else if (position == 1) {
-            fragment = WatchedRepositoryListFragment.newInstance(mUserLogin);
-        } else if (position == 2) {
-            fragment = StarredRepositoryListFragment.newInstance(mUserLogin);
-        } else if (position == 3 && isSelf) {
-            fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "public");
-        } else if (position == 4 && isSelf) {
-            fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "private");
-        } else if ((position == 5 && isSelf) || (position == 3 && !isSelf)) {
-            fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "sources");
-        } else if ((position == 6 && isSelf) || (position == 4 && !isSelf)) {
-            fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "forks");
-        } else if ((position == 7 && isSelf) || (position == 5 && !isSelf)) {
-            fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, "member");
+        if (position < mTypes.length) {
+            String type = mTypes[position];
+            if (type.equals("starred")) {
+                fragment = StarredRepositoryListFragment.newInstance(mUserLogin);
+            } else if (type.equals("watched")) {
+                fragment = WatchedRepositoryListFragment.newInstance(mUserLogin);
+            } else {
+                fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, type);
+            }
         }
 
         if (fragment != null) {
