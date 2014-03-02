@@ -388,7 +388,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         int id = item.getItemId();
 
         if (id == MENU_USER) {
-            IntentUtils.openUserInfoActivity(getActivity(), repoOwner);
+            IntentUtils.openUserInfoActivity(getActivity(), event.getActor().getLogin());
         } else if (id == MENU_REPO) {
             IntentUtils.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
         } else if (id >= MENU_PUSH_COMMIT_START || id == MENU_COMMENT_COMMIT) {
