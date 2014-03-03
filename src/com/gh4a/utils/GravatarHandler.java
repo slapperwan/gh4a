@@ -240,9 +240,11 @@ public class GravatarHandler {
                     Bitmap bitmap = null;
                     try {
                         bitmap = fetchBitmap(url);
-                        bitmap = getRoundedCornerResizedBitmap(bitmap);
                     } catch (IOException e) {
                         Log.e(TAG, "Couldn't fetch gravatar from URL " + url, e);
+                    }
+                    if (bitmap != null) {
+                        bitmap = getRoundedCornerResizedBitmap(bitmap);
                     }
                     sHandler.obtainMessage(MSG_LOADED, msg.arg1, 0, bitmap).sendToTarget();
                     break;
