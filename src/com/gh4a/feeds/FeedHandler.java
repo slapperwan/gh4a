@@ -10,8 +10,10 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import android.net.Uri;
+import android.text.TextUtils;
+
 import com.gh4a.holder.Feed;
-import com.gh4a.utils.GravatarUtils;
 
 public class FeedHandler extends DefaultHandler {
 
@@ -49,7 +51,7 @@ public class FeedHandler extends DefaultHandler {
             } else if (localName.equalsIgnoreCase("thumbnail")) {
                 String gravatarUrl = attributes.getValue("url");
                 if (gravatarUrl != null) {
-                    mFeed.setGravatarId(GravatarUtils.extractGravatarId(gravatarUrl));
+                    mFeed.setGravatar(extractGravatarId(gravatarUrl), gravatarUrl);
                 }
             } else if (localName.equalsIgnoreCase("link")) {
                 String url = attributes.getValue("href");
@@ -92,5 +94,21 @@ public class FeedHandler extends DefaultHandler {
 
     public List<Feed> getFeeds() {
         return mFeeds;
+    }
+
+    private static String extractGravatarId(String url) {
+        Uri uri = Uri.parse(url);
+        String idParam = uri.getQueryParameter("gravatar_id");
+        if (idParam != null) {
+            return idParam;
+        }
+        // Construct fake IDs for github's own avatars, they're only used
+        // for identification purposes in GravatarHandler
+        if (TextUtils.equals(uri.getHost(), "avatars.githubusercontent.com")) {
+            if (uri.getPathSegments().size() == 2) {
+                return "github_" + uri.getLastPathSegment();
+            }
+        }
+        return null;
     }
 }
