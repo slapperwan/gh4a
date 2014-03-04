@@ -88,7 +88,6 @@ public class GravatarHandler {
         }
     };
 
-
     public static void assignGravatar(ImageView view, User user) {
         if (user == null) {
             assignGravatar(view, null, null);
@@ -135,7 +134,7 @@ public class GravatarHandler {
         int requestId = sNextRequestId++;
         request = new Request();
         request.id = gravatarId;
-        request.url = TextUtils.isEmpty(url) ? GravatarUtils.getGravatarUrl(gravatarId) : url;
+        request.url = TextUtils.isEmpty(url) ? getGravatarUrl(gravatarId) : url;
         request.views = new ArrayList<ImageView>();
         request.views.add(view);
         sRequests.put(requestId, request);
@@ -241,13 +240,19 @@ public class GravatarHandler {
                     Bitmap bitmap = null;
                     try {
                         bitmap = fetchBitmap(url);
-                        bitmap = getRoundedCornerResizedBitmap(bitmap);
                     } catch (IOException e) {
                         Log.e(TAG, "Couldn't fetch gravatar from URL " + url, e);
+                    }
+                    if (bitmap != null) {
+                        bitmap = getRoundedCornerResizedBitmap(bitmap);
                     }
                     sHandler.obtainMessage(MSG_LOADED, msg.arg1, 0, bitmap).sendToTarget();
                     break;
             }
         }
+    }
+
+    private static String getGravatarUrl(String gravatarId) {
+        return "http://www.gravatar.com/avatar.php?gravatar_id=" + gravatarId + "&size=60&d=mm";
     }
 }

@@ -17,6 +17,7 @@ package com.gh4a.adapter;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -76,18 +77,22 @@ public class CommonFeedAdapter extends RootAdapter<Feed> implements OnClickListe
         viewHolder.tvDesc.setText(feed.getPreview());
         viewHolder.tvDesc.setGravity(mShowExtra ? Gravity.TOP : Gravity.CENTER_VERTICAL);
 
-        if (mShowExtra) {
-            GravatarHandler.assignGravatar(viewHolder.ivGravatar, feed.getGravatarId());
+        if (mShowExtra && !TextUtils.isEmpty(feed.getGravatarId())) {
+            GravatarHandler.assignGravatar(viewHolder.ivGravatar,
+                    feed.getGravatarId(), feed.getGravatarUrl());
             viewHolder.ivGravatar.setTag(feed);
             viewHolder.ivGravatar.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.ivGravatar.setVisibility(View.GONE);
+        }
 
+        if (mShowExtra) {
             String published = feed.getPublished() != null
                     ? DateFormat.getMediumDateFormat(mContext).format(feed.getPublished()) : "";
             viewHolder.tvExtra.setText(mContext.getString(R.string.feed_extradata,
                     feed.getAuthor(), published));
             viewHolder.tvExtra.setVisibility(View.VISIBLE);
         } else {
-            viewHolder.ivGravatar.setVisibility(View.GONE);
             viewHolder.tvExtra.setVisibility(View.GONE);
         }
     }

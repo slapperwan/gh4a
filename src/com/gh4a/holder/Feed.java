@@ -28,6 +28,7 @@ public class Feed {
     private String preview;
     private String author;
     private String gravatarId;
+    private String gravatarUrl;
 
     public String getId() {
         return id;
@@ -86,7 +87,11 @@ public class Feed {
     public String getGravatarId() {
         return gravatarId;
     }
-    public void setGravatarId(String gravatarId) {
-        this.gravatarId = gravatarId;
+    public String getGravatarUrl() {
+        return gravatarUrl;
+    }
+    public void setGravatar(String id, String url) {
+        this.gravatarId = id;
+        this.gravatarUrl = url;
     }
 }

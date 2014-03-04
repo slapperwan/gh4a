@@ -74,8 +74,8 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             boolean success = !result.handleError(RepositoryActivity.this);
             if (success) {
                 mRepository = result.getData();
-                setTabsEnabled(true);
                 updateTitle();
+                setTabsEnabled(true);
             }
             setContentEmpty(!success);
             setContentShown(true);
@@ -260,6 +260,8 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
                 return true;
             }
         } else if (fragment instanceof CommitListFragment && mCommitListFragment == null) {
+            return true;
+        } else if (fragment instanceof RepositoryFragment && mRepositoryFragment == null) {
             return true;
         }
         return false;
@@ -469,6 +471,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
     }
 
     private void refreshFragment() {
+        mRepositoryFragment = null;
         mContentListFragment = null;
         mCommitListFragment = null;
         mGitModuleMap = null;
