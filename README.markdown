@@ -69,14 +69,15 @@ Open Source Libraries
 =====================
 
 * [GitHub Java API](https://github.com/eclipse/egit-github/tree/master/org.eclipse.egit.github.core)
-* [ActionBarSherlock](https://github.com/JakeWharton/ActionBarSherlock)
+* [ActionBarSherlock](https://github.com/JakeWharton/ActionBarSherlock) tag 4.2.0
 * [ViewPagerIndicator](https://github.com/JakeWharton/Android-ViewPagerIndicator)
 * [HoloColorPicker](https://github.com/LarsWerkman/HoloColorPicker)
 * [ProgressFragment](https://github.com/johnkil/Android-ProgressFragment)
 
 Contributions
 =============
-
+* [maniac103](https://github.com/maniac103) For code improvements, bug fixes and new features
+* [ARoiD](https://github.com/ARoiD) For testing
 * [extremis (Steven Mautone)](https://github.com/extremis)  He gave the OctoDroid name and the new icon.  Thanks a lot.
 * [zquestz](https://github.com/zquestz)  Thanks for the application icon.
 * [cketti](https://github.com/cketti)
