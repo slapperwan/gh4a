@@ -255,8 +255,11 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
     @Override
     protected boolean fragmentNeedsRefresh(Fragment fragment) {
         if (fragment instanceof ContentListFragment) {
-            if (mDirStack.isEmpty() ||
-                    !TextUtils.equals(mDirStack.peek(), mContentListFragment.getPath())) {
+            if (mContentListFragment == null) {
+                return true;
+            }
+            ContentListFragment clf = (ContentListFragment) fragment;
+            if (mDirStack.isEmpty() || !TextUtils.equals(mDirStack.peek(), clf.getPath())) {
                 return true;
             }
         } else if (fragment instanceof CommitListFragment && mCommitListFragment == null) {
