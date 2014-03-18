@@ -22,7 +22,6 @@ import org.eclipse.egit.github.core.User;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -140,7 +139,7 @@ public class ReleaseInfoActivity extends LoadingFragmentActivity implements
 
             bodyHtml = HtmlUtils.format(bodyHtml).toString();
             imageGetter.bind(body, bodyHtml, mRelease.getId());
-            body.setMovementMethod(LinkMovementMethod.getInstance());
+            body.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         } else {
             body.setText(R.string.release_no_releasenotes);
         }

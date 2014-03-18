@@ -32,7 +32,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -267,7 +266,7 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
 
         TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
         String body = mPullRequest.getBodyHtml();
-        tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
+        tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         if (!StringUtils.isBlank(body)) {
             HttpImageGetter imageGetter = new HttpImageGetter(getActivity());
             body = HtmlUtils.format(body).toString();

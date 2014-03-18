@@ -30,7 +30,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -206,7 +205,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
             body = HtmlUtils.format(body).toString();
             imageGetter.bind(tvDesc, body, mIssue.getNumber());
         }
-        tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
+        tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
 
         findViewById(R.id.iv_comment).setOnClickListener(this);
 

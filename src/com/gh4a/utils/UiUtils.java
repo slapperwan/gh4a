@@ -9,6 +9,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
+import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,12 +21,27 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.text.Spannable;
+import android.text.method.LinkMovementMethod;
 import android.view.ContextThemeWrapper;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 public class UiUtils {
+    public static final LinkMovementMethod CHECKING_LINK_METHOD = new LinkMovementMethod() {
+        @Override
+        public boolean onTouchEvent(TextView widget, Spannable buffer, MotionEvent event) {
+            try {
+                return super.onTouchEvent(widget, buffer, event);
+            } catch (ActivityNotFoundException e) {
+                ToastUtils.showMessage(widget.getContext(), R.string.link_not_openable);
+                return true;
+            }
+        }
+    };
+
     public static void hideImeForView(View view) {
         if (view == null) {
             return;
