@@ -121,9 +121,9 @@ public class GistActivity extends LoadingFragmentActivity implements OnClickList
     public void onClick(View view) {
         Intent intent = new Intent(this, GistViewerActivity.class);
         GistFile gist = (GistFile) view.getTag();
-        intent.putExtra(Constants.User.LOGIN, mGist.getUser().getLogin());
+        intent.putExtra(Constants.User.LOGIN, mUserLogin);
         intent.putExtra(Constants.Gist.FILENAME, gist.getFilename());
-        intent.putExtra(Constants.Gist.ID, mGist.getId());
+        intent.putExtra(Constants.Gist.ID, mGistId);
         startActivity(intent);
     }
 
