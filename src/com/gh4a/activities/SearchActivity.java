@@ -82,7 +82,7 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         mSearchType = (Spinner) searchLayout.findViewById(R.id.search_type);
-        mSearchType.setAdapter(new SearchTypeAdapter(this));
+        mSearchType.setAdapter(new SearchTypeAdapter(actionBar.getThemedContext()));
         mSearchType.setOnItemSelectedListener(this);
 
         mSearch = (SearchView) searchLayout.findViewById(R.id.search_view);
@@ -116,8 +116,8 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
         private Context mContext;
 
         private final int[][] mResources = new int[][] {
-            { R.string.search_type_repo, R.attr.searchRepoIcon, 0 },
-            { R.string.search_type_user, R.attr.searchUserIcon, 0 }
+            { R.string.search_type_repo, R.attr.searchRepoMenuIcon, 0 },
+            { R.string.search_type_user, R.attr.searchUserMenuIcon, 0 }
         };
 
         SearchTypeAdapter(Context context) {
