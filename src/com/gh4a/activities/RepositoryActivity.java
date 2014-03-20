@@ -87,8 +87,8 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             new LoaderCallbacks<Map<String, String>>() {
         @Override
         public Loader<LoaderResult<Map<String, String>>> onCreateLoader(int id, Bundle args) {
-            return new GitModuleParserLoader(RepositoryActivity.this, mRepository.getOwner().getLogin(),
-                    mRepository.getName(), ".gitmodules", mSelectedRef);
+            return new GitModuleParserLoader(RepositoryActivity.this, mRepoOwner,
+                    mRepoName, ".gitmodules", mSelectedRef);
         }
         @Override
         public void onResultReady(LoaderResult<Map<String, String>> result) {
