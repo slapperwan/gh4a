@@ -55,8 +55,8 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
     private LoaderCallbacks<String> mReadmeCallback = new LoaderCallbacks<String>() {
         @Override
         public Loader<LoaderResult<String>> onCreateLoader(int id, Bundle args) {
-            return new ReadmeLoader(getActivity(),
-                    mRepository.getOwner().getLogin(), mRepository.getName());
+            return new ReadmeLoader(getActivity(), mRepository.getOwner().getLogin(),
+                    mRepository.getName(), mRepository.getMasterBranch());
         }
         @Override
         public void onResultReady(LoaderResult<String> result) {

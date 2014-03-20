@@ -33,6 +33,8 @@ import android.text.style.StrikethroughSpan;
 import android.text.style.TypefaceSpan;
 
 import java.util.LinkedList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.xml.sax.XMLReader;
 
@@ -273,6 +275,38 @@ public class HtmlUtils {
      */
     public static CharSequence encode(final String html) {
         return encode(html, null);
+    }
+
+    /**
+     * Rewrite relative URLs in HTML fetched e.g. from markdown files.
+     *
+     * @param html
+     * @param repoUser
+     * @param repoName
+     * @param branch
+     * @return
+     */
+    public static String rewriteRelativeUrls(final String html, final String repoUser,
+            final String repoName, final String branch) {
+        final String baseUrl = "https://raw.github.com/" + repoUser + "/" + repoName + "/" + branch;
+        final StringBuffer sb = new StringBuffer();
+        final Pattern p = Pattern.compile("(href|src)=\"(\\S+)\"");
+        final Matcher m = p.matcher(html);
+
+        while (m.find()) {
+            String url = m.group(2);
+            if (!url.contains("://") && !url.startsWith("#")) {
+                if (url.startsWith("/")) {
+                    url = baseUrl + url;
+                } else {
+                    url = baseUrl + "/" + url;
+                }
+            }
+            m.appendReplacement(sb, Matcher.quoteReplacement(m.group(1) + "=\"" + url + "\""));
+        }
+        m.appendTail(sb);
+
+        return sb.toString();
     }
 
     /**

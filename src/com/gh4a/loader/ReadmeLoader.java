@@ -11,16 +11,19 @@ import android.content.Context;
 
 import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
+import com.github.mobile.util.HtmlUtils;
 
 public class ReadmeLoader extends BaseLoader<String> {
 
     private String mRepoOwner;
     private String mRepoName;
+    private String mRef;
 
-    public ReadmeLoader(Context context, String repoOwner, String repoName) {
+    public ReadmeLoader(Context context, String repoOwner, String repoName, String ref) {
         super(context);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
+        mRef = ref;
     }
 
     @Override
@@ -31,7 +34,10 @@ public class ReadmeLoader extends BaseLoader<String> {
 
         ContentsService contentService = new ContentsService(client);
         try {
-            return contentService.getReadmeHtml(new RepositoryId(mRepoOwner, mRepoName));
+            String html = contentService.getReadmeHtml(new RepositoryId(mRepoOwner, mRepoName), mRef);
+            if (html != null) {
+                return HtmlUtils.rewriteRelativeUrls(html, mRepoOwner, mRepoName, mRef);
+            }
         } catch (RequestException e) {
             /* don't spam logcat with 404 errors, those are normal */
             if (e.getStatus() != 404) {
