@@ -479,6 +479,23 @@ var _EscapeSpecialCharsWithinTagAttributes = function(text) {
 	return text;
 }
 
+var _FixUpRelativeUrl = function(url) {
+	if (typeof(GitHub) == "undefined" || typeof(GitHub.nameWithOwner) == "undefined") {
+		return url;
+	}
+	if (url.indexOf("://") != -1 || url.indexOf("#") == 0) {
+	       return url;
+	}
+	var branch = typeof(GitHub.branch) == "undefined" ? "master" : GitHub.branch;
+	var baseUrl = "https://raw.github.com/" + GitHub.nameWithOwner + "/" + branch;
+
+	if (url.indexOf("/") == 0) {
+		return baseUrl + url;
+	}
+
+	return baseUrl + "/" + url;
+}
+
 var _DoAnchors = function(text) {
 //
 // Turn Markdown link shortcuts into XHTML <a> tags.
@@ -595,6 +612,7 @@ var writeAnchorTag = function(wholeMatch,m1,m2,m3,m4,m5,m6,m7) {
 		}
 	}
 
+	url = _FixUpRelativeUrl(url);
 	url = escapeCharacters(url,"*_");
 	var result = "<a href=\"" + url + "\"";
 
@@ -696,6 +714,7 @@ var writeImageTag = function(wholeMatch,m1,m2,m3,m4,m5,m6,m7) {
 	}
 
 	alt_text = alt_text.replace(/"/g,"&quot;");
+	url = _FixUpRelativeUrl(url);
 	url = escapeCharacters(url,"*_");
 	var result = "<img src=\"" + url + "\" alt=\"" + alt_text + "\"";
 

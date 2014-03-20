@@ -169,7 +169,8 @@ public class StringUtils {
         return writer.toString();
     }
 
-    public static String highlightSyntax(String data, boolean highlight, String fileName) {
+    public static String highlightSyntax(String data, boolean highlight, String fileName,
+            String repoOwner, String repoName, String ref) {
         String ext = FileUtils.getFileExtension(fileName);
         boolean highlighted = false;
 
@@ -206,6 +207,13 @@ public class StringUtils {
             content.append("</div>");
 
             content.append("<script>");
+            if (repoOwner != null && repoName != null) {
+                content.append("var GitHub = new Object();");
+                content.append("GitHub.nameWithOwner = \"" + repoOwner + "/" + repoName + "\";");
+                if (ref != null) {
+                    content.append("GitHub.branch = \"" + ref + "\";");
+                }
+            }
             content.append("var text = document.getElementById('content').innerHTML;");
             content.append("var converter = new Showdown.converter();");
             content.append("var html = converter.makeHtml(text);");

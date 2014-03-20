@@ -179,7 +179,7 @@ public class FileViewerActivity extends LoadingFragmentActivity {
             mWebView.loadDataWithBaseURL("file:///android_asset/", htmlImage, null, "utf-8", null);
         } else {
             String data = base64Data != null ? new String(EncodingUtils.fromBase64(base64Data)) : "";
-            String highlighted = StringUtils.highlightSyntax(data, true, mPath);
+            String highlighted = StringUtils.highlightSyntax(data, true, mPath, mRepoOwner, mRepoName, mRef);
             mWebView.loadDataWithBaseURL("file:///android_asset/", highlighted, null, "utf-8", null);
         }
     }

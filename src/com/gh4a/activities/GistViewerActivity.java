@@ -122,7 +122,7 @@ public class GistViewerActivity extends LoadingFragmentActivity {
 
         mWebView.setWebViewClient(mWebViewClient);
 
-        String highlighted = StringUtils.highlightSyntax(data, highlight, mFileName);
+        String highlighted = StringUtils.highlightSyntax(data, highlight, mFileName, null, null, null);
         mWebView.loadDataWithBaseURL("file:///android_asset/", highlighted, "text/html", "utf-8", "");
     }
 
