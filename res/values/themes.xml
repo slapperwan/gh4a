@@ -21,6 +21,8 @@
         <item name="saveIcon">@drawable/content_save_dark</item>
         <item name="searchUserIcon">@drawable/search_users_dark</item>
         <item name="searchRepoIcon">@drawable/search_repos_dark</item>
+        <item name="searchUserMenuIcon">@drawable/search_users_dark</item>
+        <item name="searchRepoMenuIcon">@drawable/search_repos_dark</item>
     </style>
 
     <style name="LightTheme" parent="Theme.Sherlock.Light">
@@ -44,11 +46,13 @@
         <item name="saveIcon">@drawable/content_save</item>
         <item name="searchUserIcon">@drawable/search_users</item>
         <item name="searchRepoIcon">@drawable/search_repos</item>
+        <item name="searchUserMenuIcon">@drawable/search_users</item>
+        <item name="searchRepoMenuIcon">@drawable/search_repos</item>
     </style>
 
     <style name="LightDarkTheme" parent="Theme.Sherlock.Light.DarkActionBar">
-        <item name="sendIcon">@drawable/social_send_now_dark</item>
-        <item name="contentEditIcon">@drawable/content_edit_dark</item>
+        <item name="sendIcon">@drawable/social_send_now</item>
+        <item name="contentEditIcon">@drawable/content_edit</item>
         <item name="downloadIcon">@drawable/download_dark</item>
         <item name="searchIcon">@drawable/action_search_dark</item>
         <item name="shareIcon">@drawable/social_share_dark</item>
@@ -67,6 +71,8 @@
         <item name="saveIcon">@drawable/content_save_dark</item>
         <item name="searchUserIcon">@drawable/search_users</item>
         <item name="searchRepoIcon">@drawable/search_repos</item>
+        <item name="searchUserMenuIcon">@drawable/search_users_dark</item>
+        <item name="searchRepoMenuIcon">@drawable/search_repos_dark</item>
     </style>
 
 </resources>

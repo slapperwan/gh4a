@@ -37,4 +37,6 @@
     <attr name="saveIcon" format="reference" />
     <attr name="searchUserIcon" format="reference" />
     <attr name="searchRepoIcon" format="reference" />
+    <attr name="searchUserMenuIcon" format="reference" />
+    <attr name="searchRepoMenuIcon" format="reference" />
 </resources>
