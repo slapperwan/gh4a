@@ -18,7 +18,6 @@ package com.gh4a.adapter;
 import org.eclipse.egit.github.core.Comment;
 
 import android.content.Context;
-import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,6 +30,7 @@ import com.gh4a.R;
 import com.gh4a.utils.GravatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.UiUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 public class CommentAdapter extends RootAdapter<Comment> implements OnClickListener {
@@ -58,7 +58,7 @@ public class CommentAdapter extends RootAdapter<Comment> implements OnClickListe
         viewHolder.ivGravatar.setOnClickListener(this);
 
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvDesc.setMovementMethod(LinkMovementMethod.getInstance());
+        viewHolder.tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
         viewHolder.ivEdit = (ImageView) v.findViewById(R.id.iv_edit);
 

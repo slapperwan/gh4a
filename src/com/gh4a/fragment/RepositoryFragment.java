@@ -22,7 +22,6 @@ import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -56,8 +55,8 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
     private LoaderCallbacks<String> mReadmeCallback = new LoaderCallbacks<String>() {
         @Override
         public Loader<LoaderResult<String>> onCreateLoader(int id, Bundle args) {
-            return new ReadmeLoader(getActivity(),
-                    mRepository.getOwner().getLogin(), mRepository.getName());
+            return new ReadmeLoader(getActivity(), mRepository.getOwner().getLogin(),
+                    mRepository.getName(), mRepository.getMasterBranch());
         }
         @Override
         public void onResultReady(LoaderResult<String> result) {
@@ -271,7 +270,7 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
         @Override
         protected void onPostExecute(String result) {
             if (result != null) {
-                mReadmeView.setMovementMethod(LinkMovementMethod.getInstance());
+                mReadmeView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
                 mImageGetter.bind(mReadmeView, result, mId);
             } else {
                 mReadmeView.setText(R.string.repo_no_readme);

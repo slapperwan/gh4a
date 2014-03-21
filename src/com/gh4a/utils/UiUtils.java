@@ -1,5 +1,7 @@
 package com.gh4a.utils;
 
+import java.io.File;
+
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 
@@ -7,6 +9,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
+import android.content.ActivityNotFoundException;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.TypedArray;
@@ -17,12 +21,27 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.text.Spannable;
+import android.text.method.LinkMovementMethod;
 import android.view.ContextThemeWrapper;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 public class UiUtils {
+    public static final LinkMovementMethod CHECKING_LINK_METHOD = new LinkMovementMethod() {
+        @Override
+        public boolean onTouchEvent(TextView widget, Spannable buffer, MotionEvent event) {
+            try {
+                return super.onTouchEvent(widget, buffer, event);
+            } catch (ActivityNotFoundException e) {
+                ToastUtils.showMessage(widget.getContext(), R.string.link_not_openable);
+                return true;
+            }
+        }
+    };
+
     public static void hideImeForView(View view) {
         if (view == null) {
             return;
@@ -76,43 +95,90 @@ public class UiUtils {
         return resource;
     }
 
-    public static void enqueueDownload(Context context, String url, String mimeType,
-            String fileName, String description, String mediaType) {
-        Uri uri = Uri.parse(url).buildUpon()
+    private static void enqueueDownload(Context context, Uri uri, Uri destinationUri,
+            String description, String mimeType, String mediaType, boolean wifiOnly) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            final DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+            DownloadManager.Request request = new DownloadManager.Request(uri);
+
+            request.setDestinationUri(destinationUri);
+            request.setDescription(description);
+            if (mediaType != null) {
+                request.addRequestHeader("Accept", mediaType);
+            }
+            if (mimeType != null) {
+                request.setMimeType(mimeType);
+            }
+            if (wifiOnly) {
+                restrictDownloadToWifi(request);
+            }
+            request.setAllowedOverRoaming(false);
+
+            dm.enqueue(request);
+        } else {
+            // HACK alert:
+            // Gingerbread's DownloadManager needlessly rejected HTTPS URIs. Circumvent that
+            // by building and enqueing the request to the provider by ourselves. This is safe
+            // as we only rely on internal API that won't change anymore.
+            ContentValues values = new ContentValues();
+            values.put("uri", uri.toString());
+            values.put("is_public_api", "true");
+            values.put("notificationpackage", context.getPackageName());
+            values.put("destination", 4);
+            values.put("hint", destinationUri.toString());
+            if (mediaType != null) {
+                values.put("http_header_0", "Accept:" + mediaType);
+            }
+            values.put("description", description);
+            if (mimeType != null) {
+                values.put("mimetype", mimeType);
+            }
+            values.put("visibility", 0);
+            values.put("allowed_network_types", wifiOnly ? DownloadManager.Request.NETWORK_WIFI : ~0);
+            values.put("allow_roaming", false);
+            values.put("is_visible_in_downloads_ui", true);
+
+            context.getContentResolver().insert(Uri.parse("content://downloads/my_downloads"), values);
+        }
+    }
+
+    private static Uri buildDownloadDestinationUri(Context context, String fileName) {
+        final File file = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+        if (file == null) {
+            return null;
+        }
+        if (file.exists()) {
+            if (!file.isDirectory()) {
+                return null;
+            }
+        } else if (!file.mkdirs()) {
+            return null;
+        }
+        return Uri.withAppendedPath(Uri.fromFile(file), fileName);
+    }
+
+    public static void enqueueDownload(final Context context, String url, final String mimeType,
+            final String fileName, final String description, final String mediaType) {
+        final Uri uri = Uri.parse(url).buildUpon()
                 .appendQueryParameter("access_token", Gh4Application.get(context).getAuthToken())
                 .build();
-        final DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-        final DownloadManager.Request request = new DownloadManager.Request(uri);
-
-        if (mediaType != null) {
-            request.addRequestHeader("Accept", mediaType);
-        }
-        request.setDescription(description);
-        request.setAllowedOverRoaming(false);
-
-        try {
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
-        } catch (IllegalStateException e) {
+        final Uri destinationUri = buildDownloadDestinationUri(context, fileName);
+        if (destinationUri == null) {
             ToastUtils.showMessage(context, R.string.download_fail_no_storage_toast);
             return;
         }
 
-        if (mimeType != null) {
-            request.setMimeType(mimeType);
-        }
-
         if (!downloadNeedsWarning(context)) {
-            dm.enqueue(request);
+            enqueueDownload(context, uri, destinationUri, description, mimeType, mediaType, false);
             return;
         }
 
         DialogInterface.OnClickListener buttonListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (which == DialogInterface.BUTTON_NEUTRAL) {
-                    restrictDownloadToWifi(request);
-                }
-                dm.enqueue(request);
+                boolean wifiOnly = which == DialogInterface.BUTTON_NEUTRAL;
+                enqueueDownload(context, uri, destinationUri, description,
+                        mimeType, mediaType, wifiOnly);
             }
         };
 
