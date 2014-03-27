@@ -192,13 +192,17 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
     }
 
     public void updateStargazerCount(boolean starring) {
-        TextView tvStargazersCount = (TextView) getView().findViewById(R.id.tv_stargazers_count);
         if (starring) {
             mRepository.setWatchers(mRepository.getWatchers() + 1);
         } else {
             mRepository.setWatchers(mRepository.getWatchers() - 1);
         }
-        tvStargazersCount.setText(String.valueOf(mRepository.getWatchers()));
+
+        View view = getView();
+        if (view != null) {
+            TextView tvStargazersCount = (TextView) view.findViewById(R.id.tv_stargazers_count);
+            tvStargazersCount.setText(String.valueOf(mRepository.getWatchers()));
+        }
     }
 
     @Override
