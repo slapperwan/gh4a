@@ -357,6 +357,9 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
                 starAction.setTitle(R.string.repo_star_action);
             }
         }
+        if (mRepository == null) {
+            menu.removeItem(R.id.bookmark);
+        }
 
         return super.onPrepareOptionsMenu(menu);
     }
