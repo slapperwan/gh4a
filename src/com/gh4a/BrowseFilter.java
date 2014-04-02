@@ -27,6 +27,11 @@ public class BrowseFilter extends BaseSherlockFragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Uri uri = getIntent().getData();
+        if (uri == null) {
+            finish();
+            return;
+        }
+
         List<String> parts = uri.getPathSegments();
 
         String first = parts.isEmpty() ? null : parts.get(0);
