@@ -73,6 +73,10 @@ public class CompareActivity extends LoadingFragmentActivity implements OnItemCl
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
+        if (hasErrorView()) {
+            return;
+        }
+
         setContentView(R.layout.generic_list);
         setContentShown(false);
 

@@ -32,82 +32,43 @@
             android:label="@string/app_name"
             android:targetActivity=".activities.Github4AndroidActivity"/>
         <activity
-            android:name=".activities.SearchActivity"
+            android:name=".activities.BlogActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.RepositoryListActivity"
+            android:name=".activities.BlogListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.RepositoryActivity"
-            android:configChanges="orientation|screenSize"
-            android:uiOptions="splitActionBarWhenNarrow" />
-        <activity
-            android:name=".activities.UserListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.UserActivity"
-            android:uiOptions="splitActionBarWhenNarrow"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.CommitListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.CommitActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.WatcherListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.FollowerFollowingListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.IssueListActivity"
-            android:configChanges="orientation|screenSize"
-            android:uiOptions="splitActionBarWhenNarrow" />
-        <activity
-            android:name=".activities.IssueActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.DiffViewerActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.PullRequestListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.PullRequestActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.FileManagerActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.FileViewerActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.OrganizationMemberListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.ContributorListActivity"
+            android:name=".activities.BookmarkListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activities.CollaboratorListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.IssueCreateActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.IssueLabelListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.IssueListByLabelActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.CompareActivity"
+            android:name=".activities.CommitActivity"
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activities.CommitHistoryActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.UserYourActionsActivity"
+            android:name=".activities.CompareActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activities.ContributorListActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activities.DownloadsActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activities.EditCommentActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activities.ExploreActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activities.FileViewerActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activities.FollowerFollowingListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activities.GistActivity"
@@ -119,41 +80,18 @@
             android:name=".activities.GistViewerActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.PushableRepoListActivity"
+            android:name=".activities.IssueActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.ExploreActivity"
+            android:name=".activities.IssueCreateActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.TrendingActivity"
+            android:name=".activities.IssueLabelListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.TimelineActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.BlogListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.BlogActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.WikiListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.WikiActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.OrganizationListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.BookmarkListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.IssueMilestoneListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.IssueListByMilestoneActivity"
-            android:configChanges="orientation|screenSize" />
+            android:name=".activities.IssueListActivity"
+            android:configChanges="orientation|screenSize"
+            android:uiOptions="splitActionBarWhenNarrow" />
         <activity
             android:name=".activities.IssueMilestoneCreateActivity"
             android:configChanges="orientation|screenSize" />
@@ -161,16 +99,54 @@
             android:name=".activities.IssueMilestoneEditActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.EditCommentActivity"
+            android:name=".activities.IssueMilestoneListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.DownloadsActivity"
+            android:name=".activities.OrganizationMemberListActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activities.PullRequestActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activities.PullRequestListActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activities.ReleaseInfoActivity"
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activities.ReleaseListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.ReleaseInfoActivity"
+            android:name=".activities.RepositoryActivity"
+            android:configChanges="orientation|screenSize"
+            android:uiOptions="splitActionBarWhenNarrow" />
+        <activity
+            android:name=".activities.RepositoryListActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activities.SearchActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activities.TimelineActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activities.TrendingActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activities.UserActivity"
+            android:uiOptions="splitActionBarWhenNarrow"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activities.UserListActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activities.WatcherListActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activities.WikiActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activities.WikiListActivity"
             android:configChanges="orientation|screenSize" />
         <activity android:name="BrowseFilter">
             <intent-filter>
