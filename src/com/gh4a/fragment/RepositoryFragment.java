@@ -62,9 +62,8 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
         }
         @Override
         public void onResultReady(LoaderResult<String> result) {
-            View v = getView();
-            TextView readmeView = (TextView) v.findViewById(R.id.readme);
-            View progress = v.findViewById(R.id.pb_readme);
+            TextView readmeView = (TextView) mContentView.findViewById(R.id.readme);
+            View progress = mContentView.findViewById(R.id.pb_readme);
             new FillReadmeTask(mRepository.getId(), readmeView, progress).execute(result.getData());
         }
     };
@@ -217,11 +216,8 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
             mRepository.setWatchers(mRepository.getWatchers() - 1);
         }
 
-        View view = getView();
-        if (view != null) {
-            TextView tvStargazersCount = (TextView) view.findViewById(R.id.tv_stargazers_count);
-            tvStargazersCount.setText(String.valueOf(mRepository.getWatchers()));
-        }
+        TextView tvStargazersCount = (TextView) mContentView.findViewById(R.id.tv_stargazers_count);
+        tvStargazersCount.setText(String.valueOf(mRepository.getWatchers()));
     }
 
     @Override

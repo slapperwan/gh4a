@@ -362,6 +362,10 @@ public class UserFragment extends SherlockProgressFragment implements View.OnCli
     }
 
     public void updateFollowingAction(boolean following) {
+        if (mUser == null) {
+            return;
+        }
+
         if (following) {
             mUser.setFollowers(mUser.getFollowers() + 1);
         } else {
