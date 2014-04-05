@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.egit.github.core.Commit;
+import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.GollumPage;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.Repository;
@@ -133,10 +134,11 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
 
         if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
             CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
-
-            return res.getString(R.string.event_commit_comment_desc,
-                    payload.getComment().getCommitId().substring(0, 7),
-                    payload.getComment().getBody());
+            CommitComment comment = payload.getComment();
+            if (comment != null) {
+                return res.getString(R.string.event_commit_comment_desc,
+                        comment.getCommitId().substring(0, 7), comment.getBody());
+            }
 
         } else if (Event.TYPE_CREATE.equals(eventType)) {
             CreatePayload payload = (CreatePayload) event.getPayload();

@@ -65,6 +65,7 @@ public class SearchUserAdapter extends RootAdapter<SearchUser> implements OnClic
         ViewHolder viewHolder = (ViewHolder) v.getTag();
 
         GravatarHandler.assignGravatar(viewHolder.ivGravatar, user.getGravatarId());
+        viewHolder.ivGravatar.setTag(user);
 
         viewHolder.tvTitle.setText(StringUtils.formatName(user.getLogin(), user.getName()));
         viewHolder.tvExtra.setText(mContext.getString(R.string.user_extra_data,
