@@ -17,27 +17,41 @@ package com.gh4a.activities;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Authorization;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.OAuthService;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.gh4a.ClientForAuthorization;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
+import com.gh4a.TwoFactorAuthException;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 
 /**
@@ -96,6 +110,7 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
     private class LoginTask extends ProgressDialogTask<Authorization> {
         private String mUserName;
         private String mPassword;
+        private String mOtpCode;
 
         /**
          * Instantiates a new load repository list task.
@@ -105,10 +120,17 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
             mUserName = userName;
             mPassword = password;
         }
+        
+        public LoginTask(String userName, String password, String otpCode) {
+            super(Github4AndroidActivity.this, R.string.please_wait, R.string.authenticating);
+            mUserName = userName;
+            mPassword = password;
+            mOtpCode = otpCode;
+        }
 
         @Override
         protected Authorization run() throws IOException {
-            GitHubClient client = new GitHubClient();
+            GitHubClient client = new ClientForAuthorization(mOtpCode);
             client.setCredentials(mUserName, mPassword);
             client.setUserAgent("Gh4a");
 
@@ -138,6 +160,15 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
         }
 
         @Override
+        protected void onError(Exception e) {
+            if (e instanceof TwoFactorAuthException) {
+                open2FADialog(mUserName, mPassword);
+            } else {
+                Toast.makeText(Github4AndroidActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
         protected void onSuccess(Authorization result) {
             SharedPreferences sharedPreferences = getSharedPreferences(
                     Constants.PREF_NAME, MODE_PRIVATE);
@@ -150,5 +181,27 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
                     null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
             finish();
         }
+    }
+    
+    private void open2FADialog(final String username, final String password) {
+        LayoutInflater li = LayoutInflater.from(Github4AndroidActivity.this);
+        View authDialog = li.inflate(R.layout.twofactor_auth_dialog, null);
+        
+        AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
+        builder.setCancelable(true);
+        builder.setTitle(R.string.two_factor_auth);
+        builder.setView(authDialog);
+
+        final EditText authCode = (EditText) authDialog.findViewById(R.id.auth_code);
+        
+        builder.setPositiveButton(R.string.verify, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                new LoginTask(username, password, authCode.getText().toString()).execute();
+            }
+        });
+        
+        builder.setNegativeButton(R.string.cancel, null);
+        
+        builder.show();
     }
 }
