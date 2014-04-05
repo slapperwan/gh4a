@@ -17,7 +17,6 @@ package com.gh4a.activities;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Authorization;
@@ -25,20 +24,14 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.OAuthService;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
@@ -51,7 +44,6 @@ import com.gh4a.R;
 import com.gh4a.TwoFactorAuthException;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 
 /**
