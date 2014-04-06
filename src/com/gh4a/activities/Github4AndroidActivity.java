@@ -180,7 +180,7 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
         View authDialog = li.inflate(R.layout.twofactor_auth_dialog, null);
         
         AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
-        builder.setCancelable(true);
+        builder.setCancelable(false);
         builder.setTitle(R.string.two_factor_auth);
         builder.setView(authDialog);
 
