@@ -1,14 +1,18 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/layout_root"
-    android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:padding="7dp">
-	<EditText
+    android:orientation="vertical"
+    android:padding="7dp" >
+
+    <EditText
         android:id="@+id/auth_code"
-        android:layout_height="wrap_content"
         android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:hint="@string/auth_code" />
+        android:hint="@string/auth_code"
+        android:imeOptions="actionDone"
+        android:inputType="number"
+        android:maxLength="6" />
+
 </LinearLayout>
