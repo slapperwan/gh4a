@@ -68,7 +68,7 @@ Main features
 Open Source Libraries
 =====================
 
-* [GitHub Java API](https://github.com/eclipse/egit-github/tree/master/org.eclipse.egit.github.core)
+* [GitHub Java API](https://github.com/maniac103/egit-github/tree/master/org.eclipse.egit.github.core)
 * [ActionBarSherlock](https://github.com/JakeWharton/ActionBarSherlock) tag 4.2.0
 * [ViewPagerIndicator](https://github.com/JakeWharton/Android-ViewPagerIndicator)
 * [HoloColorPicker](https://github.com/LarsWerkman/HoloColorPicker)
