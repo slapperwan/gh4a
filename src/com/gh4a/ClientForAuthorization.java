@@ -52,7 +52,6 @@ public class ClientForAuthorization extends GitHubClient {
     public <V> V post(String uri, Object params, Type type) throws IOException {
         HttpURLConnection conn = createPost(uri);
         try {
-            Log.d("XXXX", "+++++ " + otpCode);
             if (!StringUtils.isBlank(otpCode)) {
                 conn.setRequestProperty("X-GitHub-OTP", otpCode);
             }
