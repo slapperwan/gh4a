@@ -1,3 +1,9 @@
+v3.6 - Fix 2fa for first time login
+
+v3.5
+- 2 factor authentication
+- bug fixes
+
 v3.4 (Mar 10, 2014)
 - Search users
 - Merge pull requests
