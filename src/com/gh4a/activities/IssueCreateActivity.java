@@ -312,7 +312,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
 
         AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
         builder.setCancelable(true);
-        builder.setTitle(R.string.issue_milestone);
+        builder.setTitle(R.string.issue_milestone_hint);
         builder.setSingleChoiceItems(milestones, checkedItem, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -354,7 +354,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
 
         AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
         builder.setCancelable(true);
-        builder.setTitle(R.string.issue_assignee);
+        builder.setTitle(R.string.issue_assignee_hint);
         builder.setSingleChoiceItems(assignees, checkedItem, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
