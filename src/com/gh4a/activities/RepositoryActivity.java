@@ -235,7 +235,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
     protected Fragment getFragment(int position) {
         switch (position) {
             case 0:
-                mRepositoryFragment = RepositoryFragment.newInstance(mRepository);
+                mRepositoryFragment = RepositoryFragment.newInstance(mRepository, mSelectedRef);
                 return mRepositoryFragment;
             case 1:
                 if (mDirStack.isEmpty()) {

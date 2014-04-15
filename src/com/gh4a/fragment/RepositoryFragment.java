@@ -51,12 +51,13 @@ import com.github.mobile.util.HttpImageGetter;
 public class RepositoryFragment extends SherlockProgressFragment implements OnClickListener {
     private Repository mRepository;
     private View mContentView;
+    private String mRef;
 
     private LoaderCallbacks<String> mReadmeCallback = new LoaderCallbacks<String>() {
         @Override
         public Loader<LoaderResult<String>> onCreateLoader(int id, Bundle args) {
             return new ReadmeLoader(getActivity(), mRepository.getOwner().getLogin(),
-                    mRepository.getName(), mRepository.getMasterBranch());
+                    mRepository.getName(), StringUtils.isBlank(mRef) ? mRepository.getMasterBranch() : mRef);
         }
         @Override
         public void onResultReady(LoaderResult<String> result) {
@@ -67,11 +68,12 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
         }
     };
 
-    public static RepositoryFragment newInstance(Repository repository) {
+    public static RepositoryFragment newInstance(Repository repository, String ref) {
         RepositoryFragment f = new RepositoryFragment();
 
         Bundle args = new Bundle();
         args.putSerializable("REPOSITORY", repository);
+        args.putString(Constants.Object.REF, ref);
         f.setArguments(args);
 
         return f;
@@ -81,6 +83,7 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mRepository = (Repository) getArguments().getSerializable("REPOSITORY");
+        mRef = getArguments().getString(Constants.Object.REF);
     }
 
     @Override
