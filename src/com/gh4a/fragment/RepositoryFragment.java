@@ -142,7 +142,7 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
 
         fillTextView(R.id.tv_desc, 0, mRepository.getDescription());
         fillTextView(R.id.tv_language,R.string.repo_language, mRepository.getLanguage());
-        fillTextView(R.id.tv_url, 0, mRepository.getHtmlUrl());
+        fillTextView(R.id.tv_url, 0, !StringUtils.isBlank(mRepository.getHomepage()) ? mRepository.getHomepage() : mRepository.getHtmlUrl());
 
         mContentView.findViewById(R.id.cell_stargazers).setOnClickListener(this);
         mContentView.findViewById(R.id.cell_forks).setOnClickListener(this);
