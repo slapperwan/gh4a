@@ -1,6 +1,8 @@
 package com.gh4a.loader;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Release;
@@ -26,6 +28,15 @@ public class ReleaseLoader extends BaseLoader<List<Release>> {
     public List<Release> doLoadInBackground() throws IOException {
         RepositoryService repoService = (RepositoryService)
                 Gh4Application.get(getContext()).getService(Gh4Application.REPO_SERVICE);
-        return repoService.getReleases(new RepositoryId(mRepoOwner, mRepoName));
+        List<Release> releases = repoService.getReleases(new RepositoryId(mRepoOwner, mRepoName));
+        Collections.sort(releases, new Comparator<Release>() {
+
+            @Override
+            public int compare(Release lhs, Release rhs) {
+                return rhs.getCreatedAt().compareTo(lhs.getCreatedAt());
+            }
+            
+        });
+        return releases;
     }
 }
