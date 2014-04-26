@@ -1,0 +1,48 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.9+'
+    }
+}
+
+repositories {
+    maven { url 'http://dl.bintray.com/populov/maven' }
+    mavenCentral()
+}
+
+apply plugin: 'android'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion '19.0.3'
+
+    defaultConfig {
+        minSdkVersion 10
+        targetSdkVersion 19
+        versionCode 36
+        versionName "3.6"
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: '*.jar')
+
+    compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
+    compile 'com.viewpagerindicator:library:2.4.1@aar'
+    compile 'com.larswerkman:HoloColorPicker:1.4@aar'
+    compile 'com.github.johnkil.android-progressfragment:sherlockprogressfragment:1.4.0@aar'
+    compile 'com.google.code.gson:gson:2.2.4'
+    compile 'org.ocpsoft.prettytime:prettytime:3.2.4.Final'
+}

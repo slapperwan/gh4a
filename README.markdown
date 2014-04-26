@@ -65,11 +65,26 @@ Main features
 
 <i>..and many more</i>
 
+How to Build GH4A
+=================
+- Ensure Android SDK platform version 19 and build-tools version 19.0.3 are installed
+- Build using Gradle
+
+```bash
+./gradlew assembleDebug
+```
+
+- To get a full list of available tasks
+
+```bash
+./gradlew tasks
+```
+
 Open Source Libraries
 =====================
 
 * [GitHub Java API](https://github.com/maniac103/egit-github/tree/master/org.eclipse.egit.github.core)
-* [ActionBarSherlock](https://github.com/JakeWharton/ActionBarSherlock) tag 4.2.0
+* [ActionBarSherlock](https://github.com/JakeWharton/ActionBarSherlock) tag 4.4.0
 * [ViewPagerIndicator](https://github.com/JakeWharton/Android-ViewPagerIndicator)
 * [HoloColorPicker](https://github.com/LarsWerkman/HoloColorPicker)
 * [ProgressFragment](https://github.com/johnkil/Android-ProgressFragment)
