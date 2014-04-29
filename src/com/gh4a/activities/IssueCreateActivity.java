@@ -385,7 +385,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
 
         for (final Label label : labels) {
             final View rowView = getLayoutInflater().inflate(R.layout.row_issue_create_label, null);
-            View viewColor = (View) rowView.findViewById(R.id.view_color);
+            View viewColor = rowView.findViewById(R.id.view_color);
             viewColor.setBackgroundColor(Color.parseColor("#" + label.getColor()));
 
             final TextView tvLabel = (TextView) rowView.findViewById(R.id.tv_title);

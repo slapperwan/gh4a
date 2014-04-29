@@ -67,7 +67,7 @@ public class UserFragment extends SherlockProgressFragment implements View.OnCli
         public void onResultReady(LoaderResult<User> result) {
             boolean success = !result.handleError(getActivity());
             if (success) {
-                mUser = (User) result.getData();
+                mUser = result.getData();
                 fillData();
             }
             setContentEmpty(!success);

@@ -72,7 +72,7 @@ public class Feed {
             preview = content.length() > 2000 ? content.substring(0, 2000) : content;
             preview = content.replaceAll("<(.|\n)*?>","");
             if (preview.length() > 500) {
-                preview = preview.toString().substring(0,  500);
+                preview = preview.substring(0,  500);
             }
         } else {
             preview = null;

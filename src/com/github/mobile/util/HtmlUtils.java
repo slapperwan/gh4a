@@ -243,7 +243,6 @@ public class HtmlUtils {
                     output.setSpan(new ReplySpan(), start, end,
                             SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
-                return;
             }
         }
     };
@@ -330,7 +329,7 @@ public class HtmlUtils {
      * @param html
      * @return formatted HTML
      */
-    public static final CharSequence format(final String html) {
+    public static CharSequence format(final String html) {
         if (html == null)
             return "";
         if (html.length() == 0)

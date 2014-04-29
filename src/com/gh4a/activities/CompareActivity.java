@@ -45,7 +45,6 @@ public class CompareActivity extends LoadingFragmentActivity implements OnItemCl
     private String mBase;
     private String mHead;
     private CommitAdapter mAdapter;
-    private ListView mListView;
 
     private LoaderCallbacks<RepositoryCommitCompare> mCompareCallback =
             new LoaderCallbacks<RepositoryCommitCompare>() {
@@ -80,7 +79,7 @@ public class CompareActivity extends LoadingFragmentActivity implements OnItemCl
         setContentView(R.layout.generic_list);
         setContentShown(false);
 
-        mListView = (ListView) findViewById(R.id.list_view);
+        ListView listView = (ListView) findViewById(R.id.list_view);
 
         mRepoOwner = getIntent().getExtras().getString(Constants.Repository.OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);
@@ -93,15 +92,15 @@ public class CompareActivity extends LoadingFragmentActivity implements OnItemCl
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         mAdapter = new CommitAdapter(this);
-        mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener(this);
+        listView.setAdapter(mAdapter);
+        listView.setOnItemClickListener(this);
 
         getSupportLoaderManager().initLoader(0, null, mCompareCallback);
     }
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        RepositoryCommit commit = (RepositoryCommit) mAdapter.getItem(position);
+        RepositoryCommit commit = mAdapter.getItem(position);
         IntentUtils.openCommitInfoActivity(this, mRepoOwner, mRepoName, commit.getSha(), 0);
     }
 

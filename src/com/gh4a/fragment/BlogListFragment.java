@@ -34,8 +34,7 @@ public class BlogListFragment extends ListDataBaseFragment<Feed> {
     private static final String BLOG = "https://github.com/blog.atom";
 
     public static BlogListFragment newInstance() {
-        BlogListFragment f = new BlogListFragment();
-        return f;
+        return new BlogListFragment();
     }
 
     @Override

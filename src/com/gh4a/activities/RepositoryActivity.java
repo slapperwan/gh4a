@@ -123,7 +123,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         public void onResultReady(LoaderResult<List<RepositoryTag>> result) {
             if (!result.handleError(RepositoryActivity.this)) {
                 stopProgressDialog(mProgressDialog);
-                mTags = (List<RepositoryTag>) result.getData();
+                mTags = result.getData();
                 showTagsDialog();
                 getSupportLoaderManager().destroyLoader(LOADER_TAGS);
             }

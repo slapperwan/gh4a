@@ -8,7 +8,6 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.GitHubResponse;
 
-import android.util.Log;
 
 import com.gh4a.utils.StringUtils;
 

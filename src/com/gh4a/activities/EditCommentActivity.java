@@ -24,7 +24,6 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
     private String mRepoOwner;
     private String mRepoName;
     private long mCommentId;
-    private String mText;
     private EditText mEditText;
 
     @Override
@@ -38,14 +37,14 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
         mRepoOwner = data.getString(Constants.Repository.OWNER);
         mRepoName = data.getString(Constants.Repository.NAME);
         mCommentId = data.getLong(Constants.Comment.ID);
-        mText = data.getString(Constants.Comment.BODY);
+        String text = data.getString(Constants.Comment.BODY);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getString(R.string.issue_comment_title) + " " + mCommentId);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         mEditText = (EditText) findViewById(R.id.et_text);
-        mEditText.setText(mText);
+        mEditText.setText(text);
 
         setResult(RESULT_CANCELED);
     }

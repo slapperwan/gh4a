@@ -36,7 +36,7 @@ public class FeedLoader extends BaseLoader<List<Feed>> {
         BufferedInputStream bis = null;
         try {
             URL url = new URL(mUrl);
-            URLConnection request = (URLConnection) url.openConnection();
+            URLConnection request = url.openConnection();
 
             if (request instanceof HttpsURLConnection) {
                 ((HttpsURLConnection) request).setHostnameVerifier(DO_NOT_VERIFY);

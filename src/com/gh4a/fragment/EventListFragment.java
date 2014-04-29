@@ -129,7 +129,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
     protected void onItemClick(Event event) {
         Gh4Application context = Gh4Application.get(getActivity());
 
-        if (!FeedAdapter.hasValidPayload(event)) {
+        if (!FeedAdapter.hasInvalidPayload(event)) {
             return;
         }
 
@@ -283,10 +283,10 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         super.onCreateContextMenu(menu, v, menuInfo);
 
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        Event event = (Event) mAdapter.getItem(info.position);
+        Event event = mAdapter.getItem(info.position);
         int groupId = getMenuGroupId();
 
-        if (!FeedAdapter.hasValidPayload(event)) {
+        if (!FeedAdapter.hasInvalidPayload(event)) {
             return;
         }
 
@@ -376,7 +376,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         AdapterView.AdapterContextMenuInfo info =
                 (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
-        Event event = (Event) mAdapter.getItem(info.position);
+        Event event = mAdapter.getItem(info.position);
         String[] repoNamePart = event.getRepo().getName().split("/");
         String repoOwner = null;
         String repoName = null;

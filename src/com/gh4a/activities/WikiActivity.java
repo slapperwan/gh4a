@@ -32,7 +32,6 @@ public class WikiActivity extends LoadingFragmentActivity {
 
     private String mUserLogin;
     private String mRepoName;
-    private String mTitle;
     private String mContent;
 
     @Override
@@ -45,11 +44,11 @@ public class WikiActivity extends LoadingFragmentActivity {
 
         mUserLogin = getIntent().getStringExtra(Constants.Repository.OWNER);
         mRepoName = getIntent().getStringExtra(Constants.Repository.NAME);
-        mTitle = getIntent().getStringExtra(Constants.Blog.TITLE);
+        String title = getIntent().getStringExtra(Constants.Blog.TITLE);
         mContent = getIntent().getStringExtra(Constants.Blog.CONTENT);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(mTitle);
+        actionBar.setTitle(title);
         actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 

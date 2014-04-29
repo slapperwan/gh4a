@@ -69,8 +69,8 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
     private List<Milestone> mMilestones;
     private List<User> mAssignees;
 
-    private static final int[] TITLES = new int[] {
-        R.string.issues_submitted, R.string.issues_updated, R.string.issues_comments
+    private static final int[] TITLES = new int[]{
+            R.string.issues_submitted, R.string.issues_updated, R.string.issues_comments
     };
 
     private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
@@ -78,14 +78,17 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         public Loader<LoaderResult<List<Label>>> onCreateLoader(int id, Bundle args) {
             return new LabelListLoader(IssueListActivity.this, mRepoOwner, mRepoName);
         }
+
         @Override
         public void onResultReady(LoaderResult<List<Label>> result) {
-            if (!checkForError(result)) {
-                stopProgressDialog(mProgressDialog);
-                mLabels = result.getData();
-                showLabelsDialog();
-                getSupportLoaderManager().destroyLoader(0);
+            if (checkForError(result)) {
+                return;
             }
+            stopProgressDialog(mProgressDialog);
+            mLabels = result.getData();
+            showLabelsDialog();
+            getSupportLoaderManager().destroyLoader(0);
+
         }
     };
 
@@ -94,30 +97,38 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         public Loader<LoaderResult<List<Milestone>>> onCreateLoader(int id, Bundle args) {
             return new MilestoneListLoader(IssueListActivity.this, mRepoOwner, mRepoName, "open");
         }
+
         @Override
         public void onResultReady(LoaderResult<List<Milestone>> result) {
-            if (!checkForError(result)) {
-                stopProgressDialog(mProgressDialog);
-                mMilestones = result.getData();
-                showMilestonesDialog();
-                getSupportLoaderManager().destroyLoader(1);
+            if (checkForError(result)) {
+
+                return;
             }
+            stopProgressDialog(mProgressDialog);
+            mMilestones = result.getData();
+            showMilestonesDialog();
+            getSupportLoaderManager().destroyLoader(1);
+
         }
     };
 
-    private LoaderCallbacks<List<User>> mCollaboratorListCallback =new LoaderCallbacks<List<User>>() {
+    private LoaderCallbacks<List<User>> mCollaboratorListCallback = new LoaderCallbacks<List<User>>() {
         @Override
         public Loader<LoaderResult<List<User>>> onCreateLoader(int id, Bundle args) {
             return new CollaboratorListLoader(IssueListActivity.this, mRepoOwner, mRepoName);
         }
+
         @Override
         public void onResultReady(LoaderResult<List<User>> result) {
-            if (!checkForError(result)) {
-                stopProgressDialog(mProgressDialog);
-                mAssignees = result.getData();
-                showAssigneesDialog();
-                getSupportLoaderManager().destroyLoader(2);
+            if (checkForError(result)) {
+
+                return;
             }
+            stopProgressDialog(mProgressDialog);
+            mAssignees = result.getData();
+            showAssigneesDialog();
+            getSupportLoaderManager().destroyLoader(2);
+
         }
     };
 
@@ -126,12 +137,15 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
             return new IsCollaboratorLoader(IssueListActivity.this, mRepoOwner, mRepoName);
         }
+
         @Override
         public void onResultReady(LoaderResult<Boolean> result) {
-            if (!checkForError(result)) {
-                mIsCollaborator = result.getData();
-                invalidateOptionsMenu();
+            if (checkForError(result)) {
+                return;
             }
+            mIsCollaborator = result.getData();
+            invalidateOptionsMenu();
+
         }
     };
 
@@ -221,73 +235,73 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case R.id.view_open_closed:
-            if (Constants.Issue.STATE_OPEN.equals(mState)) {
-                mState = Constants.Issue.STATE_CLOSED;
-                item.setTitle(R.string.issue_view_open_issues);
-            } else {
-                mState = Constants.Issue.STATE_OPEN;
-                item.setTitle(R.string.issue_view_closed_issues);
-            }
-            mFilterData.put("state", mState);
-            reloadIssueList();
-            return true;
-        case R.id.create_issue:
-            if (Gh4Application.get(this).isAuthorized()) {
-                Intent intent = new Intent(this, IssueCreateActivity.class);
+            case R.id.view_open_closed:
+                if (Constants.Issue.STATE_OPEN.equals(mState)) {
+                    mState = Constants.Issue.STATE_CLOSED;
+                    item.setTitle(R.string.issue_view_open_issues);
+                } else {
+                    mState = Constants.Issue.STATE_OPEN;
+                    item.setTitle(R.string.issue_view_closed_issues);
+                }
+                mFilterData.put("state", mState);
+                reloadIssueList();
+                return true;
+            case R.id.create_issue:
+                if (Gh4Application.get(this).isAuthorized()) {
+                    Intent intent = new Intent(this, IssueCreateActivity.class);
+                    intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+                    intent.putExtra(Constants.Repository.NAME, mRepoName);
+                    startActivity(intent);
+                } else {
+                    Intent intent = new Intent(this, Github4AndroidActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+                return true;
+            case R.id.view_labels:
+                Intent intent = new Intent(this, IssueLabelListActivity.class);
                 intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
                 intent.putExtra(Constants.Repository.NAME, mRepoName);
                 startActivity(intent);
-            } else {
-                Intent intent = new Intent(this, Github4AndroidActivity.class);
+                return true;
+            case R.id.view_milestones:
+                intent = new Intent(this, IssueMilestoneListActivity.class);
+                intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+                intent.putExtra(Constants.Repository.NAME, mRepoName);
                 startActivity(intent);
-                finish();
-            }
-            return true;
-        case R.id.view_labels:
-            Intent intent = new Intent(this, IssueLabelListActivity.class);
-            intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-            intent.putExtra(Constants.Repository.NAME, mRepoName);
-            startActivity(intent);
-            return true;
-        case R.id.view_milestones:
-            intent = new Intent(this, IssueMilestoneListActivity.class);
-            intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-            intent.putExtra(Constants.Repository.NAME, mRepoName);
-            startActivity(intent);
-            return true;
-        case R.id.sort:
-            String direction = mFilterData.get("direction");
-            boolean isDesc = "desc".equals(direction) || direction == null;
-            item.setIcon(UiUtils.resolveDrawable(this, isDesc
-                    ? R.attr.collapseIcon : R.attr.expandIcon));
-            mFilterData.put("direction", isDesc ? "asc" : "desc");
-            reloadIssueList();
-            return true;
-        case R.id.labels:
-            if (mLabels == null) {
-                mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-                getSupportLoaderManager().initLoader(0, null, mLabelCallback);
-            } else {
-                showLabelsDialog();
-            }
-            return true;
-        case R.id.milestones:
-            if (mMilestones == null) {
-                mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-                getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
-            } else {
-                showMilestonesDialog();
-            }
-            return true;
-        case R.id.assignees:
-            if (mAssignees == null) {
-                mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-                getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
-            } else {
-                showAssigneesDialog();
-            }
-            return true;
+                return true;
+            case R.id.sort:
+                String direction = mFilterData.get("direction");
+                boolean isDesc = "desc".equals(direction) || direction == null;
+                item.setIcon(UiUtils.resolveDrawable(this, isDesc
+                        ? R.attr.collapseIcon : R.attr.expandIcon));
+                mFilterData.put("direction", isDesc ? "asc" : "desc");
+                reloadIssueList();
+                return true;
+            case R.id.labels:
+                if (mLabels == null) {
+                    mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+                    getSupportLoaderManager().initLoader(0, null, mLabelCallback);
+                } else {
+                    showLabelsDialog();
+                }
+                return true;
+            case R.id.milestones:
+                if (mMilestones == null) {
+                    mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+                    getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
+                } else {
+                    showMilestonesDialog();
+                }
+                return true;
+            case R.id.assignees:
+                if (mAssignees == null) {
+                    mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+                    getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
+                } else {
+                    showAssigneesDialog();
+                }
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -303,7 +317,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
     private void showLabelsDialog() {
         String selectedLabels = mFilterData.get("labels");
         String[] checkedLabels = selectedLabels != null ?
-                selectedLabels.split(",") : new String[] {};
+                selectedLabels.split(",") : new String[]{};
         List<String> checkLabelStringList = Arrays.asList(checkedLabels);
         final boolean[] checkedItems = new boolean[mLabels.size()];
         final String[] allLabelArray = new String[mLabels.size()];

@@ -36,9 +36,6 @@ import com.viewpagerindicator.TitlePageIndicator;
 
 public class ExploreActivity extends BaseSherlockFragmentActivity implements ActionBar.OnNavigationListener {
     private ActionBar mActionBar;
-    private ThisPageAdapter mAdapter;
-    private ViewPager mPager;
-    private TitlePageIndicator mIndicator;
     private PublicTimelineFragment mPublicTimeFragment;
 
     @Override
@@ -69,25 +66,25 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
     }
 
     private void setPageIndicator(int position) {
-        mAdapter = new ThisPageAdapter(getSupportFragmentManager());
-        mPager = (ViewPager) findViewById(R.id.pager);
-        mPager.setAdapter(mAdapter);
-        mPager.invalidate();
+        ThisPageAdapter adapter = new ThisPageAdapter(getSupportFragmentManager());
+        ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        pager.setAdapter(adapter);
+        pager.invalidate();
 
-        mIndicator = (TitlePageIndicator) findViewById(R.id.indicator);
+        TitlePageIndicator indicator = (TitlePageIndicator) findViewById(R.id.indicator);
 
         if (Gh4Application.THEME != R.style.DefaultTheme) {
-            mIndicator.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_light));
-            mIndicator.setSelectedColor(getResources().getColor(R.color.abs__primary_text_holo_light));
-            mIndicator.setSelectedBold(true);
+            indicator.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_light));
+            indicator.setSelectedColor(getResources().getColor(R.color.abs__primary_text_holo_light));
+            indicator.setSelectedBold(true);
         }
 
         boolean trending = position == 1;
-        mIndicator.setVisibility(trending ? View.VISIBLE : View.GONE);
-        mIndicator.setViewPager(mPager);
+        indicator.setVisibility(trending ? View.VISIBLE : View.GONE);
+        indicator.setViewPager(pager);
 
-        mIndicator.notifyDataSetChanged();
-        mAdapter.notifyDataSetChanged();
+        indicator.notifyDataSetChanged();
+        adapter.notifyDataSetChanged();
     }
 
     private class ThisPageAdapter extends FragmentStatePagerAdapter {

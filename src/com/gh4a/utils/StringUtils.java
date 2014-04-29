@@ -209,9 +209,9 @@ public class StringUtils {
             content.append("<script>");
             if (repoOwner != null && repoName != null) {
                 content.append("var GitHub = new Object();");
-                content.append("GitHub.nameWithOwner = \"" + repoOwner + "/" + repoName + "\";");
+                content.append("GitHub.nameWithOwner = \"").append(repoOwner).append("/").append(repoName).append("\";");
                 if (ref != null) {
-                    content.append("GitHub.branch = \"" + ref + "\";");
+                    content.append("GitHub.branch = \"").append(ref).append("\";");
                 }
             }
             content.append("var text = document.getElementById('content').innerHTML;");
@@ -233,7 +233,7 @@ public class StringUtils {
         StringBuilder content = new StringBuilder();
         content.append("<html><body style=\"background-color:#dddddd;margin:auto\">");
         content.append("<span class=\"border:solid 1px #333333;\">");
-        content.append("<img src=\"" + imageUrl + "\" style=\"\"/>");
+        content.append("<img src=\"").append(imageUrl).append("\" style=\"\"/>");
         content.append("</span>");
         content.append("</body></html>");
 

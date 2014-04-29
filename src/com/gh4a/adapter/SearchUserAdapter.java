@@ -40,7 +40,8 @@ public class SearchUserAdapter extends RootAdapter<SearchUser> implements OnClic
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_gravatar_1, parent, false);
-        ViewHolder viewHolder = new ViewHolder();
+        ViewHolder viewHolder;
+        new ViewHolder();
 
         Gh4Application app = Gh4Application.get(mContext);
         Typeface boldCondensed = app.boldCondensed;
