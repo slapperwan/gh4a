@@ -129,7 +129,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
     protected void onItemClick(Event event) {
         Gh4Application context = Gh4Application.get(getActivity());
 
-        if (!FeedAdapter.hasInvalidPayload(event)) {
+        if (FeedAdapter.hasInvalidPayload(event)) {
             return;
         }
 
@@ -286,7 +286,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         Event event = mAdapter.getItem(info.position);
         int groupId = getMenuGroupId();
 
-        if (!FeedAdapter.hasInvalidPayload(event)) {
+        if (FeedAdapter.hasInvalidPayload(event)) {
             return;
         }
 
