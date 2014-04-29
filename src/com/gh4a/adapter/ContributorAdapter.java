@@ -25,13 +25,12 @@ public class ContributorAdapter extends RootAdapter<Contributor> implements OnCl
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_gravatar_1, parent, false);
-        ViewHolder viewHolder = new ViewHolder();
 
         Gh4Application app = (Gh4Application) mContext.getApplicationContext();
         Typeface boldCondensed = app.boldCondensed;
         Typeface italic = app.italic;
 
-        viewHolder = new ViewHolder();
+        ViewHolder viewHolder = new ViewHolder();
         viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
         viewHolder.ivGravatar.setOnClickListener(this);
 

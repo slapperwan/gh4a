@@ -28,7 +28,6 @@ public class BookmarkListActivity extends LoadingFragmentActivity implements
         AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, LoaderCallbacks<Cursor> {
     private static final String TAG = "BookmarkListActivity";
 
-    private ListView mListView;
     private BookmarkAdapter mAdapter;
 
     @Override
@@ -43,11 +42,11 @@ public class BookmarkListActivity extends LoadingFragmentActivity implements
         actionBar.setTitle(R.string.bookmarks);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        mListView = (ListView) findViewById(R.id.list_view);
+        ListView listView = (ListView) findViewById(R.id.list_view);
         mAdapter = new BookmarkAdapter(this);
-        mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener(this);
-        mListView.setOnItemLongClickListener(this);
+        listView.setAdapter(mAdapter);
+        listView.setOnItemClickListener(this);
+        listView.setOnItemLongClickListener(this);
 
         getSupportLoaderManager().initLoader(0, null, this);
     }

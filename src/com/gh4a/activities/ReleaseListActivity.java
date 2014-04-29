@@ -41,7 +41,6 @@ public class ReleaseListActivity extends LoadingFragmentActivity implements
         AdapterView.OnItemClickListener {
     private String mUserLogin;
     private String mRepoName;
-    private ListView mListView;
     private ReleaseAdapter mAdapter;
 
     private LoaderCallbacks<List<Release>> mReleaseCallback = new LoaderCallbacks<List<Release>>() {
@@ -82,10 +81,10 @@ public class ReleaseListActivity extends LoadingFragmentActivity implements
         actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        mListView = (ListView) findViewById(R.id.list_view);
+        ListView listView = (ListView) findViewById(R.id.list_view);
         mAdapter = new ReleaseAdapter(this);
-        mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener(this);
+        listView.setAdapter(mAdapter);
+        listView.setOnItemClickListener(this);
 
         getSupportLoaderManager().initLoader(0, null, mReleaseCallback);
     }

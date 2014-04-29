@@ -102,7 +102,6 @@ public abstract class PagedDataBaseFragment<T> extends SherlockListFragment impl
             mAdapter.clear();
         }
         onAddData(mAdapter, data);
-        return;
     }
 
     protected void onAddData(RootAdapter<T> adapter, Collection<T> data) {
