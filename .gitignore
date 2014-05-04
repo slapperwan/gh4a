@@ -5,3 +5,4 @@ build
 # Android Studio stuff
 .idea
 local.properties
+*.iml

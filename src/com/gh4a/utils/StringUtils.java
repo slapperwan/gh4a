@@ -15,6 +15,13 @@
  */
 package com.gh4a.utils;
 
+import android.content.Context;
+import android.text.TextUtils;
+import android.text.format.DateUtils;
+
+import com.gh4a.Constants;
+import com.gh4a.Gh4Application;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,13 +33,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.regex.Pattern;
-
-import android.content.Context;
-import android.text.TextUtils;
-import android.text.format.DateUtils;
-
-import com.gh4a.Constants;
-import com.gh4a.Gh4Application;
 
 /**
  * The Class StringUtils.
@@ -109,14 +109,14 @@ public class StringUtils {
     /**
      * To hex.
      *
-     * @param a the a
-     * @return the string
+     * @param dataBytes
+     * @return the hex string representation of dataBytes
      */
-    public static String toHex(byte[] a) {
-        StringBuilder sb = new StringBuilder(a.length * 2);
-        for (int i = 0; i < a.length; i++) {
-            sb.append(Character.forDigit((a[i] & 0xf0) >> 4, 16));
-            sb.append(Character.forDigit(a[i] & 0x0f, 16));
+    public static String toHex(byte[] dataBytes) {
+        StringBuilder sb = new StringBuilder(dataBytes.length * 2);
+        for (byte dataByte : dataBytes) {
+            sb.append(Character.forDigit((dataByte & 0xf0) >> 4, 16));
+            sb.append(Character.forDigit(dataByte & 0x0f, 16));
         }
         return sb.toString();
     }
@@ -230,14 +230,7 @@ public class StringUtils {
     }
 
     public static String highlightImage(String imageUrl) {
-        StringBuilder content = new StringBuilder();
-        content.append("<html><body style=\"background-color:#dddddd;margin:auto\">");
-        content.append("<span class=\"border:solid 1px #333333;\">");
-        content.append("<img src=\"").append(imageUrl).append("\" style=\"\"/>");
-        content.append("</span>");
-        content.append("</body></html>");
-
-        return content.toString();
+        return "<html><body style=\"background-color:#dddddd;margin:auto\">" + "<span class=\"border:solid 1px #333333;\">" + "<img src=\"" + imageUrl + "\" style=\"\"/>" + "</span>" + "</body></html>";
     }
 
     public static boolean checkEmail(String email) {

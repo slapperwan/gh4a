@@ -1,15 +1,15 @@
 package com.gh4a;
 
-import java.net.HttpURLConnection;
-
 import org.eclipse.egit.github.core.client.GitHubClient;
 
-public class DefaultClient extends GitHubClient {
+import java.net.HttpURLConnection;
 
+public class DefaultClient extends GitHubClient {
+    private static final String DEFAULT_HEADER_ACCEPT = "application/vnd.github.beta.full+json";
     private String headerAccept;
 
     public DefaultClient() {
-        this.headerAccept = "application/vnd.github.beta.full+json";
+        this(DEFAULT_HEADER_ACCEPT);
     }
 
     public DefaultClient(String headerAccept) {
