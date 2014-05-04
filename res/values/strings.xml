@@ -4,13 +4,8 @@
 
     <!-- Common -->
     <string name="record_not_found">%1$s not found</string>
-    <string name="more_data_1">%1$s</string>
-    <string name="more_data">%1$s | %2$s</string>
-    <string name="more_data_3">%1$s | %2$s | %3$s</string>
     <string name="more_commit_data">%1$s authored %2$s</string>
     <string name="more_issue_data">%1$s %2$s</string>
-    <string name="more_issue_assignee">Assigned to %1$s</string>
-    <string name="more_comment_data">by %1$s %2$s</string>
     <string name="loading_msg">Loading\u2026</string>
     <string name="saving_msg">Saving\u2026</string>
     <string name="deleting_msg">Deleting\u2026</string>
@@ -19,38 +14,24 @@
     <string name="merging_msg">Merging\u2026</string>
     <string name="authenticating">Authenticating\u2026</string>
     <string name="search">Search</string>
-    <string name="activity">Activity</string>
     <string name="logout">Logout</string>
     <string name="login">Login</string>
-    <string name="invalid_login">Invalid username/password</string>
-    <string name="success_logout">Successful logout</string>
-    <string name="sign">&lt;i>Sent via Gh4a App&lt;i></string>
-    <string name="label_it">Update</string>
     <string name="cancel">Cancel</string>
-    <string name="promote">Help Promote Gh4a</string>
-    <string name="promote_desc">(When checked, the signature \'Sent via Gh4a App\' will appear at the bottom of the message)</string>
     <string name="about">About</string>
-    <string name="my_name">Azwan Adli</string>
     <string name="my_email">slapperwan@gmail.com</string>
     <string name="my_web">http://slapperwan.github.com/gh4a</string>
     <string name="my_username">slapperwan</string>
     <string name="my_repo">gh4a</string>
-    <string name="feedback">Feedback</string>
     <string name="feedback_text">If you have any issues or suggestions, please contact me.  Any kind of feedback is greatly appreciated.</string>
     <string name="feedback_by_email">By Email</string>
     <string name="feedback_by_gh4a">By OctoDroid</string>
-    <string name="settings">Settings</string>
     <string name="bookmarks">Bookmarks</string>
-    <string name="donate">Donate</string>
-    <string name="donate_text">Gh4a is open source and will always be available for free.  If you find it useful consider donating via Paypal (slapperwan.pp@gmail.com).  Thank you.</string>
-    <string name="sort_by">Sort By (desc)</string>
     <string name="other_info">Other Information</string>
     <string name="view">View</string>
     <string name="readme">Readme</string>
     <string name="ok">@android:string/ok</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="sort">Sort</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>
     <string name="members">Members</string>
@@ -65,9 +46,8 @@
     <string name="releases">Releases</string>
     <string name="packages">Packages</string>
     <string name="no_browser_found">The link could not be opened: no browser was found on your device</string>
-    <string name="need_profile_reload">Please reload your profile page by pressing \'Home\' button at the top left for the changes to take effect</string>
     <string name="login_prompt">Please login</string>
-    <string name="error_toast">An error occured while fetching data</string>
+    <string name="error_toast">An error occurred while fetching data</string>
     <string name="unknown">unknown</string>
     <string name="history">History</string>
     <string name="deleted">(deleted)</string>
@@ -79,7 +59,6 @@
     <string name="feed_extradata">%1$s\u00a0\u00a0\u00a0%2$s</string>
     <string name="gist_extradata">%1$s\u00a0\u00a0\u00a0%2$s</string>
     <string name="go_to">Go to</string>
-    <string name="fail_view_diff">Unable to view diff</string>
     <string name="forked_from">forked from %1$s</string>
     <string name="enter_username_toast">Please enter your user name instead of your email address</string>
     <string name="menu_user">User %1$s</string>
@@ -96,8 +75,6 @@
     <string name="refresh">Refresh</string>
     <string name="delete_comment_message">Delete this comment?</string>
     <string name="please_wait">Please wait</string>
-    <string name="no_more_results">No more results</string>
-    <string name="auth_err_toast">Your API token may be invalid</string>
     <string name="bookmark_user">Bookmark user</string>
     <string name="bookmark_repo">Bookmark repo</string>
     <string name="ellipse" translatable="false">\u2026</string>
@@ -164,7 +141,6 @@
     <string name="event_issues_title">%1$s %2$s issue %3$s on %4$s</string>
     <string name="event_delete_repo_title">%1$s deleted repository %2$s</string>
     <string name="event_delete_branch_title">%1$s deleted %2$s %3$s at %4$s</string>
-    <string name="event_wiki_title">%1$s %2$s a page in the %3$s wiki</string>
     <string name="event_pull_request_title">%1$s %2$s pull request %3$s on %4$s</string>
     <string name="event_member_title">%1$s added %2$s to %3$s</string>
     <string name="event_download_title">%1$s uploaded a file to %2$s</string>
@@ -181,91 +157,38 @@
     <string name="event_gollum_desc">View %1$s</string>
     <string name="event_commit_comment_desc">Comment in %1$s - %2$s</string>
     <string name="event_push_desc">%1$d more commits...</string>
-    <string name="event_pull_request_review_comment_desc">Comment on %1$s in pull request %2$d</string>
 
-    <!-- User -->
-    <plurals name="user">
-        <item quantity="one">User</item>
-        <item quantity="other">Users</item>
-    </plurals>
-    <string name="user">User</string>
-    <string name="user_login">Login</string>
-    <string name="user_name">Name</string>
     <string name="user_username">Username</string>
     <string name="user_password">Password</string>
-    <string name="user_email">Email</string>
-    <string name="user_location">Location</string>
-    <string name="user_website">Website</string>
-    <string name="user_company">Company</string>
     <string name="user_following">Following</string>
     <string name="user_followers">Followers</string><!-- For type organization -->
     <string name="user_members">Members</string><!-- For type organization -->
     <string name="user_created_at">Member since %1$s</string>
     <string name="user_pub_repos">Repositories</string>
-    <string name="user_watched_repos">Watched</string>
-    <string name="user_starred_repos">Starred</string>
-    <string name="user_stars_repos">Stars</string>
-    <string name="user_all_repos">All</string>
-    <string name="user_owner_repos">Owner</string>
-    <string name="user_public_repos">Public</string>
-    <string name="user_private_repos">Private</string>
-    <string name="user_member_repos">Member</string>
-    <string name="user_sources_repos">Sources</string>
-    <string name="user_forks_repos">Forks</string>
-    <string name="user_pushable_repos">Pushable Repositories</string>
     <string name="user_extra_data">%1$d followers | %2$d repos</string>
     <string name="user_news_feed">News Feed</string>
     <string name="user_your_actions">Your Actions</string>
     <string name="user_public_activity">Public Activity</string>
-    <string name="user_private_activity">Private Activity</string>
     <string name="user_organizations">Organizations</string>
     <string name="user_follow_action">Follow</string>
     <string name="user_unfollow_action">Unfollow</string>
-    <string name="user_success_follow">Successful follow user %1$s</string>
-    <string name="user_success_unfollow">Successful unfollow user %1$s</string>
-    <string name="user_error_follow">An error occured while following user %1$s</string>
-    <string name="user_error_unfollow">An error occured while unfollow user %1$s</string>
 
     <!-- Repository -->
     <plurals name="repository">
         <item quantity="one">Repository</item>
         <item quantity="other">Repositories</item>
     </plurals>
-    <string name="repo_owner">Owner</string>
-    <string name="repo_name">Repository Name</string>
-    <string name="repo_description">Description</string>
-    <string name="repo_url">Url</string>
-    <string name="repo_open_issues">Open Issues</string>
-    <string name="repo_homepage">Homepage</string>
     <string name="repo_forks">Forks</string>
-    <string name="repo_size">Size</string>
     <string name="repo_language">Language %1$s</string>
-    <string name="repo_followers">Followers</string>
-    <string name="repo_created_at">Created at</string>
-    <string name="repo_pushed_at">Pushed at</string>
-    <string name="repo_source">Source</string>
-    <string name="repo_parent">Parent</string>
-    <string name="repo_organization">Organization</string>
     <string name="repo_watchers">Watchers</string>
     <string name="repo_stargazers">Stargazers</string>
     <string name="repo_network">Network</string>
     <string name="repo_watch_action">Watch</string>
     <string name="repo_star_action">Star</string>
-    <string name="repo_fork_action">Fork</string>
     <string name="repo_branches">Branches</string>
     <string name="repo_tags">Tags</string>
-    <string name="repo_branch">branch</string>
-    <string name="repo_tag">tag</string>
     <string name="repo_unwatch_action">Unwatch</string>
     <string name="repo_unstar_action">Unstar</string>
-    <string name="repo_success_watch">Successful watch %1$s</string>
-    <string name="repo_success_unwatch">Successful unwatch %1$s</string>
-    <string name="repo_success_star">Successful star %1$s</string>
-    <string name="repo_success_unstar">Successful unstar %1$s</string>
-    <string name="repo_error_star">An error occured while watching %1$s</string>
-    <string name="repo_error_unstar">An error occured while unwatch %1$s</string>
-    <string name="repo_success_fork">Successful fork %1$s</string>
-    <string name="repo_error_fork">An error occured while forking %1$s</string>
     <string name="repo_contributors">Contributors</string>
     <string name="repo_collaborators">Collaborators</string>
     <string name="repo_files">Files</string>
@@ -278,19 +201,11 @@
         <item quantity="one">Commit</item>
         <item quantity="other">Commits</item>
     </plurals>
-    <string name="commit_message">Message</string>
-    <string name="commit_date">Date</string>
-    <string name="commit_author">Author</string>
-    <string name="commit_committer">Committer</string>
-    <string name="commit_committed_date">Committed date</string>
-    <string name="commit_authored_date">Authored date</string>
     <string name="commits">Commits</string>
     <string name="commit_changed">Files Changed</string>
     <string name="commit_added">Files Added</string>
     <string name="commit_deleted">Files Deleted</string>
     <string name="commit_summary">%1$d changed files with %2$d additions and %3$d deletions.</string>
-    <string name="commit_sha">Commit - %1$s</string>
-    <string name="commit_comment">Commented on %1$s</string>
     <string name="commit_compare">Compare View</string>
     <string name="commit_comment_hint">Comment on this commit</string>
     <string name="commit_details">Committed by %1$s %2$s</string>
@@ -304,23 +219,11 @@
     <string name="release_type_prerelease">Pre-release</string>
     <string name="release_no_releasenotes">No release notes were given.</string>
 
-    <!-- Issue -->
-    <plurals name="issue">
-        <item quantity="one">Issue</item>
-        <item quantity="other">Issues</item>
-    </plurals>
     <string name="issues">Issues</string>
     <string name="issue">Issue</string>
-    <string name="issue_user">User</string>
-    <string name="issue_updated_at">Updated at</string>
-    <string name="issue_number">Number</string>
-    <string name="issue_votes">Votes</string>
     <string name="issue_comments">Comments</string>
     <string name="issue_title">Title</string>
     <string name="issue_body">Body</string>
-    <string name="issue_state">State</string>
-    <string name="issue_created_at">Created at</string>
-    <string name="issue_closed_at">Closed at</string>
     <string name="issue_view_open_issues">View Open</string>
     <string name="issue_view_closed_issues">View Closed</string>
     <string name="issue_create">New Issue</string>
@@ -329,7 +232,6 @@
     <string name="issue_edit">Edit Issue</string>
     <string name="issue_edit_title">Edit Issue #%1$d</string>
     <string name="issue_success_edit">Successful edit issue</string>
-    <string name="issue_error_edit">Cannot edit issue</string>
     <string name="issue_reopen">Reopen Issue</string>
     <string name="issue_close">Close Issue</string>
     <string name="issue_open">Open Issues</string>
@@ -337,32 +239,19 @@
     <string name="issue_success_close">Successful close issue</string>
     <string name="issue_error_close">Cannot close issue</string>
     <string name="issue_success_reopen">Successful reopen issue</string>
-    <string name="issue_error_reopen">Cannot reopen issue</string>
-    <string name="issue_view_labels">Labels</string>
     <string name="issue_manage_labels">Manage Labels</string>
-    <string name="issue_view_milestones">Milestones</string>
     <string name="issue_manage_milestones">Manage Milestones</string>
     <string name="issue_dialog_delete_title">Delete %1$s?</string>
     <string name="issue_dialog_delete_message">Are you sure?</string>
     <string name="issue_success_comment">Successful create comment</string>
     <string name="issue_error_comment">Cannot create comment</string>
-    <string name="issue_create_label">New Label</string>
-    <string name="issue_create_milestone">New Milestone</string>
     <string name="issue_milestone_title">Title</string>
     <string name="issue_milestone_desc">Description</string>
-    <string name="issue_label_create">Create</string>
     <string name="issue_error_create_label">Cannot create label</string>
     <string name="issue_error_edit_label">Cannot edit label</string>
-    <string name="issue_error_delete_label">Cannot delete label</string>
     <string name="issue_error_create_milestone">Cannot create milestone</string>
-    <string name="issue_error_delete_milestone">Cannot delete milestone</string>
-    <string name="issue_error_label">Please enter a label</string>
     <string name="issue_error_milestone_title">Please enter a title</string>
-    <string name="issue_label_add_delete">Add/Remove labels</string>
     <string name="issue_label_add">Add labels</string>
-    <string name="issue_error_label_add_delete">Cannot add/remove label</string>
-    <string name="issue_labels">Labels</string>
-    <string name="issue_label_name">Label name</string>
     <string name="issue_label_new">New Label</string>
     <string name="issue_milestone">Milestone: %1$s</string>
     <string name="issue_milestone_new">New Milestone</string>
@@ -381,16 +270,7 @@
     <string name="issue_assignee">%1$s is assigned</string>
     <string name="issue_desc">Description</string>
 
-    <!-- Issue comment -->
-    <plurals name="issue_comment">
-        <item quantity="one">Comment</item>
-        <item quantity="other">Comments</item>
-    </plurals>
     <string name="issue_comment_title">Comment</string>
-    <string name="issue_comment_created_at">Created at</string>
-    <string name="issue_comment_body">Body</string>
-    <string name="issue_comment_updated_at">Updated at</string>
-    <string name="issue_comment_user">User</string>
     <string name="issue_comment_hint">Comment on this issue</string>
 
     <!-- Pull Request -->
@@ -403,15 +283,12 @@
     <string name="pull_request_close">Close</string>
     <string name="pull_request_merge">Merge</string>
     <string name="pull_request_merged">Merged</string>
-    <string name="pull_success_merge">Pull request was merged successfully</string>
     <string name="pull_error_merge">Pull request could not be merged</string>
     <string name="pull_message_dialog_title">Merge pull request #%1$d</string>
     <string name="pull_merge_message_description">If you want to add additional details to the merge commit message, please enter them below.</string>
 
     <!-- Object -->
-    <string name="object_tree">Tree</string>
     <string name="object_view_file_at">View file @ %1$s</string>
-    <string name="object_view_history">History</string>
 
     <!-- Gist -->
     <plurals name="gist">
@@ -419,7 +296,6 @@
         <item quantity="other">Gists</item>
     </plurals>
     <string name="gists">Gists</string>
-    <string name="gist_public">Public Gist</string>
     <string name="gist_title">Gist %1$s</string>
     <string name="gist_files">Files</string>
 
@@ -437,9 +313,6 @@
 
     <!-- Recent Wiki Updates -->
     <string name="recent_wiki">Wiki</string>
-
-    <!-- GitHub Jobs -->
-    <string name="jobs">GitHub Jobs</string>
 
     <!-- Bookmarks -->
     <string name="remove_bookmark">Remove bookmark</string>

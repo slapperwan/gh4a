@@ -15,17 +15,6 @@
  */
 package com.github.mobile.util;
 
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -42,6 +31,17 @@ import android.widget.TextView;
 import com.gh4a.R;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.UiUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 /**
  *
@@ -69,7 +69,7 @@ public class HttpImageGetter implements ImageGetter {
     }
 
     private static boolean containsImages(final String html) {
-        return html.indexOf("<img") != -1;
+        return html.contains("<img");
     }
 
     private final LoadingImageGetter loading;
