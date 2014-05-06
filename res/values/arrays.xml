@@ -1,33 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array
-        name="languages_array">
-        <item>Any Language</item>
-        <item>ActionScript</item>
-        <item>C</item>
-        <item>C#</item>
-        <item>C++</item>
-        <item>CSS</item>
-        <item>Common Lisp</item>
-        <item>Diff</item>
-        <item>Erlang</item>
-        <item>HTML</item>
-        <item>Haskell</item>
-        <item>Java</item>
-        <item>JavaScript</item>
-        <item>Lua</item>
-        <item>Objective-C</item>
-        <item>PHP</item>
-        <item>Perl</item>
-        <item>Python</item>
-        <item>Ruby</item>
-        <item>SQL</item>
-        <item>Scala</item>
-        <item>Scheme</item>
-        <item>TeX</item>
-        <item>XML</item>
-    </string-array>
-    <string-array
         name="explore_item">
         <item>Public Timeline</item>
         <item>Trending Repos</item>
