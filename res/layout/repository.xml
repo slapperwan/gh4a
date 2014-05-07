@@ -1,25 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@id/main_content"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/content_padding"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        android:padding="@dimen/content_padding">
+
         <RelativeLayout
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent" >
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
             <TextView
                 android:id="@+id/tv_login"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/highlight"
-                android:textColorLink="@color/titletextcolor"
+                android:background="?attr/selectableItemBackground"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:background="?attr/selectableItemBackground" />
+                android:textColor="@color/highlight"
+                android:textColorLink="@color/titletextcolor" />
+
             <TextView
                 android:id="@+id/tv_divider"
                 android:layout_width="wrap_content"
@@ -27,6 +30,7 @@
                 android:layout_toRightOf="@id/tv_login"
                 android:text="/"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
+
             <TextView
                 android:id="@+id/tv_name"
                 android:layout_width="wrap_content"
@@ -34,30 +38,34 @@
                 android:layout_alignParentRight="true"
                 android:layout_toRightOf="@id/tv_divider"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
+
             <TextView
                 android:id="@+id/tv_parent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tv_name"
-                android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                android:textColor="@color/titletextcolor"
+                android:layout_marginTop="8dp"
+                android:background="?attr/selectableItemBackground"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:background="?attr/selectableItemBackground" />
+                android:textColor="@color/titletextcolor" />
+
             <TextView
                 android:id="@+id/tv_desc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tv_parent"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
+
             <TextView
                 android:id="@+id/tv_url"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/tv_desc"
-                android:textColorLink="@color/titletextcolor"
+                android:autoLink="web"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:autoLink="web" />
+                android:textColorLink="@color/titletextcolor" />
+
             <TextView
                 android:id="@+id/tv_language"
                 android:layout_width="wrap_content"
@@ -65,87 +73,121 @@
                 android:layout_below="@id/tv_url"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
         </RelativeLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/overview_item_spacing"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
+
             <LinearLayout
                 android:id="@+id/cell_issues"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
-                android:orientation="vertical" >
-                <TextView
-                    android:id="@+id/tv_issues_count"
+                android:orientation="vertical">
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
-                <TextView
-                    android:id="@+id/tv_issues_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="@string/issues" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_issues_count"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                    <TextView
+                        android:id="@+id/tv_issues_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/issues"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
+                </LinearLayout>
             </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/cell_stargazers"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
-                android:orientation="vertical" >
-                <TextView
-                    android:id="@+id/tv_stargazers_count"
+                android:orientation="vertical">
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
-                <TextView
-                    android:id="@+id/tv_stargazers_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="@string/repo_stargazers" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_stargazers_count"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                    <TextView
+                        android:id="@+id/tv_stargazers_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/repo_stargazers"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
+                </LinearLayout>
             </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/cell_forks"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
-                android:orientation="vertical" >
-                <TextView
-                    android:id="@+id/tv_forks_count"
+                android:orientation="vertical">
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
-                <TextView
-                    android:id="@+id/tv_forks_label"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="@string/repo_network" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_forks_count"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                    <TextView
+                        android:id="@+id/tv_forks_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/repo_network"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
+                </LinearLayout>
             </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/cell_pull_requests"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
-                android:orientation="vertical" >
+                android:orientation="vertical">
+
                 <TextView
                     android:id="@+id/tv_pull_requests_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="@string/pull" />
+                    android:text="@string/pull"
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
+
                 <TextView
                     android:id="@+id/tv_pull_requests_label"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:text="@string/requests" />
+                    android:text="@string/requests"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
             </LinearLayout>
         </LinearLayout>
         <!-- README section -->
@@ -154,19 +196,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/overview_item_spacing"
+            android:text="@string/readme"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/highlight"
-            android:text="@string/readme" />
+            android:textColor="@color/highlight" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginBottom="@dimen/overview_header_spacing"
             android:background="@color/highlight" />
+
         <ProgressBar
             android:id="@+id/pb_readme"
             style="@style/LoadingProgress"
             android:layout_width="20dp"
             android:layout_height="20dp" />
+
         <TextView
             android:id="@+id/readme"
             android:layout_width="match_parent"
@@ -178,43 +223,49 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/overview_item_spacing"
+            android:text="@string/other_info"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/highlight"
-            android:text="@string/other_info" />
+            android:textColor="@color/highlight" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginBottom="@dimen/overview_header_spacing"
             android:background="@color/highlight" />
+
         <TextView
             android:id="@+id/tv_contributors_label"
+            style="@style/SelectableLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/SelectableLabel"
             android:text="@string/repo_contributors" />
+
         <TextView
             android:id="@+id/tv_collaborators_label"
+            style="@style/SelectableLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/SelectableLabel"
             android:text="@string/repo_collaborators" />
+
         <TextView
             android:id="@+id/tv_wiki_label"
+            style="@style/SelectableLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/SelectableLabel"
             android:text="@string/recent_wiki" />
+
         <TextView
             android:id="@+id/tv_releases_label"
+            style="@style/SelectableLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/SelectableLabel"
             android:text="@string/releases" />
+
         <TextView
             android:id="@+id/tv_downloads_label"
+            style="@style/SelectableLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/SelectableLabel"
             android:text="@string/downloads" />
     </LinearLayout>
 </ScrollView>
