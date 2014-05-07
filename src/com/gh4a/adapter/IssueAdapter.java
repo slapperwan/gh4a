@@ -15,14 +15,10 @@
  */
 package com.gh4a.adapter;
 
-import java.util.List;
-
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -36,6 +32,11 @@ import com.gh4a.R;
 import com.gh4a.utils.GravatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
+
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Label;
+
+import java.util.List;
 
 public class IssueAdapter extends RootAdapter<Issue> implements OnClickListener {
     public IssueAdapter(Context context) {
@@ -92,7 +93,15 @@ public class IssueAdapter extends RootAdapter<Issue> implements OnClickListener 
             viewHolder.ivAssignee.setVisibility(View.GONE);
         }
 
-        viewHolder.tvComments.setText(String.valueOf(issue.getComments()));
+        if (issue.getComments() > 0) {
+            viewHolder.tvComments.setText(String.valueOf(issue.getComments()));
+            int drawableId = Gh4Application.THEME == R.style.DefaultTheme ? R.drawable.comments_dark : R.drawable.comments;
+            Drawable commentDrawable = v.getContext().getResources().getDrawable(drawableId);
+            viewHolder.tvComments.setCompoundDrawablesWithIntrinsicBounds(commentDrawable, null, null, null);
+        } else{
+            viewHolder.tvComments.setCompoundDrawables(null,null,null,null);
+            viewHolder.tvComments.setText("");
+        }
 
         if (issue.getMilestone() != null) {
             viewHolder.tvMilestone.setVisibility(View.VISIBLE);

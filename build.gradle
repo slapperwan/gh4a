@@ -10,6 +10,8 @@ buildscript {
 
 repositories {
     maven { url 'http://dl.bintray.com/populov/maven' }
+    maven { url "http://www.bugsense.com/gradle/" }
+    maven { url 'https://github.com/kageiit/maven-repo/raw/master' }
     mavenCentral()
 }
 
@@ -26,6 +28,12 @@ android {
         versionName "3.6"
     }
 
+    buildTypes {
+        release {
+            zipAlign true
+        }
+    }
+
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -39,6 +47,8 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
 
+    compile "com.bugsense.trace:bugsense:3.6"
+    compile 'com.android.support:support-v4:19.+'
     compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
     compile 'com.viewpagerindicator:library:2.4.1@aar'
     compile 'com.larswerkman:HoloColorPicker:1.4@aar'
