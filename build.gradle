@@ -11,6 +11,7 @@ buildscript {
 repositories {
     maven { url 'http://dl.bintray.com/populov/maven' }
     maven { url "http://www.bugsense.com/gradle/" }
+    maven { url 'https://github.com/kageiit/maven-repo/raw/master' }
     mavenCentral()
 }
 
