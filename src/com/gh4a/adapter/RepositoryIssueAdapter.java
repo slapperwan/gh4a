@@ -15,10 +15,9 @@
  */
 package com.gh4a.adapter;
 
-import org.eclipse.egit.github.core.RepositoryIssue;
-
 import android.content.Context;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,6 +31,8 @@ import com.gh4a.R;
 import com.gh4a.utils.GravatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
+
+import org.eclipse.egit.github.core.RepositoryIssue;
 
 public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> implements OnClickListener {
     public RepositoryIssueAdapter(Context context) {
@@ -78,7 +79,17 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
         viewHolder.tvDesc.setText(issue.getTitle());
         viewHolder.tvExtra.setText(issue.getUser().getLogin() + "\n"
                 + StringUtils.formatRelativeTime(mContext, issue.getCreatedAt(), true));
-        viewHolder.tvComments.setText(String.valueOf(issue.getComments()));
+
+        if (issue.getComments() > 0) {
+            viewHolder.tvComments.setText(String.valueOf(issue.getComments()));
+            int drawableId = Gh4Application.THEME == R.style.DefaultTheme ? R.drawable.comments_dark : R.drawable.comments;
+            Drawable commentDrawable = v.getContext().getResources().getDrawable(drawableId);
+            viewHolder.tvComments.setCompoundDrawablesWithIntrinsicBounds(commentDrawable, null, null, null);
+        } else{
+            viewHolder.tvComments.setCompoundDrawables(null,null,null,null);
+            viewHolder.tvComments.setText("");
+        }
+
         viewHolder.tvRepo.setText(mContext.getString(R.string.repo_issue_on,
                 issue.getRepository().getOwner().getLogin() + "/" + issue.getRepository().getName()));
 
