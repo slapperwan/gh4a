@@ -52,7 +52,6 @@
         android:layout_alignParentRight="true"
         android:layout_below="@id/tv_desc"
         android:layout_gravity="center_vertical"
-        android:drawableLeft="@drawable/comments"
         android:drawablePadding="5dp"
         android:textAppearance="?android:attr/textAppearanceSmall" />
     <TextView
