@@ -44,5 +44,6 @@ dependencies {
     compile 'com.larswerkman:HoloColorPicker:1.4@aar'
     compile 'com.github.johnkil.android-progressfragment:sherlockprogressfragment:1.4.0@aar'
     compile 'com.google.code.gson:gson:2.2.4'
+    compile 'com.squareup.okhttp:okhttp:1.5.4'
     compile 'org.ocpsoft.prettytime:prettytime:3.2.4.Final'
 }
