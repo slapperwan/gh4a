@@ -18,6 +18,7 @@ package com.gh4a.utils;
 import android.content.Context;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.util.Pair;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -169,10 +170,11 @@ public class StringUtils {
         return writer.toString();
     }
 
-    public static String highlightSyntax(String data, boolean highlight, String fileName,
+    public static Pair<String,Boolean> highlightSyntax(String data, boolean highlight, String fileName,
             String repoOwner, String repoName, String ref) {
         String ext = FileUtils.getFileExtension(fileName);
         boolean highlighted = false;
+        boolean themed = false;
 
         StringBuilder content = new StringBuilder();
         content.append("<html><head><title></title>");
@@ -186,12 +188,14 @@ public class StringUtils {
                 highlighted = true;
             } else if (!Constants.SKIP_PRETTIFY_EXT.contains(ext)) {
                 data = TextUtils.htmlEncode(data).replace("\r\n", "<br>").replace("\n", "<br>");
-                content.append("<link href='file:///android_asset/prettify.css' rel='stylesheet' type='text/css'/>");
+
+                content.append("<link href='file:///android_asset/prettify-" + ThemeUtils.getCssTheme(Gh4Application.THEME) + ".css' rel='stylesheet' type='text/css'/>");
                 content.append("<script src='file:///android_asset/prettify.js' type='text/javascript'></script>");
                 content.append("</head>");
                 content.append("<body onload='prettyPrint()'>");
                 content.append("<pre class='prettyprint linenums'>");
                 highlighted = true;
+                themed = true;
             }
         }
         if (!highlighted) {
@@ -226,7 +230,7 @@ public class StringUtils {
 
         content.append("</body></html>");
 
-        return content.toString();
+        return new Pair<String, Boolean>(content.toString(), themed);
     }
 
     public static String highlightImage(String imageUrl) {
