@@ -175,19 +175,26 @@
                 android:background="?attr/selectableItemBackground"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tv_pull_requests_count"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/pull"
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tv_pull_requests_label"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/requests"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                    <TextView
+                        android:id="@+id/tv_pull_requests_count"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/pull"
+                        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                    <TextView
+                        android:id="@+id/tv_pull_requests_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/requests"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
         <!-- README section -->

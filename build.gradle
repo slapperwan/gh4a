@@ -29,6 +29,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            zipAlign true
+        }
         release {
             zipAlign true
         }
