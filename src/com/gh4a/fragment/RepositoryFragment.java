@@ -41,6 +41,7 @@ import com.gh4a.activities.WatcherListActivity;
 import com.gh4a.activities.WikiListActivity;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.loader.PullRequestCountLoader;
 import com.gh4a.loader.ReadmeLoader;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
@@ -65,6 +66,23 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
             TextView readmeView = (TextView) v.findViewById(R.id.readme);
             View progress = v.findViewById(R.id.pb_readme);
             new FillReadmeTask(mRepository.getId(), readmeView, progress).execute(result.getData());
+        }
+    };
+
+    private LoaderCallbacks<Integer> mPullRequestsCallback = new LoaderCallbacks<Integer>() {
+        @Override
+        public Loader<LoaderResult<Integer>> onCreateLoader(int id, Bundle args) {
+            return new PullRequestCountLoader(getActivity(), mRepository, Constants.Issue.STATE_OPEN);
+        }
+
+        @Override
+        public void onResultReady(LoaderResult<Integer> result) {
+            View v = getView();
+            TextView tvPullRequestsView = (TextView) v.findViewById(R.id.tv_pull_requests_label);
+            TextView tvPullRequestsCountView = (TextView) v.findViewById(R.id.tv_pull_requests_count);
+
+            tvPullRequestsView.setText(R.string.pull_requests);
+            tvPullRequestsCountView.setText(String.valueOf(result.getData()));
         }
     };
 
@@ -102,6 +120,7 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
         setContentShownNoAnimation(true);
 
         getLoaderManager().initLoader(0, null, mReadmeCallback);
+        getLoaderManager().initLoader(1, null, mPullRequestsCallback);
     }
 
     private void fillData() {
