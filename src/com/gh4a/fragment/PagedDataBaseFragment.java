@@ -15,8 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import java.util.Collection;
-import org.eclipse.egit.github.core.client.PageIterator;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -24,7 +22,6 @@ import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
@@ -35,6 +32,10 @@ import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 
+import org.eclipse.egit.github.core.client.PageIterator;
+
+import java.util.Collection;
+
 public abstract class PagedDataBaseFragment<T> extends SherlockListFragment implements
         LoaderManager.LoaderCallbacks<Collection<T>>, OnScrollListener {
     private RootAdapter<T> mAdapter;
@@ -42,13 +43,6 @@ public abstract class PagedDataBaseFragment<T> extends SherlockListFragment impl
     private boolean mIsLoadCompleted;
     private TextView mLoadingView;
     private String mCurrentFilter;
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View v = super.onCreateView(inflater, container, savedInstanceState);
-        return v;
-    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -73,13 +67,6 @@ public abstract class PagedDataBaseFragment<T> extends SherlockListFragment impl
     @SuppressLint("NewApi") // ABS has invalidateOptionsMenu()
     public void invalidateOptionsMenu() {
         getSherlockActivity().invalidateOptionsMenu();
-    }
-
-    public void setFilterText(String text) {
-        mCurrentFilter = text;
-        if (mAdapter != null) {
-            mAdapter.getFilter().filter(mCurrentFilter);
-        }
     }
 
     public void refresh() {

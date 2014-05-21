@@ -55,6 +55,7 @@ public class WikiActivity extends LoadingFragmentActivity {
         fillData();
     }
 
+    @SuppressWarnings("deprecation")
     @SuppressLint("SetJavaScriptEnabled")
     private void fillData() {
         WebView webView = (WebView) findViewById(R.id.web_view);

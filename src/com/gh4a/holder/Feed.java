@@ -21,7 +21,6 @@ public class Feed {
 
     private String id;
     private Date published;
-    private Date updated;
     private String link;
     private String title;
     private String content;
@@ -42,12 +41,7 @@ public class Feed {
     public void setPublished(Date published) {
         this.published = published;
     }
-    public Date getUpdated() {
-        return updated;
-    }
-    public void setUpdated(Date updated) {
-        this.updated = updated;
-    }
+
     public String getLink() {
         return link;
     }

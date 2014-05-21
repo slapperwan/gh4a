@@ -23,13 +23,6 @@ import android.util.Pair;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
@@ -137,39 +130,6 @@ public class StringUtils {
         return userLogin + (!StringUtils.isBlank(name) ? " - " + name : "");
     }
 
-    /**
-     * Convert stream to string.
-     *
-     * @param is the is
-     * @return the string
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    public static String convertStreamToString(InputStream is) throws IOException {
-        /*
-         * To convert the InputStream to String we use the Reader.read(char[]
-         * buffer) method. We iterate until the Reader return -1 which means
-         * there's no more data to read. We use the StringWriter class to
-         * produce the string.
-         */
-        if (is == null) {
-            return "";
-        }
-
-        Writer writer = new StringWriter();
-
-        char[] buffer = new char[1024];
-        try {
-            Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-            int n;
-            while ((n = reader.read(buffer)) != -1) {
-                writer.write(buffer, 0, n);
-            }
-        } finally {
-            is.close();
-        }
-        return writer.toString();
-    }
-
     public static Pair<String,Boolean> highlightSyntax(String data, boolean highlight, String fileName,
             String repoOwner, String repoName, String ref) {
         String ext = FileUtils.getFileExtension(fileName);
@@ -189,7 +149,9 @@ public class StringUtils {
             } else if (!Constants.SKIP_PRETTIFY_EXT.contains(ext)) {
                 data = TextUtils.htmlEncode(data).replace("\r\n", "<br>").replace("\n", "<br>");
 
-                content.append("<link href='file:///android_asset/prettify-" + ThemeUtils.getCssTheme(Gh4Application.THEME) + ".css' rel='stylesheet' type='text/css'/>");
+                content.append("<link href='file:///android_asset/prettify-");
+                content.append(ThemeUtils.getCssTheme(Gh4Application.THEME));
+                content.append(".css' rel='stylesheet' type='text/css'/>");
                 content.append("<script src='file:///android_asset/prettify.js' type='text/javascript'></script>");
                 content.append("</head>");
                 content.append("<body onload='prettyPrint()'>");

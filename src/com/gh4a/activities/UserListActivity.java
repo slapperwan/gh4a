@@ -15,10 +15,6 @@
  */
 package com.gh4a.activities;
 
-import java.util.List;
-
-import org.eclipse.egit.github.core.User;
-
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.view.View;
@@ -35,8 +31,11 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
 
+import org.eclipse.egit.github.core.User;
+
+import java.util.List;
+
 public abstract class UserListActivity extends LoadingFragmentActivity implements OnItemClickListener {
-    protected String mSearchKey;
     protected UserAdapter mUserAdapter;
     protected ListView mListViewUsers;
 
@@ -93,9 +92,7 @@ public abstract class UserListActivity extends LoadingFragmentActivity implement
 
     protected abstract Loader<LoaderResult<List<User>>> getUserListLoader();
 
-    protected void setRequestData() {
-        mSearchKey = getIntent().getExtras().getString("searchKey");
-    }
+    protected abstract void setRequestData();
 
     protected abstract String getActionBarTitle();
     protected abstract String getSubTitle();

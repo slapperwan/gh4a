@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 public abstract class BackgroundTask<T> extends AsyncTask<Void, Void, T> {
-    protected Context mContext;
+    protected final Context mContext;
     private Exception mException;
 
     public BackgroundTask(Context context) {

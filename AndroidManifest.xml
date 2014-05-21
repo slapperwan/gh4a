@@ -2,21 +2,18 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.gh4a"
-    android:installLocation="auto"
-    android:versionCode="36"
-    android:versionName="3.6">
-    
-    <uses-sdk android:minSdkVersion="10" android:targetSdkVersion="19" />
+    android:installLocation="auto">
+
     <uses-permission
         android:name="android.permission.INTERNET" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <application
-        android:icon="@drawable/octodroid"
-        android:label="@string/app_name"
+        android:name="com.gh4a.Gh4Application"
         android:allowBackup="true"
-        android:name="com.gh4a.Gh4Application">
+        android:icon="@drawable/octodroid"
+        android:label="@string/app_name">
         <activity
             android:name=".activities.Github4AndroidActivity"
             android:configChanges="orientation|screenSize" >
@@ -134,8 +131,8 @@
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activities.UserActivity"
-            android:uiOptions="splitActionBarWhenNarrow"
-            android:configChanges="orientation|screenSize" />
+            android:configChanges="orientation|screenSize"
+            android:uiOptions="splitActionBarWhenNarrow" />
         <activity
             android:name=".activities.UserListActivity"
             android:configChanges="orientation|screenSize" />
@@ -157,17 +154,17 @@
                 <category
                     android:name="android.intent.category.BROWSABLE" />
                 <data
-                    android:scheme="https"
-                    android:host="github.com" />
+                    android:host="github.com"
+                    android:scheme="https" />
                 <data
-                    android:scheme="https"
-                    android:host="gist.github.com" />
+                    android:host="gist.github.com"
+                    android:scheme="https" />
                 <data
-                    android:scheme="http"
-                    android:host="github.com" />
+                    android:host="github.com"
+                    android:scheme="http" />
 				<data
-                    android:scheme="http"
-                    android:host="gist.github.com" />
+                    android:host="gist.github.com"
+                    android:scheme="http" />
             </intent-filter>
         </activity>
         <provider

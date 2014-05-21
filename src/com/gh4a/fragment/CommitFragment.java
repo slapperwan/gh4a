@@ -102,7 +102,7 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
         ImageView ivGravatar = (ImageView) mContentView.findViewById(R.id.iv_gravatar);
         GravatarHandler.assignGravatar(ivGravatar, mCommit.getAuthor());
 
-        String login = CommitUtils.getAuthorLogin(app, mCommit);
+        String login = CommitUtils.getAuthorLogin(mCommit);
         if (login != null) {
             ivGravatar.setOnClickListener(this);
             ivGravatar.setTag(login);

@@ -59,7 +59,6 @@ public interface Constants {
     }
 
     public interface Commit {
-        public static final String COMMIT = "Commit.COMMIT";
         public static final String DIFF = "Commit.DIFF";
     }
 
@@ -82,20 +81,9 @@ public interface Constants {
     }
 
     public interface Blog {
-        public static final String BLOG = "Blog";
         public static final String CONTENT = "Blog.content";
         public static final String TITLE = "Blog.title";
         public static final String LINK = "Blog.link";
-    }
-
-    public interface Bookmark {
-        public static final int ADD = 100;
-        public static final String NAME = "Bookmark.name";
-        public static final String OBJECT_TYPE = "Bookmark.objectType";
-        public static final String OBJECT_TYPE_USER = "User";
-        public static final String OBJECT_TYPE_REPO = "Repo";
-        public static final String OBJECT_TYPE_ISSUE = "Issue";
-        public static final String HIDE_ADD = "Bookmark.hideAdd";
     }
 
     public interface Milestone {

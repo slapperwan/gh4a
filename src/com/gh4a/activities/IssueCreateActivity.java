@@ -15,16 +15,6 @@
  */
 package com.gh4a.activities;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.service.IssueService;
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -58,6 +48,16 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
+
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.Milestone;
+import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.service.IssueService;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class IssueCreateActivity extends LoadingFragmentActivity implements OnClickListener {
     private String mRepoOwner;
@@ -234,21 +234,100 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
         return super.onOptionsItemSelected(item);
     }
 
-    public void showMilestonesDialog(View v) {
+    public void showMilestonesDialog() {
         if (mAllMilestone == null) {
             mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
             getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
         } else {
-            showMilestonesDialog();
+            final String[] milestones = new String[mAllMilestone.size() + 1];
+
+            milestones[0] = getResources().getString(R.string.issue_clear_milestone);
+
+            int checkedItem = 0;
+            if (mSelectedMilestone != null) {
+                checkedItem = mSelectedMilestone.getNumber();
+            }
+
+            for (int i = 1; i <= mAllMilestone.size(); i++) {
+                Milestone m = mAllMilestone.get(i - 1);
+                milestones[i] = m.getTitle();
+                if (m.getNumber() == checkedItem) {
+                    checkedItem = i;
+                }
+            }
+
+            AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
+            builder.setCancelable(true);
+            builder.setTitle(R.string.issue_milestone_hint);
+            builder.setSingleChoiceItems(milestones, checkedItem, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (which == 0) {
+                        mSelectedMilestone = null;
+                    } else {
+                        mSelectedMilestone = mAllMilestone.get(which - 1);
+                    }
+                }
+            });
+            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    if (mSelectedMilestone != null) {
+                        mTvSelectedMilestone.setText(getString(
+                                R.string.issue_milestone, mSelectedMilestone.getTitle()));
+                    } else {
+                        mTvSelectedMilestone.setText(null);
+                    }
+                }
+            });
+            builder.setNegativeButton(R.string.cancel, null);
+            builder.show();
         }
     }
 
-    public void showAssigneesDialog(View v) {
+    public void showAssigneesDialog() {
         if (mAllAssignee == null) {
             mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
             getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
         } else {
-            showAssigneesDialog();
+            final String[] assignees = new String[mAllAssignee.size() + 1];
+            assignees[0] = getResources().getString(R.string.issue_clear_assignee);
+
+            int checkedItem = 0;
+
+            for (int i = 1; i <= mAllAssignee.size(); i++) {
+                User u = mAllAssignee.get(i - 1);
+                assignees[i] = u.getLogin();
+                if (mSelectedAssignee != null
+                        && u.getLogin().equalsIgnoreCase(mSelectedAssignee.getLogin())) {
+                    checkedItem = i;
+                }
+            }
+
+            AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
+            builder.setCancelable(true);
+            builder.setTitle(R.string.issue_assignee_hint);
+            builder.setSingleChoiceItems(assignees, checkedItem, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (which == 0) {
+                        mSelectedAssignee = null;
+                    } else {
+                        mSelectedAssignee = mAllAssignee.get(which - 1);
+                    }
+                }
+            });
+            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    if (mSelectedAssignee != null) {
+                        mTvSelectedAssignee.setText(getString(
+                                R.string.issue_assignee, mSelectedAssignee.getLogin()));
+                    } else {
+                        mTvSelectedAssignee.setText(null);
+                    }
+                }
+            });
+            builder.setNegativeButton(R.string.cancel, null);
+            builder.show();
         }
     }
 
@@ -290,93 +369,6 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
             IntentUtils.openIssueActivity(IssueCreateActivity.this, mRepoOwner, mRepoName,
                     mEditIssue.getNumber(), Intent.FLAG_ACTIVITY_CLEAR_TOP);
         }
-    }
-
-    private void showMilestonesDialog() {
-        final String[] milestones = new String[mAllMilestone.size() + 1];
-
-        milestones[0] = getResources().getString(R.string.issue_clear_milestone);
-
-        int checkedItem = 0;
-        if (mSelectedMilestone != null) {
-            checkedItem = mSelectedMilestone.getNumber();
-        }
-
-        for (int i = 1; i <= mAllMilestone.size(); i++) {
-            Milestone m = mAllMilestone.get(i - 1);
-            milestones[i] = m.getTitle();
-            if (m.getNumber() == checkedItem) {
-                checkedItem = i;
-            }
-        }
-
-        AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
-        builder.setCancelable(true);
-        builder.setTitle(R.string.issue_milestone_hint);
-        builder.setSingleChoiceItems(milestones, checkedItem, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (which == 0) {
-                    mSelectedMilestone = null;
-                } else {
-                    mSelectedMilestone = mAllMilestone.get(which - 1);
-                }
-            }
-        });
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                if (mSelectedMilestone != null) {
-                    mTvSelectedMilestone.setText(getString(
-                            R.string.issue_milestone, mSelectedMilestone.getTitle()));
-                } else {
-                    mTvSelectedMilestone.setText(null);
-                }
-            }
-        });
-        builder.setNegativeButton(R.string.cancel, null);
-        builder.show();
-    }
-
-    private void showAssigneesDialog() {
-        final String[] assignees = new String[mAllAssignee.size() + 1];
-        assignees[0] = getResources().getString(R.string.issue_clear_assignee);
-
-        int checkedItem = 0;
-
-        for (int i = 1; i <= mAllAssignee.size(); i++) {
-            User u = mAllAssignee.get(i - 1);
-            assignees[i] = u.getLogin();
-            if (mSelectedAssignee != null
-                    && u.getLogin().equalsIgnoreCase(mSelectedAssignee.getLogin())) {
-                checkedItem = i;
-            }
-        }
-
-        AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
-        builder.setCancelable(true);
-        builder.setTitle(R.string.issue_assignee_hint);
-        builder.setSingleChoiceItems(assignees, checkedItem, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (which == 0) {
-                    mSelectedAssignee = null;
-                } else {
-                    mSelectedAssignee = mAllAssignee.get(which - 1);
-                }
-            }
-        });
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                if (mSelectedAssignee != null) {
-                    mTvSelectedAssignee.setText(getString(
-                            R.string.issue_assignee, mSelectedAssignee.getLogin()));
-                } else {
-                    mTvSelectedAssignee.setText(null);
-                }
-            }
-        });
-        builder.setNegativeButton(R.string.cancel, null);
-        builder.show();
     }
 
     public void fillLabels(List<Label> labels) {

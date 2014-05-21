@@ -15,15 +15,7 @@
  */
 package com.gh4a.activities;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.LabelService;
-
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -53,11 +45,17 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 
+import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.service.LabelService;
+
+import java.io.IOException;
+import java.util.List;
+
 public class IssueLabelListActivity extends LoadingFragmentActivity implements OnItemClickListener {
     private String mRepoOwner;
     private String mRepoName;
     private EditActionMode mActionMode;
-    private ProgressDialog mProgressDialog;
     private Label mAddedLabel;
     private boolean mShouldStartAdding;
 
@@ -69,7 +67,6 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
         @Override
         public void onResultReady(LoaderResult<List<Label>> result) {
             boolean success = !result.handleError(IssueLabelListActivity.this);
-            stopProgressDialog(mProgressDialog);
             UiUtils.hideImeForView(getCurrentFocus());
             if (success) {
                 mAdapter.clear();
