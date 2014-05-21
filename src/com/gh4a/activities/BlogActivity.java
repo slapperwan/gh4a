@@ -68,6 +68,7 @@ public class BlogActivity extends BaseSherlockFragmentActivity {
         startActivity(intent);
     }
 
+    @SuppressWarnings("deprecation")
     private void fillData() {
         WebView webView = (WebView) findViewById(R.id.web_view);
         WebSettings s = webView.getSettings();

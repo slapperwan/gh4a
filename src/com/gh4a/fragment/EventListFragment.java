@@ -15,8 +15,28 @@
  */
 package com.gh4a.fragment;
 
-import java.util.Arrays;
-import java.util.List;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+
+import com.gh4a.Constants;
+import com.gh4a.Gh4Application;
+import com.gh4a.R;
+import com.gh4a.activities.CompareActivity;
+import com.gh4a.activities.ReleaseInfoActivity;
+import com.gh4a.activities.WikiListActivity;
+import com.gh4a.adapter.FeedAdapter;
+import com.gh4a.adapter.RootAdapter;
+import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.ToastUtils;
+import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.Download;
@@ -42,28 +62,8 @@ import org.eclipse.egit.github.core.event.PushPayload;
 import org.eclipse.egit.github.core.event.ReleasePayload;
 import org.eclipse.egit.github.core.service.EventService;
 
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-
-import com.gh4a.Constants;
-import com.gh4a.Gh4Application;
-import com.gh4a.R;
-import com.gh4a.activities.CompareActivity;
-import com.gh4a.activities.ReleaseInfoActivity;
-import com.gh4a.activities.WikiListActivity;
-import com.gh4a.adapter.FeedAdapter;
-import com.gh4a.adapter.RootAdapter;
-import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.ToastUtils;
-import com.gh4a.utils.UiUtils;
+import java.util.Arrays;
+import java.util.List;
 
 public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
     private static final int MENU_USER = 1;
@@ -372,7 +372,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         }
     }
 
-    public boolean open(MenuItem item) {
+    public void open(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info =
                 (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
@@ -460,6 +460,5 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
                 startActivity(intent);
             }
         }
-        return true;
     }
 }

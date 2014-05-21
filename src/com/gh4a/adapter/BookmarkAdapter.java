@@ -15,8 +15,8 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
 public class BookmarkAdapter extends CursorAdapter {
-    private int mRepoIconResId;
-    private int mUserIconResId;
+    private final int mRepoIconResId;
+    private final int mUserIconResId;
 
     public BookmarkAdapter(Context context) {
         super(context, null, 0);

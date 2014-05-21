@@ -12,20 +12,4 @@ public class TwoFactorAuthException extends IOException {
 		this.twoFactorAuthType = twoFactorAuthType;
 	}
 
-	public IOException getE() {
-		return e;
-	}
-
-	public void setE(IOException e) {
-		this.e = e;
-	}
-
-	public String getTwoFactorAuthType() {
-		return twoFactorAuthType;
-	}
-
-	public void setTwoFactorAuthType(String twoFactorAuthType) {
-		this.twoFactorAuthType = twoFactorAuthType;
-	}
-	
 }

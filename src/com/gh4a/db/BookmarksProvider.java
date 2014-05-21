@@ -129,7 +129,6 @@ public class BookmarksProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        int count = 0;
         int match = sURIMatcher.match(uri);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
@@ -148,7 +147,7 @@ public class BookmarksProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Cannot delete the URI " + uri);
         }
 
-        count = db.delete(DbHelper.BOOKMARKS_TABLE, selection, selectionArgs);
+        int count = db.delete(DbHelper.BOOKMARKS_TABLE, selection, selectionArgs);
 
         if (count > 0) {
             getContext().getContentResolver().notifyChange(Columns.CONTENT_URI, null);

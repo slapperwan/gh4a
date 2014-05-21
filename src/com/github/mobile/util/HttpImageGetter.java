@@ -35,7 +35,6 @@ import com.gh4a.utils.UiUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -143,9 +142,9 @@ public class HttpImageGetter implements ImageGetter {
      * @param html
      * @return this image getter
      */
-    public HttpImageGetter encode(final Object id, final String html) {
+    public void encode(final Object id, final String html) {
         if (TextUtils.isEmpty(html))
-            return this;
+            return;
 
         CharSequence encoded = HtmlUtils.encode(html, loading);
         // Use default encoding if no img tags
@@ -155,7 +154,6 @@ public class HttpImageGetter implements ImageGetter {
             rawHtmlCache.remove(id);
             fullHtmlCache.put(id, encoded);
         }
-        return this;
     }
 
     /**
@@ -222,7 +220,7 @@ public class HttpImageGetter implements ImageGetter {
         }
     }
 
-    private InputStream fetch(String urlString) throws MalformedURLException, IOException {
+    private InputStream fetch(String urlString) throws IOException {
         URL url = new URL(urlString);
         return url.openStream();
     }

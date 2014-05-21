@@ -15,12 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.RepositoryContents;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
@@ -33,6 +27,12 @@ import com.gh4a.loader.ContentListLoader;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
 
+import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.RepositoryContents;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class ContentListFragment extends ListDataBaseFragment<RepositoryContents> {
     private Repository mRepository;
     public String mPath;
@@ -41,7 +41,7 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
 
     public interface ParentCallback {
         public void onContentsLoaded(ContentListFragment fragment, List<RepositoryContents> contents);
-        public void onTreeSelected(ContentListFragment fragment, RepositoryContents content, String ref);
+        public void onTreeSelected(RepositoryContents content, String ref);
     }
 
     public static ContentListFragment newInstance(Repository repository,
@@ -101,7 +101,7 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
 
     @Override
     protected void onItemClick(RepositoryContents content) {
-        mCallback.onTreeSelected(this, content, mRef);
+        mCallback.onTreeSelected(content, mRef);
     }
 
     @Override

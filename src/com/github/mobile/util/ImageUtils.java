@@ -15,19 +15,11 @@
  */
 package com.github.mobile.util;
 
-import static android.graphics.Bitmap.Config.ARGB_8888;
-import static android.graphics.Color.WHITE;
-import static android.graphics.PorterDuff.Mode.DST_IN;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.RectF;
 import android.util.Log;
-import android.widget.ImageView;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,16 +31,6 @@ import java.io.RandomAccessFile;
 public class ImageUtils {
 
     private static final String TAG = "ImageUtils";
-
-    /**
-     * Get a bitmap from the image path
-     *
-     * @param imagePath
-     * @return bitmap or null if read fails
-     */
-    public static Bitmap getBitmap(final String imagePath) {
-        return getBitmap(imagePath, 1);
-    }
 
     /**
      * Get a bitmap from the image path
@@ -141,71 +123,5 @@ public class ImageUtils {
      */
     public static Bitmap getBitmap(final File image, int width, int height) {
         return getBitmap(image.getAbsolutePath(), width, height);
-    }
-
-    /**
-     * Get a bitmap from the image file
-     *
-     * @param image
-     * @return bitmap or null if read fails
-     */
-    public static Bitmap getBitmap(final File image) {
-        return getBitmap(image.getAbsolutePath());
-    }
-
-    /**
-     * Load a {@link Bitmap} from the given path and set it on the given
-     * {@link ImageView}
-     *
-     * @param imagePath
-     * @param view
-     */
-    public static void setImage(final String imagePath, final ImageView view) {
-        setImage(new File(imagePath), view);
-    }
-
-    /**
-     * Load a {@link Bitmap} from the given {@link File} and set it on the given
-     * {@link ImageView}
-     *
-     * @param image
-     * @param view
-     */
-    public static void setImage(final File image, final ImageView view) {
-        Bitmap bitmap = getBitmap(image);
-        if (bitmap != null)
-            view.setImageBitmap(bitmap);
-    }
-
-    /**
-     * Round the corners of a {@link Bitmap}
-     *
-     * @param source
-     * @param radius
-     * @return rounded corner bitmap
-     */
-    public static Bitmap roundCorners(final Bitmap source, final float radius) {
-        int width = source.getWidth();
-        int height = source.getHeight();
-
-        Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        paint.setColor(WHITE);
-
-        Bitmap clipped = Bitmap.createBitmap(width, height, ARGB_8888);
-        Canvas canvas = new Canvas(clipped);
-        canvas.drawRoundRect(new RectF(0, 0, width, height), radius, radius,
-                paint);
-        paint.setXfermode(new PorterDuffXfermode(DST_IN));
-
-        Bitmap rounded = Bitmap.createBitmap(width, height, ARGB_8888);
-        canvas = new Canvas(rounded);
-        canvas.drawBitmap(source, 0, 0, null);
-        canvas.drawBitmap(clipped, 0, 0, paint);
-
-        source.recycle();
-        clipped.recycle();
-
-        return rounded;
     }
 }

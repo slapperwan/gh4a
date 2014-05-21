@@ -1,17 +1,16 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.service.RepositoryService;
-
 import android.content.Context;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+
+import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.service.RepositoryService;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Map;
 
 public class RepositoryListLoader extends BaseLoader<Collection<Repository>> {
     private String mLogin;
@@ -40,7 +39,7 @@ public class RepositoryListLoader extends BaseLoader<Collection<Repository>> {
             }
         } else if (Constants.User.TYPE_ORG.equals(mUserType)) {
             if (mSize > 0) {
-                return (List<Repository>) repoService.pageOrgRepositories(mLogin, mFilterData, mSize).next();
+                return repoService.pageOrgRepositories(mLogin, mFilterData, mSize).next();
             } else {
                 return repoService.getOrgRepositories(mLogin, mFilterData);
             }

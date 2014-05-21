@@ -15,11 +15,6 @@
  */
 package com.gh4a.activities;
 
-import java.util.List;
-
-import org.eclipse.egit.github.core.RepositoryContents;
-import org.eclipse.egit.github.core.util.EncodingUtils;
-
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Intent;
@@ -48,6 +43,11 @@ import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ThemeUtils;
+
+import org.eclipse.egit.github.core.RepositoryContents;
+import org.eclipse.egit.github.core.util.EncodingUtils;
+
+import java.util.List;
 
 public class FileViewerActivity extends LoadingFragmentActivity {
     protected String mRepoOwner;
@@ -126,6 +126,7 @@ public class FileViewerActivity extends LoadingFragmentActivity {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @SuppressLint("SetJavaScriptEnabled")
     private void setupWebView() {
         mWebView = (WebView) findViewById(R.id.web_view);
@@ -277,6 +278,7 @@ public class FileViewerActivity extends LoadingFragmentActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @SuppressWarnings("deprecation")
     @TargetApi(11)
     private void doSearch() {
         if (mWebView != null) {

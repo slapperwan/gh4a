@@ -1,5 +1,9 @@
 package com.gh4a.utils;
 
+import android.util.Log;
+
+import com.gh4a.Constants;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -9,10 +13,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
-import android.util.Log;
-
-import com.gh4a.Constants;
 
 public class FileUtils {
 
@@ -30,7 +30,7 @@ public class FileUtils {
         OutputStream out = null;
         try {
             out = new FileOutputStream(file);
-            int read = 0;
+            int read;
             byte[] bytes = new byte[1024];
 
             while ((read = inputStream.read(bytes)) != -1) {

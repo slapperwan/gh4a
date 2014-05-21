@@ -89,10 +89,6 @@ public class LoadingFragmentActivity extends BaseSherlockFragmentActivity {
         setContentShown(shown, true);
     }
 
-    public void setContentShownNoAnimation(boolean shown) {
-        setContentShown(shown, false);
-    }
-
     private void setContentShown(boolean shown, boolean animate) {
         ensureContent();
         if (mContentShown == shown) {
