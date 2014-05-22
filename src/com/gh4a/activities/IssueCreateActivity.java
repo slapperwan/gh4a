@@ -368,6 +368,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
                     isInEditMode() ? R.string.issue_success_edit : R.string.issue_success_create);
             IntentUtils.openIssueActivity(IssueCreateActivity.this, mRepoOwner, mRepoName,
                     mEditIssue.getNumber(), Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            finish();
         }
     }
 
