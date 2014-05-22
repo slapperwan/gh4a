@@ -287,7 +287,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
     }
 
     @Override
-    public void onTreeSelected(ContentListFragment fragment, RepositoryContents content, String ref) {
+    public void onTreeSelected(RepositoryContents content, String ref) {
         String path = content.getPath();
         if (RepositoryContents.TYPE_DIR.equals(content.getType())) {
             mSelectedRef = ref;

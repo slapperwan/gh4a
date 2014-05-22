@@ -15,13 +15,6 @@
  */
 package com.gh4a.activities;
 
-import java.io.IOException;
-import java.util.Calendar;
-
-import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.MilestoneService;
-
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -31,7 +24,6 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.Loader;
 import android.text.format.DateFormat;
-import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 
@@ -51,6 +43,13 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
+
+import org.eclipse.egit.github.core.Milestone;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.service.MilestoneService;
+
+import java.io.IOException;
+import java.util.Calendar;
 
 public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
     private String mRepoOwner;
@@ -173,7 +172,7 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
         }
     }
 
-    public void showDatePickerDialog(View v) {
+    public void showDatePickerDialog() {
         DialogFragment newFragment = new DatePickerFragment();
         newFragment.show(getSupportFragmentManager(), "datePicker");
     }

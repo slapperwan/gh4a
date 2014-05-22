@@ -15,20 +15,12 @@
  */
 package com.gh4a.activities;
 
-import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
-
-import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.service.MilestoneService;
-
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.text.format.DateFormat;
-import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 
@@ -43,6 +35,13 @@ import com.gh4a.R;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
+
+import org.eclipse.egit.github.core.Milestone;
+import org.eclipse.egit.github.core.service.MilestoneService;
+
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 
 public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
 
@@ -115,7 +114,7 @@ public class IssueMilestoneCreateActivity extends BaseSherlockFragmentActivity {
         }
     }
 
-    public void showDatePickerDialog(View v) {
+    public void showDatePickerDialog() {
         DialogFragment newFragment = new DatePickerFragment();
         newFragment.show(getSupportFragmentManager(), "datePicker");
     }

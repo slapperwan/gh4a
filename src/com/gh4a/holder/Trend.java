@@ -37,9 +37,7 @@ public class Trend {
     public void setRepo(String repo) {
         this.repo = repo;
     }
-    public String getLink() {
-        return link;
-    }
+
     public void setLink(String link) {
         this.link = link;
     }
