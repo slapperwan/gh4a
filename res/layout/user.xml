@@ -7,11 +7,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="@dimen/content_padding">
+        android:paddingBottom="@dimen/content_padding"
+        android:paddingTop="@dimen/content_padding">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/content_padding"
+            android:paddingRight="@dimen/content_padding">
 
             <com.gh4a.widget.FixedSizeImageView
                 android:id="@+id/iv_gravatar"
@@ -76,7 +79,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/overview_item_spacing">
+            android:layout_marginTop="@dimen/overview_item_spacing"
+            android:paddingLeft="@dimen/content_padding"
+            android:paddingRight="@dimen/content_padding">
 
             <LinearLayout
                 android:id="@+id/cell_org_members"
@@ -218,26 +223,35 @@
             </LinearLayout>
         </LinearLayout>
         <!-- Repository section -->
-        <TextView
-            android:id="@+id/tv_pub_repos_label"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/overview_item_spacing"
-            android:text="@string/user_pub_repos"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/highlight" />
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/content_padding"
+            android:paddingRight="@dimen/content_padding">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="@dimen/overview_header_spacing"
-            android:background="@color/highlight" />
+            <TextView
+                android:id="@+id/tv_pub_repos_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/overview_item_spacing"
+                android:text="@string/user_pub_repos"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/highlight" />
 
-        <ProgressBar
-            android:id="@+id/pb_top_repos"
-            style="@style/LoadingProgress"
-            android:layout_width="20dp"
-            android:layout_height="20dp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="@dimen/overview_header_spacing"
+                android:background="@color/highlight" />
+
+            <ProgressBar
+                android:id="@+id/pb_top_repos"
+                style="@style/LoadingProgress"
+                android:layout_width="20dp"
+                android:layout_height="20dp" />
+        </LinearLayout>
+
 
         <LinearLayout
             android:id="@+id/ll_top_repos"
@@ -248,8 +262,10 @@
 
         <Button
             android:id="@+id/btn_repos"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/content_padding"
+            android:layout_marginRight="@dimen/content_padding"
             android:text="@string/view_more"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:visibility="gone" />
@@ -260,7 +276,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/overview_item_spacing"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:paddingLeft="@dimen/content_padding"
+            android:paddingRight="@dimen/content_padding">
 
             <TextView
                 android:id="@+id/tv_orgs"
@@ -275,12 +292,12 @@
                 android:layout_height="1dp"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
                 android:background="@color/highlight" />
-
-            <LinearLayout
-                android:id="@+id/ll_org"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" />
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_org"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
     </LinearLayout>
 </ScrollView>

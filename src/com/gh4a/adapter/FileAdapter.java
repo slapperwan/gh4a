@@ -22,9 +22,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.FileUtils;
+import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.RepositoryContents;
 
@@ -56,13 +56,16 @@ public class FileAdapter extends RootAdapter<RepositoryContents> {
     }
 
     private int getIconId(String type, String ext) {
-        int theme = Gh4Application.THEME;
+        int iconId;
         if (RepositoryContents.TYPE_DIR.equals(type)) {
-            return theme == R.style.DefaultTheme ? R.drawable.folder_dark : R.drawable.folder;
+            iconId = R.attr.dirIcon;
         } else if (RepositoryContents.TYPE_FILE.equals(type) && isImageExt(ext)) {
-            return theme == R.style.DefaultTheme ? R.drawable.content_picture_dark : R.drawable.content_picture;
+            iconId = R.attr.contentPictureIcon;
+        } else {
+            iconId = R.attr.fileIcon;
         }
-        return theme == R.style.DefaultTheme ? R.drawable.file_dark : R.drawable.file;
+
+        return UiUtils.resolveDrawable(mContext, iconId);
     }
 
     private boolean isImageExt(String ext) {

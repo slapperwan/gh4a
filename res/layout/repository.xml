@@ -8,11 +8,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="@dimen/content_padding">
+        android:paddingBottom="@dimen/content_padding"
+        android:paddingTop="@dimen/content_padding">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/content_padding"
+            android:paddingRight="@dimen/content_padding">
 
             <TextView
                 android:id="@+id/tv_login"
@@ -78,7 +81,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/overview_item_spacing"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingLeft="@dimen/content_padding"
+            android:paddingRight="@dimen/content_padding">
 
             <LinearLayout
                 android:id="@+id/cell_issues"
@@ -197,53 +202,63 @@
             </LinearLayout>
         </LinearLayout>
         <!-- README section -->
-        <TextView
-            android:id="@+id/readme_title"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/overview_item_spacing"
-            android:text="@string/readme"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/highlight" />
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/content_padding"
+            android:paddingRight="@dimen/content_padding">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="@dimen/overview_header_spacing"
-            android:background="@color/highlight" />
+            <TextView
+                android:id="@+id/readme_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/overview_item_spacing"
+                android:text="@string/readme"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/highlight" />
 
-        <ProgressBar
-            android:id="@+id/pb_readme"
-            style="@style/LoadingProgress"
-            android:layout_width="20dp"
-            android:layout_height="20dp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="@dimen/overview_header_spacing"
+                android:background="@color/highlight" />
 
-        <TextView
-            android:id="@+id/readme"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone" />
-        <!-- Other info section -->
-        <TextView
-            android:id="@+id/other_info"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/overview_item_spacing"
-            android:text="@string/other_info"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/highlight" />
+            <ProgressBar
+                android:id="@+id/pb_readme"
+                style="@style/LoadingProgress"
+                android:layout_width="20dp"
+                android:layout_height="20dp" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="@dimen/overview_header_spacing"
-            android:background="@color/highlight" />
+            <TextView
+                android:id="@+id/readme"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+            <!-- Other info section -->
+            <TextView
+                android:id="@+id/other_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/overview_item_spacing"
+                android:text="@string/other_info"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/highlight" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="@dimen/overview_header_spacing"
+                android:background="@color/highlight" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tv_contributors_label"
             style="@style/SelectableLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/content_padding"
+            android:paddingRight="@dimen/content_padding"
             android:text="@string/repo_contributors" />
 
         <TextView
@@ -251,6 +266,8 @@
             style="@style/SelectableLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/content_padding"
+            android:paddingRight="@dimen/content_padding"
             android:text="@string/repo_collaborators" />
 
         <TextView
@@ -258,6 +275,8 @@
             style="@style/SelectableLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/content_padding"
+            android:paddingRight="@dimen/content_padding"
             android:text="@string/recent_wiki" />
 
         <TextView
@@ -265,6 +284,8 @@
             style="@style/SelectableLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/content_padding"
+            android:paddingRight="@dimen/content_padding"
             android:text="@string/releases" />
 
         <TextView
@@ -272,6 +293,8 @@
             style="@style/SelectableLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/content_padding"
+            android:paddingRight="@dimen/content_padding"
             android:text="@string/downloads" />
     </LinearLayout>
 </ScrollView>

@@ -15,12 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.User;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
@@ -34,6 +28,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.devspark.progressfragment.SherlockProgressFragment;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -51,6 +46,14 @@ import com.gh4a.utils.GravatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
+
+import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.User;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class UserFragment extends SherlockProgressFragment implements View.OnClickListener {
     private String mUserLogin;
@@ -294,10 +297,12 @@ public class UserFragment extends SherlockProgressFragment implements View.OnCli
                 rowView.setTag(repo);
 
                 TextView tvTitle = (TextView) rowView.findViewById(R.id.tv_title);
+                applyHorizontalContentPadding(tvTitle);
                 tvTitle.setTypeface(app.boldCondensed);
                 tvTitle.setText(repo.getOwner().getLogin() + "/" + repo.getName());
 
                 TextView tvDesc = (TextView) rowView.findViewById(R.id.tv_desc);
+                applyHorizontalContentPadding(tvDesc);
                 tvDesc.setSingleLine(true);
                 if (!StringUtils.isBlank(repo.getDescription())) {
                     tvDesc.setVisibility(View.VISIBLE);
@@ -307,6 +312,7 @@ public class UserFragment extends SherlockProgressFragment implements View.OnCli
                 }
 
                 TextView tvExtra = (TextView) rowView.findViewById(R.id.tv_extra);
+                applyHorizontalContentPadding(tvExtra);
                 String language = repo.getLanguage() != null
                         ? repo.getLanguage() : getString(R.string.unknown);
                 tvExtra.setText(getString(R.string.repo_search_extradata, language,
@@ -346,6 +352,8 @@ public class UserFragment extends SherlockProgressFragment implements View.OnCli
             rowView.setTag(org);
 
             TextView tvTitle = (TextView) rowView.findViewById(R.id.tv_title);
+            tvTitle.setPadding((int) getResources().getDimension(R.dimen.content_padding), tvTitle.getPaddingTop(),
+                    (int) getResources().getDimension(R.dimen.content_padding), tvTitle.getPaddingBottom());
             tvTitle.setTypeface(app.boldCondensed);
             tvTitle.setText(org.getLogin());
 
@@ -361,5 +369,10 @@ public class UserFragment extends SherlockProgressFragment implements View.OnCli
         }
         TextView tvFollowersCount = (TextView) mContentView.findViewById(R.id.tv_followers_count);
         tvFollowersCount.setText(String.valueOf(mUser.getFollowers()));
+    }
+
+    private void applyHorizontalContentPadding(View v){
+        v.setPadding((int) v.getResources().getDimension(R.dimen.content_padding), 0,
+                (int) v.getResources().getDimension(R.dimen.content_padding), 0);
     }
 }

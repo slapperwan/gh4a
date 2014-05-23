@@ -426,14 +426,27 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
 
     private void showBranchesDialog() {
         String[] branchList = new String[mBranches.size()];
+        int current = -1;
+        int master = -1;
         for (int i = 0; i < mBranches.size(); i++) {
             branchList[i] = mBranches.get(i).getName();
+            if (mBranches.get(i).getCommit().getSha().equals(mSelectedRef)) {
+                current = i;
+            }
+            if(mBranches.get(i).getName().equals(mRepository.getMasterBranch())){
+                master = i;
+            }
+        }
+
+        // if mSelectedRef is not set yet, use master branch
+        if (mSelectedRef == null && current == -1) {
+            current = master;
         }
 
         AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
         builder.setCancelable(true);
         builder.setTitle(R.string.repo_branches);
-        builder.setSingleChoiceItems(branchList, -1, new DialogInterface.OnClickListener() {
+        builder.setSingleChoiceItems(branchList, current, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 mSelectedRef = mBranches.get(which).getCommit().getSha();
@@ -451,14 +464,18 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
 
     private void showTagsDialog() {
         String[] tagList = new String[mTags.size()];
+        int current = -1;
         for (int i = 0; i < mTags.size(); i++) {
             tagList[i] = mTags.get(i).getName();
+            if (mTags.get(i).getCommit().getSha().equals(mSelectedRef)) {
+                current = i;
+            }
         }
 
         AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
         builder.setCancelable(true);
         builder.setTitle(R.string.repo_tags);
-        builder.setSingleChoiceItems(tagList, -1, new DialogInterface.OnClickListener() {
+        builder.setSingleChoiceItems(tagList, current, new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {

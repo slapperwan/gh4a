@@ -23,6 +23,8 @@
         <item name="searchRepoIcon">@drawable/search_repos_dark</item>
         <item name="searchUserMenuIcon">@drawable/search_users_dark</item>
         <item name="searchRepoMenuIcon">@drawable/search_repos_dark</item>
+        <item name="dirIcon">@drawable/folder_dark</item>
+        <item name="fileIcon">@drawable/file_dark</item>
     </style>
 
     <style name="LightTheme" parent="Theme.Sherlock.Light">
@@ -48,6 +50,8 @@
         <item name="searchRepoIcon">@drawable/search_repos</item>
         <item name="searchUserMenuIcon">@drawable/search_users</item>
         <item name="searchRepoMenuIcon">@drawable/search_repos</item>
+        <item name="dirIcon">@drawable/folder</item>
+        <item name="fileIcon">@drawable/file</item>
     </style>
 
     <style name="LightDarkTheme" parent="Theme.Sherlock.Light.DarkActionBar">
@@ -73,6 +77,8 @@
         <item name="searchRepoIcon">@drawable/search_repos</item>
         <item name="searchUserMenuIcon">@drawable/search_users_dark</item>
         <item name="searchRepoMenuIcon">@drawable/search_repos_dark</item>
+        <item name="dirIcon">@drawable/folder_dark</item>
+        <item name="fileIcon">@drawable/file_dark</item>
     </style>
 
 </resources>

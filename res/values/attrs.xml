@@ -39,4 +39,7 @@
     <attr name="searchRepoIcon" format="reference" />
     <attr name="searchUserMenuIcon" format="reference" />
     <attr name="searchRepoMenuIcon" format="reference" />
+    <attr name="dirIcon" format="reference" />
+    <attr name="fileIcon" format="reference" />
+
 </resources>
