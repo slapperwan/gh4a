@@ -15,8 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import org.eclipse.egit.github.core.Repository;
-
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
@@ -49,6 +47,8 @@ import com.gh4a.utils.UiUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
+import org.eclipse.egit.github.core.Repository;
+
 public class RepositoryFragment extends SherlockProgressFragment implements OnClickListener {
     private Repository mRepository;
     private View mContentView;
@@ -78,10 +78,7 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
         @Override
         public void onResultReady(LoaderResult<Integer> result) {
             View v = getView();
-            TextView tvPullRequestsView = (TextView) v.findViewById(R.id.tv_pull_requests_label);
             TextView tvPullRequestsCountView = (TextView) v.findViewById(R.id.tv_pull_requests_count);
-
-            tvPullRequestsView.setText(R.string.pull_requests);
             tvPullRequestsCountView.setText(String.valueOf(result.getData()));
         }
     };

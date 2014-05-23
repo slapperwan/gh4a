@@ -172,7 +172,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_gravity="bottom"
                 android:background="?attr/selectableItemBackground"
                 android:orientation="vertical">
 
@@ -186,15 +185,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="@string/pull"
                         android:textAppearance="?android:attr/textAppearanceLarge" />
 
                     <TextView
                         android:id="@+id/tv_pull_requests_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/requests"
-                        android:textSize="12sp" />
+                        android:text="@string/pulls"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

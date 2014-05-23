@@ -79,8 +79,7 @@
     <string name="bookmark_repo">Bookmark repo</string>
     <string name="ellipse" translatable="false">\u2026</string>
     <string name="view_more">View more</string>
-    <string name="pull">Pull</string>
-    <string name="requests">Requests</string>
+    <string name="pulls">Pulls</string>
     <string name="issue_milestone_hint">Milestone</string>
     <string name="issue_assignee_hint">Assignee</string>
     <string name="link_not_openable">Link could not be opened</string>
