@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 import com.gh4a.holder.Feed;
+import com.gh4a.utils.StringUtils;
 
 public class FeedHandler extends DefaultHandler {
 
@@ -85,6 +86,9 @@ public class FeedHandler extends DefaultHandler {
                 catch (ParseException e) {
                 }
             } else if (localName.equalsIgnoreCase("entry")) {
+                if (StringUtils.isBlank(mFeed.getTitle())) {
+                    mFeed.setTitle(getTitleFromUrl(mFeed.getLink()));
+                }
                 mFeeds.add(mFeed);
                 mFeed = null;
             }
@@ -110,5 +114,9 @@ public class FeedHandler extends DefaultHandler {
             }
         }
         return null;
+    }
+
+    private String getTitleFromUrl(String wikiUrl) {
+        return wikiUrl != null ? wikiUrl.substring(wikiUrl.lastIndexOf("/") + 1, wikiUrl.length()).replaceAll("-", " ") : null;
     }
 }

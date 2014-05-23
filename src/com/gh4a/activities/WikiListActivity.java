@@ -103,10 +103,7 @@ public class WikiListActivity extends LoadingFragmentActivity {
     private void fillData(List<Feed> result) {
         if (result != null) {
             CommonFeedAdapter adapter = (CommonFeedAdapter) mListView.getAdapter();
-            for (Feed feed : result) {
-                feed.setTitle(getTitleFromUrl(feed.getLink()));
-                adapter.add(feed);
-            }
+            adapter.addAll(result);
             adapter.notifyDataSetChanged();
 
             String initialPage = getIntent().getStringExtra(Constants.Object.OBJECT_SHA);
@@ -121,13 +118,9 @@ public class WikiListActivity extends LoadingFragmentActivity {
         }
     }
     
-    private String getTitleFromUrl(String wikiUrl) {
-        return wikiUrl != null ? wikiUrl.substring(wikiUrl.lastIndexOf("/") + 1, wikiUrl.length()).replaceAll("-", " ") : null;
-    }
-    
     private void openViewer(Feed feed) {
         Intent intent = new Intent(this, WikiActivity.class);
-        intent.putExtra(Constants.Blog.TITLE, getTitleFromUrl(feed.getLink()));
+        intent.putExtra(Constants.Blog.TITLE, feed.getTitle());
         intent.putExtra(Constants.Blog.CONTENT, feed.getContent());
         intent.putExtra(Constants.Repository.OWNER, mUserLogin);
         intent.putExtra(Constants.Repository.NAME, mRepoName);
