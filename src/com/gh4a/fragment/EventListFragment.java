@@ -47,6 +47,7 @@ import org.eclipse.egit.github.core.Release;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.event.CommitCommentPayload;
+import org.eclipse.egit.github.core.event.CreatePayload;
 import org.eclipse.egit.github.core.event.DownloadPayload;
 import org.eclipse.egit.github.core.event.Event;
 import org.eclipse.egit.github.core.event.EventRepository;
@@ -157,7 +158,12 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
                     payload.getComment().getCommitId(), 0);
 
         } else if (Event.TYPE_CREATE.equals(eventType)) {
-            IntentUtils.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
+            CreatePayload payload = (CreatePayload) event.getPayload();
+            String ref = null;
+            if ("branch".equals(payload.getRefType()) || "tag".equals(payload.getRefType())) {
+                ref = payload.getRef();
+            }
+            IntentUtils.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, ref, 0);
 
         } else if (Event.TYPE_DELETE.equals(eventType)) {
             IntentUtils.openRepositoryInfoActivity(getActivity(), repoOwner, repoName, null, 0);
