@@ -71,6 +71,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
     private String mRepoName;
     private int mIssueNumber;
     private String mIssueState;
+    private LinearLayout mHeader;
     private CommentAdapter mCommentAdapter;
     private boolean mIsCollaborator;
 
@@ -148,7 +149,24 @@ public class IssueActivity extends LoadingFragmentActivity implements
             findViewById(R.id.divider).setVisibility(View.GONE);
         }
 
+        ListView listView = (ListView) findViewById(R.id.list_view);
+
+        mHeader = (LinearLayout) getLayoutInflater().inflate(R.layout.issue_header, listView, false);
+        mHeader.setClickable(false);
+
+        UiUtils.assignTypeface(mHeader, Gh4Application.get(this).boldCondensed, new int[] {
+                R.id.comment_title, R.id.tv_title, R.id.desc_title
+        });
+
+        listView.addHeaderView(mHeader, null, false);
+
         mCommentAdapter = new CommentAdapter(this, mRepoOwner, this);
+        listView.setAdapter(mCommentAdapter);
+
+        if (!Gh4Application.get(this).isAuthorized()) {
+            findViewById(R.id.comment).setVisibility(View.GONE);
+            findViewById(R.id.divider).setVisibility(View.GONE);
+        }
 
         getSupportLoaderManager().initLoader(0, null, mIssueCallback);
         getSupportLoaderManager().initLoader(1, null, mCollaboratorCallback);
@@ -157,36 +175,18 @@ public class IssueActivity extends LoadingFragmentActivity implements
 
     private void fillData() {
         // set details inside listview header
-        LayoutInflater inflater = getLayoutInflater();
-        ListView listView = (ListView) findViewById(R.id.list_view);
-
-        LinearLayout header = (LinearLayout) inflater.inflate(R.layout.issue_header, listView, false);
-        header.setClickable(false);
-
-        UiUtils.assignTypeface(header, Gh4Application.get(this).boldCondensed, new int[] {
-            R.id.comment_title, R.id.tv_title, R.id.desc_title
-        });
-
-        listView.addHeaderView(header, null, false);
-        listView.setAdapter(mCommentAdapter);
-
-        if (!Gh4Application.get(this).isAuthorized()) {
-            findViewById(R.id.comment).setVisibility(View.GONE);
-            findViewById(R.id.divider).setVisibility(View.GONE);
-        }
-
-        TextView tvCommentTitle = (TextView) header.findViewById(R.id.comment_title);
+        TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
         tvCommentTitle.setText(getString(R.string.issue_comments) + " (" + mIssue.getComments() + ")");
 
-        ImageView ivGravatar = (ImageView) header.findViewById(R.id.iv_gravatar);
+        ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
         GravatarHandler.assignGravatar(ivGravatar, mIssue.getUser());
         ivGravatar.setOnClickListener(this);
 
-        TextView tvExtra = (TextView) header.findViewById(R.id.tv_extra);
+        TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
         tvExtra.setText(mIssue.getUser().getLogin() + "\n"
                 + StringUtils.formatRelativeTime(this, mIssue.getCreatedAt(), true));
 
-        TextView tvState = (TextView) header.findViewById(R.id.tv_state);
+        TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
         if (Constants.Issue.STATE_CLOSED.equals(mIssue.getState())) {
             tvState.setBackgroundResource(R.drawable.default_red_box);
             tvState.setText(getString(R.string.closed).toUpperCase(Locale.getDefault()));
@@ -195,10 +195,10 @@ public class IssueActivity extends LoadingFragmentActivity implements
             tvState.setText(getString(R.string.open).toUpperCase(Locale.getDefault()));
         }
 
-        TextView tvTitle = (TextView) header.findViewById(R.id.tv_title);
+        TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
         tvTitle.setText(mIssue.getTitle());
 
-        TextView tvDesc = (TextView) header.findViewById(R.id.tv_desc);
+        TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
         String body = mIssue.getBodyHtml();
         if (!StringUtils.isBlank(body)) {
             HttpImageGetter imageGetter = new HttpImageGetter(this);
@@ -210,7 +210,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
         findViewById(R.id.iv_comment).setOnClickListener(this);
 
         boolean showInfoBox = false;
-        TextView tvMilestone = (TextView) header.findViewById(R.id.tv_milestone);
+        TextView tvMilestone = (TextView) mHeader.findViewById(R.id.tv_milestone);
         if (mIssue.getMilestone() != null) {
             showInfoBox = true;
             tvMilestone.setText(getString(R.string.issue_milestone, mIssue.getMilestone().getTitle()));
@@ -220,12 +220,12 @@ public class IssueActivity extends LoadingFragmentActivity implements
 
         if (mIssue.getAssignee() != null) {
             showInfoBox = true;
-            TextView tvAssignee = (TextView) header.findViewById(R.id.tv_assignee);
+            TextView tvAssignee = (TextView) mHeader.findViewById(R.id.tv_assignee);
             tvAssignee.setText(getString(R.string.issue_assignee, mIssue.getAssignee().getLogin()));
             tvAssignee.setVisibility(View.VISIBLE);
             tvAssignee.setOnClickListener(this);
 
-            ImageView ivAssignee = (ImageView) header.findViewById(R.id.iv_assignee);
+            ImageView ivAssignee = (ImageView) mHeader.findViewById(R.id.iv_assignee);
             GravatarHandler.assignGravatar(ivAssignee, mIssue.getAssignee());
             ivAssignee.setVisibility(View.VISIBLE);
             ivAssignee.setOnClickListener(this);
@@ -237,8 +237,11 @@ public class IssueActivity extends LoadingFragmentActivity implements
 
         if (labels != null && !labels.isEmpty()) {
             showInfoBox = true;
+            llLabels.removeAllViews();
+            llLabels.setVisibility(View.VISIBLE);
+
             for (Label label : labels) {
-                TextView tvLabel = (TextView) inflater.inflate(R.layout.issue_label, null);
+                TextView tvLabel = (TextView) getLayoutInflater().inflate(R.layout.issue_label, null);
                 int color = Color.parseColor("#" + label.getColor());
 
                 tvLabel.setText(label.getName());
@@ -254,16 +257,17 @@ public class IssueActivity extends LoadingFragmentActivity implements
             llLabels.setVisibility(View.GONE);
         }
 
-        TextView tvPull = (TextView) header.findViewById(R.id.tv_pull);
+        TextView tvPull = (TextView) mHeader.findViewById(R.id.tv_pull);
         if (mIssue.getPullRequest() != null && mIssue.getPullRequest().getDiffUrl() != null) {
             showInfoBox = true;
             tvPull.setVisibility(View.VISIBLE);
             tvPull.setOnClickListener(this);
+        } else {
+            tvPull.setVisibility(View.GONE);
         }
 
-        if (!showInfoBox) {
-            header.findViewById(R.id.info_box).setVisibility(View.GONE);
-        }
+        View infoBox = mHeader.findViewById(R.id.info_box);
+        infoBox.setVisibility(showInfoBox ? View.VISIBLE : View.GONE);
     }
 
     protected void fillComments(List<Comment> comments) {
@@ -341,7 +345,6 @@ public class IssueActivity extends LoadingFragmentActivity implements
                 return true;
             case R.id.refresh:
                 setContentShown(false);
-                setContentView(R.layout.issue);
                 getSupportLoaderManager().restartLoader(0, null, mIssueCallback);
                 getSupportLoaderManager().restartLoader(1, null, mCollaboratorCallback);
                 getSupportLoaderManager().restartLoader(2, null, mCommentCallback);
