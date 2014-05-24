@@ -67,7 +67,7 @@ Main features
 
 How to Build GH4A
 =================
-- Ensure Android SDK platform version 19 and build-tools version 19.0.3 are installed
+- Ensure Android SDK platform version 19 and build-tools version 19.1.0 are installed
 - Build using Gradle
 
 ```bash
@@ -91,6 +91,7 @@ Open Source Libraries
 
 Contributions
 =============
+* [kageiit](https://github.com/kageiit) For improvements and bug fixes.
 * [maniac103](https://github.com/maniac103) For code improvements, bug fixes and new features
 * [ARoiD](https://github.com/ARoiD) For testing
 * [extremis (Steven Mautone)](https://github.com/extremis)  He gave the OctoDroid name and the new icon.  Thanks a lot.
