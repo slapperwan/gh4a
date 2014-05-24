@@ -5,7 +5,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.Tab;
@@ -47,6 +46,9 @@ public abstract class LoadingFragmentPagerActivity extends LoadingFragmentActivi
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(mAdapter);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+        // We never have many pages, make sure to keep them all alive
+        pager.setOffscreenPageLimit(titleResIds.length - 1);
 
         pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -90,13 +92,6 @@ public abstract class LoadingFragmentPagerActivity extends LoadingFragmentActivi
         @Override
         public Fragment getItem(int position) {
             return getFragment(position);
-        }
-
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            if (fragmentNeedsRefresh((Fragment) object)) {
-                super.destroyItem(container, position, object);
-            }
         }
 
         @Override
