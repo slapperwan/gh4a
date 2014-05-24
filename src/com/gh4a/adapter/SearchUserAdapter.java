@@ -15,8 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import org.eclipse.egit.github.core.SearchUser;
-
 import android.content.Context;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
@@ -32,6 +30,8 @@ import com.gh4a.utils.GravatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
+import org.eclipse.egit.github.core.SearchUser;
+
 public class SearchUserAdapter extends RootAdapter<SearchUser> implements OnClickListener {
     public SearchUserAdapter(Context context) {
         super(context);
@@ -40,14 +40,12 @@ public class SearchUserAdapter extends RootAdapter<SearchUser> implements OnClic
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_gravatar_1, parent, false);
-        ViewHolder viewHolder;
-        new ViewHolder();
 
         Gh4Application app = Gh4Application.get(mContext);
         Typeface boldCondensed = app.boldCondensed;
         Typeface italic = app.italic;
 
-        viewHolder = new ViewHolder();
+        ViewHolder viewHolder = new ViewHolder();
         viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
         viewHolder.ivGravatar.setOnClickListener(this);
 

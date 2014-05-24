@@ -15,15 +15,6 @@
  */
 package com.gh4a.activities;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.User;
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -54,6 +45,15 @@ import com.gh4a.loader.MilestoneListLoader;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 
+import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.Milestone;
+import org.eclipse.egit.github.core.User;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class IssueListActivity extends LoadingFragmentPagerActivity {
     private String mRepoOwner;
     private String mRepoName;
@@ -70,7 +70,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
     private List<User> mAssignees;
 
     private static final int[] TITLES = new int[]{
-            R.string.issues_submitted, R.string.issues_updated, R.string.issues_comments
+        R.string.issues_submitted, R.string.issues_updated, R.string.issues_comments
     };
 
     private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
@@ -88,7 +88,6 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
             mLabels = result.getData();
             showLabelsDialog();
             getSupportLoaderManager().destroyLoader(0);
-
         }
     };
 
@@ -101,7 +100,6 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         @Override
         public void onResultReady(LoaderResult<List<Milestone>> result) {
             if (checkForError(result)) {
-
                 return;
             }
             stopProgressDialog(mProgressDialog);
@@ -121,14 +119,12 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         @Override
         public void onResultReady(LoaderResult<List<User>> result) {
             if (checkForError(result)) {
-
                 return;
             }
             stopProgressDialog(mProgressDialog);
             mAssignees = result.getData();
             showAssigneesDialog();
             getSupportLoaderManager().destroyLoader(2);
-
         }
     };
 
@@ -145,7 +141,6 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
             }
             mIsCollaborator = result.getData();
             invalidateOptionsMenu();
-
         }
     };
 
