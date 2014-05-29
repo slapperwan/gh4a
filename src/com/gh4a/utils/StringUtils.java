@@ -18,7 +18,6 @@ package com.gh4a.utils;
 import android.content.Context;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
-import android.util.Pair;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -130,41 +129,42 @@ public class StringUtils {
         return userLogin + (!StringUtils.isBlank(name) ? " - " + name : "");
     }
 
-    public static Pair<String,Boolean> highlightSyntax(String data, boolean highlight, String fileName,
+    public static String highlightSyntax(String data, boolean highlight, String fileName,
             String repoOwner, String repoName, String ref) {
         String ext = FileUtils.getFileExtension(fileName);
-        boolean highlighted = false;
-        boolean themed = false;
+        String cssTheme = ThemeUtils.getCssTheme(Gh4Application.THEME);
 
         StringBuilder content = new StringBuilder();
         content.append("<html><head><title></title>");
         if (highlight) {
             if (Constants.MARKDOWN_EXT.contains(ext)) {
                 content.append("<script src='file:///android_asset/showdown.js' type='text/javascript'></script>");
-                content.append("<link href='file:///android_asset/markdown.css' rel='stylesheet' type='text/css'/>");
+                content.append("<link href='file:///android_asset/markdown-");
+                content.append(cssTheme);
+                content.append(".css' rel='stylesheet' type='text/css'/>");
                 content.append("</head>");
                 content.append("<body>");
                 content.append("<div id='content'>");
-                highlighted = true;
             } else if (!Constants.SKIP_PRETTIFY_EXT.contains(ext)) {
                 data = TextUtils.htmlEncode(data).replace("\r\n", "<br>").replace("\n", "<br>");
 
                 content.append("<link href='file:///android_asset/prettify-");
-                content.append(ThemeUtils.getCssTheme(Gh4Application.THEME));
+                content.append(cssTheme);
                 content.append(".css' rel='stylesheet' type='text/css'/>");
                 content.append("<script src='file:///android_asset/prettify.js' type='text/javascript'></script>");
                 content.append("</head>");
                 content.append("<body onload='prettyPrint()'>");
                 content.append("<pre class='prettyprint linenums'>");
-                highlighted = true;
-                themed = true;
+            } else{
+                data = TextUtils.htmlEncode(data).replace("\r\n", "<br>").replace("\n", "<br>");
+
+                content.append("<link href='file:///android_asset/text-");
+                content.append(cssTheme);
+                content.append(".css' rel='stylesheet' type='text/css'/>");
+                content.append("</head>");
+                content.append("<body>");
+                content.append("<pre>");
             }
-        }
-        if (!highlighted) {
-            data = TextUtils.htmlEncode(data).replace("\r\n", "<br>").replace("\n", "<br>");
-            content.append("</head>");
-            content.append("<body>");
-            content.append("<pre>");
         }
 
         content.append(data);
@@ -183,7 +183,6 @@ public class StringUtils {
             content.append("var text = document.getElementById('content').innerHTML;");
             content.append("var converter = new Showdown.converter();");
             content.append("var html = converter.makeHtml(text);");
-            //content.append("html = html.replace(/>/g, '>\n').replace(/</g, '\n<').replace(/\n{2,}/g, '\n\n')");
             content.append("document.getElementById('content').innerHTML = html;");
             content.append("</script>");
         } else {
@@ -192,7 +191,7 @@ public class StringUtils {
 
         content.append("</body></html>");
 
-        return new Pair<String, Boolean>(content.toString(), themed);
+        return content.toString();
     }
 
     public static String highlightImage(String imageUrl) {

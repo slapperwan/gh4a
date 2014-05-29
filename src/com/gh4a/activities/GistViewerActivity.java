@@ -22,7 +22,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.util.Pair;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -123,15 +122,10 @@ public class GistViewerActivity extends LoadingFragmentActivity {
         s.setJavaScriptEnabled(true);
         s.setUseWideViewPort(true);
 
+        mWebView.setBackgroundColor(ThemeUtils.getWebViewBackgroundColor(Gh4Application.THEME));
         mWebView.setWebViewClient(mWebViewClient);
 
-        Pair<String, Boolean> result = StringUtils.highlightSyntax(data, highlight, mFileName, null, null, null);
-        String highlightedText = result.first;
-        boolean themed = result.second;
-
-        if(themed){
-            mWebView.setBackgroundColor(ThemeUtils.getWebViewBackgroundColor(Gh4Application.THEME));
-        }
+        String highlightedText = StringUtils.highlightSyntax(data, highlight, mFileName, null, null, null);
 
         mWebView.loadDataWithBaseURL("file:///android_asset/", highlightedText, "text/html", "utf-8", "");
     }

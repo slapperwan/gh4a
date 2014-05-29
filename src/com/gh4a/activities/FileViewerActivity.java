@@ -23,7 +23,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
-import android.util.Pair;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -142,25 +141,29 @@ public class FileViewerActivity extends LoadingFragmentActivity {
         s.setJavaScriptEnabled(true);
         s.setUseWideViewPort(true);
 
-        mWebView.setBackgroundColor(ThemeUtils.LIGHT_BACKGROUND_COLOR);
+        mWebView.setBackgroundColor(ThemeUtils.getWebViewBackgroundColor(Gh4Application.THEME));
         mWebView.setWebViewClient(mWebViewClient);
     }
 
     private void showDiff() {
         StringBuilder content = new StringBuilder();
+
         content.append("<html><head><title></title>");
+        content.append("<link href='file:///android_asset/text-");
+        content.append(ThemeUtils.getCssTheme(Gh4Application.THEME));
+        content.append(".css' rel='stylesheet' type='text/css'/>");
         content.append("</head><body><pre>");
 
         String encoded = TextUtils.htmlEncode(mDiff);
         String[] lines = encoded.split("\n");
         for (String line : lines) {
             if (line.startsWith("@@")) {
-                line = "<div style=\"background-color: #EAF2F5;\">" + line + "</div>";
+                line = "<div class=\"change\">" + line + "</div>";
             } else if (line.startsWith("+")) {
-                line = "<div style=\"background-color: #DDFFDD; border-color: #00AA00;\">"
+                line = "<div class=\"add\">"
                         + line + "</div>";
             } else if (line.startsWith("-")) {
-                line = "<div style=\"background-color: #FFDDDD; border-color: #CC0000;\">"
+                line = "<div class=\"remove\">"
                         + line + "</div>";
             } else {
                 line = "<div>" + line + "</div>";
@@ -184,14 +187,7 @@ public class FileViewerActivity extends LoadingFragmentActivity {
             mWebView.loadDataWithBaseURL("file:///android_asset/", htmlImage, null, "utf-8", null);
         } else {
             String data = base64Data != null ? new String(EncodingUtils.fromBase64(base64Data)) : "";
-            Pair<String, Boolean> result = StringUtils.highlightSyntax(data, true, mPath, mRepoOwner, mRepoName, mRef);
-
-            String highlightedText = result.first;
-            boolean themed = result.second;
-
-            if(themed){
-                mWebView.setBackgroundColor(ThemeUtils.getWebViewBackgroundColor(Gh4Application.THEME));
-            }
+            String highlightedText = StringUtils.highlightSyntax(data, true, mPath, mRepoOwner, mRepoName, mRef);
 
             mWebView.loadDataWithBaseURL("file:///android_asset/", highlightedText, null, "utf-8", null);
         }
