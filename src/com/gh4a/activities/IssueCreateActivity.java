@@ -100,7 +100,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
             stopProgressDialog(mProgressDialog);
             if (!result.handleError(IssueCreateActivity.this)) {
                 mAllMilestone = result.getData();
-                showMilestonesDialog();
+                showMilestonesDialog(null);
                 getSupportLoaderManager().destroyLoader(1);
             }
         }
@@ -116,7 +116,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
             stopProgressDialog(mProgressDialog);
             if (!result.handleError(IssueCreateActivity.this)) {
                 mAllAssignee = result.getData();
-                showAssigneesDialog();
+                showAssigneesDialog(null);
                 getSupportLoaderManager().destroyLoader(2);
             }
         }
@@ -234,7 +234,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
         return super.onOptionsItemSelected(item);
     }
 
-    public void showMilestonesDialog() {
+    public void showMilestonesDialog(View view) {
         if (mAllMilestone == null) {
             mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
             getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
@@ -284,7 +284,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
         }
     }
 
-    public void showAssigneesDialog() {
+    public void showAssigneesDialog(View view) {
         if (mAllAssignee == null) {
             mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
             getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
