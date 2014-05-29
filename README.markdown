@@ -24,7 +24,7 @@ Main features
 
 *User*
 
-* View basic informations
+* View basic information
 * Activity feeds
 * Follow/unfollow user
 * View public/watched repositories
