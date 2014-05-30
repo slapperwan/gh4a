@@ -378,7 +378,9 @@ public class FileViewerActivity extends LoadingFragmentActivity {
             body.setText(mCommitComments.get(id).getBody());
         }
 
-        DialogInterface.OnClickListener saveCb = new DialogInterface.OnClickListener() {
+        final int saveButtonResId = isEdit
+                ? R.string.issue_comment_update_title : R.string.issue_comment_title;
+        final DialogInterface.OnClickListener saveCb = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String text = body.getText().toString();
@@ -390,30 +392,33 @@ public class FileViewerActivity extends LoadingFragmentActivity {
             }
         };
 
-        DialogInterface.OnClickListener deleteCb = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                new AlertDialog.Builder(FileViewerActivity.this)
-                        .setTitle(R.string.delete_comment_message)
-                        .setMessage(R.string.confirmation)
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                new DeleteCommentTask(id).execute();
-                            }
-                        })
-                        .setNegativeButton(R.string.cancel, null)
-                        .show();
-            }
-        };
-
-        new AlertDialog.Builder(this)
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
             .setCancelable(true)
-            .setTitle(R.string.commit_comment_dialog_title)
+            .setTitle(getString(R.string.commit_comment_dialog_title, position))
             .setView(commentDialog)
-            .setPositiveButton(R.string.issue_comment_title, saveCb)
-            .setNegativeButton(isEdit ? R.string.delete : R.string.cancel, isEdit ? deleteCb : null)
-            .show();
+            .setPositiveButton(saveButtonResId, saveCb)
+            .setNegativeButton(R.string.cancel, null);
+
+        if (isEdit) {
+            builder.setNeutralButton(R.string.delete, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    new AlertDialog.Builder(FileViewerActivity.this)
+                            .setTitle(R.string.delete_comment_message)
+                            .setMessage(R.string.confirmation)
+                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    new DeleteCommentTask(id).execute();
+                                }
+                            })
+                            .setNegativeButton(R.string.cancel, null)
+                            .show();
+                }
+            });
+        }
+
+        builder.show();
     }
 
     private void refresh() {
