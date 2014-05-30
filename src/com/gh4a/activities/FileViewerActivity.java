@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.text.Html;
 import android.text.TextUtils;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.WebSettings;
@@ -52,7 +53,6 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ThemeUtils;
 import com.gh4a.utils.ToastUtils;
-import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.RepositoryContents;
@@ -64,7 +64,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class FileViewerActivity extends LoadingFragmentActivity {
     protected String mRepoOwner;
@@ -75,9 +74,11 @@ public class FileViewerActivity extends LoadingFragmentActivity {
     private String mDiff;
     private boolean mInDiffMode;
     private WebView mWebView;
-    private Map<Integer, String> positionLineMap = new HashMap<Integer, String>();
-    private Map<Integer, List<CommitComment>> positionListCommitCommentsMap = new HashMap<Integer, List<CommitComment>>();
-    private Map<Long, CommitComment> positionCommitCommentMap = new HashMap<Long, CommitComment>();
+
+    private String[] mDiffLines;
+    private SparseArray<List<CommitComment>> mCommitCommentsByPos =
+            new SparseArray<List<CommitComment>>();
+    private HashMap<Long, CommitComment> mCommitComments = new HashMap<Long, CommitComment>();
 
     private WebViewClient mWebViewClient = new WebViewClient() {
         @Override
@@ -87,81 +88,73 @@ public class FileViewerActivity extends LoadingFragmentActivity {
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            if (!StringUtils.isBlank(url)) {
-                if (url.startsWith("http://add-comment")) {
-                    int positionIdx = url.lastIndexOf("?position=");
-                    String position = url.substring(positionIdx + 10, url.length());
-                    String line = positionLineMap.get(Integer.parseInt(position));
-                    line = Html.fromHtml(line).toString();
-                    openCommentDialog(0L, line, Integer.parseInt(position));
-                } else if (url.startsWith("http://edit-comment")) {
-                    int positionIdx = url.lastIndexOf("?position=");
-                    int idIdx = url.lastIndexOf("&id=");
-                    String position = url.substring(positionIdx + 10, idIdx);
-                    String id = url.substring(idIdx + 4, url.length());
-                    String line = positionLineMap.get(Integer.parseInt(position));
-                    line = Html.fromHtml(line).toString();
-                    openCommentDialog(Long.parseLong(id), line, Integer.parseInt(position));
-                }
+            if (url.startsWith("comment://")) {
+                Uri uri = Uri.parse(url);
+                int line = Integer.parseInt(uri.getQueryParameter("position"));
+                String lineText = Html.fromHtml(mDiffLines[line]).toString();
+                String idParam = uri.getQueryParameter("id");
+                long id = idParam != null ? Long.parseLong(idParam) : 0L;
+
+                openCommentDialog(id, lineText, line);
             } else {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 startActivity(intent);
             }
+
             return true;
         }
     };
 
     private LoaderCallbacks<List<RepositoryContents>> mFileCallback =
             new LoaderCallbacks<List<RepositoryContents>>() {
-                @Override
-                public Loader<LoaderResult<List<RepositoryContents>>> onCreateLoader(int id, Bundle args) {
-                    return new ContentLoader(FileViewerActivity.this, mRepoOwner, mRepoName, mPath, mRef);
-                }
+        @Override
+        public Loader<LoaderResult<List<RepositoryContents>>> onCreateLoader(int id, Bundle args) {
+            return new ContentLoader(FileViewerActivity.this, mRepoOwner, mRepoName, mPath, mRef);
+        }
 
-                @Override
-                public void onResultReady(LoaderResult<List<RepositoryContents>> result) {
-                    setContentEmpty(true);
-                    if (!result.handleError(FileViewerActivity.this)) {
-                        List<RepositoryContents> data = result.getData();
-                        if (data != null && !data.isEmpty()) {
-                            loadContent(data.get(0));
-                            setContentEmpty(false);
-                        }
-                    }
-                    setContentShown(true);
+        @Override
+        public void onResultReady(LoaderResult<List<RepositoryContents>> result) {
+            setContentEmpty(true);
+            if (!result.handleError(FileViewerActivity.this)) {
+                List<RepositoryContents> data = result.getData();
+                if (data != null && !data.isEmpty()) {
+                    loadContent(data.get(0));
+                    setContentEmpty(false);
                 }
-            };
+            }
+            setContentShown(true);
+        }
+    };
 
     private LoaderCallbacks<List<CommitComment>> mCommitCommentCallback =
             new LoaderCallbacks<List<CommitComment>>() {
-                @Override
-                public Loader<LoaderResult<List<CommitComment>>> onCreateLoader(int id, Bundle args) {
-                    return new CommitCommentListLoader(FileViewerActivity.this, mRepoOwner, mRepoName, mSha);
-                }
+        @Override
+        public Loader<LoaderResult<List<CommitComment>>> onCreateLoader(int id, Bundle args) {
+            return new CommitCommentListLoader(FileViewerActivity.this, mRepoOwner, mRepoName, mSha);
+        }
 
-                @Override
-                public void onResultReady(LoaderResult<List<CommitComment>> result) {
-                    setContentEmpty(true);
-                    if (!result.handleError(FileViewerActivity.this)) {
-                        List<CommitComment> data = result.getData();
-                        for (CommitComment commitComment : data) {
-                            if (commitComment.getPath() != null && commitComment.getPath().equals(mPath)) {
-                                if (positionListCommitCommentsMap.containsKey(commitComment.getPosition())) {
-                                    List<CommitComment> commitComments = positionListCommitCommentsMap.get(commitComment.getPosition());
-                                    commitComments.add(commitComment);
-                                } else {
-                                    List<CommitComment> commitComments = new ArrayList<CommitComment>();
-                                    commitComments.add(commitComment);
-                                    positionListCommitCommentsMap.put(commitComment.getPosition(), commitComments);
-                                }
-                            }
-                        }
-                        showDiff();
-                        setContentEmpty(false);
+        @Override
+        public void onResultReady(LoaderResult<List<CommitComment>> result) {
+            setContentEmpty(true);
+            if (!result.handleError(FileViewerActivity.this)) {
+                for (CommitComment comment : result.getData()) {
+                    if (!TextUtils.equals(comment.getPath(), mPath)) {
+                        continue;
                     }
-                    setContentShown(true);
+                    int position = comment.getPosition();
+                    List<CommitComment> comments = mCommitCommentsByPos.get(position);
+                    if (comments == null) {
+                        comments = new ArrayList<CommitComment>();
+                        mCommitCommentsByPos.put(position, comments);
+                    }
+                    comments.add(comment);
                 }
-            };
+                showDiff();
+                setContentEmpty(false);
+            }
+            setContentShown(true);
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -188,12 +181,12 @@ public class FileViewerActivity extends LoadingFragmentActivity {
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
+        setContentShown(false);
+
         if (mDiff != null) {
             getSupportLoaderManager().initLoader(1, null, mCommitCommentCallback);
-            setContentShown(false);
         } else {
             getSupportLoaderManager().initLoader(0, null, mFileCallback);
-            setContentShown(false);
         }
     }
 
@@ -227,9 +220,10 @@ public class FileViewerActivity extends LoadingFragmentActivity {
         content.append("</head><body><pre>");
 
         String encoded = TextUtils.htmlEncode(mDiff);
-        String[] lines = encoded.split("\n");
-        for (int i = 0; i < lines.length; i++) {
-            String line = lines[i];
+        mDiffLines = encoded.split("\n");
+
+        for (int i = 0; i < mDiffLines.length; i++) {
+            String line = mDiffLines[i];
             String cssClass = null;
             if (line.startsWith("@@")) {
                 cssClass = "change";
@@ -239,30 +233,25 @@ public class FileViewerActivity extends LoadingFragmentActivity {
                 cssClass = "remove";
             }
 
-            positionLineMap.put(i, line);
+            content.append("<div class=\"").append(cssClass).append("\" ");
+            content.append("onclick=\"javascript:location.href='comment://add");
+            content.append("?position=").append(i).append("'\">").append(line).append("</div>");
 
-            line = "<div class=\"" + cssClass + "\" "
-                    + "onclick=\"javascript:location.href='http://add-comment/"
-                    + "?position=" + i + "'\">"
-                    + line + "</div>";
-
-            // display notes on line
-            if (positionListCommitCommentsMap.containsKey(i)) {
-                List<CommitComment> commitComments = positionListCommitCommentsMap.get(i);
-                for (CommitComment commitComment : commitComments) {
-                    positionCommitCommentMap.put(commitComment.getId(), commitComment);
-                    String commentHtml = "<div style=\"border:1px solid; padding: 2px; margin: 5px 0;\" ";
-                    commentHtml += "onclick=\"javascript:location.href='http://edit-comment/";
-                    commentHtml += "?position=" + i + "&id=" + commitComment.getId() + "'\">";
-                    commentHtml += "<div class=\"change\"><b>" + commitComment.getUser().getLogin() + "</b> added a note ";
-                    commentHtml += StringUtils.formatRelativeTime(FileViewerActivity.this, commitComment.getCreatedAt(), true) + ".</div>";
-                    commentHtml += commitComment.getBodyHtml();
-                    commentHtml += "</div>";
-
-                    line += commentHtml;
+            List<CommitComment> comments = mCommitCommentsByPos.get(i);
+            if (comments != null) {
+                for (CommitComment comment : comments) {
+                    mCommitComments.put(comment.getId(), comment);
+                    content.append("<div style=\"border:1px solid; padding: 2px; margin: 5px 0;\" ");
+                    content.append("onclick=\"javascript:location.href='comment://edit");
+                    content.append("?position=").append(i);
+                    content.append("&id=").append(comment.getId()).append("'\">");
+                    content.append("<div class=\"change\"><b>").append(comment.getUser().getLogin());
+                    content.append("</b> added a note "); //XXX
+                    content.append(StringUtils.formatRelativeTime(FileViewerActivity.this,
+                            comment.getCreatedAt(), true));
+                    content.append(".</div>").append(comment.getBodyHtml()).append("</div>");
                 }
             }
-            content.append(line);
         }
         content.append("</pre></body></html>");
 
@@ -377,54 +366,59 @@ public class FileViewerActivity extends LoadingFragmentActivity {
     }
 
     private void openCommentDialog(final long id, String line, final int position) {
-        final boolean isEdit = id != 0L ? true : false;
-        LayoutInflater li = LayoutInflater.from(this);
-        View commentDialog = li.inflate(R.layout.commit_comment_dialog, null);
+        final boolean isEdit = id != 0L;
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View commentDialog = inflater.inflate(R.layout.commit_comment_dialog, null);
 
         final TextView code = (TextView) commentDialog.findViewById(R.id.line);
         code.setText(line);
 
         final EditText body = (EditText) commentDialog.findViewById(R.id.body);
         if (isEdit) {
-            CommitComment commitComment = positionCommitCommentMap.get(id);
-            body.setText(commitComment.getBody());
+            body.setText(mCommitComments.get(id).getBody());
         }
+
+        DialogInterface.OnClickListener saveCb = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String text = body.getText().toString();
+                if (!StringUtils.isBlank(text)) {
+                    new CommentTask(id, text, position).execute();
+                } else {
+                    ToastUtils.showMessage(FileViewerActivity.this, R.string.commit_comment_error_body);
+                }
+            }
+        };
+
+        DialogInterface.OnClickListener deleteCb = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                new AlertDialog.Builder(FileViewerActivity.this)
+                        .setTitle(R.string.delete_comment_message)
+                        .setMessage(R.string.confirmation)
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                new DeleteCommentTask(id).execute();
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, null)
+                        .show();
+            }
+        };
 
         new AlertDialog.Builder(this)
             .setCancelable(true)
             .setTitle(R.string.commit_comment_dialog_title)
             .setView(commentDialog)
-            .setPositiveButton(R.string.issue_comment_title, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    if (!StringUtils.isBlank(body.getText().toString())) {
-                        new CommentTask(id, body.getText().toString(), position).execute();
-                    } else {
-                        ToastUtils.showMessage(FileViewerActivity.this, R.string.commit_comment_error_body);
-                    }
-                }
-            })
-            .setNegativeButton(isEdit ? R.string.delete : R.string.cancel, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    if (isEdit) {
-                        new AlertDialog.Builder(FileViewerActivity.this)
-                            .setTitle(R.string.delete_comment_message)
-                            .setMessage(R.string.confirmation)
-                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int whichButton) {
-                                    new DeleteCommentTask(id).execute();
-                                }
-                            })
-                            .setNegativeButton(R.string.cancel, null)
-                            .show();
-                    }
-                }
-            })
+            .setPositiveButton(R.string.issue_comment_title, saveCb)
+            .setNegativeButton(isEdit ? R.string.delete : R.string.cancel, isEdit ? deleteCb : null)
             .show();
     }
 
     private void refresh() {
-        positionListCommitCommentsMap = new HashMap<Integer, List<CommitComment>>();
-        positionCommitCommentMap = new HashMap<Long, CommitComment>();
+        mCommitComments.clear();
+        mCommitCommentsByPos.clear();
         getSupportLoaderManager().restartLoader(1, null, mCommitCommentCallback);
         setContentShown(false);
     }
@@ -443,9 +437,10 @@ public class FileViewerActivity extends LoadingFragmentActivity {
 
         @Override
         protected Void run() throws IOException {
-            boolean isEdit = mId != 0L ? true : false;
+            boolean isEdit = mId != 0L;
             CommitComment commitComment = new CommitComment();
-            if (isEdit) {// edit mode
+
+            if (isEdit) {
                 commitComment.setId(mId);
             }
             commitComment.setPosition(mPosition);
