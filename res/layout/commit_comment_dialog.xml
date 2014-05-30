@@ -10,7 +10,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:singleLine="true"/>
+        android:maxLines="3"/>
 
     <EditText
         android:id="@+id/body"
