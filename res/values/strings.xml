@@ -208,6 +208,8 @@
     <string name="commit_compare">Compare View</string>
     <string name="commit_comment_hint">Comment on this commit</string>
     <string name="commit_details">Committed by %1$s %2$s</string>
+    <string name="commit_comment_dialog_title">Comment on this line.</string>
+    <string name="commit_comment_error_body">Please enter your comment.</string>
 
     <!-- Release -->
     <string name="release_details">Released by %1$s %2$s</string>
@@ -268,7 +270,6 @@
     <string name="issue_milestone_due_date">Due Date</string>
     <string name="issue_assignee">%1$s is assigned</string>
     <string name="issue_desc">Description</string>
-
     <string name="issue_comment_title">Comment</string>
     <string name="issue_comment_hint">Comment on this issue</string>
 
