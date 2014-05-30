@@ -245,11 +245,11 @@ public class FileViewerActivity extends LoadingFragmentActivity {
                     content.append("onclick=\"javascript:location.href='comment://edit");
                     content.append("?position=").append(i);
                     content.append("&id=").append(comment.getId()).append("'\">");
-                    content.append("<div class=\"change\"><b>").append(comment.getUser().getLogin());
-                    content.append("</b> added a note "); //XXX
-                    content.append(StringUtils.formatRelativeTime(FileViewerActivity.this,
-                            comment.getCreatedAt(), true));
-                    content.append(".</div>").append(comment.getBodyHtml()).append("</div>");
+                    content.append("<div class=\"change\">");
+                    content.append(getString(R.string.commit_comment_header,
+                            comment.getUser().getLogin(),
+                            StringUtils.formatRelativeTime(FileViewerActivity.this, comment.getCreatedAt(), true)));
+                    content.append("</div>").append(comment.getBodyHtml()).append("</div>");
                 }
             }
         }

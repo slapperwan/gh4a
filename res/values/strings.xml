@@ -273,6 +273,7 @@
     <string name="issue_desc">Description</string>
     <string name="issue_comment_title">Comment</string>
     <string name="issue_comment_hint">Comment on this issue</string>
+    <string name="commit_comment_header">&lt;b&gt;%1$s&lt;/b&gt; added a note %2$s</string>
 
     <!-- Pull Request -->
     <string name="pull_request_title">Pull Request</string>
