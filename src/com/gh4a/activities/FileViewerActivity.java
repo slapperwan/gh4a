@@ -145,15 +145,16 @@ public class FileViewerActivity extends LoadingFragmentActivity {
                     if (!result.handleError(FileViewerActivity.this)) {
                         List<CommitComment> data = result.getData();
                         for (CommitComment commitComment : data) {
-                            if (positionListCommitCommentsMap.containsKey(commitComment.getPosition())) {
-                                List<CommitComment> commitComments = positionListCommitCommentsMap.get(commitComment.getPosition());
-                                commitComments.add(commitComment);
-                            } else {
-                                List<CommitComment> commitComments = new ArrayList<CommitComment>();
-                                commitComments.add(commitComment);
-                                positionListCommitCommentsMap.put(commitComment.getPosition(), commitComments);
+                            if (commitComment.getPath() != null && commitComment.getPath().equals(mPath)) {
+                                if (positionListCommitCommentsMap.containsKey(commitComment.getPosition())) {
+                                    List<CommitComment> commitComments = positionListCommitCommentsMap.get(commitComment.getPosition());
+                                    commitComments.add(commitComment);
+                                } else {
+                                    List<CommitComment> commitComments = new ArrayList<CommitComment>();
+                                    commitComments.add(commitComment);
+                                    positionListCommitCommentsMap.put(commitComment.getPosition(), commitComments);
+                                }
                             }
-
                         }
                         showDiff();
                         setContentEmpty(false);
@@ -245,15 +246,16 @@ public class FileViewerActivity extends LoadingFragmentActivity {
                     + "?position=" + i + "'\">"
                     + line + "</div>";
 
+            // display notes on line
             if (positionListCommitCommentsMap.containsKey(i)) {
                 List<CommitComment> commitComments = positionListCommitCommentsMap.get(i);
                 for (CommitComment commitComment : commitComments) {
                     positionCommitCommentMap.put(commitComment.getId(), commitComment);
-                    String commentHtml = "<div style=\"border:1px solid; padding: 2px; margin-top: 2px;\" ";
+                    String commentHtml = "<div style=\"border:1px solid; padding: 2px; margin: 5px 0;\" ";
                     commentHtml += "onclick=\"javascript:location.href='http://edit-comment/";
                     commentHtml += "?position=" + i + "&id=" + commitComment.getId() + "'\">";
-                    commentHtml += commitComment.getUser().getLogin() + " added a note ";
-                    commentHtml += StringUtils.formatRelativeTime(FileViewerActivity.this, commitComment.getCreatedAt(), true) + ".<br/>";
+                    commentHtml += "<div class=\"change\"><b>" + commitComment.getUser().getLogin() + "</b> added a note ";
+                    commentHtml += StringUtils.formatRelativeTime(FileViewerActivity.this, commitComment.getCreatedAt(), true) + ".</div>";
                     commentHtml += commitComment.getBodyHtml();
                     commentHtml += "</div>";
 
@@ -405,7 +407,16 @@ public class FileViewerActivity extends LoadingFragmentActivity {
         builder.setNegativeButton(isEdit ? R.string.delete : R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 if (isEdit) {
-                    new DeleteCommentTask(id).execute();
+                    AlertDialog.Builder builder = UiUtils.createDialogBuilder(FileViewerActivity.this);
+                    builder.setTitle(R.string.delete_comment_message);
+                    builder.setMessage(R.string.confirmation);
+                    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            new DeleteCommentTask(id).execute();
+                        }
+                    });
+                    builder.setNegativeButton(R.string.cancel, null);
+                    builder.show();
                 }
             }
         });
@@ -426,7 +437,7 @@ public class FileViewerActivity extends LoadingFragmentActivity {
         private long mId;
 
         public CommentTask(long id, String body, int position) {
-            super(FileViewerActivity.this, 0, R.string.issue_comment_hint);
+            super(FileViewerActivity.this, 0, R.string.saving_msg);
             mBody = body;
             mPosition = position;
             mId = id;
@@ -465,7 +476,7 @@ public class FileViewerActivity extends LoadingFragmentActivity {
         private long mId;
 
         public DeleteCommentTask(long id) {
-            super(FileViewerActivity.this, 0, R.string.issue_comment_hint);
+            super(FileViewerActivity.this, 0, R.string.deleting_msg);
             mId = id;
         }
 
