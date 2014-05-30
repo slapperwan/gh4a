@@ -151,7 +151,7 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
             if ("added".equals(status)) {
                 parent = llAdded;
                 added++;
-            } else if ("modified".equals(status)) {
+            } else if ("modified".equals(status) || "renamed".equals(status)) {
                 parent = llChanged;
                 changed++;
             } else if ("removed".equals(status)) {
