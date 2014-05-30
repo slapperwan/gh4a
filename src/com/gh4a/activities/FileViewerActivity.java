@@ -26,17 +26,13 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.text.Html;
 import android.text.TextUtils;
-import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.webkit.URLUtil;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
@@ -57,26 +53,14 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ThemeUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
-import com.github.mobile.util.HtmlUtils;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.CommitService;
-import org.eclipse.egit.github.core.service.MilestoneService;
 import org.eclipse.egit.github.core.util.EncodingUtils;
-import org.eclipse.egit.github.core.util.UrlUtils;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -92,7 +76,8 @@ public class FileViewerActivity extends LoadingFragmentActivity {
     private boolean mInDiffMode;
     private WebView mWebView;
     private Map<Integer, String> positionLineMap = new HashMap<Integer, String>();
-    private Map<Integer, List<CommitComment>> commitCommentsMap = new HashMap<Integer, List<CommitComment>>();
+    private Map<Integer, List<CommitComment>> positionListCommitCommentsMap = new HashMap<Integer, List<CommitComment>>();
+    private Map<Long, CommitComment> positionCommitCommentMap = new HashMap<Long, CommitComment>();
 
     private WebViewClient mWebViewClient = new WebViewClient() {
         @Override
@@ -102,12 +87,22 @@ public class FileViewerActivity extends LoadingFragmentActivity {
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            if (!StringUtils.isBlank(url) && url.startsWith("http://comment")) {
-                int positionIdx = url.lastIndexOf("?position=");
-                String position = url.substring(positionIdx + 10, url.length());
-                String line = positionLineMap.get(Integer.parseInt(position));
-                line = Html.fromHtml(line).toString();
-                openCommentDialog(line, Integer.parseInt(position));
+            if (!StringUtils.isBlank(url)) {
+                if (url.startsWith("http://add-comment")) {
+                    int positionIdx = url.lastIndexOf("?position=");
+                    String position = url.substring(positionIdx + 10, url.length());
+                    String line = positionLineMap.get(Integer.parseInt(position));
+                    line = Html.fromHtml(line).toString();
+                    openCommentDialog(0L, line, Integer.parseInt(position));
+                } else if (url.startsWith("http://edit-comment")) {
+                    int positionIdx = url.lastIndexOf("?position=");
+                    int idIdx = url.lastIndexOf("&id=");
+                    String position = url.substring(positionIdx + 10, idIdx);
+                    String id = url.substring(idIdx + 4, url.length());
+                    String line = positionLineMap.get(Integer.parseInt(position));
+                    line = Html.fromHtml(line).toString();
+                    openCommentDialog(Long.parseLong(id), line, Integer.parseInt(position));
+                }
             } else {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 startActivity(intent);
@@ -150,13 +145,13 @@ public class FileViewerActivity extends LoadingFragmentActivity {
                     if (!result.handleError(FileViewerActivity.this)) {
                         List<CommitComment> data = result.getData();
                         for (CommitComment commitComment : data) {
-                            if (commitCommentsMap.containsKey(commitComment.getPosition())) {
-                                List<CommitComment> commitComments = commitCommentsMap.get(commitComment.getPosition());
+                            if (positionListCommitCommentsMap.containsKey(commitComment.getPosition())) {
+                                List<CommitComment> commitComments = positionListCommitCommentsMap.get(commitComment.getPosition());
                                 commitComments.add(commitComment);
                             } else {
                                 List<CommitComment> commitComments = new ArrayList<CommitComment>();
                                 commitComments.add(commitComment);
-                                commitCommentsMap.put(commitComment.getPosition(), commitComments);
+                                positionListCommitCommentsMap.put(commitComment.getPosition(), commitComments);
                             }
 
                         }
@@ -246,14 +241,17 @@ public class FileViewerActivity extends LoadingFragmentActivity {
             positionLineMap.put(i, line);
 
             line = "<div class=\"" + cssClass + "\" "
-                    + "onclick=\"javascript:location.href='http://comment/"
+                    + "onclick=\"javascript:location.href='http://add-comment/"
                     + "?position=" + i + "'\">"
                     + line + "</div>";
 
-            if (commitCommentsMap.containsKey(i)) {
-                List<CommitComment> commitComments = commitCommentsMap.get(i);
+            if (positionListCommitCommentsMap.containsKey(i)) {
+                List<CommitComment> commitComments = positionListCommitCommentsMap.get(i);
                 for (CommitComment commitComment : commitComments) {
-                    String commentHtml = "<div style=\"border:1px solid; padding: 2px; margin-top: 2px;\">";
+                    positionCommitCommentMap.put(commitComment.getId(), commitComment);
+                    String commentHtml = "<div style=\"border:1px solid; padding: 2px; margin-top: 2px;\" ";
+                    commentHtml += "onclick=\"javascript:location.href='http://edit-comment/";
+                    commentHtml += "?position=" + i + "&id=" + commitComment.getId() + "'\">";
                     commentHtml += commitComment.getUser().getLogin() + " added a note ";
                     commentHtml += StringUtils.formatRelativeTime(FileViewerActivity.this, commitComment.getCreatedAt(), true) + ".<br/>";
                     commentHtml += commitComment.getBodyHtml();
@@ -376,12 +374,13 @@ public class FileViewerActivity extends LoadingFragmentActivity {
         }
     }
 
-    private void openCommentDialog(String line, final int position) {
+    private void openCommentDialog(final long id, String line, final int position) {
+        final boolean isEdit = id != 0L ? true : false;
         LayoutInflater li = LayoutInflater.from(this);
         View commentDialog = li.inflate(R.layout.commit_comment_dialog, null);
 
         AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
-        builder.setCancelable(false);
+        builder.setCancelable(true);
         builder.setTitle(R.string.commit_comment_dialog_title);
         builder.setView(commentDialog);
 
@@ -389,35 +388,58 @@ public class FileViewerActivity extends LoadingFragmentActivity {
         code.setText(line);
 
         final EditText body = (EditText) commentDialog.findViewById(R.id.body);
+        if (isEdit) {
+            CommitComment commitComment = positionCommitCommentMap.get(id);
+            body.setText(commitComment.getBody());
+        }
 
         builder.setPositiveButton(R.string.issue_comment_title, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 if (!StringUtils.isBlank(body.getText().toString())) {
-                    new CommentTask(body.getText().toString(), position).execute();
+                    new CommentTask(id, body.getText().toString(), position).execute();
                 } else {
                     ToastUtils.showMessage(FileViewerActivity.this, R.string.commit_comment_error_body);
                 }
             }
         });
 
-        builder.setNegativeButton(R.string.cancel, null);
+        builder.setNegativeButton(isEdit ? R.string.delete : R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                if (isEdit) {
+                    new DeleteCommentTask(id).execute();
+                }
+            }
+        });
 
         builder.show();
+    }
+
+    private void refresh() {
+        positionListCommitCommentsMap = new HashMap<Integer, List<CommitComment>>();
+        positionCommitCommentMap = new HashMap<Long, CommitComment>();
+        getSupportLoaderManager().restartLoader(1, null, mCommitCommentCallback);
+        setContentShown(false);
     }
 
     private class CommentTask extends ProgressDialogTask<Void> {
         private String mBody;
         private int mPosition;
+        private long mId;
 
-        public CommentTask(String body, int position) {
+        public CommentTask(long id, String body, int position) {
             super(FileViewerActivity.this, 0, R.string.issue_comment_hint);
             mBody = body;
             mPosition = position;
+            mId = id;
         }
 
         @Override
         protected Void run() throws IOException {
+            boolean isEdit = mId != 0L ? true : false;
             CommitComment commitComment = new CommitComment();
+            if (isEdit) {// edit mode
+                commitComment.setId(mId);
+            }
             commitComment.setPosition(mPosition);
             commitComment.setCommitId(mSha);
             commitComment.setPath(mPath);
@@ -425,15 +447,44 @@ public class FileViewerActivity extends LoadingFragmentActivity {
 
             CommitService commitService = (CommitService)
                     Gh4Application.get(mContext).getService(Gh4Application.COMMIT_SERVICE);
-            commitService.addComment(new RepositoryId(mRepoOwner, mRepoName), mSha, commitComment);
+
+            if (isEdit) {
+                commitService.editComment(new RepositoryId(mRepoOwner, mRepoName), commitComment);
+            } else {
+                commitService.addComment(new RepositoryId(mRepoOwner, mRepoName), mSha, commitComment);
+            }
             return null;
         }
 
         @Override
         protected void onSuccess(Void result) {
-            commitCommentsMap = new HashMap<Integer, List<CommitComment>>();
-            getSupportLoaderManager().restartLoader(1, null, mCommitCommentCallback);
-            setContentShown(false);
+            refresh();
+        }
+    }
+
+    private class DeleteCommentTask extends ProgressDialogTask<Void> {
+        private long mId;
+
+        public DeleteCommentTask(long id) {
+            super(FileViewerActivity.this, 0, R.string.issue_comment_hint);
+            mId = id;
+        }
+
+        @Override
+        protected Void run() throws IOException {
+            CommitComment commitComment = new CommitComment();
+            commitComment.setId(mId);
+
+            CommitService commitService = (CommitService)
+                    Gh4Application.get(mContext).getService(Gh4Application.COMMIT_SERVICE);
+
+            commitService.deleteComment(new RepositoryId(mRepoOwner, mRepoName), mId);
+            return null;
+        }
+
+        @Override
+        protected void onSuccess(Void result) {
+            refresh();
         }
     }
 }
