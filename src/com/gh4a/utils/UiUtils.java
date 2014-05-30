@@ -50,10 +50,6 @@ public class UiUtils {
         imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
-    public static AlertDialog.Builder createDialogBuilder(Context context) {
-        return new AlertDialog.Builder(context);
-    }
-
     public static void assignTypeface(Activity parent, Typeface typeface, int[] textViewIds) {
         View decor = parent.getWindow() != null ? parent.getWindow().getDecorView() : null;
         assignTypeface(decor, typeface, textViewIds);
@@ -179,7 +175,7 @@ public class UiUtils {
             }
         };
 
-        createDialogBuilder(context)
+        new AlertDialog.Builder(context)
                 .setTitle(R.string.download_mobile_warning_title)
                 .setMessage(R.string.download_mobile_warning_message)
                 .setPositiveButton(R.string.download_now_button, buttonListener)

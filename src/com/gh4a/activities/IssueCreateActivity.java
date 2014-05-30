@@ -256,10 +256,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
                 }
             }
 
-            AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
-            builder.setCancelable(true);
-            builder.setTitle(R.string.issue_milestone_hint);
-            builder.setSingleChoiceItems(milestones, checkedItem, new DialogInterface.OnClickListener() {
+            final DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if (which == 0) {
@@ -268,8 +265,10 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
                         mSelectedMilestone = mAllMilestone.get(which - 1);
                     }
                 }
-            });
-            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            };
+
+            final DialogInterface.OnClickListener okCb = new DialogInterface.OnClickListener() {
+                @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if (mSelectedMilestone != null) {
                         mTvSelectedMilestone.setText(getString(
@@ -278,9 +277,15 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
                         mTvSelectedMilestone.setText(null);
                     }
                 }
-            });
-            builder.setNegativeButton(R.string.cancel, null);
-            builder.show();
+            };
+
+            new AlertDialog.Builder(this)
+                    .setCancelable(true)
+                    .setTitle(R.string.issue_milestone_hint)
+                    .setSingleChoiceItems(milestones, checkedItem, selectCb)
+                    .setPositiveButton(R.string.ok, okCb)
+                    .setNegativeButton(R.string.cancel, null)
+                    .show();
         }
     }
 
@@ -303,10 +308,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
                 }
             }
 
-            AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
-            builder.setCancelable(true);
-            builder.setTitle(R.string.issue_assignee_hint);
-            builder.setSingleChoiceItems(assignees, checkedItem, new DialogInterface.OnClickListener() {
+            DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if (which == 0) {
@@ -315,8 +317,9 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
                         mSelectedAssignee = mAllAssignee.get(which - 1);
                     }
                 }
-            });
-            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            };
+            DialogInterface.OnClickListener okCb = new DialogInterface.OnClickListener() {
+                @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if (mSelectedAssignee != null) {
                         mTvSelectedAssignee.setText(getString(
@@ -325,9 +328,15 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
                         mTvSelectedAssignee.setText(null);
                     }
                 }
-            });
-            builder.setNegativeButton(R.string.cancel, null);
-            builder.show();
+            };
+
+            new AlertDialog.Builder(this)
+                    .setCancelable(true)
+                    .setTitle(R.string.issue_assignee_hint)
+                    .setSingleChoiceItems(assignees, checkedItem, selectCb)
+                    .setPositiveButton(R.string.ok, okCb)
+                    .setNegativeButton(R.string.cancel, null)
+                    .show();
         }
     }
 

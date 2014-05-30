@@ -49,7 +49,6 @@ import com.gh4a.loader.RepositoryLoader;
 import com.gh4a.loader.TagListLoader;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.UiUtils;
 
 public class RepositoryActivity extends LoadingFragmentPagerActivity implements ParentCallback {
     private static final int LOADER_REPO = 0;
@@ -443,23 +442,23 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             current = master;
         }
 
-        AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
-        builder.setCancelable(true);
-        builder.setTitle(R.string.repo_branches);
-        builder.setSingleChoiceItems(branchList, current, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mSelectedRef = mBranches.get(which).getCommit().getSha();
-                mSelectBranchTag = mBranches.get(which).getName();
-            }
-        });
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                refreshFragment();
-            }
-        });
-        builder.setNegativeButton(R.string.cancel, null);
-        builder.show();
+        new AlertDialog.Builder(this)
+                .setCancelable(true)
+                .setTitle(R.string.repo_branches)
+                .setSingleChoiceItems(branchList, current, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mSelectedRef = mBranches.get(which).getCommit().getSha();
+                        mSelectBranchTag = mBranches.get(which).getName();
+                    }
+                })
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        refreshFragment();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
 
     private void showTagsDialog() {
@@ -472,25 +471,23 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             }
         }
 
-        AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
-        builder.setCancelable(true);
-        builder.setTitle(R.string.repo_tags);
-        builder.setSingleChoiceItems(tagList, current, new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mSelectedRef = mTags.get(which).getCommit().getSha();
-                mSelectBranchTag = mTags.get(which).getName();
-            }
-        });
-
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                refreshFragment();
-            }
-        });
-
-        builder.show();
+        new AlertDialog.Builder(this)
+                .setCancelable(true)
+                .setTitle(R.string.repo_tags)
+                .setSingleChoiceItems(tagList, current, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mSelectedRef = mTags.get(which).getCommit().getSha();
+                        mSelectBranchTag = mTags.get(which).getName();
+                    }
+                })
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        refreshFragment();
+                    }
+                })
+                .show();
     }
 
     private void refreshFragment() {

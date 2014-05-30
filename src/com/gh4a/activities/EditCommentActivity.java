@@ -18,7 +18,6 @@ import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.UiUtils;
 
 public class EditCommentActivity extends BaseSherlockFragmentActivity {
     private String mRepoOwner;
@@ -71,16 +70,16 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
             }
             return true;
         case R.id.delete:
-            AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
-            builder.setMessage(R.string.delete_comment_message);
-            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    new DeleteCommentTask(mCommentId).execute();
-                }
-            });
-            builder.setNegativeButton(R.string.cancel, null);
-            builder.show();
+            new AlertDialog.Builder(this)
+                    .setMessage(R.string.delete_comment_message)
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            new DeleteCommentTask(mCommentId).execute();
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, null)
+                    .show();
             return true;
         }
         return super.onOptionsItemSelected(item);

@@ -43,7 +43,6 @@ import com.gh4a.loader.MilestoneLoader;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
-import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -146,16 +145,17 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
                 new EditIssueMilestoneTask(title, desc).execute();
             }
         } else if (itemId == R.id.delete) {
-            AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
-            builder.setTitle(getString(R.string.issue_dialog_delete_title, mMilestone.getTitle()));
-            builder.setMessage(R.string.issue_dialog_delete_message);
-            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    new DeleteIssueMilestoneTask(mMilestone.getNumber()).execute();
-                }
-            });
-            builder.setNegativeButton(R.string.cancel, null);
-            builder.show();
+            new AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.issue_dialog_delete_title, mMilestone.getTitle()))
+                    .setMessage(R.string.issue_dialog_delete_message)
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            new DeleteIssueMilestoneTask(mMilestone.getNumber()).execute();
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, null)
+                    .show();
         }
         return super.onOptionsItemSelected(item);
     }

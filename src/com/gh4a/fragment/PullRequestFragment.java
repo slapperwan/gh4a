@@ -28,6 +28,7 @@ import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -283,7 +284,7 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         final EditText editor = (EditText) view.findViewById(R.id.et_commit_message);
         editor.setText(mPullRequest.getTitle());
 
-        UiUtils.createDialogBuilder(getActivity())
+        new AlertDialog.Builder(getActivity())
                 .setTitle(title)
                 .setView(view)
                 .setPositiveButton(getString(R.string.pull_request_merge), new DialogInterface.OnClickListener() {

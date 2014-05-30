@@ -176,24 +176,21 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
     }
     
     private void open2FADialog(final String username, final String password) {
-        LayoutInflater li = LayoutInflater.from(Github4AndroidActivity.this);
-        View authDialog = li.inflate(R.layout.twofactor_auth_dialog, null);
-        
-        AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
-        builder.setCancelable(false);
-        builder.setTitle(R.string.two_factor_auth);
-        builder.setView(authDialog);
-
+        LayoutInflater inflater = LayoutInflater.from(Github4AndroidActivity.this);
+        View authDialog = inflater.inflate(R.layout.twofactor_auth_dialog, null);
         final EditText authCode = (EditText) authDialog.findViewById(R.id.auth_code);
-        
-        builder.setPositiveButton(R.string.verify, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                new LoginTask(username, password, authCode.getText().toString()).execute();
-            }
-        });
-        
-        builder.setNegativeButton(R.string.cancel, null);
-        
-        builder.show();
+
+        new AlertDialog.Builder(this)
+                .setCancelable(false)
+                .setTitle(R.string.two_factor_auth)
+                .setView(authDialog)
+                .setPositiveButton(R.string.verify, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        new LoginTask(username, password, authCode.getText().toString()).execute();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
 }

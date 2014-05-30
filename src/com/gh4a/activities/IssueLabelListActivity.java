@@ -222,16 +222,17 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
                 }
                 break;
             case Menu.FIRST + 1:
-                AlertDialog.Builder builder = UiUtils.createDialogBuilder(IssueLabelListActivity.this);
-                builder.setTitle(getString(R.string.issue_dialog_delete_title, mCurrentLabelName));
-                builder.setMessage(R.string.issue_dialog_delete_message);
-                builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        new DeleteIssueLabelTask(mCurrentLabelName).execute();
-                    }
-                });
-                builder.setNegativeButton(R.string.cancel, null);
-                builder.show();
+                new AlertDialog.Builder(IssueLabelListActivity.this)
+                        .setTitle(getString(R.string.issue_dialog_delete_title, mCurrentLabelName))
+                        .setMessage(R.string.issue_dialog_delete_message)
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                new DeleteIssueLabelTask(mCurrentLabelName).execute();
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, null)
+                        .show();
                 break;
             default:
                 break;
