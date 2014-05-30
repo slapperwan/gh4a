@@ -91,6 +91,7 @@
 	<string name="auth_code">Authentication Code</string>
 	<string name="two_factor_auth">Two-factor Authentication</string>
 	<string name="verify">Verify</string>
+    <string name="confirmation">Are you sure?</string>
 	
     <plurals name="file">
         <item quantity="one">File</item>
