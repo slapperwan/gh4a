@@ -16,6 +16,7 @@ public abstract class BackgroundTask<T> extends AsyncTask<Void, Void, T> {
         try {
             return run();
         } catch (Exception e) {
+            e.printStackTrace();
             mException = e;
         }
         return null;
