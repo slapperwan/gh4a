@@ -421,7 +421,6 @@ public class FileViewerActivity extends LoadingFragmentActivity {
                 }
             }
         });
-
         builder.show();
     }
 
@@ -458,7 +457,6 @@ public class FileViewerActivity extends LoadingFragmentActivity {
 
             CommitService commitService = (CommitService)
                     Gh4Application.get(mContext).getService(Gh4Application.COMMIT_SERVICE);
-
             if (isEdit) {
                 commitService.editComment(new RepositoryId(mRepoOwner, mRepoName), commitComment);
             } else {
