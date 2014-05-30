@@ -1,29 +1,26 @@
-OctoDroid (formerly known as Gh4a)
-================================
-This application provides access to github.com information and stay connected with your networks.
+OctoDroid
+=========
+This application provides access to [GitHub](https://github.com/) and lets you stay connected with your network
 
-<a href="https://play.google.com/store/apps/details?id=com.gh4a" alt="Download from Google Play">
-  <img src="http://www.android.com/images/brand/android_app_on_play_large.png">
-</a>
+![Octodroid](https://raw.githubusercontent.com/slapperwan/gh4a/master/res/drawable-xxhdpi/octodroid.png)
 
-
-[OctoDroid on F-Droid.org](http://f-droid.org/repository/browse/?fdfilter=octodroid&fdid=com.gh4a)
+Download
+--------
+[![Download OctoDroid from Google Play](http://www.android.com/images/brand/android_app_on_play_large.png)](https://play.google.com/store/apps/details?id=com.gh4a) [![Download OctoDroid from F-Droid.org](https://f-droid.org/wp-content/uploads/2014/04/cropped-header_resp1.png)](http://f-droid.org/repository/browse/?fdfilter=octodroid&fdid=com.gh4a)
 
 Main features
 -------------
 
-*Repository*
-
+###Repository###
 * List repositories
 * Watch/unwatch repository
 * View branches/tags
 * View pull requests
-* View collaborators/contributors
+* View contributors
 * View watchers/networks
 * View issues
 
-*User*
-
+###User###
 * View basic information
 * Activity feeds
 * Follow/unfollow user
@@ -32,8 +29,7 @@ Main features
 * View organizations (if type is user)
 * View members (if type is organization)
 
-*Issue*
-
+###Issue###
 * List issues
 * Filter by label, assignee or milestone
 * Create/edit/close/reopen issue
@@ -41,32 +37,28 @@ Main features
 * Manage labels
 * Manage milestones
 
-*Commit*
-
+###Commit###
 * View commit (shows files changed/added/deleted)
 * Diff viewer with colorized HTML
 * View commit history on each file
 
-*Tree/File browser*
+###Tree/File browser###
+* Browse source code
+* View code with syntax hightlighting
 
-* Browse source codes
-* File viewer with code syntax hightlighted
-
-*Gist*
-
+###Gist###
 * List public gists
 * View gist content
 
-*Explore Github*
-
+###Explore Github###
 * Public timeline
 * Trending repos (today, week, month, forever)
 * GitHub blog
 
-<i>..and many more</i>
+*..and many more*
 
 How to Build GH4A
-=================
+-----------------
 - Ensure Android SDK platform version 19 and build-tools version 19.1.0 are installed
 - Build using Gradle
 
@@ -81,8 +73,7 @@ How to Build GH4A
 ```
 
 Open Source Libraries
-=====================
-
+---------------------
 * [GitHub Java API](https://github.com/maniac103/egit-github/tree/master/org.eclipse.egit.github.core)
 * [ActionBarSherlock](https://github.com/JakeWharton/ActionBarSherlock) tag 4.4.0
 * [ViewPagerIndicator](https://github.com/JakeWharton/Android-ViewPagerIndicator)
@@ -90,10 +81,10 @@ Open Source Libraries
 * [ProgressFragment](https://github.com/johnkil/Android-ProgressFragment)
 
 Contributions
-=============
-* [kageiit](https://github.com/kageiit) For improvements and bug fixes.
-* [maniac103](https://github.com/maniac103) For code improvements, bug fixes and new features
-* [ARoiD](https://github.com/ARoiD) For testing
-* [extremis (Steven Mautone)](https://github.com/extremis)  He gave the OctoDroid name and the new icon.  Thanks a lot.
-* [zquestz](https://github.com/zquestz)  Thanks for the application icon.
+-------------
+* [kageiit](https://github.com/kageiit) - Improvements and bug fixes
+* [maniac103](https://github.com/maniac103) - Improvements, bug fixes and new features
+* [ARoiD](https://github.com/ARoiD) - Testing
+* [extremis (Steven Mautone)](https://github.com/extremis) - OctoDroid name and the new icon
+* [zquestz](https://github.com/zquestz) - Thanks for the application icon
 * [cketti](https://github.com/cketti)
