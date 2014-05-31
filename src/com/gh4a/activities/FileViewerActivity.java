@@ -381,11 +381,6 @@ public class FileViewerActivity extends LoadingFragmentActivity {
         LayoutInflater li = LayoutInflater.from(this);
         View commentDialog = li.inflate(R.layout.commit_comment_dialog, null);
 
-        AlertDialog.Builder builder = UiUtils.createDialogBuilder(this);
-        builder.setCancelable(true);
-        builder.setTitle(R.string.commit_comment_dialog_title);
-        builder.setView(commentDialog);
-
         final TextView code = (TextView) commentDialog.findViewById(R.id.line);
         code.setText(line);
 
@@ -395,33 +390,36 @@ public class FileViewerActivity extends LoadingFragmentActivity {
             body.setText(commitComment.getBody());
         }
 
-        builder.setPositiveButton(R.string.issue_comment_title, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                if (!StringUtils.isBlank(body.getText().toString())) {
-                    new CommentTask(id, body.getText().toString(), position).execute();
-                } else {
-                    ToastUtils.showMessage(FileViewerActivity.this, R.string.commit_comment_error_body);
+        new AlertDialog.Builder(this)
+            .setCancelable(true)
+            .setTitle(R.string.commit_comment_dialog_title)
+            .setView(commentDialog)
+            .setPositiveButton(R.string.issue_comment_title, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    if (!StringUtils.isBlank(body.getText().toString())) {
+                        new CommentTask(id, body.getText().toString(), position).execute();
+                    } else {
+                        ToastUtils.showMessage(FileViewerActivity.this, R.string.commit_comment_error_body);
+                    }
                 }
-            }
-        });
-
-        builder.setNegativeButton(isEdit ? R.string.delete : R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                if (isEdit) {
-                    AlertDialog.Builder builder = UiUtils.createDialogBuilder(FileViewerActivity.this);
-                    builder.setTitle(R.string.delete_comment_message);
-                    builder.setMessage(R.string.confirmation);
-                    builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            new DeleteCommentTask(id).execute();
-                        }
-                    });
-                    builder.setNegativeButton(R.string.cancel, null);
-                    builder.show();
+            })
+            .setNegativeButton(isEdit ? R.string.delete : R.string.cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    if (isEdit) {
+                        new AlertDialog.Builder(FileViewerActivity.this)
+                            .setTitle(R.string.delete_comment_message)
+                            .setMessage(R.string.confirmation)
+                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    new DeleteCommentTask(id).execute();
+                                }
+                            })
+                            .setNegativeButton(R.string.cancel, null)
+                            .show();
+                    }
                 }
-            }
-        });
-        builder.show();
+            })
+            .show();
     }
 
     private void refresh() {
