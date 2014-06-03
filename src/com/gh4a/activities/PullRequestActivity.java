@@ -25,6 +25,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.PullRequestCommitListFragment;
+import com.gh4a.fragment.PullRequestFilesFragment;
 import com.gh4a.fragment.PullRequestFragment;
 import com.gh4a.utils.IntentUtils;
 
@@ -34,7 +35,7 @@ public class PullRequestActivity extends LoadingFragmentPagerActivity {
     private int mPullRequestNumber;
 
     private static final int[] TITLES = new int[] {
-        R.string.pull_request_comments, R.string.commits
+        R.string.pull_request_conversation, R.string.commits, R.string.pull_request_files
     };
 
     @Override
@@ -65,6 +66,8 @@ public class PullRequestActivity extends LoadingFragmentPagerActivity {
     protected Fragment getFragment(int position) {
         if (position == 1) {
             return PullRequestCommitListFragment.newInstance(mRepoOwner, mRepoName, mPullRequestNumber);
+        } else if (position == 2) {
+            return PullRequestFilesFragment.newInstance(mRepoOwner, mRepoName, mPullRequestNumber);
         } else {
             return PullRequestFragment.newInstance(mRepoOwner, mRepoName, mPullRequestNumber);
         }

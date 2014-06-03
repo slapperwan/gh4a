@@ -70,7 +70,6 @@ public class PullRequestCommitListFragment extends ListDataBaseFragment<Reposito
     @Override
     protected void onItemClick(RepositoryCommit commit) {
         Intent intent = new Intent(getActivity(), CommitActivity.class);
-
         intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.NAME, mRepoName);
         intent.putExtra(Constants.Object.OBJECT_SHA, commit.getSha());
