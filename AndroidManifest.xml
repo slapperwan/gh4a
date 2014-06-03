@@ -108,6 +108,9 @@
             android:name=".activities.PullRequestListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
+            android:name=".activities.PullRequestDiffViewerActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
             android:name=".activities.ReleaseInfoActivity"
             android:configChanges="orientation|screenSize" />
         <activity
