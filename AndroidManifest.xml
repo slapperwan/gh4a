@@ -65,6 +65,12 @@
             android:name=".activities.FileViewerActivity"
             android:configChanges="orientation|screenSize" />
         <activity
+            android:name=".activities.CommitDiffViewerActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activities.PullFileDiffViewerActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
             android:name=".activities.FollowerFollowingListActivity"
             android:configChanges="orientation|screenSize" />
         <activity
