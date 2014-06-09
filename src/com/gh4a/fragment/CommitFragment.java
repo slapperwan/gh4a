@@ -19,6 +19,7 @@ import com.devspark.progressfragment.SherlockProgressFragment;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.CommitDiffViewerActivity;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.loader.CommitLoader;
 import com.gh4a.loader.LoaderCallbacks;
@@ -207,7 +208,7 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
         } else {
             CommitFile file = (CommitFile) v.getTag();
 
-            Intent intent = new Intent(getActivity(), FileViewerActivity.class);
+            Intent intent = new Intent(getActivity(), CommitDiffViewerActivity.class);
             intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
             intent.putExtra(Constants.Repository.NAME, mRepoName);
             intent.putExtra(Constants.Object.REF, mObjectSha);

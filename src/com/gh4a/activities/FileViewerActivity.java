@@ -65,22 +65,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class FileViewerActivity extends LoadingFragmentActivity {
-    protected String mRepoOwner;
-    protected String mRepoName;
-    private String mPath;
-    private String mRef;
-    private String mSha;
-    private String mDiff;
-    private boolean mInDiffMode;
-    private WebView mWebView;
-
-    private String[] mDiffLines;
-    private SparseArray<List<CommitComment>> mCommitCommentsByPos =
-            new SparseArray<List<CommitComment>>();
-    private HashMap<Long, CommitComment> mCommitComments = new HashMap<Long, CommitComment>();
-
-    private WebViewClient mWebViewClient = new WebViewClient() {
+public class FileViewerActivity extends WebViewerActivity {
+    protected WebViewClient mWebViewClient = new WebViewClient() {
         @Override
         public void onPageFinished(WebView webView, String url) {
             setContentShown(true);
@@ -88,181 +74,43 @@ public class FileViewerActivity extends LoadingFragmentActivity {
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            if (url.startsWith("comment://")) {
-                Uri uri = Uri.parse(url);
-                int line = Integer.parseInt(uri.getQueryParameter("position"));
-                String lineText = Html.fromHtml(mDiffLines[line]).toString();
-                String idParam = uri.getQueryParameter("id");
-                long id = idParam != null ? Long.parseLong(idParam) : 0L;
-
-                openCommentDialog(id, lineText, line);
-            } else {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                startActivity(intent);
-            }
-
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
             return true;
         }
     };
 
     private LoaderCallbacks<List<RepositoryContents>> mFileCallback =
             new LoaderCallbacks<List<RepositoryContents>>() {
-        @Override
-        public Loader<LoaderResult<List<RepositoryContents>>> onCreateLoader(int id, Bundle args) {
-            return new ContentLoader(FileViewerActivity.this, mRepoOwner, mRepoName, mPath, mRef);
-        }
-
-        @Override
-        public void onResultReady(LoaderResult<List<RepositoryContents>> result) {
-            setContentEmpty(true);
-            if (!result.handleError(FileViewerActivity.this)) {
-                List<RepositoryContents> data = result.getData();
-                if (data != null && !data.isEmpty()) {
-                    loadContent(data.get(0));
-                    setContentEmpty(false);
+                @Override
+                public Loader<LoaderResult<List<RepositoryContents>>> onCreateLoader(int id, Bundle args) {
+                    return new ContentLoader(FileViewerActivity.this, mRepoOwner, mRepoName, mPath, mRef);
                 }
-            }
-            setContentShown(true);
-        }
-    };
 
-    private LoaderCallbacks<List<CommitComment>> mCommitCommentCallback =
-            new LoaderCallbacks<List<CommitComment>>() {
-        @Override
-        public Loader<LoaderResult<List<CommitComment>>> onCreateLoader(int id, Bundle args) {
-            return new CommitCommentListLoader(FileViewerActivity.this, mRepoOwner, mRepoName, mSha);
-        }
-
-        @Override
-        public void onResultReady(LoaderResult<List<CommitComment>> result) {
-            setContentEmpty(true);
-            if (!result.handleError(FileViewerActivity.this)) {
-                for (CommitComment comment : result.getData()) {
-                    if (!TextUtils.equals(comment.getPath(), mPath)) {
-                        continue;
+                @Override
+                public void onResultReady(LoaderResult<List<RepositoryContents>> result) {
+                    setContentEmpty(true);
+                    if (!result.handleError(FileViewerActivity.this)) {
+                        List<RepositoryContents> data = result.getData();
+                        if (data != null && !data.isEmpty()) {
+                            loadContent(data.get(0));
+                            setContentEmpty(false);
+                        }
                     }
-                    int position = comment.getPosition();
-                    List<CommitComment> comments = mCommitCommentsByPos.get(position);
-                    if (comments == null) {
-                        comments = new ArrayList<CommitComment>();
-                        mCommitCommentsByPos.put(position, comments);
-                    }
-                    comments.add(comment);
+                    setContentShown(true);
                 }
-                showDiff();
-                setContentEmpty(false);
-            }
-            setContentShown(true);
-        }
-    };
+            };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         Bundle data = getIntent().getExtras();
-        mRepoOwner = data.getString(Constants.Repository.OWNER);
-        mRepoName = data.getString(Constants.Repository.NAME);
-        mPath = data.getString(Constants.Object.PATH);
         mRef = data.getString(Constants.Object.REF);
-        mSha = data.getString(Constants.Object.OBJECT_SHA);
-        mDiff = data.getString(Constants.Commit.DIFF);
-        mInDiffMode = data.getString(Constants.Object.TREE_SHA) != null;
-
-        if (hasErrorView()) {
-            return;
-        }
-
-        setContentView(R.layout.web_viewer);
-
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(FileUtils.getFileName(mPath));
-        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
-        setContentShown(false);
-
-        if (mDiff != null) {
-            getSupportLoaderManager().initLoader(1, null, mCommitCommentCallback);
-        } else {
-            getSupportLoaderManager().initLoader(0, null, mFileCallback);
-        }
-    }
-
-    @SuppressWarnings("deprecation")
-    @SuppressLint("SetJavaScriptEnabled")
-    private void setupWebView() {
-        mWebView = (WebView) findViewById(R.id.web_view);
-
-        WebSettings s = mWebView.getSettings();
-        s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
-        s.setAllowFileAccess(true);
-        s.setBuiltInZoomControls(true);
-        s.setLightTouchEnabled(true);
-        s.setLoadsImagesAutomatically(true);
-        s.setSupportZoom(true);
-        s.setSupportMultipleWindows(true);
-        s.setJavaScriptEnabled(true);
-        s.setUseWideViewPort(true);
-
-        mWebView.setBackgroundColor(ThemeUtils.getWebViewBackgroundColor(Gh4Application.THEME));
-        mWebView.setWebViewClient(mWebViewClient);
-    }
-
-    private void showDiff() {
-        StringBuilder content = new StringBuilder();
-
-        content.append("<html><head><title></title>");
-        content.append("<link href='file:///android_asset/text-");
-        content.append(ThemeUtils.getCssTheme(Gh4Application.THEME));
-        content.append(".css' rel='stylesheet' type='text/css'/>");
-        content.append("</head><body><pre>");
-
-        String encoded = TextUtils.htmlEncode(mDiff);
-        mDiffLines = encoded.split("\n");
-
-        for (int i = 0; i < mDiffLines.length; i++) {
-            String line = mDiffLines[i];
-            String cssClass = null;
-            if (line.startsWith("@@")) {
-                cssClass = "change";
-            } else if (line.startsWith("+")) {
-                cssClass = "add";
-            } else if (line.startsWith("-")) {
-                cssClass = "remove";
-            }
-
-            content.append("<div class=\"").append(cssClass).append("\" ");
-            content.append("onclick=\"javascript:location.href='comment://add");
-            content.append("?position=").append(i).append("'\">").append(line).append("</div>");
-
-            List<CommitComment> comments = mCommitCommentsByPos.get(i);
-            if (comments != null) {
-                for (CommitComment comment : comments) {
-                    mCommitComments.put(comment.getId(), comment);
-                    content.append("<div style=\"border:1px solid; padding: 2px; margin: 5px 0;\" ");
-                    content.append("onclick=\"javascript:location.href='comment://edit");
-                    content.append("?position=").append(i);
-                    content.append("&id=").append(comment.getId()).append("'\">");
-                    content.append("<div class=\"change\">");
-                    content.append(getString(R.string.commit_comment_header,
-                            comment.getUser().getLogin(),
-                            StringUtils.formatRelativeTime(FileViewerActivity.this, comment.getCreatedAt(), true)));
-                    content.append("</div>").append(comment.getBodyHtml()).append("</div>");
-                }
-            }
-        }
-        content.append("</pre></body></html>");
-
-        setupWebView();
-
-        mWebView.loadDataWithBaseURL("file:///android_asset/", content.toString(), null, "utf-8", null);
+        getSupportLoaderManager().initLoader(0, null, mFileCallback);
     }
 
     private void loadContent(RepositoryContents content) {
-        setupWebView();
-
         String base64Data = content.getContent();
         if (base64Data != null && FileUtils.isImage(mPath)) {
             String imageUrl = "data:image/" + FileUtils.getFileExtension(mPath) + ";base64," + base64Data;
@@ -286,213 +134,31 @@ public class FileViewerActivity extends LoadingFragmentActivity {
             menu.removeItem(R.id.search);
         }
 
-        if (mDiff != null) {
-            menu.add(0, 11, Menu.NONE, getString(R.string.object_view_file_at, mSha.substring(0, 7)))
-                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-        } else if (!mInDiffMode) {
-            menu.add(0, 10, Menu.NONE, getString(R.string.history))
-                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-        }
+        menu.add(0, 10, Menu.NONE, getString(R.string.history))
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     protected void navigateUp() {
-        if (mInDiffMode) {
-            IntentUtils.openCommitInfoActivity(this, mRepoOwner, mRepoName,
-                    mSha, Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        } else {
-            IntentUtils.openRepositoryInfoActivity(this, mRepoOwner, mRepoName,
-                    null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        }
+        IntentUtils.openRepositoryInfoActivity(this, mRepoOwner, mRepoName,
+                null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        String urlBase = "https://github.com/" + mRepoOwner + "/" + mRepoName;
-        String url = mDiff != null ? urlBase + "/commit/" + mSha : urlBase + "/blob/" + mRef + "/" + mPath;
-
-        switch (item.getItemId()) {
-            case R.id.browser:
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                startActivity(browserIntent);
-                return true;
-            case R.id.share:
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                if (mDiff != null) {
-                    shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_commit_subject,
-                            mSha.substring(0, 7), mRepoOwner + "/" + mRepoName));
-                } else {
-                    shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_file_subject,
-                            FileUtils.getFileName(mPath), mRepoOwner + "/" + mRepoName));
-                }
-                shareIntent.putExtra(Intent.EXTRA_TEXT, url);
-                shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
-                startActivity(shareIntent);
-                return true;
-            case R.id.search:
-                doSearch();
-                return true;
-            case 10:
-                Intent historyIntent = new Intent(this, CommitHistoryActivity.class);
-                historyIntent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-                historyIntent.putExtra(Constants.Repository.NAME, mRepoName);
-                historyIntent.putExtra(Constants.Object.PATH, mPath);
-                historyIntent.putExtra(Constants.Object.REF, mRef);
-                historyIntent.putExtra(Constants.Object.OBJECT_SHA, mSha);
-                startActivity(historyIntent);
-                return true;
-            case 11:
-                Intent viewIntent = new Intent(this, FileViewerActivity.class);
-                viewIntent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-                viewIntent.putExtra(Constants.Repository.NAME, mRepoName);
-                viewIntent.putExtra(Constants.Object.PATH, mPath);
-                viewIntent.putExtra(Constants.Object.REF, mSha);
-                viewIntent.putExtra(Constants.Object.OBJECT_SHA, mSha);
-                startActivity(viewIntent);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
+    public void setWebViewClient() {
+        mWebView.setWebViewClient(mWebViewClient);
     }
 
-    @SuppressWarnings("deprecation")
-    @TargetApi(11)
-    private void doSearch() {
-        if (mWebView != null) {
-            mWebView.showFindDialog(null, true);
-        }
+    @Override
+    public String getUrl() {
+        return "/blob/" + mRef + "/" + mPath;
     }
 
-    private void openCommentDialog(final long id, String line, final int position) {
-        final boolean isEdit = id != 0L;
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View commentDialog = inflater.inflate(R.layout.commit_comment_dialog, null);
-
-        final TextView code = (TextView) commentDialog.findViewById(R.id.line);
-        code.setText(line);
-
-        final EditText body = (EditText) commentDialog.findViewById(R.id.body);
-        if (isEdit) {
-            body.setText(mCommitComments.get(id).getBody());
-        }
-
-        final int saveButtonResId = isEdit
-                ? R.string.issue_comment_update_title : R.string.issue_comment_title;
-        final DialogInterface.OnClickListener saveCb = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String text = body.getText().toString();
-                if (!StringUtils.isBlank(text)) {
-                    new CommentTask(id, text, position).execute();
-                } else {
-                    ToastUtils.showMessage(FileViewerActivity.this, R.string.commit_comment_error_body);
-                }
-            }
-        };
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
-            .setCancelable(true)
-            .setTitle(getString(R.string.commit_comment_dialog_title, position))
-            .setView(commentDialog)
-            .setPositiveButton(saveButtonResId, saveCb)
-            .setNegativeButton(R.string.cancel, null);
-
-        if (isEdit) {
-            builder.setNeutralButton(R.string.delete, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    new AlertDialog.Builder(FileViewerActivity.this)
-                            .setTitle(R.string.delete_comment_message)
-                            .setMessage(R.string.confirmation)
-                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int whichButton) {
-                                    new DeleteCommentTask(id).execute();
-                                }
-                            })
-                            .setNegativeButton(R.string.cancel, null)
-                            .show();
-                }
-            });
-        }
-
-        builder.show();
-    }
-
-    private void refresh() {
-        mCommitComments.clear();
-        mCommitCommentsByPos.clear();
-        getSupportLoaderManager().restartLoader(1, null, mCommitCommentCallback);
-        setContentShown(false);
-    }
-
-    private class CommentTask extends ProgressDialogTask<Void> {
-        private String mBody;
-        private int mPosition;
-        private long mId;
-
-        public CommentTask(long id, String body, int position) {
-            super(FileViewerActivity.this, 0, R.string.saving_msg);
-            mBody = body;
-            mPosition = position;
-            mId = id;
-        }
-
-        @Override
-        protected Void run() throws IOException {
-            boolean isEdit = mId != 0L;
-            CommitComment commitComment = new CommitComment();
-
-            if (isEdit) {
-                commitComment.setId(mId);
-            }
-            commitComment.setPosition(mPosition);
-            commitComment.setCommitId(mSha);
-            commitComment.setPath(mPath);
-            commitComment.setBody(mBody);
-
-            CommitService commitService = (CommitService)
-                    Gh4Application.get(mContext).getService(Gh4Application.COMMIT_SERVICE);
-
-            if (isEdit) {
-                commitService.editComment(new RepositoryId(mRepoOwner, mRepoName), commitComment);
-            } else {
-                commitService.addComment(new RepositoryId(mRepoOwner, mRepoName), mSha, commitComment);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            refresh();
-        }
-    }
-
-    private class DeleteCommentTask extends ProgressDialogTask<Void> {
-        private long mId;
-
-        public DeleteCommentTask(long id) {
-            super(FileViewerActivity.this, 0, R.string.deleting_msg);
-            mId = id;
-        }
-
-        @Override
-        protected Void run() throws IOException {
-            CommitComment commitComment = new CommitComment();
-            commitComment.setId(mId);
-
-            CommitService commitService = (CommitService)
-                    Gh4Application.get(mContext).getService(Gh4Application.COMMIT_SERVICE);
-
-            commitService.deleteComment(new RepositoryId(mRepoOwner, mRepoName), mId);
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            refresh();
-        }
+    @Override
+    public String getShareSubject() {
+        return getString(R.string.share_file_subject,
+                FileUtils.getFileName(mPath), mRepoOwner + "/" + mRepoName);
     }
 }
