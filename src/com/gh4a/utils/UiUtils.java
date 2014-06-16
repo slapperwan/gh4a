@@ -135,8 +135,8 @@ public class UiUtils {
         }
     }
 
-    private static Uri buildDownloadDestinationUri(Context context, String fileName) {
-        final File file = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+    private static Uri buildDownloadDestinationUri(String fileName) {
+        final File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         if (file == null) {
             return null;
         }
@@ -155,7 +155,7 @@ public class UiUtils {
         final Uri uri = Uri.parse(url).buildUpon()
                 .appendQueryParameter("access_token", Gh4Application.get(context).getAuthToken())
                 .build();
-        final Uri destinationUri = buildDownloadDestinationUri(context, fileName);
+        final Uri destinationUri = buildDownloadDestinationUri(fileName);
         if (destinationUri == null) {
             ToastUtils.showMessage(context, R.string.download_fail_no_storage_toast);
             return;
