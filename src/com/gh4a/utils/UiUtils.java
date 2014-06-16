@@ -115,7 +115,7 @@ public class UiUtils {
             // as we only rely on internal API that won't change anymore.
             ContentValues values = new ContentValues();
             values.put("uri", uri.toString());
-            values.put("is_public_api", "true");
+            values.put("is_public_api", true);
             values.put("notificationpackage", context.getPackageName());
             values.put("destination", 4);
             values.put("hint", destinationUri.toString());
