@@ -171,7 +171,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
                     content.append("&id=").append(comment.getId()).append("'\">");
                     content.append("<div class=\"change\">");
                     content.append(getString(R.string.commit_comment_header,
-                            comment.getUser().getLogin(),
+                            "<b>" + comment.getUser().getLogin() + "</b>",
                             StringUtils.formatRelativeTime(DiffViewerActivity.this, comment.getCreatedAt(), true)));
                     content.append("</div>").append(comment.getBodyHtml()).append("</div>");
                 }
