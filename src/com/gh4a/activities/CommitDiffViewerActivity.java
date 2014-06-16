@@ -83,12 +83,14 @@ public class CommitDiffViewerActivity extends DiffViewerActivity {
                         continue;
                     }
                     int position = comment.getPosition();
-                    List<CommitComment> comments = mCommitCommentsByPos.get(position);
-                    if (comments == null) {
-                        comments = new ArrayList<CommitComment>();
-                        mCommitCommentsByPos.put(position, comments);
+                    if (position != -1) {
+                        List<CommitComment> comments = mCommitCommentsByPos.get(position);
+                        if (comments == null) {
+                            comments = new ArrayList<CommitComment>();
+                            mCommitCommentsByPos.put(position, comments);
+                        }
+                        comments.add(comment);
                     }
-                    comments.add(comment);
                 }
                 showDiff();
                 setContentEmpty(false);

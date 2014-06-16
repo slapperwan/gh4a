@@ -16,6 +16,7 @@
 package com.gh4a.adapter;
 
 import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.CommitComment;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -27,6 +28,7 @@ import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.GravatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
@@ -68,25 +70,38 @@ public class CommentAdapter extends RootAdapter<Comment> implements OnClickListe
 
     @Override
     protected void bindView(View v, Comment comment) {
-        ViewHolder viewHolder = (ViewHolder) v.getTag();
-        String login = Gh4Application.get(mContext).getAuthLogin();
+        boolean isCommitComment = comment instanceof CommitComment;
+        if (!isCommitComment ||
+                ((CommitComment) comment).getPosition() != -1) {
+            ViewHolder viewHolder = (ViewHolder) v.getTag();
+            String login = Gh4Application.get(mContext).getAuthLogin();
 
-        GravatarHandler.assignGravatar(viewHolder.ivGravatar, comment.getUser());
+            GravatarHandler.assignGravatar(viewHolder.ivGravatar, comment.getUser());
 
-        viewHolder.tvExtra.setText(comment.getUser().getLogin() + "\n"
-                + StringUtils.formatRelativeTime(mContext, comment.getCreatedAt(), true));
+            if (isCommitComment) {
+                viewHolder.tvExtra.setText(mContext.getString(R.string.issue_commit_comment_header,
+                        comment.getUser().getLogin(),
+                        StringUtils.formatRelativeTime(mContext, comment.getCreatedAt(), true),
+                        FileUtils.getFileName(((CommitComment) comment).getPath())));
+            } else {
+                viewHolder.tvExtra.setText(mContext.getString(R.string.issue_comment_header,
+                        comment.getUser().getLogin(),
+                        StringUtils.formatRelativeTime(mContext, comment.getCreatedAt(), true)));
+            }
 
-        String body = comment.getBodyHtml();
-        mImageGetter.bind(viewHolder.tvDesc, body, comment.getId());
+            String body = comment.getBodyHtml();
+            mImageGetter.bind(viewHolder.tvDesc, body, comment.getId());
 
-        viewHolder.ivGravatar.setTag(comment);
+            viewHolder.ivGravatar.setTag(comment);
 
-        if (comment.getUser().getLogin().equals(login) || mRepoOwner.equals(login)) {
-            viewHolder.ivEdit.setVisibility(View.VISIBLE);
-            viewHolder.ivEdit.setTag(comment);
-            viewHolder.ivEdit.setOnClickListener(this);
-        } else {
-            viewHolder.ivEdit.setVisibility(View.GONE);
+            if (!isCommitComment &&
+                    (comment.getUser().getLogin().equals(login) || mRepoOwner.equals(login))) {
+                viewHolder.ivEdit.setVisibility(View.VISIBLE);
+                viewHolder.ivEdit.setTag(comment);
+                viewHolder.ivEdit.setOnClickListener(this);
+            } else {
+                viewHolder.ivEdit.setVisibility(View.GONE);
+            }
         }
     }
 

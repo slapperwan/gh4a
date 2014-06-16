@@ -246,7 +246,7 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         GravatarHandler.assignGravatar(gravatar, user);
 
         TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
-        tvCommentTitle.setText(getString(R.string.issue_comments) + " (" + mPullRequest.getComments() + ")");
+        tvCommentTitle.setText(getString(R.string.issue_comments));
 
         TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
         if (Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState())) {
