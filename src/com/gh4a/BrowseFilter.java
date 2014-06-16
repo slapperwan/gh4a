@@ -95,8 +95,8 @@ public class BrowseFilter extends BaseSherlockFragmentActivity {
                 }
             } else if ("commit".equals(action) && !StringUtils.isBlank(id)) {
                 IntentUtils.openCommitInfoActivity(this, user, repo, id, 0);
-            } else if ("commits".equals(action) && !StringUtils.isBlank(id)) {
-                IntentUtils.openRepositoryInfoActivity(this, user, repo, id, 0);
+            } else if ("commits".equals(action)) {
+                IntentUtils.openRepositoryInfoActivity(this, user, repo, !StringUtils.isBlank(id) ? id : null, 0);
             } else if ("blob".equals(action) && !StringUtils.isBlank(id) && parts.size() >= 5) {
                 String fullPath = TextUtils.join("/", parts.subList(4, parts.size()));
                 IntentUtils.openFileViewerActivity(this, user, repo, id, fullPath, uri.getLastPathSegment());
