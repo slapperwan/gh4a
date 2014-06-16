@@ -325,7 +325,6 @@ public class PullRequestDiffViewerActivity extends LoadingFragmentActivity {
                 commitComment.setId(mId);
             }
             commitComment.setPosition(mPosition);
-            Log.d("XXX", mSha);
             commitComment.setCommitId(mSha);
             commitComment.setPath(mPath);
             commitComment.setBody(mBody);
