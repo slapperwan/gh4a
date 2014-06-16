@@ -5,6 +5,7 @@ import org.eclipse.egit.github.core.User;
 
 import android.content.Context;
 import android.content.Intent;
+import android.text.TextUtils;
 
 import com.gh4a.Constants;
 import com.gh4a.R;
@@ -78,11 +79,21 @@ public class IntentUtils {
 
     public static void openRepositoryInfoActivity(Context context, String repoOwner, String repoName,
             String ref, int flags) {
+        openRepositoryInfoActivity(context, repoOwner, repoName, ref,
+                RepositoryActivity.PAGE_REPO_OVERVIEW, flags);
+    }
+
+    public static void openRepositoryInfoActivity(Context context, String repoOwner, String repoName,
+            String ref, int initialPage, int flags) {
         Intent intent = new Intent(context, RepositoryActivity.class);
+        if (TextUtils.isEmpty(ref)) {
+            ref = null;
+        }
         intent.putExtra(Constants.Repository.OWNER, repoOwner);
         intent.putExtra(Constants.Repository.NAME, repoName);
         intent.putExtra(Constants.Repository.SELECTED_REF, ref);
         intent.putExtra(Constants.Repository.SELECTED_BRANCHTAG_NAME, ref);
+        intent.putExtra(RepositoryActivity.EXTRA_INITIAL_PAGE, initialPage);
         if (flags != 0) {
             intent.setFlags(flags);
         }
