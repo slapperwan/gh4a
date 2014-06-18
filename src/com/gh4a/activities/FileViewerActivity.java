@@ -15,54 +15,29 @@
  */
 package com.gh4a.activities;
 
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.text.Html;
-import android.text.TextUtils;
-import android.util.SparseArray;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.EditText;
-import android.widget.TextView;
 
-import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
-import com.gh4a.Gh4Application;
-import com.gh4a.LoadingFragmentActivity;
-import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
-import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.ContentLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.ThemeUtils;
-import com.gh4a.utils.ToastUtils;
 
-import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.RepositoryContents;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.CommitService;
 import org.eclipse.egit.github.core.util.EncodingUtils;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class FileViewerActivity extends WebViewerActivity {
@@ -150,7 +125,6 @@ public class FileViewerActivity extends WebViewerActivity {
     public void setWebViewClient() {
         mWebView.setWebViewClient(mWebViewClient);
     }
-
 
     @Override
     public String getUrl() {
