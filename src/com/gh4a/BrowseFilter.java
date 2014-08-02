@@ -33,7 +33,7 @@ public class BrowseFilter extends BaseSherlockFragmentActivity {
             return;
         }
 
-        List<String> parts = uri.getPathSegments();
+        List<String> parts = new ArrayList<String>(uri.getPathSegments());
 
         String first = parts.isEmpty() ? null : parts.get(0);
         if (IGitHubConstants.HOST_GISTS.equals(uri.getHost())) {

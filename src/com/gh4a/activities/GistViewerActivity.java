@@ -66,6 +66,7 @@ public class GistViewerActivity extends LoadingFragmentActivity {
             }
             setContentEmpty(!success);
             setContentShown(true);
+            invalidateOptionsMenu();
         }
     };
 
@@ -139,6 +140,9 @@ public class GistViewerActivity extends LoadingFragmentActivity {
         menu.removeItem(R.id.share);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
             menu.removeItem(R.id.search);
+        }
+        if (mGistFile == null) {
+            menu.removeItem(R.id.browser);
         }
 
         return super.onCreateOptionsMenu(menu);

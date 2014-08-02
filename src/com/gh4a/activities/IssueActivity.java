@@ -298,6 +298,9 @@ public class IssueActivity extends LoadingFragmentActivity implements
                 menu.removeItem(R.id.issue_reopen);
                 menu.removeItem(R.id.issue_edit);
             }
+            if (mIssue == null) {
+                menu.removeItem(R.id.share);
+            }
         }
         return super.onCreateOptionsMenu(menu);
     }
