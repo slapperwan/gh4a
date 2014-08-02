@@ -20,6 +20,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.SparseArray;
 import android.view.View;
 import android.widget.ArrayAdapter;
 
@@ -36,7 +37,11 @@ import com.viewpagerindicator.TitlePageIndicator;
 
 public class ExploreActivity extends BaseSherlockFragmentActivity implements ActionBar.OnNavigationListener {
     private ActionBar mActionBar;
+    private ViewPager mPager;
+    private TitlePageIndicator mIndicator;
+    private ThisPageAdapter mAdapter;
     private PublicTimelineFragment mPublicTimeFragment;
+    private int mSelectedItem;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,58 +67,64 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         mActionBar.setListNavigationCallbacks(list, this);
 
-        setPageIndicator(mActionBar.getSelectedNavigationIndex());
-    }
+        mAdapter = new ThisPageAdapter(getSupportFragmentManager());
+        mPager = (ViewPager) findViewById(R.id.pager);
+        mPager.setAdapter(mAdapter);
 
-    private void setPageIndicator(int position) {
-        ThisPageAdapter adapter = new ThisPageAdapter(getSupportFragmentManager());
-        ViewPager pager = (ViewPager) findViewById(R.id.pager);
-        pager.setAdapter(adapter);
-        pager.invalidate();
-
-        TitlePageIndicator indicator = (TitlePageIndicator) findViewById(R.id.indicator);
-
+        mIndicator = (TitlePageIndicator) findViewById(R.id.indicator);
+        mIndicator.setViewPager(mPager);
         if (Gh4Application.THEME != R.style.DefaultTheme) {
-            indicator.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_light));
-            indicator.setSelectedColor(getResources().getColor(R.color.abs__primary_text_holo_light));
-            indicator.setSelectedBold(true);
+            mIndicator.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_light));
+            mIndicator.setSelectedColor(getResources().getColor(R.color.abs__primary_text_holo_light));
+            mIndicator.setSelectedBold(true);
         }
 
-        boolean trending = position == 1;
-        indicator.setVisibility(trending ? View.VISIBLE : View.GONE);
-        indicator.setViewPager(pager);
+        mSelectedItem = mActionBar.getSelectedNavigationIndex();
+        updatePageIndicator();
+    }
 
-        indicator.notifyDataSetChanged();
-        adapter.notifyDataSetChanged();
+    private void updatePageIndicator() {
+        boolean trending = mSelectedItem == 1;
+        mIndicator.setVisibility(trending ? View.VISIBLE : View.GONE);
+
+        mIndicator.notifyDataSetChanged();
+        mAdapter.notifyDataSetChanged();
+        invalidateOptionsMenu();
+        mPager.invalidate();
     }
 
     private class ThisPageAdapter extends FragmentStatePagerAdapter {
+        private SparseArray<String> mTrendingTypePositionMap = new SparseArray<String>();
+
         public ThisPageAdapter(FragmentManager fm) {
             super(fm);
+            mTrendingTypePositionMap.put(0, TrendingFragment.TYPE_DAILY);
+            mTrendingTypePositionMap.put(1, TrendingFragment.TYPE_WEEKLY);
+            mTrendingTypePositionMap.put(2, TrendingFragment.TYPE_MONTHLY);
         }
 
         @Override
         public int getCount() {
-            return mActionBar.getSelectedNavigationIndex() == 1 ? 3 : 1;
+            return mSelectedItem == 1 ? 3 : 1;
         }
 
         @Override
         public Fragment getItem(int position) {
-            int mode = mActionBar.getSelectedNavigationIndex();
-            if (position == 0) {
-                if (mode == 0) {
+            switch (mSelectedItem) {
+                case 0:
                     mPublicTimeFragment = PublicTimelineFragment.newInstance();
                     return mPublicTimeFragment;
-                } else if (mode == 2) {
+                case 1:
+                    return TrendingFragment.newInstance(mTrendingTypePositionMap.get(position));
+                case 2:
                     return BlogListFragment.newInstance();
-                } else {
-                    return TrendingFragment.newInstance(TrendingFragment.TYPE_DAILY);
-                }
-            } else if (position == 1) {
-                return TrendingFragment.newInstance(TrendingFragment.TYPE_WEEKLY);
-            } else {
-                return TrendingFragment.newInstance(TrendingFragment.TYPE_MONTHLY);
             }
+            return null;
+        }
+
+        @Override
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
         }
 
         @Override
@@ -130,13 +141,14 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
 
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        setPageIndicator(itemPosition);
+        mSelectedItem = itemPosition;
+        updatePageIndicator();
         return true;
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.clear();
-        if (mActionBar.getSelectedNavigationIndex() == 0) {
+        if (mSelectedItem == 0) {
             menu.add(0, R.id.refresh, 0, getString(R.string.refresh))
                 .setIcon(UiUtils.resolveDrawable(this, R.attr.refreshIcon))
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
