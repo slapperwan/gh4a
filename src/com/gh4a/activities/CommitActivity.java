@@ -97,8 +97,7 @@ public class CommitActivity extends LoadingFragmentPagerActivity {
         String diffUrl = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/commit/" + mObjectSha;
         switch (item.getItemId()) {
             case R.id.browser:
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(diffUrl));
-                startActivity(browserIntent);
+                IntentUtils.launchBrowser(this, Uri.parse(diffUrl));
                 return true;
             case R.id.share:
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);

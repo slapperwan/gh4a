@@ -157,8 +157,7 @@ public class GistViewerActivity extends LoadingFragmentActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.browser:
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mGistFile.getRawUrl()));
-                startActivity(browserIntent);
+                IntentUtils.launchBrowser(this, Uri.parse(mGistFile.getRawUrl()));
                 return true;
             case R.id.search:
                 doSearch();
