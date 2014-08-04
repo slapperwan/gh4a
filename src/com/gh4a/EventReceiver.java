@@ -18,6 +18,7 @@ package com.gh4a;
 
 import android.annotation.SuppressLint;
 import android.app.DownloadManager;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -28,12 +29,16 @@ public class EventReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (DownloadManager.ACTION_NOTIFICATION_CLICKED.equals(intent.getAction())) {
-            Intent downloadManagerIntent = new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS);
-            downloadManagerIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                downloadManagerIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            try {
+                Intent downloadManagerIntent = new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS);
+                downloadManagerIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                    downloadManagerIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                }
+                context.startActivity(downloadManagerIntent);
+            } catch (ActivityNotFoundException e) {
+                // ignore, there's nothing we can do about this
             }
-            context.startActivity(downloadManagerIntent);
         }
     }
 

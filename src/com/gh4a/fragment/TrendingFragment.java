@@ -38,8 +38,11 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
     public String mUrl;
 
     public static TrendingFragment newInstance(String type) {
-        TrendingFragment f = new TrendingFragment();
+        if (type == null) {
+            return null;
+        }
 
+        TrendingFragment f = new TrendingFragment();
         Bundle args = new Bundle();
         args.putString("url", String.format(Locale.US, URL_TEMPLATE, type));
         f.setArguments(args);
