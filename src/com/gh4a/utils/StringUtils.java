@@ -146,8 +146,6 @@ public class StringUtils {
                 content.append("<body>");
                 content.append("<div id='content'>");
             } else if (!Constants.SKIP_PRETTIFY_EXT.contains(ext)) {
-                data = TextUtils.htmlEncode(data).replace("\r\n", "<br>").replace("\n", "<br>");
-
                 content.append("<link href='file:///android_asset/prettify-");
                 content.append(cssTheme);
                 content.append(".css' rel='stylesheet' type='text/css'/>");
@@ -156,8 +154,6 @@ public class StringUtils {
                 content.append("<body onload='prettyPrint()'>");
                 content.append("<pre class='prettyprint linenums'>");
             } else{
-                data = TextUtils.htmlEncode(data).replace("\r\n", "<br>").replace("\n", "<br>");
-
                 content.append("<link href='file:///android_asset/text-");
                 content.append(cssTheme);
                 content.append(".css' rel='stylesheet' type='text/css'/>");
@@ -167,7 +163,7 @@ public class StringUtils {
             }
         }
 
-        content.append(data);
+        content.append(TextUtils.htmlEncode(data));
 
         if (Constants.MARKDOWN_EXT.contains(ext)) {
             content.append("</div>");
