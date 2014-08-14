@@ -15,6 +15,7 @@ import com.gh4a.loader.LoaderResult;
 public abstract class ListDataBaseFragment<T> extends SherlockListFragment implements
         LoaderCallbacks<LoaderResult<List<T>>> {
     private RootAdapter<T> mAdapter;
+    private boolean mViewCreated;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -50,8 +51,24 @@ public abstract class ListDataBaseFragment<T> extends SherlockListFragment imple
     }
 
     @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mViewCreated = true;
+    }
+
+    @Override
+    public void onDestroyView() {
+        mViewCreated = false;
+        super.onDestroyView();
+    }
+
+    @Override
     public void onListItemClick(ListView listView, View view, final int position, long id) {
-        onItemClick(mAdapter.getItem(position));
+        // When the fragment is torn down, it can happen we get a click event after our
+        // view is already destroyed. Catch that by checking whether our views are still valid.
+        if (mViewCreated) {
+            onItemClick(mAdapter.getItem(position));
+        }
     }
 
     @Override
