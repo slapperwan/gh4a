@@ -100,6 +100,10 @@ public class ImageUtils {
      */
     public static Bitmap getBitmap(final String imagePath, int width, int height) {
         Point size = getSize(imagePath);
+        if (size == null) {
+            return null;
+        }
+
         int currWidth = size.x;
         int currHeight = size.y;
 
