@@ -79,6 +79,16 @@ public class UiUtils {
         return context.getResources().getColor(R.color.abs__primary_text_holo_dark);
     }
 
+    public static AlertDialog.Builder createDialogBuilderWithAlertIcon(Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            builder.setIconAttribute(android.R.attr.alertDialogIcon);
+        } else {
+            builder.setIcon(android.R.drawable.ic_dialog_alert);
+        }
+        return builder;
+    }
+
     public static int resolveDrawable(Context context, int styledAttributeId) {
         TypedArray a = context.getTheme().obtainStyledAttributes(Gh4Application.THEME, new int[] {
             styledAttributeId
