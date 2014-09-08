@@ -174,6 +174,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
     private List<RepositoryBranch> mBranches;
     private List<RepositoryTag> mTags;
     private String mSelectedRef;
+    private String mPendingRef; // used during branch/tag selection
 
     private boolean mIsFinishLoadingWatching;
     private boolean mIsWatching;
@@ -435,8 +436,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
 
     private void showBranchesDialog() {
         String[] branchList = new String[mBranches.size()];
-        int current = -1;
-        int master = -1;
+        int current = -1, master = -1;
         for (int i = 0; i < mBranches.size(); i++) {
             RepositoryBranch branch = mBranches.get(i);
             branchList[i] = branch.getName();
@@ -452,6 +452,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         if (mSelectedRef == null && current == -1) {
             current = master;
         }
+        mPendingRef = mSelectedRef;
 
         new AlertDialog.Builder(this)
                 .setCancelable(true)
@@ -459,11 +460,12 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
                 .setSingleChoiceItems(branchList, current, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mSelectedRef = mBranches.get(which).getName();
+                        mPendingRef = mBranches.get(which).getName();
                     }
                 })
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+                        mSelectedRef = mPendingRef;
                         refreshFragment();
                     }
                 })
@@ -482,18 +484,21 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             }
         }
 
+        mPendingRef = mSelectedRef;
+
         new AlertDialog.Builder(this)
                 .setCancelable(true)
                 .setTitle(R.string.repo_tags)
                 .setSingleChoiceItems(tagList, current, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mSelectedRef = mTags.get(which).getName();
+                        mPendingRef = mTags.get(which).getName();
                     }
                 })
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        mSelectedRef = mPendingRef;
                         refreshFragment();
                     }
                 })
