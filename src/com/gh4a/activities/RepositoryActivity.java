@@ -370,6 +370,8 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             }
         }
         if (mRepository == null) {
+            menu.removeItem(R.id.branches);
+            menu.removeItem(R.id.tags);
             menu.removeItem(R.id.bookmark);
         }
 
@@ -441,11 +443,12 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         int current = -1;
         int master = -1;
         for (int i = 0; i < mBranches.size(); i++) {
-            branchList[i] = mBranches.get(i).getName();
-            if (mBranches.get(i).getCommit().getSha().equals(mSelectedRef)) {
+            RepositoryBranch branch = mBranches.get(i);
+            branchList[i] = branch.getName();
+            if (branch.getCommit().getSha().equals(mSelectedRef)) {
                 current = i;
             }
-            if(mBranches.get(i).getName().equals(mRepository.getMasterBranch())){
+            if (branch.getName().equals(mRepository.getMasterBranch())) {
                 master = i;
             }
         }
