@@ -2,6 +2,7 @@ package com.gh4a.widget;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.text.Layout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -30,6 +31,11 @@ public class VerticalTextView extends TextView {
 
     @Override
     public void onDraw(Canvas canvas) {
+        Layout layout = getLayout();
+        if (layout == null) {
+            return;
+        }
+
         TextPaint textPaint = getPaint();
         textPaint.setColor(getCurrentTextColor());
         textPaint.drawableState = getDrawableState();
@@ -45,7 +51,7 @@ public class VerticalTextView extends TextView {
         }
 
         canvas.translate(getCompoundPaddingLeft(), getExtendedPaddingTop());
-        getLayout().draw(canvas);
+        layout.draw(canvas);
 
         canvas.restore();
     }
