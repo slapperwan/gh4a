@@ -9,6 +9,7 @@
         android:orientation="vertical"
         android:padding="@dimen/content_padding" >
         <RelativeLayout
+            android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
             <com.gh4a.widget.FixedSizeImageView
@@ -55,14 +56,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:layout_marginTop="@dimen/overview_item_spacing" />
+            android:layout_marginTop="@dimen/overview_item_spacing"
+            android:layout_marginBottom="@dimen/overview_item_spacing" />
         <TextView
             android:id="@+id/tv_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textStyle="italic"
-            android:layout_marginTop="@dimen/overview_item_spacing" />
+            android:textStyle="italic" />
         <LinearLayout
             android:id="@+id/ll_changed"
             android:orientation="vertical"

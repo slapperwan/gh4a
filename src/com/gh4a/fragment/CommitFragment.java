@@ -29,12 +29,14 @@ import com.gh4a.utils.GravatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
+import java.util.List;
+
 public class CommitFragment extends SherlockProgressFragment implements OnClickListener {
     private String mRepoOwner;
     private String mRepoName;
     private String mObjectSha;
     private RepositoryCommit mCommit;
-    private View mContentView;
+    protected View mContentView;
 
     private LoaderCallbacks<RepositoryCommit> mCommitCallback = new LoaderCallbacks<RepositoryCommit>() {
         @Override
@@ -87,18 +89,21 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
         setContentView(mContentView);
         setContentShown(false);
 
+        initLoader();
+    }
+
+    protected void initLoader() {
         getLoaderManager().initLoader(0, null, mCommitCallback);
     }
 
     private void fillData() {
+        fillHeader();
+        fillStats(mCommit.getFiles());
+    }
+
+    private void fillHeader() {
         final Activity activity = getActivity();
         final Gh4Application app = Gh4Application.get(activity);
-        final LayoutInflater inflater = getLayoutInflater(null);
-
-        LinearLayout llChanged = (LinearLayout) mContentView.findViewById(R.id.ll_changed);
-        LinearLayout llAdded = (LinearLayout) mContentView.findViewById(R.id.ll_added);
-        LinearLayout llDeleted = (LinearLayout) mContentView.findViewById(R.id.ll_deleted);
-        int added = 0, changed = 0, deleted = 0;
 
         ImageView ivGravatar = (ImageView) mContentView.findViewById(R.id.iv_gravatar);
         GravatarHandler.assignGravatar(ivGravatar, mCommit.getAuthor());
@@ -142,10 +147,20 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
             extra.setText(getString(R.string.commit_details, CommitUtils.getCommitterName(app, mCommit),
                     StringUtils.formatRelativeTime(activity, mCommit.getCommit().getCommitter().getDate(), true)));
         }
+    }
 
-        int count = mCommit.getFiles() != null ? mCommit.getFiles().size() : 0;
+    protected void fillStats(List<CommitFile> files) {
+        LinearLayout llChanged = (LinearLayout) mContentView.findViewById(R.id.ll_changed);
+        LinearLayout llAdded = (LinearLayout) mContentView.findViewById(R.id.ll_added);
+        LinearLayout llDeleted = (LinearLayout) mContentView.findViewById(R.id.ll_deleted);
+        final Gh4Application app = Gh4Application.get(getActivity());
+        final LayoutInflater inflater = getLayoutInflater(null);
+        int added = 0, changed = 0, deleted = 0;
+        int additions = 0, deletions = 0;
+        int count = files != null ? files.size() : 0;
+
         for (int i = 0; i < count; i++) {
-            CommitFile file = mCommit.getFiles().get(i);
+            CommitFile file = files.get(i);
             String status = file.getStatus();
             final LinearLayout parent;
 
@@ -161,6 +176,9 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
             } else {
                 continue;
             }
+
+            additions += file.getAdditions();
+            deletions += file.getDeletions();
 
             TextView fileNameView = (TextView) inflater.inflate(R.layout.commit_filename, parent, false);
             fileNameView.setText(file.getFilename());
@@ -192,12 +210,8 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
         }
 
         TextView tvSummary = (TextView) mContentView.findViewById(R.id.tv_desc);
-        if (mCommit.getStats() != null) {
-            tvSummary.setText(getString(R.string.commit_summary, added + changed + deleted,
-                    mCommit.getStats().getAdditions(), mCommit.getStats().getDeletions()));
-        } else {
-            tvSummary.setVisibility(View.GONE);
-        }
+        tvSummary.setText(getString(R.string.commit_summary, added + changed + deleted,
+                additions, deletions));
     }
 
     @Override
