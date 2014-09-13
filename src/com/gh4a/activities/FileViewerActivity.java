@@ -17,12 +17,10 @@ package com.gh4a.activities;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -39,63 +37,75 @@ import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.util.EncodingUtils;
 
 import java.util.List;
+import java.util.Locale;
 
 public class FileViewerActivity extends WebViewerActivity {
-    protected WebViewClient mWebViewClient = new WebViewClient() {
-        @Override
-        public void onPageFinished(WebView webView, String url) {
-            setContentShown(true);
-        }
+    private String mRepoName;
+    private String mRepoOwner;
+    private String mPath;
+    private String mRef;
+    private String mSha;
 
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            startActivity(intent);
-            return true;
-        }
-    };
+    private static final int MENU_ITEM_HISTORY = 10;
 
     private LoaderCallbacks<List<RepositoryContents>> mFileCallback =
             new LoaderCallbacks<List<RepositoryContents>>() {
-                @Override
-                public Loader<LoaderResult<List<RepositoryContents>>> onCreateLoader(int id, Bundle args) {
-                    return new ContentLoader(FileViewerActivity.this, mRepoOwner, mRepoName, mPath, mRef);
-                }
+        @Override
+        public Loader<LoaderResult<List<RepositoryContents>>> onCreateLoader(int id, Bundle args) {
+            return new ContentLoader(FileViewerActivity.this, mRepoOwner, mRepoName, mPath, mRef);
+        }
 
-                @Override
-                public void onResultReady(LoaderResult<List<RepositoryContents>> result) {
-                    setContentEmpty(true);
-                    if (!result.handleError(FileViewerActivity.this)) {
-                        List<RepositoryContents> data = result.getData();
-                        if (data != null && !data.isEmpty()) {
-                            loadContent(data.get(0));
-                            setContentEmpty(false);
-                        }
-                    }
-                    setContentShown(true);
+        @Override
+        public void onResultReady(LoaderResult<List<RepositoryContents>> result) {
+            boolean dataLoaded = false;
+
+            if (!result.handleError(FileViewerActivity.this)) {
+                List<RepositoryContents> data = result.getData();
+                if (data != null && !data.isEmpty()) {
+                    loadContent(data.get(0));
+                    dataLoaded = true;
                 }
-            };
+            }
+            if (!dataLoaded) {
+                setContentEmpty(true);
+                setContentShown(true);
+            }
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (hasErrorView()) {
+            return;
+        }
+
         Bundle data = getIntent().getExtras();
+        mRepoOwner = data.getString(Constants.Repository.OWNER);
+        mRepoName = data.getString(Constants.Repository.NAME);
+        mPath = data.getString(Constants.Object.PATH);
         mRef = data.getString(Constants.Object.REF);
+        mSha = data.getString(Constants.Object.OBJECT_SHA);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(FileUtils.getFileName(mPath));
+        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
         getSupportLoaderManager().initLoader(0, null, mFileCallback);
     }
 
     private void loadContent(RepositoryContents content) {
         String base64Data = content.getContent();
         if (base64Data != null && FileUtils.isImage(mPath)) {
-            String imageUrl = "data:image/" + FileUtils.getFileExtension(mPath) + ";base64," + base64Data;
-            String htmlImage = StringUtils.highlightImage(imageUrl);
-            mWebView.loadDataWithBaseURL("file:///android_asset/", htmlImage, null, "utf-8", null);
+            String imageUrl = "data:image/" + FileUtils.getFileExtension(mPath) +
+                    ";base64," + base64Data;
+            loadThemedHtml(StringUtils.highlightImage(imageUrl));
         } else {
             String data = base64Data != null ? new String(EncodingUtils.fromBase64(base64Data)) : "";
-            String highlightedText = StringUtils.highlightSyntax(data, true, mPath, mRepoOwner, mRepoName, mRef);
-
-            mWebView.loadDataWithBaseURL("file:///android_asset/", highlightedText, null, "utf-8", null);
+            loadThemedHtml(StringUtils.highlightSyntax(data, true,
+                    mPath, mRepoOwner, mRepoName, mRef));
         }
     }
 
@@ -105,35 +115,47 @@ public class FileViewerActivity extends WebViewerActivity {
         inflater.inflate(R.menu.download_menu, menu);
 
         menu.removeItem(R.id.download);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-            menu.removeItem(R.id.search);
-        }
-
-        menu.add(0, 10, Menu.NONE, getString(R.string.history))
+        menu.add(0, MENU_ITEM_HISTORY, Menu.NONE, getString(R.string.history))
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        String url = String.format(Locale.US, "https://github.com/%s/%s/blob/%s/%s",
+                mRepoOwner, mRepoName, mRef, mPath);
+
+        switch (item.getItemId()) {
+            case R.id.browser:
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(browserIntent);
+                return true;
+            case R.id.share:
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_file_subject,
+                        FileUtils.getFileName(mPath), mRepoOwner + "/" + mRepoName));
+                shareIntent.putExtra(Intent.EXTRA_TEXT, url);
+                shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
+                startActivity(shareIntent);
+                return true;
+            case MENU_ITEM_HISTORY:
+                Intent historyIntent = new Intent(this, CommitHistoryActivity.class);
+                historyIntent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+                historyIntent.putExtra(Constants.Repository.NAME, mRepoName);
+                historyIntent.putExtra(Constants.Object.PATH, mPath);
+                historyIntent.putExtra(Constants.Object.REF, mRef);
+                historyIntent.putExtra(Constants.Object.OBJECT_SHA, mSha);
+                startActivity(historyIntent);
+                return true;
+         }
+         return super.onOptionsItemSelected(item);
+     }
+
+    @Override
     protected void navigateUp() {
         IntentUtils.openRepositoryInfoActivity(this, mRepoOwner, mRepoName,
                 null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
-    }
-
-    @Override
-    public void setWebViewClient() {
-        mWebView.setWebViewClient(mWebViewClient);
-    }
-
-    @Override
-    public String getUrl() {
-        return "/blob/" + mRef + "/" + mPath;
-    }
-
-    @Override
-    public String getShareSubject() {
-        return getString(R.string.share_file_subject,
-                FileUtils.getFileName(mPath), mRepoOwner + "/" + mRepoName);
     }
 }

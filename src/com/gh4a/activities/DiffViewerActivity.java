@@ -15,23 +15,16 @@
  */
 package com.gh4a.activities;
 
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -41,72 +34,50 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
-import com.gh4a.LoadingFragmentActivity;
-import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
-import com.gh4a.loader.CommitCommentListLoader;
-import com.gh4a.loader.ContentLoader;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.FileUtils;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ThemeUtils;
 import com.gh4a.utils.ToastUtils;
 
 import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.RepositoryContents;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.CommitService;
-import org.eclipse.egit.github.core.util.EncodingUtils;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public abstract class DiffViewerActivity extends WebViewerActivity {
-    private String mDiff;
-    private boolean mInDiffMode;
+    protected String mRepoOwner;
+    protected String mRepoName;
+    protected String mPath;
+    protected String mSha;
+    protected String mDiff;
 
     private String[] mDiffLines;
     protected SparseArray<List<CommitComment>> mCommitCommentsByPos =
             new SparseArray<List<CommitComment>>();
     private HashMap<Long, CommitComment> mCommitComments = new HashMap<Long, CommitComment>();
 
-    private WebViewClient mWebViewClient = new WebViewClient() {
-        @Override
-        public void onPageFinished(WebView webView, String url) {
-            setContentShown(true);
-        }
-
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            if (url.startsWith("comment://")) {
-                Uri uri = Uri.parse(url);
-                int line = Integer.parseInt(uri.getQueryParameter("position"));
-                String lineText = Html.fromHtml(mDiffLines[line]).toString();
-                String idParam = uri.getQueryParameter("id");
-                long id = idParam != null ? Long.parseLong(idParam) : 0L;
-
-                openCommentDialog(id, lineText, line);
-            } else {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                startActivity(intent);
-            }
-
-            return true;
-        }
-    };
+    private static final int MENU_ITEM_VIEW = 10;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (hasErrorView()) {
+            return;
+        }
+
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.OWNER);
         mRepoName = data.getString(Constants.Repository.NAME);
+        mPath = data.getString(Constants.Object.PATH);
+        mSha = data.getString(Constants.Object.OBJECT_SHA);
         mDiff = data.getString(Constants.Commit.DIFF);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(FileUtils.getFileName(mPath));
+        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         doInitLoader();
     }
@@ -119,19 +90,43 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
         inflater.inflate(R.menu.download_menu, menu);
 
         menu.removeItem(R.id.download);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-            menu.removeItem(R.id.search);
-        }
 
-        menu.add(0, 11, Menu.NONE, getString(R.string.object_view_file_at, mSha.substring(0, 7)))
+        String viewAtTitle = getString(R.string.object_view_file_at, mSha.substring(0, 7));
+        menu.add(0, MENU_ITEM_VIEW, Menu.NONE, viewAtTitle)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
-    public void setWebViewClient() {
-        mWebView.setWebViewClient(mWebViewClient);
+    public boolean onOptionsItemSelected(MenuItem item) {
+        String url = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/commit/" + mSha;
+
+        switch (item.getItemId()) {
+            case R.id.browser:
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(browserIntent);
+                return true;
+            case R.id.share:
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_commit_subject,
+                        mSha.substring(0, 7), mRepoOwner + "/" + mRepoName));
+                shareIntent.putExtra(Intent.EXTRA_TEXT, url);
+                shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
+                startActivity(shareIntent);
+                return true;
+            case MENU_ITEM_VIEW:
+                Intent viewIntent = new Intent(this, FileViewerActivity.class);
+                viewIntent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+                viewIntent.putExtra(Constants.Repository.NAME, mRepoName);
+                viewIntent.putExtra(Constants.Object.PATH, mPath);
+                viewIntent.putExtra(Constants.Object.REF, mSha);
+                viewIntent.putExtra(Constants.Object.OBJECT_SHA, mSha);
+                startActivity(viewIntent);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     protected void showDiff() {
@@ -178,8 +173,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
             }
         }
         content.append("</pre></body></html>");
-
-        mWebView.loadDataWithBaseURL("file:///android_asset/", content.toString(), null, "utf-8", null);
+        loadThemedHtml(content.toString());
     }
 
     private void openCommentDialog(final long id, String line, final int position) {
@@ -210,11 +204,11 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
-            .setCancelable(true)
-            .setTitle(getString(R.string.commit_comment_dialog_title, position))
-            .setView(commentDialog)
-            .setPositiveButton(saveButtonResId, saveCb)
-            .setNegativeButton(R.string.cancel, null);
+                .setCancelable(true)
+                .setTitle(getString(R.string.commit_comment_dialog_title, position))
+                .setView(commentDialog)
+                .setPositiveButton(saveButtonResId, saveCb)
+                .setNegativeButton(R.string.cancel, null);
 
         if (isEdit) {
             builder.setNeutralButton(R.string.delete, new DialogInterface.OnClickListener() {
@@ -238,6 +232,22 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
         builder.show();
     }
 
+    @Override
+    protected boolean handleUrlLoad(String url) {
+        if (!url.startsWith("comment://")) {
+            return false;
+        }
+
+        Uri uri = Uri.parse(url);
+        int line = Integer.parseInt(uri.getQueryParameter("position"));
+        String lineText = Html.fromHtml(mDiffLines[line]).toString();
+        String idParam = uri.getQueryParameter("id");
+        long id = idParam != null ? Long.parseLong(idParam) : 0L;
+
+        openCommentDialog(id, lineText, line);
+        return true;
+    }
+
     protected void refresh() {
         mCommitComments.clear();
         mCommitCommentsByPos.clear();
@@ -250,15 +260,4 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
     public abstract void deleteComment(long id);
 
     public abstract void doRestartLoader();
-
-    @Override
-    public String getUrl() {
-        return "/commit/" + mSha;
-    }
-
-    @Override
-    public String getShareSubject() {
-        return getString(R.string.share_commit_subject,
-                mSha.substring(0, 7), mRepoOwner + "/" + mRepoName);
-    }
 }

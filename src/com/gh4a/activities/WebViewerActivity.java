@@ -17,87 +17,59 @@ package com.gh4a.activities;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
-import android.text.Html;
-import android.text.TextUtils;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentActivity;
-import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
-import com.gh4a.loader.CommitCommentListLoader;
-import com.gh4a.loader.ContentLoader;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
-import com.gh4a.utils.FileUtils;
-import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ThemeUtils;
-import com.gh4a.utils.ToastUtils;
-
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.RepositoryContents;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.CommitService;
-import org.eclipse.egit.github.core.util.EncodingUtils;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public abstract class WebViewerActivity extends LoadingFragmentActivity {
-    protected String mRepoOwner;
-    protected String mRepoName;
-    protected String mPath;
-    protected String mSha;
-    protected String mRef;
-    protected WebView mWebView;
+    private WebView mWebView;
+
+    private WebViewClient mWebViewClient = new WebViewClient() {
+        @Override
+        public void onPageFinished(WebView webView, String url) {
+            setContentShown(true);
+        }
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            if (handleUrlLoad(url)) {
+                return true;
+            }
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
+            return true;
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
-        Bundle data = getIntent().getExtras();
-        mRepoOwner = data.getString(Constants.Repository.OWNER);
-        mRepoName = data.getString(Constants.Repository.NAME);
-        mPath = data.getString(Constants.Object.PATH);
-        mSha = data.getString(Constants.Object.OBJECT_SHA);
-        mRef = data.getString(Constants.Object.REF);
-
         if (hasErrorView()) {
             return;
         }
 
-        setContentView(R.layout.web_viewer);
-
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(FileUtils.getFileName(mPath));
-        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        // Inflate from action bar context to get the correct foreground color
+        // when using the DarkActionBar theme
+        LayoutInflater inflater = LayoutInflater.from(actionBar.getThemedContext());
+        setContentView(inflater.inflate(R.layout.web_viewer, null));
 
         setContentShown(false);
-
         setupWebView();
     }
 
@@ -118,52 +90,22 @@ public abstract class WebViewerActivity extends LoadingFragmentActivity {
         s.setUseWideViewPort(true);
 
         mWebView.setBackgroundColor(ThemeUtils.getWebViewBackgroundColor(Gh4Application.THEME));
-        setWebViewClient();
+        mWebView.setWebViewClient(mWebViewClient);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+            menu.removeItem(R.id.search);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        String urlBase = "https://github.com/" + mRepoOwner + "/" + mRepoName;
-        String url = urlBase + getUrl();
-
         switch (item.getItemId()) {
-            case R.id.browser:
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                startActivity(browserIntent);
-                return true;
-            case R.id.share:
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_SUBJECT, getShareSubject());
-                shareIntent.putExtra(Intent.EXTRA_TEXT, url);
-                shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
-                startActivity(shareIntent);
-                return true;
             case R.id.search:
                 doSearch();
-                return true;
-            case 10:
-                Intent historyIntent = new Intent(this, CommitHistoryActivity.class);
-                historyIntent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-                historyIntent.putExtra(Constants.Repository.NAME, mRepoName);
-                historyIntent.putExtra(Constants.Object.PATH, mPath);
-                historyIntent.putExtra(Constants.Object.REF, mRef);
-                historyIntent.putExtra(Constants.Object.OBJECT_SHA, mSha);
-                startActivity(historyIntent);
-                return true;
-            case 11:
-                Intent viewIntent = new Intent(this, FileViewerActivity.class);
-                viewIntent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-                viewIntent.putExtra(Constants.Repository.NAME, mRepoName);
-                viewIntent.putExtra(Constants.Object.PATH, mPath);
-                viewIntent.putExtra(Constants.Object.REF, mSha);
-                viewIntent.putExtra(Constants.Object.OBJECT_SHA, mSha);
-                startActivity(viewIntent);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -177,9 +119,21 @@ public abstract class WebViewerActivity extends LoadingFragmentActivity {
         }
     }
 
-    public abstract void setWebViewClient();
+    protected void loadUnthemedHtml(String html) {
+        if (Gh4Application.THEME == R.style.DefaultTheme) {
+            html = "<style type=\"text/css\">" +
+                    "body { color: #A3A3A5 !important }" +
+                    "a { color: #4183C4 !important }</style><body>" +
+                    html + "</body>";
+        }
+        loadThemedHtml(html);
+    }
 
-    public abstract String getUrl();
+    protected void loadThemedHtml(String html) {
+        mWebView.loadDataWithBaseURL("file:///android_asset/", html, null, "utf-8", null);
+    }
 
-    public abstract String getShareSubject();
+    protected boolean handleUrlLoad(String url) {
+        return false;
+    }
 }
