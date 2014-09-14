@@ -159,6 +159,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
         });
 
         listView.addHeaderView(mHeader, null, false);
+        listView.setHeaderDividersEnabled(false);
 
         mCommentAdapter = new CommentAdapter(this, mRepoOwner, this);
         listView.setAdapter(mCommentAdapter);

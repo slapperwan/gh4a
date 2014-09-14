@@ -182,6 +182,7 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         mHeader.setClickable(false);
         mHeader.findViewById(R.id.info_box).setVisibility(View.GONE);
         getListView().addHeaderView(mHeader, null, true);
+        getListView().setHeaderDividersEnabled(false);
 
         UiUtils.assignTypeface(mHeader, Gh4Application.get(getActivity()).boldCondensed, new int[] {
             R.id.comment_title, R.id.tv_title, R.id.desc_title
