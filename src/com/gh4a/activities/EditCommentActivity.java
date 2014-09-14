@@ -1,9 +1,5 @@
 package com.gh4a.activities;
 
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.IssueService;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -15,14 +11,13 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
-import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
-public class EditCommentActivity extends BaseSherlockFragmentActivity {
-    private String mRepoOwner;
-    private String mRepoName;
-    private long mCommentId;
+public abstract class EditCommentActivity extends BaseSherlockFragmentActivity {
+    protected String mRepoOwner;
+    protected String mRepoName;
+    protected long mCommentId;
     private EditText mEditText;
 
     @Override
@@ -66,7 +61,7 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
         case R.id.accept:
             String text = mEditText.getText().toString();
             if (!StringUtils.isBlank(text)) {
-                new EditCommentTask(mCommentId, text).execute();
+                updateComment(mCommentId, text);
             }
             return true;
         case R.id.delete:
@@ -75,7 +70,7 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
                     .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            new DeleteCommentTask(mCommentId).execute();
+                            deleteComment(mCommentId);
                         }
                     })
                     .setNegativeButton(R.string.cancel, null)
@@ -85,56 +80,6 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class EditCommentTask extends ProgressDialogTask<Void> {
-        private long mId;
-        private String mBody;
-
-        public EditCommentTask(long id, String body) {
-            super(EditCommentActivity.this, 0, R.string.saving_msg);
-            mId = id;
-            mBody = body;
-        }
-
-        @Override
-        protected Void run() throws Exception {
-            IssueService issueService = (IssueService)
-                    Gh4Application.get(mContext).getService(Gh4Application.ISSUE_SERVICE);
-
-            Comment comment = new Comment();
-            comment.setBody(mBody);
-            comment.setId(mId);
-            issueService.editComment(new RepositoryId(mRepoOwner, mRepoName), comment);
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            setResult(RESULT_OK);
-            finish();
-        }
-    }
-
-    private class DeleteCommentTask extends ProgressDialogTask<Void> {
-        private long mId;
-
-        public DeleteCommentTask(long id) {
-            super(EditCommentActivity.this, 0, R.string.deleting_msg);
-            mId = id;
-        }
-
-        @Override
-        protected Void run() throws Exception {
-            IssueService issueService = (IssueService)
-                    Gh4Application.get(mContext).getService(Gh4Application.ISSUE_SERVICE);
-
-            issueService.deleteComment(new RepositoryId(mRepoOwner, mRepoName), mId);
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            setResult(RESULT_OK);
-            finish();
-        }
-    }
+    protected abstract void updateComment(long id, String text);
+    protected abstract void deleteComment(long id);
 }

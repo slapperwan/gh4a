@@ -56,7 +56,10 @@
             android:name=".activities.DownloadsActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.EditCommentActivity"
+            android:name=".activities.EditCommitCommentActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activities.EditPullRequestCommentActivity"
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activities.ExploreActivity"
