@@ -57,7 +57,7 @@ public class CommitDiffViewerActivity extends DiffViewerActivity {
 
     @Override
     protected Loader<LoaderResult<List<CommitComment>>> createCommentLoader() {
-        return new CommitCommentListLoader(this, mRepoOwner, mRepoName, mSha);
+        return new CommitCommentListLoader(this, mRepoOwner, mRepoName, mSha, false, true);
     }
 
     private class CommentTask extends ProgressDialogTask<Void> {
