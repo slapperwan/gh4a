@@ -15,95 +15,25 @@
  */
 package com.gh4a.activities;
 
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.text.Html;
-import android.text.TextUtils;
-import android.util.SparseArray;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.EditText;
-import android.widget.TextView;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
-import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.loader.CommitCommentListLoader;
-import com.gh4a.loader.ContentLoader;
-import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.ThemeUtils;
-import com.gh4a.utils.ToastUtils;
 
 import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.CommitService;
-import org.eclipse.egit.github.core.util.EncodingUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class CommitDiffViewerActivity extends DiffViewerActivity {
-
-    private LoaderCallbacks<List<CommitComment>> mCommitCommentCallback =
-            new LoaderCallbacks<List<CommitComment>>() {
-        @Override
-        public Loader<LoaderResult<List<CommitComment>>> onCreateLoader(int id, Bundle args) {
-            return new CommitCommentListLoader(CommitDiffViewerActivity.this, mRepoOwner, mRepoName, mSha);
-        }
-
-        @Override
-        public void onResultReady(LoaderResult<List<CommitComment>> result) {
-            setContentEmpty(true);
-            if (!result.handleError(CommitDiffViewerActivity.this)) {
-                for (CommitComment comment : result.getData()) {
-                    if (!TextUtils.equals(comment.getPath(), mPath)) {
-                        continue;
-                    }
-                    int position = comment.getPosition();
-                    if (position != -1) {
-                        List<CommitComment> comments = mCommitCommentsByPos.get(position);
-                        if (comments == null) {
-                            comments = new ArrayList<CommitComment>();
-                            mCommitCommentsByPos.put(position, comments);
-                        }
-                        comments.add(comment);
-                    }
-                }
-                showDiff();
-                setContentEmpty(false);
-            }
-            setContentShown(true);
-        }
-    };
-
-    @Override
-    public void doInitLoader() {
-        getSupportLoaderManager().initLoader(1, null, mCommitCommentCallback);
-    }
-
     @Override
     protected void navigateUp() {
         IntentUtils.openCommitInfoActivity(this, mRepoOwner, mRepoName,
@@ -126,8 +56,8 @@ public class CommitDiffViewerActivity extends DiffViewerActivity {
     }
 
     @Override
-    public void doRestartLoader() {
-        getSupportLoaderManager().restartLoader(1, null, mCommitCommentCallback);
+    protected Loader<LoaderResult<List<CommitComment>>> createCommentLoader() {
+        return new CommitCommentListLoader(this, mRepoOwner, mRepoName, mSha);
     }
 
     private class CommentTask extends ProgressDialogTask<Void> {
@@ -157,11 +87,12 @@ public class CommitDiffViewerActivity extends DiffViewerActivity {
 
             CommitService commitService = (CommitService)
                     Gh4Application.get(mContext).getService(Gh4Application.COMMIT_SERVICE);
+            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
 
             if (isEdit) {
-                commitService.editComment(new RepositoryId(mRepoOwner, mRepoName), commitComment);
+                commitService.editComment(repoId, commitComment);
             } else {
-                commitService.addComment(new RepositoryId(mRepoOwner, mRepoName), mSha, commitComment);
+                commitService.addComment(repoId, mSha, commitComment);
             }
             return null;
         }

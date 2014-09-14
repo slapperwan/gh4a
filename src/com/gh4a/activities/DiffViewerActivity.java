@@ -20,6 +20,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.Loader;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.SparseArray;
@@ -35,6 +36,8 @@ import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ThemeUtils;
@@ -42,6 +45,7 @@ import com.gh4a.utils.ToastUtils;
 
 import org.eclipse.egit.github.core.CommitComment;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -53,11 +57,41 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
     protected String mDiff;
 
     private String[] mDiffLines;
-    protected SparseArray<List<CommitComment>> mCommitCommentsByPos =
+    private SparseArray<List<CommitComment>> mCommitCommentsByPos =
             new SparseArray<List<CommitComment>>();
     private HashMap<Long, CommitComment> mCommitComments = new HashMap<Long, CommitComment>();
 
     private static final int MENU_ITEM_VIEW = 10;
+
+    private LoaderCallbacks<List<CommitComment>> mCommentCallback =
+            new LoaderCallbacks<List<CommitComment>>() {
+        @Override
+        public Loader<LoaderResult<List<CommitComment>>> onCreateLoader(int id, Bundle args) {
+            return createCommentLoader();
+        }
+
+        @Override
+        public void onResultReady(LoaderResult<List<CommitComment>> result) {
+            setContentEmpty(true);
+            if (!result.handleError(DiffViewerActivity.this)) {
+                for (CommitComment comment : result.getData()) {
+                    if (!TextUtils.equals(comment.getPath(), mPath)) {
+                        continue;
+                    }
+                    int position = comment.getPosition();
+                    List<CommitComment> comments = mCommitCommentsByPos.get(position);
+                    if (comments == null) {
+                        comments = new ArrayList<CommitComment>();
+                        mCommitCommentsByPos.put(position, comments);
+                    }
+                    comments.add(comment);
+                }
+                showDiff();
+                setContentEmpty(false);
+            }
+            setContentShown(true);
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -79,10 +113,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        doInitLoader();
+        getSupportLoaderManager().initLoader(0, null, mCommentCallback);
     }
-
-    public abstract void doInitLoader();
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -251,13 +283,11 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
     protected void refresh() {
         mCommitComments.clear();
         mCommitCommentsByPos.clear();
-        doRestartLoader();
+        getSupportLoaderManager().restartLoader(0, null, mCommentCallback);
         setContentShown(false);
     }
 
-    public abstract void updateComment(long id, String body, int position);
-
-    public abstract void deleteComment(long id);
-
-    public abstract void doRestartLoader();
+    protected abstract Loader<LoaderResult<List<CommitComment>>> createCommentLoader();
+    protected abstract void updateComment(long id, String body, int position);
+    protected abstract void deleteComment(long id);
 }
