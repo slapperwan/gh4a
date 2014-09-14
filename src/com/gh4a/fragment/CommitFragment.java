@@ -1,5 +1,6 @@
 package com.gh4a.fragment;
 
+import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.RepositoryCommit;
 
@@ -7,6 +8,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -20,7 +22,7 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.CommitDiffViewerActivity;
-import com.gh4a.activities.FileViewerActivity;
+import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.CommitLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
@@ -36,6 +38,7 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
     private String mRepoName;
     private String mObjectSha;
     private RepositoryCommit mCommit;
+    private List<CommitComment> mComments;
     protected View mContentView;
 
     private LoaderCallbacks<RepositoryCommit> mCommitCallback = new LoaderCallbacks<RepositoryCommit>() {
@@ -46,13 +49,32 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
 
         @Override
         public void onResultReady(LoaderResult<RepositoryCommit> result) {
-            boolean success = !result.handleError(getActivity());
-            if (success) {
-                mCommit = result.getData();
-                fillData();
+            if (result.handleError(getActivity())) {
+                setContentEmpty(true);
+                setContentShown(true);
+                return;
             }
-            setContentEmpty(!success);
-            setContentShown(true);
+            mCommit = result.getData();
+            fillDataIfReady();
+        }
+    };
+    private LoaderCallbacks<List<CommitComment>> mCommentCallback =
+            new LoaderCallbacks<List<CommitComment>>() {
+        @Override
+        public Loader<LoaderResult<List<CommitComment>>> onCreateLoader(int id, Bundle args) {
+            return new CommitCommentListLoader(getActivity(), mRepoOwner, mRepoName,
+                    mObjectSha, false, true);
+        }
+
+        @Override
+        public void onResultReady(LoaderResult<List<CommitComment>> result) {
+            if (result.handleError(getActivity())) {
+                setContentEmpty(true);
+                setContentShown(true);
+                return;
+            }
+            mComments = result.getData();
+            fillDataIfReady();
         }
     };
 
@@ -94,11 +116,15 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
 
     protected void initLoader() {
         getLoaderManager().initLoader(0, null, mCommitCallback);
+        getLoaderManager().initLoader(1, null, mCommentCallback);
     }
 
-    private void fillData() {
-        fillHeader();
-        fillStats(mCommit.getFiles());
+    private void fillDataIfReady() {
+        if (mCommit != null && mComments != null) {
+            fillHeader();
+            fillStats(mCommit.getFiles(), mComments);
+            setContentShown(true);
+        }
     }
 
     private void fillHeader() {
@@ -149,7 +175,7 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
         }
     }
 
-    protected void fillStats(List<CommitFile> files) {
+    protected void fillStats(List<CommitFile> files, List<CommitComment> comments) {
         LinearLayout llChanged = (LinearLayout) mContentView.findViewById(R.id.ll_changed);
         LinearLayout llAdded = (LinearLayout) mContentView.findViewById(R.id.ll_added);
         LinearLayout llDeleted = (LinearLayout) mContentView.findViewById(R.id.ll_deleted);
@@ -180,14 +206,28 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
             additions += file.getAdditions();
             deletions += file.getDeletions();
 
-            TextView fileNameView = (TextView) inflater.inflate(R.layout.commit_filename, parent, false);
+            int commentCount = 0;
+            for (CommitComment comment : comments) {
+                if (TextUtils.equals(file.getFilename(), comment.getPath())) {
+                    commentCount++;
+                }
+            }
+
+            ViewGroup fileView = (ViewGroup) inflater.inflate(R.layout.commit_filename, parent, false);
+            TextView fileNameView = (TextView) fileView.findViewById(R.id.filename);
             fileNameView.setText(file.getFilename());
             fileNameView.setTag(file);
             if (parent != llDeleted) {
                 fileNameView.setTextColor(getResources().getColor(R.color.highlight));
                 fileNameView.setOnClickListener(this);
             }
-            parent.addView(fileNameView);
+            if (commentCount > 0) {
+                TextView commentView = (TextView) fileView.findViewById(R.id.comments);
+                commentView.setText(String.valueOf(commentCount));
+                commentView.setVisibility(View.VISIBLE);
+            }
+
+            parent.addView(fileView);
         }
 
         if (added == 0) {

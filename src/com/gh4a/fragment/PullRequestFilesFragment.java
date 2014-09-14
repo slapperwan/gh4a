@@ -3,17 +3,17 @@ package com.gh4a.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.activities.PullRequestDiffViewerActivity;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.loader.PullRequestCommentsLoader;
 import com.gh4a.loader.PullRequestFilesLoader;
 
+import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitFile;
 
 import java.util.List;
@@ -22,6 +22,8 @@ public class PullRequestFilesFragment extends CommitFragment {
     private String mRepoOwner;
     private String mRepoName;
     private int mPullRequestNumber;
+    private List<CommitFile> mFiles;
+    private List<CommitComment> mComments;
 
     private LoaderCallbacks<List<CommitFile>> mPullRequestFilesCallback = new LoaderCallbacks<List<CommitFile>>() {
         @Override
@@ -31,12 +33,33 @@ public class PullRequestFilesFragment extends CommitFragment {
 
         @Override
         public void onResultReady(LoaderResult<List<CommitFile>> result) {
-            boolean success = !result.handleError(getActivity());
-            if (success) {
-                fillStats(result.getData());
+            if (result.handleError(getActivity())) {
+                setContentEmpty(true);
+                setContentShown(true);
+                return;
             }
-            setContentEmpty(!success);
-            setContentShown(true);
+            mFiles = result.getData();
+            fillDataIfReady();
+        }
+    };
+
+    private LoaderCallbacks<List<CommitComment>> mPullRequestCommentsCallback =
+            new LoaderCallbacks<List<CommitComment>>() {
+        @Override
+        public Loader<LoaderResult<List<CommitComment>>> onCreateLoader(int id, Bundle args) {
+            return new PullRequestCommentsLoader(getActivity(),
+                    mRepoOwner, mRepoName, mPullRequestNumber);
+        }
+
+        @Override
+        public void onResultReady(LoaderResult<List<CommitComment>> result) {
+            if (result.handleError(getActivity())) {
+                setContentEmpty(true);
+                setContentShown(true);
+                return;
+            }
+            mComments = result.getData();
+            fillDataIfReady();
         }
     };
 
@@ -70,6 +93,14 @@ public class PullRequestFilesFragment extends CommitFragment {
     @Override
     protected void initLoader() {
         getLoaderManager().initLoader(0, null, mPullRequestFilesCallback);
+        getLoaderManager().initLoader(1, null, mPullRequestCommentsCallback);
+    }
+
+    private void fillDataIfReady() {
+        if (mComments != null && mFiles != null) {
+            fillStats(mFiles, mComments);
+            setContentShown(true);
+        }
     }
 
     @Override

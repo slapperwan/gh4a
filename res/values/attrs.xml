@@ -41,5 +41,6 @@
     <attr name="searchRepoMenuIcon" format="reference" />
     <attr name="dirIcon" format="reference" />
     <attr name="fileIcon" format="reference" />
+    <attr name="commentsIcon" format="reference" />
 
 </resources>
