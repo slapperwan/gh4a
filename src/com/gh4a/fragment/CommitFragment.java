@@ -31,6 +31,7 @@ import com.gh4a.utils.GravatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CommitFragment extends SherlockProgressFragment implements OnClickListener {
@@ -268,6 +269,7 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
             intent.putExtra(Constants.Object.REF, mObjectSha);
             intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
             intent.putExtra(Constants.Commit.DIFF, file.getPatch());
+            intent.putExtra(Constants.Commit.COMMENTS, new ArrayList<CommitComment>(mComments));
             intent.putExtra(Constants.Object.PATH, file.getFilename());
             intent.putExtra(Constants.Object.TREE_SHA, mCommit.getCommit().getTree().getSha());
             startActivity(intent);

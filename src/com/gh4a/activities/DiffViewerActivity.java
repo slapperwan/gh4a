@@ -74,24 +74,14 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
 
         @Override
         public void onResultReady(LoaderResult<List<CommitComment>> result) {
-            setContentEmpty(true);
-            if (!result.handleError(DiffViewerActivity.this)) {
-                for (CommitComment comment : result.getData()) {
-                    if (!TextUtils.equals(comment.getPath(), mPath)) {
-                        continue;
-                    }
-                    int position = comment.getPosition();
-                    List<CommitComment> comments = mCommitCommentsByPos.get(position);
-                    if (comments == null) {
-                        comments = new ArrayList<CommitComment>();
-                        mCommitCommentsByPos.put(position, comments);
-                    }
-                    comments.add(comment);
-                }
-                showDiff();
-                setContentEmpty(false);
+            if (result.handleError(DiffViewerActivity.this)) {
+                setContentEmpty(true);
+                setContentShown(true);
+                return;
             }
-            setContentShown(true);
+
+            addCommentsToMap(result.getData());
+            showDiff();
         }
     };
 
@@ -115,7 +105,15 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        getSupportLoaderManager().initLoader(0, null, mCommentCallback);
+        List<CommitComment> comments =
+                (ArrayList<CommitComment>) data.getSerializable(Constants.Commit.COMMENTS);
+
+        if (comments != null) {
+            addCommentsToMap(comments);
+            showDiff();
+        } else {
+            getSupportLoaderManager().initLoader(0, null, mCommentCallback);
+        }
     }
 
     @Override
@@ -161,6 +159,21 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void addCommentsToMap(List<CommitComment> comments) {
+        for (CommitComment comment : comments) {
+            if (!TextUtils.equals(comment.getPath(), mPath)) {
+                continue;
+            }
+            int position = comment.getPosition();
+            List<CommitComment> commentsByPos = mCommitCommentsByPos.get(position);
+            if (commentsByPos == null) {
+                commentsByPos = new ArrayList<CommitComment>();
+                mCommitCommentsByPos.put(position, commentsByPos);
+            }
+            commentsByPos.add(comment);
+        }
     }
 
     protected void showDiff() {

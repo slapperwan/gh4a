@@ -16,6 +16,7 @@ import com.gh4a.loader.PullRequestFilesLoader;
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PullRequestFilesFragment extends CommitFragment {
@@ -113,6 +114,7 @@ public class PullRequestFilesFragment extends CommitFragment {
         intent.putExtra(Constants.PullRequest.NUMBER, mPullRequestNumber);
         intent.putExtra(Constants.Object.OBJECT_SHA, file.getRawUrl().split("/")[6]);
         intent.putExtra(Constants.Commit.DIFF, file.getPatch());
+        intent.putExtra(Constants.Commit.COMMENTS, new ArrayList<CommitComment>(mComments));
         intent.putExtra(Constants.Object.PATH, file.getFilename());
         startActivity(intent);
     }
