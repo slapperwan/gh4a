@@ -20,8 +20,6 @@ import android.support.v4.content.Loader;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
-import com.gh4a.ProgressDialogTask;
-import com.gh4a.R;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestCommentsLoader;
 import com.gh4a.utils.IntentUtils;
@@ -56,80 +54,35 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity {
     }
 
     @Override
-    protected void updateComment(long id, String body, int position) {
-        new CommentTask(id, body, position).execute();
+    protected void updateComment(long id, String body, int position) throws IOException {
+        boolean isEdit = id != 0L;
+        CommitComment commitComment = new CommitComment();
+
+        if (isEdit) {
+            commitComment.setId(id);
+        }
+        commitComment.setPosition(position);
+        commitComment.setCommitId(mSha);
+        commitComment.setPath(mPath);
+        commitComment.setBody(body);
+
+        Gh4Application app = Gh4Application.get(PullRequestDiffViewerActivity.this);
+        PullRequestService pullRequestService = (PullRequestService)
+                app.getService(Gh4Application.PULL_SERVICE);
+        RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+        if (isEdit) {
+            pullRequestService.editComment(repoId, commitComment);
+        } else {
+            pullRequestService.createComment(repoId, mPullRequestNumber, commitComment);
+        }
     }
 
     @Override
-    protected void deleteComment(long id) {
-        new DeleteCommentTask(id).execute();
-    }
+    protected void deleteComment(long id) throws IOException {
+        Gh4Application app = Gh4Application.get(PullRequestDiffViewerActivity.this);
+        PullRequestService pullRequestService = (PullRequestService)
+                app.getService(Gh4Application.PULL_SERVICE);
 
-    private class CommentTask extends ProgressDialogTask<Void> {
-        private String mBody;
-        private int mPosition;
-        private long mId;
-
-        public CommentTask(long id, String body, int position) {
-            super(PullRequestDiffViewerActivity.this, 0, R.string.saving_msg);
-            mBody = body;
-            mPosition = position;
-            mId = id;
-        }
-
-        @Override
-        protected Void run() throws IOException {
-            boolean isEdit = mId != 0L;
-            CommitComment commitComment = new CommitComment();
-
-            if (isEdit) {
-                commitComment.setId(mId);
-            }
-            commitComment.setPosition(mPosition);
-            commitComment.setCommitId(mSha);
-            commitComment.setPath(mPath);
-            commitComment.setBody(mBody);
-
-            PullRequestService pullRequestService = (PullRequestService)
-                    Gh4Application.get(mContext).getService(Gh4Application.PULL_SERVICE);
-            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
-            if (isEdit) {
-                pullRequestService.editComment(repoId, commitComment);
-            } else {
-                pullRequestService.createComment(repoId, mPullRequestNumber, commitComment);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            refresh();
-        }
-    }
-
-    private class DeleteCommentTask extends ProgressDialogTask<Void> {
-        private long mId;
-
-        public DeleteCommentTask(long id) {
-            super(PullRequestDiffViewerActivity.this, 0, R.string.deleting_msg);
-            mId = id;
-        }
-
-        @Override
-        protected Void run() throws IOException {
-            CommitComment commitComment = new CommitComment();
-            commitComment.setId(mId);
-
-            PullRequestService pullRequestService = (PullRequestService)
-                    Gh4Application.get(mContext).getService(Gh4Application.PULL_SERVICE);
-
-            pullRequestService.deleteComment(new RepositoryId(mRepoOwner, mRepoName), mId);
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            refresh();
-        }
+        pullRequestService.deleteComment(new RepositoryId(mRepoOwner, mRepoName), id);
     }
 }

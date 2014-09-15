@@ -35,6 +35,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
@@ -45,6 +46,7 @@ import com.gh4a.utils.ToastUtils;
 
 import org.eclipse.egit.github.core.CommitComment;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -228,7 +230,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
             public void onClick(DialogInterface dialog, int which) {
                 String text = body.getText().toString();
                 if (!StringUtils.isBlank(text)) {
-                    updateComment(id, text, position);
+                    new CommentTask(id, text, position).execute();
                 } else {
                     ToastUtils.showMessage(DiffViewerActivity.this, R.string.commit_comment_error_body);
                 }
@@ -252,7 +254,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
                             .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int whichButton) {
-                                    deleteComment(id);
+                                    new DeleteCommentTask(id).execute();
                                 }
                             })
                             .setNegativeButton(R.string.cancel, null)
@@ -288,6 +290,50 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
     }
 
     protected abstract Loader<LoaderResult<List<CommitComment>>> createCommentLoader();
-    protected abstract void updateComment(long id, String body, int position);
-    protected abstract void deleteComment(long id);
+    protected abstract void updateComment(long id, String body, int position) throws IOException;
+    protected abstract void deleteComment(long id) throws IOException;
+
+    private class CommentTask extends ProgressDialogTask<Void> {
+        private String mBody;
+        private int mPosition;
+        private long mId;
+
+        public CommentTask(long id, String body, int position) {
+            super(DiffViewerActivity.this, 0, R.string.saving_msg);
+            mBody = body;
+            mPosition = position;
+            mId = id;
+        }
+
+        @Override
+        protected Void run() throws IOException {
+            updateComment(mId, mBody, mPosition);
+            return null;
+        }
+
+        @Override
+        protected void onSuccess(Void result) {
+            refresh();
+        }
+    }
+
+    private class DeleteCommentTask extends ProgressDialogTask<Void> {
+        private long mId;
+
+        public DeleteCommentTask(long id) {
+            super(DiffViewerActivity.this, 0, R.string.deleting_msg);
+            mId = id;
+        }
+
+        @Override
+        protected Void run() throws IOException {
+            deleteComment(mId);
+            return null;
+        }
+
+        @Override
+        protected void onSuccess(Void result) {
+            refresh();
+        }
+    }
 }

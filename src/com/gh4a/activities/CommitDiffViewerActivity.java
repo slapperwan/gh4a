@@ -20,8 +20,6 @@ import android.support.v4.content.Loader;
 
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Gh4Application;
-import com.gh4a.ProgressDialogTask;
-import com.gh4a.R;
 import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
@@ -46,86 +44,39 @@ public class CommitDiffViewerActivity extends DiffViewerActivity {
     }
 
     @Override
-    public void updateComment(long id, String body, int position) {
-        new CommentTask(id, body, position).execute();
+    public void updateComment(long id, String body, int position) throws IOException {
+        boolean isEdit = id != 0L;
+        CommitComment commitComment = new CommitComment();
+
+        if (isEdit) {
+            commitComment.setId(id);
+        }
+        commitComment.setPosition(position);
+        commitComment.setCommitId(mSha);
+        commitComment.setPath(mPath);
+        commitComment.setBody(body);
+
+        Gh4Application app = Gh4Application.get(CommitDiffViewerActivity.this);
+        CommitService commitService = (CommitService) app.getService(Gh4Application.COMMIT_SERVICE);
+        RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+
+        if (isEdit) {
+            commitService.editComment(repoId, commitComment);
+        } else {
+            commitService.addComment(repoId, mSha, commitComment);
+        }
     }
 
     @Override
-    public void deleteComment(long id) {
-        new DeleteCommentTask(id).execute();
+    public void deleteComment(long id) throws IOException {
+        Gh4Application app = Gh4Application.get(CommitDiffViewerActivity.this);
+        CommitService commitService = (CommitService) app.getService(Gh4Application.COMMIT_SERVICE);
+
+        commitService.deleteComment(new RepositoryId(mRepoOwner, mRepoName), id);
     }
 
     @Override
     protected Loader<LoaderResult<List<CommitComment>>> createCommentLoader() {
         return new CommitCommentListLoader(this, mRepoOwner, mRepoName, mSha, false, true);
-    }
-
-    private class CommentTask extends ProgressDialogTask<Void> {
-        private String mBody;
-        private int mPosition;
-        private long mId;
-
-        public CommentTask(long id, String body, int position) {
-            super(CommitDiffViewerActivity.this, 0, R.string.saving_msg);
-            mBody = body;
-            mPosition = position;
-            mId = id;
-        }
-
-        @Override
-        protected Void run() throws IOException {
-            boolean isEdit = mId != 0L;
-            CommitComment commitComment = new CommitComment();
-
-            if (isEdit) {
-                commitComment.setId(mId);
-            }
-            commitComment.setPosition(mPosition);
-            commitComment.setCommitId(mSha);
-            commitComment.setPath(mPath);
-            commitComment.setBody(mBody);
-
-            CommitService commitService = (CommitService)
-                    Gh4Application.get(mContext).getService(Gh4Application.COMMIT_SERVICE);
-            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
-
-            if (isEdit) {
-                commitService.editComment(repoId, commitComment);
-            } else {
-                commitService.addComment(repoId, mSha, commitComment);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            refresh();
-        }
-    }
-
-    private class DeleteCommentTask extends ProgressDialogTask<Void> {
-        private long mId;
-
-        public DeleteCommentTask(long id) {
-            super(CommitDiffViewerActivity.this, 0, R.string.deleting_msg);
-            mId = id;
-        }
-
-        @Override
-        protected Void run() throws IOException {
-            CommitComment commitComment = new CommitComment();
-            commitComment.setId(mId);
-
-            CommitService commitService = (CommitService)
-                    Gh4Application.get(mContext).getService(Gh4Application.COMMIT_SERVICE);
-
-            commitService.deleteComment(new RepositoryId(mRepoOwner, mRepoName), mId);
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            refresh();
-        }
     }
 }
