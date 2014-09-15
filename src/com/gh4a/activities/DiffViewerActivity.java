@@ -199,7 +199,10 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
                 cssClass = "remove";
             }
 
-            content.append("<div class=\"").append(cssClass).append("\" ");
+            content.append("<div ");
+            if (cssClass != null) {
+                content.append("class=\"").append(cssClass).append("\" ");
+            }
             content.append("onclick=\"javascript:location.href='comment://add");
             content.append("?position=").append(i).append("'\">").append(line).append("</div>");
 
@@ -207,7 +210,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
             if (comments != null) {
                 for (CommitComment comment : comments) {
                     mCommitComments.put(comment.getId(), comment);
-                    content.append("<div style=\"border:1px solid; padding: 2px; margin: 5px 0;\" ");
+                    content.append("<div class=\"comment\"");
+                    content.append(" style=\"border:1px solid; padding: 2px; margin: 5px 0;\" ");
                     content.append("onclick=\"javascript:location.href='comment://edit");
                     content.append("?position=").append(i);
                     content.append("&id=").append(comment.getId()).append("'\">");
