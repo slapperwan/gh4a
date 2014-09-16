@@ -153,6 +153,9 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
             } else if (!mPullRequest.isMergeable()) {
                 menu.findItem(R.id.pull_merge).setEnabled(false);
             }
+            if (mPullRequest == null) {
+                menu.removeItem(R.id.share);
+            }
         }
         super.onCreateOptionsMenu(menu, inflater);
     }
