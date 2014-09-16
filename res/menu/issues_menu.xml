@@ -1,8 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/sort"
-        android:icon="?attr/expandIcon"
-        android:showAsAction="always" />
+    <item
+        android:title="@string/issue_sort_order"
+        android:icon="?attr/sortIcon"
+        android:showAsAction="always">
+        <menu>
+            <group android:id="@+id/sort_mode"
+                android:checkableBehavior="single">
+                <item android:id="@+id/sort_created_desc"
+                    android:title="@string/issue_sort_created_desc" />
+                <item android:id="@+id/sort_created_asc"
+                    android:title="@string/issue_sort_created_asc" />
+                <item android:id="@+id/sort_updated_desc"
+                    android:title="@string/issue_sort_updated_desc" />
+                <item android:id="@+id/sort_updated_asc"
+                    android:title="@string/issue_sort_updated_asc" />
+                <item android:id="@+id/sort_comments_desc"
+                    android:title="@string/issue_sort_comments_desc" />
+                <item android:id="@+id/sort_comments_asc"
+                    android:title="@string/issue_sort_comments_asc" />
+            </group>
+        </menu>
+    </item>
 
     <item android:id="@+id/labels"
         android:icon="?attr/labelListIcon"
@@ -15,10 +34,6 @@
     <item android:id="@+id/assignees"
         android:icon="?attr/personIcon"
         android:showAsAction="always" />
-
-    <item android:id="@+id/view_open_closed"
-        android:title="@string/issue_view_closed_issues"
-        android:showAsAction="never" />
 
     <item android:id="@+id/view_labels"
         android:title="@string/issue_manage_labels"

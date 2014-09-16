@@ -32,9 +32,6 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
-import com.gh4a.fragment.IssueListByCommentsFragment;
-import com.gh4a.fragment.IssueListBySubmittedFragment;
-import com.gh4a.fragment.IssueListByUpdatedFragment;
 import com.gh4a.fragment.IssueListFragment;
 import com.gh4a.loader.CollaboratorListLoader;
 import com.gh4a.loader.IsCollaboratorLoader;
@@ -49,7 +46,7 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,21 +54,31 @@ import java.util.Map;
 public class IssueListActivity extends LoadingFragmentPagerActivity {
     private String mRepoOwner;
     private String mRepoName;
-    private String mState;
-    private IssueListFragment mUpdateFragment;
-    private IssueListFragment mCommentFragment;
-    private IssueListFragment mSubmitFragment;
+
+    private String mSortMode;
+    private boolean mSortAscending;
+    private List<String> mSelectedLabels;
+    private int mSelectedMilestone;
+    private String mSelectedAssignee;
+
+    private int mPendingSelectedItem;
+
+    private IssueListFragment mOpenFragment;
+    private IssueListFragment mClosedFragment;
     private ActionBar mActionBar;
-    private Map<String, String> mFilterData;
     private boolean mIsCollaborator;
     private ProgressDialog mProgressDialog;
     private List<Label> mLabels;
     private List<Milestone> mMilestones;
     private List<User> mAssignees;
 
-    private static final int[] TITLES = new int[]{
-        R.string.issues_submitted, R.string.issues_updated, R.string.issues_comments
+    private static final int[] TITLES = new int[] {
+        R.string.open, R.string.closed
     };
+
+    private static final String SORT_MODE_CREATED = "created";
+    private static final String SORT_MODE_UPDATED = "updated";
+    private static final String SORT_MODE_COMMENTS = "comments";
 
     private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
         @Override
@@ -91,10 +98,12 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         }
     };
 
-    private LoaderCallbacks<List<Milestone>> mMilestoneCallback = new LoaderCallbacks<List<Milestone>>() {
+    private LoaderCallbacks<List<Milestone>> mMilestoneCallback =
+            new LoaderCallbacks<List<Milestone>>() {
         @Override
         public Loader<LoaderResult<List<Milestone>>> onCreateLoader(int id, Bundle args) {
-            return new MilestoneListLoader(IssueListActivity.this, mRepoOwner, mRepoName, "open");
+            return new MilestoneListLoader(IssueListActivity.this, mRepoOwner, mRepoName,
+                    Constants.Issue.STATE_OPEN);
         }
 
         @Override
@@ -110,7 +119,8 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         }
     };
 
-    private LoaderCallbacks<List<User>> mCollaboratorListCallback = new LoaderCallbacks<List<User>>() {
+    private LoaderCallbacks<List<User>> mCollaboratorListCallback =
+            new LoaderCallbacks<List<User>>() {
         @Override
         public Loader<LoaderResult<List<User>>> onCreateLoader(int id, Bundle args) {
             return new CollaboratorListLoader(IssueListActivity.this, mRepoOwner, mRepoName);
@@ -155,25 +165,19 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.OWNER);
         mRepoName = data.getString(Constants.Repository.NAME);
-        mState = data.getString(Constants.Issue.STATE);
+        mSortMode = SORT_MODE_CREATED;
+        mSortAscending = false;
 
-        mFilterData = new HashMap<String, String>();
-        mFilterData.put("state", mState);
+        if (TextUtils.equals(data.getString(Constants.Issue.STATE), Constants.Issue.STATE_CLOSED)) {
+            getPager().setCurrentItem(1);
+        }
 
         getSupportLoaderManager().initLoader(3, null, mIsCollaboratorCallback);
 
         mActionBar = getSupportActionBar();
+        mActionBar.setTitle(R.string.issues);
         mActionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         mActionBar.setDisplayHomeAsUpEnabled(true);
-        updateTitle();
-    }
-
-    private void updateTitle() {
-        if (mState == null || Constants.Issue.STATE_OPEN.equals(mState)) {
-            mActionBar.setTitle(R.string.issue_open);
-        } else {
-            mActionBar.setTitle(R.string.issue_closed);
-        }
     }
 
     @Override
@@ -183,26 +187,36 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
 
     @Override
     protected Fragment getFragment(int position) {
+        Map<String, String> filterData = new HashMap<String, String>();
+        filterData.put("sort", mSortMode);
+        filterData.put("direction", mSortAscending ? "asc" : "desc");
+        if (mSelectedLabels != null) {
+            filterData.put("labels", TextUtils.join(",", mSelectedLabels));
+        }
+        if (mSelectedMilestone > 0) {
+            filterData.put("milestone", String.valueOf(mSelectedMilestone));
+        }
+        if (mSelectedAssignee != null) {
+            filterData.put("assignee", mSelectedAssignee);
+        }
+
         if (position == 1) {
-            mUpdateFragment = IssueListByUpdatedFragment.newInstance(mRepoOwner, mRepoName, mFilterData);
-            return mUpdateFragment;
-        } else if (position == 2) {
-            mCommentFragment = IssueListByCommentsFragment.newInstance(mRepoOwner, mRepoName, mFilterData);
-            return mCommentFragment;
+            filterData.put(Constants.Issue.STATE, Constants.Issue.STATE_CLOSED);
+            mClosedFragment = IssueListFragment.newInstance(mRepoOwner, mRepoName, filterData);
+            return mClosedFragment;
         } else {
-            mSubmitFragment = IssueListBySubmittedFragment.newInstance(mRepoOwner, mRepoName, mFilterData);
-            return mSubmitFragment;
+            filterData.put(Constants.Issue.STATE, Constants.Issue.STATE_OPEN);
+            mOpenFragment = IssueListFragment.newInstance(mRepoOwner, mRepoName, filterData);
+            return mOpenFragment;
         }
     }
 
     @Override
     protected boolean fragmentNeedsRefresh(Fragment object) {
-        if (object instanceof IssueListByUpdatedFragment && mUpdateFragment != object) {
-            return true;
-        } else if (object instanceof IssueListByCommentsFragment && mUpdateFragment != object) {
-            return true;
-        } else if (object instanceof IssueListBySubmittedFragment && mSubmitFragment != object) {
-            return true;
+        if (object instanceof IssueListFragment) {
+            if (object != mOpenFragment && object != mClosedFragment) {
+                return true;
+            }
         }
         return false;
     }
@@ -211,12 +225,20 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
         inflater.inflate(R.menu.issues_menu, menu);
-        menu.findItem(R.id.view_open_closed).setTitle(Constants.Issue.STATE_OPEN.equals(mState)
-                ? R.string.issue_view_closed_issues : R.string.issue_view_open_issues);
         if (!mIsCollaborator) {
             menu.removeItem(R.id.view_labels);
             menu.removeItem(R.id.view_milestones);
         }
+
+        int selectedSortItemId;
+        if (TextUtils.equals(mSortMode, SORT_MODE_CREATED)) {
+            selectedSortItemId = mSortAscending ? R.id.sort_created_asc : R.id.sort_created_desc;
+        } else if (TextUtils.equals(mSortMode, SORT_MODE_UPDATED)) {
+            selectedSortItemId = mSortAscending ? R.id.sort_updated_asc : R.id.sort_updated_desc;
+        } else { /* SORT_MODE_COMMENTS */
+            selectedSortItemId = mSortAscending ? R.id.sort_comments_asc : R.id.sort_comments_desc;
+        }
+        menu.findItem(selectedSortItemId).setChecked(true);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -229,17 +251,25 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.view_open_closed:
-                if (Constants.Issue.STATE_OPEN.equals(mState)) {
-                    mState = Constants.Issue.STATE_CLOSED;
-                    item.setTitle(R.string.issue_view_open_issues);
-                } else {
-                    mState = Constants.Issue.STATE_OPEN;
-                    item.setTitle(R.string.issue_view_closed_issues);
-                }
-                mFilterData.put("state", mState);
-                reloadIssueList();
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.sort_created_asc:
+                updateSortModeAndReload(item, SORT_MODE_CREATED, true);
+                return true;
+            case R.id.sort_created_desc:
+                updateSortModeAndReload(item, SORT_MODE_CREATED, false);
+                return true;
+            case R.id.sort_updated_asc:
+                updateSortModeAndReload(item, SORT_MODE_UPDATED, true);
+                return true;
+            case R.id.sort_updated_desc:
+                updateSortModeAndReload(item, SORT_MODE_UPDATED, false);
+                return true;
+            case R.id.sort_comments_asc:
+                updateSortModeAndReload(item, SORT_MODE_COMMENTS, true);
+                return true;
+            case R.id.sort_comments_desc:
+                updateSortModeAndReload(item, SORT_MODE_COMMENTS, false);
                 return true;
             case R.id.create_issue:
                 if (Gh4Application.get(this).isAuthorized()) {
@@ -264,14 +294,6 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
                 intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
                 intent.putExtra(Constants.Repository.NAME, mRepoName);
                 startActivity(intent);
-                return true;
-            case R.id.sort:
-                String direction = mFilterData.get("direction");
-                boolean isDesc = "desc".equals(direction) || direction == null;
-                item.setIcon(UiUtils.resolveDrawable(this, isDesc
-                        ? R.attr.collapseIcon : R.attr.expandIcon));
-                mFilterData.put("direction", isDesc ? "asc" : "desc");
-                reloadIssueList();
                 return true;
             case R.id.labels:
                 if (mLabels == null) {
@@ -301,29 +323,31 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void updateSortModeAndReload(MenuItem item, String sortMode, boolean ascending) {
+        item.setChecked(true);
+        mSortAscending = ascending;
+        mSortMode = sortMode;
+        reloadIssueList();
+    }
+
     private void reloadIssueList() {
-        updateTitle();
-        mSubmitFragment = null;
-        mUpdateFragment = null;
-        mCommentFragment = null;
+        mOpenFragment = null;
+        mClosedFragment = null;
         invalidateFragments();
     }
 
     private void showLabelsDialog() {
-        String selectedLabels = mFilterData.get("labels");
-        String[] checkedLabels = selectedLabels != null ?
-                selectedLabels.split(",") : new String[]{};
-        List<String> checkLabelStringList = Arrays.asList(checkedLabels);
         final boolean[] checkedItems = new boolean[mLabels.size()];
         final String[] allLabelArray = new String[mLabels.size()];
 
         for (int i = 0; i < mLabels.size(); i++) {
             Label l = mLabels.get(i);
             allLabelArray[i] = l.getName();
-            checkedItems[i] = checkLabelStringList.contains(l.getName());
+            checkedItems[i] = mSelectedLabels != null && mSelectedLabels.contains(l.getName());
         }
 
-        DialogInterface.OnMultiChoiceClickListener selectCb = new DialogInterface.OnMultiChoiceClickListener() {
+        DialogInterface.OnMultiChoiceClickListener selectCb =
+                new DialogInterface.OnMultiChoiceClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int whichButton, boolean isChecked) {
                 checkedItems[whichButton] = isChecked;
@@ -332,13 +356,12 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         DialogInterface.OnClickListener okCb = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int whichButton) {
-                String labels = "";
+                mSelectedLabels = new ArrayList<String>();
                 for (int i = 0; i < allLabelArray.length; i++) {
                     if (checkedItems[i]) {
-                        labels += allLabelArray[i] + ",";
+                        mSelectedLabels.add(allLabelArray[i]);
                     }
                 }
-                mFilterData.put("labels", labels);
                 reloadIssueList();
             }
         };
@@ -359,32 +382,27 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         milestones[0] = getResources().getString(R.string.issue_filter_by_any_milestone);
         milestoneIds[0] = 0;
 
-        String checkedMilestoneNumber = mFilterData.get("milestone");
-        int checkedItem = TextUtils.isEmpty(checkedMilestoneNumber)
-                ? 0 : Integer.parseInt(checkedMilestoneNumber);
+        mPendingSelectedItem = 0;
 
         for (int i = 1; i <= mMilestones.size(); i++) {
             Milestone m = mMilestones.get(i - 1);
             milestones[i] = m.getTitle();
             milestoneIds[i] = m.getNumber();
-            if (m.getNumber() == checkedItem) {
-                checkedItem = i;
+            if (m.getNumber() == mSelectedMilestone) {
+                mPendingSelectedItem = i;
             }
         }
 
         DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (which == 0) {
-                    mFilterData.remove("milestone");
-                } else {
-                    mFilterData.put("milestone", String.valueOf(milestoneIds[which]));
-                }
+                mPendingSelectedItem = which;
             }
         };
         DialogInterface.OnClickListener okCb = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                mSelectedMilestone = milestoneIds[mPendingSelectedItem];
                 reloadIssueList();
             }
         };
@@ -392,7 +410,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         new AlertDialog.Builder(this)
                 .setCancelable(true)
                 .setTitle(R.string.issue_filter_by_milestone)
-                .setSingleChoiceItems(milestones, checkedItem, selectCb)
+                .setSingleChoiceItems(milestones, mPendingSelectedItem, selectCb)
                 .setPositiveButton(R.string.ok, okCb)
                 .setNegativeButton(R.string.cancel, null)
                 .show();
@@ -403,30 +421,27 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
 
         assignees[0] = getResources().getString(R.string.issue_filter_by_any_assignee);
 
-        String checkedAssignee = mFilterData.get("assignee");
-        int checkedItem = 0;
+        mPendingSelectedItem = 0;
 
         for (int i = 1; i <= mAssignees.size(); i++) {
             User u = mAssignees.get(i - 1);
             assignees[i] = u.getLogin();
-            if (u.getLogin().equalsIgnoreCase(checkedAssignee)) {
-                checkedItem = i;
+            if (u.getLogin().equalsIgnoreCase(mSelectedAssignee)) {
+                mPendingSelectedItem = i;
             }
         }
 
         DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (which == 0) {
-                    mFilterData.remove("assignee");
-                } else {
-                    mFilterData.put("assignee", assignees[which]);
-                }
+                mPendingSelectedItem = which;
             }
         };
         DialogInterface.OnClickListener okCb = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                mSelectedAssignee = mPendingSelectedItem != 0
+                        ? mAssignees.get(mPendingSelectedItem - 1).getLogin() : null;
                 reloadIssueList();
             }
         };
@@ -434,7 +449,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         new AlertDialog.Builder(this)
                 .setCancelable(true)
                 .setTitle(R.string.issue_filter_by_assignee)
-                .setSingleChoiceItems(assignees, checkedItem, selectCb)
+                .setSingleChoiceItems(assignees, mPendingSelectedItem, selectCb)
                 .setPositiveButton(R.string.ok, okCb)
                 .setNegativeButton(R.string.cancel, null)
                 .show();

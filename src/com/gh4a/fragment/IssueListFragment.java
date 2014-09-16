@@ -38,6 +38,23 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     private String mRepoName;
     private Map<String, String> mFilterData;
 
+    public static IssueListFragment newInstance(String repoOwner, String repoName,
+            Map<String, String> filterData) {
+
+        IssueListFragment f = new IssueListFragment();
+        Bundle args = new Bundle();
+        args.putString(Constants.Repository.OWNER, repoOwner);
+        args.putString(Constants.Repository.NAME, repoName);
+
+        if (filterData != null) {
+            for (String key : filterData.keySet()) {
+                args.putString(key, filterData.get(key));
+            }
+        }
+        f.setArguments(args);
+        return f;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
