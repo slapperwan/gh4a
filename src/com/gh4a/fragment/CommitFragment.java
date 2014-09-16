@@ -30,6 +30,7 @@ import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.GravatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.UiUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,6 +103,13 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         mContentView = inflater.inflate(R.layout.commit, null);
+
+        Gh4Application app = Gh4Application.get(getActivity());
+        UiUtils.assignTypeface(mContentView, app.boldCondensed, new int[] {
+                R.id.commit_added, R.id.commit_changed,
+                R.id.commit_renamed, R.id.commit_deleted
+        });
+
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -179,10 +187,10 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
     protected void fillStats(List<CommitFile> files, List<CommitComment> comments) {
         LinearLayout llChanged = (LinearLayout) mContentView.findViewById(R.id.ll_changed);
         LinearLayout llAdded = (LinearLayout) mContentView.findViewById(R.id.ll_added);
+        LinearLayout llRenamed = (LinearLayout) mContentView.findViewById(R.id.ll_renamed);
         LinearLayout llDeleted = (LinearLayout) mContentView.findViewById(R.id.ll_deleted);
-        final Gh4Application app = Gh4Application.get(getActivity());
         final LayoutInflater inflater = getLayoutInflater(null);
-        int added = 0, changed = 0, deleted = 0;
+        int added = 0, changed = 0, renamed = 0, deleted = 0;
         int additions = 0, deletions = 0;
         int count = files != null ? files.size() : 0;
 
@@ -194,9 +202,12 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
             if ("added".equals(status)) {
                 parent = llAdded;
                 added++;
-            } else if ("modified".equals(status) || "renamed".equals(status)) {
+            } else if ("modified".equals(status)) {
                 parent = llChanged;
                 changed++;
+            } else if ("renamed".equals(status)) {
+                parent = llRenamed;
+                renamed++;
             } else if ("removed".equals(status)) {
                 parent = llDeleted;
                 deleted++;
@@ -218,7 +229,8 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
             TextView fileNameView = (TextView) fileView.findViewById(R.id.filename);
             fileNameView.setText(file.getFilename());
             fileNameView.setTag(file);
-            if (parent != llDeleted) {
+
+            if (parent != llDeleted && file.getPatch() != null) {
                 fileNameView.setTextColor(getResources().getColor(R.color.highlight));
                 fileNameView.setOnClickListener(this);
             }
@@ -231,27 +243,13 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
             parent.addView(fileView);
         }
 
-        if (added == 0) {
-            llAdded.setVisibility(View.GONE);
-        } else {
-            TextView tvAddedTitle = (TextView) mContentView.findViewById(R.id.commit_added);
-            tvAddedTitle.setTypeface(app.boldCondensed);
-        }
-        if (changed == 0) {
-            llChanged.setVisibility(View.GONE);
-        } else {
-            TextView tvChangeTitle = (TextView) mContentView.findViewById(R.id.commit_changed);
-            tvChangeTitle.setTypeface(app.boldCondensed);
-        }
-        if (deleted == 0) {
-            llDeleted.setVisibility(View.GONE);
-        } else {
-            TextView tvDeletedTitle = (TextView) mContentView.findViewById(R.id.commit_deleted);
-            tvDeletedTitle.setTypeface(app.boldCondensed);
-        }
+        llAdded.setVisibility(added > 0 ? View.VISIBLE : View.GONE);
+        llChanged.setVisibility(changed > 0 ? View.VISIBLE : View.GONE);
+        llRenamed.setVisibility(renamed > 0 ? View.VISIBLE : View.GONE);
+        llDeleted.setVisibility(deleted > 0 ? View.VISIBLE : View.GONE);
 
         TextView tvSummary = (TextView) mContentView.findViewById(R.id.tv_desc);
-        tvSummary.setText(getString(R.string.commit_summary, added + changed + deleted,
+        tvSummary.setText(getString(R.string.commit_summary, added + changed + renamed + deleted,
                 additions, deletions));
     }
 
