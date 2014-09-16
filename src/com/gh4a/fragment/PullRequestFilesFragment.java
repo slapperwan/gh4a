@@ -7,11 +7,13 @@ import android.view.View;
 
 import com.gh4a.Constants;
 import com.gh4a.R;
+import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.PullRequestDiffViewerActivity;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestCommentsLoader;
 import com.gh4a.loader.PullRequestFilesLoader;
+import com.gh4a.utils.FileUtils;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitFile;
@@ -108,7 +110,8 @@ public class PullRequestFilesFragment extends CommitFragment {
     public void onClick(View v) {
         CommitFile file = (CommitFile) v.getTag();
 
-        Intent intent = new Intent(getActivity(), PullRequestDiffViewerActivity.class);
+        Intent intent = new Intent(getActivity(), FileUtils.isImage(file.getFilename())
+                ? FileViewerActivity.class : PullRequestDiffViewerActivity.class);
         intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.NAME, mRepoName);
         intent.putExtra(Constants.PullRequest.NUMBER, mPullRequestNumber);

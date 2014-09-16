@@ -22,11 +22,13 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.CommitDiffViewerActivity;
+import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.CommitLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.CommitUtils;
+import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.GravatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
@@ -105,7 +107,7 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
         mContentView = inflater.inflate(R.layout.commit, null);
 
         Gh4Application app = Gh4Application.get(getActivity());
-        UiUtils.assignTypeface(mContentView, app.boldCondensed, new int[] {
+        UiUtils.assignTypeface(mContentView, app.boldCondensed, new int[]{
                 R.id.commit_added, R.id.commit_changed,
                 R.id.commit_renamed, R.id.commit_deleted
         });
@@ -230,7 +232,8 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
             fileNameView.setText(file.getFilename());
             fileNameView.setTag(file);
 
-            if (parent != llDeleted && file.getPatch() != null) {
+            if (parent != llDeleted &&
+                    (file.getPatch() != null || FileUtils.isImage(file.getFilename()))) {
                 fileNameView.setTextColor(getResources().getColor(R.color.highlight));
                 fileNameView.setOnClickListener(this);
             }
@@ -261,7 +264,8 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
         } else {
             CommitFile file = (CommitFile) v.getTag();
 
-            Intent intent = new Intent(getActivity(), CommitDiffViewerActivity.class);
+            Intent intent = new Intent(getActivity(), FileUtils.isImage(file.getFilename())
+                    ? FileViewerActivity.class : CommitDiffViewerActivity.class);
             intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
             intent.putExtra(Constants.Repository.NAME, mRepoName);
             intent.putExtra(Constants.Object.REF, mObjectSha);
