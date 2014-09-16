@@ -477,8 +477,10 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         String[] tagList = new String[mTags.size()];
         int current = -1;
         for (int i = 0; i < mTags.size(); i++) {
-            tagList[i] = mTags.get(i).getName();
-            if (mTags.get(i).getCommit().getSha().equals(mSelectedRef)) {
+            RepositoryTag tag = mTags.get(i);
+            tagList[i] = tag.getName();
+            if (tag.getName().equals(mSelectedRef)
+                    || tag.getCommit().getSha().equals(mSelectedRef)) {
                 current = i;
                 break;
             }
