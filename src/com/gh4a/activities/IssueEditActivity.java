@@ -70,6 +70,7 @@ public class IssueEditActivity extends LoadingFragmentActivity implements OnClic
     private List<Milestone> mAllMilestone;
     private List<User> mAllAssignee;
     private Issue mEditIssue;
+    private int mPendingSelection;
 
     private ProgressDialog mProgressDialog;
     private TextView mTvSelectedMilestone;
@@ -244,33 +245,28 @@ public class IssueEditActivity extends LoadingFragmentActivity implements OnClic
 
             milestones[0] = getResources().getString(R.string.issue_clear_milestone);
 
-            int checkedItem = 0;
-            if (mSelectedMilestone != null) {
-                checkedItem = mSelectedMilestone.getNumber();
-            }
+            mPendingSelection = 0;
 
             for (int i = 1; i <= mAllMilestone.size(); i++) {
                 Milestone m = mAllMilestone.get(i - 1);
                 milestones[i] = m.getTitle();
-                if (m.getNumber() == checkedItem) {
-                    checkedItem = i;
+                if (mSelectedMilestone != null && m.getNumber() == mSelectedMilestone.getNumber()) {
+                    mPendingSelection = i;
                 }
             }
 
             final DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    if (which == 0) {
-                        mSelectedMilestone = null;
-                    } else {
-                        mSelectedMilestone = mAllMilestone.get(which - 1);
-                    }
+                    mPendingSelection = which;
                 }
             };
 
             final DialogInterface.OnClickListener okCb = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    mSelectedMilestone = mPendingSelection == 0
+                            ? null : mAllMilestone.get(mPendingSelection - 1);
                     if (mSelectedMilestone != null) {
                         mTvSelectedMilestone.setText(getString(
                                 R.string.issue_milestone, mSelectedMilestone.getTitle()));
@@ -283,7 +279,7 @@ public class IssueEditActivity extends LoadingFragmentActivity implements OnClic
             new AlertDialog.Builder(this)
                     .setCancelable(true)
                     .setTitle(R.string.issue_milestone_hint)
-                    .setSingleChoiceItems(milestones, checkedItem, selectCb)
+                    .setSingleChoiceItems(milestones, mPendingSelection, selectCb)
                     .setPositiveButton(R.string.ok, okCb)
                     .setNegativeButton(R.string.cancel, null)
                     .show();
@@ -298,30 +294,28 @@ public class IssueEditActivity extends LoadingFragmentActivity implements OnClic
             final String[] assignees = new String[mAllAssignee.size() + 1];
             assignees[0] = getResources().getString(R.string.issue_clear_assignee);
 
-            int checkedItem = 0;
+            mPendingSelection = 0;
 
             for (int i = 1; i <= mAllAssignee.size(); i++) {
                 User u = mAllAssignee.get(i - 1);
                 assignees[i] = u.getLogin();
                 if (mSelectedAssignee != null
                         && u.getLogin().equalsIgnoreCase(mSelectedAssignee.getLogin())) {
-                    checkedItem = i;
+                    mPendingSelection = i;
                 }
             }
 
             DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    if (which == 0) {
-                        mSelectedAssignee = null;
-                    } else {
-                        mSelectedAssignee = mAllAssignee.get(which - 1);
-                    }
+                    mPendingSelection = which;
                 }
             };
             DialogInterface.OnClickListener okCb = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    mSelectedAssignee = mPendingSelection == 0
+                            ? null : mAllAssignee.get(mPendingSelection - 1);
                     if (mSelectedAssignee != null) {
                         mTvSelectedAssignee.setText(getString(
                                 R.string.issue_assignee, mSelectedAssignee.getLogin()));
@@ -334,7 +328,7 @@ public class IssueEditActivity extends LoadingFragmentActivity implements OnClic
             new AlertDialog.Builder(this)
                     .setCancelable(true)
                     .setTitle(R.string.issue_assignee_hint)
-                    .setSingleChoiceItems(assignees, checkedItem, selectCb)
+                    .setSingleChoiceItems(assignees, mPendingSelection, selectCb)
                     .setPositiveButton(R.string.ok, okCb)
                     .setNegativeButton(R.string.cancel, null)
                     .show();
