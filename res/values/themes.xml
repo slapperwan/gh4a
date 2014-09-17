@@ -12,8 +12,7 @@
         <item name="acceptIcon">@drawable/navigation_accept_dark</item>
         <item name="newIcon">@drawable/content_new_dark</item>
         <item name="refreshIcon">@drawable/navigation_refresh_dark</item>
-        <item name="collapseIcon">@drawable/navigation_collapse_dark</item>
-        <item name="expandIcon">@drawable/navigation_expand_dark</item>
+        <item name="sortIcon">@drawable/navigation_sort_dark</item>
         <item name="labelListIcon">@drawable/collections_labels_dark</item>
         <item name="milestoneListIcon">@drawable/collections_view_as_list_dark</item>
         <item name="personIcon">@drawable/social_person_dark</item>
@@ -25,6 +24,7 @@
         <item name="searchRepoMenuIcon">@drawable/search_repos_dark</item>
         <item name="dirIcon">@drawable/folder_dark</item>
         <item name="fileIcon">@drawable/file_dark</item>
+        <item name="commentsIcon">@drawable/comments_dark</item>
     </style>
 
     <style name="LightTheme" parent="Theme.Sherlock.Light">
@@ -39,8 +39,7 @@
         <item name="acceptIcon">@drawable/navigation_accept</item>
         <item name="newIcon">@drawable/content_new</item>
         <item name="refreshIcon">@drawable/navigation_refresh</item>
-        <item name="collapseIcon">@drawable/navigation_collapse</item>
-        <item name="expandIcon">@drawable/navigation_expand</item>
+        <item name="sortIcon">@drawable/navigation_sort</item>
         <item name="labelListIcon">@drawable/collections_labels</item>
         <item name="milestoneListIcon">@drawable/collections_view_as_list</item>
         <item name="personIcon">@drawable/social_person</item>
@@ -52,6 +51,7 @@
         <item name="searchRepoMenuIcon">@drawable/search_repos</item>
         <item name="dirIcon">@drawable/folder</item>
         <item name="fileIcon">@drawable/file</item>
+        <item name="commentsIcon">@drawable/comments</item>
     </style>
 
     <style name="LightDarkTheme" parent="Theme.Sherlock.Light.DarkActionBar">
@@ -66,8 +66,7 @@
         <item name="acceptIcon">@drawable/navigation_accept_dark</item>
         <item name="newIcon">@drawable/content_new_dark</item>
         <item name="refreshIcon">@drawable/navigation_refresh_dark</item>
-        <item name="collapseIcon">@drawable/navigation_collapse_dark</item>
-        <item name="expandIcon">@drawable/navigation_expand_dark</item>
+        <item name="sortIcon">@drawable/navigation_sort_dark</item>
         <item name="labelListIcon">@drawable/collections_labels_dark</item>
         <item name="milestoneListIcon">@drawable/collections_view_as_list_dark</item>
         <item name="personIcon">@drawable/social_person_dark</item>
@@ -79,6 +78,7 @@
         <item name="searchRepoMenuIcon">@drawable/search_repos_dark</item>
         <item name="dirIcon">@drawable/folder_dark</item>
         <item name="fileIcon">@drawable/file_dark</item>
+        <item name="commentsIcon">@drawable/comments</item>
     </style>
 
 </resources>

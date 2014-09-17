@@ -10,6 +10,7 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PullRequestCommentsLoader extends BaseLoader<List<CommitComment>> {
@@ -29,6 +30,14 @@ public class PullRequestCommentsLoader extends BaseLoader<List<CommitComment>> {
     public List<CommitComment> doLoadInBackground() throws IOException {
         PullRequestService pullRequestService = (PullRequestService)
                 Gh4Application.get(getContext()).getService(Gh4Application.PULL_SERVICE);
-        return pullRequestService.getComments(new RepositoryId(mRepoOwner, mRepoName), mPullRequestNumber);
+        List<CommitComment> comments = pullRequestService.getComments(
+                new RepositoryId(mRepoOwner, mRepoName), mPullRequestNumber);
+        List<CommitComment> result = new ArrayList<CommitComment>();
+        for (CommitComment comment : comments) {
+            if (comment.getPosition() >= 0) {
+                result.add(comment);
+            }
+        }
+        return result;
     }
 }

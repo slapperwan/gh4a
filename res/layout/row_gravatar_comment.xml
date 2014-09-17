@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:src="?attr/contentEditIcon"
-        android:background="?attr/selectableItemBackground" />
+        style="@style/SelectableItem" />
     <TextView
         android:id="@+id/tv_extra"
         android:layout_width="wrap_content"

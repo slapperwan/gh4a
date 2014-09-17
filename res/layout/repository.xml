@@ -21,7 +21,7 @@
                 android:id="@+id/tv_login"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
+                style="@style/SelectableItem"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/highlight"
                 android:textColorLink="@color/titletextcolor" />
@@ -49,7 +49,7 @@
                 android:layout_below="@id/tv_name"
                 android:layout_marginBottom="8dp"
                 android:layout_marginTop="8dp"
-                android:background="?attr/selectableItemBackground"
+                style="@style/SelectableItem"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/titletextcolor" />
 
@@ -91,7 +91,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center_horizontal"
-                android:background="?attr/selectableItemBackground"
+                style="@style/SelectableItem"
                 android:orientation="vertical">
 
                 <TextView
@@ -114,7 +114,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center_horizontal"
-                android:background="?attr/selectableItemBackground"
+                style="@style/SelectableItem"
                 android:orientation="vertical">
 
                 <TextView
@@ -137,7 +137,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center_horizontal"
-                android:background="?attr/selectableItemBackground"
+                style="@style/SelectableItem"
                 android:orientation="vertical">
 
                 <TextView
@@ -160,7 +160,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center_horizontal"
-                android:background="?attr/selectableItemBackground"
+                style="@style/SelectableItem"
                 android:orientation="vertical">
 
                 <TextView
@@ -191,15 +191,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/overview_item_spacing"
-                android:text="@string/readme"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/highlight" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
-                android:background="@color/highlight" />
+                style="@style/HeaderLabel"
+                android:text="@string/readme" />
 
             <ProgressBar
                 android:id="@+id/pb_readme"
@@ -218,15 +212,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/overview_item_spacing"
-                android:text="@string/other_info"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/highlight" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
-                android:background="@color/highlight" />
+                style="@style/HeaderLabel"
+                android:text="@string/other_info" />
         </LinearLayout>
 
         <TextView

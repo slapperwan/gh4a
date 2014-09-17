@@ -92,6 +92,7 @@
 	<string name="two_factor_auth">Two-factor Authentication</string>
 	<string name="verify">Verify</string>
     <string name="confirmation">Are you sure?</string>
+    <string name="unset">Unset</string>
 	
     <plurals name="file">
         <item quantity="one">File</item>
@@ -204,6 +205,7 @@
     <string name="commits">Commits</string>
     <string name="commit_changed">Files Changed</string>
     <string name="commit_added">Files Added</string>
+    <string name="commit_renamed">Files Renamed</string>
     <string name="commit_deleted">Files Deleted</string>
     <string name="commit_summary">%1$d changed files with %2$d additions and %3$d deletions.</string>
     <string name="commit_compare">Compare View</string>
@@ -226,8 +228,6 @@
     <string name="issue_comments">Comments</string>
     <string name="issue_title">Title</string>
     <string name="issue_body">Body</string>
-    <string name="issue_view_open_issues">View Open</string>
-    <string name="issue_view_closed_issues">View Closed</string>
     <string name="issue_create">New Issue</string>
     <string name="issue_error_title">Please enter a title</string>
     <string name="issue_success_create">Successfully created issue</string>
@@ -236,11 +236,16 @@
     <string name="issue_success_edit">Successfully edited issue</string>
     <string name="issue_reopen">Reopen Issue</string>
     <string name="issue_close">Close Issue</string>
-    <string name="issue_open">Open Issues</string>
-    <string name="issue_closed">Closed Issues</string>
     <string name="issue_success_close">Successfully closed issue</string>
     <string name="issue_error_close">Cannot close issue</string>
     <string name="issue_success_reopen">Successfully reopened issue</string>
+    <string name="issue_sort_order">Sort order</string>
+    <string name="issue_sort_created_asc">Oldest</string>
+    <string name="issue_sort_created_desc">Newest</string>
+    <string name="issue_sort_updated_asc">Least recently updated</string>
+    <string name="issue_sort_updated_desc">Most recently updated</string>
+    <string name="issue_sort_comments_asc">Least commented</string>
+    <string name="issue_sort_comments_desc">Most commented</string>
     <string name="issue_manage_labels">Manage Labels</string>
     <string name="issue_manage_milestones">Manage Milestones</string>
     <string name="issue_dialog_delete_title">Delete %1$s?</string>
@@ -253,14 +258,11 @@
     <string name="issue_error_edit_label">Cannot edit label</string>
     <string name="issue_error_create_milestone">Cannot create milestone</string>
     <string name="issue_error_milestone_title">Please enter a title</string>
-    <string name="issue_label_add">Add labels</string>
+    <string name="issue_label_add">Labels</string>
     <string name="issue_label_new">New Label</string>
     <string name="issue_milestone">Milestone: %1$s</string>
     <string name="issue_milestone_new">New Milestone</string>
     <string name="issue_milestone_edit">Edit Milestone</string>
-    <string name="issues_submitted">Submitted</string>
-    <string name="issues_updated">Updated</string>
-    <string name="issues_comments">Comments</string>
     <string name="issue_filter_by_labels">Filter by labels</string>
     <string name="issue_filter_by_milestone">Filter by milestone</string>
     <string name="issue_filter_by_assignee">Filter by assignee</string>
@@ -269,6 +271,7 @@
     <string name="issue_clear_milestone">No milestone</string>
     <string name="issue_clear_assignee">No assignee</string>
     <string name="issue_milestone_due_date">Due Date</string>
+    <string name="issue_milestone_due">Due on %1$s</string>
     <string name="issue_assignee">%1$s is assigned</string>
     <string name="issue_desc">Description</string>
     <string name="issue_comment_title">Comment</string>

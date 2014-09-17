@@ -1,9 +1,5 @@
 package com.gh4a.activities;
 
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.IssueService;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -19,10 +15,12 @@ import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
-public class EditCommentActivity extends BaseSherlockFragmentActivity {
-    private String mRepoOwner;
-    private String mRepoName;
-    private long mCommentId;
+import java.io.IOException;
+
+public abstract class EditCommentActivity extends BaseSherlockFragmentActivity {
+    protected String mRepoOwner;
+    protected String mRepoName;
+    protected long mCommentId;
     private EditText mEditText;
 
     @Override
@@ -85,6 +83,9 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    protected abstract void updateComment(long id, String text) throws IOException;
+    protected abstract void deleteComment(long id) throws IOException;
+
     private class EditCommentTask extends ProgressDialogTask<Void> {
         private long mId;
         private String mBody;
@@ -97,13 +98,7 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
 
         @Override
         protected Void run() throws Exception {
-            IssueService issueService = (IssueService)
-                    Gh4Application.get(mContext).getService(Gh4Application.ISSUE_SERVICE);
-
-            Comment comment = new Comment();
-            comment.setBody(mBody);
-            comment.setId(mId);
-            issueService.editComment(new RepositoryId(mRepoOwner, mRepoName), comment);
+            updateComment(mId, mBody);
             return null;
         }
 
@@ -124,10 +119,7 @@ public class EditCommentActivity extends BaseSherlockFragmentActivity {
 
         @Override
         protected Void run() throws Exception {
-            IssueService issueService = (IssueService)
-                    Gh4Application.get(mContext).getService(Gh4Application.ISSUE_SERVICE);
-
-            issueService.deleteComment(new RepositoryId(mRepoOwner, mRepoName), mId);
+            deleteComment(mId);
             return null;
         }
 

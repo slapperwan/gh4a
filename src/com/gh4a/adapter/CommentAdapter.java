@@ -70,38 +70,34 @@ public class CommentAdapter extends RootAdapter<Comment> implements OnClickListe
 
     @Override
     protected void bindView(View v, Comment comment) {
-        boolean isCommitComment = comment instanceof CommitComment;
-        if (!isCommitComment ||
-                ((CommitComment) comment).getPosition() != -1) {
-            ViewHolder viewHolder = (ViewHolder) v.getTag();
-            String login = Gh4Application.get(mContext).getAuthLogin();
+        ViewHolder viewHolder = (ViewHolder) v.getTag();
+        String ourLogin = Gh4Application.get(mContext).getAuthLogin();
+        String login = comment.getUser().getLogin();
 
-            GravatarHandler.assignGravatar(viewHolder.ivGravatar, comment.getUser());
+        GravatarHandler.assignGravatar(viewHolder.ivGravatar, comment.getUser());
 
-            if (isCommitComment) {
-                viewHolder.tvExtra.setText(mContext.getString(R.string.issue_commit_comment_header,
-                        comment.getUser().getLogin(),
-                        StringUtils.formatRelativeTime(mContext, comment.getCreatedAt(), true),
-                        FileUtils.getFileName(((CommitComment) comment).getPath())));
-            } else {
-                viewHolder.tvExtra.setText(mContext.getString(R.string.issue_comment_header,
-                        comment.getUser().getLogin(),
-                        StringUtils.formatRelativeTime(mContext, comment.getCreatedAt(), true)));
-            }
+        String body = comment.getBodyHtml();
+        mImageGetter.bind(viewHolder.tvDesc, body, comment.getId());
 
-            String body = comment.getBodyHtml();
-            mImageGetter.bind(viewHolder.tvDesc, body, comment.getId());
+        viewHolder.ivGravatar.setTag(comment);
 
-            viewHolder.ivGravatar.setTag(comment);
+        if (comment instanceof CommitComment) {
+            CommitComment commitComment = (CommitComment) comment;
+            viewHolder.tvExtra.setText(mContext.getString(R.string.issue_commit_comment_header,
+                    login,
+                    StringUtils.formatRelativeTime(mContext, comment.getCreatedAt(), true),
+                    FileUtils.getFileName(commitComment.getPath())));
+        } else {
+            viewHolder.tvExtra.setText(mContext.getString(R.string.issue_comment_header, login,
+                    StringUtils.formatRelativeTime(mContext, comment.getCreatedAt(), true)));
+        }
 
-            if (!isCommitComment &&
-                    (comment.getUser().getLogin().equals(login) || mRepoOwner.equals(login))) {
-                viewHolder.ivEdit.setVisibility(View.VISIBLE);
-                viewHolder.ivEdit.setTag(comment);
-                viewHolder.ivEdit.setOnClickListener(this);
-            } else {
-                viewHolder.ivEdit.setVisibility(View.GONE);
-            }
+        if ((login.equals(ourLogin) || mRepoOwner.equals(ourLogin)) && mEditCallback != null) {
+            viewHolder.ivEdit.setVisibility(View.VISIBLE);
+            viewHolder.ivEdit.setTag(comment);
+            viewHolder.ivEdit.setOnClickListener(this);
+        } else {
+            viewHolder.ivEdit.setVisibility(View.GONE);
         }
     }
 
@@ -110,7 +106,7 @@ public class CommentAdapter extends RootAdapter<Comment> implements OnClickListe
         if (v.getId() == R.id.iv_gravatar) {
             Comment comment = (Comment) v.getTag();
             IntentUtils.openUserInfoActivity(mContext, comment.getUser());
-        } else if (v.getId() == R.id.iv_edit && mEditCallback != null) {
+        } else if (v.getId() == R.id.iv_edit) {
             Comment comment = (Comment) v.getTag();
             mEditCallback.editComment(comment);
         }

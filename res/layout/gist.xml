@@ -29,14 +29,9 @@
                 android:id="@+id/files_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/highlight"
-                android:text="@string/gist_files" />
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
-                android:background="@color/highlight" />
+                style="@style/HeaderLabel"
+                android:text="@string/gist_files" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

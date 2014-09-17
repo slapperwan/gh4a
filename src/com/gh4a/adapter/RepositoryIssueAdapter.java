@@ -17,7 +17,6 @@ package com.gh4a.adapter;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -81,13 +80,10 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
                 + StringUtils.formatRelativeTime(mContext, issue.getCreatedAt(), true));
 
         if (issue.getComments() > 0) {
+            viewHolder.tvComments.setVisibility(View.VISIBLE);
             viewHolder.tvComments.setText(String.valueOf(issue.getComments()));
-            int drawableId = Gh4Application.THEME == R.style.DefaultTheme ? R.drawable.comments_dark : R.drawable.comments;
-            Drawable commentDrawable = v.getContext().getResources().getDrawable(drawableId);
-            viewHolder.tvComments.setCompoundDrawablesWithIntrinsicBounds(commentDrawable, null, null, null);
-        } else{
-            viewHolder.tvComments.setCompoundDrawables(null,null,null,null);
-            viewHolder.tvComments.setText("");
+        } else {
+            viewHolder.tvComments.setVisibility(View.GONE);
         }
 
         viewHolder.tvRepo.setText(mContext.getString(R.string.repo_issue_on,

@@ -159,6 +159,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
         });
 
         listView.addHeaderView(mHeader, null, false);
+        listView.setHeaderDividersEnabled(false);
 
         mCommentAdapter = new CommentAdapter(this, mRepoOwner, this);
         listView.setAdapter(mCommentAdapter);
@@ -313,28 +314,24 @@ public class IssueActivity extends LoadingFragmentActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
+        int itemId = item.getItemId();
+        switch (itemId) {
             case R.id.issue_create:
-                if (checkForAuthOrExit()) {
-                    Intent intent = new Intent(this, IssueCreateActivity.class);
-                    intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-                    intent.putExtra(Constants.Repository.NAME, mRepoName);
-                    startActivity(intent);
-                }
-                return true;
             case R.id.issue_edit:
                 if (checkForAuthOrExit()) {
-                    Intent intent = new Intent(this, IssueCreateActivity.class);
+                    Intent intent = new Intent(this, IssueEditActivity.class);
                     intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
                     intent.putExtra(Constants.Repository.NAME, mRepoName);
-                    intent.putExtra(Constants.Issue.NUMBER, mIssue.getNumber());
+                    if (itemId == R.id.issue_edit) {
+                        intent.putExtra(Constants.Issue.NUMBER, mIssue.getNumber());
+                    }
                     startActivity(intent);
                 }
                 return true;
             case R.id.issue_close:
             case R.id.issue_reopen:
                 if (checkForAuthOrExit()) {
-                    new IssueOpenCloseTask(item.getItemId() == R.id.issue_reopen).execute();
+                    new IssueOpenCloseTask(itemId == R.id.issue_reopen).execute();
                 }
                 return true;
             case R.id.share:
@@ -400,7 +397,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
 
     @Override
     public void editComment(Comment comment) {
-        Intent intent = new Intent(this, EditCommentActivity.class);
+        Intent intent = new Intent(this, EditCommitCommentActivity.class);
 
         intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.NAME, mRepoName);

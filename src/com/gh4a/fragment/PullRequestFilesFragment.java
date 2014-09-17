@@ -1,36 +1,32 @@
 package com.gh4a.fragment;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
-import com.devspark.progressfragment.SherlockProgressFragment;
 import com.gh4a.Constants;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.PullRequestDiffViewerActivity;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.loader.PullRequestCommentsLoader;
 import com.gh4a.loader.PullRequestFilesLoader;
+import com.gh4a.utils.FileUtils;
 
+import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class PullRequestFilesFragment extends SherlockProgressFragment implements OnClickListener {
+public class PullRequestFilesFragment extends CommitFragment {
     private String mRepoOwner;
     private String mRepoName;
     private int mPullRequestNumber;
-    private View mContentView;
-    private List<CommitFile> mCommitFiles;
+    private List<CommitFile> mFiles;
+    private List<CommitComment> mComments;
 
     private LoaderCallbacks<List<CommitFile>> mPullRequestFilesCallback = new LoaderCallbacks<List<CommitFile>>() {
         @Override
@@ -40,13 +36,33 @@ public class PullRequestFilesFragment extends SherlockProgressFragment implement
 
         @Override
         public void onResultReady(LoaderResult<List<CommitFile>> result) {
-            boolean success = !result.handleError(getActivity());
-            if (success) {
-                mCommitFiles = result.getData();
-                fillData();
+            if (result.handleError(getActivity())) {
+                setContentEmpty(true);
+                setContentShown(true);
+                return;
             }
-            setContentEmpty(!success);
-            setContentShown(true);
+            mFiles = result.getData();
+            fillDataIfReady();
+        }
+    };
+
+    private LoaderCallbacks<List<CommitComment>> mPullRequestCommentsCallback =
+            new LoaderCallbacks<List<CommitComment>>() {
+        @Override
+        public Loader<LoaderResult<List<CommitComment>>> onCreateLoader(int id, Bundle args) {
+            return new PullRequestCommentsLoader(getActivity(),
+                    mRepoOwner, mRepoName, mPullRequestNumber);
+        }
+
+        @Override
+        public void onResultReady(LoaderResult<List<CommitComment>> result) {
+            if (result.handleError(getActivity())) {
+                setContentEmpty(true);
+                setContentShown(true);
+                return;
+            }
+            mComments = result.getData();
+            fillDataIfReady();
         }
     };
 
@@ -70,99 +86,38 @@ public class PullRequestFilesFragment extends SherlockProgressFragment implement
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        mContentView = inflater.inflate(R.layout.pull_request_files, null);
-        return super.onCreateView(inflater, container, savedInstanceState);
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mContentView.findViewById(R.id.title).setVisibility(View.GONE);
+        mContentView.findViewById(R.id.committer_info).setVisibility(View.GONE);
+        mContentView.findViewById(R.id.tv_message).setVisibility(View.GONE);
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        setContentView(mContentView);
-        setContentShown(false);
-
+    protected void initLoader() {
         getLoaderManager().initLoader(0, null, mPullRequestFilesCallback);
+        getLoaderManager().initLoader(1, null, mPullRequestCommentsCallback);
     }
 
-    private void fillData() {
-        final Activity activity = getActivity();
-        final Gh4Application app = Gh4Application.get(activity);
-        final LayoutInflater inflater = getLayoutInflater(null);
-
-        LinearLayout llChanged = (LinearLayout) mContentView.findViewById(R.id.ll_changed);
-        LinearLayout llAdded = (LinearLayout) mContentView.findViewById(R.id.ll_added);
-        LinearLayout llDeleted = (LinearLayout) mContentView.findViewById(R.id.ll_deleted);
-        int added = 0, changed = 0, deleted = 0;
-        int additions = 0, deletions = 0;
-
-        int count = mCommitFiles != null ? mCommitFiles.size() : 0;
-        for (int i = 0; i < count; i++) {
-            CommitFile file = mCommitFiles.get(i);
-            String status = file.getStatus();
-            final LinearLayout parent;
-
-            if ("added".equals(status)) {
-                parent = llAdded;
-                added++;
-            } else if ("modified".equals(status) || "renamed".equals(status)) {
-                parent = llChanged;
-                changed++;
-            } else if ("removed".equals(status)) {
-                parent = llDeleted;
-                deleted++;
-            } else {
-                continue;
-            }
-
-            additions += file.getAdditions();
-            deletions += file.getDeletions();
-
-            TextView fileNameView = (TextView) inflater.inflate(R.layout.commit_filename, parent, false);
-            fileNameView.setText(file.getFilename());
-            fileNameView.setTag(file);
-            if (parent != llDeleted) {
-                fileNameView.setTextColor(getResources().getColor(R.color.highlight));
-                fileNameView.setOnClickListener(this);
-            }
-            parent.addView(fileNameView);
+    private void fillDataIfReady() {
+        if (mComments != null && mFiles != null) {
+            fillStats(mFiles, mComments);
+            setContentShown(true);
         }
-
-        if (added == 0) {
-            llAdded.setVisibility(View.GONE);
-        } else {
-            TextView tvAddedTitle = (TextView) mContentView.findViewById(R.id.commit_added);
-            tvAddedTitle.setTypeface(app.boldCondensed);
-        }
-        if (changed == 0) {
-            llChanged.setVisibility(View.GONE);
-        } else {
-            TextView tvChangeTitle = (TextView) mContentView.findViewById(R.id.commit_changed);
-            tvChangeTitle.setTypeface(app.boldCondensed);
-        }
-        if (deleted == 0) {
-            llDeleted.setVisibility(View.GONE);
-        } else {
-            TextView tvDeletedTitle = (TextView) mContentView.findViewById(R.id.commit_deleted);
-            tvDeletedTitle.setTypeface(app.boldCondensed);
-        }
-
-        TextView tvSummary = (TextView) mContentView.findViewById(R.id.tv_desc);
-        tvSummary.setText(getString(R.string.commit_summary, added + changed + deleted,
-                additions, deletions));
     }
 
     @Override
     public void onClick(View v) {
         CommitFile file = (CommitFile) v.getTag();
 
-        Intent intent = new Intent(getActivity(), PullRequestDiffViewerActivity.class);
+        Intent intent = new Intent(getActivity(), FileUtils.isImage(file.getFilename())
+                ? FileViewerActivity.class : PullRequestDiffViewerActivity.class);
         intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.NAME, mRepoName);
         intent.putExtra(Constants.PullRequest.NUMBER, mPullRequestNumber);
         intent.putExtra(Constants.Object.OBJECT_SHA, file.getRawUrl().split("/")[6]);
         intent.putExtra(Constants.Commit.DIFF, file.getPatch());
+        intent.putExtra(Constants.Commit.COMMENTS, new ArrayList<CommitComment>(mComments));
         intent.putExtra(Constants.Object.PATH, file.getFilename());
         startActivity(intent);
     }

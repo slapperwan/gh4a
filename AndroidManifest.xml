@@ -56,7 +56,10 @@
             android:name=".activities.DownloadsActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.EditCommentActivity"
+            android:name=".activities.EditCommitCommentActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".activities.EditPullRequestCommentActivity"
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activities.ExploreActivity"
@@ -66,9 +69,6 @@
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activities.CommitDiffViewerActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.PullFileDiffViewerActivity"
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activities.FollowerFollowingListActivity"
@@ -86,7 +86,7 @@
             android:name=".activities.IssueActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.IssueCreateActivity"
+            android:name=".activities.IssueEditActivity"
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activities.IssueLabelListActivity"
@@ -95,9 +95,6 @@
             android:name=".activities.IssueListActivity"
             android:configChanges="orientation|screenSize"
             android:uiOptions="splitActionBarWhenNarrow" />
-        <activity
-            android:name=".activities.IssueMilestoneCreateActivity"
-            android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activities.IssueMilestoneEditActivity"
             android:configChanges="orientation|screenSize" />

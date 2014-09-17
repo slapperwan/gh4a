@@ -59,7 +59,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IssueCreateActivity extends LoadingFragmentActivity implements OnClickListener {
+public class IssueEditActivity extends LoadingFragmentActivity implements OnClickListener {
     private String mRepoOwner;
     private String mRepoName;
     private int mIssueNumber;
@@ -70,6 +70,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
     private List<Milestone> mAllMilestone;
     private List<User> mAllAssignee;
     private Issue mEditIssue;
+    private int mPendingSelection;
 
     private ProgressDialog mProgressDialog;
     private TextView mTvSelectedMilestone;
@@ -78,12 +79,12 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
     private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
         @Override
         public Loader<LoaderResult<List<Label>>> onCreateLoader(int id, Bundle args) {
-            return new LabelListLoader(IssueCreateActivity.this, mRepoOwner, mRepoName);
+            return new LabelListLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
         }
         @Override
         public void onResultReady(LoaderResult<List<Label>> result) {
             stopProgressDialog(mProgressDialog);
-            if (!result.handleError(IssueCreateActivity.this)) {
+            if (!result.handleError(IssueEditActivity.this)) {
                 fillLabels(result.getData());
             }
         }
@@ -92,13 +93,13 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
     private LoaderCallbacks<List<Milestone>> mMilestoneCallback = new LoaderCallbacks<List<Milestone>>() {
         @Override
         public Loader<LoaderResult<List<Milestone>>> onCreateLoader(int id, Bundle args) {
-            return new MilestoneListLoader(IssueCreateActivity.this,
+            return new MilestoneListLoader(IssueEditActivity.this,
                     mRepoOwner, mRepoName, Constants.Issue.STATE_OPEN);
         }
         @Override
         public void onResultReady(LoaderResult<List<Milestone>> result) {
             stopProgressDialog(mProgressDialog);
-            if (!result.handleError(IssueCreateActivity.this)) {
+            if (!result.handleError(IssueEditActivity.this)) {
                 mAllMilestone = result.getData();
                 showMilestonesDialog(null);
                 getSupportLoaderManager().destroyLoader(1);
@@ -109,12 +110,12 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
     private LoaderCallbacks<List<User>> mCollaboratorListCallback = new LoaderCallbacks<List<User>>() {
         @Override
         public Loader<LoaderResult<List<User>>> onCreateLoader(int id, Bundle args) {
-            return new CollaboratorListLoader(IssueCreateActivity.this, mRepoOwner, mRepoName);
+            return new CollaboratorListLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
         }
         @Override
         public void onResultReady(LoaderResult<List<User>> result) {
             stopProgressDialog(mProgressDialog);
-            if (!result.handleError(IssueCreateActivity.this)) {
+            if (!result.handleError(IssueEditActivity.this)) {
                 mAllAssignee = result.getData();
                 showAssigneesDialog(null);
                 getSupportLoaderManager().destroyLoader(2);
@@ -125,12 +126,13 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
     private LoaderCallbacks<Boolean> mIsCollaboratorCallback = new LoaderCallbacks<Boolean>() {
         @Override
         public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
-            return new IsCollaboratorLoader(IssueCreateActivity.this, mRepoOwner, mRepoName);
+            return new IsCollaboratorLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
         }
         @Override
         public void onResultReady(LoaderResult<Boolean> result) {
-            if (!result.handleError(IssueCreateActivity.this)) {
-                findViewById(R.id.for_collaborator).setVisibility(result.getData() ? View.VISIBLE : View.GONE);
+            if (!result.handleError(IssueEditActivity.this)) {
+                findViewById(R.id.for_collaborator).setVisibility(
+                        result.getData() ? View.VISIBLE : View.GONE);
             }
         }
     };
@@ -138,11 +140,11 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
     private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>() {
         @Override
         public Loader<LoaderResult<Issue>> onCreateLoader(int id, Bundle args) {
-            return new IssueLoader(IssueCreateActivity.this, mRepoOwner, mRepoName, mIssueNumber);
+            return new IssueLoader(IssueEditActivity.this, mRepoOwner, mRepoName, mIssueNumber);
         }
         @Override
         public void onResultReady(LoaderResult<Issue> result) {
-            boolean success = !result.handleError(IssueCreateActivity.this);
+            boolean success = !result.handleError(IssueEditActivity.this);
             if (success) {
                 mEditIssue = result.getData();
                 fillIssueData();
@@ -243,33 +245,28 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
 
             milestones[0] = getResources().getString(R.string.issue_clear_milestone);
 
-            int checkedItem = 0;
-            if (mSelectedMilestone != null) {
-                checkedItem = mSelectedMilestone.getNumber();
-            }
+            mPendingSelection = 0;
 
             for (int i = 1; i <= mAllMilestone.size(); i++) {
                 Milestone m = mAllMilestone.get(i - 1);
                 milestones[i] = m.getTitle();
-                if (m.getNumber() == checkedItem) {
-                    checkedItem = i;
+                if (mSelectedMilestone != null && m.getNumber() == mSelectedMilestone.getNumber()) {
+                    mPendingSelection = i;
                 }
             }
 
             final DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    if (which == 0) {
-                        mSelectedMilestone = null;
-                    } else {
-                        mSelectedMilestone = mAllMilestone.get(which - 1);
-                    }
+                    mPendingSelection = which;
                 }
             };
 
             final DialogInterface.OnClickListener okCb = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    mSelectedMilestone = mPendingSelection == 0
+                            ? null : mAllMilestone.get(mPendingSelection - 1);
                     if (mSelectedMilestone != null) {
                         mTvSelectedMilestone.setText(getString(
                                 R.string.issue_milestone, mSelectedMilestone.getTitle()));
@@ -282,7 +279,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
             new AlertDialog.Builder(this)
                     .setCancelable(true)
                     .setTitle(R.string.issue_milestone_hint)
-                    .setSingleChoiceItems(milestones, checkedItem, selectCb)
+                    .setSingleChoiceItems(milestones, mPendingSelection, selectCb)
                     .setPositiveButton(R.string.ok, okCb)
                     .setNegativeButton(R.string.cancel, null)
                     .show();
@@ -297,30 +294,28 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
             final String[] assignees = new String[mAllAssignee.size() + 1];
             assignees[0] = getResources().getString(R.string.issue_clear_assignee);
 
-            int checkedItem = 0;
+            mPendingSelection = 0;
 
             for (int i = 1; i <= mAllAssignee.size(); i++) {
                 User u = mAllAssignee.get(i - 1);
                 assignees[i] = u.getLogin();
                 if (mSelectedAssignee != null
                         && u.getLogin().equalsIgnoreCase(mSelectedAssignee.getLogin())) {
-                    checkedItem = i;
+                    mPendingSelection = i;
                 }
             }
 
             DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    if (which == 0) {
-                        mSelectedAssignee = null;
-                    } else {
-                        mSelectedAssignee = mAllAssignee.get(which - 1);
-                    }
+                    mPendingSelection = which;
                 }
             };
             DialogInterface.OnClickListener okCb = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    mSelectedAssignee = mPendingSelection == 0
+                            ? null : mAllAssignee.get(mPendingSelection - 1);
                     if (mSelectedAssignee != null) {
                         mTvSelectedAssignee.setText(getString(
                                 R.string.issue_assignee, mSelectedAssignee.getLogin()));
@@ -333,7 +328,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
             new AlertDialog.Builder(this)
                     .setCancelable(true)
                     .setTitle(R.string.issue_assignee_hint)
-                    .setSingleChoiceItems(assignees, checkedItem, selectCb)
+                    .setSingleChoiceItems(assignees, mPendingSelection, selectCb)
                     .setPositiveButton(R.string.ok, okCb)
                     .setNegativeButton(R.string.cancel, null)
                     .show();
@@ -345,7 +340,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
         private String mBody;
 
         public SaveIssueTask(String title, String body) {
-            super(IssueCreateActivity.this, 0, R.string.saving_msg);
+            super(IssueEditActivity.this, 0, R.string.saving_msg);
             mTitle = title;
             mBody = body;
         }
@@ -360,8 +355,8 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
             issue.setBody(mBody);
 
             issue.setLabels(mSelectedLabels);
-            issue.setMilestone(mSelectedMilestone);
-            issue.setAssignee(mSelectedAssignee);
+            issue.setMilestone(mSelectedMilestone != null ? mSelectedMilestone : new Milestone());
+            issue.setAssignee(mSelectedAssignee != null ? mSelectedAssignee : new User());
 
             if (isInEditMode()) {
                 mEditIssue = issueService.editIssue(mRepoOwner, mRepoName, issue);
@@ -375,7 +370,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
         protected void onSuccess(Void result) {
             ToastUtils.showMessage(mContext,
                     isInEditMode() ? R.string.issue_success_edit : R.string.issue_success_create);
-            IntentUtils.openIssueActivity(IssueCreateActivity.this, mRepoOwner, mRepoName,
+            IntentUtils.openIssueActivity(IssueEditActivity.this, mRepoOwner, mRepoName,
                     mEditIssue.getNumber(), Intent.FLAG_ACTIVITY_CLEAR_TOP);
             finish();
         }
@@ -445,7 +440,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
         EditText etDesc = (EditText) findViewById(R.id.et_desc);
         etDesc.setText(mEditIssue.getBody());
 
-        mSelectedLabels = new ArrayList<Label>();
+        mSelectedLabels.clear();
         mSelectedLabels.addAll(mEditIssue.getLabels());
 
         mSelectedMilestone = mEditIssue.getMilestone();

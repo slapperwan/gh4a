@@ -39,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/titletextcolor"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:background="?attr/selectableItemBackground"
+                style="@style/SelectableItem"
                 android:layout_toRightOf="@id/iv_gravatar"
                 android:layout_below="@id/tv_releasetype" />
         </RelativeLayout>
@@ -50,14 +50,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/overview_item_spacing"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/highlight"
-            android:text="@string/release_notes" />
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
             android:layout_marginBottom="@dimen/overview_header_spacing"
-            android:background="@color/highlight" />
+            style="@style/HeaderLabel"
+            android:text="@string/release_notes" />
         <ProgressBar
             android:id="@+id/pb_releasenotes"
             style="@style/LoadingProgress"
@@ -81,14 +76,9 @@
                 android:id="@+id/downloads_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/highlight"
-                android:text="@string/downloads" />
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
-                android:background="@color/highlight" />
+                style="@style/HeaderLabel"
+                android:text="@string/downloads" />
             <ListView
                 android:id="@+id/download_list"
                 android:layout_width="match_parent"

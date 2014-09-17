@@ -145,7 +145,7 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
             public void onClick(View view) {
                 Context context = BaseSherlockFragmentActivity.this;
                 if (Gh4Application.get(context).isAuthorized()) {
-                    Intent intent = new Intent(context, IssueCreateActivity.class);
+                    Intent intent = new Intent(context, IssueEditActivity.class);
                     intent.putExtra(Constants.Repository.OWNER, getString(R.string.my_username));
                     intent.putExtra(Constants.Repository.NAME, getString(R.string.my_repo));
                     startActivity(intent);

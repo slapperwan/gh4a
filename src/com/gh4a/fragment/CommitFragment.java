@@ -1,5 +1,6 @@
 package com.gh4a.fragment;
 
+import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.RepositoryCommit;
 
@@ -7,6 +8,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,20 +23,27 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.CommitDiffViewerActivity;
 import com.gh4a.activities.FileViewerActivity;
+import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.CommitLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.CommitUtils;
+import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.GravatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.UiUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CommitFragment extends SherlockProgressFragment implements OnClickListener {
     private String mRepoOwner;
     private String mRepoName;
     private String mObjectSha;
     private RepositoryCommit mCommit;
-    private View mContentView;
+    private List<CommitComment> mComments;
+    protected View mContentView;
 
     private LoaderCallbacks<RepositoryCommit> mCommitCallback = new LoaderCallbacks<RepositoryCommit>() {
         @Override
@@ -44,13 +53,32 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
 
         @Override
         public void onResultReady(LoaderResult<RepositoryCommit> result) {
-            boolean success = !result.handleError(getActivity());
-            if (success) {
-                mCommit = result.getData();
-                fillData();
+            if (result.handleError(getActivity())) {
+                setContentEmpty(true);
+                setContentShown(true);
+                return;
             }
-            setContentEmpty(!success);
-            setContentShown(true);
+            mCommit = result.getData();
+            fillDataIfReady();
+        }
+    };
+    private LoaderCallbacks<List<CommitComment>> mCommentCallback =
+            new LoaderCallbacks<List<CommitComment>>() {
+        @Override
+        public Loader<LoaderResult<List<CommitComment>>> onCreateLoader(int id, Bundle args) {
+            return new CommitCommentListLoader(getActivity(), mRepoOwner, mRepoName,
+                    mObjectSha, false, true);
+        }
+
+        @Override
+        public void onResultReady(LoaderResult<List<CommitComment>> result) {
+            if (result.handleError(getActivity())) {
+                setContentEmpty(true);
+                setContentShown(true);
+                return;
+            }
+            mComments = result.getData();
+            fillDataIfReady();
         }
     };
 
@@ -77,6 +105,13 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         mContentView = inflater.inflate(R.layout.commit, null);
+
+        Gh4Application app = Gh4Application.get(getActivity());
+        UiUtils.assignTypeface(mContentView, app.boldCondensed, new int[]{
+                R.id.commit_added, R.id.commit_changed,
+                R.id.commit_renamed, R.id.commit_deleted
+        });
+
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -87,18 +122,25 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
         setContentView(mContentView);
         setContentShown(false);
 
-        getLoaderManager().initLoader(0, null, mCommitCallback);
+        initLoader();
     }
 
-    private void fillData() {
+    protected void initLoader() {
+        getLoaderManager().initLoader(0, null, mCommitCallback);
+        getLoaderManager().initLoader(1, null, mCommentCallback);
+    }
+
+    private void fillDataIfReady() {
+        if (mCommit != null && mComments != null) {
+            fillHeader();
+            fillStats(mCommit.getFiles(), mComments);
+            setContentShown(true);
+        }
+    }
+
+    private void fillHeader() {
         final Activity activity = getActivity();
         final Gh4Application app = Gh4Application.get(activity);
-        final LayoutInflater inflater = getLayoutInflater(null);
-
-        LinearLayout llChanged = (LinearLayout) mContentView.findViewById(R.id.ll_changed);
-        LinearLayout llAdded = (LinearLayout) mContentView.findViewById(R.id.ll_added);
-        LinearLayout llDeleted = (LinearLayout) mContentView.findViewById(R.id.ll_deleted);
-        int added = 0, changed = 0, deleted = 0;
 
         ImageView ivGravatar = (ImageView) mContentView.findViewById(R.id.iv_gravatar);
         GravatarHandler.assignGravatar(ivGravatar, mCommit.getAuthor());
@@ -142,19 +184,32 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
             extra.setText(getString(R.string.commit_details, CommitUtils.getCommitterName(app, mCommit),
                     StringUtils.formatRelativeTime(activity, mCommit.getCommit().getCommitter().getDate(), true)));
         }
+    }
 
-        int count = mCommit.getFiles() != null ? mCommit.getFiles().size() : 0;
+    protected void fillStats(List<CommitFile> files, List<CommitComment> comments) {
+        LinearLayout llChanged = (LinearLayout) mContentView.findViewById(R.id.ll_changed);
+        LinearLayout llAdded = (LinearLayout) mContentView.findViewById(R.id.ll_added);
+        LinearLayout llRenamed = (LinearLayout) mContentView.findViewById(R.id.ll_renamed);
+        LinearLayout llDeleted = (LinearLayout) mContentView.findViewById(R.id.ll_deleted);
+        final LayoutInflater inflater = getLayoutInflater(null);
+        int added = 0, changed = 0, renamed = 0, deleted = 0;
+        int additions = 0, deletions = 0;
+        int count = files != null ? files.size() : 0;
+
         for (int i = 0; i < count; i++) {
-            CommitFile file = mCommit.getFiles().get(i);
+            CommitFile file = files.get(i);
             String status = file.getStatus();
             final LinearLayout parent;
 
             if ("added".equals(status)) {
                 parent = llAdded;
                 added++;
-            } else if ("modified".equals(status) || "renamed".equals(status)) {
+            } else if ("modified".equals(status)) {
                 parent = llChanged;
                 changed++;
+            } else if ("renamed".equals(status)) {
+                parent = llRenamed;
+                renamed++;
             } else if ("removed".equals(status)) {
                 parent = llDeleted;
                 deleted++;
@@ -162,42 +217,43 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
                 continue;
             }
 
-            TextView fileNameView = (TextView) inflater.inflate(R.layout.commit_filename, parent, false);
-            fileNameView.setText(file.getFilename());
-            fileNameView.setTag(file);
-            if (parent != llDeleted) {
-                fileNameView.setTextColor(getResources().getColor(R.color.highlight));
-                fileNameView.setOnClickListener(this);
+            additions += file.getAdditions();
+            deletions += file.getDeletions();
+
+            int commentCount = 0;
+            for (CommitComment comment : comments) {
+                if (TextUtils.equals(file.getFilename(), comment.getPath())) {
+                    commentCount++;
+                }
             }
-            parent.addView(fileNameView);
+
+            ViewGroup fileView = (ViewGroup) inflater.inflate(R.layout.commit_filename, parent, false);
+            TextView fileNameView = (TextView) fileView.findViewById(R.id.filename);
+            fileNameView.setText(file.getFilename());
+
+            if (parent != llDeleted &&
+                    (file.getPatch() != null || FileUtils.isImage(file.getFilename()))) {
+                fileNameView.setTextColor(getResources().getColor(R.color.highlight));
+                fileView.setOnClickListener(this);
+                fileView.setTag(file);
+            }
+            if (commentCount > 0) {
+                TextView commentView = (TextView) fileView.findViewById(R.id.comments);
+                commentView.setText(String.valueOf(commentCount));
+                commentView.setVisibility(View.VISIBLE);
+            }
+
+            parent.addView(fileView);
         }
 
-        if (added == 0) {
-            llAdded.setVisibility(View.GONE);
-        } else {
-            TextView tvAddedTitle = (TextView) mContentView.findViewById(R.id.commit_added);
-            tvAddedTitle.setTypeface(app.boldCondensed);
-        }
-        if (changed == 0) {
-            llChanged.setVisibility(View.GONE);
-        } else {
-            TextView tvChangeTitle = (TextView) mContentView.findViewById(R.id.commit_changed);
-            tvChangeTitle.setTypeface(app.boldCondensed);
-        }
-        if (deleted == 0) {
-            llDeleted.setVisibility(View.GONE);
-        } else {
-            TextView tvDeletedTitle = (TextView) mContentView.findViewById(R.id.commit_deleted);
-            tvDeletedTitle.setTypeface(app.boldCondensed);
-        }
+        llAdded.setVisibility(added > 0 ? View.VISIBLE : View.GONE);
+        llChanged.setVisibility(changed > 0 ? View.VISIBLE : View.GONE);
+        llRenamed.setVisibility(renamed > 0 ? View.VISIBLE : View.GONE);
+        llDeleted.setVisibility(deleted > 0 ? View.VISIBLE : View.GONE);
 
         TextView tvSummary = (TextView) mContentView.findViewById(R.id.tv_desc);
-        if (mCommit.getStats() != null) {
-            tvSummary.setText(getString(R.string.commit_summary, added + changed + deleted,
-                    mCommit.getStats().getAdditions(), mCommit.getStats().getDeletions()));
-        } else {
-            tvSummary.setVisibility(View.GONE);
-        }
+        tvSummary.setText(getString(R.string.commit_summary, added + changed + renamed + deleted,
+                additions, deletions));
     }
 
     @Override
@@ -208,12 +264,14 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
         } else {
             CommitFile file = (CommitFile) v.getTag();
 
-            Intent intent = new Intent(getActivity(), CommitDiffViewerActivity.class);
+            Intent intent = new Intent(getActivity(), FileUtils.isImage(file.getFilename())
+                    ? FileViewerActivity.class : CommitDiffViewerActivity.class);
             intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
             intent.putExtra(Constants.Repository.NAME, mRepoName);
             intent.putExtra(Constants.Object.REF, mObjectSha);
             intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
             intent.putExtra(Constants.Commit.DIFF, file.getPatch());
+            intent.putExtra(Constants.Commit.COMMENTS, new ArrayList<CommitComment>(mComments));
             intent.putExtra(Constants.Object.PATH, file.getFilename());
             intent.putExtra(Constants.Object.TREE_SHA, mCommit.getCommit().getTree().getSha());
             startActivity(intent);

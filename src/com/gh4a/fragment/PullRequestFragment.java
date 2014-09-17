@@ -51,6 +51,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.activities.EditCommentActivity;
+import com.gh4a.activities.EditPullRequestCommentActivity;
 import com.gh4a.adapter.CommentAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.IsCollaboratorLoader;
@@ -181,6 +182,7 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         mHeader.setClickable(false);
         mHeader.findViewById(R.id.info_box).setVisibility(View.GONE);
         getListView().addHeaderView(mHeader, null, true);
+        getListView().setHeaderDividersEnabled(false);
 
         UiUtils.assignTypeface(mHeader, Gh4Application.get(getActivity()).boldCondensed, new int[] {
             R.id.comment_title, R.id.tv_title, R.id.desc_title
@@ -334,7 +336,7 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
 
     @Override
     public void editComment(Comment comment) {
-        Intent intent = new Intent(getActivity(), EditCommentActivity.class);
+        Intent intent = new Intent(getActivity(), EditPullRequestCommentActivity.class);
 
         intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.NAME, mRepoName);
