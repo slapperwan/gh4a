@@ -100,10 +100,12 @@ public abstract class WebViewerActivity extends LoadingFragmentActivity {
         s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
         s.setAllowFileAccess(true);
         s.setBuiltInZoomControls(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            s.setDisplayZoomControls(false);
+        }
         s.setLightTouchEnabled(true);
         s.setLoadsImagesAutomatically(true);
         s.setSupportZoom(true);
-        s.setSupportMultipleWindows(true);
         s.setJavaScriptEnabled(true);
         s.setUseWideViewPort(true);
         applyDefaultTextSize(s);
