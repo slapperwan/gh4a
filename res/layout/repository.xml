@@ -163,11 +163,22 @@
                 style="@style/SelectableItem"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tv_pull_requests_count"
+                <FrameLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
+                    android:layout_height="wrap_content">
+
+                    <ProgressBar
+                        android:id="@+id/pull_requests_progress"
+                        android:layout_gravity="center"
+                        style="@style/LoadingProgress" />
+                    <TextView
+                        android:id="@+id/tv_pull_requests_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                </FrameLayout>
 
                 <TextView
                     android:id="@+id/tv_pull_requests_label"
@@ -197,9 +208,7 @@
 
             <ProgressBar
                 android:id="@+id/pb_readme"
-                style="@style/LoadingProgress"
-                android:layout_width="20dp"
-                android:layout_height="20dp" />
+                style="@style/LoadingProgress" />
 
             <TextView
                 android:id="@+id/readme"

@@ -77,6 +77,8 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
         @Override
         public void onResultReady(LoaderResult<Integer> result) {
             View v = getView();
+            v.findViewById(R.id.pull_requests_progress).setVisibility(View.GONE);
+
             TextView tvPullRequestsCountView = (TextView) v.findViewById(R.id.tv_pull_requests_count);
             tvPullRequestsCountView.setText(String.valueOf(result.getData()));
         }

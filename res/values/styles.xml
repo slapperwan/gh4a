@@ -23,6 +23,8 @@
     </style>
 
     <style name="LoadingProgress">
+        <item name="android:layout_width">20dp</item>
+        <item name="android:layout_height">20dp</item>
         <item name="android:indeterminateBehavior">repeat</item>
         <item name="android:indeterminate">true</item>
         <item name="android:indeterminateOnly">true</item>

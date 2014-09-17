@@ -55,9 +55,7 @@
             android:text="@string/release_notes" />
         <ProgressBar
             android:id="@+id/pb_releasenotes"
-            style="@style/LoadingProgress"
-            android:layout_width="20dp"
-            android:layout_height="20dp" />
+            style="@style/LoadingProgress" />
         <TextView
             android:id="@+id/tv_release_notes"
             android:layout_width="match_parent"
