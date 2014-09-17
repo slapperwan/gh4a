@@ -204,6 +204,11 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
         updateDueDate();
     }
 
+    private void resetDueOn() {
+        mDueOn = null;
+        updateDueDate();
+    }
+
     private void updateDueDate() {
         if (mDueOn != null) {
             mDueView.setText(getString(R.string.issue_milestone_due,
@@ -279,7 +284,9 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
     }
 
     public static class DatePickerFragment extends DialogFragment
-            implements DatePickerDialog.OnDateSetListener {
+            implements DatePickerDialog.OnDateSetListener, DialogInterface.OnClickListener {
+        private boolean mStopping;
+
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             final IssueMilestoneEditActivity activity = (IssueMilestoneEditActivity) getActivity();
@@ -295,12 +302,34 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
                 month = c.get(Calendar.MONTH);
                 day = c.get(Calendar.DAY_OF_MONTH);
             }
-            return new DatePickerDialog(activity, this, year, month, day);
+            AlertDialog dialog = new DatePickerDialog(activity, this, year, month, day) {
+                @Override
+                protected void onStop() {
+                    mStopping = true;
+                    super.onStop();
+                    mStopping = false;
+                }
+            };
+            dialog.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.unset), this);
+            return dialog;
         }
 
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            if (which == DialogInterface.BUTTON_NEUTRAL) {
+                getEditActivity().resetDueOn();
+            }
+        }
+
+        @Override
         public void onDateSet(DatePicker view, int year, int month, int day) {
-            final IssueMilestoneEditActivity activity = (IssueMilestoneEditActivity) getActivity();
-            activity.setDueOn(year, month, day);
+            if (!mStopping) {
+                getEditActivity().setDueOn(year, month, day);
+            }
+        }
+
+        private IssueMilestoneEditActivity getEditActivity() {
+            return (IssueMilestoneEditActivity) getActivity();
         }
     }
 }
