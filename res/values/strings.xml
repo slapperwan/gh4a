@@ -93,7 +93,10 @@
 	<string name="verify">Verify</string>
     <string name="confirmation">Are you sure?</string>
     <string name="unset">Unset</string>
-	
+    <string name="theme_dark">Dark</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_light_dark">Light and Dark</string>
+
     <plurals name="file">
         <item quantity="one">File</item>
         <item quantity="other">Files</item>

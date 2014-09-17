@@ -25,11 +25,11 @@
         android:showAsAction="never">
         <menu>
             <item android:id="@+id/dark"
-                android:title="Dark" />
+                android:title="@string/theme_dark" />
             <item android:id="@+id/light"
-                android:title="Light" />
+                android:title="@string/theme_light" />
             <item android:id="@+id/lightDark"
-                android:title="Light and Dark" />
+                android:title="@string/theme_light_dark" />
         </menu>
     </item>
     <item android:id="@+id/logout"

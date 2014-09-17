@@ -40,7 +40,6 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
@@ -65,7 +64,6 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
 
     private IssueListFragment mOpenFragment;
     private IssueListFragment mClosedFragment;
-    private ActionBar mActionBar;
     private boolean mIsCollaborator;
     private ProgressDialog mProgressDialog;
     private List<Label> mLabels;
@@ -174,10 +172,10 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
 
         getSupportLoaderManager().initLoader(3, null, mIsCollaboratorCallback);
 
-        mActionBar = getSupportActionBar();
-        mActionBar.setTitle(R.string.issues);
-        mActionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        mActionBar.setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(R.string.issues);
+        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
+        actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
     @Override

@@ -20,7 +20,6 @@ import android.os.Bundle;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.Constants;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 
 public class BlogActivity extends WebViewerActivity {

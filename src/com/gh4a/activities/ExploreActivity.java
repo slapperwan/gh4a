@@ -36,7 +36,6 @@ import com.gh4a.utils.UiUtils;
 import com.viewpagerindicator.TitlePageIndicator;
 
 public class ExploreActivity extends BaseSherlockFragmentActivity implements ActionBar.OnNavigationListener {
-    private ActionBar mActionBar;
     private ViewPager mPager;
     private TitlePageIndicator mIndicator;
     private ThisPageAdapter mAdapter;
@@ -55,17 +54,17 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
 
         setContentView(R.layout.explore);
 
-        mActionBar = getSupportActionBar();
-        mActionBar.setDisplayShowTitleEnabled(false);
-        mActionBar.setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         ArrayAdapter<CharSequence> list = ArrayAdapter.createFromResource(
-                mActionBar.getThemedContext(), R.array.explore_item,
+                actionBar.getThemedContext(), R.array.explore_item,
                 R.layout.sherlock_spinner_item);
         list.setDropDownViewResource(R.layout.row_simple);
 
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-        mActionBar.setListNavigationCallbacks(list, this);
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        actionBar.setListNavigationCallbacks(list, this);
 
         mAdapter = new ThisPageAdapter(getSupportFragmentManager());
         mPager = (ViewPager) findViewById(R.id.pager);
@@ -79,7 +78,7 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
             mIndicator.setSelectedBold(true);
         }
 
-        mSelectedItem = mActionBar.getSelectedNavigationIndex();
+        mSelectedItem = actionBar.getSelectedNavigationIndex();
         updatePageIndicator();
     }
 

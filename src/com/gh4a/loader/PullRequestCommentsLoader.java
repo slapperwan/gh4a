@@ -5,7 +5,6 @@ import android.content.Context;
 import com.gh4a.Gh4Application;
 
 import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
