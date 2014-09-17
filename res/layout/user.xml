@@ -237,7 +237,7 @@
             android:layout_marginLeft="@dimen/content_padding"
             android:layout_marginRight="@dimen/content_padding"
             android:text="@string/view_more"
-            android:textAppearance="?android:attr/textAppearanceSmall"
+            style="@style/MoreButton"
             android:visibility="gone" />
         <!-- Organizations section -->
         <LinearLayout
