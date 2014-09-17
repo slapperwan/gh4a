@@ -18,6 +18,7 @@ package com.gh4a.activities;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,7 +29,9 @@ import android.webkit.WebViewClient;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
@@ -36,6 +39,21 @@ import com.gh4a.utils.ThemeUtils;
 
 public abstract class WebViewerActivity extends LoadingFragmentActivity {
     private WebView mWebView;
+
+    private String PREFS_KEY_INITIAL_ZOOM = "webview_initial_zoom";
+
+    private int[] ZOOM_MENU_IDS = new int[] {
+        R.id.text_size_smallest, R.id.text_size_smaller, R.id.text_size_normal,
+        R.id.text_size_larger, R.id.text_size_largest
+    };
+    private int[] ZOOM_SIZES = new int[] {
+        50, 75, 100, 150, 200
+    };
+    private WebSettings.TextSize[] ZOOM_SIZES_API10 = new WebSettings.TextSize[] {
+        WebSettings.TextSize.SMALLEST, WebSettings.TextSize.SMALLER,
+        WebSettings.TextSize.NORMAL, WebSettings.TextSize.LARGER,
+        WebSettings.TextSize.LARGEST
+    };
 
     private WebViewClient mWebViewClient = new WebViewClient() {
         @Override
@@ -88,6 +106,7 @@ public abstract class WebViewerActivity extends LoadingFragmentActivity {
         s.setSupportMultipleWindows(true);
         s.setJavaScriptEnabled(true);
         s.setUseWideViewPort(true);
+        applyDefaultTextSize(s);
 
         mWebView.setBackgroundColor(ThemeUtils.getWebViewBackgroundColor(Gh4Application.THEME));
         mWebView.setWebViewClient(mWebViewClient);
@@ -95,6 +114,9 @@ public abstract class WebViewerActivity extends LoadingFragmentActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getSupportMenuInflater();
+        inflater.inflate(R.menu.webview_text_size, menu);
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
             menu.removeItem(R.id.search);
         }
@@ -103,11 +125,20 @@ public abstract class WebViewerActivity extends LoadingFragmentActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.search:
-                doSearch();
-                return true;
+        int itemId = item.getItemId();
+
+        if (itemId == R.id.search) {
+            doSearch();
+            return true;
         }
+
+        for (int i = 0; i < ZOOM_MENU_IDS.length; i++) {
+            if (itemId == ZOOM_MENU_IDS[i]) {
+                saveInitialZoomLevel(i);
+                return true;
+            }
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -116,6 +147,30 @@ public abstract class WebViewerActivity extends LoadingFragmentActivity {
     private void doSearch() {
         if (mWebView != null) {
             mWebView.showFindDialog(null, true);
+        }
+    }
+
+    private void saveInitialZoomLevel(int level) {
+        SharedPreferences prefs = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
+        prefs.edit().putInt(PREFS_KEY_INITIAL_ZOOM, level).commit();
+
+        if (mWebView != null) {
+            applyDefaultTextSize(mWebView.getSettings());
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private void applyDefaultTextSize(WebSettings s) {
+        SharedPreferences prefs = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
+        int initialZoomLevel = prefs.getInt(PREFS_KEY_INITIAL_ZOOM, -1);
+        if (initialZoomLevel < 0 || initialZoomLevel >= ZOOM_SIZES.length) {
+            return;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            s.setTextZoom(ZOOM_SIZES[initialZoomLevel]);
+        } else {
+            s.setTextSize(ZOOM_SIZES_API10[initialZoomLevel]);
         }
     }
 

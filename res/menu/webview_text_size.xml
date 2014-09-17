@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="@string/menu_text_size"
+        android:showAsAction="never">
+        <menu>
+            <item android:id="@+id/text_size_smallest"
+                android:title="@string/text_size_smallest" />
+            <item android:id="@+id/text_size_smaller"
+                android:title="@string/text_size_smaller" />
+            <item android:id="@+id/text_size_normal"
+                android:title="@string/text_size_normal" />
+            <item android:id="@+id/text_size_larger"
+                android:title="@string/text_size_larger" />
+            <item android:id="@+id/text_size_largest"
+                android:title="@string/text_size_largest" />
+        </menu>
+    </item>
+</menu>

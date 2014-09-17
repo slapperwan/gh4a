@@ -39,11 +39,6 @@ public class CommitDiffViewerActivity extends DiffViewerActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public void updateComment(long id, String body, int position) throws IOException {
         boolean isEdit = id != 0L;
         CommitComment commitComment = new CommitComment();

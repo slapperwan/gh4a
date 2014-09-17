@@ -347,4 +347,12 @@
     <string name="share_commit_subject">Commit #%1$s at %2$s</string>
     <string name="share_user_subject">User %1$s (%2$s)</string>
     <string name="share_user_subject_loginonly">User %1$s</string>
+
+    <!-- Webview text size -->
+    <string name="menu_text_size">Text size</string>
+    <string name="text_size_smallest">Smallest</string>
+    <string name="text_size_smaller">Smaller</string>
+    <string name="text_size_normal">Normal</string>
+    <string name="text_size_larger">Larger</string>
+    <string name="text_size_largest">Largest</string>
 </resources>
