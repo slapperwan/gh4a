@@ -97,7 +97,7 @@
             android:layout_marginTop="@dimen/overview_item_spacing" >
             <TextView
                 android:id="@+id/commit_added"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
                 android:layout_marginLeft="@dimen/content_padding"
@@ -113,7 +113,7 @@
             android:layout_marginTop="@dimen/overview_item_spacing" >
             <TextView
                 android:id="@+id/commit_renamed"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
                 android:layout_marginLeft="@dimen/content_padding"
@@ -129,7 +129,7 @@
             android:layout_marginTop="@dimen/overview_item_spacing" >
             <TextView
                 android:id="@+id/commit_deleted"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
                 android:layout_marginLeft="@dimen/content_padding"
