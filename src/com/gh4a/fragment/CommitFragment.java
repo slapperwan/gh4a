@@ -230,12 +230,12 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
             ViewGroup fileView = (ViewGroup) inflater.inflate(R.layout.commit_filename, parent, false);
             TextView fileNameView = (TextView) fileView.findViewById(R.id.filename);
             fileNameView.setText(file.getFilename());
-            fileNameView.setTag(file);
 
             if (parent != llDeleted &&
                     (file.getPatch() != null || FileUtils.isImage(file.getFilename()))) {
                 fileNameView.setTextColor(getResources().getColor(R.color.highlight));
-                fileNameView.setOnClickListener(this);
+                fileView.setOnClickListener(this);
+                fileView.setTag(file);
             }
             if (commentCount > 0) {
                 TextView commentView = (TextView) fileView.findViewById(R.id.comments);

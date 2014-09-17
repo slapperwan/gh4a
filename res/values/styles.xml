@@ -29,8 +29,11 @@
         <item name="android:layout_gravity">center_horizontal</item>
     </style>
 
-    <style name="SelectableLabel">
+    <style name="SelectableItem">
         <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
+    <style name="SelectableLabel" parent="@style/SelectableItem">
         <item name="android:paddingTop">6dp</item>
         <item name="android:paddingBottom">6dp</item>
         <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
