@@ -360,8 +360,8 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
             issue.setBody(mBody);
 
             issue.setLabels(mSelectedLabels);
-            issue.setMilestone(mSelectedMilestone);
-            issue.setAssignee(mSelectedAssignee);
+            issue.setMilestone(mSelectedMilestone != null ? mSelectedMilestone : new Milestone());
+            issue.setAssignee(mSelectedAssignee != null ? mSelectedAssignee : new User());
 
             if (isInEditMode()) {
                 mEditIssue = issueService.editIssue(mRepoOwner, mRepoName, issue);
@@ -445,7 +445,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
         EditText etDesc = (EditText) findViewById(R.id.et_desc);
         etDesc.setText(mEditIssue.getBody());
 
-        mSelectedLabels = new ArrayList<Label>();
+        mSelectedLabels.clear();
         mSelectedLabels.addAll(mEditIssue.getLabels());
 
         mSelectedMilestone = mEditIssue.getMilestone();
