@@ -273,7 +273,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
                 return true;
             case R.id.create_issue:
                 if (Gh4Application.get(this).isAuthorized()) {
-                    Intent intent = new Intent(this, IssueCreateActivity.class);
+                    Intent intent = new Intent(this, IssueEditActivity.class);
                     intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
                     intent.putExtra(Constants.Repository.NAME, mRepoName);
                     startActivity(intent);

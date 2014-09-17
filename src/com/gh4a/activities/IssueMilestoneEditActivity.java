@@ -50,12 +50,18 @@ import org.eclipse.egit.github.core.service.MilestoneService;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Date;
 
 public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
     private String mRepoOwner;
     private String mRepoName;
     private int mMilestoneNumber;
     private Milestone mMilestone;
+    private Date mDueOn;
+
+    private EditText mTitleView;
+    private EditText mDescriptionView;
+    private EditText mDueView;
 
     private LoaderCallbacks<Milestone> mMilestoneCallback = new LoaderCallbacks<Milestone>() {
         @Override
@@ -68,7 +74,10 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
             boolean success = !result.handleError(IssueMilestoneEditActivity.this);
             if (success) {
                 mMilestone = result.getData();
-                fillData();
+                mTitleView.setText(mMilestone.getTitle());
+                mDescriptionView.setText(mMilestone.getDescription());
+                mDueOn = mMilestone.getDueOn();
+                updateDueDate();
             }
             setContentEmpty(!success);
             setContentShown(true);
@@ -94,16 +103,27 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
             finish();
             return;
         }
+
         setContentView(R.layout.issue_create_milestone);
-        setContentShown(false);
+        mTitleView = (EditText) findViewById(R.id.et_title);
+        mDescriptionView = (EditText) findViewById(R.id.et_desc);
+        mDueView = (EditText) findViewById(R.id.et_due_date);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(R.string.issue_milestone_edit);
+        actionBar.setTitle(isInEditMode()
+                ? R.string.issue_milestone_edit : R.string.issue_milestone_new);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        getSupportLoaderManager().initLoader(0, null, mMilestoneCallback);
+        if (isInEditMode()) {
+            getSupportLoaderManager().initLoader(0, null, mMilestoneCallback);
+        }
+        setContentShown(!isInEditMode());
+    }
+
+    private boolean isInEditMode() {
+        return mMilestoneNumber != 0;
     }
 
     private void openIssueMilestones() {
@@ -117,7 +137,7 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getSupportMenuInflater();
-        inflater.inflate(R.menu.accept_delete, menu);
+        inflater.inflate(isInEditMode() ? R.menu.accept_delete : R.menu.accept_cancel, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -129,48 +149,41 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        final EditText tvTitle = (EditText) findViewById(R.id.et_title);
-        final EditText tvDesc = (EditText) findViewById(R.id.et_desc);
-        int itemId = item.getItemId();
-
-        if (itemId == R.id.accept) {
-            String title = tvTitle.getText() == null ? null : tvTitle.getText().toString();
-            String desc = null;
-            if (tvDesc.getText() != null) {
-                desc = tvDesc.getText().toString();
+        switch (item.getItemId()) {
+            case R.id.accept: {
+                String title = mTitleView.getText() == null
+                        ? null : mTitleView.getText().toString();
+                if (StringUtils.isBlank(title)) {
+                    ToastUtils.showMessage(this, R.string.issue_error_milestone_title);
+                } else {
+                    String desc = null;
+                    if (mDescriptionView.getText() != null) {
+                        desc = mDescriptionView.getText().toString();
+                    }
+                    new SaveIssueMilestoneTask(title, desc, mDueOn).execute();
+                }
+                return true;
             }
-            if (StringUtils.isBlank(title)) {
-                ToastUtils.showMessage(this, R.string.issue_error_milestone_title);
-            } else {
-                new EditIssueMilestoneTask(title, desc).execute();
-            }
-        } else if (itemId == R.id.delete) {
-            new AlertDialog.Builder(this)
-                    .setTitle(getString(R.string.issue_dialog_delete_title, mMilestone.getTitle()))
-                    .setMessage(R.string.issue_dialog_delete_message)
-                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            new DeleteIssueMilestoneTask(mMilestone.getNumber()).execute();
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, null)
-                    .show();
+            case R.id.delete:
+                new AlertDialog.Builder(this)
+                        .setTitle(getString(R.string.issue_dialog_delete_title,
+                                mMilestone.getTitle()))
+                        .setMessage(R.string.issue_dialog_delete_message)
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                new DeleteIssueMilestoneTask(mMilestone.getNumber()).execute();
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, null)
+                        .show();
+                return true;
+            case R.id.cancel:
+                finish();
+                return true;
         }
+
         return super.onOptionsItemSelected(item);
-    }
-
-    private void fillData() {
-        EditText tvTitle = (EditText) findViewById(R.id.et_title);
-        EditText tvDesc = (EditText) findViewById(R.id.et_desc);
-        EditText etDueDate = (EditText) findViewById(R.id.et_due_date);
-
-        tvTitle.setText(mMilestone.getTitle());
-        tvDesc.setText(mMilestone.getDescription());
-
-        if (mMilestone.getDueOn() != null) {
-            etDueDate.setText(DateFormat.getMediumDateFormat(this).format(mMilestone.getDueOn()));
-        }
     }
 
     public void showDatePickerDialog(View view) {
@@ -187,20 +200,29 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
 
-        mMilestone.setDueOn(cal.getTime());
-
-        EditText etDueDate = (EditText) findViewById(R.id.et_due_date);
-        etDueDate.setText(DateFormat.getMediumDateFormat(this).format(mMilestone.getDueOn()));
+        mDueOn = cal.getTime();
+        updateDueDate();
     }
 
-    private class EditIssueMilestoneTask extends ProgressDialogTask<Void> {
+    private void updateDueDate() {
+        if (mDueOn != null) {
+            mDueView.setText(getString(R.string.issue_milestone_due,
+                    DateFormat.getMediumDateFormat(this).format(mDueOn)));
+        } else {
+            mDueView.setText(null);
+        }
+    }
+
+    private class SaveIssueMilestoneTask extends ProgressDialogTask<Void> {
         private String mTitle;
         private String mDesc;
+        private Date mDueOn;
 
-        public EditIssueMilestoneTask(String title, String desc) {
+        public SaveIssueMilestoneTask(String title, String desc, Date dueOn) {
             super(IssueMilestoneEditActivity.this, 0, R.string.saving_msg);
             mTitle = title;
             mDesc = desc;
+            mDueOn = dueOn;
         }
 
         @Override
@@ -208,10 +230,18 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
             MilestoneService milestoneService = (MilestoneService)
                     Gh4Application.get(mContext).getService(Gh4Application.MILESTONE_SERVICE);
 
-            mMilestone.setTitle(mTitle);
-            mMilestone.setDescription(mDesc);
+            Milestone milestone = isInEditMode() ? mMilestone : new Milestone();
+            milestone.setTitle(mTitle);
+            milestone.setDescription(mDesc);
+            milestone.setDueOn(mDueOn);
 
-            milestoneService.editMilestone(new RepositoryId(mRepoOwner, mRepoName), mMilestone);
+            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+            if (isInEditMode()) {
+                milestoneService.editMilestone(repoId, milestone);
+            } else {
+                milestoneService.createMilestone(repoId, milestone);
+            }
+
             return null;
         }
 
@@ -248,7 +278,8 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
         }
     }
 
-    public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+    public static class DatePickerFragment extends DialogFragment
+            implements DatePickerDialog.OnDateSetListener {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             final IssueMilestoneEditActivity activity = (IssueMilestoneEditActivity) getActivity();
@@ -258,8 +289,8 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
             int month = c.get(Calendar.MONTH);
             int day = c.get(Calendar.DAY_OF_MONTH);
 
-            if (activity.mMilestone.getDueOn() != null) {
-                c.setTime(activity.mMilestone.getDueOn());
+            if (activity.mDueOn != null) {
+                c.setTime(activity.mDueOn);
                 year = c.get(Calendar.YEAR);
                 month = c.get(Calendar.MONTH);
                 day = c.get(Calendar.DAY_OF_MONTH);

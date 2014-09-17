@@ -257,7 +257,7 @@
     <string name="issue_error_edit_label">Cannot edit label</string>
     <string name="issue_error_create_milestone">Cannot create milestone</string>
     <string name="issue_error_milestone_title">Please enter a title</string>
-    <string name="issue_label_add">Add labels</string>
+    <string name="issue_label_add">Labels</string>
     <string name="issue_label_new">New Label</string>
     <string name="issue_milestone">Milestone: %1$s</string>
     <string name="issue_milestone_new">New Milestone</string>
@@ -270,6 +270,7 @@
     <string name="issue_clear_milestone">No milestone</string>
     <string name="issue_clear_assignee">No assignee</string>
     <string name="issue_milestone_due_date">Due Date</string>
+    <string name="issue_milestone_due">Due on %1$s</string>
     <string name="issue_assignee">%1$s is assigned</string>
     <string name="issue_desc">Description</string>
     <string name="issue_comment_title">Comment</string>

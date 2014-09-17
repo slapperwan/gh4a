@@ -5,35 +5,36 @@
     android:layout_height="match_parent" >
     <LinearLayout
         android:id="@+id/main_content"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/content_padding"
         android:orientation="vertical" >
         <EditText
             android:id="@+id/et_title"
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="@dimen/overview_item_spacing"
             android:hint="@string/issue_title" />
         <EditText
             android:id="@+id/et_desc"
             android:layout_height="wrap_content"
             android:layout_width="fill_parent"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="@dimen/overview_item_spacing"
             android:gravity="top"
             android:minLines="5"
             android:inputType="textMultiLine|textCapSentences"
             android:hint="@string/issue_body" />
         <LinearLayout
             android:id="@+id/for_collaborator"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:visibility="gone" >
             <EditText
                 android:id="@+id/et_milestone"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="@dimen/overview_item_spacing"
                 android:hint="@string/issue_milestone_hint"
                 android:cursorVisible="false"
                 android:focusable="false"
@@ -41,9 +42,9 @@
                 android:onClick="showMilestonesDialog" />
             <EditText
                 android:id="@+id/et_assignee"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="@dimen/overview_item_spacing"
                 android:hint="@string/issue_assignee_hint"
                 android:cursorVisible="false"
                 android:focusable="false"
@@ -51,22 +52,16 @@
                 android:onClick="showAssigneesDialog" />
             <TextView
                 android:id="@+id/tv_issue_label_add"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/overview_item_spacing"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
                 style="@style/HeaderLabel"
                 android:text="@string/issue_label_add" />
             <LinearLayout
                 android:id="@+id/ll_labels"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:orientation="vertical">
-            </LinearLayout>
+                android:orientation="vertical" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

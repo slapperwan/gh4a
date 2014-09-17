@@ -59,7 +59,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IssueCreateActivity extends LoadingFragmentActivity implements OnClickListener {
+public class IssueEditActivity extends LoadingFragmentActivity implements OnClickListener {
     private String mRepoOwner;
     private String mRepoName;
     private int mIssueNumber;
@@ -78,12 +78,12 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
     private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
         @Override
         public Loader<LoaderResult<List<Label>>> onCreateLoader(int id, Bundle args) {
-            return new LabelListLoader(IssueCreateActivity.this, mRepoOwner, mRepoName);
+            return new LabelListLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
         }
         @Override
         public void onResultReady(LoaderResult<List<Label>> result) {
             stopProgressDialog(mProgressDialog);
-            if (!result.handleError(IssueCreateActivity.this)) {
+            if (!result.handleError(IssueEditActivity.this)) {
                 fillLabels(result.getData());
             }
         }
@@ -92,13 +92,13 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
     private LoaderCallbacks<List<Milestone>> mMilestoneCallback = new LoaderCallbacks<List<Milestone>>() {
         @Override
         public Loader<LoaderResult<List<Milestone>>> onCreateLoader(int id, Bundle args) {
-            return new MilestoneListLoader(IssueCreateActivity.this,
+            return new MilestoneListLoader(IssueEditActivity.this,
                     mRepoOwner, mRepoName, Constants.Issue.STATE_OPEN);
         }
         @Override
         public void onResultReady(LoaderResult<List<Milestone>> result) {
             stopProgressDialog(mProgressDialog);
-            if (!result.handleError(IssueCreateActivity.this)) {
+            if (!result.handleError(IssueEditActivity.this)) {
                 mAllMilestone = result.getData();
                 showMilestonesDialog(null);
                 getSupportLoaderManager().destroyLoader(1);
@@ -109,12 +109,12 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
     private LoaderCallbacks<List<User>> mCollaboratorListCallback = new LoaderCallbacks<List<User>>() {
         @Override
         public Loader<LoaderResult<List<User>>> onCreateLoader(int id, Bundle args) {
-            return new CollaboratorListLoader(IssueCreateActivity.this, mRepoOwner, mRepoName);
+            return new CollaboratorListLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
         }
         @Override
         public void onResultReady(LoaderResult<List<User>> result) {
             stopProgressDialog(mProgressDialog);
-            if (!result.handleError(IssueCreateActivity.this)) {
+            if (!result.handleError(IssueEditActivity.this)) {
                 mAllAssignee = result.getData();
                 showAssigneesDialog(null);
                 getSupportLoaderManager().destroyLoader(2);
@@ -125,12 +125,13 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
     private LoaderCallbacks<Boolean> mIsCollaboratorCallback = new LoaderCallbacks<Boolean>() {
         @Override
         public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
-            return new IsCollaboratorLoader(IssueCreateActivity.this, mRepoOwner, mRepoName);
+            return new IsCollaboratorLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
         }
         @Override
         public void onResultReady(LoaderResult<Boolean> result) {
-            if (!result.handleError(IssueCreateActivity.this)) {
-                findViewById(R.id.for_collaborator).setVisibility(result.getData() ? View.VISIBLE : View.GONE);
+            if (!result.handleError(IssueEditActivity.this)) {
+                findViewById(R.id.for_collaborator).setVisibility(
+                        result.getData() ? View.VISIBLE : View.GONE);
             }
         }
     };
@@ -138,11 +139,11 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
     private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>() {
         @Override
         public Loader<LoaderResult<Issue>> onCreateLoader(int id, Bundle args) {
-            return new IssueLoader(IssueCreateActivity.this, mRepoOwner, mRepoName, mIssueNumber);
+            return new IssueLoader(IssueEditActivity.this, mRepoOwner, mRepoName, mIssueNumber);
         }
         @Override
         public void onResultReady(LoaderResult<Issue> result) {
-            boolean success = !result.handleError(IssueCreateActivity.this);
+            boolean success = !result.handleError(IssueEditActivity.this);
             if (success) {
                 mEditIssue = result.getData();
                 fillIssueData();
@@ -345,7 +346,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
         private String mBody;
 
         public SaveIssueTask(String title, String body) {
-            super(IssueCreateActivity.this, 0, R.string.saving_msg);
+            super(IssueEditActivity.this, 0, R.string.saving_msg);
             mTitle = title;
             mBody = body;
         }
@@ -375,7 +376,7 @@ public class IssueCreateActivity extends LoadingFragmentActivity implements OnCl
         protected void onSuccess(Void result) {
             ToastUtils.showMessage(mContext,
                     isInEditMode() ? R.string.issue_success_edit : R.string.issue_success_create);
-            IntentUtils.openIssueActivity(IssueCreateActivity.this, mRepoOwner, mRepoName,
+            IntentUtils.openIssueActivity(IssueEditActivity.this, mRepoOwner, mRepoName,
                     mEditIssue.getNumber(), Intent.FLAG_ACTIVITY_CLEAR_TOP);
             finish();
         }

@@ -86,7 +86,7 @@
             android:name=".activities.IssueActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".activities.IssueCreateActivity"
+            android:name=".activities.IssueEditActivity"
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activities.IssueLabelListActivity"
@@ -95,9 +95,6 @@
             android:name=".activities.IssueListActivity"
             android:configChanges="orientation|screenSize"
             android:uiOptions="splitActionBarWhenNarrow" />
-        <activity
-            android:name=".activities.IssueMilestoneCreateActivity"
-            android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activities.IssueMilestoneEditActivity"
             android:configChanges="orientation|screenSize" />
