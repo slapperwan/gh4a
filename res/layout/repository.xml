@@ -191,15 +191,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/overview_item_spacing"
-                android:text="@string/readme"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/highlight" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
-                android:background="@color/highlight" />
+                style="@style/HeaderLabel"
+                android:text="@string/readme" />
 
             <ProgressBar
                 android:id="@+id/pb_readme"
@@ -218,15 +212,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/overview_item_spacing"
-                android:text="@string/other_info"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/highlight" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
-                android:background="@color/highlight" />
+                style="@style/HeaderLabel"
+                android:text="@string/other_info" />
         </LinearLayout>
 
         <TextView

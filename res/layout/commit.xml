@@ -7,11 +7,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="@dimen/content_padding" >
+        android:paddingTop="@dimen/content_padding"
+        android:paddingBottom="@dimen/content_padding" >
         <RelativeLayout
             android:id="@+id/title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/content_padding"
+            android:paddingRight="@dimen/content_padding" >
             <com.gh4a.widget.FixedSizeImageView
                 android:id="@+id/iv_gravatar"
                 android:layout_width="40dp"
@@ -37,6 +40,8 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="4dp"
+            android:paddingLeft="@dimen/content_padding"
+            android:paddingRight="@dimen/content_padding"
             android:visibility="gone" >
             <com.gh4a.widget.FixedSizeImageView
                 android:id="@+id/iv_commit_gravatar"
@@ -57,11 +62,15 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:layout_marginTop="@dimen/overview_item_spacing"
-            android:layout_marginBottom="@dimen/overview_item_spacing" />
+            android:layout_marginBottom="@dimen/overview_item_spacing"
+            android:paddingLeft="@dimen/content_padding"
+            android:paddingRight="@dimen/content_padding" />
         <TextView
             android:id="@+id/tv_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/content_padding"
+            android:paddingRight="@dimen/content_padding"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="italic" />
         <LinearLayout
@@ -72,16 +81,13 @@
             android:layout_marginTop="@dimen/overview_item_spacing" >
             <TextView
                 android:id="@+id/commit_changed"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/highlight"
-                android:text="@string/commit_changed" />
-            <View
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
-                android:background="@color/highlight" />
+                android:layout_marginLeft="@dimen/content_padding"
+                android:layout_marginRight="@dimen/content_padding"
+                style="@style/HeaderLabel"
+                android:text="@string/commit_changed" />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/ll_added"
@@ -93,14 +99,11 @@
                 android:id="@+id/commit_added"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/highlight"
-                android:text="@string/commit_added" />
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
-                android:background="@color/highlight" />
+                android:layout_marginLeft="@dimen/content_padding"
+                android:layout_marginRight="@dimen/content_padding"
+                style="@style/HeaderLabel"
+                android:text="@string/commit_added" />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/ll_renamed"
@@ -112,14 +115,11 @@
                 android:id="@+id/commit_renamed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/highlight"
-                android:text="@string/commit_renamed" />
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
-                android:background="@color/highlight" />
+                android:layout_marginLeft="@dimen/content_padding"
+                android:layout_marginRight="@dimen/content_padding"
+                style="@style/HeaderLabel"
+                android:text="@string/commit_renamed" />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/ll_deleted"
@@ -131,14 +131,11 @@
                 android:id="@+id/commit_deleted"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/highlight"
-                android:text="@string/commit_deleted" />
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
-                android:background="@color/highlight" />
+                android:layout_marginLeft="@dimen/content_padding"
+                android:layout_marginRight="@dimen/content_padding"
+                style="@style/HeaderLabel"
+                android:text="@string/commit_deleted" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

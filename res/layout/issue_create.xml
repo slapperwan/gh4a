@@ -49,28 +49,16 @@
                 android:focusable="false"
                 android:focusableInTouchMode="false"
                 android:onClick="showAssigneesDialog" />
-            <LinearLayout
+            <TextView
+                android:id="@+id/tv_issue_label_add"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:orientation="vertical"
-                android:layout_marginTop="10dp"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp">
-                <TextView
-                    android:id="@+id/tv_issue_label_add"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="@color/highlight"
-                    android:text="@string/issue_label_add" />
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="1dp"
-                    android:background="#ff0099cc" />
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="10dp" />
-            </LinearLayout>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/overview_item_spacing"
+                android:layout_marginBottom="@dimen/overview_header_spacing"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                style="@style/HeaderLabel"
+                android:text="@string/issue_label_add" />
             <LinearLayout
                 android:id="@+id/ll_labels"
                 android:layout_width="fill_parent"

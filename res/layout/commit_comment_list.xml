@@ -18,7 +18,7 @@
         android:layout_height="1dp"
         android:layout_above="@+id/comment"
         android:layout_marginBottom="5dp"
-        android:background="#ff0099cc" />
+        android:background="@color/highlight" />
 
     <LinearLayout
         android:id="@id/comment"

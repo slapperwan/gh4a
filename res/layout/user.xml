@@ -213,15 +213,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/overview_item_spacing"
-                android:text="@string/user_pub_repos"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/highlight" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
-                android:background="@color/highlight" />
+                style="@style/HeaderLabel"
+                android:text="@string/user_pub_repos" />
 
             <ProgressBar
                 android:id="@+id/pb_top_repos"
@@ -261,15 +255,9 @@
                 android:id="@+id/tv_orgs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/user_organizations"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/highlight" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
-                android:background="@color/highlight" />
+                style="@style/HeaderLabel"
+                android:text="@string/user_organizations" />
         </LinearLayout>
 
         <LinearLayout

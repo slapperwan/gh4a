@@ -5,6 +5,8 @@
     android:layout_height="wrap_content"
     android:paddingTop="4dp"
     android:paddingBottom="4dp"
+    android:paddingLeft="@dimen/content_padding"
+    android:paddingRight="@dimen/content_padding"
     style="@style/SelectableItem"
     android:orientation="horizontal">
 
