@@ -39,6 +39,7 @@ import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Commit;
+import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.Download;
 import org.eclipse.egit.github.core.GollumPage;
 import org.eclipse.egit.github.core.Issue;
@@ -154,8 +155,11 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
 
         if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
             CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
-            IntentUtils.openCommitInfoActivity(getActivity(), repoOwner, repoName,
-                    payload.getComment().getCommitId(), 0);
+            CommitComment comment = payload.getComment();
+            if (comment != null) {
+                IntentUtils.openCommitInfoActivity(getActivity(), repoOwner, repoName,
+                        comment.getCommitId(), 0);
+            }
 
         } else if (Event.TYPE_CREATE.equals(eventType)) {
             CreatePayload payload = (CreatePayload) event.getPayload();

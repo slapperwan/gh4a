@@ -41,7 +41,7 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
 
     public interface ParentCallback {
         public void onContentsLoaded(ContentListFragment fragment, List<RepositoryContents> contents);
-        public void onTreeSelected(RepositoryContents content, String ref);
+        public void onTreeSelected(RepositoryContents content);
     }
 
     public static ContentListFragment newInstance(Repository repository,
@@ -101,7 +101,7 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
 
     @Override
     protected void onItemClick(RepositoryContents content) {
-        mCallback.onTreeSelected(content, mRef);
+        mCallback.onTreeSelected(content);
     }
 
     @Override

@@ -75,8 +75,11 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
 
         IssueAdapter.makeLabelBadges(viewHolder.llLabels, issue.getLabels());
 
+        String userName = issue.getUser() != null
+                ? issue.getUser().getLogin() : mContext.getString(R.string.deleted);
+
         viewHolder.tvDesc.setText(issue.getTitle());
-        viewHolder.tvExtra.setText(issue.getUser().getLogin() + "\n"
+        viewHolder.tvExtra.setText(userName + "\n"
                 + StringUtils.formatRelativeTime(mContext, issue.getCreatedAt(), true));
 
         if (issue.getComments() > 0) {

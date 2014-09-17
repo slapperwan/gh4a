@@ -2,7 +2,6 @@ package com.gh4a.activities;
 
 import java.net.URISyntaxException;
 
-import android.app.AlertDialog;
 import android.content.ContentUris;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,6 +22,7 @@ import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.BookmarkAdapter;
 import com.gh4a.db.BookmarksProvider.Columns;
+import com.gh4a.utils.UiUtils;
 
 public class BookmarkListActivity extends LoadingFragmentActivity implements
         AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, LoaderCallbacks<Cursor> {
@@ -66,9 +66,8 @@ public class BookmarkListActivity extends LoadingFragmentActivity implements
 
     @Override
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, final long id) {
-        new AlertDialog.Builder(this)
+        UiUtils.createDialogBuilderWithAlertIcon(this)
                 .setTitle(R.string.remove_bookmark)
-                .setIcon(android.R.drawable.ic_dialog_alert)
                 .setMessage(R.string.remove_bookmark_confirm)
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {

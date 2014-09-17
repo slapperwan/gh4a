@@ -199,9 +199,11 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
 
         } else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
             PullRequestReviewCommentPayload payload = (PullRequestReviewCommentPayload) event.getPayload();
-            return res.getString(R.string.event_commit_comment_desc,
-                    payload.getComment().getCommitId().substring(0, 7),
-                    payload.getComment().getBody());
+            CommitComment comment = payload.getComment();
+            if (comment != null) {
+                return res.getString(R.string.event_commit_comment_desc,
+                        comment.getCommitId().substring(0, 7), comment.getBody());
+            }
 
         } else if (Event.TYPE_PUSH.equals(eventType)) {
             viewHolder.llPushDesc.setVisibility(View.VISIBLE);

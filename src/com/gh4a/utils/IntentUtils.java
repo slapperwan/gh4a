@@ -100,7 +100,6 @@ public class IntentUtils {
         intent.putExtra(Constants.Repository.OWNER, repoOwner);
         intent.putExtra(Constants.Repository.NAME, repoName);
         intent.putExtra(Constants.Repository.SELECTED_REF, ref);
-        intent.putExtra(Constants.Repository.SELECTED_BRANCHTAG_NAME, ref);
         intent.putExtra(RepositoryActivity.EXTRA_INITIAL_PAGE, initialPage);
         if (flags != 0) {
             intent.setFlags(flags);

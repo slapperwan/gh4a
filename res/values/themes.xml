@@ -76,8 +76,8 @@
         <item name="searchRepoIcon">@drawable/search_repos</item>
         <item name="searchUserMenuIcon">@drawable/search_users_dark</item>
         <item name="searchRepoMenuIcon">@drawable/search_repos_dark</item>
-        <item name="dirIcon">@drawable/folder_dark</item>
-        <item name="fileIcon">@drawable/file_dark</item>
+        <item name="dirIcon">@drawable/folder</item>
+        <item name="fileIcon">@drawable/file</item>
         <item name="commentsIcon">@drawable/comments</item>
     </style>
 
