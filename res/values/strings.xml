@@ -324,7 +324,7 @@
     <string name="blog">GitHub Blog</string>
 
     <!-- Recent Wiki Updates -->
-    <string name="recent_wiki">Wiki</string>
+    <string name="recent_wiki">Recent Wiki Updates</string>
 
     <!-- Bookmarks -->
     <string name="remove_bookmark">Remove bookmark</string>
