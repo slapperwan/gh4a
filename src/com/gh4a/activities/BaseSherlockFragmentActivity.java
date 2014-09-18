@@ -64,18 +64,6 @@ public abstract class BaseSherlockFragmentActivity extends SherlockFragmentActiv
     }
 
     /* (non-Javadoc)
-     * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (!Gh4Application.get(this).isAuthorized()) {
-            MenuInflater inflater = getSupportMenuInflater();
-            inflater.inflate(R.menu.anon_menu, menu);
-        }
-        return true;
-    }
-
-    /* (non-Javadoc)
      * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
      */
     @Override
@@ -85,26 +73,17 @@ public abstract class BaseSherlockFragmentActivity extends SherlockFragmentActiv
         case android.R.id.home:
             navigateUp();
             return true;
-        case R.id.login:
-            Intent intent = new Intent(this, Github4AndroidActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP
-                    |Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            return true;
         case R.id.settings:
             startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
             return true;
         case R.id.explore:
-            intent = new Intent(this, ExploreActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(this, ExploreActivity.class));
             return true;
         case R.id.search:
-            intent = new Intent(this, SearchActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(this, SearchActivity.class));
             return true;
         case R.id.bookmarks:
-            intent = new Intent(this, BookmarkListActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(this, BookmarkListActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);

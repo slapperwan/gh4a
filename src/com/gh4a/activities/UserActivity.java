@@ -75,7 +75,9 @@ public class UserActivity extends LoadingFragmentPagerActivity {
         } else {
             actionBar.setTitle(mUserLogin);
             actionBar.setDisplayHomeAsUpEnabled(true);
-            getSupportLoaderManager().initLoader(4, null, mIsFollowingCallback);
+            if (Gh4Application.get(this).isAuthorized()) {
+                getSupportLoaderManager().initLoader(4, null, mIsFollowingCallback);
+            }
         }
     }
 

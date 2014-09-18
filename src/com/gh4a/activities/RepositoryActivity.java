@@ -218,8 +218,10 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         setTabsEnabled(false);
 
         getSupportLoaderManager().initLoader(LOADER_REPO, null, mRepoCallback);
-        getSupportLoaderManager().initLoader(LOADER_WATCHING, null, mWatchCallback);
-        getSupportLoaderManager().initLoader(LOADER_STARRING, null, mStarCallback);
+        if (Gh4Application.get(this).isAuthorized()) {
+            getSupportLoaderManager().initLoader(LOADER_WATCHING, null, mWatchCallback);
+            getSupportLoaderManager().initLoader(LOADER_STARRING, null, mStarCallback);
+        }
     }
 
     private void applyInitialPage() {

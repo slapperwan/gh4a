@@ -35,6 +35,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.ClientForAuthorization;
 import com.gh4a.Constants;
@@ -66,9 +67,9 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        boolean result = super.onCreateOptionsMenu(menu);
-        menu.findItem(R.id.login).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        return result;
+        MenuInflater inflater = getSupportMenuInflater();
+        inflater.inflate(R.menu.anon_menu, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
