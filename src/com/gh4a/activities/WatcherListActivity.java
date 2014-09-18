@@ -20,7 +20,6 @@ import android.support.v4.app.Fragment;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.Constants;
-import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.ForkListFragment;
@@ -28,7 +27,6 @@ import com.gh4a.fragment.StargazerListFragment;
 import com.gh4a.fragment.WatcherListFragment;
 
 public class WatcherListActivity extends LoadingFragmentPagerActivity {
-
     private String mRepoOwner;
     private String mRepoName;
 
@@ -38,7 +36,6 @@ public class WatcherListActivity extends LoadingFragmentPagerActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
         if (hasErrorView()) {
             return;

@@ -95,7 +95,6 @@ public class SettingsActivity extends SherlockPreferenceActivity implements
     @Override
     public boolean onPreferenceChange(Preference pref, Object newValue) {
         if (pref == mThemePref) {
-            int newTheme = Integer.parseInt((String) newValue);
             mResultIntent.putExtra(RESULT_EXTRA_THEME_CHANGED, true);
             recreate();
             return true;

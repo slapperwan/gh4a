@@ -21,14 +21,12 @@ import android.os.Bundle;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.BlogListFragment;
 
 public class BlogListActivity extends BaseSherlockFragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState == null) {

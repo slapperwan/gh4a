@@ -29,9 +29,8 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
 
 public class CollaboratorListActivity extends UserListActivity {
-
-    protected String mUserLogin;
-    protected String mRepoName;
+    private String mUserLogin;
+    private String mRepoName;
 
     @Override
     protected void setRequestData() {

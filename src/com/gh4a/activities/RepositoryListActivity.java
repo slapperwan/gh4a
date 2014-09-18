@@ -23,8 +23,8 @@ import com.gh4a.fragment.WatchedRepositoryListFragment;
 public class RepositoryListActivity extends BaseSherlockFragmentActivity implements
         ActionBar.OnNavigationListener, SearchView.OnCloseListener,
         SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener {
-    public String mUserLogin;
-    public String mUserType;
+    private String mUserLogin;
+    private String mUserType;
 
     private ActionBar mActionBar;
     private RepositorySearchFragment mSearchFragment;
@@ -32,7 +32,6 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         Bundle data = getIntent().getExtras();

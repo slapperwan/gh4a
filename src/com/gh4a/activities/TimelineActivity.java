@@ -21,7 +21,6 @@ import android.support.v4.app.FragmentManager;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.PublicTimelineFragment;
 
@@ -30,7 +29,6 @@ public class TimelineActivity extends BaseSherlockFragmentActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         FragmentManager fm = getSupportFragmentManager();

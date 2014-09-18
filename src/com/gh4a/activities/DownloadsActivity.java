@@ -5,7 +5,6 @@ import android.support.v4.app.Fragment;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.Constants;
-import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.DownloadBranchesFragment;
@@ -22,7 +21,6 @@ public class DownloadsActivity extends LoadingFragmentPagerActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
         if (hasErrorView()) {
             return;

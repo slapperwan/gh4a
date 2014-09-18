@@ -122,7 +122,6 @@ public class IssueActivity extends LoadingFragmentActivity implements
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         Bundle data = getIntent().getExtras();

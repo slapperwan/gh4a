@@ -286,7 +286,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         }
     }
 
-    public abstract int getMenuGroupId();
+    protected abstract int getMenuGroupId();
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {

@@ -156,7 +156,6 @@ public class IssueEditActivity extends LoadingFragmentActivity implements OnClic
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         mSelectedLabels = new ArrayList<Label>();

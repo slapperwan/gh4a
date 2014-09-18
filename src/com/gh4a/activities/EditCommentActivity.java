@@ -10,7 +10,6 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
-import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
@@ -20,12 +19,11 @@ import java.io.IOException;
 public abstract class EditCommentActivity extends BaseSherlockFragmentActivity {
     protected String mRepoOwner;
     protected String mRepoName;
-    protected long mCommentId;
+    private long mCommentId;
     private EditText mEditText;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.edit_text);

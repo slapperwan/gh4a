@@ -39,7 +39,6 @@ public class IssueMilestoneListActivity extends LoadingFragmentPagerActivity {
     };
 
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
         if (hasErrorView()) {
             return;

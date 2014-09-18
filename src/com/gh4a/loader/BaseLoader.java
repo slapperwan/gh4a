@@ -49,5 +49,5 @@ public abstract class BaseLoader<T> extends AsyncTaskLoader<LoaderResult<T>> {
         cancelLoad();
     }
 
-    public abstract T doLoadInBackground() throws Exception;
+    protected abstract T doLoadInBackground() throws Exception;
 }

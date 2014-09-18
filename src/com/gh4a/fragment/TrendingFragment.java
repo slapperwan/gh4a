@@ -35,7 +35,7 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
     public static final String TYPE_WEEKLY = "weekly";
     public static final String TYPE_MONTHLY = "monthly";
 
-    public String mUrl;
+    private String mUrl;
 
     public static TrendingFragment newInstance(String type) {
         if (type == null) {

@@ -52,7 +52,6 @@ import com.gh4a.utils.UiUtils;
 public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         Gh4Application app = Gh4Application.get(this);
@@ -167,7 +166,7 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
             Editor editor = sharedPreferences.edit();
             editor.putString(Constants.User.AUTH_TOKEN, result.getToken());
             editor.putString(Constants.User.LOGIN, mUserName);
-            editor.commit();
+            editor.apply();
 
             IntentUtils.openUserInfoActivity(mContext, mUserName,
                     null, Intent.FLAG_ACTIVITY_CLEAR_TOP);

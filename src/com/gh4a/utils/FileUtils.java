@@ -11,20 +11,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
 public class FileUtils {
-
-    static List<String> imageExts = new ArrayList<String>();
-
-    static {
-        imageExts.add("png");
-        imageExts.add("gif");
-        imageExts.add("jpeg");
-        imageExts.add("jpg");
-        imageExts.add("bmp");
-    }
+    private static List<String> imageExts = Arrays.asList(
+        "png", "gif", "jpeg", "jpg", "bmp"
+    );
 
     public static boolean save(File file, InputStream inputStream) {
         OutputStream out = null;

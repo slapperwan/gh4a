@@ -35,7 +35,8 @@ import com.gh4a.fragment.TrendingFragment;
 import com.gh4a.utils.UiUtils;
 import com.viewpagerindicator.TitlePageIndicator;
 
-public class ExploreActivity extends BaseSherlockFragmentActivity implements ActionBar.OnNavigationListener {
+public class ExploreActivity extends BaseSherlockFragmentActivity implements
+        ActionBar.OnNavigationListener {
     private ViewPager mPager;
     private TitlePageIndicator mIndicator;
     private ThisPageAdapter mAdapter;
@@ -44,7 +45,6 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements Act
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         if (!isOnline()) {

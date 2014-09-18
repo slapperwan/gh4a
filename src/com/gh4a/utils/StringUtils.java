@@ -105,7 +105,7 @@ public class StringUtils {
      * @param dataBytes
      * @return the hex string representation of dataBytes
      */
-    public static String toHex(byte[] dataBytes) {
+    private static String toHex(byte[] dataBytes) {
         StringBuilder sb = new StringBuilder(dataBytes.length * 2);
         for (byte dataByte : dataBytes) {
             sb.append(Character.forDigit((dataByte & 0xf0) >> 4, 16));
@@ -129,38 +129,37 @@ public class StringUtils {
         return userLogin + (!StringUtils.isBlank(name) ? " - " + name : "");
     }
 
-    public static String highlightSyntax(String data, boolean highlight, String fileName,
+    public static String highlightSyntax(String data, String fileName,
             String repoOwner, String repoName, String ref) {
         String ext = FileUtils.getFileExtension(fileName);
         String cssTheme = ThemeUtils.getCssTheme(Gh4Application.THEME);
 
         StringBuilder content = new StringBuilder();
         content.append("<html><head><title></title>");
-        if (highlight) {
-            if (Constants.MARKDOWN_EXT.contains(ext)) {
-                content.append("<script src='file:///android_asset/showdown.js' type='text/javascript'></script>");
-                content.append("<link href='file:///android_asset/markdown-");
-                content.append(cssTheme);
-                content.append(".css' rel='stylesheet' type='text/css'/>");
-                content.append("</head>");
-                content.append("<body>");
-                content.append("<div id='content'>");
-            } else if (!Constants.SKIP_PRETTIFY_EXT.contains(ext)) {
-                content.append("<link href='file:///android_asset/prettify-");
-                content.append(cssTheme);
-                content.append(".css' rel='stylesheet' type='text/css'/>");
-                content.append("<script src='file:///android_asset/prettify.js' type='text/javascript'></script>");
-                content.append("</head>");
-                content.append("<body onload='prettyPrint()'>");
-                content.append("<pre class='prettyprint linenums'>");
-            } else{
-                content.append("<link href='file:///android_asset/text-");
-                content.append(cssTheme);
-                content.append(".css' rel='stylesheet' type='text/css'/>");
-                content.append("</head>");
-                content.append("<body>");
-                content.append("<pre>");
-            }
+
+        if (Constants.MARKDOWN_EXT.contains(ext)) {
+            content.append("<script src='file:///android_asset/showdown.js' type='text/javascript'></script>");
+            content.append("<link href='file:///android_asset/markdown-");
+            content.append(cssTheme);
+            content.append(".css' rel='stylesheet' type='text/css'/>");
+            content.append("</head>");
+            content.append("<body>");
+            content.append("<div id='content'>");
+        } else if (!Constants.SKIP_PRETTIFY_EXT.contains(ext)) {
+            content.append("<link href='file:///android_asset/prettify-");
+            content.append(cssTheme);
+            content.append(".css' rel='stylesheet' type='text/css'/>");
+            content.append("<script src='file:///android_asset/prettify.js' type='text/javascript'></script>");
+            content.append("</head>");
+            content.append("<body onload='prettyPrint()'>");
+            content.append("<pre class='prettyprint linenums'>");
+        } else{
+            content.append("<link href='file:///android_asset/text-");
+            content.append(cssTheme);
+            content.append(".css' rel='stylesheet' type='text/css'/>");
+            content.append("</head>");
+            content.append("<body>");
+            content.append("<pre>");
         }
 
         content.append(TextUtils.htmlEncode(data));

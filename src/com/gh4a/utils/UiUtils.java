@@ -147,9 +147,6 @@ public class UiUtils {
 
     private static Uri buildDownloadDestinationUri(String fileName) {
         final File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        if (file == null) {
-            return null;
-        }
         if (file.exists()) {
             if (!file.isDirectory()) {
                 return null;

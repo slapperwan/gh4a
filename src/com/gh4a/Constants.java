@@ -64,7 +64,6 @@ public interface Constants {
     public interface PullRequest {
         public static final String NUMBER = "PullRequest.NUMBER";
         public static final String STATE = "PullRequest.STATE";
-        public static final String FILES = "PullRequest.FILES";
     }
 
     public interface Object {

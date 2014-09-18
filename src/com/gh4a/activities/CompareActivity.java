@@ -30,7 +30,6 @@ import android.widget.ListView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.Constants;
-import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.CommitAdapter;
@@ -69,7 +68,6 @@ public class CompareActivity extends LoadingFragmentActivity implements OnItemCl
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         if (hasErrorView()) {

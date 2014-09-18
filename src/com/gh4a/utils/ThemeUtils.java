@@ -5,7 +5,7 @@ import android.graphics.Color;
 import com.gh4a.R;
 
 public class ThemeUtils {
-    public static final int LIGHT_BACKGROUND_COLOR = Color.parseColor("#F7F7F9");
+    private static final int LIGHT_BACKGROUND_COLOR = Color.parseColor("#F7F7F9");
     private static final int DARK_BACKGROUND_COLOR = Color.parseColor("#111111");
 
     private static final String DARK_CSS_THEME = "dark";

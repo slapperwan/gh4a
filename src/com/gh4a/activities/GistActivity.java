@@ -64,7 +64,6 @@ public class GistActivity extends LoadingFragmentActivity implements OnClickList
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         mGistId = getIntent().getExtras().getString(Constants.Gist.ID);

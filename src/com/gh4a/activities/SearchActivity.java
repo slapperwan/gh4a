@@ -56,9 +56,9 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
         SearchView.OnQueryTextListener, SearchView.OnCloseListener,
         AdapterView.OnItemSelectedListener, AdapterView.OnItemClickListener {
 
-    protected SearchUserAdapter mUserAdapter;
-    protected RepositoryAdapter mRepoAdapter;
-    protected ListView mListViewResults;
+    private SearchUserAdapter mUserAdapter;
+    private RepositoryAdapter mRepoAdapter;
+    private ListView mListViewResults;
 
     private Spinner mSearchType;
     private SearchView mSearch;
@@ -67,7 +67,6 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.search);

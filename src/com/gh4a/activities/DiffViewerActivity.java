@@ -56,8 +56,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
     protected String mRepoName;
     protected String mPath;
     protected String mSha;
-    protected String mDiff;
 
+    private String mDiff;
     private String[] mDiffLines;
     private SparseArray<List<CommitComment>> mCommitCommentsByPos =
             new SparseArray<List<CommitComment>>();

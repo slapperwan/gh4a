@@ -4,16 +4,13 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.gh4a.Constants;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.CommitListFragment;
 
-public class CommitHistoryActivity extends SherlockFragmentActivity {
+public class CommitHistoryActivity extends BaseSherlockFragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.generic_list);

@@ -52,7 +52,7 @@ public class GistViewerActivity extends WebViewerActivity {
             if (success) {
                 mGistFile = result.getData().getFiles().get(mFileName);
                 loadThemedHtml(StringUtils.highlightSyntax(mGistFile.getContent(),
-                        true, mFileName, null, null, null));
+                        mFileName, null, null, null));
             } else {
                 setContentEmpty(true);
                 setContentShown(true);

@@ -86,7 +86,6 @@ public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         mRepoOwner = getIntent().getExtras().getString(Constants.Repository.OWNER);

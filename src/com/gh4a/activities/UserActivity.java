@@ -34,7 +34,7 @@ public class UserActivity extends LoadingFragmentPagerActivity {
     private PrivateEventListFragment mPrivateEventListFragment;
     private PublicEventListFragment mPublicEventListFragment;
     private RepositoryIssueListFragment mRepositoryIssueListFragment;
-    public Boolean mIsFollowing;
+    private Boolean mIsFollowing;
 
     private static final int[] TITLES_SELF = new int[] {
         R.string.about, R.string.user_news_feed,
@@ -58,8 +58,6 @@ public class UserActivity extends LoadingFragmentPagerActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME);
-
         Bundle data = getIntent().getExtras();
         mUserLogin = data.getString(Constants.User.LOGIN);
         mUserName = data.getString(Constants.User.NAME);

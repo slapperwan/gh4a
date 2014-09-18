@@ -104,8 +104,7 @@ public class FileViewerActivity extends WebViewerActivity {
             loadThemedHtml(StringUtils.highlightImage(imageUrl));
         } else {
             String data = base64Data != null ? new String(EncodingUtils.fromBase64(base64Data)) : "";
-            loadThemedHtml(StringUtils.highlightSyntax(data, true,
-                    mPath, mRepoOwner, mRepoName, mRef));
+            loadThemedHtml(StringUtils.highlightSyntax(data, mPath, mRepoOwner, mRepoName, mRef));
         }
     }
 

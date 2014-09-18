@@ -33,7 +33,7 @@ public abstract class LoadingFragmentPagerActivity extends LoadingFragmentActivi
         return mPager;
     }
 
-    public void setTabsEnabled(boolean enabled) {
+    protected void setTabsEnabled(boolean enabled) {
         mPager.setEnabled(enabled);
         if (enabled) {
             mPager.setCurrentItem(getSupportActionBar().getSelectedTab().getPosition());

@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import com.gh4a.activities.BaseSherlockFragmentActivity;
 
-public class LoadingFragmentActivity extends BaseSherlockFragmentActivity {
+public abstract class LoadingFragmentActivity extends BaseSherlockFragmentActivity {
     private View mProgressContainer;
     private View mContentContainer;
     private View mContentView;
@@ -69,7 +69,7 @@ public class LoadingFragmentActivity extends BaseSherlockFragmentActivity {
         }
     }
 
-    public void setEmptyText(int resId) {
+    protected void setEmptyText(int resId) {
         setEmptyText(getString(resId));
     }
 
@@ -85,7 +85,7 @@ public class LoadingFragmentActivity extends BaseSherlockFragmentActivity {
         }
     }
 
-    public void setContentShown(boolean shown) {
+    protected void setContentShown(boolean shown) {
         setContentShown(shown, true);
     }
 
@@ -122,7 +122,7 @@ public class LoadingFragmentActivity extends BaseSherlockFragmentActivity {
         }
     }
 
-    public void setContentEmpty(boolean isEmpty) {
+    protected void setContentEmpty(boolean isEmpty) {
         ensureContent();
         if (mContentView == null) {
             throw new IllegalStateException("Content view must be initialized before");

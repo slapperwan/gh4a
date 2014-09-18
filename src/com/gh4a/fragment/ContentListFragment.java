@@ -35,8 +35,8 @@ import java.util.List;
 
 public class ContentListFragment extends ListDataBaseFragment<RepositoryContents> {
     private Repository mRepository;
-    public String mPath;
-    public String mRef;
+    private String mPath;
+    private String mRef;
     private ParentCallback mCallback;
 
     public interface ParentCallback {

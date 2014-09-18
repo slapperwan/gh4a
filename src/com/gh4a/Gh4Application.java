@@ -127,7 +127,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         return mServices.get(name);
     }
 
-    private boolean selectTheme(int theme) {
+    private void selectTheme(int theme) {
         switch (theme) {
             case Constants.Theme.DARK:
                 THEME = R.style.DefaultTheme;
@@ -138,10 +138,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
             case Constants.Theme.LIGHTDARK:
                 THEME = R.style.LightDarkTheme;
                 break;
-            default:
-                return false;
         }
-        return true;
     }
 
     @Override

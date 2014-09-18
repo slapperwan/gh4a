@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 
@@ -38,10 +39,16 @@ import com.gh4a.utils.ToastUtils;
 /**
  * The Base activity.
  */
-public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
+public abstract class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
     private static final int REQUEST_SETTINGS = 1000;
 
     private boolean mHasErrorView = false;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        setTheme(Gh4Application.THEME);
+        super.onCreate(savedInstanceState);
+    }
 
     /**
      * Common function when device search button pressed, then open
@@ -136,7 +143,7 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         return info != null && info.isAvailable() && info.isConnected();
     }
 
-    public void setErrorView() {
+    protected void setErrorView() {
         mHasErrorView = true;
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.error);

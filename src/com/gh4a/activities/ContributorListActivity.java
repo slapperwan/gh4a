@@ -20,7 +20,6 @@ import android.os.Bundle;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.Constants;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.ContributorListFragment;
 import com.gh4a.utils.IntentUtils;
@@ -31,7 +30,6 @@ public class ContributorListActivity extends BaseSherlockFragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         Bundle extras = getIntent().getExtras();

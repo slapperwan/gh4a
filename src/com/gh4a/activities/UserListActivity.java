@@ -19,11 +19,9 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 import com.actionbarsherlock.app.ActionBar;
-import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.UserAdapter;
@@ -35,11 +33,12 @@ import org.eclipse.egit.github.core.User;
 
 import java.util.List;
 
-public abstract class UserListActivity extends LoadingFragmentActivity implements OnItemClickListener {
-    protected UserAdapter mUserAdapter;
-    protected ListView mListViewUsers;
+public abstract class UserListActivity extends LoadingFragmentActivity implements
+        AdapterView.OnItemClickListener {
+    private UserAdapter mUserAdapter;
+    private ListView mListViewUsers;
 
-    protected LoaderCallbacks<List<User>> mUserListCallback = new LoaderCallbacks<List<User>>() {
+    private LoaderCallbacks<List<User>> mUserListCallback = new LoaderCallbacks<List<User>>() {
         @Override
         public Loader<LoaderResult<List<User>>> onCreateLoader(int id, Bundle args) {
             return getUserListLoader();
@@ -58,7 +57,6 @@ public abstract class UserListActivity extends LoadingFragmentActivity implement
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         if (hasErrorView()) {

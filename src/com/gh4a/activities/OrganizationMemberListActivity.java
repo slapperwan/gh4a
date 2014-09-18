@@ -29,7 +29,7 @@ import com.gh4a.loader.OrganizationMemberListLoader;
 import com.gh4a.utils.IntentUtils;
 
 public class OrganizationMemberListActivity extends UserListActivity {
-    protected String mUserLogin;
+    private String mUserLogin;
 
     @Override
     protected void setRequestData() {
