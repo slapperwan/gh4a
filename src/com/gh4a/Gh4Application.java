@@ -40,15 +40,13 @@ import org.ocpsoft.prettytime.PrettyTime;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 
 import com.bugsense.trace.BugSenseHandler;
-import com.gh4a.activities.Github4AndroidActivity;
+import com.gh4a.activities.SettingsActivity;
 
 /**
  * The Class Gh4Application.
@@ -95,8 +93,8 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         regular = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Regular.ttf");
         italic = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Italic.ttf");
 
-        SharedPreferences prefs = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
-        selectTheme(prefs.getInt("theme", Constants.Theme.DARK));
+        SharedPreferences prefs = getPrefs();
+        selectTheme(prefs.getInt(SettingsActivity.KEY_THEME, Constants.Theme.DARK));
         prefs.registerOnSharedPreferenceChangeListener(this);
 
         BugSenseHandler.initAndStartSession(this, "1e6a83ae");
@@ -129,14 +127,6 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         return mServices.get(name);
     }
 
-    public void setThemeSetting(int theme) {
-        if (selectTheme(theme)) {
-            SharedPreferences.Editor editor =
-                    getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE).edit();
-            editor.putInt("theme", theme).apply();
-        }
-    }
-
     private boolean selectTheme(int theme) {
         switch (theme) {
             case Constants.Theme.DARK:
@@ -165,18 +155,22 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     }
 
     public String getAuthLogin() {
-        SharedPreferences sharedPreferences = getSharedPreferences(
-                Constants.PREF_NAME, MODE_PRIVATE);
-        if (sharedPreferences != null) {
-            return sharedPreferences.getString(Constants.User.LOGIN, null);
-        }
-        return null;
+        return getPrefs().getString(Constants.User.LOGIN, null);
     }
 
     public String getAuthToken() {
-        SharedPreferences sharedPreferences = getSharedPreferences(
-                Constants.PREF_NAME, Context.MODE_PRIVATE);
-        return sharedPreferences.getString(Constants.User.AUTH_TOKEN, null);
+        return getPrefs().getString(Constants.User.AUTH_TOKEN, null);
+    }
+
+    public void logout() {
+        getPrefs().edit()
+                .remove(Constants.User.LOGIN)
+                .remove(Constants.User.AUTH_TOKEN)
+                .apply();
+    }
+
+    private SharedPreferences getPrefs() {
+        return getSharedPreferences(SettingsActivity.PREF_NAME, MODE_PRIVATE);
     }
 
     public static Gh4Application get(Context context) {
@@ -187,24 +181,12 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         return getAuthLogin() != null && getAuthToken() != null;
     }
 
-    public void logout() {
-        SharedPreferences sharedPreferences = getSharedPreferences(Constants.PREF_NAME,
-                MODE_PRIVATE);
-        Editor editor = sharedPreferences.edit();
-        editor.remove(Constants.User.LOGIN);
-        editor.remove(Constants.User.AUTH_TOKEN);
-        editor.commit();
-
-        Intent intent = new Intent(this, Github4AndroidActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP
-                | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-    }
-
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(Constants.User.AUTH_TOKEN)) {
             mClient.setOAuth2Token(getAuthToken());
+        } else if (key.equals(SettingsActivity.KEY_THEME)) {
+            selectTheme(sharedPreferences.getInt(key, Constants.Theme.DARK));
         }
     }
 }

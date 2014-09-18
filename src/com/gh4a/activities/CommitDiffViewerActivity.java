@@ -18,7 +18,6 @@ package com.gh4a.activities;
 import android.content.Intent;
 import android.support.v4.content.Loader;
 
-import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Gh4Application;
 import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.LoaderResult;

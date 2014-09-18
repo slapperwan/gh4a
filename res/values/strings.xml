@@ -17,6 +17,7 @@
     <string name="logout">Logout</string>
     <string name="login">Login</string>
     <string name="cancel">Cancel</string>
+    <string name="settings">Settings</string>
     <string name="about">About</string>
     <string name="my_email">slapperwan@gmail.com</string>
     <string name="my_web">http://slapperwan.github.com/gh4a</string>
@@ -46,7 +47,6 @@
     <string name="releases">Releases</string>
     <string name="packages">Packages</string>
     <string name="no_browser_found">The link could not be opened: no browser was found on your device</string>
-    <string name="login_prompt">Please login</string>
     <string name="error_toast">An error occurred while fetching data</string>
     <string name="unknown">unknown</string>
     <string name="history">History</string>
@@ -93,9 +93,9 @@
 	<string name="verify">Verify</string>
     <string name="confirmation">Are you sure?</string>
     <string name="unset">Unset</string>
-    <string name="theme_dark">Dark</string>
-    <string name="theme_light">Light</string>
-    <string name="theme_light_dark">Light and Dark</string>
+    <string name="logout_pref_summary_logged_in">Currently logged in as %1$s</string>
+    <string name="logout_pref_summary_logged_out">Currently not logged in</string>
+    <string name="copyright_notice">\u00a9 2014 Azwan Adli, Danny Baumann</string>
 
     <plurals name="file">
         <item quantity="one">File</item>
@@ -350,9 +350,4 @@
 
     <!-- Webview text size -->
     <string name="menu_text_size">Text size</string>
-    <string name="text_size_smallest">Smallest</string>
-    <string name="text_size_smaller">Smaller</string>
-    <string name="text_size_normal">Normal</string>
-    <string name="text_size_larger">Larger</string>
-    <string name="text_size_largest">Largest</string>
 </resources>

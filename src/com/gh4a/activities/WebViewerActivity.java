@@ -29,9 +29,7 @@ import android.webkit.WebViewClient;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
@@ -40,12 +38,6 @@ import com.gh4a.utils.ThemeUtils;
 public abstract class WebViewerActivity extends LoadingFragmentActivity {
     private WebView mWebView;
 
-    private String PREFS_KEY_INITIAL_ZOOM = "webview_initial_zoom";
-
-    private int[] ZOOM_MENU_IDS = new int[] {
-        R.id.text_size_smallest, R.id.text_size_smaller, R.id.text_size_normal,
-        R.id.text_size_larger, R.id.text_size_largest
-    };
     private int[] ZOOM_SIZES = new int[] {
         50, 75, 100, 150, 200
     };
@@ -116,9 +108,6 @@ public abstract class WebViewerActivity extends LoadingFragmentActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getSupportMenuInflater();
-        inflater.inflate(R.menu.webview_text_size, menu);
-
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
             menu.removeItem(R.id.search);
         }
@@ -134,13 +123,6 @@ public abstract class WebViewerActivity extends LoadingFragmentActivity {
             return true;
         }
 
-        for (int i = 0; i < ZOOM_MENU_IDS.length; i++) {
-            if (itemId == ZOOM_MENU_IDS[i]) {
-                saveInitialZoomLevel(i);
-                return true;
-            }
-        }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -152,19 +134,10 @@ public abstract class WebViewerActivity extends LoadingFragmentActivity {
         }
     }
 
-    private void saveInitialZoomLevel(int level) {
-        SharedPreferences prefs = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
-        prefs.edit().putInt(PREFS_KEY_INITIAL_ZOOM, level).commit();
-
-        if (mWebView != null) {
-            applyDefaultTextSize(mWebView.getSettings());
-        }
-    }
-
     @SuppressWarnings("deprecation")
     private void applyDefaultTextSize(WebSettings s) {
-        SharedPreferences prefs = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE);
-        int initialZoomLevel = prefs.getInt(PREFS_KEY_INITIAL_ZOOM, -1);
+        SharedPreferences prefs = getSharedPreferences(SettingsActivity.PREF_NAME, MODE_PRIVATE);
+        int initialZoomLevel = prefs.getInt(SettingsActivity.KEY_TEXT_SIZE, -1);
         if (initialZoomLevel < 0 || initialZoomLevel >= ZOOM_SIZES.length) {
             return;
         }

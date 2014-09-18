@@ -130,6 +130,9 @@
             android:name=".activities.SearchActivity"
             android:configChanges="orientation|screenSize" />
         <activity
+            android:name=".activities.SettingsActivity"
+            android:title="@string/settings" />
+        <activity
             android:name=".activities.TimelineActivity"
             android:configChanges="orientation|screenSize" />
         <activity

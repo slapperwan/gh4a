@@ -23,7 +23,6 @@ import java.util.ArrayList;
  * The Interface Constants.
  */
 public interface Constants {
-    public static final String PREF_NAME = "Gh4a-pref";
     public static final String LOG_TAG = "Gh4a";
 
     public interface Theme {

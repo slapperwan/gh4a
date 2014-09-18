@@ -15,27 +15,20 @@
  */
 package com.gh4a.activities;
 
-import java.util.Calendar;
-
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.db.BookmarksProvider;
@@ -46,6 +39,8 @@ import com.gh4a.utils.ToastUtils;
  * The Base activity.
  */
 public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
+    private static final int REQUEST_SETTINGS = 1000;
+
     private boolean mHasErrorView = false;
 
     /**
@@ -83,17 +78,14 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         case android.R.id.home:
             navigateUp();
             return true;
-        case R.id.logout:
-            Gh4Application.get(this).logout();
-            return true;
         case R.id.login:
             Intent intent = new Intent(this, Github4AndroidActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP
                     |Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             return true;
-        case R.id.about:
-            openAboutDialog();
+        case R.id.settings:
+            startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
             return true;
         case R.id.explore:
             intent = new Intent(this, ExploreActivity.class);
@@ -111,51 +103,21 @@ public class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    protected void navigateUp() {
-    }
-
-    private void openAboutDialog() {
-        Dialog dialog = new Dialog(this);
-
-        dialog.setContentView(R.layout.about_dialog);
-
-        TextView tvCopyright = (TextView) dialog.findViewById(R.id.copyright);
-        tvCopyright.setText("Copyright " + Calendar.getInstance().get(Calendar.YEAR) + " Azwan Adli");
-
-        try {
-            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            String versionName = packageInfo.versionName;
-            dialog.setTitle(getResources().getString(R.string.app_name) + " v" + versionName);
-        }  catch (PackageManager.NameNotFoundException e) {
-            dialog.setTitle(getResources().getString(R.string.app_name));
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        android.util.Log.d("foo", "act result, req " + requestCode + " res " + resultCode + " data " + data);
+        if (requestCode == REQUEST_SETTINGS) {
+            if (data.getBooleanExtra(SettingsActivity.RESULT_EXTRA_THEME_CHANGED, false)
+                    || data.getBooleanExtra(SettingsActivity.RESULT_EXTRA_AUTH_CHANGED, false)) {
+                goToToplevelActivity(0);
+                finish();
+            }
         }
 
-        dialog.findViewById(R.id.btn_by_email).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent sendIntent = new Intent(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[] { getString(R.string.my_email) });
-                sendIntent.setType("message/rfc822");
-                startActivity(Intent.createChooser(sendIntent, getString(R.string.send_email_title)));
-            }
-        });
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 
-        dialog.findViewById(R.id.btn_by_gh4a).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Context context = BaseSherlockFragmentActivity.this;
-                if (Gh4Application.get(context).isAuthorized()) {
-                    Intent intent = new Intent(context, IssueEditActivity.class);
-                    intent.putExtra(Constants.Repository.OWNER, getString(R.string.my_username));
-                    intent.putExtra(Constants.Repository.NAME, getString(R.string.my_repo));
-                    startActivity(intent);
-                } else {
-                    ToastUtils.showMessage(context, R.string.login_prompt);
-                }
-            }
-        });
-
-        dialog.show();
+    protected void navigateUp() {
     }
 
     public ProgressDialog showProgressDialog(String message, boolean cancelable) {

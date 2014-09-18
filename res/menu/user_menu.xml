@@ -20,22 +20,7 @@
     <item android:id="@+id/explore"
         android:title="@string/explore"
         android:showAsAction="never" />
-    <item android:id="@+id/theme"
-        android:title="@string/theme"
-        android:showAsAction="never">
-        <menu>
-            <item android:id="@+id/dark"
-                android:title="@string/theme_dark" />
-            <item android:id="@+id/light"
-                android:title="@string/theme_light" />
-            <item android:id="@+id/lightDark"
-                android:title="@string/theme_light_dark" />
-        </menu>
-    </item>
-    <item android:id="@+id/logout"
-        android:title="@string/logout"
-        android:showAsAction="never" />
-    <item android:id="@+id/about"
-        android:title="@string/about"
+    <item android:id="@+id/settings"
+        android:title="@string/settings"
         android:showAsAction="never" />
 </menu>

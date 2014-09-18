@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <com.gh4a.widget.IntegerListPreference
+        android:key="theme"
+        android:title="@string/theme"
+        android:summary="%s"
+        android:entries="@array/theme_items"
+        android:entryValues="@array/theme_values"
+        android:defaultValue="0" />
+
+    <com.gh4a.widget.IntegerListPreference
+        android:key="webview_initial_zoom"
+        android:title="@string/menu_text_size"
+        android:summary="%s"
+        android:entries="@array/text_size_items"
+        android:entryValues="@array/text_size_values"
+        android:defaultValue="2" />
+
+    <Preference
+        android:key="logout"
+        android:title="@string/logout" />
+
+    <Preference
+        android:key="about"
+        android:title="@string/about" />
+
+</PreferenceScreen>

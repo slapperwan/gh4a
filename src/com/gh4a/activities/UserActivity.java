@@ -3,9 +3,7 @@ package com.gh4a.activities;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.egit.github.core.service.UserService;
-import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
@@ -122,10 +120,6 @@ public class UserActivity extends LoadingFragmentPagerActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         boolean authorized = Gh4Application.get(this).isAuthorized();
 
-        MenuItem logoutAction = menu.findItem(R.id.logout);
-        logoutAction.setTitle(authorized ? R.string.logout : R.string.login);
-        logoutAction.setVisible(mIsLoginUserPage || !authorized);
-
         MenuItem followAction = menu.findItem(R.id.follow);
         followAction.setVisible(!mIsLoginUserPage && authorized);
         if (followAction.isVisible()) {
@@ -170,15 +164,6 @@ public class UserActivity extends LoadingFragmentPagerActivity {
                     mRepositoryIssueListFragment.refresh();
                 }
                 return true;
-            case R.id.dark:
-                setThemeSetting(Constants.Theme.DARK);
-                return true;
-            case R.id.light:
-                setThemeSetting(Constants.Theme.LIGHT);
-                return true;
-            case R.id.lightDark:
-                setThemeSetting(Constants.Theme.LIGHTDARK);
-                return true;
             case R.id.follow:
                 item.setActionView(R.layout.ab_loading);
                 item.expandActionView();
@@ -201,33 +186,7 @@ public class UserActivity extends LoadingFragmentPagerActivity {
                 saveBookmark(mUserLogin, BookmarksProvider.Columns.TYPE_USER, bookmarkIntent, mUserName);
                 return true;
         }
-        boolean result = super.onOptionsItemSelected(item);
-        if (item.getItemId() == R.id.logout) {
-            finish();
-        }
-        return result;
-    }
-
-    @SuppressLint("NewApi")
-    private void setThemeSetting(int theme) {
-        Gh4Application.get(this).setThemeSetting(theme);
-        recreate();
-    }
-
-    @Override
-    public void recreate() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            super.recreate();
-        } else {
-            final Intent intent = getIntent();
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-
-            startActivity(intent);
-            overridePendingTransition(0, 0);
-
-            finish();
-            overridePendingTransition(0, 0);
-        }
+        return super.onOptionsItemSelected(item);
     }
 
     private class UpdateFollowTask extends BackgroundTask<Void> {

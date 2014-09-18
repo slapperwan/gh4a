@@ -163,7 +163,7 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
         @Override
         protected void onSuccess(Authorization result) {
             SharedPreferences sharedPreferences = getSharedPreferences(
-                    Constants.PREF_NAME, MODE_PRIVATE);
+                    SettingsActivity.PREF_NAME, MODE_PRIVATE);
             Editor editor = sharedPreferences.edit();
             editor.putString(Constants.User.AUTH_TOKEN, result.getToken());
             editor.putString(Constants.User.LOGIN, mUserName);
