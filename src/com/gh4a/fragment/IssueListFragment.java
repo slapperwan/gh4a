@@ -23,6 +23,7 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.IssueService;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -34,6 +35,8 @@ import com.gh4a.adapter.IssueAdapter;
 import com.gh4a.adapter.RootAdapter;
 
 public class IssueListFragment extends PagedDataBaseFragment<Issue> {
+    private static final int REQUEST_ISSUE = 1000;
+
     private String mRepoOwner;
     private String mRepoName;
     private Map<String, String> mFilterData;
@@ -90,7 +93,18 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
         intent.putExtra(Constants.Repository.NAME, mRepoName);
         intent.putExtra(Constants.Issue.NUMBER, issue.getNumber());
         intent.putExtra(Constants.Issue.STATE, issue.getState());
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_ISSUE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_ISSUE) {
+            if (resultCode == Activity.RESULT_OK) {
+                super.refresh();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override

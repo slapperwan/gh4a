@@ -1,5 +1,6 @@
 package com.gh4a.fragment;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
@@ -22,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PullRequestFilesFragment extends CommitFragment {
+    private static final int REQUEST_DIFF_VIEWER = 1000;
+
     private String mRepoOwner;
     private String mRepoName;
     private int mPullRequestNumber;
@@ -119,6 +122,18 @@ public class PullRequestFilesFragment extends CommitFragment {
         intent.putExtra(Constants.Commit.DIFF, file.getPatch());
         intent.putExtra(Constants.Commit.COMMENTS, new ArrayList<CommitComment>(mComments));
         intent.putExtra(Constants.Object.PATH, file.getFilename());
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_DIFF_VIEWER);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_DIFF_VIEWER) {
+            if (resultCode == Activity.RESULT_OK) {
+                // reload comments
+                getLoaderManager().getLoader(1).onContentChanged();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 }

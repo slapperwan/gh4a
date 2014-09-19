@@ -390,6 +390,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
         if (requestCode == REQUEST_EDIT) {
             if (resultCode == Activity.RESULT_OK) {
                 getSupportLoaderManager().getLoader(2).onContentChanged();
+                setResult(RESULT_OK);
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -437,6 +438,9 @@ public class IssueActivity extends LoadingFragmentActivity implements
             TextView tvState = (TextView) findViewById(R.id.tv_state);
             tvState.setBackgroundResource(mOpen ? R.drawable.default_green_box : R.drawable.default_red_box);
             tvState.setText(getString(mOpen ? R.string.open : R.string.closed).toUpperCase(Locale.getDefault()));
+            // reload issue state
+            getSupportLoaderManager().getLoader(0).onContentChanged();
+            setResult(RESULT_OK);
             invalidateOptionsMenu();
         }
 
@@ -467,6 +471,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
             ToastUtils.showMessage(mContext, R.string.issue_success_comment);
             //reload comments
             getSupportLoaderManager().getLoader(2).onContentChanged();
+            setResult(RESULT_OK);
 
             EditText etComment = (EditText) findViewById(R.id.et_comment);
             etComment.setText(null);

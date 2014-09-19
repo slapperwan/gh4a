@@ -331,6 +331,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
         @Override
         protected void onSuccess(Void result) {
             refresh();
+            setResult(RESULT_OK);
         }
     }
 
@@ -351,6 +352,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
         @Override
         protected void onSuccess(Void result) {
             refresh();
+            setResult(RESULT_OK);
         }
     }
 }

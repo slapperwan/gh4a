@@ -38,6 +38,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommitFragment extends SherlockProgressFragment implements OnClickListener {
+    private static final int REQUEST_DIFF_VIEWER = 1000;
+
     private String mRepoOwner;
     private String mRepoName;
     private String mObjectSha;
@@ -274,7 +276,19 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
             intent.putExtra(Constants.Commit.COMMENTS, new ArrayList<CommitComment>(mComments));
             intent.putExtra(Constants.Object.PATH, file.getFilename());
             intent.putExtra(Constants.Object.TREE_SHA, mCommit.getCommit().getTree().getSha());
-            startActivity(intent);
+            startActivityForResult(intent, REQUEST_DIFF_VIEWER);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_DIFF_VIEWER) {
+            if (resultCode == Activity.RESULT_OK) {
+                // reload comments
+                getLoaderManager().getLoader(1).onContentChanged();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 }
