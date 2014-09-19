@@ -178,6 +178,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
 
     protected void showDiff() {
         StringBuilder content = new StringBuilder();
+        boolean authorized = Gh4Application.get(this).isAuthorized();
 
         content.append("<html><head><title></title>");
         content.append("<link href='file:///android_asset/text-");
@@ -201,21 +202,26 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
 
             content.append("<div ");
             if (cssClass != null) {
-                content.append("class=\"").append(cssClass).append("\" ");
+                content.append("class=\"").append(cssClass).append("\"");
             }
-            content.append("onclick=\"javascript:location.href='comment://add");
-            content.append("?position=").append(i).append("'\">").append(line).append("</div>");
+            if (authorized) {
+                content.append(" onclick=\"javascript:location.href='comment://add");
+                content.append("?position=").append(i).append("'\"");
+            }
+            content.append(">").append(line).append("</div>");
 
             List<CommitComment> comments = mCommitCommentsByPos.get(i);
             if (comments != null) {
                 for (CommitComment comment : comments) {
                     mCommitComments.put(comment.getId(), comment);
                     content.append("<div class=\"comment\"");
-                    content.append(" style=\"border:1px solid; padding: 2px; margin: 5px 0;\" ");
-                    content.append("onclick=\"javascript:location.href='comment://edit");
-                    content.append("?position=").append(i);
-                    content.append("&id=").append(comment.getId()).append("'\">");
-                    content.append("<div class=\"change\">");
+                    content.append(" style=\"border:1px solid; padding: 2px; margin: 5px 0;\"");
+                    if (authorized) {
+                        content.append(" onclick=\"javascript:location.href='comment://edit");
+                        content.append("?position=").append(i);
+                        content.append("&id=").append(comment.getId()).append("'\"");
+                    }
+                    content.append("><div class=\"change\">");
                     content.append(getString(R.string.commit_comment_header,
                             "<b>" + comment.getUser().getLogin() + "</b>",
                             StringUtils.formatRelativeTime(DiffViewerActivity.this, comment.getCreatedAt(), true)));
