@@ -69,9 +69,7 @@ public class UiUtils {
         int red = Color.red(backgroundColor);
         int green = Color.green(backgroundColor);
         int blue = Color.blue(backgroundColor);
-        int min = Math.min(red, Math.min(green, blue));
-        int max = Math.max(red, Math.min(green, blue));
-        int luminance = (min + max) / 2;
+        int luminance = Math.round(0.213F * red + 0.715F * green + 0.072F * blue);
 
         if (luminance >= 128) {
             return context.getResources().getColor(R.color.abs__primary_text_holo_light);
