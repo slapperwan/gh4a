@@ -79,6 +79,8 @@
         <item name="dirIcon">@drawable/folder</item>
         <item name="fileIcon">@drawable/file</item>
         <item name="commentsIcon">@drawable/comments</item>
+        <!-- seems to be missing in ABS -->
+        <item name="listPopupWindowStyle">@style/Widget.Sherlock.Light.ListPopupWindow</item>
     </style>
 
 </resources>

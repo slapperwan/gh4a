@@ -16,8 +16,10 @@
 package com.gh4a.activities;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
@@ -25,11 +27,18 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.internal.widget.IcsListPopupWindow;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -45,13 +54,15 @@ import com.gh4a.utils.ThemeUtils;
 import com.gh4a.utils.ToastUtils;
 
 import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.User;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public abstract class DiffViewerActivity extends WebViewerActivity {
+public abstract class DiffViewerActivity extends WebViewerActivity implements
+        View.OnTouchListener {
     protected String mRepoOwner;
     protected String mRepoName;
     protected String mPath;
@@ -62,6 +73,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
     private SparseArray<List<CommitComment>> mCommitCommentsByPos =
             new SparseArray<List<CommitComment>>();
     private HashMap<Long, CommitComment> mCommitComments = new HashMap<Long, CommitComment>();
+
+    private Point mLastTouchDown = new Point();
 
     private static final int MENU_ITEM_VIEW = 10;
 
@@ -104,6 +117,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
         actionBar.setTitle(FileUtils.getFileName(mPath));
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
+
+        mWebView.setOnTouchListener(this);
 
         List<CommitComment> comments =
                 (ArrayList<CommitComment>) data.getSerializable(Constants.Commit.COMMENTS);
@@ -267,25 +282,6 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
                 .setPositiveButton(saveButtonResId, saveCb)
                 .setNegativeButton(R.string.cancel, null);
 
-        if (isEdit) {
-            builder.setNeutralButton(R.string.delete, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    new AlertDialog.Builder(DiffViewerActivity.this)
-                            .setTitle(R.string.delete_comment_message)
-                            .setMessage(R.string.confirmation)
-                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int whichButton) {
-                                    new DeleteCommentTask(id).execute();
-                                }
-                            })
-                            .setNegativeButton(R.string.cancel, null)
-                            .show();
-                }
-            });
-        }
-
         builder.show();
     }
 
@@ -301,8 +297,22 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
         String idParam = uri.getQueryParameter("id");
         long id = idParam != null ? Long.parseLong(idParam) : 0L;
 
-        openCommentDialog(id, lineText, line);
+        if (idParam == null) {
+            openCommentDialog(id, lineText, line);
+        } else {
+            CommentActionPopup p = new CommentActionPopup(id, line, lineText,
+                    mLastTouchDown.x, mLastTouchDown.y);
+            p.show();
+        }
         return true;
+    }
+
+    @Override
+    public boolean onTouch(View view, MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            mLastTouchDown.set((int) event.getX(), (int) event.getY());
+        }
+        return false;
     }
 
     protected void refresh() {
@@ -315,6 +325,85 @@ public abstract class DiffViewerActivity extends WebViewerActivity {
     protected abstract Loader<LoaderResult<List<CommitComment>>> createCommentLoader();
     protected abstract void updateComment(long id, String body, int position) throws IOException;
     protected abstract void deleteComment(long id) throws IOException;
+
+    private class CommentActionPopup extends IcsListPopupWindow implements
+            AdapterView.OnItemClickListener {
+        private long mId;
+        private int mPosition;
+        private String mLineText;
+
+        public CommentActionPopup(long id, int position, String lineText, int x, int y) {
+            super(DiffViewerActivity.this, null, R.attr.listPopupWindowStyle);
+
+            mId = id;
+            mPosition = position;
+            mLineText = lineText;
+
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(DiffViewerActivity.this,
+                    R.layout.popup_menu_item, populateChoices(isOwnComment(id)));
+            setAdapter(adapter);
+            setContentWidth(measureContentWidth(adapter));
+
+            View anchor = findViewById(R.id.popup_helper);
+            anchor.layout(x, y, x + 1, y + 1);
+            setAnchorView(anchor);
+
+            setOnItemClickListener(this);
+            setModal(true);
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            if (position == 2) {
+                new AlertDialog.Builder(DiffViewerActivity.this)
+                        .setTitle(R.string.delete_comment_message)
+                        .setMessage(R.string.confirmation)
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                new DeleteCommentTask(mId).execute();
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, null)
+                        .show();
+            } else {
+                openCommentDialog(position == 0 ? 0 : mId, mLineText, mPosition);
+            }
+            dismiss();
+        }
+
+        private boolean isOwnComment(long id) {
+            String login = Gh4Application.get(DiffViewerActivity.this).getAuthLogin();
+            CommitComment comment = mCommitComments.get(id);
+            User user = comment.getUser();
+            return user != null && TextUtils.equals(login, comment.getUser().getLogin());
+        }
+
+        private String[] populateChoices(boolean ownComment) {
+            String[] choices = new String[ownComment ? 3 : 1];
+            choices[0] = getString(R.string.reply);
+            if (ownComment) {
+                choices[1] = getString(R.string.edit);
+                choices[2] = getString(R.string.delete);
+            }
+            return choices;
+        }
+
+        private int measureContentWidth(ListAdapter adapter) {
+            Context context = DiffViewerActivity.this;
+            ViewGroup measureParent = new FrameLayout(context);
+            int measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+            int maxWidth = 0, count = adapter.getCount();
+            View itemView = null;
+
+            for (int i = 0; i < count; i++) {
+                itemView = adapter.getView(i, itemView, measureParent);
+                itemView.measure(measureSpec, measureSpec);
+                maxWidth = Math.max(maxWidth, itemView.getMeasuredWidth());
+            }
+            return maxWidth;
+        }
+    }
 
     private class CommentTask extends ProgressDialogTask<Void> {
         private String mBody;

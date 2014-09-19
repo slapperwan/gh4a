@@ -35,6 +35,8 @@
     <string name="no">No</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>
+    <string name="reply">Reply</string>
+    <string name="edit">Edit</string>
     <string name="members">Members</string>
     <string name="open">Open</string>
     <string name="closed">Closed</string>

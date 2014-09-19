@@ -36,7 +36,7 @@ import com.gh4a.R;
 import com.gh4a.utils.ThemeUtils;
 
 public abstract class WebViewerActivity extends LoadingFragmentActivity {
-    private WebView mWebView;
+    protected WebView mWebView;
 
     private int[] ZOOM_SIZES = new int[] {
         50, 75, 100, 150, 200
