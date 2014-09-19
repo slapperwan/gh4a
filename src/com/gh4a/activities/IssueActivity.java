@@ -387,10 +387,13 @@ public class IssueActivity extends LoadingFragmentActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_EDIT && resultCode == Activity.RESULT_OK) {
-            getSupportLoaderManager().getLoader(2).onContentChanged();
+        if (requestCode == REQUEST_EDIT) {
+            if (resultCode == Activity.RESULT_OK) {
+                getSupportLoaderManager().getLoader(2).onContentChanged();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

@@ -325,11 +325,14 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_EDIT && resultCode == Activity.RESULT_OK) {
-            // no need to refresh pull request and collaborator status in that case
-            super.refresh();
+        if (requestCode == REQUEST_EDIT) {
+            if (resultCode == Activity.RESULT_OK) {
+                // no need to refresh pull request and collaborator status in that case
+                super.refresh();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

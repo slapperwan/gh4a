@@ -40,7 +40,7 @@ import com.gh4a.utils.ToastUtils;
  * The Base activity.
  */
 public abstract class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
-    private static final int REQUEST_SETTINGS = 1000;
+    private static final int REQUEST_SETTINGS = 10000;
 
     private boolean mHasErrorView = false;
 
@@ -91,16 +91,15 @@ public abstract class BaseSherlockFragmentActivity extends SherlockFragmentActiv
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        android.util.Log.d("foo", "act result, req " + requestCode + " res " + resultCode + " data " + data);
         if (requestCode == REQUEST_SETTINGS) {
             if (data.getBooleanExtra(SettingsActivity.RESULT_EXTRA_THEME_CHANGED, false)
                     || data.getBooleanExtra(SettingsActivity.RESULT_EXTRA_AUTH_CHANGED, false)) {
                 goToToplevelActivity(0);
                 finish();
             }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
-
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     protected void navigateUp() {
