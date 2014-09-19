@@ -166,18 +166,15 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
         message = pos > 0 && pos < length ? message.substring(pos) : null;
 
         tvTitle.setText(title);
-        if (message != null) {
-            tvMessage.setText(message);
-        } else {
-            tvMessage.setVisibility(View.GONE);
-        }
+        tvMessage.setText(message);
+        tvMessage.setVisibility(message != null ? View.VISIBLE : View.GONE);
 
         TextView tvExtra = (TextView) mContentView.findViewById(R.id.tv_extra);
         tvExtra.setText(CommitUtils.getAuthorName(app, mCommit) + " "
                 + StringUtils.formatRelativeTime(activity, mCommit.getCommit().getAuthor().getDate(), true));
 
+        ViewGroup committer = (ViewGroup) mContentView.findViewById(R.id.committer_info);
         if (!CommitUtils.authorEqualsCommitter(mCommit)) {
-            ViewGroup committer = (ViewGroup) mContentView.findViewById(R.id.committer_info);
             ImageView gravatar = (ImageView) committer.findViewById(R.id.iv_commit_gravatar);
             TextView extra = (TextView) committer.findViewById(R.id.tv_commit_extra);
 
@@ -185,6 +182,8 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
             GravatarHandler.assignGravatar(gravatar, mCommit.getCommitter());
             extra.setText(getString(R.string.commit_details, CommitUtils.getCommitterName(app, mCommit),
                     StringUtils.formatRelativeTime(activity, mCommit.getCommit().getCommitter().getDate(), true)));
+        } else {
+            committer.setVisibility(View.GONE);
         }
     }
 
@@ -197,6 +196,11 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
         int added = 0, changed = 0, renamed = 0, deleted = 0;
         int additions = 0, deletions = 0;
         int count = files != null ? files.size() : 0;
+
+        llChanged.removeAllViews();
+        llAdded.removeAllViews();
+        llRenamed.removeAllViews();
+        llDeleted.removeAllViews();
 
         for (int i = 0; i < count; i++) {
             CommitFile file = files.get(i);
@@ -248,14 +252,20 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
             parent.addView(fileView);
         }
 
-        llAdded.setVisibility(added > 0 ? View.VISIBLE : View.GONE);
-        llChanged.setVisibility(changed > 0 ? View.VISIBLE : View.GONE);
-        llRenamed.setVisibility(renamed > 0 ? View.VISIBLE : View.GONE);
-        llDeleted.setVisibility(deleted > 0 ? View.VISIBLE : View.GONE);
+        adjustVisibility(llAdded, R.id.commit_added, added);
+        adjustVisibility(llChanged, R.id.commit_changed, changed);
+        adjustVisibility(llRenamed, R.id.commit_renamed, renamed);
+        adjustVisibility(llDeleted, R.id.commit_deleted, deleted);
 
         TextView tvSummary = (TextView) mContentView.findViewById(R.id.tv_desc);
         tvSummary.setText(getString(R.string.commit_summary, added + changed + renamed + deleted,
                 additions, deletions));
+    }
+
+    private void adjustVisibility(View container, int headerRes, int count) {
+        int visibility = count > 0 ? View.VISIBLE : View.GONE;
+        container.setVisibility(visibility);
+        mContentView.findViewById(headerRes).setVisibility(visibility);
     }
 
     @Override

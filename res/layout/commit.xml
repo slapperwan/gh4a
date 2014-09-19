@@ -73,69 +73,65 @@
             android:paddingRight="@dimen/content_padding"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="italic" />
+        <TextView
+            android:id="@+id/commit_changed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/overview_item_spacing"
+            android:layout_marginBottom="@dimen/overview_header_spacing"
+            android:layout_marginLeft="@dimen/content_padding"
+            android:layout_marginRight="@dimen/content_padding"
+            style="@style/HeaderLabel"
+            android:text="@string/commit_changed" />
         <LinearLayout
             android:id="@+id/ll_changed"
             android:orientation="vertical"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/commit_added"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/overview_item_spacing" >
-            <TextView
-                android:id="@+id/commit_changed"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/overview_header_spacing"
-                android:layout_marginLeft="@dimen/content_padding"
-                android:layout_marginRight="@dimen/content_padding"
-                style="@style/HeaderLabel"
-                android:text="@string/commit_changed" />
-        </LinearLayout>
+            android:layout_marginTop="@dimen/overview_item_spacing"
+            android:layout_marginBottom="@dimen/overview_header_spacing"
+            android:layout_marginLeft="@dimen/content_padding"
+            android:layout_marginRight="@dimen/content_padding"
+            style="@style/HeaderLabel"
+            android:text="@string/commit_added" />
         <LinearLayout
             android:id="@+id/ll_added"
             android:orientation="vertical"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/commit_renamed"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/overview_item_spacing" >
-            <TextView
-                android:id="@+id/commit_added"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/overview_header_spacing"
-                android:layout_marginLeft="@dimen/content_padding"
-                android:layout_marginRight="@dimen/content_padding"
-                style="@style/HeaderLabel"
-                android:text="@string/commit_added" />
-        </LinearLayout>
+            android:layout_marginTop="@dimen/overview_item_spacing"
+            android:layout_marginBottom="@dimen/overview_header_spacing"
+            android:layout_marginLeft="@dimen/content_padding"
+            android:layout_marginRight="@dimen/content_padding"
+            style="@style/HeaderLabel"
+            android:text="@string/commit_renamed" />
         <LinearLayout
             android:id="@+id/ll_renamed"
             android:orientation="vertical"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/commit_deleted"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/overview_item_spacing" >
-            <TextView
-                android:id="@+id/commit_renamed"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/overview_header_spacing"
-                android:layout_marginLeft="@dimen/content_padding"
-                android:layout_marginRight="@dimen/content_padding"
-                style="@style/HeaderLabel"
-                android:text="@string/commit_renamed" />
-        </LinearLayout>
+            android:layout_marginTop="@dimen/overview_item_spacing"
+            android:layout_marginBottom="@dimen/overview_header_spacing"
+            android:layout_marginLeft="@dimen/content_padding"
+            android:layout_marginRight="@dimen/content_padding"
+            style="@style/HeaderLabel"
+            android:text="@string/commit_deleted" />
         <LinearLayout
             android:id="@+id/ll_deleted"
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/overview_item_spacing" >
-            <TextView
-                android:id="@+id/commit_deleted"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/overview_header_spacing"
-                android:layout_marginLeft="@dimen/content_padding"
-                android:layout_marginRight="@dimen/content_padding"
-                style="@style/HeaderLabel"
-                android:text="@string/commit_deleted" />
-        </LinearLayout>
+            android:layout_height="wrap_content" />
     </LinearLayout>
 </ScrollView>
