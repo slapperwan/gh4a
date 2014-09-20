@@ -244,8 +244,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
 
         } else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
             PullRequestReviewCommentPayload payload = (PullRequestReviewCommentPayload) event.getPayload();
-            IntentUtils.openCommitInfoActivity(getActivity(), repoOwner, repoName,
-                    payload.getComment().getCommitId(), 0);
+            IntentUtils.openPullRequestActivity(getActivity(), repoOwner, repoName, payload.getPullRequest().getNumber());
 
         } else if (Event.TYPE_PUSH.equals(eventType)) {
             PushPayload payload = (PushPayload) event.getPayload();

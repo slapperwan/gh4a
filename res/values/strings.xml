@@ -139,7 +139,7 @@
     <string name="event_watch_title">%1$s starred %2$s</string>
     <string name="event_gist_title">%1$s %2$s gist: %3$s</string>
     <string name="event_fork_title">%1$s forked %2$s</string>
-    <string name="event_commit_comment_title">%1$s commented on %2$s</string>
+    <string name="event_commit_comment_title">%1$s commented on commit %2$s@%3$s</string>
     <string name="event_fork_apply_title">%1$s applied fork commits to %2$s</string>
     <string name="event_follow_title">%1$s started following %2$s</string>
     <string name="event_create_repo_title">%1$s created repository %2$s</string>
@@ -148,12 +148,13 @@
     <string name="event_delete_repo_title">%1$s deleted repository %2$s</string>
     <string name="event_delete_branch_title">%1$s deleted %2$s %3$s at %4$s</string>
     <string name="event_pull_request_title">%1$s %2$s pull request %3$s on %4$s</string>
+    <string name="event_pull_request_review_comment_title">%1$s commented on pull request %2$s#%3$s</string>
     <string name="event_member_title">%1$s added %2$s to %3$s</string>
     <string name="event_download_title">%1$s uploaded a file to %2$s</string>
     <string name="event_gollum_title">%1$s edited page in the %2$s wiki</string>
     <string name="event_public_title">%1$s open sourced %2$s</string>
     <string name="event_release_title">%1$s created a release in %2$s</string>
-    <string name="event_issue_comment">%1$s commented on %2$s %3$s on %4$s</string>
+    <string name="event_issue_comment">%1$s commented on %2$s %3$s#%4$s</string>
 
     <string name="event_pull_request_desc">%1$s\n%2$d commits with %3$d additions and %4$d deletions</string>
     <string name="event_follow_desc">%1$s has %2$d repositories and %3$d followers</string>

@@ -136,8 +136,7 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
             CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
             CommitComment comment = payload.getComment();
             if (comment != null) {
-                return res.getString(R.string.event_commit_comment_desc,
-                        comment.getCommitId().substring(0, 7), comment.getBody());
+                return comment.getBody();
             }
 
         } else if (Event.TYPE_CREATE.equals(eventType)) {
@@ -201,8 +200,7 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
             PullRequestReviewCommentPayload payload = (PullRequestReviewCommentPayload) event.getPayload();
             CommitComment comment = payload.getComment();
             if (comment != null) {
-                return res.getString(R.string.event_commit_comment_desc,
-                        comment.getCommitId().substring(0, 7), comment.getBody());
+                return comment.getBody();
             }
 
         } else if (Event.TYPE_PUSH.equals(eventType)) {
@@ -267,8 +265,9 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         }
 
         if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
+            CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
             return res.getString(R.string.event_commit_comment_title,
-                    actor.getLogin(), formatFromRepoName(eventRepo));
+                    actor.getLogin(), formatFromRepoName(eventRepo), payload.getComment().getCommitId().substring(0, 7));
 
         } else if (Event.TYPE_CREATE.equals(eventType)) {
             CreatePayload payload = (CreatePayload) event.getPayload();
@@ -340,7 +339,7 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
                 }
 
                 return res.getString(R.string.event_issue_comment,
-                        actor.getLogin(), type, payload.getIssue().getNumber(), formatFromRepoName(eventRepo));
+                        actor.getLogin(), type, formatFromRepoName(eventRepo), payload.getIssue().getNumber());
             }
         } else if (Event.TYPE_ISSUES.equals(eventType)) {
             IssuesPayload eventPayload = (IssuesPayload) event.getPayload();
@@ -365,8 +364,9 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
                     payload.getNumber(), formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
-            return res.getString(R.string.event_commit_comment_title,
-                    actor.getLogin(), formatFromRepoName(eventRepo));
+            PullRequestReviewCommentPayload payload = (PullRequestReviewCommentPayload) event.getPayload();
+            return res.getString(R.string.event_pull_request_review_comment_title,
+                    actor.getLogin(), formatFromRepoName(eventRepo), payload.getPullRequest().getNumber());
 
         } else if (Event.TYPE_PUSH.equals(eventType)) {
             PushPayload payload = (PushPayload) event.getPayload();
