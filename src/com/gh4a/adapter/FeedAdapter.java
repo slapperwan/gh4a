@@ -16,11 +16,12 @@
 package com.gh4a.adapter;
 
 import java.util.List;
-import java.util.Locale;
 
 import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.Gist;
 import org.eclipse.egit.github.core.GollumPage;
+import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.User;
@@ -47,6 +48,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
 import android.text.style.TextAppearanceSpan;
@@ -62,6 +64,7 @@ import com.gh4a.R;
 import com.gh4a.utils.GravatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.widget.CustomTypefaceSpan;
 
 public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
     public FeedAdapter(Context context) {
@@ -74,18 +77,17 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         ViewHolder viewHolder = new ViewHolder();
 
         Gh4Application app = (Gh4Application) mContext.getApplicationContext();
-        Typeface boldCondensed = app.boldCondensed;
-        Typeface regular = app.regular;
 
         viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
         viewHolder.ivGravatar.setOnClickListener(this);
 
         viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvTitle.setTypeface(boldCondensed);
+        viewHolder.tvTitle.setTypeface(app.condensed);
 
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvDesc.setTypeface(regular);
+        viewHolder.tvDesc.setTypeface(app.regular);
 
+        viewHolder.tvCreatedAt = (TextView) v.findViewById(R.id.tv_created_at);
         viewHolder.llPushDesc = (ViewGroup) v.findViewById(R.id.ll_push_desc);
 
         v.setTag(viewHolder);
@@ -100,12 +102,9 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         GravatarHandler.assignGravatar(viewHolder.ivGravatar, actor);
         viewHolder.ivGravatar.setTag(actor);
 
-        SpannableString createdAt = new SpannableString(
-                StringUtils.formatRelativeTime(mContext, event.getCreatedAt(), false));
-        createdAt.setSpan(new TextAppearanceSpan(v.getContext(), R.style.default_text_small_italic),
-                0, createdAt.length(), 0);
-
-        viewHolder.tvTitle.setText(TextUtils.concat(formatTitle(event), " ", createdAt));
+        viewHolder.tvTitle.setText(applyCustomTags(formatTitle(event)));
+        viewHolder.tvCreatedAt.setText(StringUtils.formatRelativeTime(
+                mContext, event.getCreatedAt(), false));
 
         String content = formatDescription(event, viewHolder);
         viewHolder.tvDesc.setText(content);
@@ -197,7 +196,8 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
             }
 
         } else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
-            PullRequestReviewCommentPayload payload = (PullRequestReviewCommentPayload) event.getPayload();
+            PullRequestReviewCommentPayload payload =
+                    (PullRequestReviewCommentPayload) event.getPayload();
             CommitComment comment = payload.getComment();
             if (comment != null) {
                 return comment.getBody();
@@ -254,6 +254,29 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         return null;
     }
 
+    private CharSequence applyCustomTags(String input) {
+        SpannableStringBuilder ssb = new SpannableStringBuilder();
+        Typeface boldCondensed = Gh4Application.get(mContext).boldCondensed;
+        int pos = 0;
+
+        while (pos >= 0) {
+            int start = input.indexOf("[b]", pos);
+            int end = input.indexOf("[/b]", pos);
+            if (start >= 0 && end >= 0) {
+                int tokenLength = end - start - 3 /* length of [b] */;
+                ssb.append(input.substring(pos, start));
+                ssb.append(input.substring(start + 3, end));
+                ssb.setSpan(new CustomTypefaceSpan(boldCondensed),
+                        ssb.length() - tokenLength, ssb.length(), 0);
+                pos = end + 4;
+            } else {
+                ssb.append(input.substring(pos, input.length()));
+                pos = -1;
+            }
+        }
+        return ssb;
+    }
+
     private String formatTitle(Event event) {
         String eventType = event.getType();
         EventRepository eventRepo = event.getRepo();
@@ -267,19 +290,18 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
             CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
             return res.getString(R.string.event_commit_comment_title,
-                    actor.getLogin(), formatFromRepoName(eventRepo), payload.getComment().getCommitId().substring(0, 7));
+                    actor.getLogin(), payload.getComment().getCommitId().substring(0, 7),
+                    formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_CREATE.equals(eventType)) {
             CreatePayload payload = (CreatePayload) event.getPayload();
-            if ("repository".equals(payload.getRefType())) {
+            String type = payload.getRefType();
+            if ("repository".equals(type)) {
                 return res.getString(R.string.event_create_repo_title,
                         actor.getLogin(), formatFromRepoName(eventRepo));
-            } else if ("branch".equals(payload.getRefType()) || "tag".equals(payload.getRefType())) {
+            } else if ("branch".equals(type) || "tag".equals(type)) {
                 return res.getString(R.string.event_create_branch_title,
-                        actor.getLogin(), payload.getRefType(), payload.getRef(),
-                        formatFromRepoName(eventRepo));
-            } else {
-                return actor.getLogin();
+                        actor.getLogin(), type, payload.getRef(), formatFromRepoName(eventRepo));
             }
 
         } else if (Event.TYPE_DELETE.equals(eventType)) {
@@ -312,35 +334,39 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
 
         } else if (Event.TYPE_GIST.equals(eventType)) {
             GistPayload payload = (GistPayload) event.getPayload();
+            Gist gist = payload.getGist();
             String login = actor.getLogin();
-            if (StringUtils.isBlank(login) && payload.getGist() != null
-                    && payload.getGist().getUser() != null) {
-                login = payload.getGist().getUser().getLogin();
+            if (TextUtils.isEmpty(login)) {
+                if (gist != null && gist.getUser() != null) {
+                    login = gist.getUser().getLogin();
+                } else {
+                    login = mContext.getString(R.string.unknown);
+                }
             }
 
-            String id = payload.getGist() != null
-                    ? payload.getGist().getId() : mContext.getString(R.string.deleted);
-                    return res.getString(R.string.event_gist_title,
-                            !StringUtils.isBlank(login) ? login : mContext.getString(R.string.unknown),
-                                    payload.getAction(), id);
+            String id = gist != null ? gist.getId() : mContext.getString(R.string.deleted);
+            int resId = TextUtils.equals(payload.getAction(), "update")
+                    ? R.string.event_update_gist_title : R.string.event_create_gist_title;
+            return res.getString(resId, login, id);
 
         } else if (Event.TYPE_GOLLUM.equals(eventType)) {
-            return res.getString(R.string.event_gollum_title,
-                    actor.getLogin(), formatFromRepoName(eventRepo));
+            GollumPayload payload = (GollumPayload) event.getPayload();
+            List<GollumPage> pages = payload.getPages();
+            int count = pages == null ? 0 : pages.size();
+            return res.getString(R.string.event_gollum_title, actor.getLogin(),
+                    res.getQuantityString(R.plurals.page, count, count),
+                    formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
             IssueCommentPayload payload = (IssueCommentPayload) event.getPayload();
-            String type = mContext.getResources().getString(R.string.issue).toLowerCase(Locale.getDefault());
-            if (payload.getIssue() != null) {
-                if (payload.getIssue().getPullRequest() != null
-                        && payload.getIssue().getPullRequest().getHtmlUrl() != null) {
-                    type = mContext.getResources().getString(
-                            R.string.pull_request_title).toLowerCase(Locale.getDefault());
-                }
-
-                return res.getString(R.string.event_issue_comment,
-                        actor.getLogin(), type, formatFromRepoName(eventRepo), payload.getIssue().getNumber());
+            Issue issue = payload.getIssue();
+            if (issue != null) {
+                int formatResId = issue.getPullRequest() != null
+                        ? R.string.event_pull_request_comment : R.string.event_issue_comment;
+                return res.getString(formatResId, actor.getLogin(),
+                        issue.getNumber(), formatFromRepoName(eventRepo));
             }
+
         } else if (Event.TYPE_ISSUES.equals(eventType)) {
             IssuesPayload eventPayload = (IssuesPayload) event.getPayload();
             return res.getString(R.string.event_issues_title,
@@ -364,9 +390,11 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
                     payload.getNumber(), formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
-            PullRequestReviewCommentPayload payload = (PullRequestReviewCommentPayload) event.getPayload();
+            PullRequestReviewCommentPayload payload =
+                    (PullRequestReviewCommentPayload) event.getPayload();
             return res.getString(R.string.event_pull_request_review_comment_title,
-                    actor.getLogin(), formatFromRepoName(eventRepo), payload.getPullRequest().getNumber());
+                    actor.getLogin(), payload.getPullRequest().getNumber(),
+                    formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_PUSH.equals(eventType)) {
             PushPayload payload = (PushPayload) event.getPayload();
@@ -418,6 +446,7 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         public ImageView ivGravatar;
         public TextView tvTitle;
         public TextView tvDesc;
+        public TextView tvCreatedAt;
         public ViewGroup llPushDesc;
     }
 }
