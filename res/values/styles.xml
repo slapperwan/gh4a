@@ -17,6 +17,10 @@
         <item name="android:textColor">@color/highlight</item>
     </style>
 
+    <style name="small_highlighted_sha" parent="default_text_small_url">
+        <item name="android:typeface">monospace</item>
+    </style>
+
     <style name="default_text_micro_url" parent="@android:style/TextAppearance.Small">
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/highlight</item>

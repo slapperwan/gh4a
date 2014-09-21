@@ -47,11 +47,10 @@ import org.eclipse.egit.github.core.event.ReleasePayload;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Typeface;
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
-import android.text.TextUtils.TruncateAt;
 import android.text.style.TextAppearanceSpan;
+import android.text.style.TypefaceSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -65,6 +64,7 @@ import com.gh4a.utils.GravatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.CustomTypefaceSpan;
+import com.gh4a.widget.EllipsizeLineSpan;
 
 public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
     public FeedAdapter(Context context) {
@@ -88,7 +88,6 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         viewHolder.tvDesc.setTypeface(app.regular);
 
         viewHolder.tvCreatedAt = (TextView) v.findViewById(R.id.tv_created_at);
-        viewHolder.llPushDesc = (ViewGroup) v.findViewById(R.id.ll_push_desc);
 
         v.setTag(viewHolder);
         return v;
@@ -106,7 +105,7 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         viewHolder.tvCreatedAt.setText(StringUtils.formatRelativeTime(
                 mContext, event.getCreatedAt(), false));
 
-        String content = formatDescription(event, viewHolder);
+        CharSequence content = formatDescription(event);
         viewHolder.tvDesc.setText(content);
         viewHolder.tvDesc.setVisibility(content != null ? View.VISIBLE : View.GONE);
     }
@@ -119,7 +118,7 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         }
     }
 
-    private String formatDescription(Event event, ViewHolder viewHolder) {
+    private CharSequence formatDescription(Event event) {
         String eventType = event.getType();
         EventRepository eventRepo = event.getRepo();
 
@@ -128,8 +127,6 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         }
 
         Resources res = mContext.getResources();
-
-        viewHolder.llPushDesc.setVisibility(View.GONE);
 
         if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
             CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
@@ -204,44 +201,43 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
             }
 
         } else if (Event.TYPE_PUSH.equals(eventType)) {
-            viewHolder.llPushDesc.setVisibility(View.VISIBLE);
-            viewHolder.llPushDesc.removeAllViews();
-
             PushPayload payload = (PushPayload) event.getPayload();
             List<Commit> commits = payload.getCommits();
 
-            if (commits != null) {
-                Gh4Application app = (Gh4Application) mContext.getApplicationContext();
-                Typeface regular = app.regular;
-                Typeface italic = app.italic;
+            if (commits != null && !commits.isEmpty()) {
+                SpannableStringBuilder ssb = new SpannableStringBuilder();
+                float density = mContext.getResources().getDisplayMetrics().density;
+                int bottomMargin = Math.round(2 /* dp */ * density);
+                int count = commits.size();
 
-                for (int i = 0; i < commits.size() && i < 3; i++) {
+                for (int i = 0; i < count && i < 3; i++) {
                     Commit commit = commits.get(i);
-                    SpannableString spannableSha = new SpannableString(commit.getSha().substring(0, 7));
-
-                    if (eventRepo != null) {
-                        spannableSha.setSpan(new TextAppearanceSpan(mContext,
-                                R.style.default_text_small_url), 0, spannableSha.length(), 0);
-                    } else {
-                        spannableSha = new SpannableString(mContext.getString(R.string.deleted));
+                    if (i != 0) {
+                        ssb.append("\n");
                     }
 
-                    TextView tvCommitMsg = new TextView(mContext);
-                    tvCommitMsg.setText(spannableSha);
-                    tvCommitMsg.append(" " + commit.getMessage());
-                    tvCommitMsg.setSingleLine(true);
-                    tvCommitMsg.setEllipsize(TruncateAt.END);
-                    tvCommitMsg.setTextAppearance(mContext, android.R.style.TextAppearance_Small);
-                    tvCommitMsg.setTypeface(regular);
-                    viewHolder.llPushDesc.addView(tvCommitMsg);
+                    int lastLength = ssb.length();
+                    String sha = commit.getSha().substring(0, 7);
+
+                    ssb.append(sha);
+                    ssb.setSpan(new TextAppearanceSpan(mContext, R.style.small_highlighted_sha),
+                            ssb.length() - sha.length(), ssb.length(), 0);
+
+                    ssb.append(" ");
+                    ssb.append(getFirstLine(commit.getMessage()));
+                    ssb.setSpan(new EllipsizeLineSpan(i == (count - 1) ? 0 : bottomMargin),
+                            lastLength, ssb.length(), 0);
                 }
-                if (commits.size() > 3) {
-                    TextView tvMoreMsg = new TextView(mContext);
-                    String text = res.getString(R.string.event_push_desc, commits.size() - 3);
-                    tvMoreMsg.setText(text);
-                    tvMoreMsg.setTypeface(italic);
-                    viewHolder.llPushDesc.addView(tvMoreMsg);
+                if (count > 3) {
+                    String text = res.getString(R.string.event_push_desc, count - 3);
+                    ssb.append("\n");
+                    ssb.append(text);
+                    ssb.setSpan(new CustomTypefaceSpan(Gh4Application.get(mContext).italic),
+                            ssb.length() - text.length(), ssb.length(), 0);
                 }
+                return ssb;
+            } else if (eventRepo == null) {
+                return mContext.getString(R.string.deleted);
             }
 
         } else if (Event.TYPE_RELEASE.equals(eventType)) {
@@ -252,6 +248,17 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         }
 
         return null;
+    }
+
+    private String getFirstLine(String input) {
+        if (input == null) {
+            return null;
+        }
+        int pos = input.indexOf('\n');
+        if (pos < 0) {
+            return input;
+        }
+        return input.substring(0, pos);
     }
 
     private CharSequence applyCustomTags(String input) {
@@ -447,6 +454,5 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         public TextView tvTitle;
         public TextView tvDesc;
         public TextView tvCreatedAt;
-        public ViewGroup llPushDesc;
     }
 }
