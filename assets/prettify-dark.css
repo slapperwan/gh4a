@@ -1,1 +1,84 @@
-body{margin:0}.pln{color:#F1F2F3}.str{color:#EC7600}.kwd{color:#93C763}.com{color:#555;font-style:italic}.typ{color:#678CB1}.lit{color:#FACD22}.clo,.opn,.pun{color:#F1F2F3}.tag{color:#8AC763}.atn{color:#E0E2E4}.atv{color:#EC7600}.dec{color:purple}.var{color:#ff9da4}.fun{color:#bbdaff}pre.prettyprint{background-color:#111;padding:6px;display:table}}ol.linenums li{color:#7285b7;list-style-type:none;counter-increment:linenumber;}ol.linenums li:before{content: counter(linenumber);float:left;margin-left:-4em;text-align:right;width:3em;}li.L0,li.L1,li.L2,li.L3,li.L4,li.L5,li.L6,li.L7,li.L8,li.L9{color:#555}li.L1,li.L3,li.L5,li.L7,li.L9{background:#111}
+body {
+    margin: 0;
+}
+
+.pln {
+    color: #F1F2F3;
+}
+
+.str {
+    color: #EC7600;
+}
+
+.kwd {
+    color: #93C763;
+}
+
+.com {
+    color: #555;
+    font-style: italic;
+}
+
+.typ {
+    color: #678CB1;
+}
+
+.lit {
+    color: #FACD22;
+}
+
+.clo,.opn,.pun {
+    color: #F1F2F3;
+}
+
+.tag {
+    color: #8AC763;
+}
+
+.atn {
+    color: #E0E2E4;
+}
+
+.atv {
+    color: #EC7600;
+}
+
+.dec {
+    color: purple;
+}
+
+.var {
+    color: #ff9da4;
+}
+
+.fun {
+    color: #bbdaff;
+}
+
+pre.prettyprint {
+    background-color: #111;
+    padding: 6px;
+    display: table;
+}}
+
+ol.linenums li {
+    color: #7285b7;
+    list-style-type: none;
+    counter-increment: linenumber;
+}
+
+ol.linenums li:before {
+    content: counter(linenumber);
+    float: left;
+    margin-left: -4em;
+    text-align: right;
+    width: 3em;
+}
+
+li.L0,li.L1,li.L2,li.L3,li.L4,li.L5,li.L6,li.L7,li.L8,li.L9 {
+    color: #555;
+}
+
+li.L1,li.L3,li.L5,li.L7,li.L9 {
+    background: #111;
+}

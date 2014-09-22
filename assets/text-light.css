@@ -1,1 +1,30 @@
-body{font-family:Helvetica,arial,sans-serif;font-size:12px;line-height:1.4;background-color:#F7F7F9;color:#48484C;margin:0}pre{display:table;padding:6px}.change{background-color:#9ea1a1;color:#eee}.add{background-color:#DFD}.remove{background-color:#FDD}.comment{white-space:normal}
+body {
+    font-family: Helvetica,arial,sans-serif;
+    font-size: 12px;
+    line-height: 1.4;
+    background-color: #F7F7F9;
+    color: #48484C;
+    margin: 0;
+}
+
+pre {
+    display: table;
+    padding: 6px;
+}
+
+.change {
+    background-color: #9ea1a1;
+    color: #eee;
+}
+
+.add {
+    background-color: #DFD;
+}
+
+.remove {
+    background-color: #FDD;
+}
+
+.comment {
+    white-space: normal;
+}
