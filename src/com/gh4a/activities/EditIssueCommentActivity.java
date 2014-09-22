@@ -10,13 +10,18 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
+import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
+import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.service.IssueService;
+
 import java.io.IOException;
 
-public abstract class EditCommentActivity extends BaseSherlockFragmentActivity {
+public class EditIssueCommentActivity extends BaseSherlockFragmentActivity {
     protected String mRepoOwner;
     protected String mRepoName;
     private long mCommentId;
@@ -81,22 +86,25 @@ public abstract class EditCommentActivity extends BaseSherlockFragmentActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    protected abstract void updateComment(long id, String text) throws IOException;
-    protected abstract void deleteComment(long id) throws IOException;
-
     private class EditCommentTask extends ProgressDialogTask<Void> {
         private long mId;
         private String mBody;
 
         public EditCommentTask(long id, String body) {
-            super(EditCommentActivity.this, 0, R.string.saving_msg);
+            super(EditIssueCommentActivity.this, 0, R.string.saving_msg);
             mId = id;
             mBody = body;
         }
 
         @Override
         protected Void run() throws Exception {
-            updateComment(mId, mBody);
+            Gh4Application app = Gh4Application.get(EditIssueCommentActivity.this);
+            IssueService issueService = (IssueService) app.getService(Gh4Application.ISSUE_SERVICE);
+
+            Comment comment = new Comment();
+            comment.setBody(mBody);
+            comment.setId(mId);
+            issueService.editComment(new RepositoryId(mRepoOwner, mRepoName), comment);
             return null;
         }
 
@@ -111,13 +119,16 @@ public abstract class EditCommentActivity extends BaseSherlockFragmentActivity {
         private long mId;
 
         public DeleteCommentTask(long id) {
-            super(EditCommentActivity.this, 0, R.string.deleting_msg);
+            super(EditIssueCommentActivity.this, 0, R.string.deleting_msg);
             mId = id;
         }
 
         @Override
         protected Void run() throws Exception {
-            deleteComment(mId);
+            Gh4Application app = Gh4Application.get(EditIssueCommentActivity.this);
+            IssueService issueService = (IssueService) app.getService(Gh4Application.ISSUE_SERVICE);
+
+            issueService.deleteComment(new RepositoryId(mRepoOwner, mRepoName), mId);
             return null;
         }
 

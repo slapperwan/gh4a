@@ -399,7 +399,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
 
     @Override
     public void editComment(Comment comment) {
-        Intent intent = new Intent(this, EditCommitCommentActivity.class);
+        Intent intent = new Intent(this, EditIssueCommentActivity.class);
 
         intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.NAME, mRepoName);
