@@ -98,7 +98,7 @@ public abstract class WebViewerActivity extends LoadingFragmentActivity {
         s.setLoadsImagesAutomatically(true);
         s.setSupportZoom(true);
         s.setJavaScriptEnabled(true);
-        s.setUseWideViewPort(true);
+        s.setUseWideViewPort(false);
         applyDefaultTextSize(s);
 
         mWebView.setBackgroundColor(ThemeUtils.getWebViewBackgroundColor(Gh4Application.THEME));
