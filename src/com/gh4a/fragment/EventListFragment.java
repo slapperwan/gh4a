@@ -149,7 +149,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         }
 
         if (Arrays.binarySearch(REPO_EVENTS, eventType) >= 0 && eventRepo == null) {
-            ToastUtils.notFoundMessage(getActivity(), R.plurals.repository);
+            ToastUtils.notFoundMessage(getActivity(), R.string.repository);
             return;
         }
 
@@ -188,7 +188,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             if (forkee != null) {
                 IntentUtils.openRepositoryInfoActivity(getActivity(), forkee);
             } else {
-                ToastUtils.notFoundMessage(getActivity(), R.plurals.repository);
+                ToastUtils.notFoundMessage(getActivity(), R.string.repository);
             }
 
         } else if (Event.TYPE_FORK_APPLY.equals(eventType)) {
@@ -413,7 +413,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
                     IntentUtils.openCommitInfoActivity(getActivity(), repoOwner, repoName, sha, 0);
                 }
             } else {
-                ToastUtils.notFoundMessage(getActivity(), R.plurals.repository);
+                ToastUtils.notFoundMessage(getActivity(), R.string.repository);
             }
         } else if (id == MENU_OPEN_ISSUES) {
             IntentUtils.openIssueListActivity(getActivity(), repoOwner, repoName,
@@ -445,7 +445,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             if (forkee != null) {
                 IntentUtils.openRepositoryInfoActivity(getActivity(), forkee);
             } else {
-                ToastUtils.notFoundMessage(getActivity(), R.plurals.repository);
+                ToastUtils.notFoundMessage(getActivity(), R.string.repository);
             }
         } else if (id == MENU_WIKI_IN_BROWSER) {
             GollumPayload payload = (GollumPayload) event.getPayload();

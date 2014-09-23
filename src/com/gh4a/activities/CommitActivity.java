@@ -54,8 +54,7 @@ public class CommitActivity extends LoadingFragmentPagerActivity {
         mObjectSha = data.getString(Constants.Object.OBJECT_SHA);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(getResources().getQuantityString(R.plurals.commit, 1)
-                + " " + mObjectSha.substring(0, 7));
+        actionBar.setTitle(getString(R.string.commit, mObjectSha.substring(0, 7)));
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
     }

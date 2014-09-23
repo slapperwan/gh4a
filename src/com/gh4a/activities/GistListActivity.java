@@ -72,7 +72,7 @@ public class GistListActivity extends LoadingFragmentActivity implements OnItemC
         setContentShown(false);
 
         ActionBar mActionBar = getSupportActionBar();
-        mActionBar.setTitle(getResources().getQuantityString(R.plurals.gist, 0));
+        mActionBar.setTitle(R.string.gists);
         mActionBar.setSubtitle(mUserLogin);
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
@@ -88,7 +88,7 @@ public class GistListActivity extends LoadingFragmentActivity implements OnItemC
             adapter.addAll(gists);
             listView.setAdapter(adapter);
         } else {
-            ToastUtils.notFoundMessage(this, R.plurals.gist);
+            ToastUtils.notFoundMessage(this, R.string.gist);
         }
     }
 

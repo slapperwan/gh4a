@@ -81,7 +81,7 @@ public class IntentUtils {
             intent.putExtra(Constants.Repository.NAME, repository.getName());
             context.startActivity(intent);
         } else {
-            ToastUtils.notFoundMessage(context, R.plurals.repository);
+            ToastUtils.notFoundMessage(context, R.string.repository);
         }
     }
 

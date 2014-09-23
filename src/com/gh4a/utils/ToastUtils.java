@@ -16,10 +16,8 @@ public class ToastUtils {
         Toast.makeText(context, context.getString(resId), Toast.LENGTH_SHORT).show();
     }
 
-    public static void notFoundMessage(Context context, int pluralsId) {
-        Resources res = context.getResources();
-        Toast.makeText(context, res.getString(R.string.record_not_found,
-                res.getQuantityString(pluralsId, 1)), Toast.LENGTH_SHORT).show();
+    public static void notFoundMessage(Context context, int stringId) {
+        notFoundMessage(context, context.getString(stringId));
     }
 
     public static void notFoundMessage(Context context, String object) {

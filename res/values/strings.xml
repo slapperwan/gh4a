@@ -100,8 +100,8 @@
     <string name="copyright_notice">\u00a9 2014 Azwan Adli, Danny Baumann</string>
 
     <plurals name="file">
-        <item quantity="one">File</item>
-        <item quantity="other">Files</item>
+        <item quantity="one">%1$d File</item>
+        <item quantity="other">%1$d Files</item>
     </plurals>
 
     <plurals name="contributor_extra_data">
@@ -187,10 +187,7 @@
     <string name="user_unfollow_action">Unfollow</string>
 
     <!-- Repository -->
-    <plurals name="repository">
-        <item quantity="one">Repository</item>
-        <item quantity="other">Repositories</item>
-    </plurals>
+    <string name="repository">Repository</string>
     <string name="repo_forks">Forks</string>
     <string name="repo_language">Language %1$s</string>
     <string name="repo_watchers">Watchers</string>
@@ -210,10 +207,7 @@
     <string name="repo_issue_on">on %1$s</string>
 
     <!-- Commit -->
-    <plurals name="commit">
-        <item quantity="one">Commit</item>
-        <item quantity="other">Commits</item>
-    </plurals>
+    <string name="commit">Commit %1$s</string>
     <string name="commits">Commits</string>
     <string name="commit_changed">Files Changed</string>
     <string name="commit_added">Files Added</string>
@@ -312,10 +306,7 @@
     <string name="object_view_file_at">View file @ %1$s</string>
 
     <!-- Gist -->
-    <plurals name="gist">
-        <item quantity="one">Gist</item>
-        <item quantity="other">Gists</item>
-    </plurals>
+    <string name="gist">Gist</string>
     <string name="gists">Gists</string>
     <string name="gist_title">Gist %1$s</string>
     <string name="gist_files">Files</string>
