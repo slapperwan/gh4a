@@ -42,7 +42,7 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.OrganizationListLoader;
 import com.gh4a.loader.RepositoryListLoader;
 import com.gh4a.loader.UserLoader;
-import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
@@ -168,7 +168,7 @@ public class UserFragment extends SherlockProgressFragment implements View.OnCli
         });
 
         ImageView gravatar = (ImageView) mContentView.findViewById(R.id.iv_gravatar);
-        GravatarHandler.assignGravatar(gravatar, mUser);
+        AvatarHandler.assignAvatar(gravatar, mUser);
 
         TextView tvFollowersCount = (TextView) mContentView.findViewById(R.id.tv_followers_count);
         tvFollowersCount.setText(String.valueOf(mUser.getFollowers()));

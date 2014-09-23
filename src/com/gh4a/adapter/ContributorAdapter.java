@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
@@ -48,7 +48,7 @@ public class ContributorAdapter extends RootAdapter<Contributor> implements OnCl
     protected void bindView(View v, Contributor contributor) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
 
-        GravatarHandler.assignGravatar(viewHolder.ivGravatar,
+        AvatarHandler.assignAvatar(viewHolder.ivGravatar,
                 contributor.getId(), contributor.getAvatarUrl());
         viewHolder.ivGravatar.setTag(contributor);
 

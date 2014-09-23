@@ -26,7 +26,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.R;
-import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
@@ -62,7 +62,7 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements OnC
     protected void bindView(View v, CommitComment comment) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
 
-        GravatarHandler.assignGravatar(viewHolder.ivGravatar, comment.getUser());
+        AvatarHandler.assignAvatar(viewHolder.ivGravatar, comment.getUser());
 
         viewHolder.ivGravatar.setTag(comment);
         viewHolder.tvExtra.setText(comment.getUser().getLogin() + "\n"

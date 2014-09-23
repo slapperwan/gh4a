@@ -30,7 +30,7 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.holder.Feed;
-import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 
 public class CommonFeedAdapter extends RootAdapter<Feed> implements OnClickListener {
@@ -78,7 +78,7 @@ public class CommonFeedAdapter extends RootAdapter<Feed> implements OnClickListe
         viewHolder.tvDesc.setGravity(mShowExtra ? Gravity.TOP : Gravity.CENTER_VERTICAL);
 
         if (mShowExtra && feed.getUserId() > 0) {
-            GravatarHandler.assignGravatar(viewHolder.ivGravatar,
+            AvatarHandler.assignAvatar(viewHolder.ivGravatar,
                     feed.getUserId(), feed.getAvatarUrl());
             viewHolder.ivGravatar.setTag(feed);
             viewHolder.ivGravatar.setVisibility(View.VISIBLE);

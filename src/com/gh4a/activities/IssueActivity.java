@@ -53,7 +53,7 @@ import com.gh4a.loader.IssueCommentListLoader;
 import com.gh4a.loader.IssueLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
@@ -178,7 +178,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
         tvCommentTitle.setText(getString(R.string.issue_comments) + " (" + mIssue.getComments() + ")");
 
         ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
-        GravatarHandler.assignGravatar(ivGravatar, mIssue.getUser());
+        AvatarHandler.assignAvatar(ivGravatar, mIssue.getUser());
         ivGravatar.setOnClickListener(this);
 
         TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
@@ -225,7 +225,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
             tvAssignee.setOnClickListener(this);
 
             ImageView ivAssignee = (ImageView) mHeader.findViewById(R.id.iv_assignee);
-            GravatarHandler.assignGravatar(ivAssignee, mIssue.getAssignee());
+            AvatarHandler.assignAvatar(ivAssignee, mIssue.getAssignee());
             ivAssignee.setVisibility(View.VISIBLE);
             ivAssignee.setOnClickListener(this);
         }

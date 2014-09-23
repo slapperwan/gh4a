@@ -29,7 +29,7 @@ import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
@@ -65,7 +65,7 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> implements OnCl
         ViewHolder viewHolder = (ViewHolder) v.getTag();
         final User user = pullRequest.getUser();
 
-        GravatarHandler.assignGravatar(viewHolder.ivGravatar, user);
+        AvatarHandler.assignAvatar(viewHolder.ivGravatar, user);
         viewHolder.ivGravatar.setTag(pullRequest.getUser());
 
         viewHolder.tvDesc.setText(pullRequest.getTitle());

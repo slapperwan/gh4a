@@ -27,7 +27,7 @@ import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
@@ -69,7 +69,7 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
     protected void bindView(View v, RepositoryIssue issue) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
 
-        GravatarHandler.assignGravatar(viewHolder.ivGravatar, issue.getUser());
+        AvatarHandler.assignAvatar(viewHolder.ivGravatar, issue.getUser());
         viewHolder.ivGravatar.setTag(issue);
         viewHolder.tvNumber.setText(String.valueOf(issue.getNumber()));
 
@@ -94,7 +94,7 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
 
         if (issue.getAssignee() != null) {
             viewHolder.ivAssignee.setVisibility(View.VISIBLE);
-            GravatarHandler.assignGravatar(viewHolder.ivAssignee, issue.getAssignee());
+            AvatarHandler.assignAvatar(viewHolder.ivAssignee, issue.getAssignee());
         } else {
             viewHolder.ivAssignee.setVisibility(View.GONE);
         }

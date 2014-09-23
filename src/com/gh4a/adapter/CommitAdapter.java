@@ -29,7 +29,7 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.CommitUtils;
-import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
@@ -63,7 +63,7 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> implements OnCl
     protected void bindView(View v, RepositoryCommit commit) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
 
-        GravatarHandler.assignGravatar(viewHolder.ivGravatar, commit.getAuthor());
+        AvatarHandler.assignAvatar(viewHolder.ivGravatar, commit.getAuthor());
         viewHolder.ivGravatar.setTag(commit);
 
         String message = commit.getCommit().getMessage();

@@ -58,7 +58,7 @@ import com.gh4a.loader.IssueCommentsLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestLoader;
-import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
@@ -247,7 +247,7 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         ImageView gravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
         gravatar.setOnClickListener(this);
         gravatar.setTag(user);
-        GravatarHandler.assignGravatar(gravatar, user);
+        AvatarHandler.assignAvatar(gravatar, user);
 
         TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
         tvCommentTitle.setText(getString(R.string.issue_comments));

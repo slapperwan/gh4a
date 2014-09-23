@@ -29,7 +29,7 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.FileUtils;
-import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
@@ -74,7 +74,7 @@ public class CommentAdapter extends RootAdapter<Comment> implements OnClickListe
         String ourLogin = Gh4Application.get(mContext).getAuthLogin();
         String login = comment.getUser().getLogin();
 
-        GravatarHandler.assignGravatar(viewHolder.ivGravatar, comment.getUser());
+        AvatarHandler.assignAvatar(viewHolder.ivGravatar, comment.getUser());
 
         String body = comment.getBodyHtml();
         mImageGetter.bind(viewHolder.tvDesc, body, comment.getId());

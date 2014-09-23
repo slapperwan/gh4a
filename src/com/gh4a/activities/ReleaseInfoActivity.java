@@ -37,7 +37,7 @@ import com.gh4a.adapter.DownloadAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MarkdownLoader;
-import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
@@ -100,7 +100,7 @@ public class ReleaseInfoActivity extends LoadingFragmentActivity implements
         });
 
         ImageView gravatar = (ImageView) findViewById(R.id.iv_gravatar);
-        GravatarHandler.assignGravatar(gravatar, mRelease.getAuthor());
+        AvatarHandler.assignAvatar(gravatar, mRelease.getAuthor());
 
         TextView details = (TextView) findViewById(R.id.tv_releaseinfo);
         details.setText(getString(R.string.release_details, mReleaser.getLogin(),

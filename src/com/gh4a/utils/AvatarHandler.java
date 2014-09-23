@@ -28,7 +28,7 @@ import android.widget.ImageView;
 
 import com.gh4a.R;
 
-public class GravatarHandler {
+public class AvatarHandler {
     private static final String TAG = "GravatarHandler";
 
     private static final int MAX_CACHE_SIZE = 100;
@@ -86,16 +86,16 @@ public class GravatarHandler {
         }
     };
 
-    public static void assignGravatar(ImageView view, User user) {
+    public static void assignAvatar(ImageView view, User user) {
         if (user == null) {
-            assignGravatar(view, 0, null);
+            assignAvatar(view, 0, null);
             return;
         }
 
-        assignGravatar(view, user.getId(), user.getAvatarUrl());
+        assignAvatar(view, user.getId(), user.getAvatarUrl());
     }
 
-    public static void assignGravatar(ImageView view, int userId, String url) {
+    public static void assignAvatar(ImageView view, int userId, String url) {
         removeOldRequest(view);
 
         Bitmap bitmap = sCache.get(userId);

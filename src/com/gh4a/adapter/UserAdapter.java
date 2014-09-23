@@ -28,7 +28,7 @@ import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
@@ -66,7 +66,7 @@ public class UserAdapter extends RootAdapter<User> implements OnClickListener {
     protected void bindView(View v, User user) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
 
-        GravatarHandler.assignGravatar(viewHolder.ivGravatar, user);
+        AvatarHandler.assignAvatar(viewHolder.ivGravatar, user);
         viewHolder.ivGravatar.setTag(user);
 
         viewHolder.tvTitle.setText(StringUtils.formatName(user.getLogin(), user.getName()));

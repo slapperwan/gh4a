@@ -29,7 +29,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.FileUtils;
-import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
@@ -145,7 +145,7 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
         final Gh4Application app = Gh4Application.get(activity);
 
         ImageView ivGravatar = (ImageView) mContentView.findViewById(R.id.iv_gravatar);
-        GravatarHandler.assignGravatar(ivGravatar, mCommit.getAuthor());
+        AvatarHandler.assignAvatar(ivGravatar, mCommit.getAuthor());
 
         String login = CommitUtils.getAuthorLogin(mCommit);
         if (login != null) {
@@ -179,7 +179,7 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
             TextView extra = (TextView) committer.findViewById(R.id.tv_commit_extra);
 
             committer.setVisibility(View.VISIBLE);
-            GravatarHandler.assignGravatar(gravatar, mCommit.getCommitter());
+            AvatarHandler.assignAvatar(gravatar, mCommit.getCommitter());
             extra.setText(getString(R.string.commit_details, CommitUtils.getCommitterName(app, mCommit),
                     StringUtils.formatRelativeTime(activity, mCommit.getCommit().getCommitter().getDate(), true)));
         } else {

@@ -60,7 +60,7 @@ import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.GravatarHandler;
+import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.CustomTypefaceSpan;
@@ -98,7 +98,7 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
         User actor = event.getActor();
 
-        GravatarHandler.assignGravatar(viewHolder.ivGravatar, actor);
+        AvatarHandler.assignAvatar(viewHolder.ivGravatar, actor);
         viewHolder.ivGravatar.setTag(actor);
 
         viewHolder.tvTitle.setText(applyCustomTags(formatTitle(event)));
