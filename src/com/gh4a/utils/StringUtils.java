@@ -190,7 +190,10 @@ public class StringUtils {
     }
 
     public static String highlightImage(String imageUrl) {
-        return "<html><body style=\"background-color:#dddddd;margin:auto\">" + "<span class=\"border:solid 1px #333333;\">" + "<img src=\"" + imageUrl + "\" style=\"\"/>" + "</span>" + "</body></html>";
+        return "<html><body style=\"background-color:#dddddd;margin:auto\">"
+                + "<span class=\"border:solid 1px #333333;\">"
+                + "<img src=\"" + imageUrl + "\" style=\"\"/>"
+                + "</span>" + "</body></html>";
     }
 
     public static boolean checkEmail(String email) {
