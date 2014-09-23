@@ -232,9 +232,15 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
     }
 
     private void updateTitle() {
-        mActionBar.setSubtitle(!TextUtils.isEmpty(mSelectedRef)
-                ? mSelectedRef : mRepository.getMasterBranch());
+        mActionBar.setSubtitle(getCurrentRef());
         invalidateFragments();
+    }
+
+    private String getCurrentRef() {
+        if (!TextUtils.isEmpty(mSelectedRef)) {
+            return mSelectedRef;
+        }
+        return mRepository.getMasterBranch();
     }
 
     @Override
@@ -316,7 +322,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.NAME, mRepoName);
         intent.putExtra(Constants.Object.PATH, content.getPath());
-        intent.putExtra(Constants.Object.REF, mSelectedRef);
+        intent.putExtra(Constants.Object.REF, getCurrentRef());
         intent.putExtra(Constants.Object.NAME, content.getName());
         intent.putExtra(Constants.Object.OBJECT_SHA, content.getSha());
         startActivity(intent);

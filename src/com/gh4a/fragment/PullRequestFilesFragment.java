@@ -118,7 +118,8 @@ public class PullRequestFilesFragment extends CommitFragment {
         intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.NAME, mRepoName);
         intent.putExtra(Constants.PullRequest.NUMBER, mPullRequestNumber);
-        intent.putExtra(Constants.Object.OBJECT_SHA, file.getRawUrl().split("/")[6]);
+        intent.putExtra(Constants.Object.REF, file.getRawUrl().split("/")[6]);
+        intent.putExtra(Constants.Object.OBJECT_SHA, file.getSha());
         intent.putExtra(Constants.Commit.DIFF, file.getPatch());
         intent.putExtra(Constants.Commit.COMMENTS, new ArrayList<CommitComment>(mComments));
         intent.putExtra(Constants.Object.PATH, file.getFilename());
