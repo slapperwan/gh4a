@@ -80,41 +80,6 @@ public class StringUtils {
     }
 
     /**
-     * Md5 hex.
-     *
-     * @param s the s
-     * @return the string
-     */
-    public static String md5Hex(String s) {
-        if (StringUtils.isBlank(s)) {
-            return null;
-        }
-        try {
-            MessageDigest md5 = MessageDigest.getInstance("MD5");
-            byte[] digest = md5.digest(s.getBytes());
-            return toHex(digest);
-        } catch (NoSuchAlgorithmException e) {
-            // this won't happen, we know Java has MD5!
-        }
-        return null;
-    }
-
-    /**
-     * To hex.
-     *
-     * @param dataBytes
-     * @return the hex string representation of dataBytes
-     */
-    private static String toHex(byte[] dataBytes) {
-        StringBuilder sb = new StringBuilder(dataBytes.length * 2);
-        for (byte dataByte : dataBytes) {
-            sb.append(Character.forDigit((dataByte & 0xf0) >> 4, 16));
-            sb.append(Character.forDigit(dataByte & 0x0f, 16));
-        }
-        return sb.toString();
-    }
-
-    /**
      * Format name.
      *
      * @param userLogin the user login

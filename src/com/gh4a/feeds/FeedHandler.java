@@ -50,10 +50,7 @@ public class FeedHandler extends DefaultHandler {
             if (localName.equalsIgnoreCase("author")) {
                 mAuthor = true;
             } else if (localName.equalsIgnoreCase("thumbnail")) {
-                String gravatarUrl = attributes.getValue("url");
-                if (gravatarUrl != null) {
-                    mFeed.setGravatar(extractGravatarId(gravatarUrl), gravatarUrl);
-                }
+                mFeed.setAvatarUrl(attributes.getValue("url"));
             } else if (localName.equalsIgnoreCase("link")) {
                 String url = attributes.getValue("href");
                 mFeed.setLink(url);
@@ -89,6 +86,7 @@ public class FeedHandler extends DefaultHandler {
                 if (StringUtils.isBlank(mFeed.getTitle())) {
                     mFeed.setTitle(getTitleFromUrl(mFeed.getLink()));
                 }
+                mFeed.setUserId(determineUserId(mFeed.getAvatarUrl(), mFeed.getAuthor()));
                 mFeeds.add(mFeed);
                 mFeed = null;
             }
@@ -100,23 +98,32 @@ public class FeedHandler extends DefaultHandler {
         return mFeeds;
     }
 
-    private static String extractGravatarId(String url) {
-        Uri uri = Uri.parse(url);
-        String idParam = uri.getQueryParameter("gravatar_id");
-        if (idParam != null) {
-            return idParam;
+    private int determineUserId(String url, String userName) {
+        if (url == null) {
+            return -1;
         }
-        // Construct fake IDs for github's own avatars, they're only used
-        // for identification purposes in GravatarHandler
-        if (TextUtils.equals(uri.getHost(), "avatars.githubusercontent.com")) {
+
+        Uri uri = Uri.parse(url);
+        String host = uri.getHost();
+
+        if (host.startsWith("avatars") && host.contains("githubusercontent.com")) {
             if (uri.getPathSegments().size() == 2) {
-                return "github_" + uri.getLastPathSegment();
+                return Integer.valueOf(uri.getLastPathSegment());
             }
         }
-        return null;
+
+        // We couldn't parse the user ID from the avatar, so construct a fake
+        // user ID for identification purposes in GravatarHandler
+        if (userName != null) {
+            return userName.hashCode();
+        }
+        return -1;
     }
 
     private String getTitleFromUrl(String wikiUrl) {
-        return wikiUrl != null ? wikiUrl.substring(wikiUrl.lastIndexOf("/") + 1, wikiUrl.length()).replaceAll("-", " ") : null;
+        if (wikiUrl == null) {
+            return null;
+        }
+        return wikiUrl.substring(wikiUrl.lastIndexOf("/") + 1, wikiUrl.length()).replaceAll("-", " ");
     }
 }

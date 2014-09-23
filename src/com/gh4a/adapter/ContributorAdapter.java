@@ -49,7 +49,7 @@ public class ContributorAdapter extends RootAdapter<Contributor> implements OnCl
         ViewHolder viewHolder = (ViewHolder) v.getTag();
 
         GravatarHandler.assignGravatar(viewHolder.ivGravatar,
-                contributor.getGravatarId(), contributor.getAvatarUrl());
+                contributor.getId(), contributor.getAvatarUrl());
         viewHolder.ivGravatar.setTag(contributor);
 
         viewHolder.tvTitle.setText(StringUtils.formatName(contributor.getLogin(), contributor.getName()));

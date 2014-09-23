@@ -77,9 +77,9 @@ public class CommonFeedAdapter extends RootAdapter<Feed> implements OnClickListe
         viewHolder.tvDesc.setText(feed.getPreview());
         viewHolder.tvDesc.setGravity(mShowExtra ? Gravity.TOP : Gravity.CENTER_VERTICAL);
 
-        if (mShowExtra && !TextUtils.isEmpty(feed.getGravatarId())) {
+        if (mShowExtra && feed.getUserId() > 0) {
             GravatarHandler.assignGravatar(viewHolder.ivGravatar,
-                    feed.getGravatarId(), feed.getGravatarUrl());
+                    feed.getUserId(), feed.getAvatarUrl());
             viewHolder.ivGravatar.setTag(feed);
             viewHolder.ivGravatar.setVisibility(View.VISIBLE);
         } else {

@@ -26,8 +26,8 @@ public class Feed {
     private String content;
     private String preview;
     private String author;
-    private String gravatarId;
-    private String gravatarUrl;
+    private int userId;
+    private String avatarUrl;
 
     public String getId() {
         return id;
@@ -78,14 +78,16 @@ public class Feed {
     public void setAuthor(String author) {
         this.author = author;
     }
-    public String getGravatarId() {
-        return gravatarId;
+    public int getUserId() {
+        return userId;
     }
-    public String getGravatarUrl() {
-        return gravatarUrl;
+    public String getAvatarUrl() {
+        return avatarUrl;
     }
-    public void setGravatar(String id, String url) {
-        this.gravatarId = id;
-        this.gravatarUrl = url;
+    public void setUserId(int id) {
+        this.userId = id;
+    }
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 }
