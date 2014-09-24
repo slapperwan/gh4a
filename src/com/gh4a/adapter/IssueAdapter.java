@@ -82,9 +82,9 @@ public class IssueAdapter extends RootAdapter<Issue> implements OnClickListener 
         makeLabelBadges(viewHolder.llLabels, issue.getLabels());
 
         viewHolder.tvDesc.setText(issue.getTitle());
+        viewHolder.tvExtra.setText(StringUtils.createUserWithDateText(mContext,
+                issue.getUser(), issue.getCreatedAt()));
 
-        viewHolder.tvExtra.setText(issue.getUser().getLogin() + "\n"
-                + StringUtils.formatRelativeTime(mContext, issue.getCreatedAt(), false));
         if (issue.getAssignee() != null) {
             viewHolder.ivAssignee.setVisibility(View.VISIBLE);
             AvatarHandler.assignAvatar(viewHolder.ivAssignee, issue.getAssignee());

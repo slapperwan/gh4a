@@ -4,7 +4,7 @@
 
     <!-- Common -->
     <string name="record_not_found">%1$s not found</string>
-    <string name="more_commit_data">%1$s authored %2$s</string>
+    <string name="more_commit_data">[b]%1$s[/b] authored %2$s</string>
     <string name="more_issue_data">%1$s %2$s</string>
     <string name="loading_msg">Loading\u2026</string>
     <string name="saving_msg">Saving\u2026</string>

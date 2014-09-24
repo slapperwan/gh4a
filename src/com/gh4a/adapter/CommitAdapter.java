@@ -75,9 +75,10 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> implements OnCl
         viewHolder.tvDesc.setText(message);
         viewHolder.tvSha.setText(commit.getSha().substring(0, 10));
 
-        viewHolder.tvExtra.setText(mContext.getString(R.string.more_commit_data,
+        String extra = mContext.getString(R.string.more_commit_data,
                 CommitUtils.getAuthorName(mContext, commit),
-                StringUtils.formatRelativeTime(mContext, commit.getCommit().getAuthor().getDate(), false)));
+                StringUtils.formatRelativeTime(mContext, commit.getCommit().getAuthor().getDate(), false));
+        viewHolder.tvExtra.setText(StringUtils.applyBoldTags(extra, null));
     }
 
     @Override

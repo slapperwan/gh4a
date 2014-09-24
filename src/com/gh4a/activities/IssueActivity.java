@@ -182,8 +182,8 @@ public class IssueActivity extends LoadingFragmentActivity implements
         ivGravatar.setOnClickListener(this);
 
         TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
-        tvExtra.setText(mIssue.getUser().getLogin() + "\n"
-                + StringUtils.formatRelativeTime(this, mIssue.getCreatedAt(), true));
+        tvExtra.setText(StringUtils.createUserWithDateText(this,
+                mIssue.getUser(), mIssue.getCreatedAt()));
 
         TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
         if (Constants.Issue.STATE_CLOSED.equals(mIssue.getState())) {

@@ -26,6 +26,8 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.widget.CustomTypefaceSpan;
 
+import org.eclipse.egit.github.core.User;
+
 import java.util.Date;
 import java.util.regex.Pattern;
 
@@ -201,5 +203,13 @@ public class StringUtils {
             }
         }
         return ssb;
+    }
+
+    public static CharSequence createUserWithDateText(Context context, User user, Date date) {
+        SpannableStringBuilder text = new SpannableStringBuilder();
+        text.append(user.getLogin()).append("\n");
+        text.append(formatRelativeTime(context, date, true));
+        text.setSpan(new StyleSpan(Typeface.BOLD), 0, user.getLogin().length(), 0);
+        return text;
     }
 }

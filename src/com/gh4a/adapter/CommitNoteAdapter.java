@@ -65,8 +65,8 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements OnC
         AvatarHandler.assignAvatar(viewHolder.ivGravatar, comment.getUser());
 
         viewHolder.ivGravatar.setTag(comment);
-        viewHolder.tvExtra.setText(comment.getUser().getLogin() + "\n"
-                + StringUtils.formatRelativeTime(mContext, comment.getCreatedAt(), true));
+        viewHolder.tvExtra.setText(StringUtils.createUserWithDateText(mContext,
+                comment.getUser(), comment.getCreatedAt()));
 
         String body = HtmlUtils.format(comment.getBodyHtml()).toString();
         mImageGetter.bind(viewHolder.tvDesc, body, comment.getId());
