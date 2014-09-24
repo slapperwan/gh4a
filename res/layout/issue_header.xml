@@ -15,7 +15,7 @@
             android:textAppearance="@style/default_text_micro"
             android:textColor="@android:color/white"
             android:gravity="bottom|center"
-            android:layout_marginRight="5dp" />
+            android:layout_marginRight="8dp" />
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -25,7 +25,7 @@
                 android:id="@+id/iv_gravatar"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:layout_marginRight="5dp" />
+                android:layout_marginRight="8dp" />
             <TextView
                 android:id="@+id/tv_extra"
                 android:layout_width="wrap_content"
@@ -37,7 +37,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textSize="17sp"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:layout_below="@id/iv_gravatar" />
         </RelativeLayout>
     </LinearLayout>
@@ -117,7 +117,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/overview_item_spacing"
-            android:layout_marginBottom="@dimen/overview_header_spacing"
             style="@style/HeaderLabel" />
     </LinearLayout>
 </LinearLayout>
