@@ -19,7 +19,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="5dp" />
+                android:layout_marginRight="8dp" />
             <TextView
                 android:id="@+id/tv_releaseinfo"
                 android:layout_width="wrap_content"
@@ -30,6 +30,7 @@
                 android:id="@+id/tv_releasetype"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/overview_header_spacing"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:layout_toRightOf="@id/iv_gravatar"
                 android:layout_below="@id/tv_releaseinfo" />
@@ -37,6 +38,7 @@
                 android:id="@+id/tv_releasetag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/overview_header_spacing"
                 android:textColor="@color/highlight"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 style="@style/SelectableItem"
