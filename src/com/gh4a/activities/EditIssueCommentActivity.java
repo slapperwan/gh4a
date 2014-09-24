@@ -19,8 +19,6 @@ import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.IssueService;
 
-import java.io.IOException;
-
 public class EditIssueCommentActivity extends BaseSherlockFragmentActivity {
     protected String mRepoOwner;
     protected String mRepoName;

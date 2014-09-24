@@ -73,7 +73,6 @@ public abstract class RootAdapter<T> extends BaseAdapter implements Filterable {
      * Instantiates a new root adapter.
      *
      * @param context the context
-     * @param objects the objects
      */
     public RootAdapter(Context context) {
         mObjects = new ArrayList<T>();

@@ -49,12 +49,12 @@ public class FeedLoader extends BaseLoader<List<Feed>> {
             FeedHandler handler = new FeedHandler();
             parser.parse(bis, handler);
             return handler.getFeeds();
-        }
-        finally {
+        } finally {
             if (bis != null) {
                 try {
                     bis.close();
                 } catch (IOException e) {
+                    // ignored
                 }
             }
         }

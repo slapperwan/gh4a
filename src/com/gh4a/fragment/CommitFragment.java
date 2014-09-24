@@ -7,12 +7,9 @@ import org.eclipse.egit.github.core.RepositoryCommit;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
-import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;

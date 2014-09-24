@@ -17,7 +17,6 @@ package com.gh4a.adapter;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.view.Gravity;
 import android.view.LayoutInflater;

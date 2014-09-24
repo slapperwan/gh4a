@@ -26,8 +26,6 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.widget.CustomTypefaceSpan;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.regex.Pattern;
 

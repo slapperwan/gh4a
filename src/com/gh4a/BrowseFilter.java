@@ -78,6 +78,7 @@ public class BrowseFilter extends BaseSherlockFragmentActivity {
                     try {
                         IntentUtils.openIssueActivity(this, user, repo, Integer.parseInt(id));
                     } catch (NumberFormatException e) {
+                        // ignored
                     }
                 } else {
                     IntentUtils.openIssueListActivity(this, user, repo, Constants.Issue.STATE_OPEN);
@@ -93,6 +94,7 @@ public class BrowseFilter extends BaseSherlockFragmentActivity {
                 try {
                     IntentUtils.openPullRequestActivity(this, user, repo, Integer.parseInt(id));
                 } catch (NumberFormatException e) {
+                    // ignored
                 }
             } else if ("commit".equals(action) && !StringUtils.isBlank(id)) {
                 IntentUtils.openCommitInfoActivity(this, user, repo, id, 0);

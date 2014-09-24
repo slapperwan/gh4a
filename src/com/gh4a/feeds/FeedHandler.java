@@ -11,7 +11,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import android.net.Uri;
-import android.text.TextUtils;
 
 import com.gh4a.holder.Feed;
 import com.gh4a.utils.StringUtils;
@@ -79,8 +78,8 @@ public class FeedHandler extends DefaultHandler {
             } else if (localName.equalsIgnoreCase("published")) {
                 try {
                     mFeed.setPublished(sdf.parse(mBuilder.toString().trim()));
-                }
-                catch (ParseException e) {
+                } catch (ParseException e) {
+                    // ignored
                 }
             } else if (localName.equalsIgnoreCase("entry")) {
                 if (StringUtils.isBlank(mFeed.getTitle())) {

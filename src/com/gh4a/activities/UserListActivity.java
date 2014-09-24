@@ -36,7 +36,6 @@ import java.util.List;
 public abstract class UserListActivity extends LoadingFragmentActivity implements
         AdapterView.OnItemClickListener {
     private UserAdapter mUserAdapter;
-    private ListView mListViewUsers;
 
     private LoaderCallbacks<List<User>> mUserListCallback = new LoaderCallbacks<List<User>>() {
         @Override
@@ -72,11 +71,11 @@ public abstract class UserListActivity extends LoadingFragmentActivity implement
         actionBar.setSubtitle(getSubTitle());
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        mListViewUsers = (ListView) findViewById(R.id.list_view);
-        mListViewUsers.setOnItemClickListener(this);
-
         mUserAdapter = new UserAdapter(this, getShowExtraData());
-        mListViewUsers.setAdapter(mUserAdapter);
+
+        ListView listView = (ListView) findViewById(R.id.list_view);
+        listView.setOnItemClickListener(this);
+        listView.setAdapter(mUserAdapter);
 
         getSupportLoaderManager().initLoader(0, null, mUserListCallback);
     }

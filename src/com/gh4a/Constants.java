@@ -16,7 +16,8 @@
 
 package com.gh4a;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -100,26 +101,10 @@ public interface Constants {
         public static final String RELEASER = "Release.releaser";
     }
 
-    public static final ArrayList<String> SKIP_PRETTIFY_EXT = new ArrayList<String>() {
-        private static final long serialVersionUID = -9195888220037295330L;
-    {
-        add("txt");
-        add("rdoc");
-        add("texttile");
-        add("org");
-        add("creole");
-        add("rst");
-        add("asciidoc");
-        add("pod");
-        add("");
-    }};
-    public static final ArrayList<String> MARKDOWN_EXT = new ArrayList<String>() {
-        private static final long serialVersionUID = -3693714294514389145L;
-    {
-        add("markdown");
-        add("md");
-        add("mdown");
-        add("mkdn");
-        add("mkd");
-    }};
+    public static final List<String> SKIP_PRETTIFY_EXT = Arrays.asList(
+        "txt", "rdoc", "texttile", "org", "creole", "rst",
+        "asciidoc", "pod", "");
+
+    public static final List<String> MARKDOWN_EXT = Arrays.asList(
+        "markdown", "md", "mdown", "mkdn", "mkd");
 }

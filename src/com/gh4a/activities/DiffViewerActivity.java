@@ -99,6 +99,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     };
 
     @Override
+    @SuppressWarnings("unchecked")
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 

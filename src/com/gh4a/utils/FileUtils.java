@@ -10,7 +10,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -33,12 +32,9 @@ public class FileUtils {
             return true;
         } catch (FileNotFoundException e) {
             Log.e(Constants.LOG_TAG, e.getMessage(), e);
-            return false;
         } catch (IOException e) {
             Log.e(Constants.LOG_TAG, e.getMessage(), e);
-            return false;
-        }
-        finally {
+        } finally {
             try {
                 if (inputStream != null) {
                     inputStream.close();
@@ -49,9 +45,9 @@ public class FileUtils {
                 }
             } catch (IOException e) {
                 Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                return false;
             }
         }
+        return false;
     }
 
     public static String getFileExtension(String filename) {
