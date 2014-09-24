@@ -1,14 +1,18 @@
 package com.gh4a.fragment;
 
+import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.RepositoryCommit;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -172,9 +176,13 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
         tvMessage.setText(message);
         tvMessage.setVisibility(message != null ? View.VISIBLE : View.GONE);
 
+        Commit commit = mCommit.getCommit();
+
         TextView tvExtra = (TextView) mContentView.findViewById(R.id.tv_extra);
-        tvExtra.setText(CommitUtils.getAuthorName(app, mCommit) + " "
-                + StringUtils.formatRelativeTime(activity, mCommit.getCommit().getAuthor().getDate(), true));
+        String extraText = getString(R.string.commit_info,
+                CommitUtils.getAuthorName(app, mCommit),
+                StringUtils.formatRelativeTime(activity, commit.getAuthor().getDate(), true));
+        tvExtra.setText(StringUtils.applyBoldTags(extraText, null));
 
         ViewGroup committer = (ViewGroup) mContentView.findViewById(R.id.committer_info);
         if (!CommitUtils.authorEqualsCommitter(mCommit)) {
@@ -183,8 +191,10 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
 
             committer.setVisibility(View.VISIBLE);
             AvatarHandler.assignAvatar(gravatar, mCommit.getCommitter());
-            extra.setText(getString(R.string.commit_details, CommitUtils.getCommitterName(app, mCommit),
-                    StringUtils.formatRelativeTime(activity, mCommit.getCommit().getCommitter().getDate(), true)));
+            String committerText = getString(R.string.commit_details,
+                    CommitUtils.getCommitterName(app, mCommit),
+                    StringUtils.formatRelativeTime(activity, commit.getCommitter().getDate(), true));
+            extra.setText(StringUtils.applyBoldTags(committerText, null));
         } else {
             committer.setVisibility(View.GONE);
         }

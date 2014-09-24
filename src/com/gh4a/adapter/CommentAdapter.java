@@ -81,16 +81,17 @@ public class CommentAdapter extends RootAdapter<Comment> implements OnClickListe
 
         viewHolder.ivGravatar.setTag(comment);
 
+        String extra;
         if (comment instanceof CommitComment) {
             CommitComment commitComment = (CommitComment) comment;
-            viewHolder.tvExtra.setText(mContext.getString(R.string.issue_commit_comment_header,
-                    login,
+            extra = mContext.getString(R.string.issue_commit_comment_header, login,
                     StringUtils.formatRelativeTime(mContext, comment.getCreatedAt(), true),
-                    FileUtils.getFileName(commitComment.getPath())));
+                    FileUtils.getFileName(commitComment.getPath()));
         } else {
-            viewHolder.tvExtra.setText(mContext.getString(R.string.issue_comment_header, login,
-                    StringUtils.formatRelativeTime(mContext, comment.getCreatedAt(), true)));
+            extra = mContext.getString(R.string.issue_comment_header, login,
+                    StringUtils.formatRelativeTime(mContext, comment.getCreatedAt(), true));
         }
+        viewHolder.tvExtra.setText(StringUtils.applyBoldTags(extra, null));
 
         if ((login.equals(ourLogin) || mRepoOwner.equals(ourLogin)) && mEditCallback != null) {
             viewHolder.ivEdit.setVisibility(View.VISIBLE);

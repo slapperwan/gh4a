@@ -16,11 +16,15 @@
 package com.gh4a.utils;
 
 import android.content.Context;
+import android.graphics.Typeface;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.text.style.StyleSpan;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.widget.CustomTypefaceSpan;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -174,5 +178,30 @@ public class StringUtils {
             return DateUtils.getRelativeTimeSpanString(context, time, true);
         }
         return Gh4Application.get(context).getPrettyTimeInstance().format(date);
+    }
+
+    public static CharSequence applyBoldTags(String input, Typeface boldFont) {
+        SpannableStringBuilder ssb = new SpannableStringBuilder();
+        int pos = 0;
+
+        while (pos >= 0) {
+            int start = input.indexOf("[b]", pos);
+            int end = input.indexOf("[/b]", pos);
+            if (start >= 0 && end >= 0) {
+                int tokenLength = end - start - 3 /* length of [b] */;
+                ssb.append(input.substring(pos, start));
+                ssb.append(input.substring(start + 3, end));
+
+                Object span = boldFont != null
+                        ? new CustomTypefaceSpan(boldFont) : new StyleSpan(Typeface.BOLD);
+                    ssb.setSpan(span, ssb.length() - tokenLength, ssb.length(), 0);
+
+                pos = end + 4;
+            } else {
+                ssb.append(input.substring(pos, input.length()));
+                pos = -1;
+            }
+        }
+        return ssb;
     }
 }

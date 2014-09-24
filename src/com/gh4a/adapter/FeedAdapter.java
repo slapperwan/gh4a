@@ -50,7 +50,6 @@ import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.TextAppearanceSpan;
-import android.text.style.TypefaceSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -101,7 +100,8 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
         AvatarHandler.assignAvatar(viewHolder.ivGravatar, actor);
         viewHolder.ivGravatar.setTag(actor);
 
-        viewHolder.tvTitle.setText(applyCustomTags(formatTitle(event)));
+        Typeface boldFont = Gh4Application.get(mContext).boldCondensed;
+        viewHolder.tvTitle.setText(StringUtils.applyBoldTags(formatTitle(event), boldFont));
         viewHolder.tvCreatedAt.setText(StringUtils.formatRelativeTime(
                 mContext, event.getCreatedAt(), false));
 
@@ -259,29 +259,6 @@ public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
             return input;
         }
         return input.substring(0, pos);
-    }
-
-    private CharSequence applyCustomTags(String input) {
-        SpannableStringBuilder ssb = new SpannableStringBuilder();
-        Typeface boldCondensed = Gh4Application.get(mContext).boldCondensed;
-        int pos = 0;
-
-        while (pos >= 0) {
-            int start = input.indexOf("[b]", pos);
-            int end = input.indexOf("[/b]", pos);
-            if (start >= 0 && end >= 0) {
-                int tokenLength = end - start - 3 /* length of [b] */;
-                ssb.append(input.substring(pos, start));
-                ssb.append(input.substring(start + 3, end));
-                ssb.setSpan(new CustomTypefaceSpan(boldCondensed),
-                        ssb.length() - tokenLength, ssb.length(), 0);
-                pos = end + 4;
-            } else {
-                ssb.append(input.substring(pos, input.length()));
-                pos = -1;
-            }
-        }
-        return ssb;
     }
 
     private String formatTitle(Event event) {

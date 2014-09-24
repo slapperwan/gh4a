@@ -103,8 +103,9 @@ public class ReleaseInfoActivity extends LoadingFragmentActivity implements
         AvatarHandler.assignAvatar(gravatar, mRelease.getAuthor());
 
         TextView details = (TextView) findViewById(R.id.tv_releaseinfo);
-        details.setText(getString(R.string.release_details, mReleaser.getLogin(),
-                StringUtils.formatRelativeTime(this, mRelease.getCreatedAt(), true)));
+        String detailsText = getString(R.string.release_details, mReleaser.getLogin(),
+                StringUtils.formatRelativeTime(this, mRelease.getCreatedAt(), true));
+        details.setText(StringUtils.applyBoldTags(detailsText, null));
 
         TextView releaseType = (TextView) findViewById(R.id.tv_releasetype);
         if (mRelease.isDraft()) {
