@@ -51,6 +51,7 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> implements OnCl
         viewHolder.tvSha.setTypeface(Typeface.MONOSPACE);
 
         viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+        viewHolder.tvComments = (TextView) v.findViewById(R.id.tv_comments);
 
         viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
         viewHolder.ivGravatar.setOnClickListener(this);
@@ -75,6 +76,14 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> implements OnCl
         viewHolder.tvDesc.setText(message);
         viewHolder.tvSha.setText(commit.getSha().substring(0, 10));
 
+        int comments = commit.getCommit().getCommentCount();
+        if (comments > 0) {
+            viewHolder.tvComments.setText(String.valueOf(comments));
+            viewHolder.tvComments.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.tvComments.setVisibility(View.GONE);
+        }
+
         String extra = mContext.getString(R.string.more_commit_data,
                 CommitUtils.getAuthorName(mContext, commit),
                 StringUtils.formatRelativeTime(mContext, commit.getCommit().getAuthor().getDate(), false));
@@ -94,5 +103,6 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> implements OnCl
         public TextView tvDesc;
         public TextView tvExtra;
         public TextView tvSha;
+        public TextView tvComments;
     }
 }

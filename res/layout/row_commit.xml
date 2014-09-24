@@ -23,11 +23,23 @@
         android:layout_centerVertical="true"
         android:layout_marginRight="8dp" />
     <TextView
+        android:id="@+id/tv_comments"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:drawableLeft="?attr/commentsIcon"
+        android:drawablePadding="5dp"
+        android:visibility="gone"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+    <TextView
         android:id="@+id/tv_sha"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:layout_toRightOf="@id/iv_gravatar" />
+        android:layout_toRightOf="@id/iv_gravatar"
+        android:layout_toLeftOf="@id/tv_comments"
+        android:layout_alignWithParentIfMissing="true" />
     <TextView
         android:id="@+id/tv_desc"
         android:layout_width="match_parent"
@@ -36,6 +48,8 @@
         android:maxLines="2"
         android:ellipsize="end"
         android:layout_toRightOf="@id/iv_gravatar"
+        android:layout_toLeftOf="@id/tv_comments"
+        android:layout_alignWithParentIfMissing="true"
         android:layout_below="@id/tv_sha" />
     <TextView
         android:id="@+id/tv_extra"
@@ -43,5 +57,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_toRightOf="@id/iv_gravatar"
+        android:layout_toLeftOf="@id/tv_comments"
+        android:layout_alignWithParentIfMissing="true"
         android:layout_below="@id/tv_desc" />
 </RelativeLayout>
