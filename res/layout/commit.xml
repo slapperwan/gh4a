@@ -19,6 +19,7 @@
                 android:id="@+id/iv_gravatar"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:layout_centerVertical="true"
                 android:layout_marginRight="8dp" />
             <TextView
                 android:id="@+id/tv_extra"
@@ -30,7 +31,8 @@
                 android:id="@+id/tv_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_marginTop="@dimen/overview_header_spacing"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:layout_toRightOf="@id/iv_gravatar"
                 android:layout_below="@id/tv_extra" />
         </RelativeLayout>
@@ -62,7 +64,6 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:layout_marginTop="@dimen/overview_item_spacing"
-            android:layout_marginBottom="@dimen/overview_item_spacing"
             android:paddingLeft="@dimen/content_padding"
             android:paddingRight="@dimen/content_padding" />
         <TextView
@@ -71,6 +72,7 @@
             android:layout_height="wrap_content"
             android:paddingLeft="@dimen/content_padding"
             android:paddingRight="@dimen/content_padding"
+            android:layout_marginTop="@dimen/overview_item_spacing"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="italic" />
         <TextView
