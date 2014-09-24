@@ -72,7 +72,6 @@
             android:layout_marginBottom="2dp"
             android:gravity="center_vertical"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColorLink="@color/titletextcolor"
             android:layout_below="@id/tv_milestone"
             android:layout_toRightOf="@id/iv_assignee"
             android:visibility="gone" />
@@ -90,7 +89,6 @@
             android:paddingBottom="4dp"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/highlight"
-            android:textColorLink="@color/titletextcolor"
             android:layout_below="@id/ll_labels"
             android:text="@string/view_pull_request"
             android:visibility="gone" />

@@ -18,40 +18,21 @@
             android:paddingRight="@dimen/content_padding">
 
             <TextView
-                android:id="@+id/tv_login"
+                android:id="@+id/tv_repo_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/SelectableItem"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="@color/highlight"
-                android:textColorLink="@color/titletextcolor" />
-
-            <TextView
-                android:id="@+id/tv_divider"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/tv_login"
-                android:text="/"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <TextView
-                android:id="@+id/tv_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_toRightOf="@id/tv_divider"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <TextView
                 android:id="@+id/tv_parent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/tv_name"
+                android:layout_below="@id/tv_repo_name"
                 android:layout_marginBottom="8dp"
                 android:layout_marginTop="8dp"
                 style="@style/SelectableItem"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@color/titletextcolor" />
+                android:textColor="@color/highlight" />
 
             <TextView
                 android:id="@+id/tv_desc"
@@ -67,7 +48,7 @@
                 android:layout_below="@+id/tv_desc"
                 android:autoLink="web"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColorLink="@color/titletextcolor" />
+                android:textColorLink="@color/highlight" />
 
             <TextView
                 android:id="@+id/tv_language"

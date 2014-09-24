@@ -20,6 +20,10 @@ import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.text.SpannableStringBuilder;
+import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -84,6 +88,20 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
         }
     };
 
+    private ClickableSpan mLoginClickSpan = new ClickableSpan() {
+        @Override
+        public void onClick(View view) {
+            IntentUtils.openUserInfoActivity(view.getContext(), mRepository.getOwner());
+        }
+
+        @Override
+        public void updateDrawState(TextPaint ds) {
+            super.updateDrawState(ds);
+            ds.setUnderlineText(false);
+            ds.setColor(getResources().getColor(R.color.highlight));
+        }
+    };
+
     public static RepositoryFragment newInstance(Repository repository, String ref) {
         RepositoryFragment f = new RepositoryFragment();
 
@@ -125,25 +143,26 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
         final Gh4Application app = Gh4Application.get(getActivity());
 
         UiUtils.assignTypeface(mContentView, app.boldCondensed, new int[] {
-            R.id.readme_title, R.id.tv_login, R.id.tv_divider, R.id.tv_name,
-            R.id.tv_stargazers_count, R.id.tv_forks_count, R.id.tv_issues_count,
-            R.id.tv_pull_requests_count, R.id.tv_wiki_label, R.id.tv_contributors_label,
-            R.id.tv_collaborators_label, R.id.other_info, R.id.tv_downloads_label,
-            R.id.tv_releases_label
+            R.id.readme_title, R.id.tv_repo_name,  R.id.tv_stargazers_count,
+            R.id.tv_forks_count, R.id.tv_issues_count, R.id.tv_pull_requests_count,
+            R.id.tv_wiki_label, R.id.tv_contributors_label, R.id.tv_collaborators_label,
+            R.id.other_info, R.id.tv_downloads_label, R.id.tv_releases_label
         });
-        UiUtils.assignTypeface(mContentView, app.italic, new int[] {
-            R.id.tv_parent
+        UiUtils.assignTypeface(mContentView, app.italic, new int[]{
+                R.id.tv_parent
         });
-        UiUtils.assignTypeface(mContentView, app.regular, new int[] {
-            R.id.tv_desc, R.id.tv_language, R.id.tv_url
+        UiUtils.assignTypeface(mContentView, app.regular, new int[]{
+                R.id.tv_desc, R.id.tv_language, R.id.tv_url
         });
 
-        TextView tvOwner = (TextView) mContentView.findViewById(R.id.tv_login);
-        tvOwner.setText(mRepository.getOwner().getLogin());
-        tvOwner.setOnClickListener(this);
-
-        TextView tvRepoName = (TextView) mContentView.findViewById(R.id.tv_name);
-        tvRepoName.setText(mRepository.getName());
+        TextView tvRepoName = (TextView) mContentView.findViewById(R.id.tv_repo_name);
+        SpannableStringBuilder repoName = new SpannableStringBuilder();
+        repoName.append(mRepository.getOwner().getLogin());
+        repoName.append("/");
+        repoName.append(mRepository.getName());
+        repoName.setSpan(mLoginClickSpan, 0, mRepository.getOwner().getLogin().length(), 0);
+        tvRepoName.setText(repoName);
+        tvRepoName.setMovementMethod(LinkMovementMethod.getInstance());
 
         TextView tvParentRepo = (TextView) mContentView.findViewById(R.id.tv_parent);
         if (mRepository.isFork() && mRepository.getParent() != null) {
@@ -159,7 +178,8 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
 
         fillTextView(R.id.tv_desc, 0, mRepository.getDescription());
         fillTextView(R.id.tv_language,R.string.repo_language, mRepository.getLanguage());
-        fillTextView(R.id.tv_url, 0, !StringUtils.isBlank(mRepository.getHomepage()) ? mRepository.getHomepage() : mRepository.getHtmlUrl());
+        fillTextView(R.id.tv_url, 0, !StringUtils.isBlank(mRepository.getHomepage())
+                ? mRepository.getHomepage() : mRepository.getHtmlUrl());
 
         mContentView.findViewById(R.id.cell_stargazers).setOnClickListener(this);
         mContentView.findViewById(R.id.cell_forks).setOnClickListener(this);
@@ -229,9 +249,7 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
         String name = mRepository.getName();
         Intent intent = null;
 
-        if (id == R.id.tv_login) {
-            IntentUtils.openUserInfoActivity(getActivity(), mRepository.getOwner());
-        } else if (id == R.id.cell_pull_requests) {
+        if (id == R.id.cell_pull_requests) {
             IntentUtils.openPullRequestListActivity(getActivity(), owner, name,
                     Constants.Issue.STATE_OPEN);
         } else if (id == R.id.tv_contributors_label) {

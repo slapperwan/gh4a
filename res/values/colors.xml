@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="titletextcolor">#0099cc</color>
-
     <color name="highlight">#0099cc</color>
     <color name="issue_number_bg">#ddd</color>
 </resources>

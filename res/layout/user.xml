@@ -46,7 +46,7 @@
                 android:layout_toRightOf="@id/iv_gravatar"
                 android:autoLink="email"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColorLink="@color/titletextcolor" />
+                android:textColorLink="@color/highlight" />
 
             <TextView
                 android:id="@+id/tv_website"
@@ -56,7 +56,7 @@
                 android:layout_toRightOf="@id/iv_gravatar"
                 android:autoLink="web"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColorLink="@color/titletextcolor" />
+                android:textColorLink="@color/highlight" />
 
             <TextView
                 android:id="@+id/tv_company"
