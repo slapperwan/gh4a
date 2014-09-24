@@ -232,6 +232,7 @@
     <string name="issues">Issues</string>
     <string name="issue">Issue</string>
     <string name="issue_comments">Comments</string>
+    <string name="issue_comments_with_count">Comments (%1$d)</string>
     <string name="issue_title">Title</string>
     <string name="issue_body">Body</string>
     <string name="issue_create">New Issue</string>

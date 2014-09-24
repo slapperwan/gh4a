@@ -250,7 +250,8 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         AvatarHandler.assignAvatar(gravatar, user);
 
         TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
-        tvCommentTitle.setText(getString(R.string.issue_comments));
+        tvCommentTitle.setText(getString(R.string.issue_comments_with_count,
+                mPullRequest.getComments()));
 
         TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
         if (Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState())) {
