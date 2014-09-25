@@ -16,6 +16,7 @@
 package com.gh4a.adapter;
 
 import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.User;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -25,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
@@ -34,10 +36,18 @@ import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 public class CommitNoteAdapter extends RootAdapter<CommitComment> implements OnClickListener {
-    private HttpImageGetter mImageGetter;
+    public interface OnEditComment {
+        void editComment(CommitComment comment);
+    }
 
-    public CommitNoteAdapter(Context context) {
+    private String mRepoOwner;
+    private HttpImageGetter mImageGetter;
+    private OnEditComment mEditCallback;
+
+    public CommitNoteAdapter(Context context, String repoOwner, OnEditComment editCallback) {
         super(context);
+        mRepoOwner = repoOwner;
+        mEditCallback = editCallback;
         mImageGetter = new HttpImageGetter(context);
     }
 
@@ -52,7 +62,6 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements OnC
         viewHolder.tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
         viewHolder.ivEdit = (ImageView) v.findViewById(R.id.iv_edit);
-        viewHolder.ivEdit.setVisibility(View.GONE);
 
         v.setTag(viewHolder);
         return v;
@@ -61,8 +70,10 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements OnC
     @Override
     protected void bindView(View v, CommitComment comment) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
+        String ourLogin = Gh4Application.get(mContext).getAuthLogin();
+        User user = comment.getUser();
 
-        AvatarHandler.assignAvatar(viewHolder.ivGravatar, comment.getUser());
+        AvatarHandler.assignAvatar(viewHolder.ivGravatar, user);
 
         viewHolder.ivGravatar.setTag(comment);
         viewHolder.tvExtra.setText(StringUtils.createUserWithDateText(mContext,
@@ -70,13 +81,24 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements OnC
 
         String body = HtmlUtils.format(comment.getBodyHtml()).toString();
         mImageGetter.bind(viewHolder.tvDesc, body, comment.getId());
+
+        if (mEditCallback != null &&
+                (user.getLogin().equals(ourLogin) || mRepoOwner.equals(ourLogin))) {
+            viewHolder.ivEdit.setVisibility(View.VISIBLE);
+            viewHolder.ivEdit.setTag(comment);
+            viewHolder.ivEdit.setOnClickListener(this);
+        } else {
+            viewHolder.ivEdit.setVisibility(View.GONE);
+        }
     }
 
     @Override
     public void onClick(View v) {
+        CommitComment comment = (CommitComment) v.getTag();
         if (v.getId() == R.id.iv_gravatar) {
-            CommitComment comment = (CommitComment) v.getTag();
             IntentUtils.openUserInfoActivity(mContext, comment.getUser());
+        } else if (v.getId() == R.id.iv_edit) {
+            mEditCallback.editComment(comment);
         }
     }
 
