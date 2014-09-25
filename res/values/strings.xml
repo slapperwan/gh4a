@@ -207,7 +207,8 @@
     <string name="repo_issue_on">on %1$s</string>
 
     <!-- Commit -->
-    <string name="commit">Commit %1$s</string>
+    <string name="commit_title">Commit %1$s</string>
+    <string name="commit">Commit</string>
     <string name="commits">Commits</string>
     <string name="commit_changed">Files Changed</string>
     <string name="commit_added">Files Added</string>

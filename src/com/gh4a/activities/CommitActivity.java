@@ -37,7 +37,7 @@ public class CommitActivity extends LoadingFragmentPagerActivity {
     private String mObjectSha;
 
     private static final int[] TITLES = new int[] {
-        R.string.commits, R.string.issue_comments
+        R.string.commit, R.string.issue_comments
     };
 
     @Override
@@ -54,7 +54,7 @@ public class CommitActivity extends LoadingFragmentPagerActivity {
         mObjectSha = data.getString(Constants.Object.OBJECT_SHA);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(getString(R.string.commit, mObjectSha.substring(0, 7)));
+        actionBar.setTitle(getString(R.string.commit_title, mObjectSha.substring(0, 7)));
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
