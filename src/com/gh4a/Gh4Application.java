@@ -45,8 +45,8 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 
-import com.bugsense.trace.BugSenseHandler;
 import com.gh4a.activities.SettingsActivity;
+import com.splunk.mint.Mint;
 
 /**
  * The Class Gh4Application.
@@ -97,7 +97,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         selectTheme(prefs.getInt(SettingsActivity.KEY_THEME, Constants.Theme.DARK));
         prefs.registerOnSharedPreferenceChangeListener(this);
 
-        BugSenseHandler.initAndStartSession(this, "1e6a83ae");
+        Mint.initAndStartSession(this, "1e6a83ae");
 
         mPt = new PrettyTime();
 
