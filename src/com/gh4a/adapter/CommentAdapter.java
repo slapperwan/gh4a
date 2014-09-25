@@ -103,6 +103,12 @@ public class CommentAdapter extends RootAdapter<Comment> implements OnClickListe
     }
 
     @Override
+    public void clear() {
+        super.clear();
+        mImageGetter = new HttpImageGetter(mContext);
+    }
+
+    @Override
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             Comment comment = (Comment) v.getTag();

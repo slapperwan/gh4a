@@ -93,6 +93,12 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements OnC
     }
 
     @Override
+    public void clear() {
+        super.clear();
+        mImageGetter = new HttpImageGetter(mContext);
+    }
+
+    @Override
     public void onClick(View v) {
         CommitComment comment = (CommitComment) v.getTag();
         if (v.getId() == R.id.iv_gravatar) {
