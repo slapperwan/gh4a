@@ -63,7 +63,7 @@ public class SearchUserAdapter extends RootAdapter<SearchUser> implements OnClic
     protected void bindView(View v, SearchUser user) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
 
-        AvatarHandler.assignAvatar(viewHolder.ivGravatar, user.getId(), null);
+        AvatarHandler.assignAvatar(viewHolder.ivGravatar, determineUserId(user.getId()), null);
         viewHolder.ivGravatar.setTag(user);
 
         viewHolder.tvTitle.setText(StringUtils.formatName(user.getLogin(), user.getName()));
@@ -77,6 +77,21 @@ public class SearchUserAdapter extends RootAdapter<SearchUser> implements OnClic
             SearchUser user = (SearchUser) v.getTag();
             IntentUtils.openUserInfoActivity(mContext, user.getLogin(), user.getName());
         }
+    }
+
+    // For whatever reason, the legacy search returns user IDs in the form of
+    // 'user-xxxxx' instead of 'xxxxx'. Try to parse the actual ID out of the
+    // transmitted form and fail gracefully if that format isn't followed for
+    // any search result.
+    private int determineUserId(String id) {
+        if (id != null && id.startsWith("user-")) {
+            try {
+                return Integer.parseInt(id.substring(5));
+            } catch (NumberFormatException e) {
+                // fall through
+            }
+        }
+        return -1;
     }
 
     private static class ViewHolder {
