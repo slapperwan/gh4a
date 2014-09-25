@@ -69,7 +69,7 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.search);
+        setContentView(R.layout.generic_list);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.search);
@@ -94,7 +94,7 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
 
         updateSearchTypeHint();
 
-        mListViewResults = (ListView) findViewById(R.id.list_search);
+        mListViewResults = (ListView) findViewById(R.id.list_view);
         mListViewResults.setOnItemClickListener(this);
         registerForContextMenu(mListViewResults);
     }
@@ -248,7 +248,7 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         menu.clear();// clear items
 
-        if (v.getId() == R.id.list_search) {
+        if (v.getId() == R.id.list_view) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
             ListAdapter listAdapter = mListViewResults.getAdapter();
             Object object = listAdapter.getItem(info.position);

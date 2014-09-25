@@ -2,18 +2,18 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:paddingTop="5dp"
     android:paddingBottom="5dp" >
     <View
         android:id="@+id/view_color"
         android:layout_width="20dp"
-        android:layout_height="fill_parent" />
+        android:layout_height="match_parent" />
     <TextView
         android:id="@+id/tv_title"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:paddingLeft="8dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"

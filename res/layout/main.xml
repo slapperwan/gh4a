@@ -11,9 +11,10 @@
     <EditText
         android:id="@+id/et_username_main"
         android:layout_height="wrap_content"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_above="@+id/spacer"
         android:layout_gravity="center"
+        android:imeOptions="actionNext"
         android:hint="@string/user_username"
         android:singleLine="true"
         android:nextFocusDown="@+id/et_password_main"/>
@@ -25,11 +26,11 @@
     <EditText
         android:id="@id/et_password_main"
         android:layout_height="wrap_content"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_below="@+id/spacer"
+        android:imeOptions="actionDone"
         android:inputType="textPassword"
         android:hint="@string/user_password"
-        android:singleLine="true"
-        android:nextFocusDown="@+id/btn_login" />
+        android:singleLine="true" />
 
 </RelativeLayout>

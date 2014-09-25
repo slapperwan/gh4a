@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-   android:padding="8dp" >
+    android:padding="@dimen/content_padding" >
 
     <com.larswerkman.holocolorpicker.ColorPicker
         android:id="@+id/color_picker"

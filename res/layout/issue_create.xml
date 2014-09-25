@@ -12,13 +12,13 @@
         <EditText
             android:id="@+id/et_title"
             android:layout_height="wrap_content"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_marginBottom="@dimen/overview_item_spacing"
             android:hint="@string/issue_title" />
         <EditText
             android:id="@+id/et_desc"
             android:layout_height="wrap_content"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_marginBottom="@dimen/overview_item_spacing"
             android:gravity="top"
             android:minLines="5"
