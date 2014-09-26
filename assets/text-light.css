@@ -4,12 +4,17 @@ body {
     line-height: 1.4;
     background-color: #F7F7F9;
     color: #48484C;
-    margin: 6px;
+    margin: 6px 0 6px 0;
 }
 
 pre {
     display: table;
     min-width: 100%;
+}
+
+pre > div {
+    margin-left: 6px;
+    margin-right: 6px;
 }
 
 .image {

@@ -1,5 +1,5 @@
 body {
-    margin: 6px;
+    margin: 6px 0 6px 0;
 }
 
 .pln {
@@ -59,6 +59,11 @@ pre.prettyprint {
     background-color: #111;
     min-width: 100%;
     display: table;
+}
+
+pre.prettyprint > ol {
+    margin-left: 6px;
+    margin-right: 6px;
 }
 
 ol.linenums li {
