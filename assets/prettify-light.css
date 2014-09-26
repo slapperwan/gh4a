@@ -1,5 +1,5 @@
 body {
-    margin: 0;
+    margin: 6px;
 }
 
 .pln {
@@ -52,9 +52,9 @@ body {
 
 pre.prettyprint {
     background-color: #F7F7F9;
-    padding: 6px;
+    min-width: 100%;
     display: table;
-}}
+}
 
 pre.prettyprint.linenums {
     box-shadow: 40px 0 0 #FBFBFC inset,41px 0 0 #ECECF0 inset;

@@ -4,12 +4,18 @@ body {
     line-height: 1.4;
     background-color: #111;
     color: #A3A3A5;
-    margin: 0;
+    margin: 6px;
 }
 
 pre {
     display: table;
-    padding: 6px;
+    min-width: 100%;
+}
+
+.image {
+    border: 1px solid #7a7a7a;
+    display: table;
+    padding: 3px;
 }
 
 .change {
@@ -26,4 +32,7 @@ pre {
 
 .comment {
     white-space: normal;
+    border: 1px solid;
+    padding: 2px;
+    margin: 5px 0;
 }

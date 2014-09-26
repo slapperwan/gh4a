@@ -231,7 +231,6 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                 for (CommitComment comment : comments) {
                     mCommitComments.put(comment.getId(), comment);
                     content.append("<div class=\"comment\"");
-                    content.append(" style=\"border:1px solid; padding: 2px; margin: 5px 0;\"");
                     if (authorized) {
                         content.append(" onclick=\"javascript:location.href='comment://edit");
                         content.append("?position=").append(i);

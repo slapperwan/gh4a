@@ -101,31 +101,24 @@ public class StringUtils {
     public static String highlightSyntax(String data, String fileName,
             String repoOwner, String repoName, String ref) {
         String ext = FileUtils.getFileExtension(fileName);
-        String cssTheme = ThemeUtils.getCssTheme(Gh4Application.THEME);
 
         StringBuilder content = new StringBuilder();
         content.append("<html><head><title></title>");
 
         if (Constants.MARKDOWN_EXT.contains(ext)) {
             content.append("<script src='file:///android_asset/showdown.js' type='text/javascript'></script>");
-            content.append("<link href='file:///android_asset/markdown-");
-            content.append(cssTheme);
-            content.append(".css' rel='stylesheet' type='text/css'/>");
+            writeCssInclude(content, "markdown");
             content.append("</head>");
             content.append("<body>");
             content.append("<div id='content'>");
         } else if (!Constants.SKIP_PRETTIFY_EXT.contains(ext)) {
-            content.append("<link href='file:///android_asset/prettify-");
-            content.append(cssTheme);
-            content.append(".css' rel='stylesheet' type='text/css'/>");
+            writeCssInclude(content, "prettify");
             content.append("<script src='file:///android_asset/prettify.js' type='text/javascript'></script>");
             content.append("</head>");
             content.append("<body onload='prettyPrint()'>");
             content.append("<pre class='prettyprint linenums'>");
         } else{
-            content.append("<link href='file:///android_asset/text-");
-            content.append(cssTheme);
-            content.append(".css' rel='stylesheet' type='text/css'/>");
+            writeCssInclude(content, "text");
             content.append("</head>");
             content.append("<body>");
             content.append("<pre>");
@@ -158,11 +151,22 @@ public class StringUtils {
         return content.toString();
     }
 
+    private static void writeCssInclude(StringBuilder builder, String cssType) {
+        builder.append("<link href='file:///android_asset/");
+        builder.append(cssType);
+        builder.append("-");
+        builder.append(ThemeUtils.getCssTheme(Gh4Application.THEME));
+        builder.append(".css' rel='stylesheet' type='text/css'/>");
+    }
+
     public static String highlightImage(String imageUrl) {
-        return "<html><body style=\"background-color:#dddddd;margin:auto\">"
-                + "<span class=\"border:solid 1px #333333;\">"
-                + "<img src=\"" + imageUrl + "\" style=\"\"/>"
-                + "</span>" + "</body></html>";
+        StringBuilder content = new StringBuilder();
+        content.append("<html><head>");
+        writeCssInclude(content, "text");
+        content.append("</head><body><div class='image'>");
+        content.append("<img src='").append(imageUrl).append("' />");
+        content.append("</div></body></html>");
+        return content.toString();
     }
 
     public static boolean checkEmail(String email) {
