@@ -16,6 +16,7 @@
 package com.gh4a.adapter;
 
 import android.content.Context;
+import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +42,7 @@ public class FileAdapter extends RootAdapter<RepositoryContents> {
 
         holder.icon = (ImageView) v.findViewById(R.id.iv_icon);
         holder.fileName = (TextView) v.findViewById(R.id.tv_text);
+        holder.fileSize = (TextView) v.findViewById(R.id.tv_size);
 
         v.setTag(holder);
         return v;
@@ -50,16 +52,22 @@ public class FileAdapter extends RootAdapter<RepositoryContents> {
     protected void bindView(View v, RepositoryContents content) {
         ViewHolder holder = (ViewHolder) v.getTag();
 
-        holder.icon.setBackgroundResource(getIconId(content.getType(),
-                FileUtils.getFileExtension(content.getName())));
+        holder.icon.setBackgroundResource(getIconId(content.getType(), content.getName()));
         holder.fileName.setText(content.getName());
+
+        if (RepositoryContents.TYPE_FILE.equals(content.getType())) {
+            holder.fileSize.setText(Formatter.formatShortFileSize(mContext, content.getSize()));
+            holder.fileSize.setVisibility(View.VISIBLE);
+        } else {
+            holder.fileSize.setVisibility(View.GONE);
+        }
     }
 
-    private int getIconId(String type, String ext) {
+    private int getIconId(String type, String fileName) {
         int iconId;
         if (RepositoryContents.TYPE_DIR.equals(type)) {
             iconId = R.attr.dirIcon;
-        } else if (RepositoryContents.TYPE_FILE.equals(type) && isImageExt(ext)) {
+        } else if (RepositoryContents.TYPE_FILE.equals(type) && FileUtils.isImage(fileName)) {
             iconId = R.attr.contentPictureIcon;
         } else {
             iconId = R.attr.fileIcon;
@@ -68,14 +76,9 @@ public class FileAdapter extends RootAdapter<RepositoryContents> {
         return UiUtils.resolveDrawable(mContext, iconId);
     }
 
-    private boolean isImageExt(String ext) {
-        return "png".equalsIgnoreCase(ext) || "ico".equalsIgnoreCase(ext)
-                || "jpg".equalsIgnoreCase(ext) || "jpeg".equalsIgnoreCase(ext)
-                || "gif".equalsIgnoreCase(ext);
-    }
-
     private static class ViewHolder {
         ImageView icon;
         TextView fileName;
+        TextView fileSize;
     }
 }

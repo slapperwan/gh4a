@@ -16,7 +16,7 @@ import java.util.Locale;
 
 public class FileUtils {
     private static List<String> imageExts = Arrays.asList(
-        "png", "gif", "jpeg", "jpg", "bmp"
+        "png", "gif", "jpeg", "jpg", "bmp", "ico"
     );
 
     public static boolean save(File file, InputStream inputStream) {
