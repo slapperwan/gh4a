@@ -58,7 +58,7 @@
     <string name="milestone_extradata_due">%1$d open\u00a0\u00a0\u00a0%2$d closed\u00a0\u00a0\u00a0due on %3$s</string>
     <string name="download_extradata">%1$s\u00a0\u00a0\u00a0%2$d downloads\u00a0\u00a0\u00a0created %3$s</string>
     <string name="release_extradata">%1$s\u00a0\u00a0\u00a0created %2$s</string>
-    <string name="feed_extradata">%1$s\u00a0\u00a0\u00a0%2$s</string>
+    <string name="feed_extradata">[b]%1$s[/b]\u00a0\u00a0\u00a0%2$s</string>
     <string name="gist_extradata">%1$s\u00a0\u00a0\u00a0%2$s</string>
     <string name="go_to">Go to</string>
     <string name="forked_from">forked from %1$s</string>
@@ -139,7 +139,7 @@
     <string name="event_watch_title">[b]%1$s[/b] starred [b]%2$s[/b]</string>
     <string name="event_create_gist_title">[b]%1$s[/b] created gist [b]%2$s[/b]</string>
     <string name="event_update_gist_title">[b]%1$s[/b] updated gist [b]%2$s[/b]</string>
-    <string name="event_fork_title">[b]%1$s forked [b]%2$s[/b]</string>
+    <string name="event_fork_title">[b]%1$s[/b] forked [b]%2$s[/b]</string>
     <string name="event_commit_comment_title">[b]%1$s[/b] commented on commit [b]%2$s[/b] at [b]%3$s[/b]</string>
     <string name="event_fork_apply_title">[b]%1$s[/b] applied fork commits to [b]%2$s[/b]</string>
     <string name="event_follow_title">[b]%1$s[/b] started following [b]%2$s[/b]</string>

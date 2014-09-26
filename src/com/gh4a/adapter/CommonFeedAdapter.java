@@ -31,6 +31,7 @@ import com.gh4a.R;
 import com.gh4a.holder.Feed;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.StringUtils;
 
 public class CommonFeedAdapter extends RootAdapter<Feed> implements OnClickListener {
     private boolean mShowExtra;
@@ -88,8 +89,9 @@ public class CommonFeedAdapter extends RootAdapter<Feed> implements OnClickListe
         if (mShowExtra) {
             String published = feed.getPublished() != null
                     ? DateFormat.getMediumDateFormat(mContext).format(feed.getPublished()) : "";
-            viewHolder.tvExtra.setText(mContext.getString(R.string.feed_extradata,
-                    feed.getAuthor(), published));
+            String text = mContext.getString(R.string.feed_extradata,
+                    feed.getAuthor(), published);
+            viewHolder.tvExtra.setText(StringUtils.applyBoldTags(text, null));
             viewHolder.tvExtra.setVisibility(View.VISIBLE);
         } else {
             viewHolder.tvExtra.setVisibility(View.GONE);
