@@ -70,7 +70,6 @@ public class IssueEditActivity extends LoadingFragmentActivity implements OnClic
     private List<Milestone> mAllMilestone;
     private List<User> mAllAssignee;
     private Issue mEditIssue;
-    private int mPendingSelection;
 
     private ProgressDialog mProgressDialog;
     private TextView mTvSelectedMilestone;
@@ -241,45 +240,36 @@ public class IssueEditActivity extends LoadingFragmentActivity implements OnClic
             getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
         } else {
             final String[] milestones = new String[mAllMilestone.size() + 1];
+            int selected = 0;
 
             milestones[0] = getResources().getString(R.string.issue_clear_milestone);
-
-            mPendingSelection = 0;
-
             for (int i = 1; i <= mAllMilestone.size(); i++) {
                 Milestone m = mAllMilestone.get(i - 1);
                 milestones[i] = m.getTitle();
                 if (mSelectedMilestone != null && m.getNumber() == mSelectedMilestone.getNumber()) {
-                    mPendingSelection = i;
+                    selected = i;
                 }
             }
 
             final DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    mPendingSelection = which;
-                }
-            };
-
-            final DialogInterface.OnClickListener okCb = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    mSelectedMilestone = mPendingSelection == 0
-                            ? null : mAllMilestone.get(mPendingSelection - 1);
-                    if (mSelectedMilestone != null) {
+                    if (which == 0) {
+                        mSelectedMilestone = null;
+                        mTvSelectedMilestone.setText(null);
+                    } else {
+                        mSelectedMilestone = mAllMilestone.get(which - 1);
                         mTvSelectedMilestone.setText(getString(
                                 R.string.issue_milestone, mSelectedMilestone.getTitle()));
-                    } else {
-                        mTvSelectedMilestone.setText(null);
                     }
+                    dialog.dismiss();
                 }
             };
 
             new AlertDialog.Builder(this)
                     .setCancelable(true)
                     .setTitle(R.string.issue_milestone_hint)
-                    .setSingleChoiceItems(milestones, mPendingSelection, selectCb)
-                    .setPositiveButton(R.string.ok, okCb)
+                    .setSingleChoiceItems(milestones, selected, selectCb)
                     .setNegativeButton(R.string.cancel, null)
                     .show();
         }
@@ -291,44 +281,38 @@ public class IssueEditActivity extends LoadingFragmentActivity implements OnClic
             getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
         } else {
             final String[] assignees = new String[mAllAssignee.size() + 1];
-            assignees[0] = getResources().getString(R.string.issue_clear_assignee);
+            int selected = 0;
 
-            mPendingSelection = 0;
+            assignees[0] = getResources().getString(R.string.issue_clear_assignee);
 
             for (int i = 1; i <= mAllAssignee.size(); i++) {
                 User u = mAllAssignee.get(i - 1);
                 assignees[i] = u.getLogin();
                 if (mSelectedAssignee != null
                         && u.getLogin().equalsIgnoreCase(mSelectedAssignee.getLogin())) {
-                    mPendingSelection = i;
+                    selected = i;
                 }
             }
 
             DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    mPendingSelection = which;
-                }
-            };
-            DialogInterface.OnClickListener okCb = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    mSelectedAssignee = mPendingSelection == 0
-                            ? null : mAllAssignee.get(mPendingSelection - 1);
-                    if (mSelectedAssignee != null) {
+                    if (which == 0) {
+                        mSelectedAssignee = null;
+                        mTvSelectedAssignee.setText(null);
+                    } else {
+                        mSelectedAssignee = mAllAssignee.get(which - 1);
                         mTvSelectedAssignee.setText(getString(
                                 R.string.issue_assignee, mSelectedAssignee.getLogin()));
-                    } else {
-                        mTvSelectedAssignee.setText(null);
                     }
+                    dialog.dismiss();
                 }
             };
 
             new AlertDialog.Builder(this)
                     .setCancelable(true)
                     .setTitle(R.string.issue_assignee_hint)
-                    .setSingleChoiceItems(assignees, mPendingSelection, selectCb)
-                    .setPositiveButton(R.string.ok, okCb)
+                    .setSingleChoiceItems(assignees, selected, selectCb)
                     .setNegativeButton(R.string.cancel, null)
                     .show();
         }

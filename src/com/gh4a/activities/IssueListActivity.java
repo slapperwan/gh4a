@@ -60,8 +60,6 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
     private int mSelectedMilestone;
     private String mSelectedAssignee;
 
-    private int mPendingSelectedItem;
-
     private IssueListFragment mOpenFragment;
     private IssueListFragment mClosedFragment;
     private boolean mIsCollaborator;
@@ -375,31 +373,25 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
     private void showMilestonesDialog() {
         String[] milestones = new String[mMilestones.size() + 1];
         final int[] milestoneIds = new int[mMilestones.size() + 1];
+        int selected = 0;
 
         milestones[0] = getResources().getString(R.string.issue_filter_by_any_milestone);
         milestoneIds[0] = 0;
-
-        mPendingSelectedItem = 0;
 
         for (int i = 1; i <= mMilestones.size(); i++) {
             Milestone m = mMilestones.get(i - 1);
             milestones[i] = m.getTitle();
             milestoneIds[i] = m.getNumber();
             if (m.getNumber() == mSelectedMilestone) {
-                mPendingSelectedItem = i;
+                selected = i;
             }
         }
 
         DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mPendingSelectedItem = which;
-            }
-        };
-        DialogInterface.OnClickListener okCb = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mSelectedMilestone = milestoneIds[mPendingSelectedItem];
+                mSelectedMilestone = milestoneIds[which];
+                dialog.dismiss();
                 reloadIssueList();
             }
         };
@@ -407,38 +399,30 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         new AlertDialog.Builder(this)
                 .setCancelable(true)
                 .setTitle(R.string.issue_filter_by_milestone)
-                .setSingleChoiceItems(milestones, mPendingSelectedItem, selectCb)
-                .setPositiveButton(R.string.ok, okCb)
+                .setSingleChoiceItems(milestones, selected, selectCb)
                 .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 
     private void showAssigneesDialog() {
         final String[] assignees = new String[mAssignees.size() + 1];
+        int selected = 0;
 
         assignees[0] = getResources().getString(R.string.issue_filter_by_any_assignee);
-
-        mPendingSelectedItem = 0;
 
         for (int i = 1; i <= mAssignees.size(); i++) {
             User u = mAssignees.get(i - 1);
             assignees[i] = u.getLogin();
             if (u.getLogin().equalsIgnoreCase(mSelectedAssignee)) {
-                mPendingSelectedItem = i;
+                selected = i;
             }
         }
 
         DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mPendingSelectedItem = which;
-            }
-        };
-        DialogInterface.OnClickListener okCb = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mSelectedAssignee = mPendingSelectedItem != 0
-                        ? mAssignees.get(mPendingSelectedItem - 1).getLogin() : null;
+                mSelectedAssignee = which != 0 ? mAssignees.get(which - 1).getLogin() : null;
+                dialog.dismiss();
                 reloadIssueList();
             }
         };
@@ -446,8 +430,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         new AlertDialog.Builder(this)
                 .setCancelable(true)
                 .setTitle(R.string.issue_filter_by_assignee)
-                .setSingleChoiceItems(assignees, mPendingSelectedItem, selectCb)
-                .setPositiveButton(R.string.ok, okCb)
+                .setSingleChoiceItems(assignees, selected, selectCb)
                 .setNegativeButton(R.string.cancel, null)
                 .show();
     }
