@@ -15,87 +15,59 @@
  */
 package com.gh4a.activities;
 
-import java.util.List;
-
-import org.eclipse.egit.github.core.Gist;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
+import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.Constants;
-import com.gh4a.LoadingFragmentActivity;
+import com.gh4a.Gh4Application;
+import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
-import com.gh4a.adapter.GistAdapter;
-import com.gh4a.loader.GistListLoader;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
+import com.gh4a.fragment.GistListFragment;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.ToastUtils;
 
-public class GistListActivity extends LoadingFragmentActivity implements OnItemClickListener {
+public class GistListActivity extends LoadingFragmentPagerActivity {
     private String mUserLogin;
+    private boolean mIsSelf;
 
-    private LoaderCallbacks<List<Gist>> mGistsCallback = new LoaderCallbacks<List<Gist>>() {
-        @Override
-        public Loader<LoaderResult<List<Gist>>> onCreateLoader(int id, Bundle args) {
-            return new GistListLoader(GistListActivity.this, mUserLogin);
-        }
-
-        @Override
-        public void onResultReady(LoaderResult<List<Gist>> result) {
-            boolean success = !result.handleError(GistListActivity.this);
-            if (success) {
-                fillData(result.getData());
-            }
-            setContentEmpty(!success);
-            setContentShown(true);
-        }
+    private static final int[] TITLES_SELF = new int[] {
+        R.string.mine, R.string.starred
+    };
+    private static final int[] TITLES_OTHER = new int[] {
+        R.string.gists
     };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
         mUserLogin = getIntent().getExtras().getString(Constants.User.LOGIN);
+        mIsSelf = TextUtils.equals(mUserLogin, Gh4Application.get(this).getAuthLogin());
+
+        super.onCreate(savedInstanceState);
 
         if (hasErrorView()) {
             return;
         }
 
-        setContentView(R.layout.generic_list);
-        setContentShown(false);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(R.string.gists);
+        actionBar.setSubtitle(mUserLogin);
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
-        ActionBar mActionBar = getSupportActionBar();
-        mActionBar.setTitle(R.string.gists);
-        mActionBar.setSubtitle(mUserLogin);
-        mActionBar.setDisplayHomeAsUpEnabled(true);
-
-        getSupportLoaderManager().initLoader(0, null, mGistsCallback);
-    }
-
-    private void fillData(List<Gist> gists) {
-        ListView listView = (ListView) findViewById(R.id.list_view);
-        listView.setOnItemClickListener(this);
-
-        GistAdapter adapter = new GistAdapter(this);
-        if (gists != null && !gists.isEmpty()) {
-            adapter.addAll(gists);
-            listView.setAdapter(adapter);
-        } else {
-            ToastUtils.notFoundMessage(this, R.string.gist);
+        if (!mIsSelf) {
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         }
     }
 
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        Gist gist = (Gist) adapterView.getAdapter().getItem(position);
-        IntentUtils.openGistActivity(this, mUserLogin, gist.getId(), 0);
+    protected int[] getTabTitleResIds() {
+        return mIsSelf ? TITLES_SELF : TITLES_OTHER;
+    }
+
+    @Override
+    protected Fragment getFragment(int position) {
+        return GistListFragment.newInstance(mUserLogin, position == 1);
     }
 
     @Override

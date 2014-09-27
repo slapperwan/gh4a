@@ -59,7 +59,8 @@
     <string name="download_extradata">%1$s\u00a0\u00a0\u00a0%2$d downloads\u00a0\u00a0\u00a0created %3$s</string>
     <string name="release_extradata">%1$s\u00a0\u00a0\u00a0created %2$s</string>
     <string name="feed_extradata">[b]%1$s[/b]\u00a0\u00a0\u00a0%2$s</string>
-    <string name="gist_extradata">%1$s\u00a0\u00a0\u00a0%2$s</string>
+    <string name="gist_extradata">[b]%1$s[/b] %2$s\u00a0\u00a0\u00a0%3$s</string>
+    <string name="gist_extradata_own">%2$s\u00a0\u00a0\u00a0%3$s</string>
     <string name="go_to">Go to</string>
     <string name="forked_from">forked from %1$s</string>
     <string name="enter_username_toast">Please enter your user name instead of your email address</string>
@@ -133,6 +134,8 @@
     <string name="no_branches_found">No branches were created in this repository yet.</string>
     <string name="no_contributors_found">No contributions were made to this repository yet.</string>
     <string name="no_releases_found">No releases were created for this repository yet.</string>
+    <string name="no_gists_found">No gists were created so far.</string>
+    <string name="no_starred_gists_found">No gists were starred so far.</string>
 
     <!-- Activity event -->
     <string name="event_push_title">[b]%1$s[/b] pushed to [b]%2$s[/b] at [b]%3$s[/b]</string>
@@ -309,6 +312,8 @@
     <string name="object_view_file_at">View file @ %1$s</string>
 
     <!-- Gist -->
+    <string name="mine">Mine</string>
+    <string name="starred">Starred</string>
     <string name="gist">Gist</string>
     <string name="gists">Gists</string>
     <string name="gist_title">Gist %1$s</string>

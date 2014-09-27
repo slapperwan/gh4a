@@ -19,6 +19,7 @@ import org.eclipse.egit.github.core.Gist;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,25 +29,23 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
-/**
- * The Gist adapter.
- */
-public class GistAdapter  extends RootAdapter<Gist> {
-    public GistAdapter(Context context) {
+public class GistAdapter extends RootAdapter<Gist> {
+    private String mOwnerLogin;
+
+    public GistAdapter(Context context, String owner) {
         super(context);
+        mOwnerLogin = owner;
     }
 
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent) {
         View v = LayoutInflater.from(mContext).inflate(R.layout.row_gist, null);
-        ViewHolder viewHolder = new ViewHolder();
-
         Gh4Application app = (Gh4Application) mContext.getApplicationContext();
-        Typeface boldCondensed = app.boldCondensed;
+        ViewHolder viewHolder = new ViewHolder();
 
         viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvDesc.setTypeface(boldCondensed);
+        viewHolder.tvDesc.setTypeface(app.boldCondensed);
         viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
 
         v.setTag(viewHolder);
@@ -67,8 +66,11 @@ public class GistAdapter  extends RootAdapter<Gist> {
 
         String count = v.getResources().getQuantityString(R.plurals.file,
                 gist.getFiles().size(), gist.getFiles().size());
-        viewHolder.tvExtra.setText(mContext.getString(R.string.gist_extradata,
-                StringUtils.formatRelativeTime(mContext, gist.getCreatedAt(), false), count));
+        int extraResId = TextUtils.equals(gist.getUser().getLogin(), mOwnerLogin)
+                ? R.string.gist_extradata_own : R.string.gist_extradata;
+        String extra = mContext.getString(extraResId, gist.getUser().getLogin(),
+                StringUtils.formatRelativeTime(mContext, gist.getCreatedAt(), false), count);
+        viewHolder.tvExtra.setText(StringUtils.applyBoldTags(extra, null));
     }
 
     private static class ViewHolder {
