@@ -16,6 +16,7 @@
     <string name="search">Search</string>
     <string name="logout">Logout</string>
     <string name="login">Login</string>
+    <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="settings">Settings</string>
     <string name="about">About</string>
@@ -30,7 +31,6 @@
     <string name="other_info">Other Information</string>
     <string name="view">View</string>
     <string name="readme">Readme</string>
-    <string name="ok">@android:string/ok</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="save">Save</string>
