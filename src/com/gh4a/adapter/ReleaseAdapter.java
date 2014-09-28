@@ -24,14 +24,13 @@ public class ReleaseAdapter extends RootAdapter<Release> {
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent) {
+    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_simple_3, null);
+        Gh4Application app = Gh4Application.get(mContext);
         ViewHolder viewHolder = new ViewHolder();
 
-        Typeface boldCondensed = Gh4Application.get(mContext).boldCondensed;
-
         viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvTitle.setTypeface(boldCondensed);
+        viewHolder.tvTitle.setTypeface(app.boldCondensed);
 
         v.findViewById(R.id.tv_desc).setVisibility(View.GONE);
 

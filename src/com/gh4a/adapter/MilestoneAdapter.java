@@ -36,19 +36,16 @@ public class MilestoneAdapter extends RootAdapter<Milestone> {
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent) {
+    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_simple_3, null);
+        Gh4Application app = Gh4Application.get(mContext);
         ViewHolder viewHolder = new ViewHolder();
 
-        Gh4Application app = (Gh4Application) mContext.getApplicationContext();
-        Typeface boldCondensed = app.boldCondensed;
-        Typeface regular = app.regular;
-
         viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvTitle.setTypeface(boldCondensed);
+        viewHolder.tvTitle.setTypeface(app.boldCondensed);
 
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvDesc.setTypeface(regular);
+        viewHolder.tvDesc.setTypeface(app.regular);
         viewHolder.tvDesc.setMaxLines(2);
         viewHolder.tvDesc.setEllipsize(TruncateAt.END);
 

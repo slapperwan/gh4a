@@ -16,10 +16,8 @@
 package com.gh4a.adapter;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -33,24 +31,23 @@ import com.gh4a.utils.StringUtils;
 
 import org.eclipse.egit.github.core.RepositoryIssue;
 
-public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> implements OnClickListener {
+public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> implements
+        View.OnClickListener {
     public RepositoryIssueAdapter(Context context) {
         super(context);
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent) {
-        View v = inflater.inflate(R.layout.row_issue, null);
-        ViewHolder viewHolder = new ViewHolder();
-
+    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+        View v = inflater.inflate(R.layout.row_issue, parent, false);
         Gh4Application app = (Gh4Application) mContext.getApplicationContext();
-        Typeface boldCondensed = app.boldCondensed;
+        ViewHolder viewHolder = new ViewHolder();
 
         viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
         viewHolder.ivGravatar.setOnClickListener(this);
 
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvDesc.setTypeface(boldCondensed);
+        viewHolder.tvDesc.setTypeface(app.boldCondensed);
 
         viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
         viewHolder.tvNumber = (TextView) v.findViewById(R.id.tv_number);

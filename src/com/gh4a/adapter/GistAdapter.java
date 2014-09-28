@@ -18,7 +18,6 @@ package com.gh4a.adapter;
 import org.eclipse.egit.github.core.Gist;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,8 +37,8 @@ public class GistAdapter extends RootAdapter<Gist> {
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent) {
-        View v = LayoutInflater.from(mContext).inflate(R.layout.row_gist, null);
+    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+        View v = inflater.inflate(R.layout.row_gist, parent, false);
         Gh4Application app = (Gh4Application) mContext.getApplicationContext();
         ViewHolder viewHolder = new ViewHolder();
 

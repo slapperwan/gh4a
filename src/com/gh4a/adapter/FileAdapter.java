@@ -36,8 +36,8 @@ public class FileAdapter extends RootAdapter<RepositoryContents> {
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent) {
-        View v = inflater.inflate(R.layout.row_file_manager, null);
+    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+        View v = inflater.inflate(R.layout.row_file_manager, parent, false);
         ViewHolder holder = new ViewHolder();
 
         holder.icon = (ImageView) v.findViewById(R.id.iv_icon);

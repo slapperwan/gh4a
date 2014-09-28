@@ -52,7 +52,6 @@ import android.text.TextUtils;
 import android.text.style.TextAppearanceSpan;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -65,14 +64,14 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.CustomTypefaceSpan;
 import com.gh4a.widget.EllipsizeLineSpan;
 
-public class FeedAdapter extends RootAdapter<Event> implements OnClickListener {
+public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListener {
     public FeedAdapter(Context context) {
         super(context);
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent) {
-        View v = inflater.inflate(R.layout.feed_row, null);
+    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+        View v = inflater.inflate(R.layout.feed_row, parent, false);
         ViewHolder viewHolder = new ViewHolder();
 
         Gh4Application app = (Gh4Application) mContext.getApplicationContext();

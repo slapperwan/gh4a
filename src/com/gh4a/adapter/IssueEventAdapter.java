@@ -21,11 +21,9 @@ import org.eclipse.egit.github.core.IssueEvent;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.TextUtils;
-import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -75,25 +73,10 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        IssueEventHolder holder = getItem(position);
-        if (convertView == null) {
-            LayoutInflater inflater = LayoutInflater.from(mContext);
-            convertView = holder.comment != null
-                    ? createCommentView(inflater, parent) : createEventView(inflater, parent);
-        }
-        if (holder.comment != null) {
-            bindCommentView(convertView, holder, holder.comment);
-        } else {
-            bindEventView(convertView, holder, holder.event);
-        }
-
-        return convertView;
-    }
-
-    private View createCommentView(LayoutInflater inflater, ViewGroup parent) {
-        View v = inflater.inflate(R.layout.row_gravatar_comment, parent, false);
-        CommentViewHolder viewHolder = new CommentViewHolder();
+    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+        int layoutResId = viewType == 1 ? R.layout.row_issue_event : R.layout.row_gravatar_comment;
+        View v = inflater.inflate(layoutResId, parent, false);
+        ViewHolder viewHolder = new ViewHolder();
 
         viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
         viewHolder.ivGravatar.setOnClickListener(this);
@@ -107,62 +90,49 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
         return v;
     }
 
-    private View createEventView(LayoutInflater inflater, ViewGroup parent) {
-        View v = inflater.inflate(R.layout.row_issue_event, parent, false);
-        EventViewHolder viewHolder = new EventViewHolder();
-
-        viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-        viewHolder.ivGravatar.setOnClickListener(this);
-
-        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
-        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-
-        v.setTag(viewHolder);
-        return v;
-    }
-
-    private void bindCommentView(View v, IssueEventHolder event, Comment comment) {
-        CommentViewHolder viewHolder = (CommentViewHolder) v.getTag();
+    @Override
+    protected void bindView(View view, IssueEventHolder event) {
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
         String ourLogin = Gh4Application.get(mContext).getAuthLogin();
-        String login = comment.getUser().getLogin();
+        String login = event.getUser().getLogin();
 
-        AvatarHandler.assignAvatar(viewHolder.ivGravatar, comment.getUser());
-
-        String body = comment.getBodyHtml();
-        mImageGetter.bind(viewHolder.tvDesc, body, comment.getId());
-
+        AvatarHandler.assignAvatar(viewHolder.ivGravatar, event.getUser());
         viewHolder.ivGravatar.setTag(event);
 
-        String extra;
-        if (comment instanceof CommitComment) {
-            CommitComment commitComment = (CommitComment) comment;
-            extra = mContext.getString(R.string.issue_commit_comment_header, login,
-                    StringUtils.formatRelativeTime(mContext, comment.getCreatedAt(), true),
-                    FileUtils.getFileName(commitComment.getPath()));
+        if (event.comment != null) {
+            mImageGetter.bind(viewHolder.tvDesc, event.comment.getBodyHtml(),
+                    event.comment.getId());
+            String extra = formatCommentExtra(event.comment);
+            viewHolder.tvExtra.setText(StringUtils.applyBoldTags(extra, null));
         } else {
-            extra = mContext.getString(R.string.issue_comment_header, login,
-                    StringUtils.formatRelativeTime(mContext, comment.getCreatedAt(), true));
+            viewHolder.tvDesc.setText(formatEvent(event.event));
+            viewHolder.tvExtra.setText(StringUtils.formatRelativeTime(mContext,
+                    event.event.getCreatedAt(), true));
         }
-        viewHolder.tvExtra.setText(StringUtils.applyBoldTags(extra, null));
 
-        if ((login.equals(ourLogin) || mRepoOwner.equals(ourLogin)) && mEditCallback != null) {
-            viewHolder.ivEdit.setVisibility(View.VISIBLE);
-            viewHolder.ivEdit.setTag(comment);
-            viewHolder.ivEdit.setOnClickListener(this);
-        } else {
-            viewHolder.ivEdit.setVisibility(View.GONE);
+        if (viewHolder.ivEdit != null) {
+            if ((login.equals(ourLogin) || mRepoOwner.equals(ourLogin)) && mEditCallback != null) {
+                viewHolder.ivEdit.setVisibility(View.VISIBLE);
+                viewHolder.ivEdit.setTag(event.comment);
+                viewHolder.ivEdit.setOnClickListener(this);
+            } else {
+                viewHolder.ivEdit.setVisibility(View.GONE);
+            }
         }
     }
 
-    private void bindEventView(View v, IssueEventHolder eventHolder, IssueEvent event) {
-        EventViewHolder viewHolder = (EventViewHolder) v.getTag();
+    private String formatCommentExtra(Comment comment) {
+        String login = comment.getUser().getLogin();
+        CharSequence timestamp = StringUtils.formatRelativeTime(mContext,
+                comment.getCreatedAt(), true);
 
-        AvatarHandler.assignAvatar(viewHolder.ivGravatar, event.getActor());
-        viewHolder.ivGravatar.setTag(eventHolder);
-
-        viewHolder.tvDesc.setText(formatEvent(event));
-        viewHolder.tvExtra.setText(StringUtils.formatRelativeTime(mContext, event.getCreatedAt(), true));
+        if (comment instanceof CommitComment) {
+            CommitComment commitComment = (CommitComment) comment;
+            return mContext.getString(R.string.issue_commit_comment_header, login,
+                    timestamp, FileUtils.getFileName(commitComment.getPath()));
+        } else {
+            return mContext.getString(R.string.issue_comment_header, login, timestamp);
+        }
     }
 
     private CharSequence formatEvent(final IssueEvent event) {
@@ -218,17 +188,6 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent) {
-        // dummy only
-        return null;
-    }
-
-    @Override
-    protected void bindView(View view, IssueEventHolder object) {
-        // dummy only
-    }
-
-    @Override
     public void clear() {
         super.clear();
         mImageGetter = new HttpImageGetter(mContext);
@@ -245,16 +204,10 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
         }
     }
 
-    private static class CommentViewHolder {
+    private static class ViewHolder {
         public ImageView ivGravatar;
         public TextView tvDesc;
         public TextView tvExtra;
         public ImageView ivEdit;
-    }
-
-    private static class EventViewHolder {
-        public ImageView ivGravatar;
-        public TextView tvDesc;
-        public TextView tvExtra;
     }
 }

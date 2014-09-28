@@ -31,8 +31,8 @@ public class SimpleStringAdapter<T> extends RootAdapter<T> {
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent) {
-        View v = inflater.inflate(R.layout.row_simple, null);
+    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+        View v = inflater.inflate(R.layout.row_simple, parent, false);
 
         Gh4Application app = (Gh4Application) mContext.getApplicationContext();
         Typeface boldCondensed = app.boldCondensed;

@@ -38,19 +38,16 @@ public class RepositoryAdapter extends RootAdapter<Repository> implements Filter
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent) {
+    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_simple_3, null);
+        Gh4Application app = Gh4Application.get(mContext);
         ViewHolder viewHolder = new ViewHolder();
 
-        Gh4Application app = (Gh4Application) mContext.getApplicationContext();
-        Typeface boldCondensed = app.boldCondensed;
-        Typeface regular = app.regular;
-
         viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvTitle.setTypeface(boldCondensed);
+        viewHolder.tvTitle.setTypeface(app.boldCondensed);
 
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvDesc.setTypeface(regular);
+        viewHolder.tvDesc.setTypeface(app.regular);
 
         viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
         viewHolder.tvExtra.setTextAppearance(mContext, R.style.default_text_micro);

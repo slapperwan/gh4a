@@ -20,7 +20,6 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -37,14 +36,14 @@ import org.eclipse.egit.github.core.Label;
 
 import java.util.List;
 
-public class IssueAdapter extends RootAdapter<Issue> implements OnClickListener {
+public class IssueAdapter extends RootAdapter<Issue> implements View.OnClickListener {
     public IssueAdapter(Context context) {
         super(context);
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent) {
-        View v = inflater.inflate(R.layout.row_issue, null);
+    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+        View v = inflater.inflate(R.layout.row_issue, parent, false);
         ViewHolder viewHolder = new ViewHolder();
 
         Gh4Application app = (Gh4Application) mContext.getApplicationContext();

@@ -6,7 +6,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -17,13 +16,13 @@ import com.gh4a.utils.UiUtils;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 
-public class IssueLabelAdapter extends RootAdapter<Label> implements OnClickListener {
+public class IssueLabelAdapter extends RootAdapter<Label> implements View.OnClickListener {
     public IssueLabelAdapter(Context context) {
         super(context);
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent) {
+    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_issue_label, parent, false);
         ViewHolder holder = new ViewHolder();
 

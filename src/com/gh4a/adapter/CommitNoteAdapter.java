@@ -21,7 +21,6 @@ import org.eclipse.egit.github.core.User;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -35,7 +34,7 @@ import com.gh4a.utils.UiUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
-public class CommitNoteAdapter extends RootAdapter<CommitComment> implements OnClickListener {
+public class CommitNoteAdapter extends RootAdapter<CommitComment> implements View.OnClickListener {
     public interface OnEditComment {
         void editComment(CommitComment comment);
     }
@@ -52,8 +51,8 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements OnC
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent) {
-        View v = inflater.inflate(R.layout.row_gravatar_comment, null);
+    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+        View v = inflater.inflate(R.layout.row_gravatar_comment, parent, false);
         ViewHolder viewHolder = new ViewHolder();
 
         viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);

@@ -21,7 +21,6 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -33,14 +32,14 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
-public class CommitAdapter extends RootAdapter<RepositoryCommit> implements OnClickListener {
+public class CommitAdapter extends RootAdapter<RepositoryCommit> implements View.OnClickListener {
     public CommitAdapter(Context context) {
         super(context);
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent) {
-        View v = LayoutInflater.from(mContext).inflate(R.layout.row_commit, null);
+    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+        View v = inflater.inflate(R.layout.row_commit, parent, false);
         ViewHolder viewHolder = new ViewHolder();
         Typeface boldCondensed = Gh4Application.get(mContext).boldCondensed;
 

@@ -16,10 +16,8 @@
 package com.gh4a.adapter;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -32,28 +30,25 @@ import com.gh4a.utils.StringUtils;
 
 import org.eclipse.egit.github.core.SearchUser;
 
-public class SearchUserAdapter extends RootAdapter<SearchUser> implements OnClickListener {
+public class SearchUserAdapter extends RootAdapter<SearchUser> implements View.OnClickListener {
     public SearchUserAdapter(Context context) {
         super(context);
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent) {
+    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_gravatar_1, parent, false);
-
         Gh4Application app = Gh4Application.get(mContext);
-        Typeface boldCondensed = app.boldCondensed;
-        Typeface italic = app.italic;
 
         ViewHolder viewHolder = new ViewHolder();
         viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
         viewHolder.ivGravatar.setOnClickListener(this);
 
         viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvTitle.setTypeface(boldCondensed);
+        viewHolder.tvTitle.setTypeface(app.boldCondensed);
 
         viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-        viewHolder.tvExtra.setTypeface(italic);
+        viewHolder.tvExtra.setTypeface(app.italic);
 
         v.setTag(viewHolder);
         return v;

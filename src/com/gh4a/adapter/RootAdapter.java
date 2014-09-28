@@ -115,7 +115,8 @@ public abstract class RootAdapter<T> extends BaseAdapter implements Filterable {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            convertView = createView(LayoutInflater.from(mContext), parent);
+            convertView = createView(LayoutInflater.from(mContext), parent,
+                    getItemViewType(position));
         }
         bindView(convertView, getItem(position));
 
@@ -158,6 +159,6 @@ public abstract class RootAdapter<T> extends BaseAdapter implements Filterable {
         return mFilter;
     }
 
-    protected abstract View createView(LayoutInflater inflater, ViewGroup parent);
+    protected abstract View createView(LayoutInflater inflater, ViewGroup parent, int viewType);
     protected abstract void bindView(View view, T object);
 }

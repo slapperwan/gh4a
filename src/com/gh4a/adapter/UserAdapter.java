@@ -21,7 +21,6 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -32,7 +31,7 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
-public class UserAdapter extends RootAdapter<User> implements OnClickListener {
+public class UserAdapter extends RootAdapter<User> implements View.OnClickListener {
     private boolean mShowExtraData;
 
     public UserAdapter(Context context, boolean showExtraData) {
@@ -41,7 +40,7 @@ public class UserAdapter extends RootAdapter<User> implements OnClickListener {
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent) {
+    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_gravatar_1, parent, false);
 
         Gh4Application app = (Gh4Application) mContext.getApplicationContext();

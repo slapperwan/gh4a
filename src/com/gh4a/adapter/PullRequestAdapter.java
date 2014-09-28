@@ -22,7 +22,6 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -33,13 +32,13 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
-public class PullRequestAdapter extends RootAdapter<PullRequest> implements OnClickListener {
+public class PullRequestAdapter extends RootAdapter<PullRequest> implements View.OnClickListener {
     public PullRequestAdapter(Context context) {
         super(context);
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent) {
+    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_gravatar_1, parent, false);
         ViewHolder viewHolder = new ViewHolder();
 
