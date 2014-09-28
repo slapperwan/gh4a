@@ -35,7 +35,6 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -51,10 +50,11 @@ import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.activities.EditIssueCommentActivity;
-import com.gh4a.adapter.CommentAdapter;
+import com.gh4a.adapter.IssueEventAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.IsCollaboratorLoader;
-import com.gh4a.loader.IssueCommentsLoader;
+import com.gh4a.loader.PullRequestCommentListLoader;
+import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestLoader;
@@ -66,8 +66,8 @@ import com.gh4a.utils.UiUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
-public class PullRequestFragment extends ListDataBaseFragment<Comment> implements
-        CommentAdapter.OnEditComment, OnClickListener {
+public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> implements
+        IssueEventAdapter.OnEditComment, View.OnClickListener {
     private static final int REQUEST_EDIT = 1000;
 
     private String mRepoOwner;
@@ -204,8 +204,14 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
     }
 
     @Override
-    protected RootAdapter<Comment> onCreateAdapter() {
-        return new CommentAdapter(getActivity(), mRepoOwner, this);
+    protected RootAdapter<IssueEventHolder> onCreateAdapter() {
+        return new IssueEventAdapter(getActivity(), mRepoOwner, mRepoName, this);
+    }
+
+    @Override
+    protected void onAddData(RootAdapter<IssueEventHolder> adapter, List<IssueEventHolder> data) {
+        super.onAddData(adapter, data);
+        updateListCaption();
     }
 
     @Override
@@ -239,6 +245,12 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         return super.onOptionsItemSelected(item);
     }
 
+    private void updateListCaption() {
+        TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
+        tvCommentTitle.setText(getString(R.string.issue_events_with_count,
+                getListAdapter().getCount()));
+    }
+
     private void fillData() {
         final Gh4Application app = Gh4Application.get(getActivity());
         View v = getView();
@@ -248,10 +260,6 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
         gravatar.setOnClickListener(this);
         gravatar.setTag(user);
         AvatarHandler.assignAvatar(gravatar, user);
-
-        TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
-        tvCommentTitle.setText(getString(R.string.issue_comments_with_count,
-                mPullRequest.getComments()));
 
         TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
         if (Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState())) {
@@ -320,8 +328,9 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
     }
 
     @Override
-    public Loader<LoaderResult<List<Comment>>> onCreateLoader(int id, Bundle args) {
-        return new IssueCommentsLoader(getActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
+    public Loader<LoaderResult<List<IssueEventHolder>>> onCreateLoader(int id, Bundle args) {
+        return new PullRequestCommentListLoader(getActivity(),
+                mRepoOwner, mRepoName, mPullRequestNumber);
     }
 
     @Override
@@ -337,7 +346,7 @@ public class PullRequestFragment extends ListDataBaseFragment<Comment> implement
     }
 
     @Override
-    protected void onItemClick(Comment comment) {
+    protected void onItemClick(IssueEventHolder event) {
     }
 
     @Override

@@ -47,9 +47,10 @@ import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
-import com.gh4a.adapter.CommentAdapter;
+import com.gh4a.adapter.IssueEventAdapter;
 import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.IssueCommentListLoader;
+import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.loader.IssueLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
@@ -62,16 +63,16 @@ import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 public class IssueActivity extends LoadingFragmentActivity implements
-        OnClickListener, CommentAdapter.OnEditComment {
+        OnClickListener, IssueEventAdapter.OnEditComment {
     private static final int REQUEST_EDIT = 1000;
 
     private Issue mIssue;
     private String mRepoOwner;
     private String mRepoName;
     private int mIssueNumber;
-    private String mIssueState;
     private LinearLayout mHeader;
-    private CommentAdapter mCommentAdapter;
+    private boolean mEventsLoaded;
+    private IssueEventAdapter mEventAdapter;
     private boolean mIsCollaborator;
 
     private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>() {
@@ -81,27 +82,37 @@ public class IssueActivity extends LoadingFragmentActivity implements
         }
         @Override
         public void onResultReady(LoaderResult<Issue> result) {
-            boolean success = !result.handleError(IssueActivity.this);
-            if (success) {
+            if (!result.handleError(IssueActivity.this)) {
                 mIssue = result.getData();
-                mIssueState = mIssue.getState();
-                fillData();
+                fillDataIfDone();
+                invalidateOptionsMenu();
+            } else {
+                setContentEmpty(true);
+                setContentShown(true);
             }
-            setContentEmpty(!success);
-            setContentShown(true);
-            invalidateOptionsMenu();
         }
     };
 
-    private LoaderCallbacks<List<Comment>> mCommentCallback = new LoaderCallbacks<List<Comment>>() {
+    private LoaderCallbacks<List<IssueEventHolder>> mEventCallback =
+            new LoaderCallbacks<List<IssueEventHolder>>() {
         @Override
-        public Loader<LoaderResult<List<Comment>>> onCreateLoader(int id, Bundle args) {
+        public Loader<LoaderResult<List<IssueEventHolder>>> onCreateLoader(int id, Bundle args) {
             return new IssueCommentListLoader(IssueActivity.this, mRepoOwner, mRepoName, mIssueNumber);
         }
         @Override
-        public void onResultReady(LoaderResult<List<Comment>> result) {
+        public void onResultReady(LoaderResult<List<IssueEventHolder>> result) {
             if (!result.handleError(IssueActivity.this)) {
-                fillComments(result.getData());
+                List<IssueEventHolder> events = result.getData();
+                mEventAdapter.clear();
+                if (events != null) {
+                    mEventAdapter.addAll(events);
+                }
+                mEventAdapter.notifyDataSetChanged();
+                mEventsLoaded = true;
+                fillDataIfDone();
+            } else {
+                setContentEmpty(true);
+                setContentShown(true);
             }
         }
     };
@@ -128,7 +139,6 @@ public class IssueActivity extends LoadingFragmentActivity implements
         mRepoOwner = data.getString(Constants.Repository.OWNER);
         mRepoName = data.getString(Constants.Repository.NAME);
         mIssueNumber = data.getInt(Constants.Issue.NUMBER);
-        mIssueState = data.getString(Constants.Issue.STATE);
 
         if (hasErrorView()) {
             return;
@@ -159,8 +169,8 @@ public class IssueActivity extends LoadingFragmentActivity implements
         listView.addHeaderView(mHeader, null, false);
         listView.setHeaderDividersEnabled(false);
 
-        mCommentAdapter = new CommentAdapter(this, mRepoOwner, this);
-        listView.setAdapter(mCommentAdapter);
+        mEventAdapter = new IssueEventAdapter(this, mRepoOwner, mRepoName, this);
+        listView.setAdapter(mEventAdapter);
 
         if (!Gh4Application.get(this).isAuthorized()) {
             findViewById(R.id.comment).setVisibility(View.GONE);
@@ -169,13 +179,22 @@ public class IssueActivity extends LoadingFragmentActivity implements
 
         getSupportLoaderManager().initLoader(0, null, mIssueCallback);
         getSupportLoaderManager().initLoader(1, null, mCollaboratorCallback);
-        getSupportLoaderManager().initLoader(2, null, mCommentCallback);
+        getSupportLoaderManager().initLoader(2, null, mEventCallback);
+    }
+
+    private void fillDataIfDone() {
+        if (mIssue == null || !mEventsLoaded) {
+            return;
+        }
+        fillData();
+        setContentShown(true);
     }
 
     private void fillData() {
         // set details inside listview header
         TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
-        tvCommentTitle.setText(getString(R.string.issue_comments_with_count, mIssue.getComments()));
+        tvCommentTitle.setText(getString(R.string.issue_events_with_count,
+                mEventAdapter.getCount()));
 
         ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
         AvatarHandler.assignAvatar(ivGravatar, mIssue.getUser());
@@ -269,21 +288,16 @@ public class IssueActivity extends LoadingFragmentActivity implements
         infoBox.setVisibility(showInfoBox ? View.VISIBLE : View.GONE);
     }
 
-    protected void fillComments(List<Comment> comments) {
-        mCommentAdapter.clear();
-        if (comments != null) {
-            mCommentAdapter.addAll(comments);
-        }
-        mCommentAdapter.notifyDataSetChanged();
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (Gh4Application.get(this).isAuthorized()) {
             MenuInflater inflater = getSupportMenuInflater();
             inflater.inflate(R.menu.issue_menu, menu);
 
-            if (Constants.Issue.STATE_CLOSED.equals(mIssueState)) {
+            if (mIssue == null) {
+                menu.removeItem(R.id.issue_close);
+                menu.removeItem(R.id.issue_reopen);
+            } else if (Constants.Issue.STATE_CLOSED.equals(mIssue.getState())) {
                 menu.removeItem(R.id.issue_close);
             } else {
                 menu.removeItem(R.id.issue_reopen);
@@ -345,7 +359,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
                 setContentShown(false);
                 getSupportLoaderManager().restartLoader(0, null, mIssueCallback);
                 getSupportLoaderManager().restartLoader(1, null, mCollaboratorCallback);
-                getSupportLoaderManager().restartLoader(2, null, mCommentCallback);
+                getSupportLoaderManager().restartLoader(2, null, mEventCallback);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -431,7 +445,6 @@ public class IssueActivity extends LoadingFragmentActivity implements
         @Override
         protected void onSuccess(Issue result) {
             mIssue = result;
-            mIssueState = mIssue.getState();
             ToastUtils.showMessage(mContext,
                     mOpen ? R.string.issue_success_reopen : R.string.issue_success_close);
 

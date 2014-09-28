@@ -209,6 +209,16 @@
     <string name="repo_no_readme">No README file found</string>
     <string name="repo_issue_on">on %1$s</string>
 
+    <!-- Issue events -->
+    <string name="issue_event_closed">Closed by [b]%1$s[/b]</string>
+    <string name="issue_event_closed_with_commit">Closed by [b]%1$s[/b] with commit [commit]</string>
+    <string name="issue_event_reopened">Reopened by [b]%1$s[/b]</string>
+    <string name="issue_event_merged">Merged by [b]%1$s[/b]</string>
+    <string name="issue_event_referenced">Referenced by [b]%1$s[/b]</string>
+    <string name="issue_event_referenced_with_commit">Referenced by [b]%1$s[/b] from commit [commit]</string>
+    <string name="issue_event_assigned">Assigned to [b]%1$s[/b]</string>
+    <string name="issue_event_unassigned">Unassigned from [b]%1$s[/b]</string>
+
     <!-- Commit -->
     <string name="commit_title">Commit %1$s</string>
     <string name="commit">Commit</string>
@@ -237,7 +247,7 @@
     <string name="issues">Issues</string>
     <string name="issue">Issue</string>
     <string name="issue_comments">Comments</string>
-    <string name="issue_comments_with_count">Comments (%1$d)</string>
+    <string name="issue_events_with_count">Events (%1$d)</string>
     <string name="issue_title">Title</string>
     <string name="issue_body">Body</string>
     <string name="issue_create">New Issue</string>

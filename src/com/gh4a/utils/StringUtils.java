@@ -184,7 +184,7 @@ public class StringUtils {
         return Gh4Application.get(context).getPrettyTimeInstance().format(date);
     }
 
-    public static CharSequence applyBoldTags(String input, Typeface boldFont) {
+    public static SpannableStringBuilder applyBoldTags(String input, Typeface boldFont) {
         SpannableStringBuilder ssb = new SpannableStringBuilder();
         int pos = 0;
 

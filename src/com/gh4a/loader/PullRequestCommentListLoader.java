@@ -1,6 +1,7 @@
 package com.gh4a.loader;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -15,25 +16,23 @@ import android.content.Context;
 
 import com.gh4a.Gh4Application;
 
-public class IssueCommentsLoader extends BaseLoader<List<Comment>> {
-
+public class PullRequestCommentListLoader extends IssueCommentListLoader {
     private String mRepoOwner;
     private String mRepoName;
     private int mIssueNumber;
 
-    public IssueCommentsLoader(Context context, String repoOwner, String repoName, int issueNumber) {
-        super(context);
+    public PullRequestCommentListLoader(Context context, String repoOwner,
+            String repoName, int issueNumber) {
+        super(context, repoOwner, repoName, issueNumber);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
         mIssueNumber = issueNumber;
     }
 
     @Override
-    public List<Comment> doLoadInBackground() throws IOException {
+    public List<IssueEventHolder> doLoadInBackground() throws IOException {
         // combine issue comments and pull request comments (to get comments on diff)
-        IssueService issueService = (IssueService)
-                Gh4Application.get(getContext()).getService(Gh4Application.ISSUE_SERVICE);
-        List<Comment> comments = issueService.getComments(mRepoOwner, mRepoName, mIssueNumber);
+        List<IssueEventHolder> events = super.doLoadInBackground();
 
         PullRequestService pullRequestService = (PullRequestService)
                 Gh4Application.get(getContext()).getService(Gh4Application.PULL_SERVICE);
@@ -43,19 +42,12 @@ public class IssueCommentsLoader extends BaseLoader<List<Comment>> {
         // only add comment that is not outdated
         for (CommitComment commitComment: commitComments) {
             if (commitComment.getPosition() != -1) {
-                comments.add(commitComment);
+                events.add(new IssueEventHolder(commitComment));
             }
         }
 
-        Collections.sort(comments, new Comparator<Comment>() {
+        Collections.sort(events, SORTER);
 
-            @Override
-            public int compare(Comment lhs, Comment rhs) {
-                return lhs.getCreatedAt().compareTo(rhs.getCreatedAt());
-            }
-
-        });
-
-        return comments;
+        return events;
     }
 }
