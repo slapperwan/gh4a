@@ -44,7 +44,6 @@ public class FileViewerActivity extends WebViewerActivity {
     private String mRepoOwner;
     private String mPath;
     private String mRef;
-    private String mSha;
 
     private static final int MENU_ITEM_HISTORY = 10;
 
@@ -86,7 +85,6 @@ public class FileViewerActivity extends WebViewerActivity {
         mRepoName = data.getString(Constants.Repository.NAME);
         mPath = data.getString(Constants.Object.PATH);
         mRef = data.getString(Constants.Object.REF);
-        mSha = data.getString(Constants.Object.OBJECT_SHA);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(FileUtils.getFileName(mPath));
@@ -144,7 +142,6 @@ public class FileViewerActivity extends WebViewerActivity {
                 historyIntent.putExtra(Constants.Repository.NAME, mRepoName);
                 historyIntent.putExtra(Constants.Object.PATH, mPath);
                 historyIntent.putExtra(Constants.Object.REF, mRef);
-                historyIntent.putExtra(Constants.Object.OBJECT_SHA, mSha);
                 startActivity(historyIntent);
                 return true;
          }

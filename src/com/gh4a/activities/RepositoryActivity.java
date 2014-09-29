@@ -322,7 +322,6 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         intent.putExtra(Constants.Repository.NAME, mRepoName);
         intent.putExtra(Constants.Object.PATH, content.getPath());
         intent.putExtra(Constants.Object.REF, getCurrentRef());
-        intent.putExtra(Constants.Object.NAME, content.getName());
         intent.putExtra(Constants.Object.OBJECT_SHA, content.getSha());
         startActivity(intent);
     }

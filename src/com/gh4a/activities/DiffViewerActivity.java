@@ -67,6 +67,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     protected String mRepoName;
     protected String mPath;
     protected String mSha;
+    protected String mRef;
 
     private String mDiff;
     private String[] mDiffLines;
@@ -112,6 +113,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         mRepoName = data.getString(Constants.Repository.NAME);
         mPath = data.getString(Constants.Object.PATH);
         mSha = data.getString(Constants.Object.OBJECT_SHA);
+        mRef = data.getString(Constants.Object.REF);
         mDiff = data.getString(Constants.Commit.DIFF);
 
         ActionBar actionBar = getSupportActionBar();
@@ -169,7 +171,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                 viewIntent.putExtra(Constants.Repository.OWNER, mRepoOwner);
                 viewIntent.putExtra(Constants.Repository.NAME, mRepoName);
                 viewIntent.putExtra(Constants.Object.PATH, mPath);
-                viewIntent.putExtra(Constants.Object.REF, mSha);
+                viewIntent.putExtra(Constants.Object.REF, mRef);
                 viewIntent.putExtra(Constants.Object.OBJECT_SHA, mSha);
                 startActivity(viewIntent);
                 return true;

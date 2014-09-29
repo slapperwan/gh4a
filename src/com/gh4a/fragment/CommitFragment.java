@@ -290,12 +290,11 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
                     ? FileViewerActivity.class : CommitDiffViewerActivity.class);
             intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
             intent.putExtra(Constants.Repository.NAME, mRepoName);
-            intent.putExtra(Constants.Object.REF, mObjectSha);
             intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
             intent.putExtra(Constants.Commit.DIFF, file.getPatch());
             intent.putExtra(Constants.Commit.COMMENTS, new ArrayList<CommitComment>(mComments));
             intent.putExtra(Constants.Object.PATH, file.getFilename());
-            intent.putExtra(Constants.Object.TREE_SHA, mCommit.getCommit().getTree().getSha());
+            intent.putExtra(Constants.Object.REF, mCommit.getCommit().getTree().getSha());
             startActivityForResult(intent, REQUEST_DIFF_VIEWER);
         }
     }

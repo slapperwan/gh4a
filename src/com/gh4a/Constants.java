@@ -68,11 +68,9 @@ public interface Constants {
     }
 
     public interface Object {
-        public static final String NAME = "Object.NAME";
         public static final String PATH = "Object.PATH";
-        public static final String OBJECT_SHA = "Object.SHA";
-        public static final String TREE_SHA = "Object.TREE_SHA";
-        public static final String REF = "Object.REF";
+        public static final String OBJECT_SHA = "Object.SHA"; // SHA of the commit object
+        public static final String REF = "Object.REF"; // SHA or branch/tag name of tree
     }
 
     public interface Gist {

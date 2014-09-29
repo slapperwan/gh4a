@@ -100,7 +100,7 @@ public class BrowseFilter extends BaseSherlockFragmentActivity {
                 IntentUtils.openCommitInfoActivity(this, user, repo, id, 0);
             } else if ("blob".equals(action) && !StringUtils.isBlank(id) && parts.size() >= 5) {
                 String fullPath = TextUtils.join("/", parts.subList(4, parts.size()));
-                IntentUtils.openFileViewerActivity(this, user, repo, id, fullPath, uri.getLastPathSegment());
+                IntentUtils.openFileViewerActivity(this, user, repo, id, fullPath);
             } else {
                 IntentUtils.launchBrowser(this, uri);
             }

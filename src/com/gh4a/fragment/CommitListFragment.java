@@ -84,7 +84,7 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
         intent.putExtra(Constants.Repository.OWNER, urlPart[4]);
         intent.putExtra(Constants.Repository.NAME, urlPart[5]);
         intent.putExtra(Constants.Object.OBJECT_SHA, commit.getSha());
-        intent.putExtra(Constants.Object.TREE_SHA, commit.getCommit().getTree().getSha());
+        intent.putExtra(Constants.Object.REF, commit.getCommit().getTree().getSha());
 
         startActivity(intent);
     }

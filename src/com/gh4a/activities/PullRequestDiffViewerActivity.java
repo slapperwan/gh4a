@@ -33,14 +33,12 @@ import java.util.List;
 
 public class PullRequestDiffViewerActivity extends DiffViewerActivity {
     private int mPullRequestNumber;
-    private String mRef;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         // Need to fetch data before calling super method, as it will
         // initialize the loader right away
         mPullRequestNumber = getIntent().getIntExtra(Constants.PullRequest.NUMBER, -1);
-        mRef = getIntent().getStringExtra(Constants.Object.REF);
 
         super.onCreate(savedInstanceState);
     }
