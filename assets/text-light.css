@@ -40,5 +40,6 @@ pre > div {
     white-space: normal;
     border: 1px solid;
     padding: 2px;
-    margin: 5px 0;
+    margin-top: 3px;
+    margin-bottom: 3px;
 }
