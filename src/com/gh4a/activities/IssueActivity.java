@@ -452,7 +452,9 @@ public class IssueActivity extends LoadingFragmentActivity implements
             tvState.setBackgroundResource(mOpen ? R.drawable.default_green_box : R.drawable.default_red_box);
             tvState.setText(getString(mOpen ? R.string.open : R.string.closed).toUpperCase(Locale.getDefault()));
             // reload issue state
-            getSupportLoaderManager().getLoader(0).onContentChanged();
+            fillDataIfDone();
+            // reload events, the action will have triggered an additional one
+            getSupportLoaderManager().getLoader(2).onContentChanged();
             setResult(RESULT_OK);
             invalidateOptionsMenu();
         }

@@ -379,8 +379,8 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         @Override
         protected void onSuccess(Void result) {
             ToastUtils.showMessage(mContext, R.string.issue_success_comment);
-            //reload comments
-            refresh();
+            // reload comments
+            PullRequestFragment.super.refresh();
 
             EditText etComment = (EditText) getView().findViewById(R.id.et_comment);
             etComment.setText(null);
@@ -420,6 +420,8 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
                     mOpen ? R.string.issue_success_reopen : R.string.issue_success_close);
 
             fillData();
+            // reload events, the action will have triggered an additional one
+            PullRequestFragment.super.refresh();
             invalidateOptionsMenu();
         }
 
