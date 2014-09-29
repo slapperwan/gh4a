@@ -8,7 +8,6 @@ import static android.text.format.DateUtils.MINUTE_IN_MILLIS;
 import org.eclipse.egit.github.core.Release;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;

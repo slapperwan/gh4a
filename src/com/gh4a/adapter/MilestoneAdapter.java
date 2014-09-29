@@ -18,7 +18,6 @@ package com.gh4a.adapter;
 import org.eclipse.egit.github.core.Milestone;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.text.TextUtils.TruncateAt;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
