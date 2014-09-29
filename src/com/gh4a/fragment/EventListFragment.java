@@ -225,7 +225,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
                         repoOwner, repoName, issue.getNumber());
             } else if (issue != null) {
                 IntentUtils.openIssueActivity(getActivity(), repoOwner, repoName,
-                        issue.getNumber(), issue.getState());
+                        issue.getNumber());
             }
 
         } else if (Event.TYPE_ISSUES.equals(eventType)) {

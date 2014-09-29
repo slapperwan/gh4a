@@ -49,6 +49,7 @@ import com.gh4a.R;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.FileUtils;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ThemeUtils;
 import com.gh4a.utils.ToastUtils;
@@ -167,13 +168,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                 startActivity(shareIntent);
                 return true;
             case MENU_ITEM_VIEW:
-                Intent viewIntent = new Intent(this, FileViewerActivity.class);
-                viewIntent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-                viewIntent.putExtra(Constants.Repository.NAME, mRepoName);
-                viewIntent.putExtra(Constants.Object.PATH, mPath);
-                viewIntent.putExtra(Constants.Object.REF, mRef);
-                viewIntent.putExtra(Constants.Object.OBJECT_SHA, mSha);
-                startActivity(viewIntent);
+                IntentUtils.openFileViewerActivity(this, mRepoOwner, mRepoName,
+                        mRef, mPath);
                 return true;
         }
         return super.onOptionsItemSelected(item);

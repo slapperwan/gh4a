@@ -18,19 +18,19 @@ package com.gh4a.fragment;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryIssue;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.IssueService;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.activities.IssueActivity;
 import com.gh4a.adapter.RepositoryIssueAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.utils.IntentUtils;
 
 public class RepositoryIssueListFragment extends PagedDataBaseFragment<RepositoryIssue> {
     private Map<String, String> mFilterData;
@@ -65,12 +65,9 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Repositor
 
     @Override
     public void onItemClick(RepositoryIssue issue) {
-        Intent intent = new Intent(getActivity(), IssueActivity.class);
-        intent.putExtra(Constants.Repository.OWNER, issue.getRepository().getOwner().getLogin());
-        intent.putExtra(Constants.Repository.NAME, issue.getRepository().getName());
-        intent.putExtra(Constants.Issue.NUMBER, issue.getNumber());
-        intent.putExtra(Constants.Issue.STATE, issue.getState());
-        startActivity(intent);
+        Repository repo = issue.getRepository();
+        IntentUtils.openIssueActivity(getActivity(), repo.getOwner().getLogin(),
+                repo.getName(), issue.getNumber());
     }
 
     @Override

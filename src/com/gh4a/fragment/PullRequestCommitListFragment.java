@@ -19,17 +19,16 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryCommit;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 
 import com.gh4a.Constants;
 import com.gh4a.R;
-import com.gh4a.activities.CommitActivity;
 import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.RepositoryCommitsLoader;
+import com.gh4a.utils.IntentUtils;
 
 public class PullRequestCommitListFragment extends ListDataBaseFragment<RepositoryCommit> {
     private String mRepoOwner;
@@ -69,13 +68,8 @@ public class PullRequestCommitListFragment extends ListDataBaseFragment<Reposito
 
     @Override
     protected void onItemClick(RepositoryCommit commit) {
-        Intent intent = new Intent(getActivity(), CommitActivity.class);
-        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.NAME, mRepoName);
-        intent.putExtra(Constants.Object.OBJECT_SHA, commit.getSha());
-        intent.putExtra(Constants.Object.REF, commit.getCommit().getTree().getSha());
-
-        startActivity(intent);
+        IntentUtils.openCommitInfoActivity(getActivity(), mRepoOwner, mRepoName,
+                commit.getSha(), 0);
     }
 
     @Override

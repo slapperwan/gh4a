@@ -312,18 +312,9 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             String[] userRepo = mGitModuleMap.get(path).split("/");
             IntentUtils.openRepositoryInfoActivity(this, userRepo[0], userRepo[1], null, 0);
         } else {
-            openFileViewer(content);
+            IntentUtils.openFileViewerActivity(this, mRepoOwner, mRepoName,
+                    getCurrentRef(), content.getPath());
         }
-    }
-
-    private void openFileViewer(RepositoryContents content) {
-        Intent intent = new Intent(this, FileViewerActivity.class);
-        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.NAME, mRepoName);
-        intent.putExtra(Constants.Object.PATH, content.getPath());
-        intent.putExtra(Constants.Object.REF, getCurrentRef());
-        intent.putExtra(Constants.Object.OBJECT_SHA, content.getSha());
-        startActivity(intent);
     }
 
     @Override

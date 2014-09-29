@@ -28,20 +28,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class IntentUtils {
-    public static void openIssueActivity(Context context, String login, String repoName, int issueNumber) {
-        openIssueActivity(context, login, repoName, issueNumber, null);
-    }
-
-    public static void openIssueActivity(Context context, String login, String repoName,
-            int issueNumber, String state) {
-        Intent intent = new Intent(context, IssueActivity.class);
-        intent.putExtra(Constants.Repository.OWNER, login);
-        intent.putExtra(Constants.Repository.NAME, repoName);
-        intent.putExtra(Constants.Issue.NUMBER, issueNumber);
-        if (state != null) {
-            intent.putExtra(Constants.Issue.STATE, state);
-        }
-        context.startActivity(intent);
+    public static void openIssueActivity(Context context, String login,
+            String repoName, int issueNumber) {
+        openIssueActivity(context, login, repoName, issueNumber, 0);
     }
 
     public static void openIssueActivity(Context context, String login, String repoName,
@@ -148,12 +137,12 @@ public class IntentUtils {
     }
 
     public static void openFileViewerActivity(Context context, String login, String repoName,
-            String sha, String fullPath) {
+            String ref, String fullPath) {
         Intent intent = new Intent(context, FileViewerActivity.class);
         intent.putExtra(Constants.Repository.OWNER, login);
         intent.putExtra(Constants.Repository.NAME, repoName);
         intent.putExtra(Constants.Object.PATH, fullPath);
-        intent.putExtra(Constants.Object.REF, sha);
+        intent.putExtra(Constants.Object.REF, ref);
         context.startActivity(intent);
     }
 

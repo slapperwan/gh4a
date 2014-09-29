@@ -21,15 +21,14 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.CommitService;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.activities.CommitActivity;
 import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
 public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> {
@@ -78,15 +77,9 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
 
     @Override
     protected void onItemClick(RepositoryCommit commit) {
-        Intent intent = new Intent(getActivity(), CommitActivity.class);
         String[] urlPart = commit.getUrl().split("/");
-
-        intent.putExtra(Constants.Repository.OWNER, urlPart[4]);
-        intent.putExtra(Constants.Repository.NAME, urlPart[5]);
-        intent.putExtra(Constants.Object.OBJECT_SHA, commit.getSha());
-        intent.putExtra(Constants.Object.REF, commit.getCommit().getTree().getSha());
-
-        startActivity(intent);
+        IntentUtils.openCommitInfoActivity(getActivity(), urlPart[4], urlPart[5],
+                commit.getSha(), 0);
     }
 
     @Override
