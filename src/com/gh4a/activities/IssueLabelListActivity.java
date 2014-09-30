@@ -50,6 +50,7 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.LabelService;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.List;
 
 public class IssueLabelListActivity extends LoadingFragmentActivity implements OnItemClickListener {
@@ -264,7 +265,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
         protected Void run() throws IOException {
             LabelService labelService = (LabelService)
                     Gh4Application.get(mContext).getService(Gh4Application.LABEL_SERVICE);
-            labelService.deleteLabel(mRepoOwner, mRepoName, mLabelName);
+            labelService.deleteLabel(mRepoOwner, mRepoName, URLEncoder.encode(mLabelName, "UTF-8"));
             return null;
         }
 
@@ -295,7 +296,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
             label.setName(mNewLabelName);
             label.setColor(mColor);
 
-            labelService.editLabel(new RepositoryId(mRepoOwner, mRepoName), mOldLabelName, label);
+            labelService.editLabel(new RepositoryId(mRepoOwner, mRepoName), URLEncoder.encode(mOldLabelName, "UTF-8"), label);
             return null;
         }
 
