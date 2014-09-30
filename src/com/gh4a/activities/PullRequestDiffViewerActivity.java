@@ -62,7 +62,7 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity {
             commitComment.setId(id);
         }
         commitComment.setPosition(position);
-        commitComment.setCommitId(mRef);
+        commitComment.setCommitId(mSha);
         commitComment.setPath(mPath);
         commitComment.setBody(body);
 
