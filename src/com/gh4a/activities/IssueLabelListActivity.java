@@ -296,7 +296,8 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
             label.setName(mNewLabelName);
             label.setColor(mColor);
 
-            labelService.editLabel(new RepositoryId(mRepoOwner, mRepoName), URLEncoder.encode(mOldLabelName, "UTF-8"), label);
+            labelService.editLabel(new RepositoryId(mRepoOwner, mRepoName),
+                    URLEncoder.encode(mOldLabelName, "UTF-8"), label);
             return null;
         }
 
