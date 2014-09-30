@@ -25,6 +25,7 @@ import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
+import android.text.style.TypefaceSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -169,21 +170,19 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
         }
 
         text.replace(pos, pos + 8, event.getCommitId().substring(0, 7));
+        text.setSpan(new TypefaceSpan("monospace"), pos, pos + 7, 0);
         text.setSpan(new ClickableSpan() {
             @Override
             public void onClick(View view) {
                 IntentUtils.openCommitInfoActivity(mContext, mRepoOwner, mRepoName,
                         event.getCommitId(), 0);
             }
-
             @Override
             public void updateDrawState(TextPaint ds) {
-                super.updateDrawState(ds);
-                ds.setUnderlineText(false);
-                ds.setTypeface(Typeface.MONOSPACE);
                 ds.setColor(mContext.getResources().getColor(R.color.highlight));
             }
         }, pos, pos + 7, 0);
+
         return text;
     }
 
