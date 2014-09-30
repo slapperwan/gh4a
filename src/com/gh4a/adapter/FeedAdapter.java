@@ -375,9 +375,18 @@ public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListe
         } else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
             PullRequestReviewCommentPayload payload =
                     (PullRequestReviewCommentPayload) event.getPayload();
-            return res.getString(R.string.event_pull_request_review_comment_title,
-                    actor.getLogin(), payload.getPullRequest().getNumber(),
-                    formatFromRepoName(eventRepo));
+            if (payload.getPullRequest() != null) {
+                return res.getString(R.string.event_pull_request_review_comment_title,
+                        actor.getLogin(), payload.getPullRequest().getNumber(),
+                        formatFromRepoName(eventRepo));
+            } else {
+                CommitComment comment = payload.getComment();
+                if (comment != null) {
+                    return res.getString(R.string.event_commit_comment_title,
+                            actor.getLogin(), payload.getComment().getCommitId().substring(0, 7),
+                            formatFromRepoName(eventRepo));
+                }
+            }
 
         } else if (Event.TYPE_PUSH.equals(eventType)) {
             PushPayload payload = (PushPayload) event.getPayload();
