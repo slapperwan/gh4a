@@ -91,7 +91,8 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
     private ClickableSpan mLoginClickSpan = new ClickableSpan() {
         @Override
         public void onClick(View view) {
-            IntentUtils.openUserInfoActivity(view.getContext(), mRepository.getOwner());
+            startActivity(IntentUtils.getUserActivityIntent(view.getContext(),
+                    mRepository.getOwner()));
         }
 
         @Override
@@ -250,14 +251,14 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
         Intent intent = null;
 
         if (id == R.id.cell_pull_requests) {
-            IntentUtils.openPullRequestListActivity(getActivity(), owner, name,
+            intent = IntentUtils.getPullRequestListActivityIntent(getActivity(), owner, name,
                     Constants.Issue.STATE_OPEN);
         } else if (id == R.id.tv_contributors_label) {
             intent = new Intent(getActivity(), ContributorListActivity.class);
         } else if (id == R.id.tv_collaborators_label) {
             intent = new Intent(getActivity(), CollaboratorListActivity.class);
         } else if (id == R.id.cell_issues) {
-            IntentUtils.openIssueListActivity(getActivity(), owner, name,
+            intent = IntentUtils.getIssueListActivityIntent(getActivity(), owner, name,
                     Constants.Issue.STATE_OPEN);
         } else if (id == R.id.cell_stargazers) {
             intent = new Intent(getActivity(), WatcherListActivity.class);

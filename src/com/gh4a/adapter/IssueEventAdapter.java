@@ -20,7 +20,6 @@ import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.IssueEvent;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.TextUtils;
@@ -174,8 +173,8 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
         text.setSpan(new ClickableSpan() {
             @Override
             public void onClick(View view) {
-                IntentUtils.openCommitInfoActivity(mContext, mRepoOwner, mRepoName,
-                        event.getCommitId(), 0);
+                mContext.startActivity(IntentUtils.getCommitInfoActivityIntent(mContext,
+                        mRepoOwner, mRepoName, event.getCommitId()));
             }
             @Override
             public void updateDrawState(TextPaint ds) {
@@ -196,7 +195,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             IssueEventHolder event = (IssueEventHolder) v.getTag();
-            IntentUtils.openUserInfoActivity(mContext, event.getUser());
+            mContext.startActivity(IntentUtils.getUserActivityIntent(mContext, event.getUser()));
         } else if (v.getId() == R.id.iv_edit) {
             Comment comment = (Comment) v.getTag();
             mEditCallback.editComment(comment);

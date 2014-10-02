@@ -94,9 +94,4 @@ public class BookmarkListActivity extends LoadingFragmentActivity implements
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.swapCursor(null);
     }
-
-    @Override
-    protected void navigateUp() {
-        finish();
-    }
 }

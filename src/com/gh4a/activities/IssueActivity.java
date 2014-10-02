@@ -319,9 +319,9 @@ public class IssueActivity extends LoadingFragmentActivity implements
     }
 
     @Override
-    protected void navigateUp() {
-        IntentUtils.openIssueListActivity(this, mRepoOwner, mRepoName,
-                Constants.Issue.STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    protected Intent navigateUp() {
+        return IntentUtils.getIssueListActivityIntent(this,
+                mRepoOwner, mRepoName, Constants.Issue.STATE_OPEN);
     }
 
     @Override
@@ -379,11 +379,11 @@ public class IssueActivity extends LoadingFragmentActivity implements
     public void onClick(View v) {
         switch (v.getId()) {
         case R.id.iv_gravatar:
-            IntentUtils.openUserInfoActivity(this, mIssue.getUser());
+            startActivity(IntentUtils.getUserActivityIntent(this, mIssue.getUser()));
             break;
         case R.id.tv_assignee:
         case R.id.iv_assignee:
-            IntentUtils.openUserInfoActivity(this, mIssue.getAssignee());
+            startActivity(IntentUtils.getUserActivityIntent(this, mIssue.getAssignee()));
             break;
         case R.id.iv_comment:
             EditText etComment = (EditText) findViewById(R.id.et_comment);
@@ -394,7 +394,8 @@ public class IssueActivity extends LoadingFragmentActivity implements
             UiUtils.hideImeForView(getCurrentFocus());
             break;
         case R.id.tv_pull:
-            IntentUtils.openPullRequestActivity(this, mRepoOwner, mRepoName, mIssueNumber);
+            startActivity(IntentUtils.getPullRequestActivityIntent(this,
+                    mRepoOwner, mRepoName, mIssueNumber));
             break;
         }
     }

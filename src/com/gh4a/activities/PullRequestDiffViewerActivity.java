@@ -15,6 +15,7 @@
  */
 package com.gh4a.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 
@@ -49,8 +50,9 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity {
     }
 
     @Override
-    protected void navigateUp() {
-        IntentUtils.openPullRequestListActivity(this, mRepoOwner, mRepoName, Constants.Issue.STATE_OPEN);
+    protected Intent navigateUp() {
+        return IntentUtils.getPullRequestListActivityIntent(this,
+                mRepoOwner, mRepoName, Constants.Issue.STATE_OPEN);
     }
 
     @Override

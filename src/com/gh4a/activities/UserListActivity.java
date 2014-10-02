@@ -101,6 +101,6 @@ public abstract class UserListActivity extends LoadingFragmentActivity implement
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         User user = (User) adapterView.getAdapter().getItem(position);
-        IntentUtils.openUserInfoActivity(this, user);
+        startActivity(IntentUtils.getUserActivityIntent(this, user));
     }
 }

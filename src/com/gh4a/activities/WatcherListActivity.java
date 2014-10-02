@@ -66,9 +66,4 @@ public class WatcherListActivity extends LoadingFragmentPagerActivity {
 
         return null;
     }
-
-    @Override
-    protected void navigateUp() {
-        finish();
-    }
 }

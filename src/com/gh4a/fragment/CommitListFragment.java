@@ -78,8 +78,8 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
     @Override
     protected void onItemClick(RepositoryCommit commit) {
         String[] urlPart = commit.getUrl().split("/");
-        IntentUtils.openCommitInfoActivity(getActivity(), urlPart[4], urlPart[5],
-                commit.getSha(), 0);
+        startActivity(IntentUtils.getCommitInfoActivityIntent(getActivity(),
+                urlPart[4], urlPart[5], commit.getSha()));
     }
 
     @Override

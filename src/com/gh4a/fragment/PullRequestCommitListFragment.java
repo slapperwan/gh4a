@@ -68,8 +68,8 @@ public class PullRequestCommitListFragment extends ListDataBaseFragment<Reposito
 
     @Override
     protected void onItemClick(RepositoryCommit commit) {
-        IntentUtils.openCommitInfoActivity(getActivity(), mRepoOwner, mRepoName,
-                commit.getSha(), 0);
+        startActivity(IntentUtils.getCommitInfoActivityIntent(getActivity(),
+                mRepoOwner, mRepoName, commit.getSha()));
     }
 
     @Override

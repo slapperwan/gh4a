@@ -72,8 +72,8 @@ public class PullRequestActivity extends LoadingFragmentPagerActivity {
     }
 
     @Override
-    protected void navigateUp() {
-        IntentUtils.openPullRequestListActivity(this, mRepoOwner, mRepoName,
-                Constants.Issue.STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    protected Intent navigateUp() {
+        return IntentUtils.getPullRequestListActivityIntent(this, mRepoOwner, mRepoName,
+                Constants.Issue.STATE_OPEN);
     }
 }

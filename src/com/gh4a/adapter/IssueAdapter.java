@@ -111,7 +111,7 @@ public class IssueAdapter extends RootAdapter<Issue> implements View.OnClickList
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             Issue issue = (Issue) v.getTag();
-            IntentUtils.openUserInfoActivity(mContext, issue.getUser());
+            mContext.startActivity(IntentUtils.getUserActivityIntent(mContext, issue.getUser()));
         }
     }
 

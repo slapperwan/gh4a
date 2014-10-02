@@ -15,6 +15,7 @@
  */
 package com.gh4a.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -156,8 +157,8 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements
     }
 
     @Override
-    protected void navigateUp() {
-        goToToplevelActivity(0);
+    protected Intent navigateUp() {
+        return getToplevelActivityIntent();
     }
 
     @Override

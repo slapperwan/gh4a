@@ -20,7 +20,6 @@ import java.util.Locale;
 import org.eclipse.egit.github.core.Repository;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;

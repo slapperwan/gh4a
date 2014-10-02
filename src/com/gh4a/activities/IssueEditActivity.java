@@ -209,9 +209,9 @@ public class IssueEditActivity extends LoadingFragmentActivity implements OnClic
     }
 
     @Override
-    protected void navigateUp() {
-        IntentUtils.openIssueListActivity(this, mRepoOwner, mRepoName,
-                Constants.Issue.STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    protected Intent navigateUp() {
+        return IntentUtils.getIssueListActivityIntent(this,
+                mRepoOwner, mRepoName, Constants.Issue.STATE_OPEN);
     }
 
     @Override
@@ -353,8 +353,10 @@ public class IssueEditActivity extends LoadingFragmentActivity implements OnClic
         protected void onSuccess(Void result) {
             ToastUtils.showMessage(mContext,
                     isInEditMode() ? R.string.issue_success_edit : R.string.issue_success_create);
-            IntentUtils.openIssueActivity(IssueEditActivity.this, mRepoOwner, mRepoName,
-                    mEditIssue.getNumber(), Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            Intent intent = IntentUtils.getIssueActivityIntent(IssueEditActivity.this,
+                    mRepoOwner, mRepoName, mEditIssue.getNumber());
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
             finish();
         }
     }

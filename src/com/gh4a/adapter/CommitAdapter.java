@@ -93,7 +93,8 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> implements View
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             RepositoryCommit commit = (RepositoryCommit) v.getTag();
-            IntentUtils.openUserInfoActivity(mContext, CommitUtils.getAuthorLogin(commit));
+            mContext.startActivity(IntentUtils.getUserActivityIntent(mContext,
+                    CommitUtils.getAuthorLogin(commit)));
         }
     }
 

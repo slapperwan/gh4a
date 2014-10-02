@@ -70,7 +70,8 @@ public class SearchUserAdapter extends RootAdapter<SearchUser> implements View.O
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             SearchUser user = (SearchUser) v.getTag();
-            IntentUtils.openUserInfoActivity(mContext, user.getLogin(), user.getName());
+            mContext.startActivity(IntentUtils.getUserActivityIntent(mContext,
+                    user.getLogin(), user.getName()));
         }
     }
 

@@ -70,7 +70,7 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
     protected void onItemClick(Trend trend) {
         String[] repo = trend.getRepo();
         if (repo != null) {
-            IntentUtils.openRepositoryInfoActivity(getActivity(), repo[0], repo[1], null, 0);
+            startActivity(IntentUtils.getRepoActivityIntent(getActivity(), repo[0], repo[1], null));
         }
     }
 

@@ -65,7 +65,7 @@ public class FollowerFollowingListActivity extends LoadingFragmentPagerActivity 
     }
 
     @Override
-    protected void navigateUp() {
-        IntentUtils.openUserInfoActivity(this, mUserLogin, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    protected Intent navigateUp() {
+        return IntentUtils.getUserActivityIntent(this, mUserLogin);
     }
 }

@@ -282,7 +282,7 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             String login = (String) v.getTag();
-            IntentUtils.openUserInfoActivity(getActivity(), login);
+            startActivity(IntentUtils.getUserActivityIntent(getActivity(), login));
         } else {
             CommitFile file = (CommitFile) v.getTag();
 

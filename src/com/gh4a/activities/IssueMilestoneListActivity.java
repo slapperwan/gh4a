@@ -75,9 +75,9 @@ public class IssueMilestoneListActivity extends LoadingFragmentPagerActivity {
     }
 
     @Override
-    protected void navigateUp() {
-        IntentUtils.openIssueListActivity(this, mRepoOwner, mRepoName,
-                Constants.Issue.STATE_OPEN, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    protected Intent navigateUp() {
+        return IntentUtils.getIssueListActivityIntent(this,
+                mRepoOwner, mRepoName, Constants.Issue.STATE_OPEN);
     }
 
     @Override

@@ -29,11 +29,12 @@ public class BrowseFilter extends BaseSherlockFragmentActivity {
         }
 
         List<String> parts = new ArrayList<String>(uri.getPathSegments());
+        Intent intent = null;
 
         String first = parts.isEmpty() ? null : parts.get(0);
         if (IGitHubConstants.HOST_GISTS.equals(uri.getHost())) {
             if (parts.size() >= 2) {
-                IntentUtils.openGistActivity(this, parts.get(0), parts.get(1), 0);
+                intent = IntentUtils.getGistActivityIntent(this, parts.get(0), parts.get(1));
             } else {
                 IntentUtils.launchBrowser(this, uri);
             }
@@ -45,11 +46,9 @@ public class BrowseFilter extends BaseSherlockFragmentActivity {
                 || "features".equals(first)) {
             IntentUtils.launchBrowser(this, uri);
         } else if ("explore".equals(first)) {
-            Intent intent = new Intent(this, ExploreActivity.class);
-            startActivity(intent);
+            intent = new Intent(this, ExploreActivity.class);
         } else if ("blog".equals(first)) {
-            Intent intent = new Intent(this, BlogListActivity.class);
-            startActivity(intent);
+            intent = new Intent(this, BlogListActivity.class);
         } else {
             // strip off extra data like line numbers etc.
             String last = parts.get(parts.size() - 1);
@@ -64,46 +63,52 @@ public class BrowseFilter extends BaseSherlockFragmentActivity {
             String id = parts.size() >= 4 ? parts.get(3) : null;
 
             if (repo == null && action == null) {
-                IntentUtils.openUserInfoActivity(this, user);
+                intent = IntentUtils.getUserActivityIntent(this, user);
             } else if (action == null) {
-                IntentUtils.openRepositoryInfoActivity(this, user, repo, null, 0);
+                intent = IntentUtils.getRepoActivityIntent(this, user, repo, null);
             } else if ("tree".equals(action)) {
-                IntentUtils.openRepositoryInfoActivity(this, user, repo,
-                        id, RepositoryActivity.PAGE_FILES, 0);
+                intent = IntentUtils.getRepoActivityIntent(this, user, repo,
+                        id, RepositoryActivity.PAGE_FILES);
             } else if ("commits".equals(action)) {
-                IntentUtils.openRepositoryInfoActivity(this, user, repo,
-                        id, RepositoryActivity.PAGE_COMMITS, 0);
+                intent = IntentUtils.getRepoActivityIntent(this, user, repo,
+                        id, RepositoryActivity.PAGE_COMMITS);
             } else if ("issues".equals(action)) {
                 if (!StringUtils.isBlank(id)) {
                     try {
-                        IntentUtils.openIssueActivity(this, user, repo, Integer.parseInt(id));
+                        intent = IntentUtils.getIssueActivityIntent(this, user, repo,
+                                Integer.parseInt(id));
                     } catch (NumberFormatException e) {
                         // ignored
                     }
                 } else {
-                    IntentUtils.openIssueListActivity(this, user, repo, Constants.Issue.STATE_OPEN);
+                    intent = IntentUtils.getIssueListActivityIntent(this, user, repo,
+                            Constants.Issue.STATE_OPEN);
                 }
             } else if ("pulls".equals(action)) {
-                IntentUtils.openPullRequestListActivity(this, user, repo, Constants.Issue.STATE_OPEN);
+                intent = IntentUtils.getPullRequestListActivityIntent(this, user, repo,
+                        Constants.Issue.STATE_OPEN);
             } else if ("wiki".equals(action)) {
-                Intent intent = new Intent(this, WikiListActivity.class);
+                intent = new Intent(this, WikiListActivity.class);
                 intent.putExtra(Constants.Repository.OWNER, user);
                 intent.putExtra(Constants.Repository.NAME, repo);
-                startActivity(intent);
             } else if ("pull".equals(action) && !StringUtils.isBlank(id)) {
                 try {
-                    IntentUtils.openPullRequestActivity(this, user, repo, Integer.parseInt(id));
+                    intent = IntentUtils.getPullRequestActivityIntent(this,
+                            user, repo, Integer.parseInt(id));
                 } catch (NumberFormatException e) {
                     // ignored
                 }
             } else if ("commit".equals(action) && !StringUtils.isBlank(id)) {
-                IntentUtils.openCommitInfoActivity(this, user, repo, id, 0);
+                intent = IntentUtils.getCommitInfoActivityIntent(this, user, repo, id);
             } else if ("blob".equals(action) && !StringUtils.isBlank(id) && parts.size() >= 5) {
                 String fullPath = TextUtils.join("/", parts.subList(4, parts.size()));
-                IntentUtils.openFileViewerActivity(this, user, repo, id, fullPath);
+                intent = IntentUtils.getFileViewerActivityIntent(this, user, repo, id, fullPath);
             } else {
                 IntentUtils.launchBrowser(this, uri);
             }
+        }
+        if (intent != null) {
+            startActivity(intent);
         }
         finish();
     }

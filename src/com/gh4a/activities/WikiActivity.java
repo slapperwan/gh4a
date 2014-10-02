@@ -46,11 +46,10 @@ public class WikiActivity extends WebViewerActivity {
     }
 
     @Override
-    protected void navigateUp() {
+    protected Intent navigateUp() {
         Intent intent = new Intent(this, WikiListActivity.class);
         intent.putExtra(Constants.Repository.OWNER, mUserLogin);
         intent.putExtra(Constants.Repository.NAME, mRepoName);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+        return intent;
     }
 }

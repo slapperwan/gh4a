@@ -54,7 +54,7 @@ public class RepositorySearchFragment extends ListDataBaseFragment<Repository> {
 
     @Override
     protected void onItemClick(Repository item) {
-        IntentUtils.openRepositoryInfoActivity(getActivity(),
-                item.getOwner().getLogin(), item.getName(), null, 0);
+        startActivity(IntentUtils.getRepoActivityIntent(getActivity(),
+                item.getOwner().getLogin(), item.getName(), null));
     }
 }

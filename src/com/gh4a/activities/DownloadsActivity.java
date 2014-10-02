@@ -50,9 +50,4 @@ public class DownloadsActivity extends LoadingFragmentPagerActivity {
         }
         return null;
     }
-
-    @Override
-    protected void navigateUp() {
-        finish();
-    }
 }
