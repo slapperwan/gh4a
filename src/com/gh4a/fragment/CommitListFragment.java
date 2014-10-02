@@ -21,6 +21,8 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.CommitService;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.gh4a.Constants;
@@ -32,6 +34,8 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
 public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> {
+    private static final int REQUEST_COMMIT = 2000;
+
     private String mRepoOwner;
     private String mRepoName;
     private String mRef;
@@ -78,9 +82,23 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
     @Override
     protected void onItemClick(RepositoryCommit commit) {
         String[] urlPart = commit.getUrl().split("/");
-        startActivity(IntentUtils.getCommitInfoActivityIntent(getActivity(),
-                urlPart[4], urlPart[5], commit.getSha()));
+        Intent intent = IntentUtils.getCommitInfoActivityIntent(getActivity(),
+                urlPart[4], urlPart[5], commit.getSha());
+        startActivityForResult(intent, REQUEST_COMMIT);
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_COMMIT) {
+            if (resultCode == Activity.RESULT_OK) {
+                // comments were updated
+                refresh();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
 
     @Override
     protected PageIterator<RepositoryCommit> onCreateIterator() {

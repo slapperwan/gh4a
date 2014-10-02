@@ -305,6 +305,7 @@ public class CommitFragment extends SherlockProgressFragment implements OnClickL
             if (resultCode == Activity.RESULT_OK) {
                 // reload comments
                 getLoaderManager().getLoader(1).onContentChanged();
+                getActivity().setResult(Activity.RESULT_OK);
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
