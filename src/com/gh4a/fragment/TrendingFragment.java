@@ -30,7 +30,8 @@ import java.util.List;
 import java.util.Locale;
 
 public class TrendingFragment extends ListDataBaseFragment<Trend> {
-    private static final String URL_TEMPLATE = "https://www.kimonolabs.com/api/%s?apikey=H9SjV6OZ7Y4A5zGFBFwQ9J5zYTPSRbRI";
+    private static final String URL_TEMPLATE =
+            "https://www.kimonolabs.com/api/%s?apikey=H9SjV6OZ7Y4A5zGFBFwQ9J5zYTPSRbRI";
     public static final String TYPE_DAILY = "3b1kwvo8";
     public static final String TYPE_WEEKLY = "4uzm2xze";
     public static final String TYPE_MONTHLY = "c9xfekz2";
