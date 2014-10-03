@@ -16,11 +16,15 @@
 package com.gh4a.adapter;
 
 import android.content.Context;
+import android.graphics.Typeface;
+import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.holder.Trend;
 
@@ -32,11 +36,16 @@ public class TrendAdapter extends RootAdapter<Trend> {
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_simple_3, null);
+        Gh4Application app = Gh4Application.get(mContext);
         ViewHolder viewHolder = new ViewHolder();
 
         viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
         viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+
+        viewHolder.tvTitle.setTypeface(app.condensed);
+        viewHolder.tvDesc.setTypeface(app.regular);
+        viewHolder.tvExtra.setVisibility(View.GONE);
 
         v.setTag(viewHolder);
         return v;
@@ -48,12 +57,14 @@ public class TrendAdapter extends RootAdapter<Trend> {
 
         String[] repo = trend.getRepo();
         if (repo != null) {
-            viewHolder.tvTitle.setText(repo[0] + "/" + repo[1]);
+            SpannableStringBuilder title = new SpannableStringBuilder();
+            title.append(repo[0]).append("/").append(repo[1]);
+            title.setSpan(new StyleSpan(Typeface.BOLD), 0, repo[0].length(), 0);
+            viewHolder.tvTitle.setText(title);
         } else {
             viewHolder.tvTitle.setText(trend.getTitle());
         }
         viewHolder.tvDesc.setText(trend.getDescription());
-        viewHolder.tvExtra.setVisibility(View.GONE);
     }
 
     private static class ViewHolder {
