@@ -261,6 +261,7 @@
     <string name="issue_success_close">Successfully closed issue</string>
     <string name="issue_error_close">Cannot close issue</string>
     <string name="issue_success_reopen">Successfully reopened issue</string>
+    <string name="issue_error_reopen">Cannot reopen issue</string>
     <string name="issue_sort_order">Sort order</string>
     <string name="issue_sort_created_asc">Oldest</string>
     <string name="issue_sort_created_desc">Newest</string>

@@ -136,14 +136,19 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
             boolean isCreator = mPullRequest != null &&
                     mPullRequest.getUser().getLogin().equals(app.getAuthLogin());
-            String state = mPullRequest != null ? mPullRequest.getState() : null;
 
-            if ((!mIsCollaborator && !isCreator) || Constants.Issue.STATE_CLOSED.equals(state)) {
+            if (mPullRequest == null || (!mIsCollaborator && !isCreator)) {
                 menu.removeItem(R.id.pull_close);
-            }
-            if ((!mIsCollaborator && !isCreator) || Constants.Issue.STATE_OPEN.equals(state)) {
+                menu.removeItem(R.id.pull_reopen);
+            } else if (Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState())) {
+                menu.removeItem(R.id.pull_close);
+                if (mPullRequest.isMerged()) {
+                    menu.findItem(R.id.pull_reopen).setEnabled(false);
+                }
+            } else {
                 menu.removeItem(R.id.pull_reopen);
             }
+
             if (!mIsCollaborator || mPullRequest == null) {
                 menu.removeItem(R.id.pull_merge);
             } else if (mPullRequest.isMerged()) {
@@ -427,7 +432,8 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
         @Override
         protected void onError(Exception e) {
-            ToastUtils.showMessage(mContext, R.string.issue_error_close);
+            ToastUtils.showMessage(mContext,
+                    mOpen ? R.string.issue_error_reopen : R.string.issue_error_close);
         }
     }
 
