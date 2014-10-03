@@ -227,7 +227,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
                 break;
             case R.id.pull_close:
             case R.id.pull_reopen:
-                new PullRequestOpenCloseTask(item.getItemId() == R.id.issue_reopen).execute();
+                new PullRequestOpenCloseTask(item.getItemId() == R.id.pull_reopen).execute();
                 break;
             case R.id.share:
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
