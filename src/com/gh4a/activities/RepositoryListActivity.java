@@ -194,9 +194,4 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
         super.invalidateOptionsMenu();
         return true;
     }
-
-    @Override
-    protected void navigateUp() {
-        finish();
-    }
 }

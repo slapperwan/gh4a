@@ -89,9 +89,8 @@ public class ReleaseInfoActivity extends LoadingFragmentActivity implements
     }
 
     @Override
-    protected void navigateUp() {
-        IntentUtils.openRepositoryInfoActivity(this,
-                mRepoOwner, mRepoName, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    protected Intent navigateUp() {
+        return IntentUtils.getRepoActivityIntent(this, mRepoOwner, mRepoName, null);
     }
 
     private void fillData() {
@@ -161,8 +160,8 @@ public class ReleaseInfoActivity extends LoadingFragmentActivity implements
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.tv_releasetag:
-                IntentUtils.openRepositoryInfoActivity(this,
-                        mRepoOwner, mRepoName, mRelease.getTagName(), 0);
+                startActivity(IntentUtils.getRepoActivityIntent(this,
+                        mRepoOwner, mRepoName, mRelease.getTagName()));
                 break;
         }
     }

@@ -57,8 +57,9 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
 
         Gh4Application app = Gh4Application.get(this);
         if (app.isAuthorized()) {
-            IntentUtils.openUserInfoActivity(this, app.getAuthLogin(),
-                    null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            Intent intent = IntentUtils.getUserActivityIntent(this, app.getAuthLogin());
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
             finish();
             return;
         }
@@ -169,8 +170,10 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
             editor.putString(Constants.User.LOGIN, mUserName);
             editor.apply();
 
-            IntentUtils.openUserInfoActivity(mContext, mUserName,
-                    null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            Intent intent = IntentUtils.getUserActivityIntent(mContext, mUserName);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+
             finish();
         }
     }

@@ -54,11 +54,6 @@ public abstract class EditCommentActivity extends BaseSherlockFragmentActivity {
     }
 
     @Override
-    protected void navigateUp() {
-        finish();
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.accept:

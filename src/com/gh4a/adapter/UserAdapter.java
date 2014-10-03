@@ -80,7 +80,7 @@ public class UserAdapter extends RootAdapter<User> implements View.OnClickListen
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             User user = (User) v.getTag();
-            IntentUtils.openUserInfoActivity(mContext, user);
+            mContext.startActivity(IntentUtils.getUserActivityIntent(mContext, user));
         }
     }
 

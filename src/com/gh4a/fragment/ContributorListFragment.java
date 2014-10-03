@@ -46,6 +46,7 @@ public class ContributorListFragment extends ListDataBaseFragment<Contributor> {
 
     @Override
     protected void onItemClick(Contributor item) {
-        IntentUtils.openUserInfoActivity(getActivity(), item.getLogin(), item.getName());
+        startActivity(IntentUtils.getUserActivityIntent(getActivity(),
+                item.getLogin(), item.getName()));
     }
 }

@@ -108,7 +108,7 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             RepositoryIssue issue = (RepositoryIssue) v.getTag();
-            IntentUtils.openUserInfoActivity(mContext, issue.getUser());
+            mContext.startActivity(IntentUtils.getUserActivityIntent(mContext, issue.getUser()));
         }
     }
 

@@ -85,10 +85,10 @@ public class CommitActivity extends LoadingFragmentPagerActivity {
     }
 
     @Override
-    protected void navigateUp() {
-        IntentUtils.openRepositoryInfoActivity(this,
-                mRepoOwner, mRepoName, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    protected Intent navigateUp() {
+        return IntentUtils.getRepoActivityIntent(this, mRepoOwner, mRepoName, null);
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         String diffUrl = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/commit/" + mObjectSha;

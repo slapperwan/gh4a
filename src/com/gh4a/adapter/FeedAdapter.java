@@ -113,7 +113,7 @@ public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListe
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             User actor = (User) v.getTag();
-            IntentUtils.openUserInfoActivity(mContext, actor);
+            mContext.startActivity(IntentUtils.getUserActivityIntent(mContext, actor));
         }
     }
 

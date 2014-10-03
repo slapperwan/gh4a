@@ -56,7 +56,8 @@ public class PullRequestListFragment extends PagedDataBaseFragment<PullRequest> 
 
     @Override
     protected void onItemClick(PullRequest pullRequest) {
-        IntentUtils.openPullRequestActivity(getActivity(), mRepoOwner, mRepoName, pullRequest.getNumber());
+        startActivity(IntentUtils.getPullRequestActivityIntent(getActivity(),
+                mRepoOwner, mRepoName, pullRequest.getNumber()));
     }
 
     @Override

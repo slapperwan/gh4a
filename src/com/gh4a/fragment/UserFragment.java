@@ -272,7 +272,7 @@ public class UserFragment extends SherlockProgressFragment implements View.OnCli
             IntentUtils.openRepositoryInfoActivity(getActivity(), (Repository) view.getTag());
         } else if (view.getTag() instanceof User) {
             User user = (User) view.getTag();
-            IntentUtils.openUserInfoActivity(getActivity(), user);
+            intent = IntentUtils.getUserActivityIntent(getActivity(), user);
         }
         if (intent != null) {
             intent.putExtra(Constants.User.LOGIN, mUserLogin);

@@ -101,7 +101,7 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements Vie
     public void onClick(View v) {
         CommitComment comment = (CommitComment) v.getTag();
         if (v.getId() == R.id.iv_gravatar) {
-            IntentUtils.openUserInfoActivity(mContext, comment.getUser());
+            mContext.startActivity(IntentUtils.getUserActivityIntent(mContext, comment.getUser()));
         } else if (v.getId() == R.id.iv_edit) {
             mEditCallback.editComment(comment);
         }

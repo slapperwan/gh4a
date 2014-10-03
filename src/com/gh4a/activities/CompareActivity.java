@@ -99,12 +99,12 @@ public class CompareActivity extends LoadingFragmentActivity implements OnItemCl
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         RepositoryCommit commit = mAdapter.getItem(position);
-        IntentUtils.openCommitInfoActivity(this, mRepoOwner, mRepoName, commit.getSha(), 0);
+        startActivity(IntentUtils.getCommitInfoActivityIntent(this,
+                mRepoOwner, mRepoName, commit.getSha()));
     }
 
     @Override
-    protected void navigateUp() {
-        IntentUtils.openRepositoryInfoActivity(this, mRepoOwner, mRepoName,
-                null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    protected Intent navigateUp() {
+        return IntentUtils.getRepoActivityIntent(this, mRepoOwner, mRepoName, null);
     }
 }

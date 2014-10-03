@@ -68,9 +68,16 @@ public abstract class BaseSherlockFragmentActivity extends SherlockFragmentActiv
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-        case android.R.id.home:
-            navigateUp();
+        case android.R.id.home: {
+            Intent intent = navigateUp();
+            if (intent != null) {
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            } else {
+                finish();
+            }
             return true;
+        }
         case R.id.settings:
             startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
             return true;
@@ -92,7 +99,7 @@ public abstract class BaseSherlockFragmentActivity extends SherlockFragmentActiv
         if (requestCode == REQUEST_SETTINGS) {
             if (data.getBooleanExtra(SettingsActivity.RESULT_EXTRA_THEME_CHANGED, false)
                     || data.getBooleanExtra(SettingsActivity.RESULT_EXTRA_AUTH_CHANGED, false)) {
-                goToToplevelActivity(0);
+                goToToplevelActivity(false);
                 finish();
             }
         } else {
@@ -100,7 +107,8 @@ public abstract class BaseSherlockFragmentActivity extends SherlockFragmentActiv
         }
     }
 
-    protected void navigateUp() {
+    protected Intent navigateUp() {
+        return null;
     }
 
     public ProgressDialog showProgressDialog(String message, boolean cancelable) {
@@ -127,20 +135,26 @@ public abstract class BaseSherlockFragmentActivity extends SherlockFragmentActiv
         findViewById(R.id.btn_home).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToToplevelActivity(Intent.FLAG_ACTIVITY_NEW_TASK);
+                goToToplevelActivity(true);
             }
         });
     }
 
-    protected void goToToplevelActivity(int flags) {
+    private void goToToplevelActivity(boolean newTask) {
+        Intent intent = getToplevelActivityIntent();
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        if (newTask) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
+        startActivity(intent);
+    }
+
+    protected Intent getToplevelActivityIntent() {
         Gh4Application app = Gh4Application.get(this);
         if (app.isAuthorized()) {
-            IntentUtils.openUserInfoActivity(this, app.getAuthLogin(), null,
-                    Intent.FLAG_ACTIVITY_CLEAR_TOP | flags);
+            return IntentUtils.getUserActivityIntent(this, app.getAuthLogin(), null);
         } else {
-            Intent intent = new Intent(this, Github4AndroidActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | flags);
-            startActivity(intent);
+            return new Intent(this, Github4AndroidActivity.class);
         }
     }
 

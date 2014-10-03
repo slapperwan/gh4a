@@ -19,6 +19,8 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryCommit;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 
@@ -31,6 +33,8 @@ import com.gh4a.loader.RepositoryCommitsLoader;
 import com.gh4a.utils.IntentUtils;
 
 public class PullRequestCommitListFragment extends ListDataBaseFragment<RepositoryCommit> {
+    private static final int REQUEST_COMMIT = 2000;
+
     private String mRepoOwner;
     private String mRepoName;
     private int mPullRequestNumber;
@@ -68,8 +72,21 @@ public class PullRequestCommitListFragment extends ListDataBaseFragment<Reposito
 
     @Override
     protected void onItemClick(RepositoryCommit commit) {
-        IntentUtils.openCommitInfoActivity(getActivity(), mRepoOwner, mRepoName,
-                commit.getSha(), 0);
+        Intent intent = IntentUtils.getCommitInfoActivityIntent(getActivity(),
+                mRepoOwner, mRepoName, commit.getSha());
+        startActivityForResult(intent, REQUEST_COMMIT);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_COMMIT) {
+            if (resultCode == Activity.RESULT_OK) {
+                // comments were updated
+                refresh();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override

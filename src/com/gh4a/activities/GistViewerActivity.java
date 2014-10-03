@@ -95,8 +95,8 @@ public class GistViewerActivity extends WebViewerActivity {
     }
 
     @Override
-    protected void navigateUp() {
-        IntentUtils.openGistActivity(this, mUserLogin, mGistId, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    protected Intent navigateUp() {
+        return IntentUtils.getGistActivityIntent(this, mUserLogin, mGistId);
     }
 
     @Override

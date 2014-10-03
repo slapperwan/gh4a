@@ -60,7 +60,8 @@ public class ContributorAdapter extends RootAdapter<Contributor> implements View
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             Contributor contributor = (Contributor) v.getTag();
-            IntentUtils.openUserInfoActivity(mContext, contributor.getLogin(), contributor.getName());
+            mContext.startActivity(IntentUtils.getUserActivityIntent(mContext,
+                    contributor.getLogin(), contributor.getName()));
         }
     }
 

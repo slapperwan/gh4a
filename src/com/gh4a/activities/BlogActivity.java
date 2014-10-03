@@ -43,9 +43,7 @@ public class BlogActivity extends WebViewerActivity {
     }
 
     @Override
-    protected void navigateUp() {
-        Intent intent = new Intent(this, BlogListActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+    protected Intent navigateUp() {
+        return new Intent(this, BlogListActivity.class);
     }
 }

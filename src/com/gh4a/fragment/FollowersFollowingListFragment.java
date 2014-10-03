@@ -62,7 +62,7 @@ public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> 
 
     @Override
     protected void onItemClick(User user) {
-        IntentUtils.openUserInfoActivity(getActivity(), user);
+        startActivity(IntentUtils.getUserActivityIntent(getActivity(), user));
     }
 
     @Override

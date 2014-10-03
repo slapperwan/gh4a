@@ -66,8 +66,8 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Repositor
     @Override
     public void onItemClick(RepositoryIssue issue) {
         Repository repo = issue.getRepository();
-        IntentUtils.openIssueActivity(getActivity(), repo.getOwner().getLogin(),
-                repo.getName(), issue.getNumber());
+        startActivity(IntentUtils.getIssueActivityIntent(getActivity(), repo.getOwner().getLogin(),
+                repo.getName(), issue.getNumber()));
     }
 
     @Override

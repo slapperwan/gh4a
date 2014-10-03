@@ -96,9 +96,8 @@ public class ReleaseListActivity extends LoadingFragmentActivity implements
     }
 
     @Override
-    protected void navigateUp() {
-        IntentUtils.openRepositoryInfoActivity(this,
-                mUserLogin, mRepoName, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    protected Intent navigateUp() {
+        return IntentUtils.getRepoActivityIntent(this, mUserLogin, mRepoName, null);
     }
 
     @Override

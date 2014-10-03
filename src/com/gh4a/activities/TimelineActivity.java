@@ -48,8 +48,8 @@ public class TimelineActivity extends BaseSherlockFragmentActivity {
     }
 
     @Override
-    protected void navigateUp() {
-        goToToplevelActivity(0);
+    protected Intent navigateUp() {
+        return getToplevelActivityIntent();
     }
 
     @Override

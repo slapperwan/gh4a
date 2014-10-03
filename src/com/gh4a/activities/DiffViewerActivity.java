@@ -166,7 +166,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                 startActivity(shareIntent);
                 return true;
             case MENU_ITEM_VIEW:
-                IntentUtils.openFileViewerActivity(this, mRepoOwner, mRepoName, mSha, mPath);
+                startActivity(IntentUtils.getFileViewerActivityIntent(this,
+                        mRepoOwner, mRepoName, mSha, mPath));
                 return true;
         }
         return super.onOptionsItemSelected(item);

@@ -310,10 +310,10 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             invalidateFragments();
         } else if (mGitModuleMap != null && mGitModuleMap.get(path) != null) {
             String[] userRepo = mGitModuleMap.get(path).split("/");
-            IntentUtils.openRepositoryInfoActivity(this, userRepo[0], userRepo[1], null, 0);
+            startActivity(IntentUtils.getRepoActivityIntent(this, userRepo[0], userRepo[1], null));
         } else {
-            IntentUtils.openFileViewerActivity(this, mRepoOwner, mRepoName,
-                    getCurrentRef(), content.getPath());
+            startActivity(IntentUtils.getFileViewerActivityIntent(this, mRepoOwner, mRepoName,
+                    getCurrentRef(), content.getPath()));
         }
     }
 
@@ -372,8 +372,8 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
     }
 
     @Override
-    protected void navigateUp() {
-        IntentUtils.openUserInfoActivity(this, mRepoOwner, null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    protected Intent navigateUp() {
+        return IntentUtils.getUserActivityIntent(this, mRepoOwner);
     }
 
     @Override

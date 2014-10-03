@@ -101,7 +101,7 @@ public class CommonFeedAdapter extends RootAdapter<Feed> implements View.OnClick
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             Feed feed = (Feed) v.getTag();
-            IntentUtils.openUserInfoActivity(mContext, feed.getAuthor());
+            mContext.startActivity(IntentUtils.getUserActivityIntent(mContext, feed.getAuthor()));
         }
     }
 

@@ -279,12 +279,12 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
         if (object instanceof SearchUser) {
             /** User item */
             SearchUser user = (SearchUser) object;
-            IntentUtils.openUserInfoActivity(this, user.getLogin(), user.getName());
+            startActivity(IntentUtils.getUserActivityIntent(this, user.getLogin(), user.getName()));
         } else {
             /** Repo item */
             Repository repository = (Repository) object;
-            IntentUtils.openRepositoryInfoActivity(this, repository.getOwner().getLogin(),
-                    repository.getName(), null, 0);
+            startActivity(IntentUtils.getRepoActivityIntent(this,
+                    repository.getOwner().getLogin(), repository.getName(), null));
         }
         return true;
     }
@@ -351,16 +351,11 @@ public class SearchActivity extends BaseSherlockFragmentActivity implements
 
         if (object instanceof SearchUser) {
             SearchUser user = (SearchUser) object;
-            IntentUtils.openUserInfoActivity(this, user.getLogin(), user.getName());
+            startActivity(IntentUtils.getUserActivityIntent(this, user.getLogin(), user.getName()));
         } else if (object instanceof Repository) {
             Repository repository = (Repository) object;
-            IntentUtils.openRepositoryInfoActivity(this, repository.getOwner().getLogin(),
-                    repository.getName(), null, 0);
+            startActivity(IntentUtils.getRepoActivityIntent(this,
+                    repository.getOwner().getLogin(), repository.getName(), null));
         }
-    }
-
-    @Override
-    protected void navigateUp() {
-        finish();
     }
 }

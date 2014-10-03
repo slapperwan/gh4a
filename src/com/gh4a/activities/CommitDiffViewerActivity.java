@@ -32,9 +32,8 @@ import java.util.List;
 
 public class CommitDiffViewerActivity extends DiffViewerActivity {
     @Override
-    protected void navigateUp() {
-        IntentUtils.openCommitInfoActivity(this, mRepoOwner, mRepoName,
-            mSha, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    protected Intent navigateUp() {
+        return IntentUtils.getCommitInfoActivityIntent(this, mRepoOwner, mRepoName, mSha);
     }
 
     @Override

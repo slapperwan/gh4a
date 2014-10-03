@@ -126,8 +126,7 @@ public class WikiListActivity extends LoadingFragmentActivity {
     }
 
     @Override
-    protected void navigateUp() {
-        IntentUtils.openRepositoryInfoActivity(this, mUserLogin, mRepoName,
-                null, Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    protected Intent navigateUp() {
+        return IntentUtils.getRepoActivityIntent(this, mUserLogin, mRepoName, null);
     }
 }

@@ -63,8 +63,8 @@ public class ForkListFragment extends PagedDataBaseFragment<Repository> {
 
     @Override
     protected void onItemClick(Repository repo) {
-        IntentUtils.openRepositoryInfoActivity(getActivity(),
-                repo.getOwner().getLogin(), repo.getName(), null, 0);
+        startActivity(IntentUtils.getRepoActivityIntent(getActivity(),
+                repo.getOwner().getLogin(), repo.getName(), null));
     }
 
     @Override
