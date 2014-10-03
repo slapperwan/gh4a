@@ -28,46 +28,50 @@ import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.loader.CommitCompareLoader;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.RepositoryCommitsLoader;
 import com.gh4a.utils.IntentUtils;
 
-public class PullRequestCommitListFragment extends ListDataBaseFragment<RepositoryCommit> {
+public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit> {
     private static final int REQUEST_COMMIT = 2000;
 
     private String mRepoOwner;
     private String mRepoName;
-    private int mPullRequestNumber;
+    private String mBase;
+    private String mHead;
 
-    public static PullRequestCommitListFragment newInstance(String repoOwner,
-            String repoName, int pullRequestNumber) {
-        PullRequestCommitListFragment f = new PullRequestCommitListFragment();
-
+    public static CommitCompareFragment newInstance(String repoOwner, String repoName,
+            String base, String head) {
         Bundle args = new Bundle();
         args.putString(Constants.Repository.OWNER, repoOwner);
         args.putString(Constants.Repository.NAME, repoName);
-        args.putInt(Constants.Issue.NUMBER, pullRequestNumber);
-        f.setArguments(args);
+        args.putString(Constants.Repository.BASE, base);
+        args.putString(Constants.Repository.HEAD, head);
 
+        CommitCompareFragment f = new CommitCompareFragment();
+        f.setArguments(args);
         return f;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.NAME);
-        mPullRequestNumber = getArguments().getInt(Constants.Issue.NUMBER);
+
+        Bundle args = getArguments();
+        mRepoOwner = args.getString(Constants.Repository.OWNER);
+        mRepoName = args.getString(Constants.Repository.NAME);
+        mBase = args.getString(Constants.Repository.BASE);
+        mHead = args.getString(Constants.Repository.HEAD);
+    }
+
+    @Override
+    protected int getEmptyTextResId() {
+        return R.string.no_commits_found;
     }
 
     @Override
     protected RootAdapter<RepositoryCommit> onCreateAdapter() {
         return new CommitAdapter(getActivity());
-    }
-
-    @Override
-    protected int getEmptyTextResId() {
-        return R.string.no_commits_in_pullrequest_found;
     }
 
     @Override
@@ -91,6 +95,6 @@ public class PullRequestCommitListFragment extends ListDataBaseFragment<Reposito
 
     @Override
     public Loader<LoaderResult<List<RepositoryCommit>>> onCreateLoader(int id, Bundle args) {
-        return new RepositoryCommitsLoader(getActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
+        return new CommitCompareLoader(getActivity(), mRepoOwner, mRepoName, mBase, mHead);
     }
 }

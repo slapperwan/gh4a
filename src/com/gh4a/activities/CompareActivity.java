@@ -15,56 +15,19 @@
  */
 package com.gh4a.activities;
 
-import java.util.List;
-
-import org.eclipse.egit.github.core.RepositoryCommit;
-import org.eclipse.egit.github.core.RepositoryCommitCompare;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
+import android.support.v4.app.Fragment;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.Constants;
-import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
-import com.gh4a.adapter.CommitAdapter;
-import com.gh4a.loader.CommitCompareLoader;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
+import com.gh4a.fragment.CommitCompareFragment;
 import com.gh4a.utils.IntentUtils;
 
-public class CompareActivity extends LoadingFragmentActivity implements OnItemClickListener {
+public class CompareActivity extends BaseSherlockFragmentActivity {
     private String mRepoOwner;
     private String mRepoName;
-    private String mBase;
-    private String mHead;
-    private CommitAdapter mAdapter;
-
-    private LoaderCallbacks<RepositoryCommitCompare> mCompareCallback =
-            new LoaderCallbacks<RepositoryCommitCompare>() {
-        @Override
-        public Loader<LoaderResult<RepositoryCommitCompare>> onCreateLoader(int id, Bundle args) {
-            return new CommitCompareLoader(CompareActivity.this, mRepoOwner, mRepoName, mBase, mHead);
-        }
-        @Override
-        public void onResultReady(LoaderResult<RepositoryCommitCompare> result) {
-            setContentEmpty(true);
-            if (!result.handleError(CompareActivity.this)) {
-                List<RepositoryCommit> commits = result.getData().getCommits();
-                if (commits != null && !commits.isEmpty()) {
-                    mAdapter.addAll(commits);
-                    mAdapter.notifyDataSetChanged();
-                    setContentEmpty(false);
-                }
-            }
-            setContentShown(true);
-        }
-    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -74,33 +37,24 @@ public class CompareActivity extends LoadingFragmentActivity implements OnItemCl
             return;
         }
 
-        setContentView(R.layout.generic_list);
-        setContentShown(false);
+        mRepoOwner = getIntent().getStringExtra(Constants.Repository.OWNER);
+        mRepoName = getIntent().getStringExtra(Constants.Repository.NAME);
 
-        ListView listView = (ListView) findViewById(R.id.list_view);
+        String base = getIntent().getStringExtra(Constants.Repository.BASE);
+        String head = getIntent().getStringExtra(Constants.Repository.HEAD);
 
-        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.OWNER);
-        mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);
-        mBase = getIntent().getExtras().getString(Constants.Repository.BASE);
-        mHead = getIntent().getExtras().getString(Constants.Repository.HEAD);
+        if (savedInstanceState == null) {
+            Fragment fragment =
+                    CommitCompareFragment.newInstance(mRepoOwner, mRepoName, base, head);
+            getSupportFragmentManager().beginTransaction()
+                    .add(android.R.id.content, fragment)
+                    .commit();
+        }
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.commit_compare);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
-
-        mAdapter = new CommitAdapter(this);
-        listView.setAdapter(mAdapter);
-        listView.setOnItemClickListener(this);
-
-        getSupportLoaderManager().initLoader(0, null, mCompareCallback);
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        RepositoryCommit commit = mAdapter.getItem(position);
-        startActivity(IntentUtils.getCommitInfoActivityIntent(this,
-                mRepoOwner, mRepoName, commit.getSha()));
     }
 
     @Override

@@ -22,6 +22,7 @@ import java.util.Locale;
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.MergeStatus;
 import org.eclipse.egit.github.core.PullRequest;
+import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.IssueService;
@@ -57,7 +58,6 @@ import com.gh4a.loader.PullRequestCommentListLoader;
 import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.PullRequestLoader;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
@@ -70,28 +70,12 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         IssueEventAdapter.OnEditComment, View.OnClickListener {
     private static final int REQUEST_EDIT = 1000;
 
-    private String mRepoOwner;
-    private String mRepoName;
-    private int mPullRequestNumber;
     private LinearLayout mHeader;
     private PullRequest mPullRequest;
+    private String mRepoOwner;
+    private String mRepoName;
     private boolean mIsCollaborator;
-
-    private LoaderCallbacks<PullRequest> mPullRequestCallback = new LoaderCallbacks<PullRequest>() {
-        @Override
-        public Loader<LoaderResult<PullRequest>> onCreateLoader(int id, Bundle args) {
-            return new PullRequestLoader(getActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
-        }
-        @Override
-        public void onResultReady(LoaderResult<PullRequest> result) {
-            setListShown(true);
-            if (!result.handleError(getActivity())) {
-                mPullRequest = result.getData();
-                fillData();
-                invalidateOptionsMenu();
-            }
-        }
-    };
+    private boolean mListShown;
 
     private LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>() {
         @Override
@@ -107,13 +91,11 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         }
     };
 
-    public static PullRequestFragment newInstance(String repoOwner, String repoName, int pullRequestNumber) {
+    public static PullRequestFragment newInstance(PullRequest pullRequest) {
         PullRequestFragment f = new PullRequestFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.Repository.OWNER, repoOwner);
-        args.putString(Constants.Repository.NAME, repoName);
-        args.putInt(Constants.Issue.NUMBER, pullRequestNumber);
+        args.putSerializable("PULL", pullRequest);
         f.setArguments(args);
 
         return f;
@@ -122,9 +104,12 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.NAME);
-        mPullRequestNumber = getArguments().getInt(Constants.Issue.NUMBER);
+        mPullRequest = (PullRequest) getArguments().getSerializable("PULL");
+
+        Repository repo = mPullRequest.getBase().getRepo();
+        mRepoOwner = repo.getOwner().getLogin();
+        mRepoName = repo.getName();
+
         setHasOptionsMenu(true);
     }
 
@@ -134,10 +119,9 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         if (app.isAuthorized()) {
             inflater.inflate(R.menu.pullrequest_menu, menu);
 
-            boolean isCreator = mPullRequest != null &&
-                    mPullRequest.getUser().getLogin().equals(app.getAuthLogin());
+            boolean isCreator = mPullRequest.getUser().getLogin().equals(app.getAuthLogin());
 
-            if (mPullRequest == null || (!mIsCollaborator && !isCreator)) {
+            if (!mIsCollaborator && !isCreator) {
                 menu.removeItem(R.id.pull_close);
                 menu.removeItem(R.id.pull_reopen);
             } else if (Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState())) {
@@ -149,7 +133,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
                 menu.removeItem(R.id.pull_reopen);
             }
 
-            if (!mIsCollaborator || mPullRequest == null) {
+            if (!mIsCollaborator) {
                 menu.removeItem(R.id.pull_merge);
             } else if (mPullRequest.isMerged()) {
                 MenuItem mergeItem = menu.findItem(R.id.pull_merge);
@@ -157,9 +141,6 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
                 mergeItem.setEnabled(false);
             } else if (!mPullRequest.isMergeable()) {
                 menu.findItem(R.id.pull_merge).setEnabled(false);
-            }
-            if (mPullRequest == null) {
-                menu.removeItem(R.id.share);
             }
         }
         super.onCreateOptionsMenu(menu, inflater);
@@ -174,10 +155,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         FrameLayout listContainer = (FrameLayout) v.findViewById(R.id.list_container);
         listContainer.addView(listContent);
 
-        if (!Gh4Application.get(getActivity()).isAuthorized()) {
-            v.findViewById(R.id.comment).setVisibility(View.GONE);
-            v.findViewById(R.id.divider).setVisibility(View.GONE);
-        }
+        updateCommentSectionVisibility(v);
 
         return v;
     }
@@ -191,21 +169,20 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         getListView().addHeaderView(mHeader, null, true);
         getListView().setHeaderDividersEnabled(false);
 
-        UiUtils.assignTypeface(mHeader, Gh4Application.get(getActivity()).boldCondensed, new int[] {
-            R.id.comment_title, R.id.tv_title, R.id.desc_title
+        UiUtils.assignTypeface(mHeader, Gh4Application.get(getActivity()).boldCondensed, new int[]{
+                R.id.comment_title, R.id.tv_title, R.id.desc_title
         });
 
         super.onActivityCreated(savedInstanceState);
 
-        getLoaderManager().initLoader(1, null, mPullRequestCallback);
-        getLoaderManager().initLoader(2, null, mCollaboratorCallback);
+        fillData();
+        getLoaderManager().initLoader(1, null, mCollaboratorCallback);
     }
 
     @Override
     public void refresh() {
         super.refresh();
         getLoaderManager().getLoader(1).onContentChanged();
-        getLoaderManager().getLoader(2).onContentChanged();
     }
 
     @Override
@@ -238,7 +215,8 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
                 shareIntent.setType("text/plain");
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_pull_subject,
-                        mPullRequestNumber, mPullRequest.getTitle(), mRepoOwner + "/" + mRepoName));
+                        mPullRequest.getNumber(), mPullRequest.getTitle(),
+                        mRepoOwner + "/" + mRepoName));
                 shareIntent.putExtra(Intent.EXTRA_TEXT,  mPullRequest.getHtmlUrl());
                 shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
@@ -250,10 +228,35 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void setListShown(boolean shown) {
+        super.setListShown(shown);
+        mListShown = shown;
+        updateCommentSectionVisibility(getView());
+    }
+
+    @Override
+    public void setListShownNoAnimation(boolean shown) {
+        super.setListShownNoAnimation(shown);
+        mListShown = shown;
+        updateCommentSectionVisibility(getView());
+    }
+
     private void updateListCaption() {
         TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
         tvCommentTitle.setText(getString(R.string.issue_events_with_count,
                 getListAdapter().getCount()));
+    }
+
+    private void updateCommentSectionVisibility(View v) {
+        if (v == null) {
+            return;
+        }
+
+        int commentVisibility = mListShown && Gh4Application.get(getActivity()).isAuthorized()
+                ? View.VISIBLE : View.GONE;
+        v.findViewById(R.id.comment).setVisibility(commentVisibility);
+        v.findViewById(R.id.divider).setVisibility(commentVisibility);
     }
 
     private void fillData() {
@@ -296,7 +299,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     }
 
     private void showMergeDialog() {
-        String title = getString(R.string.pull_message_dialog_title, mPullRequestNumber);
+        String title = getString(R.string.pull_message_dialog_title, mPullRequest.getNumber());
         View view = getLayoutInflater(null).inflate(R.layout.pull_merge_message_dialog, null);
 
         final EditText editor = (EditText) view.findViewById(R.id.et_commit_message);
@@ -335,7 +338,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     @Override
     public Loader<LoaderResult<List<IssueEventHolder>>> onCreateLoader(int id, Bundle args) {
         return new PullRequestCommentListLoader(getActivity(),
-                mRepoOwner, mRepoName, mPullRequestNumber);
+                mRepoOwner, mRepoName, mPullRequest.getNumber());
     }
 
     @Override
@@ -377,7 +380,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         protected Void run() throws IOException {
             IssueService issueService = (IssueService)
                     Gh4Application.get(getActivity()).getService(Gh4Application.ISSUE_SERVICE);
-            issueService.createComment(mRepoOwner, mRepoName, mPullRequestNumber, mText);
+            issueService.createComment(mRepoOwner, mRepoName, mPullRequest.getNumber(), mText);
             return null;
         }
 
@@ -412,7 +415,8 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
                     Gh4Application.get(mContext).getService(Gh4Application.PULL_SERVICE);
             RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
 
-            PullRequest pullRequest = pullService.getPullRequest(repoId, mPullRequestNumber);
+            PullRequest pullRequest = new PullRequest();
+            pullRequest.setNumber(mPullRequest.getNumber());
             pullRequest.setState(mOpen ? Constants.Issue.STATE_OPEN : Constants.Issue.STATE_CLOSED);
 
             return pullService.editPullRequest(repoId, pullRequest);
@@ -451,7 +455,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
                     Gh4Application.get(mContext).getService(Gh4Application.PULL_SERVICE);
             RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
 
-            return pullService.merge(repoId, mPullRequestNumber, mCommitMessage);
+            return pullService.merge(repoId, mPullRequest.getNumber(), mCommitMessage);
         }
 
         @Override

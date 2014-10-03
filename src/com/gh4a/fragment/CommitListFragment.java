@@ -99,7 +99,6 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
         }
     }
 
-
     @Override
     protected PageIterator<RepositoryCommit> onCreateIterator() {
         CommitService commitService = (CommitService)

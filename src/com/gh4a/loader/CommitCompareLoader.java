@@ -1,7 +1,9 @@
 package com.gh4a.loader;
 
 import java.io.IOException;
+import java.util.List;
 
+import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryCommitCompare;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.CommitService;
@@ -10,7 +12,7 @@ import android.content.Context;
 
 import com.gh4a.Gh4Application;
 
-public class CommitCompareLoader extends BaseLoader<RepositoryCommitCompare> {
+public class CommitCompareLoader extends BaseLoader<List<RepositoryCommit>> {
 
     private String mRepoOwner;
     private String mRepoName;
@@ -27,9 +29,11 @@ public class CommitCompareLoader extends BaseLoader<RepositoryCommitCompare> {
     }
 
     @Override
-    public RepositoryCommitCompare doLoadInBackground() throws IOException {
+    public List<RepositoryCommit> doLoadInBackground() throws IOException {
         CommitService commitService = (CommitService)
                 Gh4Application.get(getContext()).getService(Gh4Application.COMMIT_SERVICE);
-        return commitService.compare(new RepositoryId(mRepoOwner, mRepoName), mBase, mHead);
+        RepositoryCommitCompare compare = commitService.compare(
+                new RepositoryId(mRepoOwner, mRepoName), mBase, mHead);
+        return compare.getCommits();
     }
 }

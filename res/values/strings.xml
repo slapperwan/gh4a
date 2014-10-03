@@ -114,7 +114,6 @@
     <string name="no_comments_found">Nobody has commented so far.</string>
     <string name="no_files_found">No files found.</string>
     <string name="no_trends_found">No trending repositories found.</string>
-    <string name="no_commits_in_pullrequest_found">This pull request doesn\'t contain any commits.</string>
     <string name="no_downloads_found">This repository doesn\'t provide any downloads.</string>
     <string name="no_milestones_found">This repository doesn\'t have any configured milestone.</string>
     <string name="no_commits_found">No commits found.</string>
