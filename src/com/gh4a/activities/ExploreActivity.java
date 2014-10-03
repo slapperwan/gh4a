@@ -70,6 +70,8 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements
         mAdapter = new ThisPageAdapter(getSupportFragmentManager());
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
+        // We never have many pages, make sure to keep them all alive
+        mPager.setOffscreenPageLimit(3);
 
         mIndicator = (TitlePageIndicator) findViewById(R.id.indicator);
         mIndicator.setViewPager(mPager);
