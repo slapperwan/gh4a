@@ -347,8 +347,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_EDIT) {
             if (resultCode == Activity.RESULT_OK) {
-                // no need to refresh pull request and collaborator status in that case
-                super.refresh();
+                refreshComments();
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -369,6 +368,11 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         intent.putExtra(Constants.Comment.ID, comment.getId());
         intent.putExtra(Constants.Comment.BODY, comment.getBody());
         startActivityForResult(intent, REQUEST_EDIT);
+    }
+
+    public void refreshComments() {
+        // no need to refresh pull request and collaborator status in that case
+        super.refresh();
     }
 
     private class CommentIssueTask extends ProgressDialogTask<Void> {

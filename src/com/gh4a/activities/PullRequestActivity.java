@@ -34,12 +34,14 @@ import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.PullRequest;
 
-public class PullRequestActivity extends LoadingFragmentPagerActivity {
+public class PullRequestActivity extends LoadingFragmentPagerActivity implements
+        PullRequestFilesFragment.CommentUpdateListener {
     private String mRepoOwner;
     private String mRepoName;
     private int mPullRequestNumber;
 
     private PullRequest mPullRequest;
+    private PullRequestFragment mPullRequestFragment;
 
     private static final int[] TITLES = new int[] {
         R.string.pull_request_conversation, R.string.commits, R.string.pull_request_files
@@ -100,7 +102,8 @@ public class PullRequestActivity extends LoadingFragmentPagerActivity {
         } else if (position == 2) {
             return PullRequestFilesFragment.newInstance(mRepoOwner, mRepoName, mPullRequestNumber);
         } else {
-            return PullRequestFragment.newInstance(mPullRequest);
+            mPullRequestFragment = PullRequestFragment.newInstance(mPullRequest);
+            return mPullRequestFragment;
         }
     }
 
@@ -108,5 +111,12 @@ public class PullRequestActivity extends LoadingFragmentPagerActivity {
     protected Intent navigateUp() {
         return IntentUtils.getPullRequestListActivityIntent(this, mRepoOwner, mRepoName,
                 Constants.Issue.STATE_OPEN);
+    }
+
+    @Override
+    public void onCommentsUpdated() {
+        if (mPullRequestFragment != null) {
+            mPullRequestFragment.refreshComments();
+        }
     }
 }

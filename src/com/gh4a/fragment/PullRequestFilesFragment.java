@@ -25,6 +25,10 @@ import java.util.List;
 public class PullRequestFilesFragment extends CommitFragment {
     private static final int REQUEST_DIFF_VIEWER = 1000;
 
+    public interface CommentUpdateListener {
+        void onCommentsUpdated();
+    }
+
     private String mRepoOwner;
     private String mRepoName;
     private int mPullRequestNumber;
@@ -134,6 +138,11 @@ public class PullRequestFilesFragment extends CommitFragment {
             if (resultCode == Activity.RESULT_OK) {
                 // reload comments
                 getLoaderManager().getLoader(1).onContentChanged();
+
+                if (getActivity() instanceof CommentUpdateListener) {
+                    CommentUpdateListener l = (CommentUpdateListener) getActivity();
+                    l.onCommentsUpdated();
+                }
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
