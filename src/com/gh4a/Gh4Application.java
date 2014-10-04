@@ -97,6 +97,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         selectTheme(prefs.getInt(SettingsActivity.KEY_THEME, Constants.Theme.DARK));
         prefs.registerOnSharedPreferenceChangeListener(this);
 
+        Mint.disableNetworkMonitoring();
         Mint.initAndStartSession(this, "1e6a83ae");
 
         mPt = new PrettyTime();
