@@ -29,10 +29,18 @@ import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.RepositoryContents;
 
+import java.util.Set;
+
 public class FileAdapter extends RootAdapter<RepositoryContents> {
+    private Set<String> mSubModuleNames;
 
     public FileAdapter(Context context) {
         super(context);
+    }
+
+    public void setSubModuleNames(Set<String> subModules) {
+        mSubModuleNames = subModules;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -51,11 +59,13 @@ public class FileAdapter extends RootAdapter<RepositoryContents> {
     @Override
     protected void bindView(View v, RepositoryContents content) {
         ViewHolder holder = (ViewHolder) v.getTag();
+        String name = content.getName();
+        boolean isSubModule = mSubModuleNames != null && mSubModuleNames.contains(name);
 
-        holder.icon.setBackgroundResource(getIconId(content.getType(), content.getName()));
-        holder.fileName.setText(content.getName());
+        holder.icon.setBackgroundResource(getIconId(content.getType(), name));
+        holder.fileName.setText(name);
 
-        if (RepositoryContents.TYPE_FILE.equals(content.getType())) {
+        if (!isSubModule && RepositoryContents.TYPE_FILE.equals(content.getType())) {
             holder.fileSize.setText(Formatter.formatShortFileSize(mContext, content.getSize()));
             holder.fileSize.setVisibility(View.VISIBLE);
         } else {
@@ -65,7 +75,9 @@ public class FileAdapter extends RootAdapter<RepositoryContents> {
 
     private int getIconId(String type, String fileName) {
         int iconId;
-        if (RepositoryContents.TYPE_DIR.equals(type)) {
+        if (mSubModuleNames != null && mSubModuleNames.contains(fileName)) {
+            iconId = R.attr.searchRepoIcon;
+        } else if (RepositoryContents.TYPE_DIR.equals(type)) {
             iconId = R.attr.dirIcon;
         } else if (RepositoryContents.TYPE_FILE.equals(type) && FileUtils.isImage(fileName)) {
             iconId = R.attr.contentPictureIcon;

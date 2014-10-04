@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import org.eclipse.egit.github.core.Repository;
@@ -97,6 +98,9 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         @Override
         public void onResultReady(LoaderResult<Map<String, String>> result) {
             mGitModuleMap = result.getData();
+            if (mContentListFragment != null) {
+                mContentListFragment.onSubModuleNamesChanged(getSubModuleNames(mContentListFragment));
+            }
         }
     };
 
@@ -315,6 +319,14 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             startActivity(IntentUtils.getFileViewerActivityIntent(this, mRepoOwner, mRepoName,
                     getCurrentRef(), content.getPath()));
         }
+    }
+
+    @Override
+    public Set<String> getSubModuleNames(ContentListFragment fragment) {
+        if (mGitModuleMap != null && fragment.getPath() == null) {
+            return mGitModuleMap.keySet();
+        }
+        return null;
     }
 
     @Override

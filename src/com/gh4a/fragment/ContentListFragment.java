@@ -32,16 +32,20 @@ import org.eclipse.egit.github.core.RepositoryContents;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class ContentListFragment extends ListDataBaseFragment<RepositoryContents> {
     private Repository mRepository;
     private String mPath;
     private String mRef;
+
     private ParentCallback mCallback;
+    private FileAdapter mAdapter;
 
     public interface ParentCallback {
-        public void onContentsLoaded(ContentListFragment fragment, List<RepositoryContents> contents);
-        public void onTreeSelected(RepositoryContents content);
+        void onContentsLoaded(ContentListFragment fragment, List<RepositoryContents> contents);
+        void onTreeSelected(RepositoryContents content);
+        Set<String> getSubModuleNames(ContentListFragment fragment);
     }
 
     public static ContentListFragment newInstance(Repository repository,
@@ -81,7 +85,9 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
 
     @Override
     protected RootAdapter<RepositoryContents> onCreateAdapter() {
-        return new FileAdapter(getActivity());
+        mAdapter = new FileAdapter(getActivity());
+        mAdapter.setSubModuleNames(mCallback.getSubModuleNames(this));
+        return mAdapter;
     }
 
     @Override
@@ -91,6 +97,12 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
 
     public String getPath() {
         return mPath;
+    }
+
+    public void onSubModuleNamesChanged(Set<String> subModules) {
+        if (mAdapter != null) {
+            mAdapter.setSubModuleNames(subModules);
+        }
     }
 
     @Override
