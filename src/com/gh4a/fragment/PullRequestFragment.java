@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.MergeStatus;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.Repository;
@@ -51,6 +52,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.activities.EditIssueCommentActivity;
+import com.gh4a.activities.EditPullRequestCommentActivity;
 import com.gh4a.adapter.IssueEventAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.IsCollaboratorLoader;
@@ -359,7 +361,8 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
     @Override
     public void editComment(Comment comment) {
-        Intent intent = new Intent(getActivity(), EditIssueCommentActivity.class);
+        Intent intent = new Intent(getActivity(), comment instanceof CommitComment
+                ? EditPullRequestCommentActivity.class : EditIssueCommentActivity.class);
 
         intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.NAME, mRepoName);

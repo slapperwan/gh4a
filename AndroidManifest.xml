@@ -62,6 +62,9 @@
             android:name=".activities.EditIssueCommentActivity"
             android:configChanges="orientation|screenSize" />
         <activity
+            android:name=".activities.EditPullRequestCommentActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
             android:name=".activities.ExploreActivity"
             android:configChanges="orientation|screenSize" />
         <activity
