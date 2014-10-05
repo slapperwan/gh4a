@@ -17,6 +17,7 @@ package com.gh4a.fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.text.format.DateFormat;
@@ -298,12 +299,10 @@ public class UserFragment extends SherlockProgressFragment implements View.OnCli
                 rowView.setTag(repo);
 
                 TextView tvTitle = (TextView) rowView.findViewById(R.id.tv_title);
-                applyHorizontalContentPadding(tvTitle);
                 tvTitle.setTypeface(app.boldCondensed);
                 tvTitle.setText(repo.getOwner().getLogin() + "/" + repo.getName());
 
                 TextView tvDesc = (TextView) rowView.findViewById(R.id.tv_desc);
-                applyHorizontalContentPadding(tvDesc);
                 tvDesc.setSingleLine(true);
                 if (!StringUtils.isBlank(repo.getDescription())) {
                     tvDesc.setVisibility(View.VISIBLE);
@@ -313,7 +312,6 @@ public class UserFragment extends SherlockProgressFragment implements View.OnCli
                 }
 
                 TextView tvExtra = (TextView) rowView.findViewById(R.id.tv_extra);
-                applyHorizontalContentPadding(tvExtra);
                 String language = repo.getLanguage() != null
                         ? repo.getLanguage() : getString(R.string.unknown);
                 tvExtra.setText(getString(R.string.repo_search_extradata, language,
@@ -329,9 +327,13 @@ public class UserFragment extends SherlockProgressFragment implements View.OnCli
             btnMore.setOnClickListener(this);
             btnMore.setVisibility(View.VISIBLE);
         } else {
-            TextView noRepos = new TextView(getActivity());
-            noRepos.setText(R.string.no_repos_found);
-            ll.addView(noRepos);
+            View rowView = inflater.inflate(R.layout.top_repo, null);
+            rowView.findViewById(R.id.tv_title).setVisibility(View.GONE);
+            rowView.findViewById(R.id.tv_extra).setVisibility(View.GONE);
+            TextView noRepoView = (TextView) rowView.findViewById(R.id.tv_desc);
+            noRepoView.setText(R.string.user_no_repos);
+            noRepoView.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
+            ll.addView(rowView);
         }
     }
 
@@ -353,8 +355,6 @@ public class UserFragment extends SherlockProgressFragment implements View.OnCli
             rowView.setTag(org);
 
             TextView tvTitle = (TextView) rowView.findViewById(R.id.tv_title);
-            tvTitle.setPadding((int) getResources().getDimension(R.dimen.content_padding), tvTitle.getPaddingTop(),
-                    (int) getResources().getDimension(R.dimen.content_padding), tvTitle.getPaddingBottom());
             tvTitle.setTypeface(app.boldCondensed);
             tvTitle.setText(org.getLogin());
 
@@ -374,10 +374,5 @@ public class UserFragment extends SherlockProgressFragment implements View.OnCli
         }
         TextView tvFollowersCount = (TextView) mContentView.findViewById(R.id.tv_followers_count);
         tvFollowersCount.setText(String.valueOf(mUser.getFollowers()));
-    }
-
-    private void applyHorizontalContentPadding(View v){
-        v.setPadding((int) v.getResources().getDimension(R.dimen.content_padding), 0,
-                (int) v.getResources().getDimension(R.dimen.content_padding), 0);
     }
 }

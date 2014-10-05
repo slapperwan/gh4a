@@ -187,6 +187,7 @@
     <string name="user_organizations">Organizations</string>
     <string name="user_follow_action">Follow</string>
     <string name="user_unfollow_action">Unfollow</string>
+    <string name="user_no_repos">No repositories found</string>
 
     <!-- Repository -->
     <string name="repository">Repository</string>

@@ -13,6 +13,8 @@
     android:layout_height="?android:attr/listPreferredItemHeight"
     android:paddingTop="6dp"
     android:paddingBottom="6dp"
+    android:paddingLeft="@dimen/content_padding"
+    android:paddingRight="@dimen/content_padding"
     style="@style/SelectableItem" >
     <TextView
         android:id="@+id/tv_title"
