@@ -140,6 +140,13 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
         getLoaderManager().initLoader(1, null, mPullRequestsCallback);
     }
 
+    public void setRef(String ref) {
+        mRef = ref;
+        getArguments().putString(Constants.Object.REF, ref);
+        // reload readme
+        getLoaderManager().getLoader(0).onContentChanged();
+    }
+
     private void fillData() {
         final Gh4Application app = Gh4Application.get(getActivity());
 

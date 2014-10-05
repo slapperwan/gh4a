@@ -80,7 +80,11 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
                 mRepository = result.getData();
                 updateTitle();
                 setTabsEnabled(true);
-                applyInitialPage();
+                // Apply initial page selection first time the repo is loaded
+                if (mInitialPage >= PAGE_REPO_OVERVIEW && mInitialPage <= PAGE_COMMITS) {
+                    getPager().setCurrentItem(mInitialPage);
+                    mInitialPage = -1;
+                }
             }
             setContentEmpty(!success);
             setContentShown(true);
@@ -172,6 +176,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
     private String mRepoName;
     private ActionBar mActionBar;
     private ProgressDialog mProgressDialog;
+    private int mInitialPage;
 
     private Stack<String> mDirStack;
     private Repository mRepository;
@@ -212,6 +217,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         mRepoOwner = bundle.getString(Constants.Repository.OWNER);
         mRepoName = bundle.getString(Constants.Repository.NAME);
         mSelectedRef = bundle.getString(Constants.Repository.SELECTED_REF);
+        mInitialPage = bundle.getInt(EXTRA_INITIAL_PAGE, -1);
 
         mActionBar = getSupportActionBar();
         mActionBar.setTitle(mRepoOwner + "/" + mRepoName);
@@ -224,13 +230,6 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         if (Gh4Application.get(this).isAuthorized()) {
             getSupportLoaderManager().initLoader(LOADER_WATCHING, null, mWatchCallback);
             getSupportLoaderManager().initLoader(LOADER_STARRING, null, mStarCallback);
-        }
-    }
-
-    private void applyInitialPage() {
-        int initialPage = getIntent().getIntExtra(EXTRA_INITIAL_PAGE, -1);
-        if (initialPage >= PAGE_REPO_OVERVIEW && initialPage <= PAGE_COMMITS) {
-            getPager().setCurrentItem(initialPage);
         }
     }
 
@@ -420,7 +419,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             case R.id.refresh:
                 item.setActionView(R.layout.ab_loading);
                 item.expandActionView();
-                refreshFragment();
+                refreshFragments();
                 return true;
             case R.id.share:
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
@@ -467,9 +466,8 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
                 .setSingleChoiceItems(branchList, current, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mSelectedRef = mBranches.get(which).getName();
+                        setSelectedRef(mBranches.get(which).getName());
                         dialog.dismiss();
-                        refreshFragment();
                     }
                 })
                 .setNegativeButton(R.string.cancel, null)
@@ -495,22 +493,34 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
                 .setSingleChoiceItems(tagList, current, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mSelectedRef = mTags.get(which).getName();
+                        setSelectedRef(mTags.get(which).getName());
                         dialog.dismiss();
-                        refreshFragment();
                     }
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 
-    private void refreshFragment() {
-        mRepositoryFragment = null;
+    private void setSelectedRef(String selectedRef) {
+        mSelectedRef = selectedRef;
+        clearRefDependentFragments();
+        updateTitle();
+    }
+
+    private void clearRefDependentFragments() {
+        if (mRepositoryFragment != null) {
+            mRepositoryFragment.setRef(mSelectedRef);
+        }
         mContentListFragment = null;
         mCommitListFragment = null;
         mGitModuleMap = null;
         mDirStack.clear();
         mContentCache.clear();
+    }
+
+    private void refreshFragments() {
+        mRepositoryFragment = null;
+        clearRefDependentFragments();
         setContentShown(false);
         getSupportLoaderManager().getLoader(LOADER_REPO).onContentChanged();
     }
