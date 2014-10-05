@@ -246,8 +246,9 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
     private void updateListCaption() {
         TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
-        tvCommentTitle.setText(getString(R.string.issue_events_with_count,
-                getListAdapter().getCount()));
+        int count = getListAdapter().getCount();
+        tvCommentTitle.setText(getString(R.string.issue_events_with_count, count));
+        tvCommentTitle.setVisibility(count == 0 ? View.GONE : View.VISIBLE);
     }
 
     private void updateCommentSectionVisibility(View v) {

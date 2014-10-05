@@ -193,8 +193,9 @@ public class IssueActivity extends LoadingFragmentActivity implements
     private void fillData() {
         // set details inside listview header
         TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
-        tvCommentTitle.setText(getString(R.string.issue_events_with_count,
-                mEventAdapter.getCount()));
+        int eventCount = mEventAdapter.getCount();
+        tvCommentTitle.setText(getString(R.string.issue_events_with_count, eventCount));
+        tvCommentTitle.setVisibility(eventCount == 0 ? View.GONE : View.VISIBLE);
 
         ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
         AvatarHandler.assignAvatar(ivGravatar, mIssue.getUser());
