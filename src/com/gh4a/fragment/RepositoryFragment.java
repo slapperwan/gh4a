@@ -144,7 +144,11 @@ public class RepositoryFragment extends SherlockProgressFragment implements OnCl
         mRef = ref;
         getArguments().putString(Constants.Object.REF, ref);
         // reload readme
-        getLoaderManager().getLoader(0).onContentChanged();
+        getLoaderManager().restartLoader(0, null, mReadmeCallback);
+        if (mContentView != null) {
+            mContentView.findViewById(R.id.readme).setVisibility(View.GONE);
+            mContentView.findViewById(R.id.pb_readme).setVisibility(View.VISIBLE);
+        }
     }
 
     private void fillData() {
