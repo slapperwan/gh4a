@@ -22,10 +22,10 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         playStore {
-            keyAlias System.console().readLine("Key alias: ")
-            keyPassword System.console().readLine("Key password: ")
-            storeFile file(System.console().readLine("Store file: "))
-            storePassword System.console().readLine("Store password: ")
+            keyAlias KEY_ALIAS
+            keyPassword KEY_PASSWORD
+            storeFile file(STORE_FILE)
+            storePassword STORE_PASSWORD
         }
     }
     compileSdkVersion 19
