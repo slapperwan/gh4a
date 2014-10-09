@@ -216,8 +216,9 @@
     <string name="issue_event_merged">Merged by [b]%1$s[/b]</string>
     <string name="issue_event_referenced">Referenced by [b]%1$s[/b]</string>
     <string name="issue_event_referenced_with_commit">Referenced by [b]%1$s[/b] from commit [commit]</string>
-    <string name="issue_event_assigned">Assigned to [b]%1$s[/b]</string>
-    <string name="issue_event_unassigned">Unassigned from [b]%1$s[/b]</string>
+    <string name="issue_event_assigned">[b]%1$s[/b] assigned this to [b]%2$s[/b]</string>
+    <string name="issue_event_assigned_self">Self-assigned by [b]%1$s[/b]</string>
+    <string name="issue_event_unassigned">Unassigned by [b]%1$s[/b]</string>
 
     <!-- Commit -->
     <string name="commit_title">Commit %1$s</string>

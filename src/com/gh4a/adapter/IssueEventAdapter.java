@@ -137,7 +137,8 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
 
     private CharSequence formatEvent(final IssueEvent event) {
         String type = event.getEvent();
-        int textResId;
+        String textBase = null;
+        int textResId = 0;
 
         if (TextUtils.equals(type, "closed")) {
             textResId = event.getCommitId() != null
@@ -150,15 +151,22 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
             textResId = event.getCommitId() != null
                     ? R.string.issue_event_referenced_with_commit : R.string.issue_event_referenced;
         } else if (TextUtils.equals(type, "assigned")) {
-            textResId = R.string.issue_event_assigned;
+            if (TextUtils.equals(event.getActor().getLogin(), event.getAssignee().getLogin())) {
+                textResId = R.string.issue_event_assigned_self;
+            } else {
+                textBase = mContext.getString(R.string.issue_event_assigned,
+                        event.getActor().getLogin(), event.getAssignee().getLogin());
+            }
         } else if (TextUtils.equals(type, "unassigned")) {
             textResId = R.string.issue_event_unassigned;
         } else {
             return null;
         }
 
-        SpannableStringBuilder text = StringUtils.applyBoldTags(mContext.getString(textResId,
-                event.getActor().getLogin()), null);
+        if (textBase == null) {
+            textBase = mContext.getString(textResId, event.getActor().getLogin());
+        }
+        SpannableStringBuilder text = StringUtils.applyBoldTags(textBase, null);
         if (event.getCommitId() == null) {
             return text;
         }
