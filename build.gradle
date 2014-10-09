@@ -20,14 +20,21 @@ repositories {
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        playStore {
+            keyAlias System.console().readLine("Key alias: ")
+            keyPassword System.console().readLine("Key password: ")
+            storeFile file(System.console().readLine("Store file: "))
+            storePassword System.console().readLine("Store password: ")
+        }
+    }
     compileSdkVersion 19
     buildToolsVersion '19.1.0'
-
     defaultConfig {
         minSdkVersion 10
         targetSdkVersion 19
-        versionCode 36
-        versionName "3.6"
+        versionCode 37
+        versionName "3.7"
     }
 
     buildTypes {
@@ -36,6 +43,7 @@ android {
         }
         release {
             zipAlign true
+            signingConfig signingConfigs.playStore
         }
     }
 
