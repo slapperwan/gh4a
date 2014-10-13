@@ -106,17 +106,20 @@ public class StringUtils {
         content.append("<html><head><title></title>");
 
         if (Constants.MARKDOWN_EXT.contains(ext)) {
-            content.append("<script src='file:///android_asset/showdown.js' type='text/javascript'></script>");
+            writeScriptInclude(content, "showdown");
             writeCssInclude(content, "markdown");
             content.append("</head>");
             content.append("<body>");
             content.append("<div id='content'>");
         } else if (!Constants.SKIP_PRETTIFY_EXT.contains(ext)) {
             writeCssInclude(content, "prettify");
-            content.append("<script src='file:///android_asset/prettify.js' type='text/javascript'></script>");
+            writeScriptInclude(content, "prettify");
+            // Try to load the language extension file.
+            // If there's none, this will fail silently
+            writeScriptInclude(content, "lang-" + ext);
             content.append("</head>");
             content.append("<body onload='prettyPrint()'>");
-            content.append("<pre class='prettyprint linenums'>");
+            content.append("<pre class='prettyprint linenums lang-" + ext + "'>");
         } else{
             writeCssInclude(content, "text");
             content.append("</head>");
@@ -132,7 +135,8 @@ public class StringUtils {
             content.append("<script>");
             if (repoOwner != null && repoName != null) {
                 content.append("var GitHub = new Object();");
-                content.append("GitHub.nameWithOwner = \"").append(repoOwner).append("/").append(repoName).append("\";");
+                content.append("GitHub.nameWithOwner = \"");
+                content.append(repoOwner).append("/").append(repoName).append("\";");
                 if (ref != null) {
                     content.append("GitHub.branch = \"").append(ref).append("\";");
                 }
@@ -149,6 +153,12 @@ public class StringUtils {
         content.append("</body></html>");
 
         return content.toString();
+    }
+
+    private static void writeScriptInclude(StringBuilder builder, String scriptName) {
+        builder.append("<script src='file:///android_asset/");
+        builder.append(scriptName);
+        builder.append(".js' type='text/javascript'></script>");
     }
 
     private static void writeCssInclude(StringBuilder builder, String cssType) {
