@@ -21,12 +21,7 @@ apply plugin: 'com.android.application'
 
 android {
     signingConfigs {
-        playStore {
-            keyAlias KEY_ALIAS
-            keyPassword KEY_PASSWORD
-            storeFile file(STORE_FILE)
-            storePassword STORE_PASSWORD
-        }
+        playStore
     }
     compileSdkVersion 19
     buildToolsVersion '19.1.0'
@@ -70,4 +65,23 @@ dependencies {
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.squareup.okhttp:okhttp:1.5.4'
     compile 'org.ocpsoft.prettytime:prettytime:3.2.4.Final'
+}
+
+def Properties props = new Properties()
+def propFile = new File('signing.properties')
+if (propFile.canRead()) {
+    props.load(new FileInputStream(propFile))
+}
+
+if (props.containsKey('STORE_FILE')
+        && props.containsKey('STORE_PASSWORD')
+        && props.containsKey('KEY_ALIAS')
+        && props.containsKey('KEY_PASSWORD')) {
+    android.signingConfigs.playStore.storeFile = file(props['STORE_FILE'])
+    android.signingConfigs.playStore.storePassword = props['STORE_PASSWORD']
+    android.signingConfigs.playStore.keyAlias = props['KEY_ALIAS']
+    android.signingConfigs.playStore.keyPassword = props['KEY_PASSWORD']
+} else {
+    println 'signing.properties not found or incomplete'
+    android.buildTypes.release.signingConfig = null
 }
