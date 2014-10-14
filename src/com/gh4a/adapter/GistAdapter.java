@@ -16,6 +16,7 @@
 package com.gh4a.adapter;
 
 import org.eclipse.egit.github.core.Gist;
+import org.eclipse.egit.github.core.User;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -65,9 +66,11 @@ public class GistAdapter extends RootAdapter<Gist> {
 
         String count = v.getResources().getQuantityString(R.plurals.file,
                 gist.getFiles().size(), gist.getFiles().size());
-        int extraResId = TextUtils.equals(gist.getUser().getLogin(), mOwnerLogin)
+        User user = gist.getUser();
+        int extraResId = user != null && TextUtils.equals(user.getLogin(), mOwnerLogin)
                 ? R.string.gist_extradata_own : R.string.gist_extradata;
-        String extra = mContext.getString(extraResId, gist.getUser().getLogin(),
+        String extra = mContext.getString(extraResId,
+                user != null ? user.getLogin() : mContext.getString(R.string.unknown),
                 StringUtils.formatRelativeTime(mContext, gist.getCreatedAt(), false), count);
         viewHolder.tvExtra.setText(StringUtils.applyBoldTags(extra, null));
     }
