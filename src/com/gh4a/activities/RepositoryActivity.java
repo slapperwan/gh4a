@@ -330,7 +330,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
 
     @Override
     public void onBackPressed() {
-        if (getPager().getCurrentItem() == 1 && mDirStack.size() > 1) {
+        if (mDirStack != null && mDirStack.size() > 1 && getPager().getCurrentItem() == 1) {
             mDirStack.pop();
             invalidateFragments();
         } else {
