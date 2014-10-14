@@ -189,7 +189,7 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
                 ft.remove(old);
             }
             ft.add(R.id.details, fragment, "main");
-            ft.commit();
+            ft.commitAllowingStateLoss();
         }
         super.invalidateOptionsMenu();
         return true;
