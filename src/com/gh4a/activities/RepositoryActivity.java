@@ -291,6 +291,9 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
 
     @Override
     public void onContentsLoaded(ContentListFragment fragment, List<RepositoryContents> contents) {
+        if (contents == null) {
+            return;
+        }
         mContentCache.put(fragment.getPath(), new ArrayList<RepositoryContents>(contents));
         if (fragment.getPath() == null) {
             for (RepositoryContents content : contents) {
