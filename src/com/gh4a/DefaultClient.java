@@ -19,6 +19,7 @@ public class DefaultClient extends GitHubClient {
     @Override
     protected HttpURLConnection configureRequest(HttpURLConnection request) {
         super.configureRequest(request);
+        Gh4Application.trackVisitedUrl(request.getURL().toExternalForm());
         request.setRequestProperty(HEADER_ACCEPT, headerAccept);
         return request;
     }

@@ -80,6 +80,9 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     private HashMap<String, GitHubService> mServices;
     private PrettyTime mPt;
 
+    private static final int MAX_TRACKED_URLS = 5;
+    private static int sNextUrlTrackingPosition = 0;
+
     /*
      * (non-Javadoc)
      * @see android.app.Application#onCreate()
@@ -146,6 +149,14 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mPt = new PrettyTime(newConfig.locale);
+    }
+
+    /* package */ static void trackVisitedUrl(String url) {
+        Mint.addExtraData("github-url-" + sNextUrlTrackingPosition, url);
+        Mint.addExtraData("last-url-position", Integer.toString(sNextUrlTrackingPosition));
+        if (++sNextUrlTrackingPosition >= MAX_TRACKED_URLS) {
+            sNextUrlTrackingPosition = 0;
+        }
     }
 
     public PrettyTime getPrettyTimeInstance() {
