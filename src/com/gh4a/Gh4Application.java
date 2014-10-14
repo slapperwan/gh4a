@@ -45,8 +45,8 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 
+import com.crashlytics.android.Crashlytics;
 import com.gh4a.activities.SettingsActivity;
-import com.splunk.mint.Mint;
 
 /**
  * The Class Gh4Application.
@@ -100,8 +100,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         selectTheme(prefs.getInt(SettingsActivity.KEY_THEME, Constants.Theme.DARK));
         prefs.registerOnSharedPreferenceChangeListener(this);
 
-        Mint.disableNetworkMonitoring();
-        Mint.initAndStartSession(this, "1e6a83ae");
+        Crashlytics.start(this);
 
         mPt = new PrettyTime();
 
@@ -152,8 +151,8 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     }
 
     /* package */ static void trackVisitedUrl(String url) {
-        Mint.addExtraData("github-url-" + sNextUrlTrackingPosition, url);
-        Mint.addExtraData("last-url-position", Integer.toString(sNextUrlTrackingPosition));
+        Crashlytics.setString("github-url-" + sNextUrlTrackingPosition, url);
+        Crashlytics.setInt("last-url-position", sNextUrlTrackingPosition);
         if (++sNextUrlTrackingPosition >= MAX_TRACKED_URLS) {
             sNextUrlTrackingPosition = 0;
         }

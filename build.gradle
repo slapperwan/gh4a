@@ -1,23 +1,24 @@
 buildscript {
     repositories {
         mavenCentral()
+        maven { url 'http://download.crashlytics.com/maven' }
     }
 
     dependencies {
         classpath 'com.android.tools.build:gradle:0.12.+'
+        classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
     }
 }
 
 repositories {
     maven { url 'http://dl.bintray.com/populov/maven' }
-    /* The MINT jar should be present at this repo according
-       to the docs, but it gives a 404 error
-    maven { url "http://mint.splunk.com/gradle/" } */
     maven { url 'https://github.com/kageiit/maven-repo/raw/master' }
+    maven { url 'http://download.crashlytics.com/maven' }
     mavenCentral()
 }
 
 apply plugin: 'com.android.application'
+apply plugin: 'crashlytics'
 
 android {
     signingConfigs {
@@ -55,8 +56,6 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
 
-    /* see above
-    compile "com.splunk.mint:mint:4.0" */
     compile 'com.android.support:support-v4:19.+'
     compile 'com.actionbarsherlock:actionbarsherlock:4.4.0@aar'
     compile 'com.viewpagerindicator:library:2.4.1@aar'
@@ -65,6 +64,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.squareup.okhttp:okhttp:1.5.4'
     compile 'org.ocpsoft.prettytime:prettytime:3.2.4.Final'
+    compile 'com.crashlytics.android:crashlytics:1.+'
 }
 
 def Properties props = new Properties()
