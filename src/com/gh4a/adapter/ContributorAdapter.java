@@ -3,6 +3,7 @@ package com.gh4a.adapter;
 import org.eclipse.egit.github.core.Contributor;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,8 +61,11 @@ public class ContributorAdapter extends RootAdapter<Contributor> implements View
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             Contributor contributor = (Contributor) v.getTag();
-            mContext.startActivity(IntentUtils.getUserActivityIntent(mContext,
-                    contributor.getLogin(), contributor.getName()));
+            Intent intent = IntentUtils.getUserActivityIntent(mContext,
+                    contributor.getLogin(), contributor.getName());
+            if (intent != null) {
+                mContext.startActivity(intent);
+            }
         }
     }
 

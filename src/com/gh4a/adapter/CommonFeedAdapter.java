@@ -16,6 +16,7 @@
 package com.gh4a.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.text.format.DateFormat;
 import android.view.Gravity;
@@ -101,7 +102,10 @@ public class CommonFeedAdapter extends RootAdapter<Feed> implements View.OnClick
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             Feed feed = (Feed) v.getTag();
-            mContext.startActivity(IntentUtils.getUserActivityIntent(mContext, feed.getAuthor()));
+            Intent intent = IntentUtils.getUserActivityIntent(mContext, feed.getAuthor());
+            if (intent != null) {
+                mContext.startActivity(intent);
+            }
         }
     }
 

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.Contributor;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 
@@ -46,7 +47,10 @@ public class ContributorListFragment extends ListDataBaseFragment<Contributor> {
 
     @Override
     protected void onItemClick(Contributor item) {
-        startActivity(IntentUtils.getUserActivityIntent(getActivity(),
-                item.getLogin(), item.getName()));
+        Intent intent = IntentUtils.getUserActivityIntent(getActivity(),
+                item.getLogin(), item.getName());
+        if (intent != null) {
+            startActivity(intent);
+        }
     }
 }

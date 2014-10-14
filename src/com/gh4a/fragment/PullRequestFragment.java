@@ -327,7 +327,10 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         int id = v.getId();
         if (id == R.id.iv_gravatar) {
             User user = (User) v.getTag();
-            startActivity(IntentUtils.getUserActivityIntent(getActivity(), user));
+            Intent intent = IntentUtils.getUserActivityIntent(getActivity(), user);
+            if (intent != null) {
+                startActivity(intent);
+            }
         } else if (id == R.id.iv_comment) {
             EditText etComment = (EditText) getView().findViewById(R.id.et_comment);
             String text = etComment.getText() == null ? null : etComment.getText().toString();

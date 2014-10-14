@@ -19,6 +19,7 @@ import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.UserService;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.gh4a.Constants;
@@ -62,7 +63,10 @@ public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> 
 
     @Override
     protected void onItemClick(User user) {
-        startActivity(IntentUtils.getUserActivityIntent(getActivity(), user));
+        Intent intent = IntentUtils.getUserActivityIntent(getActivity(), user);
+        if (intent != null) {
+            startActivity(intent);
+        }
     }
 
     @Override

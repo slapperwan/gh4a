@@ -15,6 +15,7 @@
  */
 package com.gh4a.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.view.View;
@@ -101,6 +102,9 @@ public abstract class UserListActivity extends LoadingFragmentActivity implement
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
         User user = (User) adapterView.getAdapter().getItem(position);
-        startActivity(IntentUtils.getUserActivityIntent(this, user));
+        Intent intent = IntentUtils.getUserActivityIntent(this, user);
+        if (intent != null) {
+            startActivity(intent);
+        }
     }
 }

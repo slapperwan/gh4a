@@ -20,6 +20,7 @@ import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.IssueEvent;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.TextUtils;
@@ -203,7 +204,10 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             IssueEventHolder event = (IssueEventHolder) v.getTag();
-            mContext.startActivity(IntentUtils.getUserActivityIntent(mContext, event.getUser()));
+            Intent intent = IntentUtils.getUserActivityIntent(mContext, event.getUser());
+            if (intent != null) {
+                mContext.startActivity(intent);
+            }
         } else if (v.getId() == R.id.iv_edit) {
             Comment comment = (Comment) v.getTag();
             mEditCallback.editComment(comment);

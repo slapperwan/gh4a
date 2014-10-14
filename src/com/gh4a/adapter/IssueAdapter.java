@@ -16,6 +16,7 @@
 package com.gh4a.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
@@ -111,7 +112,10 @@ public class IssueAdapter extends RootAdapter<Issue> implements View.OnClickList
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             Issue issue = (Issue) v.getTag();
-            mContext.startActivity(IntentUtils.getUserActivityIntent(mContext, issue.getUser()));
+            Intent intent = IntentUtils.getUserActivityIntent(mContext, issue.getUser());
+            if (intent != null) {
+                mContext.startActivity(intent);
+            }
         }
     }
 

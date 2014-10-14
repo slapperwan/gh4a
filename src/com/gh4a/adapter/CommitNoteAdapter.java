@@ -19,6 +19,7 @@ import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.User;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -101,7 +102,10 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements Vie
     public void onClick(View v) {
         CommitComment comment = (CommitComment) v.getTag();
         if (v.getId() == R.id.iv_gravatar) {
-            mContext.startActivity(IntentUtils.getUserActivityIntent(mContext, comment.getUser()));
+            Intent intent = IntentUtils.getUserActivityIntent(mContext, comment.getUser());
+            if (intent != null) {
+                mContext.startActivity(intent);
+            }
         } else if (v.getId() == R.id.iv_edit) {
             mEditCallback.editComment(comment);
         }

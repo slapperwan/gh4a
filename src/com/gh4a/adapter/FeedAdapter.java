@@ -45,6 +45,7 @@ import org.eclipse.egit.github.core.event.PushPayload;
 import org.eclipse.egit.github.core.event.ReleasePayload;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
@@ -113,7 +114,10 @@ public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListe
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             User actor = (User) v.getTag();
-            mContext.startActivity(IntentUtils.getUserActivityIntent(mContext, actor));
+            Intent intent = IntentUtils.getUserActivityIntent(mContext, actor);
+            if (intent != null) {
+                mContext.startActivity(intent);
+            }
         }
     }
 

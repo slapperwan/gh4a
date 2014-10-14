@@ -378,13 +378,14 @@ public class IssueActivity extends LoadingFragmentActivity implements
 
     @Override
     public void onClick(View v) {
+        Intent intent = null;
         switch (v.getId()) {
         case R.id.iv_gravatar:
-            startActivity(IntentUtils.getUserActivityIntent(this, mIssue.getUser()));
+            intent = IntentUtils.getUserActivityIntent(this, mIssue.getUser());
             break;
         case R.id.tv_assignee:
         case R.id.iv_assignee:
-            startActivity(IntentUtils.getUserActivityIntent(this, mIssue.getAssignee()));
+            intent = IntentUtils.getUserActivityIntent(this, mIssue.getAssignee());
             break;
         case R.id.iv_comment:
             EditText etComment = (EditText) findViewById(R.id.et_comment);
@@ -395,9 +396,12 @@ public class IssueActivity extends LoadingFragmentActivity implements
             UiUtils.hideImeForView(getCurrentFocus());
             break;
         case R.id.tv_pull:
-            startActivity(IntentUtils.getPullRequestActivityIntent(this,
-                    mRepoOwner, mRepoName, mIssueNumber));
+            intent = IntentUtils.getPullRequestActivityIntent(this,
+                    mRepoOwner, mRepoName, mIssueNumber);
             break;
+        }
+        if (intent != null) {
+            startActivity(intent);
         }
     }
 

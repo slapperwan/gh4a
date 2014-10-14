@@ -19,6 +19,7 @@ import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.User;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,7 +78,10 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> implements View
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             User user = (User) v.getTag();
-            mContext.startActivity(IntentUtils.getUserActivityIntent(mContext, user));
+            Intent intent = IntentUtils.getUserActivityIntent(mContext, user);
+            if (intent != null) {
+                mContext.startActivity(intent);
+            }
         }
     }
 

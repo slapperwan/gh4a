@@ -16,6 +16,7 @@
 package com.gh4a.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -108,7 +109,10 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             RepositoryIssue issue = (RepositoryIssue) v.getTag();
-            mContext.startActivity(IntentUtils.getUserActivityIntent(mContext, issue.getUser()));
+            Intent intent = IntentUtils.getUserActivityIntent(mContext, issue.getUser());
+            if (intent != null) {
+                mContext.startActivity(intent);
+            }
         }
     }
 

@@ -18,6 +18,7 @@ package com.gh4a.adapter;
 import org.eclipse.egit.github.core.RepositoryCommit;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -93,8 +94,11 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> implements View
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             RepositoryCommit commit = (RepositoryCommit) v.getTag();
-            mContext.startActivity(IntentUtils.getUserActivityIntent(mContext,
-                    CommitUtils.getAuthorLogin(commit)));
+            Intent intent = IntentUtils.getUserActivityIntent(mContext,
+                    CommitUtils.getAuthorLogin(commit));
+            if (intent != null) {
+                mContext.startActivity(intent);
+            }
         }
     }
 
