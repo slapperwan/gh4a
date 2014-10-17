@@ -328,7 +328,6 @@
     <!-- Gist -->
     <string name="mine">Mine</string>
     <string name="starred">Starred</string>
-    <string name="gist">Gist</string>
     <string name="gists">Gists</string>
     <string name="gist_title">Gist %1$s</string>
     <string name="gist_files">Files</string>

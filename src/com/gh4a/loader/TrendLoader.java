@@ -35,7 +35,7 @@ public class TrendLoader extends BaseLoader<List<Trend>> {
             return trends;
         }
 
-        JSONObject jsonObject = new JSONObject(json.toString());
+        JSONObject jsonObject = new JSONObject(json);
         JSONObject resultObject = jsonObject.getJSONObject("results");
         JSONArray repositoryArray = resultObject.getJSONArray("repositories");
         for (int i = 0; i < repositoryArray.length(); i++) {

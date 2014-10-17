@@ -36,8 +36,8 @@ import java.util.regex.Pattern;
  */
 public class StringUtils {
     private static final Pattern EMAIL_ADDRESS_PATTERN = Pattern.compile(
-            "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" +
-            "\\@" +
+            "[a-zA-Z0-9\\+\\._%\\-\\+]{1,256}" +
+            "@" +
             "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
             "(" +
             "\\." +
@@ -119,7 +119,7 @@ public class StringUtils {
             writeScriptInclude(content, "lang-" + ext);
             content.append("</head>");
             content.append("<body onload='prettyPrint()'>");
-            content.append("<pre class='prettyprint linenums lang-" + ext + "'>");
+            content.append("<pre class='prettyprint linenums lang-").append(ext).append("'>");
         } else{
             writeCssInclude(content, "text");
             content.append("</head>");

@@ -24,6 +24,7 @@ public class VerticalTextView extends TextView {
     }
 
     @Override
+    @SuppressWarnings("SuspiciousNameCombination")
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
        super.onMeasure(heightMeasureSpec, widthMeasureSpec);
        setMeasuredDimension(getMeasuredHeight(), getMeasuredWidth());

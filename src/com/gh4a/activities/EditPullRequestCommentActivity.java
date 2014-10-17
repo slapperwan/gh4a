@@ -4,7 +4,6 @@ import com.gh4a.Gh4Application;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.CommitService;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
 import java.io.IOException;
