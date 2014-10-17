@@ -3,16 +3,17 @@ package com.gh4a.fragment;
 import java.util.List;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.ListView;
 
-import com.actionbarsherlock.app.SherlockListFragment;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderResult;
 
-public abstract class ListDataBaseFragment<T> extends SherlockListFragment implements
+public abstract class ListDataBaseFragment<T> extends ListFragment implements
         LoaderCallbacks<LoaderResult<List<T>>> {
     private RootAdapter<T> mAdapter;
     private boolean mViewCreated;
@@ -45,9 +46,10 @@ public abstract class ListDataBaseFragment<T> extends SherlockListFragment imple
         adapter.notifyDataSetChanged();
     }
 
-    @SuppressLint("NewApi") // ABS has invalidateOptionsMenu()
+    @SuppressLint("NewApi")
     public void invalidateOptionsMenu() {
-        getSherlockActivity().invalidateOptionsMenu();
+        ActionBarActivity activity = (ActionBarActivity) getActivity();
+        activity.supportInvalidateOptionsMenu();
     }
 
     @Override

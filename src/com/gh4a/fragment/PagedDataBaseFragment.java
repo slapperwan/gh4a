@@ -17,8 +17,10 @@ package com.gh4a.fragment;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +29,6 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockListFragment;
 import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.PageIteratorLoader;
@@ -36,7 +37,7 @@ import org.eclipse.egit.github.core.client.PageIterator;
 
 import java.util.Collection;
 
-public abstract class PagedDataBaseFragment<T> extends SherlockListFragment implements
+public abstract class PagedDataBaseFragment<T> extends ListFragment implements
         LoaderManager.LoaderCallbacks<Collection<T>>, OnScrollListener {
     private RootAdapter<T> mAdapter;
     private boolean mLoadMore;
@@ -64,9 +65,10 @@ public abstract class PagedDataBaseFragment<T> extends SherlockListFragment impl
         getLoaderManager().initLoader(0, null, this);
     }
 
-    @SuppressLint("NewApi") // ABS has invalidateOptionsMenu()
+    @SuppressLint("NewApi")
     public void invalidateOptionsMenu() {
-        getSherlockActivity().invalidateOptionsMenu();
+        ActionBarActivity activity = (ActionBarActivity) getActivity();
+        activity.supportInvalidateOptionsMenu();
     }
 
     public void refresh() {

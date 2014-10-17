@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/download"
         android:icon="?attr/downloadIcon"
-        android:showAsAction="always" />
+        app:showAsAction="always" />
     <item android:id="@+id/browser"
         android:icon="?attr/webIcon"
-        android:showAsAction="always" />
+        app:showAsAction="always" />
     <item android:id="@+id/search"
         android:icon="?attr/searchIcon"
         android:title="@string/search"
-        android:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom" />
     <item android:id="@+id/share"
         android:icon="?attr/shareIcon"
         android:title="@string/share"
-        android:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom" />
 </menu>

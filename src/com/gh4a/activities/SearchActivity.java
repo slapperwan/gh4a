@@ -26,6 +26,8 @@ import org.eclipse.egit.github.core.service.UserService;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.SearchView;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -41,8 +43,6 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.widget.SearchView;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
@@ -52,7 +52,7 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
-public class SearchActivity extends BaseSherlockFragmentActivity implements
+public class SearchActivity extends BaseFragmentActivity implements
         SearchView.OnQueryTextListener, SearchView.OnCloseListener,
         AdapterView.OnItemSelectedListener, AdapterView.OnItemClickListener {
 

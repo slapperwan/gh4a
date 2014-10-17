@@ -17,7 +17,8 @@ package com.gh4a.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import com.actionbarsherlock.app.ActionBar;
+import android.support.v7.app.ActionBar;
+
 import com.gh4a.Constants;
 
 public class WikiActivity extends WebViewerActivity {

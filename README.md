@@ -78,10 +78,10 @@ How to Build Octodroid
 Open Source Libraries
 ---------------------
 * [GitHub Java API](https://github.com/maniac103/egit-github/tree/master/org.eclipse.egit.github.core)
-* [ActionBarSherlock](https://github.com/JakeWharton/ActionBarSherlock) tag 4.4.0
 * [ViewPagerIndicator](https://github.com/JakeWharton/Android-ViewPagerIndicator)
 * [HoloColorPicker](https://github.com/LarsWerkman/HoloColorPicker)
 * [ProgressFragment](https://github.com/johnkil/Android-ProgressFragment)
+* [PreferenceFragment](https://github.com/kolavar/android-support-v4-preferencefragment)
 
 Contributions
 -------------

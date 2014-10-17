@@ -72,9 +72,9 @@ public class UiUtils {
         int luminance = Math.round(0.213F * red + 0.715F * green + 0.072F * blue);
 
         if (luminance >= 128) {
-            return context.getResources().getColor(R.color.abs__primary_text_holo_light);
+            return context.getResources().getColor(R.color.label_fg_dark);
         }
-        return context.getResources().getColor(R.color.abs__primary_text_holo_dark);
+        return context.getResources().getColor(R.color.label_fg_light);
     }
 
     public static AlertDialog.Builder createDialogBuilderWithAlertIcon(Context context) {

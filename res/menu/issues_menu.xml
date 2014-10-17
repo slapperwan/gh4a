@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:title="@string/issue_sort_order"
         android:icon="?attr/sortIcon"
-        android:showAsAction="always">
+        app:showAsAction="always">
         <menu>
             <group android:id="@+id/sort_mode"
                 android:checkableBehavior="single">
@@ -25,25 +26,25 @@
 
     <item android:id="@+id/labels"
         android:icon="?attr/labelListIcon"
-        android:showAsAction="always" />
+        app:showAsAction="always" />
 
     <item android:id="@+id/milestones"
         android:icon="?attr/milestoneListIcon"
-        android:showAsAction="always" />
+        app:showAsAction="always" />
 
     <item android:id="@+id/assignees"
         android:icon="?attr/personIcon"
-        android:showAsAction="always" />
+        app:showAsAction="always" />
 
     <item android:id="@+id/view_labels"
         android:title="@string/issue_manage_labels"
-        android:showAsAction="never" />
+        app:showAsAction="never" />
 
     <item android:id="@+id/view_milestones"
          android:title="@string/issue_manage_milestones"
-         android:showAsAction="never" />
+         app:showAsAction="never" />
 
     <item android:id="@+id/create_issue"
          android:title="@string/issue_create"
-         android:showAsAction="never" />
+         app:showAsAction="never" />
 </menu>

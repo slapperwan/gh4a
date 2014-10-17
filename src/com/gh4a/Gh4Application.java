@@ -46,7 +46,7 @@ import android.content.res.Configuration;
 import android.graphics.Typeface;
 
 import com.crashlytics.android.Crashlytics;
-import com.gh4a.activities.SettingsActivity;
+import com.gh4a.fragment.SettingsFragment;
 
 /**
  * The Class Gh4Application.
@@ -97,7 +97,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         italic = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Italic.ttf");
 
         SharedPreferences prefs = getPrefs();
-        selectTheme(prefs.getInt(SettingsActivity.KEY_THEME, Constants.Theme.DARK));
+        selectTheme(prefs.getInt(SettingsFragment.KEY_THEME, Constants.Theme.DARK));
         prefs.registerOnSharedPreferenceChangeListener(this);
 
         Crashlytics.start(this);
@@ -178,7 +178,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     }
 
     private SharedPreferences getPrefs() {
-        return getSharedPreferences(SettingsActivity.PREF_NAME, MODE_PRIVATE);
+        return getSharedPreferences(SettingsFragment.PREF_NAME, MODE_PRIVATE);
     }
 
     public static Gh4Application get(Context context) {
@@ -193,7 +193,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(Constants.User.AUTH_TOKEN)) {
             mClient.setOAuth2Token(getAuthToken());
-        } else if (key.equals(SettingsActivity.KEY_THEME)) {
+        } else if (key.equals(SettingsFragment.KEY_THEME)) {
             selectTheme(sharedPreferences.getInt(key, Constants.Theme.DARK));
         }
     }

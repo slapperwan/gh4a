@@ -18,13 +18,13 @@ package com.gh4a.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.view.Menu;
+import android.view.MenuItem;
 
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.R;
 import com.gh4a.fragment.PublicTimelineFragment;
 
-public class TimelineActivity extends BaseSherlockFragmentActivity {
+public class TimelineActivity extends BaseFragmentActivity {
     private PublicTimelineFragment mFragment;
 
     @Override
@@ -42,7 +42,7 @@ public class TimelineActivity extends BaseSherlockFragmentActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getSupportMenuInflater().inflate(R.menu.explore_menu, menu);
+        getMenuInflater().inflate(R.menu.explore_menu, menu);
         menu.findItem(R.id.pub_timeline).setVisible(false);
         return super.onCreateOptionsMenu(menu);
     }

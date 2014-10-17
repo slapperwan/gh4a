@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/refresh"
         android:icon="@drawable/navigation_refresh"
-        android:showAsAction="always" />
+        app:showAsAction="always" />
     <item android:id="@+id/explore"
         android:title="@string/explore"
-        android:showAsAction="ifRoom">
+        app:showAsAction="ifRoom">
         <menu>
             <item android:id="@+id/pub_timeline"
                 android:title="@string/pub_timeline" />

@@ -30,19 +30,20 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.ClientForAuthorization;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.TwoFactorAuthException;
+import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
@@ -50,7 +51,7 @@ import com.gh4a.utils.UiUtils;
 /**
  * The Github4Android activity.
  */
-public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
+public class Github4AndroidActivity extends BaseFragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +69,7 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getSupportMenuInflater();
+        MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.anon_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
@@ -164,7 +165,7 @@ public class Github4AndroidActivity extends BaseSherlockFragmentActivity {
         @Override
         protected void onSuccess(Authorization result) {
             SharedPreferences sharedPreferences = getSharedPreferences(
-                    SettingsActivity.PREF_NAME, MODE_PRIVATE);
+                    SettingsFragment.PREF_NAME, MODE_PRIVATE);
             Editor editor = sharedPreferences.edit();
             editor.putString(Constants.User.AUTH_TOKEN, result.getToken());
             editor.putString(Constants.User.LOGIN, mUserName);

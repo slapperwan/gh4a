@@ -20,18 +20,19 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.view.ActionMode;
 import android.text.Editable;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.ActionMode;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentActivity;
@@ -89,7 +90,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
             if (label == mAddedLabel && mShouldStartAdding) {
                 holder.editor.setHint(R.string.issue_label_new);
                 mActionMode = new EditActionMode(label, holder.editor);
-                startActionMode(mActionMode);
+                startSupportActionMode(mActionMode);
                 mShouldStartAdding = false;
             } else {
                 holder.editor.setHint(null);
@@ -136,13 +137,13 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
             mActionMode = new EditActionMode(mAdapter.getItem(position),
                     (EditText) view.findViewById(R.id.et_label));
             mAdapter.setExpanded(view, true);
-            startActionMode(mActionMode);
+            startSupportActionMode(mActionMode);
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getSupportMenuInflater();
+        MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.create_new, menu);
         return super.onCreateOptionsMenu(menu);
     }
@@ -190,14 +191,14 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
 
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.save)
-                .setIcon(UiUtils.resolveDrawable(IssueLabelListActivity.this, R.attr.saveIcon))
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            MenuItem saveItem = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.save)
+                .setIcon(UiUtils.resolveDrawable(IssueLabelListActivity.this, R.attr.saveIcon));
+            MenuItemCompat.setShowAsAction(saveItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
 
             if (mLabel != mAddedLabel) {
-                menu.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, R.string.delete)
-                    .setIcon(UiUtils.resolveDrawable(IssueLabelListActivity.this, R.attr.discardIcon))
-                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                MenuItem deleteItem = menu.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, R.string.delete)
+                    .setIcon(UiUtils.resolveDrawable(IssueLabelListActivity.this, R.attr.discardIcon));
+                MenuItemCompat.setShowAsAction(deleteItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
             }
 
             return true;

@@ -6,12 +6,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.SearchView;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.widget.SearchView;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -20,9 +21,9 @@ import com.gh4a.fragment.RepositorySearchFragment;
 import com.gh4a.fragment.StarredRepositoryListFragment;
 import com.gh4a.fragment.WatchedRepositoryListFragment;
 
-public class RepositoryListActivity extends BaseSherlockFragmentActivity implements
+public class RepositoryListActivity extends BaseFragmentActivity implements
         ActionBar.OnNavigationListener, SearchView.OnCloseListener,
-        SearchView.OnQueryTextListener, MenuItem.OnActionExpandListener {
+        SearchView.OnQueryTextListener, MenuItemCompat.OnActionExpandListener {
     private String mUserLogin;
     private String mUserType;
 
@@ -67,7 +68,7 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
         mTypes = getResources().getStringArray(values);
 
         ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(context,
-                R.layout.sherlock_spinner_item, getResources().getStringArray(items));
+                android.R.layout.simple_spinner_item, getResources().getStringArray(items));
         adapter.setDropDownViewResource(R.layout.row_simple);
 
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
@@ -87,14 +88,14 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getSupportMenuInflater().inflate(R.menu.repo_list_menu, menu);
+        getMenuInflater().inflate(R.menu.repo_list_menu, menu);
 
         // We can only properly search the 'all repos' list
         if (mActionBar.getSelectedNavigationIndex() == 0) {
             MenuItem searchItem = menu.findItem(R.id.search);
-            searchItem.setOnActionExpandListener(this);
+            MenuItemCompat.setOnActionExpandListener(searchItem, this);
 
-            SearchView searchView = (SearchView) searchItem.getActionView();
+            SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
             searchView.setOnCloseListener(this);
             searchView.setOnQueryTextListener(this);
         } else {
@@ -131,7 +132,7 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
     }
 
     @Override
-    public void invalidateOptionsMenu() {
+    public void supportInvalidateOptionsMenu() {
         // happens when load is done; we ignore it as we don't want to close the IME in that case
     }
 
@@ -191,7 +192,7 @@ public class RepositoryListActivity extends BaseSherlockFragmentActivity impleme
             ft.add(R.id.details, fragment, "main");
             ft.commitAllowingStateLoss();
         }
-        super.invalidateOptionsMenu();
+        super.supportInvalidateOptionsMenu();
         return true;
     }
 }

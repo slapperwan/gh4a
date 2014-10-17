@@ -31,7 +31,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.devspark.progressfragment.SherlockProgressFragment;
+import com.devspark.progressfragment.ProgressFragment;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -53,7 +53,7 @@ import com.github.mobile.util.HttpImageGetter;
 
 import org.eclipse.egit.github.core.Repository;
 
-public class RepositoryFragment extends SherlockProgressFragment implements OnClickListener {
+public class RepositoryFragment extends ProgressFragment implements OnClickListener {
     private Repository mRepository;
     private View mContentView;
     private String mRef;

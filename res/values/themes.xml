@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="DefaultTheme" parent="Theme.Sherlock">
+    <style name="DefaultTheme" parent="Theme.AppCompat">
         <item name="sendIcon">@drawable/social_send_now_dark</item>
         <item name="contentEditIcon">@drawable/content_edit_dark</item>
         <item name="downloadIcon">@drawable/download_dark</item>
@@ -27,7 +27,7 @@
         <item name="commentsIcon">@drawable/comments_dark</item>
     </style>
 
-    <style name="LightTheme" parent="Theme.Sherlock.Light">
+    <style name="LightTheme" parent="Theme.AppCompat.Light">
         <item name="sendIcon">@drawable/social_send_now</item>
         <item name="contentEditIcon">@drawable/content_edit</item>
         <item name="downloadIcon">@drawable/download</item>
@@ -54,7 +54,7 @@
         <item name="commentsIcon">@drawable/comments</item>
     </style>
 
-    <style name="LightDarkTheme" parent="Theme.Sherlock.Light.DarkActionBar">
+    <style name="LightDarkTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="sendIcon">@drawable/social_send_now</item>
         <item name="contentEditIcon">@drawable/content_edit</item>
         <item name="downloadIcon">@drawable/download_dark</item>
@@ -79,8 +79,7 @@
         <item name="dirIcon">@drawable/folder</item>
         <item name="fileIcon">@drawable/file</item>
         <item name="commentsIcon">@drawable/comments</item>
-        <!-- seems to be missing in ABS -->
-        <item name="listPopupWindowStyle">@style/Widget.Sherlock.Light.ListPopupWindow</item>
+        <item name="listPopupWindowStyle">@style/Widget.AppCompat.Light.ListPopupWindow</item>
     </style>
 
 </resources>

@@ -7,10 +7,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+
 import com.gh4a.BackgroundTask;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -111,7 +113,7 @@ public class UserActivity extends LoadingFragmentPagerActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getSupportMenuInflater();
+        MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.user_menu, menu);
         return true;
     }
@@ -124,8 +126,8 @@ public class UserActivity extends LoadingFragmentPagerActivity {
         followAction.setVisible(!mIsLoginUserPage && authorized);
         if (followAction.isVisible()) {
             if (mIsFollowing == null) {
-                followAction.setActionView(R.layout.ab_loading);
-                followAction.expandActionView();
+                MenuItemCompat.setActionView(followAction, R.layout.ab_loading);
+                MenuItemCompat.expandActionView(followAction);
             } else if (mIsFollowing) {
                 followAction.setTitle(R.string.user_unfollow_action);
             } else {
@@ -149,8 +151,8 @@ public class UserActivity extends LoadingFragmentPagerActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.refresh:
-                item.setActionView(R.layout.ab_loading);
-                item.expandActionView();
+                MenuItemCompat.setActionView(item, R.layout.ab_loading);
+                MenuItemCompat.expandActionView(item);
                 if (mUserFragment != null) {
                     mUserFragment.refresh();
                 }
@@ -165,8 +167,8 @@ public class UserActivity extends LoadingFragmentPagerActivity {
                 }
                 return true;
             case R.id.follow:
-                item.setActionView(R.layout.ab_loading);
-                item.expandActionView();
+                MenuItemCompat.setActionView(item, R.layout.ab_loading);
+                MenuItemCompat.expandActionView(item);
                 new UpdateFollowTask().execute();
                 return true;
             case R.id.share:

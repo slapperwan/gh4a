@@ -2,13 +2,13 @@ package com.gh4a.activities;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBar;
 
-import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.fragment.CommitListFragment;
 
-public class CommitHistoryActivity extends BaseSherlockFragmentActivity {
+public class CommitHistoryActivity extends BaseFragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

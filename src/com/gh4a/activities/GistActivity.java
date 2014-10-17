@@ -23,14 +23,15 @@ import org.eclipse.egit.github.core.GistFile;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentActivity;
@@ -127,9 +128,9 @@ public class GistActivity extends LoadingFragmentActivity implements OnClickList
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, R.id.share, 0, getString(R.string.share))
-            .setIcon(UiUtils.resolveDrawable(this, R.attr.shareIcon))
-            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        MenuItem item = menu.add(0, R.id.share, 0, getString(R.string.share))
+            .setIcon(UiUtils.resolveDrawable(this, R.attr.shareIcon));
+        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
         return super.onCreateOptionsMenu(menu);
     }
 

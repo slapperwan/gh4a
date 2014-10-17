@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/refresh"
         android:icon="?attr/refreshIcon"
-        android:showAsAction="always" />
+        app:showAsAction="always" />
     <item android:id="@+id/star"
-        android:showAsAction="always" />
+        app:showAsAction="always" />
     <item android:id="@+id/watch"
-        android:showAsAction="always" />
+        app:showAsAction="always" />
     <item android:id="@+id/branches"
         android:title="@string/repo_branches"
-        android:showAsAction="never" />
+        app:showAsAction="never" />
     <item android:id="@+id/tags"
         android:title="@string/repo_tags"
-        android:showAsAction="never" />
+        app:showAsAction="never" />
     <item android:id="@+id/bookmark"
         android:title="@string/bookmark_repo"
-        android:showAsAction="never" />
+        app:showAsAction="never" />
     <item android:id="@+id/share"
         android:title="@string/share"
-        android:showAsAction="never" />
+        app:showAsAction="never" />
 </menu>

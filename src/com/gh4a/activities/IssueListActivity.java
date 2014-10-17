@@ -22,12 +22,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentPagerActivity;
@@ -218,7 +218,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getSupportMenuInflater();
+        MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.issues_menu, menu);
         if (!mIsCollaborator) {
             menu.removeItem(R.id.view_labels);
@@ -437,7 +437,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
     private boolean checkForError(LoaderResult<?> result) {
         if (result.handleError(IssueListActivity.this)) {
             stopProgressDialog(mProgressDialog);
-            invalidateOptionsMenu();
+            supportInvalidateOptionsMenu();
             return true;
         }
         return false;

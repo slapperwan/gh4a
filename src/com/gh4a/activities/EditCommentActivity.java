@@ -3,12 +3,12 @@ package com.gh4a.activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.EditText;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
@@ -18,7 +18,7 @@ import org.eclipse.egit.github.core.RepositoryId;
 
 import java.io.IOException;
 
-public abstract class EditCommentActivity extends BaseSherlockFragmentActivity {
+public abstract class EditCommentActivity extends BaseFragmentActivity {
     private String mRepoOwner;
     private String mRepoName;
     private long mCommentId;
@@ -48,7 +48,7 @@ public abstract class EditCommentActivity extends BaseSherlockFragmentActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getSupportMenuInflater();
+        MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.accept_delete, menu);
         return super.onCreateOptionsMenu(menu);
     }

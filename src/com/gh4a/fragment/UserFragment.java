@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBarActivity;
 import android.text.format.DateFormat;
 import android.text.format.Formatter;
 import android.view.LayoutInflater;
@@ -30,7 +31,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.devspark.progressfragment.SherlockProgressFragment;
+import com.devspark.progressfragment.ProgressFragment;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -56,7 +57,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class UserFragment extends SherlockProgressFragment implements View.OnClickListener {
+public class UserFragment extends ProgressFragment implements View.OnClickListener {
     private String mUserLogin;
     private String mUserName;
     private User mUser;
@@ -150,9 +151,10 @@ public class UserFragment extends SherlockProgressFragment implements View.OnCli
         getLoaderManager().getLoader(0).onContentChanged();
     }
 
-    @SuppressLint("NewApi") // ABS has invalidateOptionsMenu()
+    @SuppressLint("NewApi")
     private void invalidateOptionsMenu() {
-        getSherlockActivity().invalidateOptionsMenu();
+        ActionBarActivity activity = (ActionBarActivity) getActivity();
+        activity.supportInvalidateOptionsMenu();
     }
 
     private void fillData() {

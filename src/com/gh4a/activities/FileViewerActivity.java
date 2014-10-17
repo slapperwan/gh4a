@@ -19,11 +19,12 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.loader.ContentLoader;
@@ -108,12 +109,12 @@ public class FileViewerActivity extends WebViewerActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getSupportMenuInflater();
+        MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.download_menu, menu);
 
         menu.removeItem(R.id.download);
-        menu.add(0, MENU_ITEM_HISTORY, Menu.NONE, getString(R.string.history))
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        MenuItem item = menu.add(0, MENU_ITEM_HISTORY, Menu.NONE, getString(R.string.history));
+        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_NEVER);
 
         return super.onCreateOptionsMenu(menu);
     }

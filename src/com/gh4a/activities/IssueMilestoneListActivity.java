@@ -18,11 +18,11 @@ package com.gh4a.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentPagerActivity;
@@ -68,7 +68,7 @@ public class IssueMilestoneListActivity extends LoadingFragmentPagerActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         if (Gh4Application.get(this).isAuthorized()) {
             menu.clear();
-            MenuInflater inflater = getSupportMenuInflater();
+            MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.create_new, menu);
         }
         return true;

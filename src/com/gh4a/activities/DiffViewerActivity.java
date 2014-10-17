@@ -23,10 +23,16 @@ import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.internal.widget.ListPopupWindow;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,11 +43,6 @@ import android.widget.FrameLayout;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.internal.widget.IcsListPopupWindow;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
@@ -135,14 +136,14 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getSupportMenuInflater();
+        MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.download_menu, menu);
 
         menu.removeItem(R.id.download);
 
         String viewAtTitle = getString(R.string.object_view_file_at, mSha.substring(0, 7));
-        menu.add(0, MENU_ITEM_VIEW, Menu.NONE, viewAtTitle)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        MenuItem item = menu.add(0, MENU_ITEM_VIEW, Menu.NONE, viewAtTitle);
+        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_NEVER);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -322,7 +323,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     protected abstract void updateComment(long id, String body, int position) throws IOException;
     protected abstract void deleteComment(long id) throws IOException;
 
-    private class CommentActionPopup extends IcsListPopupWindow implements
+    private class CommentActionPopup extends ListPopupWindow implements
             AdapterView.OnItemClickListener {
         private long mId;
         private int mPosition;

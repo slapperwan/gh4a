@@ -24,12 +24,13 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.BackgroundTask;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -343,7 +344,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getSupportMenuInflater();
+        MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.repo_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
@@ -355,8 +356,8 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         watchAction.setVisible(authorized);
         if (authorized) {
             if (!mIsFinishLoadingWatching) {
-                watchAction.setActionView(R.layout.ab_loading);
-                watchAction.expandActionView();
+                MenuItemCompat.setActionView(watchAction, R.layout.ab_loading);
+                MenuItemCompat.expandActionView(watchAction);
             } else if (mIsWatching) {
                 watchAction.setTitle(R.string.repo_unwatch_action);
             } else {
@@ -368,8 +369,8 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         starAction.setVisible(authorized);
         if (authorized) {
             if (!mIsFinishLoadingStarring) {
-                starAction.setActionView(R.layout.ab_loading);
-                starAction.expandActionView();
+                MenuItemCompat.setActionView(starAction, R.layout.ab_loading);
+                MenuItemCompat.expandActionView(starAction);
             } else if (mIsStarring) {
                 starAction.setTitle(R.string.repo_unstar_action);
             } else {
@@ -394,13 +395,13 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.watch:
-                item.setActionView(R.layout.ab_loading);
-                item.expandActionView();
+                MenuItemCompat.setActionView(item, R.layout.ab_loading);
+                MenuItemCompat.expandActionView(item);
                 new UpdateWatchTask().execute();
                 return true;
             case R.id.star:
-                item.setActionView(R.layout.ab_loading);
-                item.expandActionView();
+                MenuItemCompat.setActionView(item, R.layout.ab_loading);
+                MenuItemCompat.expandActionView(item);
                 new UpdateStarTask().execute();
                 return true;
             case R.id.branches:
@@ -420,8 +421,8 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
                 }
                 return true;
             case R.id.refresh:
-                item.setActionView(R.layout.ab_loading);
-                item.expandActionView();
+                MenuItemCompat.setActionView(item, R.layout.ab_loading);
+                MenuItemCompat.expandActionView(item);
                 refreshFragments();
                 return true;
             case R.id.share:

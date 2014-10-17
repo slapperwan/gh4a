@@ -5,12 +5,12 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.client.IGitHubConstants;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 
-import com.gh4a.activities.BaseSherlockFragmentActivity;
 import com.gh4a.activities.BlogListActivity;
 import com.gh4a.activities.ExploreActivity;
 import com.gh4a.activities.RepositoryActivity;
@@ -18,7 +18,7 @@ import com.gh4a.activities.WikiListActivity;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
-public class BrowseFilter extends BaseSherlockFragmentActivity {
+public class BrowseFilter extends Activity {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

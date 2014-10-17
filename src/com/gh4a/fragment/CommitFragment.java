@@ -18,7 +18,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.devspark.progressfragment.SherlockProgressFragment;
+import com.devspark.progressfragment.ProgressFragment;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -38,7 +38,7 @@ import com.gh4a.utils.UiUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommitFragment extends SherlockProgressFragment implements OnClickListener {
+public class CommitFragment extends ProgressFragment implements OnClickListener {
     private static final int REQUEST_DIFF_VIEWER = 1000;
 
     private String mRepoOwner;

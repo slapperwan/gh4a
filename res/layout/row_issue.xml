@@ -17,7 +17,7 @@
         android:paddingTop="2dp"
         android:paddingBottom="2dp"
         android:singleLine="true"
-        android:fontFamily="bold"
+        android:textStyle="bold"
         android:textColor="@android:color/black"
         android:background="@color/issue_number_bg"
         android:layout_marginRight="5dp" />

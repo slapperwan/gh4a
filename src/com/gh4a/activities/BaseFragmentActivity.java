@@ -22,12 +22,12 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.Window;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.db.BookmarksProvider;
@@ -37,7 +37,7 @@ import com.gh4a.utils.ToastUtils;
 /**
  * The Base activity.
  */
-public abstract class BaseSherlockFragmentActivity extends SherlockFragmentActivity {
+public abstract class BaseFragmentActivity extends ActionBarActivity {
     private static final int REQUEST_SETTINGS = 10000;
 
     private boolean mHasErrorView = false;
@@ -129,7 +129,7 @@ public abstract class BaseSherlockFragmentActivity extends SherlockFragmentActiv
 
     protected void setErrorView() {
         mHasErrorView = true;
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.error);
 
         findViewById(R.id.btn_home).setOnClickListener(new OnClickListener() {

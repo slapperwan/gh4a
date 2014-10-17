@@ -18,14 +18,14 @@ package com.gh4a.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 
-import com.actionbarsherlock.app.ActionBar;
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.fragment.CommitCompareFragment;
 import com.gh4a.utils.IntentUtils;
 
-public class CompareActivity extends BaseSherlockFragmentActivity {
+public class CompareActivity extends BaseFragmentActivity {
     private String mRepoOwner;
     private String mRepoName;
 

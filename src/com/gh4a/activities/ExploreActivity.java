@@ -20,14 +20,15 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.util.SparseArray;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.BlogListFragment;
@@ -36,7 +37,7 @@ import com.gh4a.fragment.TrendingFragment;
 import com.gh4a.utils.UiUtils;
 import com.viewpagerindicator.TitlePageIndicator;
 
-public class ExploreActivity extends BaseSherlockFragmentActivity implements
+public class ExploreActivity extends BaseFragmentActivity implements
         ActionBar.OnNavigationListener {
     private ViewPager mPager;
     private TitlePageIndicator mIndicator;
@@ -61,7 +62,7 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements
 
         ArrayAdapter<CharSequence> list = ArrayAdapter.createFromResource(
                 actionBar.getThemedContext(), R.array.explore_item,
-                R.layout.sherlock_spinner_item);
+                android.R.layout.simple_spinner_item);
         list.setDropDownViewResource(R.layout.row_simple);
 
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
@@ -76,8 +77,8 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements
         mIndicator = (TitlePageIndicator) findViewById(R.id.indicator);
         mIndicator.setViewPager(mPager);
         if (Gh4Application.THEME != R.style.DefaultTheme) {
-            mIndicator.setTextColor(getResources().getColor(R.color.abs__primary_text_holo_light));
-            mIndicator.setSelectedColor(getResources().getColor(R.color.abs__primary_text_holo_light));
+            mIndicator.setTextColor(getResources().getColor(R.color.label_fg_dark));
+            mIndicator.setSelectedColor(getResources().getColor(R.color.label_fg_dark));
             mIndicator.setSelectedBold(true);
         }
 
@@ -91,7 +92,7 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements
 
         mIndicator.notifyDataSetChanged();
         mAdapter.notifyDataSetChanged();
-        invalidateOptionsMenu();
+        supportInvalidateOptionsMenu();
         mPager.invalidate();
     }
 
@@ -151,9 +152,9 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.clear();
         if (mSelectedItem == 0) {
-            menu.add(0, R.id.refresh, 0, getString(R.string.refresh))
-                .setIcon(UiUtils.resolveDrawable(this, R.attr.refreshIcon))
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            MenuItem item = menu.add(0, R.id.refresh, 0, getString(R.string.refresh))
+                .setIcon(UiUtils.resolveDrawable(this, R.attr.refreshIcon));
+            MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
         }
         return super.onCreateOptionsMenu(menu);
     }
@@ -167,8 +168,8 @@ public class ExploreActivity extends BaseSherlockFragmentActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.refresh:
-                item.setActionView(R.layout.ab_loading);
-                item.expandActionView();
+                MenuItemCompat.setActionView(item, R.layout.ab_loading);
+                MenuItemCompat.expandActionView(item);
                 if (mPublicTimeFragment != null) {
                     mPublicTimeFragment.refresh();
                 }

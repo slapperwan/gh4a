@@ -23,17 +23,18 @@ import android.content.pm.ApplicationInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
+import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.utils.ThemeUtils;
 
 public abstract class WebViewerActivity extends LoadingFragmentActivity {
@@ -142,8 +143,8 @@ public abstract class WebViewerActivity extends LoadingFragmentActivity {
 
     @SuppressWarnings("deprecation")
     private void applyDefaultTextSize(WebSettings s) {
-        SharedPreferences prefs = getSharedPreferences(SettingsActivity.PREF_NAME, MODE_PRIVATE);
-        int initialZoomLevel = prefs.getInt(SettingsActivity.KEY_TEXT_SIZE, -1);
+        SharedPreferences prefs = getSharedPreferences(SettingsFragment.PREF_NAME, MODE_PRIVATE);
+        int initialZoomLevel = prefs.getInt(SettingsFragment.KEY_TEXT_SIZE, -1);
         if (initialZoomLevel < 0 || initialZoomLevel >= ZOOM_SIZES.length) {
             return;
         }

@@ -7,9 +7,9 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
-import com.gh4a.activities.BaseSherlockFragmentActivity;
+import com.gh4a.activities.BaseFragmentActivity;
 
-public abstract class LoadingFragmentActivity extends BaseSherlockFragmentActivity {
+public abstract class LoadingFragmentActivity extends BaseFragmentActivity {
     private View mProgressContainer;
     private View mContentContainer;
     private View mContentView;
