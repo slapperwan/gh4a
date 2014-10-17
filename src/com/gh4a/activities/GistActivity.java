@@ -128,8 +128,8 @@ public class GistActivity extends LoadingFragmentActivity implements OnClickList
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuItem item = menu.add(0, R.id.share, 0, getString(R.string.share))
-            .setIcon(UiUtils.resolveDrawable(this, R.attr.shareIcon));
+        MenuItem item = menu.add(0, R.id.share, 0, R.string.share)
+                .setIcon(UiUtils.resolveDrawable(this, R.attr.shareIcon));
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
         return super.onCreateOptionsMenu(menu);
     }

@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/refresh"
         android:icon="@drawable/navigation_refresh"
+        android:title="@string/refresh"
         app:showAsAction="always" />
     <item android:id="@+id/explore"
         android:title="@string/explore"

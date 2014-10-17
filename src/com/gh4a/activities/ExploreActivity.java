@@ -152,7 +152,7 @@ public class ExploreActivity extends BaseFragmentActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.clear();
         if (mSelectedItem == 0) {
-            MenuItem item = menu.add(0, R.id.refresh, 0, getString(R.string.refresh))
+            MenuItem item = menu.add(0, R.id.refresh, 0, R.string.refresh)
                 .setIcon(UiUtils.resolveDrawable(this, R.attr.refreshIcon));
             MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
         }

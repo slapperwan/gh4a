@@ -18,9 +18,9 @@ package com.gh4a.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.gh4a.Constants;
@@ -29,6 +29,7 @@ import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueMilestoneListFragment;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.UiUtils;
 
 public class IssueMilestoneListActivity extends LoadingFragmentPagerActivity {
     private String mRepoOwner;
@@ -65,13 +66,13 @@ public class IssueMilestoneListActivity extends LoadingFragmentPagerActivity {
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu) {
         if (Gh4Application.get(this).isAuthorized()) {
-            menu.clear();
-            MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.create_new, menu);
+            MenuItem createItem = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.issue_milestone_new)
+                    .setIcon(UiUtils.resolveDrawable(this, R.attr.newIcon));
+            MenuItemCompat.setShowAsAction(createItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
         }
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -83,7 +84,7 @@ public class IssueMilestoneListActivity extends LoadingFragmentPagerActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case R.id.create_new:
+        case Menu.FIRST:
             Intent intent = new Intent(this, IssueMilestoneEditActivity.class);
             intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
             intent.putExtra(Constants.Repository.NAME, mRepoName);

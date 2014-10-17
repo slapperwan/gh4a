@@ -25,7 +25,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
 import android.text.Editable;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -143,8 +142,11 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.create_new, menu);
+        if (Gh4Application.get(this).isAuthorized()) {
+            MenuItem createItem = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.issue_label_new)
+                    .setIcon(UiUtils.resolveDrawable(this, R.attr.newIcon));
+            MenuItemCompat.setShowAsAction(createItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -157,7 +159,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case R.id.create_new:
+        case Menu.FIRST:
             if (mActionMode == null) {
                 mAddedLabel = new Label();
                 mAddedLabel.setColor("dddddd");
