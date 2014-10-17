@@ -4,5 +4,9 @@ build
 
 # Android Studio stuff
 .idea
-local.properties
+*.properties
 *.iml
+
+# Crashlytics generated files
+assets/crashlytics-build.properties
+res/values/com_crashlytics_export_strings.xml
