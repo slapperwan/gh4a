@@ -262,20 +262,19 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
             parent.addView(fileView);
         }
 
-        adjustVisibility(llAdded, R.id.commit_added, added);
-        adjustVisibility(llChanged, R.id.commit_changed, changed);
-        adjustVisibility(llRenamed, R.id.commit_renamed, renamed);
-        adjustVisibility(llDeleted, R.id.commit_deleted, deleted);
+        adjustVisibility(R.id.card_added, added);
+        adjustVisibility(R.id.card_changed, changed);
+        adjustVisibility(R.id.card_renamed, renamed);
+        adjustVisibility(R.id.card_deleted, deleted);
 
         TextView tvSummary = (TextView) mContentView.findViewById(R.id.tv_desc);
         tvSummary.setText(getString(R.string.commit_summary, added + changed + renamed + deleted,
                 additions, deletions));
     }
 
-    private void adjustVisibility(View container, int headerRes, int count) {
+    private void adjustVisibility(int containerResId, int count) {
         int visibility = count > 0 ? View.VISIBLE : View.GONE;
-        container.setVisibility(visibility);
-        mContentView.findViewById(headerRes).setVisibility(visibility);
+        mContentView.findViewById(containerResId).setVisibility(visibility);
     }
 
     @Override

@@ -2,138 +2,220 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingTop="@dimen/content_padding"
-        android:paddingBottom="@dimen/content_padding" >
-        <RelativeLayout
-            android:id="@+id/title"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/content_padding"
-            android:paddingRight="@dimen/content_padding" >
-            <com.gh4a.widget.FixedSizeImageView
-                android:id="@+id/iv_gravatar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="8dp" />
-            <TextView
-                android:id="@+id/tv_extra"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:layout_toRightOf="@id/iv_gravatar" />
-            <TextView
-                android:id="@+id/tv_title"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/overview_header_spacing"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:layout_toRightOf="@id/iv_gravatar"
-                android:layout_below="@id/tv_extra" />
-        </RelativeLayout>
-        <LinearLayout
-            android:id="@+id/committer_info"
+                android:layout_marginBottom="@dimen/overview_header_spacing"
+                android:orientation="vertical"
+                android:paddingLeft="@dimen/content_padding"
+                android:paddingRight="@dimen/content_padding">
+
+                <RelativeLayout
+                    android:id="@+id/title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.gh4a.widget.FixedSizeImageView
+                        android:id="@+id/iv_gravatar"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="8dp" />
+                    <TextView
+                        android:id="@+id/tv_extra"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:layout_toRightOf="@id/iv_gravatar" />
+                    <TextView
+                        android:id="@+id/tv_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/overview_header_spacing"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:layout_toRightOf="@id/iv_gravatar"
+                        android:layout_below="@id/tv_extra" />
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/committer_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="4dp"
+                    android:visibility="gone">
+
+                    <com.gh4a.widget.FixedSizeImageView
+                        android:id="@+id/iv_commit_gravatar"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="13dp" />
+                    <TextView
+                        android:id="@+id/tv_commit_extra"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:layout_marginTop="@dimen/overview_item_spacing" />
+                <TextView
+                    android:id="@+id/tv_desc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/overview_header_spacing"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textStyle="italic" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_changed"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="4dp"
-            android:paddingLeft="@dimen/content_padding"
-            android:paddingRight="@dimen/content_padding"
-            android:visibility="gone" >
-            <com.gh4a.widget.FixedSizeImageView
-                android:id="@+id/iv_commit_gravatar"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="13dp" />
-            <TextView
-                android:id="@+id/tv_commit_extra"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-        </LinearLayout>
-        <TextView
-            android:id="@+id/tv_message"
+                android:layout_marginTop="@dimen/overview_header_spacing"
+                android:layout_marginBottom="@dimen/overview_header_spacing"
+                android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/commit_changed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/overview_header_spacing"
+                android:paddingLeft="@dimen/content_padding"
+                android:paddingRight="@dimen/content_padding"
+                style="@style/HeaderLabel"
+                android:text="@string/commit_changed" />
+
+            <LinearLayout
+                android:id="@+id/ll_changed"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_added"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:layout_marginTop="@dimen/overview_item_spacing"
-            android:paddingLeft="@dimen/content_padding"
-            android:paddingRight="@dimen/content_padding" />
-        <TextView
-            android:id="@+id/tv_desc"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/overview_header_spacing"
+                android:layout_marginBottom="@dimen/overview_header_spacing"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/commit_added"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/overview_header_spacing"
+                    android:paddingLeft="@dimen/content_padding"
+                    android:paddingRight="@dimen/content_padding"
+                    style="@style/HeaderLabel"
+                    android:text="@string/commit_added" />
+                <LinearLayout
+                    android:id="@+id/ll_added"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_renamed"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/content_padding"
-            android:paddingRight="@dimen/content_padding"
-            android:layout_marginTop="@dimen/overview_item_spacing"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textStyle="italic" />
-        <TextView
-            android:id="@+id/commit_changed"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/overview_header_spacing"
+                android:layout_marginBottom="@dimen/overview_header_spacing"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/commit_renamed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/overview_header_spacing"
+                    android:paddingLeft="@dimen/content_padding"
+                    android:paddingRight="@dimen/content_padding"
+                    style="@style/HeaderLabel"
+                    android:text="@string/commit_renamed" />
+                <LinearLayout
+                    android:id="@+id/ll_renamed"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_deleted"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/overview_item_spacing"
-            android:layout_marginBottom="@dimen/overview_header_spacing"
-            android:layout_marginLeft="@dimen/content_padding"
-            android:layout_marginRight="@dimen/content_padding"
-            style="@style/HeaderLabel"
-            android:text="@string/commit_changed" />
-        <LinearLayout
-            android:id="@+id/ll_changed"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-        <TextView
-            android:id="@+id/commit_added"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/overview_item_spacing"
-            android:layout_marginBottom="@dimen/overview_header_spacing"
-            android:layout_marginLeft="@dimen/content_padding"
-            android:layout_marginRight="@dimen/content_padding"
-            style="@style/HeaderLabel"
-            android:text="@string/commit_added" />
-        <LinearLayout
-            android:id="@+id/ll_added"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-        <TextView
-            android:id="@+id/commit_renamed"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/overview_item_spacing"
-            android:layout_marginBottom="@dimen/overview_header_spacing"
-            android:layout_marginLeft="@dimen/content_padding"
-            android:layout_marginRight="@dimen/content_padding"
-            style="@style/HeaderLabel"
-            android:text="@string/commit_renamed" />
-        <LinearLayout
-            android:id="@+id/ll_renamed"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-        <TextView
-            android:id="@+id/commit_deleted"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/overview_item_spacing"
-            android:layout_marginBottom="@dimen/overview_header_spacing"
-            android:layout_marginLeft="@dimen/content_padding"
-            android:layout_marginRight="@dimen/content_padding"
-            style="@style/HeaderLabel"
-            android:text="@string/commit_deleted" />
-        <LinearLayout
-            android:id="@+id/ll_deleted"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/overview_header_spacing"
+                android:layout_marginBottom="@dimen/overview_header_spacing"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/commit_deleted"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/overview_header_spacing"
+                    android:paddingLeft="@dimen/content_padding"
+                    android:paddingRight="@dimen/content_padding"
+                    style="@style/HeaderLabel"
+                    android:text="@string/commit_deleted" />
+                <LinearLayout
+                    android:id="@+id/ll_deleted"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
     </LinearLayout>
+
 </ScrollView>
