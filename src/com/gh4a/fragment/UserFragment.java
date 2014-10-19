@@ -341,7 +341,7 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
 
     public void fillOrganizations(List<User> organizations) {
         Gh4Application app = Gh4Application.get(getActivity());
-        LinearLayout llOrgs = (LinearLayout) mContentView.findViewById(R.id.ll_orgs);
+        ViewGroup llOrgs = (ViewGroup) mContentView.findViewById(R.id.ll_orgs);
         LinearLayout llOrg = (LinearLayout) mContentView.findViewById(R.id.ll_org);
         int count = organizations != null ? organizations.size() : 0;
         LayoutInflater inflater = getLayoutInflater(null);
