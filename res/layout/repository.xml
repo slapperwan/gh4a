@@ -7,249 +7,283 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="@dimen/content_padding"
-        android:paddingTop="@dimen/content_padding">
+        android:orientation="vertical">
 
-        <RelativeLayout
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/content_padding"
-            android:paddingRight="@dimen/content_padding">
+            android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/tv_repo_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <TextView
-                android:id="@+id/tv_parent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_repo_name"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="8dp"
-                style="@style/SelectableItem"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="@color/highlight" />
-
-            <TextView
-                android:id="@+id/tv_desc"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/tv_parent"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-
-            <TextView
-                android:id="@+id/tv_url"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tv_desc"
-                android:autoLink="web"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColorLink="@color/highlight" />
-
-            <TextView
-                android:id="@+id/tv_language"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_url"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-        </RelativeLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/overview_item_spacing"
-            android:orientation="horizontal"
-            android:paddingLeft="@dimen/content_padding"
-            android:paddingRight="@dimen/content_padding">
-
-            <LinearLayout
-                android:id="@+id/cell_issues"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal"
-                style="@style/SelectableItem"
-                android:orientation="vertical">
+                android:layout_marginTop="@dimen/overview_header_spacing"
+                android:layout_marginBottom="@dimen/overview_header_spacing"
+                android:paddingLeft="@dimen/content_padding"
+                android:paddingRight="@dimen/content_padding">
 
                 <TextView
-                    android:id="@+id/tv_issues_count"
+                    android:id="@+id/tv_repo_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
 
                 <TextView
-                    android:id="@+id/tv_issues_label"
+                    android:id="@+id/tv_parent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/issues"
+                    android:layout_below="@id/tv_repo_name"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp"
+                    style="@style/SelectableItem"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/highlight" />
+
+                <TextView
+                    android:id="@+id/tv_desc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_parent"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/cell_stargazers"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal"
-                style="@style/SelectableItem"
-                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/tv_stargazers_count"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tv_url"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
+                    android:layout_below="@+id/tv_desc"
+                    android:autoLink="web"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColorLink="@color/highlight" />
 
                 <TextView
-                    android:id="@+id/tv_stargazers_label"
+                    android:id="@+id/tv_language"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/repo_stargazers"
+                    android:layout_below="@id/tv_url"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
-            </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/cell_forks"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal"
-                style="@style/SelectableItem"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tv_forks_count"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
+                    android:layout_marginTop="@dimen/overview_item_spacing"
+                    android:layout_below="@id/tv_language"
+                    android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/tv_forks_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/repo_network"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/cell_pull_requests"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal"
-                style="@style/SelectableItem"
-                android:orientation="vertical">
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <ProgressBar
-                        android:id="@+id/pull_requests_progress"
-                        android:layout_gravity="center"
-                        style="@style/LoadingProgress" />
-                    <TextView
-                        android:id="@+id/tv_pull_requests_count"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:id="@+id/cell_issues"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        style="@style/SelectableItem"
+                        android:orientation="vertical">
 
-                </FrameLayout>
+                        <TextView
+                            android:id="@+id/tv_issues_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceLarge" />
 
-                <TextView
-                    android:id="@+id/tv_pull_requests_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/pulls"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-            </LinearLayout>
-        </LinearLayout>
+                        <TextView
+                            android:id="@+id/tv_issues_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/issues"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/cell_stargazers"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        style="@style/SelectableItem"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tv_stargazers_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                        <TextView
+                            android:id="@+id/tv_stargazers_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/repo_stargazers"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/cell_forks"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        style="@style/SelectableItem"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tv_forks_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                        <TextView
+                            android:id="@+id/tv_forks_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/repo_network"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/cell_pull_requests"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        style="@style/SelectableItem"
+                        android:orientation="vertical">
+
+                        <FrameLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <ProgressBar
+                                android:id="@+id/pull_requests_progress"
+                                android:layout_gravity="center"
+                                style="@style/LoadingProgress" />
+                            <TextView
+                                android:id="@+id/tv_pull_requests_count"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/tv_pull_requests_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/pulls"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
+                    </LinearLayout>
+                </LinearLayout>
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
 
         <!-- README section -->
-        <LinearLayout
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingLeft="@dimen/content_padding"
-            android:paddingRight="@dimen/content_padding">
+            android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/readme_title"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/overview_item_spacing"
+                android:layout_marginTop="@dimen/overview_header_spacing"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
-                style="@style/HeaderLabel"
-                android:text="@string/readme" />
+                android:orientation="vertical">
 
-            <ProgressBar
-                android:id="@+id/pb_readme"
-                style="@style/LoadingProgress" />
+                <TextView
+                    android:id="@+id/readme_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/overview_header_spacing"
+                    android:paddingLeft="@dimen/content_padding"
+                    android:paddingRight="@dimen/content_padding"
+                    style="@style/HeaderLabel"
+                    android:text="@string/readme" />
 
-            <TextView
-                android:id="@+id/readme"
+                <ProgressBar
+                    android:id="@+id/pb_readme"
+                    style="@style/LoadingProgress" />
+
+                <TextView
+                    android:id="@+id/readme"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/content_padding"
+                    android:paddingRight="@dimen/content_padding"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <!-- Other info section -->
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone" />
-            <!-- Other info section -->
-            <TextView
-                android:id="@+id/other_info"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/overview_item_spacing"
+                android:layout_marginTop="@dimen/overview_header_spacing"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
-                style="@style/HeaderLabel"
-                android:text="@string/other_info" />
-        </LinearLayout>
+                android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_contributors_label"
-            style="@style/SelectableLabel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/content_padding"
-            android:paddingRight="@dimen/content_padding"
-            android:text="@string/repo_contributors" />
+                <TextView
+                    android:id="@+id/other_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/overview_header_spacing"
+                    android:paddingLeft="@dimen/content_padding"
+                    android:paddingRight="@dimen/content_padding"
+                    style="@style/HeaderLabel"
+                    android:text="@string/other_info" />
 
-        <TextView
-            android:id="@+id/tv_collaborators_label"
-            style="@style/SelectableLabel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/content_padding"
-            android:paddingRight="@dimen/content_padding"
-            android:text="@string/repo_collaborators" />
+                <TextView
+                    android:id="@+id/tv_contributors_label"
+                    style="@style/SelectableLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/content_padding"
+                    android:paddingRight="@dimen/content_padding"
+                    android:text="@string/repo_contributors" />
 
-        <TextView
-            android:id="@+id/tv_wiki_label"
-            style="@style/SelectableLabel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/content_padding"
-            android:paddingRight="@dimen/content_padding"
-            android:text="@string/recent_wiki" />
+                <TextView
+                    android:id="@+id/tv_collaborators_label"
+                    style="@style/SelectableLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/content_padding"
+                    android:paddingRight="@dimen/content_padding"
+                    android:text="@string/repo_collaborators" />
 
-        <TextView
-            android:id="@+id/tv_releases_label"
-            style="@style/SelectableLabel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/content_padding"
-            android:paddingRight="@dimen/content_padding"
-            android:text="@string/releases" />
+                <TextView
+                    android:id="@+id/tv_wiki_label"
+                    style="@style/SelectableLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/content_padding"
+                    android:paddingRight="@dimen/content_padding"
+                    android:text="@string/recent_wiki" />
 
-        <TextView
-            android:id="@+id/tv_downloads_label"
-            style="@style/SelectableLabel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/content_padding"
-            android:paddingRight="@dimen/content_padding"
-            android:text="@string/downloads" />
+                <TextView
+                    android:id="@+id/tv_releases_label"
+                    style="@style/SelectableLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/content_padding"
+                    android:paddingRight="@dimen/content_padding"
+                    android:text="@string/releases" />
+
+                <TextView
+                    android:id="@+id/tv_downloads_label"
+                    style="@style/SelectableLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/content_padding"
+                    android:paddingRight="@dimen/content_padding"
+                    android:text="@string/downloads" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
     </LinearLayout>
+
 </ScrollView>
