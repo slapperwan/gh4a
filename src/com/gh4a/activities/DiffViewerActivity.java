@@ -25,7 +25,7 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.internal.widget.ListPopupWindow;
+import android.support.v7.widget.ListPopupWindow;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.SparseArray;

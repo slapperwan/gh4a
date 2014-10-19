@@ -20,7 +20,7 @@
     <attr name="sendIcon" format="reference" />
     <attr name="contentEditIcon" format="reference" />
     <attr name="downloadIcon" format="reference" />
-    <attr name="searchIcon" format="reference" />
+    <attr name="searchActionIcon" format="reference" />
     <attr name="shareIcon" format="reference" />
     <attr name="webIcon" format="reference" />
     <attr name="cancelIcon" format="reference" />

@@ -4,7 +4,7 @@
         <item name="sendIcon">@drawable/social_send_now_dark</item>
         <item name="contentEditIcon">@drawable/content_edit_dark</item>
         <item name="downloadIcon">@drawable/download_dark</item>
-        <item name="searchIcon">@drawable/action_search_dark</item>
+        <item name="searchActionIcon">@drawable/action_search_dark</item>
         <item name="shareIcon">@drawable/social_share_dark</item>
         <item name="webIcon">@drawable/web_site_dark</item>
         <item name="cancelIcon">@drawable/navigation_cancel_dark</item>
@@ -31,7 +31,7 @@
         <item name="sendIcon">@drawable/social_send_now</item>
         <item name="contentEditIcon">@drawable/content_edit</item>
         <item name="downloadIcon">@drawable/download</item>
-        <item name="searchIcon">@drawable/action_search</item>
+        <item name="searchActionIcon">@drawable/action_search</item>
         <item name="shareIcon">@drawable/social_share</item>
         <item name="webIcon">@drawable/web_site</item>
         <item name="cancelIcon">@drawable/navigation_cancel</item>
@@ -58,7 +58,7 @@
         <item name="sendIcon">@drawable/social_send_now</item>
         <item name="contentEditIcon">@drawable/content_edit</item>
         <item name="downloadIcon">@drawable/download_dark</item>
-        <item name="searchIcon">@drawable/action_search_dark</item>
+        <item name="searchActionIcon">@drawable/action_search_dark</item>
         <item name="shareIcon">@drawable/social_share_dark</item>
         <item name="webIcon">@drawable/web_site_dark</item>
         <item name="cancelIcon">@drawable/navigation_cancel_dark</item>

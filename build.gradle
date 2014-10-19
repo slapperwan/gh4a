@@ -25,8 +25,8 @@ android {
     signingConfigs {
         playStore
     }
-    compileSdkVersion 19
-    buildToolsVersion '19.1.0'
+    compileSdkVersion 21
+    buildToolsVersion '21.0.1'
     defaultConfig {
         minSdkVersion 10
         targetSdkVersion 19
@@ -57,8 +57,9 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
 
-    compile 'com.android.support:support-v4:19.+'
-    compile 'com.android.support:appcompat-v7:19.+'
+    compile 'com.android.support:support-v4:21.+'
+    compile 'com.android.support:appcompat-v7:21.+'
+    compile 'com.android.support:cardview-v7:21.+'
     compile 'com.viewpagerindicator:library:2.4.1@aar'
     compile 'com.larswerkman:HoloColorPicker:1.4@aar'
     compile 'com.github.johnkil.android-progressfragment:progressfragment:1.4.0@aar'

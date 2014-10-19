@@ -10,7 +10,7 @@
         android:title="@string/open_in_browser"
         app:showAsAction="always" />
     <item android:id="@+id/search"
-        android:icon="?attr/searchIcon"
+        android:icon="?attr/searchActionIcon"
         android:title="@string/search"
         app:showAsAction="ifRoom" />
     <item android:id="@+id/share"
