@@ -96,8 +96,10 @@
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activities.IssueListActivity"
-            android:configChanges="orientation|screenSize"
-            android:uiOptions="splitActionBarWhenNarrow" />
+            android:configChanges="orientation|screenSize">
+            <meta-data android:name="android.support.UI_OPTIONS"
+                android:value="splitActionBarWhenNarrow" />
+        </activity>
         <activity
             android:name=".activities.IssueMilestoneEditActivity"
             android:configChanges="orientation|screenSize" />
@@ -124,8 +126,10 @@
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activities.RepositoryActivity"
-            android:configChanges="orientation|screenSize"
-            android:uiOptions="splitActionBarWhenNarrow" />
+            android:configChanges="orientation|screenSize">
+            <meta-data android:name="android.support.UI_OPTIONS"
+                android:value="splitActionBarWhenNarrow" />
+        </activity>
         <activity
             android:name=".activities.RepositoryListActivity"
             android:configChanges="orientation|screenSize" />
@@ -143,8 +147,10 @@
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activities.UserActivity"
-            android:configChanges="orientation|screenSize"
-            android:uiOptions="splitActionBarWhenNarrow" />
+            android:configChanges="orientation|screenSize">
+            <meta-data android:name="android.support.UI_OPTIONS"
+                android:value="splitActionBarWhenNarrow" />
+        </activity>
         <activity
             android:name=".activities.WatcherListActivity"
             android:configChanges="orientation|screenSize" />
