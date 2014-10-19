@@ -78,6 +78,8 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
 
     @Override
     protected RootAdapter<Issue> onCreateAdapter() {
+        getListView().setDivider(null);
+        getListView().setDividerHeight(0);
         return new IssueAdapter(getActivity());
     }
 
