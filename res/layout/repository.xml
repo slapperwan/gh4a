@@ -37,7 +37,7 @@
                     android:layout_marginTop="8dp"
                     style="@style/SelectableItem"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/highlight" />
+                    android:textColor="?attr/colorPrimaryDark" />
 
                 <TextView
                     android:id="@+id/tv_desc"
@@ -53,7 +53,7 @@
                     android:layout_below="@+id/tv_desc"
                     android:autoLink="web"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColorLink="@color/highlight" />
+                    android:textColorLink="?attr/colorPrimaryDark" />
 
                 <TextView
                     android:id="@+id/tv_language"

@@ -2,12 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/delete"
-        android:icon="?attr/discardIcon"
+        android:icon="@drawable/content_discard"
         android:title="@string/cancel"
         app:showAsAction="always" />
 
     <item android:id="@+id/accept"
-        android:icon="?attr/acceptIcon"
+        android:icon="@drawable/navigation_accept"
         android:title="@string/save"
         app:showAsAction="always" />
 </menu>

@@ -96,6 +96,15 @@ public class UiUtils {
         return resource;
     }
 
+    public static int resolveColor(Context context, int styledAttributeId) {
+        TypedArray a = context.getTheme().obtainStyledAttributes(Gh4Application.THEME, new int[] {
+            styledAttributeId
+        });
+        int color = a.getColor(0, 0);
+        a.recycle();
+        return color;
+    }
+
     private static void enqueueDownload(Context context, Uri uri, Uri destinationUri,
             String description, String mimeType, String mediaType, boolean wifiOnly) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {

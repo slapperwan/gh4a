@@ -136,10 +136,8 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
                 THEME = R.style.DefaultTheme;
                 break;
             case Constants.Theme.LIGHT:
+            case Constants.Theme.LIGHTDARK: /* backwards compat with old settings */
                 THEME = R.style.LightTheme;
-                break;
-            case Constants.Theme.LIGHTDARK:
-                THEME = R.style.LightDarkTheme;
                 break;
         }
     }

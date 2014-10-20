@@ -2,19 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/download"
-        android:icon="?attr/downloadIcon"
+        android:icon="@drawable/download"
         android:title="@string/download"
         app:showAsAction="always" />
     <item android:id="@+id/browser"
-        android:icon="?attr/webIcon"
+        android:icon="@drawable/web_site"
         android:title="@string/open_in_browser"
         app:showAsAction="always" />
     <item android:id="@+id/search"
-        android:icon="?attr/searchActionIcon"
+        android:icon="@drawable/action_search"
         android:title="@string/search"
         app:showAsAction="ifRoom" />
     <item android:id="@+id/share"
-        android:icon="?attr/shareIcon"
+        android:icon="@drawable/social_share"
         android:title="@string/share"
         app:showAsAction="ifRoom" />
 </menu>

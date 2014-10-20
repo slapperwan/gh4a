@@ -29,7 +29,6 @@ import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueMilestoneListFragment;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.UiUtils;
 
 public class IssueMilestoneListActivity extends LoadingFragmentPagerActivity {
     private String mRepoOwner;
@@ -69,7 +68,7 @@ public class IssueMilestoneListActivity extends LoadingFragmentPagerActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         if (Gh4Application.get(this).isAuthorized()) {
             MenuItem createItem = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.issue_milestone_new)
-                    .setIcon(UiUtils.resolveDrawable(this, R.attr.newIcon));
+                    .setIcon(R.drawable.content_new);
             MenuItemCompat.setShowAsAction(createItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
         }
         return super.onCreateOptionsMenu(menu);

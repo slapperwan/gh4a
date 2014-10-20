@@ -144,7 +144,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
     public boolean onCreateOptionsMenu(Menu menu) {
         if (Gh4Application.get(this).isAuthorized()) {
             MenuItem createItem = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.issue_label_new)
-                    .setIcon(UiUtils.resolveDrawable(this, R.attr.newIcon));
+                    .setIcon(R.drawable.content_new);
             MenuItemCompat.setShowAsAction(createItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
         }
         return super.onCreateOptionsMenu(menu);
@@ -199,7 +199,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
 
             if (mLabel != mAddedLabel) {
                 MenuItem deleteItem = menu.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, R.string.delete)
-                    .setIcon(UiUtils.resolveDrawable(IssueLabelListActivity.this, R.attr.discardIcon));
+                    .setIcon(R.drawable.content_discard);
                 MenuItemCompat.setShowAsAction(deleteItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
             }
 

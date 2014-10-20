@@ -107,7 +107,7 @@ public class GistActivity extends LoadingFragmentActivity implements OnClickList
                 TextView tvTitle = (TextView) rowView.findViewById(R.id.tv_title);
 
                 tvTitle.setText(gistFile.getFilename());
-                tvTitle.setTextColor(getResources().getColor(R.color.highlight));
+                tvTitle.setTextColor(UiUtils.resolveColor(this, R.attr.colorPrimaryDark));
                 tvTitle.setOnClickListener(this);
                 tvTitle.setTag(gistFile);
                 llFiles.addView(tvTitle);
@@ -129,7 +129,7 @@ public class GistActivity extends LoadingFragmentActivity implements OnClickList
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuItem item = menu.add(0, R.id.share, 0, R.string.share)
-                .setIcon(UiUtils.resolveDrawable(this, R.attr.shareIcon));
+                .setIcon(R.drawable.social_share);
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
         return super.onCreateOptionsMenu(menu);
     }

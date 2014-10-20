@@ -29,7 +29,7 @@ public interface Constants {
     public interface Theme {
         public static final int DARK = 0;
         public static final int LIGHT = 1;
-        public static final int LIGHTDARK = 2;
+        public static final int LIGHTDARK = 2; /* backwards compat with old settings */
     }
 
     public interface User {

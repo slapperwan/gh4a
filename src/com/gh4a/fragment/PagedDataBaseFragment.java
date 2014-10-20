@@ -32,6 +32,7 @@ import android.widget.TextView;
 import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.PageIteratorLoader;
+import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.client.PageIterator;
 
@@ -52,7 +53,7 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
         LayoutInflater vi = getActivity().getLayoutInflater();
         mLoadingView = (TextView) vi.inflate(R.layout.row_simple, null);
         mLoadingView.setText(R.string.loading_msg);
-        mLoadingView.setTextColor(getResources().getColor(R.color.highlight));
+        mLoadingView.setTextColor(UiUtils.resolveColor(getActivity(), R.attr.colorPrimaryDark));
 
         mAdapter = onCreateAdapter();
 

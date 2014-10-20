@@ -81,7 +81,7 @@ public class SearchActivity extends BaseFragmentActivity implements
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         mSearchType = (Spinner) searchLayout.findViewById(R.id.search_type);
-        mSearchType.setAdapter(new SearchTypeAdapter(actionBar.getThemedContext()));
+        mSearchType.setAdapter(new SearchTypeAdapter(actionBar.getThemedContext(), this));
         mSearchType.setOnItemSelectedListener(this);
 
         mSearch = (SearchView) searchLayout.findViewById(R.id.search_view);
@@ -113,16 +113,20 @@ public class SearchActivity extends BaseFragmentActivity implements
 
     private static class SearchTypeAdapter extends BaseAdapter implements SpinnerAdapter {
         private Context mContext;
+        private LayoutInflater mInflater;
+        private LayoutInflater mPopupInflater;
 
         private final int[][] mResources = new int[][] {
-            { R.string.search_type_repo, R.attr.searchRepoMenuIcon, 0 },
-            { R.string.search_type_user, R.attr.searchUserMenuIcon, 0 }
+            { R.string.search_type_repo, R.drawable.search_repos_dark, R.attr.searchRepoIcon, 0 },
+            { R.string.search_type_user, R.drawable.search_users_dark, R.attr.searchUserIcon, 0 }
         };
 
-        SearchTypeAdapter(Context context) {
+        SearchTypeAdapter(Context context, Context popupContext) {
             mContext = context;
+            mInflater = LayoutInflater.from(context);
+            mPopupInflater = LayoutInflater.from(popupContext);
             for (int i = 0; i < mResources.length; i++) {
-                mResources[i][2] = UiUtils.resolveDrawable(context, mResources[i][1]);
+                mResources[i][3] = UiUtils.resolveDrawable(popupContext, mResources[i][2]);
             }
         }
 
@@ -144,12 +148,11 @@ public class SearchActivity extends BaseFragmentActivity implements
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                LayoutInflater inflater = LayoutInflater.from(mContext);
-                convertView = inflater.inflate(R.layout.search_type_small, null);
+                convertView = mInflater.inflate(R.layout.search_type_small, null);
             }
 
             ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
-            icon.setImageResource(mResources[position][2]);
+            icon.setImageResource(mResources[position][1]);
 
             return convertView;
         }
@@ -157,12 +160,11 @@ public class SearchActivity extends BaseFragmentActivity implements
         @Override
         public View getDropDownView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                LayoutInflater inflater = LayoutInflater.from(mContext);
-                convertView = inflater.inflate(R.layout.search_type_popup, null);
+                convertView = mPopupInflater.inflate(R.layout.search_type_popup, null);
             }
 
             ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
-            icon.setImageResource(mResources[position][2]);
+            icon.setImageResource(mResources[position][3]);
 
             TextView label = (TextView) convertView.findViewById(R.id.label);
             label.setText(mResources[position][0]);

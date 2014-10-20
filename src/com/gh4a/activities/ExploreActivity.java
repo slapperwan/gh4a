@@ -34,7 +34,6 @@ import com.gh4a.R;
 import com.gh4a.fragment.BlogListFragment;
 import com.gh4a.fragment.PublicTimelineFragment;
 import com.gh4a.fragment.TrendingFragment;
-import com.gh4a.utils.UiUtils;
 import com.viewpagerindicator.TitlePageIndicator;
 
 public class ExploreActivity extends BaseFragmentActivity implements
@@ -153,7 +152,7 @@ public class ExploreActivity extends BaseFragmentActivity implements
         menu.clear();
         if (mSelectedItem == 0) {
             MenuItem item = menu.add(0, R.id.refresh, 0, R.string.refresh)
-                .setIcon(UiUtils.resolveDrawable(this, R.attr.refreshIcon));
+                .setIcon(R.drawable.navigation_refresh);
             MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
         }
         return super.onCreateOptionsMenu(menu);

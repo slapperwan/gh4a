@@ -187,7 +187,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
             }
             @Override
             public void updateDrawState(TextPaint ds) {
-                ds.setColor(mContext.getResources().getColor(R.color.highlight));
+                ds.setColor(UiUtils.resolveColor(mContext, R.attr.colorPrimaryDark));
             }
         }, pos, pos + 7, 0);
 

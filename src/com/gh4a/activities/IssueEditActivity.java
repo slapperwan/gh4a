@@ -184,7 +184,6 @@ public class IssueEditActivity extends LoadingFragmentActivity implements OnClic
 
         TextView tvIssueLabelAdd = (TextView) findViewById(R.id.tv_issue_label_add);
         tvIssueLabelAdd.setTypeface(Gh4Application.get(this).boldCondensed);
-        tvIssueLabelAdd.setTextColor(getResources().getColor(R.color.highlight));
 
         mTvSelectedMilestone = (TextView) findViewById(R.id.et_milestone);
         mTvSelectedAssignee = (TextView) findViewById(R.id.et_assignee);

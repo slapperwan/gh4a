@@ -93,7 +93,7 @@
                         android:paddingTop="4dp"
                         android:paddingBottom="4dp"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textColor="@color/highlight"
+                        android:textColor="?attr/colorPrimaryDark"
                         android:layout_below="@id/ll_labels"
                         android:text="@string/view_pull_request"
                         android:visibility="gone" />
