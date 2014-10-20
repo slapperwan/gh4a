@@ -25,6 +25,7 @@
         <item name="dirIcon">@drawable/folder_dark</item>
         <item name="fileIcon">@drawable/file_dark</item>
         <item name="commentsIcon">@drawable/comments_dark</item>
+        <item name="cardViewTheme">@style/CardView.Dark</item>
     </style>
 
     <style name="LightTheme" parent="Theme.AppCompat.Light">
@@ -52,6 +53,7 @@
         <item name="dirIcon">@drawable/folder</item>
         <item name="fileIcon">@drawable/file</item>
         <item name="commentsIcon">@drawable/comments</item>
+        <item name="cardViewTheme">@style/CardView.Light</item>
     </style>
 
     <style name="LightDarkTheme" parent="Theme.AppCompat.Light.DarkActionBar">
@@ -80,6 +82,7 @@
         <item name="fileIcon">@drawable/file</item>
         <item name="commentsIcon">@drawable/comments</item>
         <item name="listPopupWindowStyle">@style/Widget.AppCompat.Light.ListPopupWindow</item>
+        <item name="cardViewTheme">@style/CardView.Light</item>
     </style>
 
 </resources>
