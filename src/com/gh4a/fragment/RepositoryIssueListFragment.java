@@ -72,6 +72,8 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Repositor
 
     @Override
     protected RootAdapter<RepositoryIssue> onCreateAdapter() {
+        getListView().setDivider(null);
+        getListView().setDividerHeight(0);
         return new RepositoryIssueAdapter(getActivity());
     }
 

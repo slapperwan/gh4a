@@ -71,6 +71,8 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
 
     @Override
     protected RootAdapter<RepositoryCommit> onCreateAdapter() {
+        getListView().setDivider(null);
+        getListView().setDividerHeight(0);
         return new CommitAdapter(getActivity());
     }
 
