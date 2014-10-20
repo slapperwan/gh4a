@@ -163,11 +163,12 @@ public class IssueActivity extends LoadingFragmentActivity implements
         mHeader.setClickable(false);
 
         UiUtils.assignTypeface(mHeader, Gh4Application.get(this).boldCondensed, new int[] {
-                R.id.comment_title, R.id.tv_title, R.id.desc_title
+            R.id.tv_title, R.id.desc_title
         });
 
         listView.addHeaderView(mHeader, null, false);
-        listView.setHeaderDividersEnabled(false);
+        listView.setDivider(null);
+        listView.setDividerHeight(0);
 
         mEventAdapter = new IssueEventAdapter(this, mRepoOwner, mRepoName, this);
         listView.setAdapter(mEventAdapter);
@@ -192,11 +193,6 @@ public class IssueActivity extends LoadingFragmentActivity implements
 
     private void fillData() {
         // set details inside listview header
-        TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
-        int eventCount = mEventAdapter.getCount();
-        tvCommentTitle.setText(getString(R.string.issue_events_with_count, eventCount));
-        tvCommentTitle.setVisibility(eventCount == 0 ? View.GONE : View.VISIBLE);
-
         ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
         AvatarHandler.assignAvatar(ivGravatar, mIssue.getUser());
         ivGravatar.setOnClickListener(this);
