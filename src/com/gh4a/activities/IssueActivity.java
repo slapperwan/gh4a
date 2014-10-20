@@ -325,15 +325,12 @@ public class IssueActivity extends LoadingFragmentActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         switch (itemId) {
-            case R.id.issue_create:
             case R.id.issue_edit:
                 if (checkForAuthOrExit()) {
                     Intent intent = new Intent(this, IssueEditActivity.class);
                     intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
                     intent.putExtra(Constants.Repository.NAME, mRepoName);
-                    if (itemId == R.id.issue_edit) {
-                        intent.putExtra(Constants.Issue.NUMBER, mIssue.getNumber());
-                    }
+                    intent.putExtra(Constants.Issue.NUMBER, mIssue.getNumber());
                     startActivity(intent);
                 }
                 return true;

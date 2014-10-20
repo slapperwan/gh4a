@@ -265,18 +265,6 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
             case R.id.sort_comments_desc:
                 updateSortModeAndReload(item, SORT_MODE_COMMENTS, false);
                 return true;
-            case R.id.create_issue:
-                if (Gh4Application.get(this).isAuthorized()) {
-                    Intent intent = new Intent(this, IssueEditActivity.class);
-                    intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-                    intent.putExtra(Constants.Repository.NAME, mRepoName);
-                    startActivity(intent);
-                } else {
-                    Intent intent = new Intent(this, Github4AndroidActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-                return true;
             case R.id.view_labels:
                 Intent intent = new Intent(this, IssueLabelListActivity.class);
                 intent.putExtra(Constants.Repository.OWNER, mRepoOwner);

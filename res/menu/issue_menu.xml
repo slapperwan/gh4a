@@ -13,10 +13,6 @@
         android:title="@string/issue_edit"
         app:showAsAction="never" />
 
-    <item android:id="@+id/issue_create"
-         android:title="@string/issue_create"
-         app:showAsAction="never" />
-
     <item android:id="@+id/share"
         android:title="@string/share"
         app:showAsAction="never" />

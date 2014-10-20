@@ -26,15 +26,24 @@ import org.eclipse.egit.github.core.service.IssueService;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ListView;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.IssueActivity;
+import com.gh4a.activities.IssueEditActivity;
 import com.gh4a.adapter.IssueAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.shamanland.fab.FloatingActionButton;
+import com.shamanland.fab.ShowHideOnScroll;
 
-public class IssueListFragment extends PagedDataBaseFragment<Issue> {
+public class IssueListFragment extends PagedDataBaseFragment<Issue> implements
+        View.OnClickListener {
     private static final int REQUEST_ISSUE = 1000;
 
     private String mRepoOwner;
@@ -56,6 +65,29 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
         }
         f.setArguments(args);
         return f;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if (TextUtils.equals(mFilterData.get(Constants.Issue.STATE), Constants.Issue.STATE_OPEN)) {
+            View wrapper = inflater.inflate(R.layout.fab_list_wrapper, container, false);
+            ViewGroup listContainer = (ViewGroup) wrapper.findViewById(R.id.container);
+
+            View content = super.onCreateView(inflater, listContainer, savedInstanceState);
+            FloatingActionButton fab = (FloatingActionButton) wrapper.findViewById(R.id.fab_add);
+            ListView list = (ListView) content.findViewById(android.R.id.list);
+
+            if (Gh4Application.get(getActivity()).isAuthorized()) {
+                fab.setOnClickListener(this);
+                list.setOnTouchListener(new ShowHideOnScroll(fab));
+            } else {
+                fab.setVisibility(View.GONE);
+            }
+            listContainer.addView(content);
+            return wrapper;
+        } else {
+            return super.onCreateView(inflater, container, savedInstanceState);
+        }
     }
 
     @Override
@@ -116,4 +148,11 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
         return issueService.pageIssues(new RepositoryId(mRepoOwner, mRepoName), mFilterData);
     }
 
+    @Override
+    public void onClick(View view) {
+        Intent intent = new Intent(getActivity(), IssueEditActivity.class);
+        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+        intent.putExtra(Constants.Repository.NAME, mRepoName);
+        startActivity(intent);
+    }
 }

@@ -44,6 +44,8 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
+import com.shamanland.fab.FloatingActionButton;
+import com.shamanland.fab.ShowHideOnScroll;
 
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -53,12 +55,17 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.List;
 
-public class IssueLabelListActivity extends LoadingFragmentActivity implements OnItemClickListener {
+public class IssueLabelListActivity extends LoadingFragmentActivity implements
+        OnItemClickListener, View.OnClickListener {
     private String mRepoOwner;
     private String mRepoName;
     private EditActionMode mActionMode;
     private Label mAddedLabel;
     private boolean mShouldStartAdding;
+
+    private FloatingActionButton mFab;
+    private ShowHideOnScroll mFabListener;
+    private ListView mListView;
 
     private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
         @Override
@@ -90,6 +97,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
                 holder.editor.setHint(R.string.issue_label_new);
                 mActionMode = new EditActionMode(label, holder.editor);
                 startSupportActionMode(mActionMode);
+                updateFabVisibility();
                 mShouldStartAdding = false;
             } else {
                 holder.editor.setHint(null);
@@ -118,9 +126,14 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
         setContentView(R.layout.issue_label_list);
         setContentShown(false);
 
-        ListView listView = (ListView) findViewById(R.id.main_content);
-        listView.setAdapter(mAdapter);
-        listView.setOnItemClickListener(this);
+        mListView = (ListView) findViewById(R.id.main_content);
+        mListView.setAdapter(mAdapter);
+        mListView.setOnItemClickListener(this);
+
+        mFab = (FloatingActionButton) findViewById(R.id.fab_add);
+        mFab.setOnClickListener(this);
+        mFabListener = new ShowHideOnScroll(mFab);
+        updateFabVisibility();
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.issue_manage_labels);
@@ -137,17 +150,8 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
                     (EditText) view.findViewById(R.id.et_label));
             mAdapter.setExpanded(view, true);
             startSupportActionMode(mActionMode);
+            updateFabVisibility();
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (Gh4Application.get(this).isAuthorized()) {
-            MenuItem createItem = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.issue_label_new)
-                    .setIcon(R.drawable.content_new);
-            MenuItemCompat.setShowAsAction(createItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-        }
-        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -157,21 +161,26 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case Menu.FIRST:
-            if (mActionMode == null) {
-                mAddedLabel = new Label();
-                mAddedLabel.setColor("dddddd");
-                mAdapter.add(mAddedLabel);
-                mShouldStartAdding = true;
-                mAdapter.notifyDataSetChanged();
-            }
-            return true;
+    public void onClick(View view) {
+        if (mActionMode == null) {
+            mAddedLabel = new Label();
+            mAddedLabel.setColor("dddddd");
+            mAdapter.add(mAddedLabel);
+            mShouldStartAdding = true;
+            mAdapter.notifyDataSetChanged();
         }
-        return super.onOptionsItemSelected(item);
     }
 
+    private void updateFabVisibility() {
+        if (Gh4Application.get(this).isAuthorized() && mActionMode == null) {
+            mListView.setOnTouchListener(mFabListener);
+            mFab.setVisibility(View.VISIBLE);
+        } else {
+            mListView.setOnTouchListener(null);
+            mFab.setVisibility(View.GONE);
+        }
+
+    }
     private final class EditActionMode implements ActionMode.Callback {
         private String mCurrentLabelName;
         private EditText mEditor;
@@ -253,6 +262,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
                 mAddedLabel = null;
             }
             mAdapter.notifyDataSetChanged();
+            updateFabVisibility();
         }
     }
 

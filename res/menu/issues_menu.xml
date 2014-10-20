@@ -46,8 +46,4 @@
     <item android:id="@+id/view_milestones"
          android:title="@string/issue_manage_milestones"
          app:showAsAction="never" />
-
-    <item android:id="@+id/create_issue"
-         android:title="@string/issue_create"
-         app:showAsAction="never" />
 </menu>
