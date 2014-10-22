@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:layout_above="@+id/toolbar_container">
 
-        <android.support.v7.widget.CardView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="?attr/cardViewTheme">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/overview_header_spacing"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
+                android:layout_marginTop="@dimen/overview_header_spacing"
                 android:orientation="vertical"
-                android:paddingLeft="@dimen/content_padding"
-                android:paddingRight="@dimen/content_padding">
+                android:padding="@dimen/content_padding">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -56,7 +56,7 @@
                         android:layout_toRightOf="@id/iv_gravatar"
                         android:autoLink="email"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textColorLink="?attr/colorPrimaryDark" />
+                        android:textColorLink="?android:attr/textColorLink" />
 
                     <TextView
                         android:id="@+id/tv_website"
@@ -66,7 +66,7 @@
                         android:layout_toRightOf="@id/iv_gravatar"
                         android:autoLink="web"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textColorLink="?attr/colorPrimaryDark" />
+                        android:textColorLink="?android:attr/textColorLink" />
 
                     <TextView
                         android:id="@+id/tv_company"
@@ -95,11 +95,11 @@
 
                     <LinearLayout
                         android:id="@+id/cell_org_members"
+                        style="@style/SelectableItem"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center_horizontal"
-                        style="@style/SelectableItem"
                         android:orientation="vertical">
 
                         <TextView
@@ -119,11 +119,11 @@
 
                     <LinearLayout
                         android:id="@+id/cell_followers"
+                        style="@style/SelectableItem"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center_horizontal"
-                        style="@style/SelectableItem"
                         android:orientation="vertical">
 
                         <TextView
@@ -143,11 +143,11 @@
 
                     <LinearLayout
                         android:id="@+id/cell_following"
+                        style="@style/SelectableItem"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center_horizontal"
-                        style="@style/SelectableItem"
                         android:orientation="vertical">
 
                         <TextView
@@ -166,11 +166,11 @@
 
                     <LinearLayout
                         android:id="@+id/cell_repos"
+                        style="@style/SelectableItem"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center_horizontal"
-                        style="@style/SelectableItem"
                         android:orientation="vertical">
 
                         <TextView
@@ -189,11 +189,11 @@
 
                     <LinearLayout
                         android:id="@+id/cell_gists"
+                        style="@style/SelectableItem"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center_horizontal"
-                        style="@style/SelectableItem"
                         android:orientation="vertical">
 
                         <TextView
@@ -213,89 +213,87 @@
                 </LinearLayout>
 
             </LinearLayout>
-        </android.support.v7.widget.CardView>
 
-        <!-- Repository section -->
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="?attr/cardViewTheme">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/overview_header_spacing"
-                android:layout_marginBottom="@dimen/overview_header_spacing"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tv_pub_repos_label"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/overview_header_spacing"
-                    android:layout_marginBottom="@dimen/overview_header_spacing"
-                    android:paddingLeft="@dimen/content_padding"
-                    android:paddingRight="@dimen/content_padding"
-                    style="@style/HeaderLabel"
-                    android:text="@string/user_pub_repos" />
-
-                <ProgressBar
-                    android:id="@+id/pb_top_repos"
-                    style="@style/LoadingProgress" />
+            <!-- Repository section -->
+            <android.support.v7.widget.CardView
+                style="?attr/cardViewTheme">
 
                 <LinearLayout
-                    android:id="@+id/ll_top_repos"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone" />
-
-                <Button
-                    android:id="@+id/btn_repos"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/content_padding"
-                    android:layout_marginRight="@dimen/content_padding"
-                    android:text="@string/view_more"
-                    style="@style/MoreButton"
-                    android:visibility="gone" />
-
-            </LinearLayout>
-
-        </android.support.v7.widget.CardView>
-
-        <!-- Organizations section -->
-        <android.support.v7.widget.CardView
-            android:id="@+id/ll_orgs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="?attr/cardViewTheme">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/overview_header_spacing"
-                android:layout_marginBottom="@dimen/overview_header_spacing"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tv_orgs"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/overview_header_spacing"
-                    android:paddingLeft="@dimen/content_padding"
-                    android:paddingRight="@dimen/content_padding"
-                    style="@style/HeaderLabel"
-                    android:text="@string/user_organizations" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_pub_repos_label"
+                        style="@style/HeaderBoldLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/content_padding"
+                        android:text="@string/user_pub_repos"/>
+
+                    <ProgressBar
+                        android:id="@+id/pb_top_repos"
+                        style="@style/LoadingProgress" />
+
+                    <LinearLayout
+                        android:id="@+id/ll_top_repos"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone" />
+
+                    <Button
+                        android:id="@+id/btn_repos"
+                        style="@style/MoreButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/content_padding"
+                        android:layout_marginRight="@dimen/content_padding"
+                        android:text="@string/view_more"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+            </android.support.v7.widget.CardView>
+
+            <!-- Organizations section -->
+            <android.support.v7.widget.CardView
+                android:id="@+id/ll_orgs"
+                style="?attr/cardViewTheme">
 
                 <LinearLayout
-                    android:id="@+id/ll_org"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical" />
+                    android:layout_marginBottom="@dimen/overview_header_spacing"
+                    android:orientation="vertical">
 
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
+                    <TextView
+                        android:id="@+id/tv_orgs"
+                        style="@style/HeaderBoldLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/content_padding"
+                        android:text="@string/user_organizations" />
+
+                    <LinearLayout
+                        android:id="@+id/ll_org"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@id/toolbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom">
+
+        <include layout="@layout/toolbar_actionbar" />
     </LinearLayout>
-
-</ScrollView>
+</RelativeLayout>

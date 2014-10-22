@@ -50,9 +50,15 @@
     </style>
 
     <style name="HeaderLabel">
-        <item name="android:background">?attr/headerUnderline</item>
+        <item name="android:background">@drawable/header_underline</item>
         <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
-        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+
+    <style name="HeaderBoldLabel">
+        <item name="android:background">?attr/headerBoldBackground</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
     <style name="Widget.ActionBar.TabView" parent="Widget.AppCompat.ActionBar.TabView">

@@ -30,5 +30,10 @@
     <attr name="dirIcon" format="reference" />
     <attr name="fileIcon" format="reference" />
     <attr name="commentsIcon" format="reference" />
-
+    <attr name="refreshIcon" format="reference" />
+    <attr name="toolbarAbBackground" format="color" />
+    <attr name="toolbarAbTheme" format="reference" />
+    <attr name="toolbarAbPopupTheme" format="reference" />
+    <attr name="topInfoBackground" format="color" />
+    <attr name="headerBoldBackground" format="color" />
 </resources>

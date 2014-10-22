@@ -143,8 +143,7 @@
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".activities.UserActivity"
-            android:configChanges="orientation|screenSize"
-            android:uiOptions="splitActionBarWhenNarrow" />
+            android:configChanges="orientation|screenSize"/>
         <activity
             android:name=".activities.WatcherListActivity"
             android:configChanges="orientation|screenSize" />

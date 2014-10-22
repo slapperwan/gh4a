@@ -99,7 +99,7 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
         public void updateDrawState(TextPaint ds) {
             super.updateDrawState(ds);
             ds.setUnderlineText(false);
-            ds.setColor(UiUtils.resolveColor(getActivity(), R.attr.colorPrimaryDark));
+            ds.setColor(UiUtils.resolveColor(getActivity(), android.R.attr.textColorLink));
         }
     };
 
