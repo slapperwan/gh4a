@@ -11,7 +11,6 @@
         <item name="fileIcon">@drawable/file_dark</item>
         <item name="commentsIcon">@drawable/comments_dark</item>
         <item name="cardViewTheme">@style/Base.CardView.Dark</item>
-        <item name="headerUnderline">@drawable/header_underline_dark</item>
         <item name="colorAccent">#43782e</item>
         <item name="colorPrimary">#396426</item>
         <item name="colorPrimaryDark">#2d501e</item>
@@ -31,7 +30,6 @@
         <item name="commentsIcon">@drawable/comments</item>
         <item name="listPopupWindowStyle">@style/Widget.AppCompat.Light.ListPopupWindow</item>
         <item name="cardViewTheme">@style/Base.CardView.Light</item>
-        <item name="headerUnderline">@drawable/header_underline</item>
         <item name="colorAccent">#65b345</item>
         <item name="colorPrimary">#65b345</item>
         <item name="colorPrimaryDark">#5aa03d</item>
