@@ -26,6 +26,7 @@ public class LoadingListFragmentBase extends ProgressListFragment implements
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.loading_fragment, container, false);
         ViewGroup contentContainer = (ViewGroup) view.findViewById(R.id.content_container);
+        contentContainer.removeView(contentContainer.findViewById(android.R.id.empty));
         inflater.inflate(R.layout.list_fragment_list, contentContainer);
         return view;
     }
