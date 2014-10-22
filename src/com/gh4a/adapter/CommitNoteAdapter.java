@@ -93,6 +93,11 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements Vie
     }
 
     @Override
+    public boolean isCardStyle() {
+        return true;
+    }
+
+    @Override
     public void clear() {
         super.clear();
         mImageGetter = new HttpImageGetter(mContext);

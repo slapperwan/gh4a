@@ -119,6 +119,11 @@ public class IssueAdapter extends RootAdapter<Issue> implements View.OnClickList
         }
     }
 
+    @Override
+    public boolean isCardStyle() {
+        return true;
+    }
+
     /* package */ static void makeLabelBadges(LinearLayout badgeLayout, List<Label> labels) {
         if (labels != null) {
             int viewCount = badgeLayout.getChildCount();

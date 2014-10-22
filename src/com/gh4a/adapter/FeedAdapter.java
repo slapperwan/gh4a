@@ -121,6 +121,11 @@ public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListe
         }
     }
 
+    @Override
+    public boolean isCardStyle() {
+        return true;
+    }
+
     private CharSequence formatDescription(Event event) {
         String eventType = event.getType();
         EventRepository eventRepo = event.getRepo();

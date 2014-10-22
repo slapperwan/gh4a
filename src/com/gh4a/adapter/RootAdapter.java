@@ -159,6 +159,10 @@ public abstract class RootAdapter<T> extends BaseAdapter implements Filterable {
         return mFilter;
     }
 
+    public boolean isCardStyle() {
+        return false;
+    }
+
     protected abstract View createView(LayoutInflater inflater, ViewGroup parent, int viewType);
     protected abstract void bindView(View view, T object);
 }

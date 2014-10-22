@@ -108,8 +108,6 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
 
     @Override
     protected RootAdapter<Event> onCreateAdapter() {
-        getListView().setDivider(null);
-        getListView().setDividerHeight(0);
         mAdapter = new FeedAdapter(getActivity());
         return mAdapter;
     }

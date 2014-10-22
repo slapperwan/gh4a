@@ -54,7 +54,6 @@
                 android:id="@+id/tv_issue_label_add"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/overview_header_spacing"
                 style="@style/HeaderLabel"
                 android:text="@string/issue_label_add" />
             <LinearLayout

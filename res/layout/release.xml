@@ -52,7 +52,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/overview_item_spacing"
-            android:layout_marginBottom="@dimen/overview_header_spacing"
             style="@style/HeaderLabel"
             android:text="@string/release_notes" />
         <ProgressBar
@@ -76,7 +75,6 @@
                 android:id="@+id/downloads_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/overview_header_spacing"
                 style="@style/HeaderLabel"
                 android:text="@string/downloads" />
             <ListView

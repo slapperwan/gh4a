@@ -6,4 +6,5 @@
     <dimen name="label_badge_size">2dp</dimen>
     <dimen name="label_badge_spacing">2dp</dimen>
     <dimen name="label_spacing">5dp</dimen>
+    <dimen name="card_margin">4dp</dimen>
 </resources>

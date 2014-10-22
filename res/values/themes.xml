@@ -12,19 +12,14 @@
         <item name="commentsIcon">@drawable/comments_dark</item>
         <item name="cardViewTheme">@style/Base.CardView.Dark</item>
         <item name="headerUnderline">@drawable/header_underline_dark</item>
-        <!--item name="colorAccent">#4c8634</item-->
-        <item name="colorPrimary">#37474f</item>
-        <item name="toolbarAbBackground">#37474f</item>
-        <item name="toolbarAbTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
-        <item name="toolbarAbPopupTheme">@style/ThemeOverlay.AppCompat.Dark</item>
-        <!--item name="colorPrimaryDark">#65b345</item-->
+        <item name="colorAccent">#43782e</item>
+        <item name="colorPrimary">#396426</item>
+        <item name="colorPrimaryDark">#2d501e</item>
+        <item name="android:textColorLink">#559639</item>
         <item name="actionBarTabStyle">@style/Widget.ActionBar.TabView</item>
-        <item name="refreshIcon">@drawable/navigation_refresh_dark</item>
-        <item name="topInfoBackground">@color/cardview_dark_background</item>
-        <item name="headerBoldBackground">#33691e</item>
     </style>
 
-    <style name="LightTheme" parent="Theme.AppCompat.Light">
+    <style name="LightTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="sendIcon">@drawable/social_send_now</item>
         <item name="contentEditIcon">@drawable/content_edit</item>
         <item name="contentPictureIcon">@drawable/content_picture</item>
@@ -37,31 +32,26 @@
         <item name="listPopupWindowStyle">@style/Widget.AppCompat.Light.ListPopupWindow</item>
         <item name="cardViewTheme">@style/Base.CardView.Light</item>
         <item name="headerUnderline">@drawable/header_underline</item>
-        <!--item name="colorAccent">#4c8634</item-->
-        <item name="colorPrimary">#90a4ae</item>
-        <item name="toolbarAbBackground">#90a4ae</item>
-        <item name="toolbarAbTheme">@style/ThemeOverlay.AppCompat.ActionBar</item>
-        <item name="toolbarAbPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
-        <!--item name="colorPrimaryDark">#65b345</item-->
+        <item name="colorAccent">#65b345</item>
+        <item name="colorPrimary">#65b345</item>
+        <item name="colorPrimaryDark">#5aa03d</item>
+        <item name="android:textColorLink">#5aa03d</item>
         <item name="actionBarTabStyle">@style/Widget.ActionBar.TabView</item>
-        <item name="refreshIcon">@drawable/navigation_refresh</item>
-        <item name="topInfoBackground">@color/cardview_light_background</item>
-        <item name="headerBoldBackground">#bdbdbd</item>
     </style>
 
     <style name="Base.CardView.Light" parent="CardView.Light">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginLeft">10dp</item>
-        <item name="android:layout_marginRight">10dp</item>
+        <item name="android:layout_marginLeft">@dimen/card_margin</item>
+        <item name="android:layout_marginRight">@dimen/card_margin</item>
         <item name="android:foreground">?android:attr/selectableItemBackground</item>
     </style>
 
     <style name="Base.CardView.Dark" parent="CardView.Dark">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginLeft">10dp</item>
-        <item name="android:layout_marginRight">10dp</item>
+        <item name="android:layout_marginLeft">@dimen/card_margin</item>
+        <item name="android:layout_marginRight">@dimen/card_margin</item>
         <item name="android:foreground">?android:attr/selectableItemBackground</item>
     </style>
 </resources>

@@ -71,8 +71,6 @@ public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit
 
     @Override
     protected RootAdapter<RepositoryCommit> onCreateAdapter() {
-        getListView().setDivider(null);
-        getListView().setDividerHeight(0);
         return new CommitAdapter(getActivity());
     }
 

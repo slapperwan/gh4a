@@ -116,6 +116,11 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
         }
     }
 
+    @Override
+    public boolean isCardStyle() {
+        return true;
+    }
+
     private static class ViewHolder {
         public ImageView ivGravatar;
         public TextView tvDesc;

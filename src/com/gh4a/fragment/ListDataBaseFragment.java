@@ -9,6 +9,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.ListView;
 
+import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderResult;
 
@@ -22,6 +23,14 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase im
         super.onActivityCreated(savedInstanceState);
 
         mAdapter = onCreateAdapter();
+        if (mAdapter.isCardStyle()) {
+            ListView listView = getListView();
+            listView.setDivider(null);
+            listView.setDividerHeight(0);
+
+            int cardMargin = getResources().getDimensionPixelSize(R.dimen.card_margin);
+            listView.setPadding(cardMargin, 0, cardMargin, 0);
+        }
 
         int emptyResId = getEmptyTextResId();
         if (emptyResId != 0) {

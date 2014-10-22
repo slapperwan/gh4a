@@ -187,7 +187,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
             }
             @Override
             public void updateDrawState(TextPaint ds) {
-                ds.setColor(UiUtils.resolveColor(mContext, R.attr.colorPrimaryDark));
+                ds.setColor(UiUtils.resolveColor(mContext, android.R.attr.textColorLink));
             }
         }, pos, pos + 7, 0);
 
@@ -198,6 +198,11 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
     public void clear() {
         super.clear();
         mImageGetter = new HttpImageGetter(mContext);
+    }
+
+    @Override
+    public boolean isCardStyle() {
+        return true;
     }
 
     @Override

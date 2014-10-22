@@ -34,9 +34,6 @@
                 android:id="@+id/files_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/overview_header_spacing"
-                android:layout_marginLeft="@dimen/content_padding"
-                android:layout_marginRight="@dimen/content_padding"
                 style="@style/HeaderLabel"
                 android:text="@string/gist_files" />
         </LinearLayout>

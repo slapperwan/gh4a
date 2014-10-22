@@ -52,6 +52,14 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         mLoadingView = (TextView) vi.inflate(R.layout.list_loading_view, null);
 
         mAdapter = onCreateAdapter();
+        if (mAdapter.isCardStyle()) {
+            ListView listView = getListView();
+            listView.setDivider(null);
+            listView.setDividerHeight(0);
+
+            int cardMargin = getResources().getDimensionPixelSize(R.dimen.card_margin);
+            listView.setPadding(cardMargin, 0, cardMargin, 0);
+        }
 
         getListView().setOnScrollListener(this);
         getListView().setTextFilterEnabled(true);

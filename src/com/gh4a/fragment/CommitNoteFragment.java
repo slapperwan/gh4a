@@ -77,8 +77,6 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
     @Override
     protected RootAdapter<CommitComment> onCreateAdapter() {
-        getListView().setDivider(null);
-        getListView().setDividerHeight(0);
         return new CommitNoteAdapter(getActivity(), mRepoOwner, this);
     }
 

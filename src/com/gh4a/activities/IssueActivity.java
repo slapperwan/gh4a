@@ -166,9 +166,11 @@ public class IssueActivity extends LoadingFragmentActivity implements
             R.id.tv_title, R.id.desc_title
         });
 
+        int cardMargin = getResources().getDimensionPixelSize(R.dimen.card_margin);
         listView.addHeaderView(mHeader, null, false);
         listView.setDivider(null);
         listView.setDividerHeight(0);
+        listView.setPadding(cardMargin, 0, cardMargin, 0);
 
         mEventAdapter = new IssueEventAdapter(this, mRepoOwner, mRepoName, this);
         listView.setAdapter(mEventAdapter);
