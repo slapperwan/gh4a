@@ -21,7 +21,6 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
 import android.text.format.Formatter;
 import android.view.LayoutInflater;
@@ -134,8 +133,6 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
             Bundle savedInstanceState) {
         mContentView = inflater.inflate(R.layout.user, null);
 
-        Toolbar toolbarAction = (Toolbar) mContentView.findViewById(R.id.toolbar);
-        toolbarAction.inflateMenu(R.menu.user_menu);
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
