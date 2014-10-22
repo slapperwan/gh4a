@@ -206,7 +206,7 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
         int added = 0, changed = 0, renamed = 0, deleted = 0;
         int additions = 0, deletions = 0;
         int count = files != null ? files.size() : 0;
-        int highlightColor = UiUtils.resolveColor(getActivity(), R.attr.colorPrimaryDark);
+        int highlightColor = UiUtils.resolveColor(getActivity(), android.R.attr.textColorPrimary);
 
         llChanged.removeAllViews();
         llAdded.removeAllViews();
