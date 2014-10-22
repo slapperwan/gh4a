@@ -74,7 +74,7 @@ public abstract class UserListActivity extends LoadingFragmentActivity implement
 
         mUserAdapter = new UserAdapter(this, getShowExtraData());
 
-        ListView listView = (ListView) findViewById(R.id.list_view);
+        ListView listView = (ListView) findViewById(android.R.id.list);
         listView.setOnItemClickListener(this);
         listView.setAdapter(mUserAdapter);
 

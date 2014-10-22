@@ -8,20 +8,27 @@ import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import com.gh4a.activities.BaseFragmentActivity;
+import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.SwipeRefreshLayout;
 
-public abstract class LoadingFragmentActivity extends BaseFragmentActivity {
-    private View mProgressContainer;
+import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
+
+public abstract class LoadingFragmentActivity extends BaseFragmentActivity implements
+        SwipeRefreshLayout.OnRefreshListener {
     private View mContentContainer;
     private View mContentView;
     private View mEmptyView;
     private boolean mContentShown;
+    private SmoothProgressBar mProgress;
+    protected SwipeRefreshLayout mSwipeLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (isOnline()) {
-            super.setContentView(R.layout.fragment_progress);
+            super.setContentView(R.layout.loading_activity);
+            setupSwipeToRefresh();
         } else {
             setErrorView();
         }
@@ -38,6 +45,33 @@ public abstract class LoadingFragmentActivity extends BaseFragmentActivity {
         super.onStart();
     }
 
+    protected boolean canSwipeToRefresh() {
+        return false;
+    }
+
+    @Override
+    public void onRefresh() {
+        mSwipeLayout.setRefreshing(true);
+    }
+
+    protected void refreshDone() {
+        mSwipeLayout.setRefreshing(false);
+    }
+
+    private void setupSwipeToRefresh() {
+        mSwipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+        if (canSwipeToRefresh()) {
+            mSwipeLayout.setOnRefreshListener(this);
+            mSwipeLayout.setColorSchemeColors(
+                    UiUtils.resolveColor(this, R.attr.colorPrimary), 0,
+                    UiUtils.resolveColor(this, R.attr.colorPrimaryDark), 0
+            );
+        } else {
+            mSwipeLayout.setEnabled(false);
+        }
+    }
+
+    @Override
     public void setContentView(int layoutResId) {
         if (layoutResId == R.layout.error) {
             super.setContentView(layoutResId);
@@ -48,6 +82,7 @@ public abstract class LoadingFragmentActivity extends BaseFragmentActivity {
         }
     }
 
+    @Override
     public void setContentView(View view) {
         ensureContent();
         if (view == null) {
@@ -78,8 +113,6 @@ public abstract class LoadingFragmentActivity extends BaseFragmentActivity {
         if (mEmptyView != null && mEmptyView instanceof TextView) {
             TextView emptyView = (TextView) mEmptyView;
             emptyView.setText(text);
-            // align text size with support library's empty text
-            emptyView.setTextAppearance(this, android.R.style.TextAppearance_Small);
         } else {
             throw new IllegalStateException("Can't be used with a custom content view");
         }
@@ -97,27 +130,27 @@ public abstract class LoadingFragmentActivity extends BaseFragmentActivity {
         mContentShown = shown;
         if (shown) {
             if (animate) {
-                mProgressContainer.startAnimation(
+                mProgress.startAnimation(
                         AnimationUtils.loadAnimation(this, android.R.anim.fade_out));
                 mContentContainer.startAnimation(
                         AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
             } else {
-                mProgressContainer.clearAnimation();
+                mProgress.clearAnimation();
                 mContentContainer.clearAnimation();
             }
-            mProgressContainer.setVisibility(View.GONE);
+            mProgress.setVisibility(View.GONE);
             mContentContainer.setVisibility(View.VISIBLE);
         } else {
             if (animate) {
-                mProgressContainer.startAnimation(
+                mProgress.startAnimation(
                         AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
                 mContentContainer.startAnimation(
                         AnimationUtils.loadAnimation(this, android.R.anim.fade_out));
             } else {
-                mProgressContainer.clearAnimation();
+                mProgress.clearAnimation();
                 mContentContainer.clearAnimation();
             }
-            mProgressContainer.setVisibility(View.VISIBLE);
+            mProgress.setVisibility(View.VISIBLE);
             mContentContainer.setVisibility(View.GONE);
         }
     }
@@ -137,13 +170,18 @@ public abstract class LoadingFragmentActivity extends BaseFragmentActivity {
     }
 
     private void ensureContent() {
-        if (mContentContainer != null && mProgressContainer != null) {
+        if (mContentContainer != null && mProgress != null) {
             return;
         }
-        mProgressContainer = findViewById(R.id.progress_container);
-        if (mProgressContainer == null) {
-            throw new RuntimeException("Your content must have a ViewGroup whose id attribute is 'R.id.progress_container'");
+        mProgress = (SmoothProgressBar) findViewById(R.id.progress);
+        if (mProgress == null) {
+            throw new RuntimeException("Your content must have a ViewGroup whose id attribute is 'R.id.progress'");
         }
+        mProgress.setSmoothProgressDrawableColors(new int[] {
+            UiUtils.resolveColor(this, R.attr.colorPrimary),
+            UiUtils.resolveColor(this, R.attr.colorPrimaryDark)
+        });
+
         mContentContainer = findViewById(R.id.content_container);
         if (mContentContainer == null) {
             throw new RuntimeException("Your content must have a ViewGroup whose id attribute is 'R.id.content_container'");

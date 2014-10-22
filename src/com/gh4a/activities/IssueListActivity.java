@@ -29,7 +29,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.gh4a.Constants;
-import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueListFragment;

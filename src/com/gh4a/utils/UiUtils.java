@@ -21,11 +21,13 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.support.v4.view.ViewCompat;
 import android.text.Spannable;
 import android.text.method.LinkMovementMethod;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
 import android.widget.TextView;
 
 public class UiUtils {
@@ -75,6 +77,26 @@ public class UiUtils {
             return context.getResources().getColor(R.color.label_fg_dark);
         }
         return context.getResources().getColor(R.color.label_fg_light);
+    }
+
+    public static boolean canViewScrollUp(View view) {
+        if (view == null) {
+            return false;
+        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            if (view instanceof AbsListView) {
+                final AbsListView absListView = (AbsListView) view;
+                if (absListView.getChildCount() == 0) {
+                    return false;
+                }
+                return absListView.getFirstVisiblePosition() > 0
+                        || absListView.getChildAt(0).getTop() < absListView.getPaddingTop();
+            } else {
+                return view.getScrollY() > 0;
+            }
+        } else {
+            return ViewCompat.canScrollVertically(view, -1);
+        }
     }
 
     public static AlertDialog.Builder createDialogBuilderWithAlertIcon(Context context) {

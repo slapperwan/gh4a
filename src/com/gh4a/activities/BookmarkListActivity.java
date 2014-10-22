@@ -40,7 +40,7 @@ public class BookmarkListActivity extends LoadingFragmentActivity implements
         actionBar.setTitle(R.string.bookmarks);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        ListView listView = (ListView) findViewById(R.id.list_view);
+        ListView listView = (ListView) findViewById(android.R.id.list);
         mAdapter = new BookmarkAdapter(this);
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);

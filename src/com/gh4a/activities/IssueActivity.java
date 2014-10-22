@@ -157,7 +157,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
             findViewById(R.id.divider).setVisibility(View.GONE);
         }
 
-        ListView listView = (ListView) findViewById(R.id.list_view);
+        ListView listView = (ListView) findViewById(android.R.id.list);
 
         mHeader = (LinearLayout) getLayoutInflater().inflate(R.layout.issue_header, listView, false);
         mHeader.setClickable(false);

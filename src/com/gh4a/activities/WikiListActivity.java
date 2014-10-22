@@ -82,7 +82,7 @@ public class WikiListActivity extends LoadingFragmentActivity {
         actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        mListView = (ListView) findViewById(R.id.list_view);
+        mListView = (ListView) findViewById(android.R.id.list);
         //mListView.setOnScrollListener(new WikiScrollListener(this));
         CommonFeedAdapter adapter = new CommonFeedAdapter(this, false);
         mListView.setAdapter(adapter);

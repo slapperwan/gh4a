@@ -82,6 +82,8 @@ Open Source Libraries
 * [HoloColorPicker](https://github.com/LarsWerkman/HoloColorPicker)
 * [ProgressFragment](https://github.com/johnkil/Android-ProgressFragment)
 * [PreferenceFragment](https://github.com/kolavar/android-support-v4-preferencefragment)
+* [SmoothProgressBar](https://github.com/castorflex/SmoothProgressBar)
+* [FloatingActionButton](https://github.com/shamanland/floating-action-button)
 
 Contributions
 -------------

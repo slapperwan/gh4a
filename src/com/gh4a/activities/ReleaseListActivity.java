@@ -79,7 +79,7 @@ public class ReleaseListActivity extends LoadingFragmentActivity implements
         actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        ListView listView = (ListView) findViewById(R.id.list_view);
+        ListView listView = (ListView) findViewById(android.R.id.list);
         mAdapter = new ReleaseAdapter(this);
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);

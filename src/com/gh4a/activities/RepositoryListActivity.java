@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.ListFragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
@@ -168,7 +167,7 @@ public class RepositoryListActivity extends BaseFragmentActivity implements
 
     @Override
     public boolean onNavigationItemSelected(int position, long itemId) {
-        ListFragment fragment = null;
+        Fragment fragment = null;
 
         if (position < mTypes.length) {
             String type = mTypes[position];

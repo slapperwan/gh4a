@@ -150,22 +150,6 @@ public class UserActivity extends LoadingFragmentPagerActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.refresh:
-                MenuItemCompat.setActionView(item, R.layout.ab_loading);
-                MenuItemCompat.expandActionView(item);
-                if (mUserFragment != null) {
-                    mUserFragment.refresh();
-                }
-                if (mPrivateEventListFragment != null) {
-                    mPrivateEventListFragment.refresh();
-                }
-                if (mPublicEventListFragment != null) {
-                    mPublicEventListFragment.refresh();
-                }
-                if (mRepositoryIssueListFragment != null) {
-                    mRepositoryIssueListFragment.refresh();
-                }
-                return true;
             case R.id.follow:
                 MenuItemCompat.setActionView(item, R.layout.ab_loading);
                 MenuItemCompat.expandActionView(item);
@@ -189,6 +173,28 @@ public class UserActivity extends LoadingFragmentPagerActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected boolean canSwipeToRefresh() {
+        return true;
+    }
+
+    @Override
+    public void onRefresh() {
+        if (mUserFragment != null) {
+            mUserFragment.refresh();
+        }
+        if (mPrivateEventListFragment != null) {
+            mPrivateEventListFragment.refresh();
+        }
+        if (mPublicEventListFragment != null) {
+            mPublicEventListFragment.refresh();
+        }
+        if (mRepositoryIssueListFragment != null) {
+            mRepositoryIssueListFragment.refresh();
+        }
+        refreshDone();
     }
 
     private class UpdateFollowTask extends BackgroundTask<Void> {

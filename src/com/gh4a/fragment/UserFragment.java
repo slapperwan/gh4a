@@ -32,7 +32,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.devspark.progressfragment.ProgressFragment;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -58,7 +57,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class UserFragment extends ProgressFragment implements View.OnClickListener {
+public class UserFragment extends LoadingFragmentBase implements View.OnClickListener {
     private String mUserLogin;
     private String mUserName;
     private User mUser;
@@ -151,8 +150,10 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
     }
 
     public void refresh() {
-        setContentShown(false);
-        getLoaderManager().getLoader(0).onContentChanged();
+        if (mContentView != null) {
+            setContentShown(false);
+            getLoaderManager().getLoader(0).onContentChanged();
+        }
     }
 
     @SuppressLint("NewApi")

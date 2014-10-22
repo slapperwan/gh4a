@@ -17,7 +17,6 @@ package com.gh4a.fragment;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBarActivity;
@@ -32,13 +31,12 @@ import android.widget.TextView;
 import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.PageIteratorLoader;
-import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.client.PageIterator;
 
 import java.util.Collection;
 
-public abstract class PagedDataBaseFragment<T> extends ListFragment implements
+public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase implements
         LoaderManager.LoaderCallbacks<Collection<T>>, OnScrollListener {
     private RootAdapter<T> mAdapter;
     private boolean mLoadMore;
@@ -51,9 +49,7 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
         super.onActivityCreated(savedInstanceState);
 
         LayoutInflater vi = getActivity().getLayoutInflater();
-        mLoadingView = (TextView) vi.inflate(R.layout.row_simple, null);
-        mLoadingView.setText(R.string.loading_msg);
-        mLoadingView.setTextColor(UiUtils.resolveColor(getActivity(), R.attr.colorPrimaryDark));
+        mLoadingView = (TextView) vi.inflate(R.layout.list_loading_view, null);
 
         mAdapter = onCreateAdapter();
 
@@ -74,8 +70,10 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
 
     public void refresh() {
         mLoadMore = false;
-        setListShown(false);
-        getLoaderManager().getLoader(0).onContentChanged();
+        if (getListView() != null) {
+            setListShown(false);
+            getLoaderManager().getLoader(0).onContentChanged();
+        }
     }
 
     private void fillData(Collection<T> data) {

@@ -7,8 +7,12 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBar.Tab;
+import android.view.ViewGroup;
 
-public abstract class LoadingFragmentPagerActivity extends LoadingFragmentActivity {
+import com.gh4a.widget.SwipeRefreshLayout;
+
+public abstract class LoadingFragmentPagerActivity extends LoadingFragmentActivity implements
+        SwipeRefreshLayout.ChildScrollDelegate {
     private FragmentAdapter mAdapter;
     private ViewPager mPager;
 
@@ -22,6 +26,7 @@ public abstract class LoadingFragmentPagerActivity extends LoadingFragmentActivi
         mAdapter = new FragmentAdapter();
         setContentView(R.layout.view_pager);
         mPager = setupPager();
+        mSwipeLayout.setChildScrollDelegate(this);
     }
 
     protected void invalidateFragments() {
@@ -37,6 +42,15 @@ public abstract class LoadingFragmentPagerActivity extends LoadingFragmentActivi
         if (enabled) {
             mPager.setCurrentItem(getSupportActionBar().getSelectedTab().getPosition());
         }
+    }
+
+    @Override
+    public boolean canChildScrollUp() {
+        Fragment item = mAdapter.getCurrentFragment();
+        if (item != null && item instanceof SwipeRefreshLayout.ChildScrollDelegate) {
+            return ((SwipeRefreshLayout.ChildScrollDelegate) item).canChildScrollUp();
+        }
+        return false;
     }
 
     private ViewPager setupPager() {
@@ -79,6 +93,8 @@ public abstract class LoadingFragmentPagerActivity extends LoadingFragmentActivi
     }
 
     private class FragmentAdapter extends FragmentStatePagerAdapter {
+        private Fragment mCurrentFragment;
+
         public FragmentAdapter() {
             super(getSupportFragmentManager());
         }
@@ -91,6 +107,24 @@ public abstract class LoadingFragmentPagerActivity extends LoadingFragmentActivi
         @Override
         public Fragment getItem(int position) {
             return getFragment(position);
+        }
+
+        private Fragment getCurrentFragment() {
+            return mCurrentFragment;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            super.destroyItem(container, position, object);
+            if (object == mCurrentFragment) {
+                mCurrentFragment = null;
+            }
+        }
+
+        @Override
+        public void setPrimaryItem(ViewGroup container, int position, Object object) {
+            mCurrentFragment = (Fragment) object;
+            super.setPrimaryItem(container, position, object);
         }
 
         @Override

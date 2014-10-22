@@ -89,6 +89,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             }
             setContentEmpty(!success);
             setContentShown(true);
+            refreshDone();
             invalidateOptionsMenu();
         }
     };
@@ -291,6 +292,16 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
     }
 
     @Override
+    protected boolean canSwipeToRefresh() {
+        return true;
+    }
+
+    @Override
+    public void onRefresh() {
+        refreshFragments();
+    }
+
+    @Override
     public void onContentsLoaded(ContentListFragment fragment, List<RepositoryContents> contents) {
         if (contents == null) {
             return;
@@ -419,11 +430,6 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
                 } else {
                     showTagsDialog();
                 }
-                return true;
-            case R.id.refresh:
-                MenuItemCompat.setActionView(item, R.layout.ab_loading);
-                MenuItemCompat.expandActionView(item);
-                refreshFragments();
                 return true;
             case R.id.share:
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
