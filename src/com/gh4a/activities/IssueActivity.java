@@ -62,11 +62,12 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.SwipeRefreshLayout;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 public class IssueActivity extends LoadingFragmentActivity implements
-        OnClickListener, IssueEventAdapter.OnEditComment {
+        OnClickListener, IssueEventAdapter.OnEditComment, SwipeRefreshLayout.ChildScrollDelegate {
     private static final int REQUEST_EDIT = 1000;
 
     private Issue mIssue;
@@ -76,6 +77,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
     private LinearLayout mHeader;
     private boolean mEventsLoaded;
     private IssueEventAdapter mEventAdapter;
+    private ListView mListView;
     private boolean mIsCollaborator;
 
     private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>() {
@@ -160,9 +162,9 @@ public class IssueActivity extends LoadingFragmentActivity implements
             findViewById(R.id.divider).setVisibility(View.GONE);
         }
 
-        ListView listView = (ListView) findViewById(android.R.id.list);
+        mListView = (ListView) findViewById(android.R.id.list);
 
-        mHeader = (LinearLayout) getLayoutInflater().inflate(R.layout.issue_header, listView, false);
+        mHeader = (LinearLayout) getLayoutInflater().inflate(R.layout.issue_header, mListView, false);
         mHeader.setClickable(false);
 
         UiUtils.assignTypeface(mHeader, Gh4Application.get(this).boldCondensed, new int[]{
@@ -170,13 +172,15 @@ public class IssueActivity extends LoadingFragmentActivity implements
         });
 
         int cardMargin = getResources().getDimensionPixelSize(R.dimen.card_margin);
-        listView.addHeaderView(mHeader, null, false);
-        listView.setDivider(null);
-        listView.setDividerHeight(0);
-        listView.setPadding(cardMargin, 0, cardMargin, 0);
+        mListView.addHeaderView(mHeader, null, false);
+        mListView.setDivider(null);
+        mListView.setDividerHeight(0);
+        mListView.setPadding(cardMargin, 0, cardMargin, 0);
 
         mEventAdapter = new IssueEventAdapter(this, mRepoOwner, mRepoName, this);
-        listView.setAdapter(mEventAdapter);
+        mListView.setAdapter(mEventAdapter);
+
+        mSwipeLayout.setChildScrollDelegate(this);
 
         if (!Gh4Application.get(this).isAuthorized()) {
             findViewById(R.id.comment).setVisibility(View.GONE);
@@ -186,6 +190,11 @@ public class IssueActivity extends LoadingFragmentActivity implements
         getSupportLoaderManager().initLoader(0, null, mIssueCallback);
         getSupportLoaderManager().initLoader(1, null, mCollaboratorCallback);
         getSupportLoaderManager().initLoader(2, null, mEventCallback);
+    }
+
+    @Override
+    public boolean canChildScrollUp() {
+        return UiUtils.canViewScrollUp(mListView);
     }
 
     private void fillDataIfDone() {
