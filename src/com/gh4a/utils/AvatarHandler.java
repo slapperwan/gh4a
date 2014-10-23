@@ -8,15 +8,13 @@ import java.util.ArrayList;
 
 import org.eclipse.egit.github.core.User;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.PorterDuff.Mode;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
-import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -27,14 +25,15 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import com.gh4a.R;
+import com.gh4a.widget.RoundedAvatarDrawable;
 
 public class AvatarHandler {
     private static final String TAG = "GravatarHandler";
 
     private static final int MAX_CACHE_SIZE = 100;
     private static final int MAX_CACHED_IMAGE_SIZE = 60; /* dp - maximum gravatar view size used */
-    private static final float ROUND_CORNER_RADIUS = 0.05f; /* 5% */
 
+    private static Bitmap sDefaultAvatarBitmap;
     private static final SparseArrayCompat<Bitmap> sCache =
             new SparseArrayCompat<Bitmap>(MAX_CACHE_SIZE);
     private static int sNextRequestId = 1;
@@ -74,12 +73,13 @@ public class AvatarHandler {
             final Request request = sRequests.get(requestId);
             if (request != null && bitmap != null) {
                 if (sCache.size() >= MAX_CACHE_SIZE) {
+                    sCache.get(sCache.keyAt(0)).recycle();
                     sCache.removeAt(0);
                 }
                 sCache.put(request.id, bitmap);
 
                 for (ImageView view : request.views) {
-                    view.setImageBitmap(bitmap);
+                    view.setImageDrawable(new RoundedAvatarDrawable(bitmap));
                 }
             }
             sRequests.delete(requestId);
@@ -100,11 +100,15 @@ public class AvatarHandler {
 
         Bitmap bitmap = sCache.get(userId);
         if (bitmap != null) {
-            view.setImageBitmap(bitmap);
+            view.setImageDrawable(new RoundedAvatarDrawable(bitmap));
             return;
         }
 
-        view.setImageResource(R.drawable.default_avatar);
+        if (sDefaultAvatarBitmap == null) {
+            Resources res = view.getContext().getResources();
+            sDefaultAvatarBitmap = BitmapFactory.decodeResource(res, R.drawable.default_avatar);
+        }
+        view.setImageDrawable(new RoundedAvatarDrawable(sDefaultAvatarBitmap));
         if (userId <= 0) {
             return;
         }
@@ -191,28 +195,26 @@ public class AvatarHandler {
         return BitmapFactory.decodeByteArray(data, 0, data.length);
     }
 
-    private static Bitmap getRoundedCornerResizedBitmap(Bitmap bitmap) {
+    private static Bitmap getResizedBitmap(Bitmap bitmap) {
         float widthScale = (float) sMaxImageSizePx / (float) bitmap.getWidth();
         float heightScale = (float) sMaxImageSizePx / (float) bitmap.getHeight();
-        float scaleFactor = Math.min(1, Math.min(widthScale, heightScale));
+        float scaleFactor = Math.min(widthScale, heightScale);
+
+        if (scaleFactor <= 1) {
+            return bitmap;
+        }
+
         Bitmap output = Bitmap.createBitmap(Math.round(scaleFactor * bitmap.getWidth()),
                 Math.round(scaleFactor * bitmap.getHeight()), Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
-
-        final int color = 0xff424242;
         final Paint paint = new Paint();
         final Rect srcRect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
         final Rect rect = new Rect(0, 0, output.getWidth(), output.getHeight());
-        final RectF rectF = new RectF(rect);
-        final float radius = ROUND_CORNER_RADIUS * Math.max(output.getWidth(), output.getHeight());
 
         paint.setAntiAlias(true);
-        canvas.drawARGB(0, 0, 0, 0);
-        paint.setColor(color);
-        canvas.drawRoundRect(rectF, radius, radius, paint);
-
-        paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
         canvas.drawBitmap(bitmap, srcRect, rect, paint);
+
+        bitmap.recycle();
 
         return output;
     }
@@ -242,7 +244,7 @@ public class AvatarHandler {
                         Log.e(TAG, "Couldn't fetch gravatar from URL " + url, e);
                     }
                     if (bitmap != null) {
-                        bitmap = getRoundedCornerResizedBitmap(bitmap);
+                        bitmap = getResizedBitmap(bitmap);
                     }
                     sHandler.obtainMessage(MSG_LOADED, msg.arg1, 0, bitmap).sendToTarget();
                     break;
