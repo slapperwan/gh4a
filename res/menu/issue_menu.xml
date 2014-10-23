@@ -9,11 +9,8 @@
         android:title="@string/issue_close"
         app:showAsAction="ifRoom|withText" />
 
-    <item android:id="@+id/issue_edit"
-        android:title="@string/issue_edit"
-        app:showAsAction="never" />
-
     <item android:id="@+id/share"
         android:title="@string/share"
-        app:showAsAction="never" />
+        android:icon="@drawable/social_share"
+        app:showAsAction="ifRoom" />
 </menu>

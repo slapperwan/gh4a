@@ -384,8 +384,10 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
                 MenuItemCompat.expandActionView(starAction);
             } else if (mIsStarring) {
                 starAction.setTitle(R.string.repo_unstar_action);
+                starAction.setIcon(R.drawable.unstar);
             } else {
                 starAction.setTitle(R.string.repo_star_action);
+                starAction.setIcon(R.drawable.star);
             }
         }
         if (mRepository == null) {

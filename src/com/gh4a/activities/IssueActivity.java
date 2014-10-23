@@ -37,6 +37,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -65,6 +67,7 @@ import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
+import com.shamanland.fab.FloatingActionButton;
 
 public class IssueActivity extends LoadingFragmentActivity implements
         OnClickListener, IssueEventAdapter.OnEditComment, SwipeRefreshLayout.ChildScrollDelegate {
@@ -74,11 +77,24 @@ public class IssueActivity extends LoadingFragmentActivity implements
     private String mRepoOwner;
     private String mRepoName;
     private int mIssueNumber;
-    private LinearLayout mHeader;
+    private ViewGroup mHeader;
     private boolean mEventsLoaded;
     private IssueEventAdapter mEventAdapter;
     private ListView mListView;
     private boolean mIsCollaborator;
+    private FloatingActionButton mEditFab;
+
+    private ViewTreeObserver.OnGlobalLayoutListener mGlobalLayoutListener =
+            new ViewTreeObserver.OnGlobalLayoutListener() {
+        @Override
+        public void onGlobalLayout() {
+            View headerCard = mHeader.findViewById(R.id.header_card);
+            ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) mEditFab.getLayoutParams();
+            lp.topMargin = headerCard.getBottom() - mEditFab.getHeight() / 2;
+            mEditFab.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+            mEditFab.setLayoutParams(lp);
+        }
+    };
 
     private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>() {
         @Override
@@ -131,6 +147,9 @@ public class IssueActivity extends LoadingFragmentActivity implements
         public void onResultReady(LoaderResult<Boolean> result) {
             if (!result.handleError(IssueActivity.this)) {
                 mIsCollaborator = result.getData();
+                if (mIsCollaborator) {
+                    mEditFab.setVisibility(View.VISIBLE);
+                }
                 invalidateOptionsMenu();
             }
         }
@@ -164,7 +183,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
 
         mListView = (ListView) findViewById(android.R.id.list);
 
-        mHeader = (LinearLayout) getLayoutInflater().inflate(R.layout.issue_header, mListView, false);
+        mHeader = (ViewGroup) getLayoutInflater().inflate(R.layout.issue_header, mListView, false);
         mHeader.setClickable(false);
 
         UiUtils.assignTypeface(mHeader, Gh4Application.get(this).boldCondensed, new int[]{
@@ -186,6 +205,10 @@ public class IssueActivity extends LoadingFragmentActivity implements
             findViewById(R.id.comment).setVisibility(View.GONE);
             findViewById(R.id.divider).setVisibility(View.GONE);
         }
+
+        mEditFab = (FloatingActionButton) mHeader.findViewById(R.id.edit_fab);
+        mEditFab.setOnClickListener(this);
+        mEditFab.getViewTreeObserver().addOnGlobalLayoutListener(mGlobalLayoutListener);
 
         getSupportLoaderManager().initLoader(0, null, mIssueCallback);
         getSupportLoaderManager().initLoader(1, null, mCollaboratorCallback);
@@ -322,7 +345,6 @@ public class IssueActivity extends LoadingFragmentActivity implements
             if (!mIsCollaborator && !isCreator) {
                 menu.removeItem(R.id.issue_close);
                 menu.removeItem(R.id.issue_reopen);
-                menu.removeItem(R.id.issue_edit);
             }
             if (mIssue == null) {
                 menu.removeItem(R.id.share);
@@ -341,15 +363,6 @@ public class IssueActivity extends LoadingFragmentActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         switch (itemId) {
-            case R.id.issue_edit:
-                if (checkForAuthOrExit()) {
-                    Intent intent = new Intent(this, IssueEditActivity.class);
-                    intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-                    intent.putExtra(Constants.Repository.NAME, mRepoName);
-                    intent.putExtra(Constants.Issue.NUMBER, mIssue.getNumber());
-                    startActivity(intent);
-                }
-                return true;
             case R.id.issue_close:
             case R.id.issue_reopen:
                 if (checkForAuthOrExit()) {
@@ -398,6 +411,14 @@ public class IssueActivity extends LoadingFragmentActivity implements
     public void onClick(View v) {
         Intent intent = null;
         switch (v.getId()) {
+        case R.id.edit_fab:
+            if (checkForAuthOrExit()) {
+                intent = new Intent(this, IssueEditActivity.class);
+                intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+                intent.putExtra(Constants.Repository.NAME, mRepoName);
+                intent.putExtra(Constants.Issue.NUMBER, mIssue.getNumber());
+            }
+            break;
         case R.id.iv_gravatar:
             intent = IntentUtils.getUserActivityIntent(this, mIssue.getUser());
             break;

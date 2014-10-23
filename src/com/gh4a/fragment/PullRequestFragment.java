@@ -72,7 +72,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         IssueEventAdapter.OnEditComment, View.OnClickListener {
     private static final int REQUEST_EDIT = 1000;
 
-    private LinearLayout mHeader;
+    private ViewGroup mHeader;
     private PullRequest mPullRequest;
     private String mRepoOwner;
     private String mRepoName;
@@ -164,7 +164,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        mHeader = (LinearLayout) getLayoutInflater(savedInstanceState).inflate(
+        mHeader = (ViewGroup) getLayoutInflater(savedInstanceState).inflate(
                 R.layout.issue_header, getListView(), false);
         mHeader.setClickable(false);
         mHeader.findViewById(R.id.info_box).setVisibility(View.GONE);
