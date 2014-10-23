@@ -216,9 +216,6 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
                 shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
                 break;
-            case R.id.refresh:
-                refresh();
-                break;
         }
         return super.onOptionsItemSelected(item);
     }

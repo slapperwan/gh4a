@@ -90,6 +90,19 @@ public class PullRequestActivity extends LoadingFragmentPagerActivity implements
     }
 
     @Override
+    protected boolean canSwipeToRefresh() {
+        return true;
+    }
+
+    @Override
+    public void onRefresh() {
+        if (mPullRequestFragment != null) {
+            mPullRequestFragment.refresh();
+        }
+        refreshDone();
+    }
+
+    @Override
     protected int[] getTabTitleResIds() {
         return TITLES;
     }

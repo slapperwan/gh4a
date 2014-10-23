@@ -4,9 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 
 import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
@@ -14,7 +11,7 @@ import com.gh4a.fragment.TrendingFragment;
 
 public class TrendingActivity extends LoadingFragmentPagerActivity {
     private static final int[] TITLES = new int[] {
-        R.string.trend_today, R.string.trend_month, R.string.trend_month
+        R.string.trend_today, R.string.trend_week, R.string.trend_month
     };
 
     @Override
@@ -26,7 +23,6 @@ public class TrendingActivity extends LoadingFragmentPagerActivity {
 
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.trend);
-        actionBar.setSubtitle(R.string.explore);
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
@@ -46,38 +42,7 @@ public class TrendingActivity extends LoadingFragmentPagerActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.explore_menu, menu);
-        menu.removeItem(R.id.refresh);
-        menu.findItem(R.id.trend).setVisible(false);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
     protected Intent navigateUp() {
         return getToplevelActivityIntent();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.pub_timeline:
-                Intent intent = new Intent(this, TimelineActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                return true;
-            case R.id.trend:
-                intent = new Intent(this, TrendingActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                return true;
-            case R.id.blog:
-                intent = new Intent(this, BlogListActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 }

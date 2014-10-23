@@ -77,7 +77,6 @@
     <string name="menu_wiki">Wiki in browser</string>
     <string name="menu_pull">Pull request %1$d</string>
     <string name="menu_issues">Open issues</string>
-    <string name="refresh">Refresh</string>
     <string name="delete_comment_message">Delete this comment?</string>
     <string name="please_wait">Please wait</string>
     <string name="bookmark_user">Bookmark user</string>
@@ -101,11 +100,11 @@
     <string name="logout_pref_summary_logged_in">Currently logged in as %1$s</string>
     <string name="logout_pref_summary_logged_out">Currently not logged in</string>
     <string name="copyright_notice">\u00a9 2014 Azwan Adli, Danny Baumann</string>
-
     <plurals name="file">
         <item quantity="one">%1$d File</item>
         <item quantity="other">%1$d Files</item>
     </plurals>
+    <string name="actions">Actions</string>
 
     <plurals name="contributor_extra_data">
         <item quantity="one">%1$d contribution</item>
@@ -289,6 +288,7 @@
     <string name="issue_milestone">Milestone: %1$s</string>
     <string name="issue_milestone_new">New Milestone</string>
     <string name="issue_milestone_edit">Edit Milestone</string>
+    <string name="issue_filter">Filter</string>
     <string name="issue_filter_by_labels">Filter by labels</string>
     <string name="issue_filter_by_milestone">Filter by milestone</string>
     <string name="issue_filter_by_assignee">Filter by assignee</string>
@@ -333,6 +333,7 @@
     <string name="gist_files">Files</string>
 
     <!-- Explore -->
+    <string name="navigation">Navigation</string>
     <string name="explore">Explore</string>
 
     <!-- Trending repos -->

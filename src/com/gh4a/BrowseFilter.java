@@ -12,8 +12,8 @@ import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.gh4a.activities.BlogListActivity;
-import com.gh4a.activities.ExploreActivity;
 import com.gh4a.activities.RepositoryActivity;
+import com.gh4a.activities.TrendingActivity;
 import com.gh4a.activities.WikiListActivity;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
@@ -46,7 +46,7 @@ public class BrowseFilter extends Activity {
                 || "features".equals(first)) {
             IntentUtils.launchBrowser(this, uri);
         } else if ("explore".equals(first)) {
-            intent = new Intent(this, ExploreActivity.class);
+            intent = new Intent(this, TrendingActivity.class);
         } else if ("blog".equals(first)) {
             intent = new Intent(this, BlogListActivity.class);
         } else {

@@ -1,10 +1,18 @@
 package com.gh4a;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.gh4a.activities.BaseFragmentActivity;
@@ -21,6 +29,8 @@ public abstract class LoadingFragmentActivity extends BaseFragmentActivity imple
     private boolean mContentShown;
     private SmoothProgressBar mProgress;
     protected SwipeRefreshLayout mSwipeLayout;
+    protected DrawerLayout mDrawerLayout;
+    private ActionBarDrawerToggle mDrawerToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +39,7 @@ public abstract class LoadingFragmentActivity extends BaseFragmentActivity imple
         if (isOnline()) {
             super.setContentView(R.layout.loading_activity);
             setupSwipeToRefresh();
+            setupNavigationDrawer();
         } else {
             setErrorView();
         }
@@ -68,6 +79,71 @@ public abstract class LoadingFragmentActivity extends BaseFragmentActivity imple
             );
         } else {
             mSwipeLayout.setEnabled(false);
+        }
+    }
+
+    protected ListAdapter getNavigationDrawerAdapter() {
+        return null;
+    }
+
+    protected boolean isRightSideDrawer() {
+        return false;
+    }
+
+    protected boolean onDrawerItemSelected(int position) {
+        return false;
+    }
+
+    private void setupNavigationDrawer() {
+        ListAdapter adapter = getNavigationDrawerAdapter();
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer);
+        if (adapter != null) {
+            ListView drawerList = (ListView) findViewById(R.id.drawer_list);
+            drawerList.setAdapter(adapter);
+            drawerList.setOnItemClickListener(new ListView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    if (onDrawerItemSelected(position)) {
+                        mDrawerLayout.closeDrawers();
+                    }
+                }
+            });
+
+            if (isRightSideDrawer()) {
+                DrawerLayout.LayoutParams lp =
+                        (DrawerLayout.LayoutParams) drawerList.getLayoutParams();
+                lp.gravity = Gravity.RIGHT;
+                drawerList.setLayoutParams(lp);
+            } else {
+                mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, 0, 0);
+                mDrawerLayout.setDrawerListener(mDrawerToggle);
+            }
+        } else {
+            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (mDrawerToggle != null) {
+            mDrawerToggle.onConfigurationChanged(newConfig);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (mDrawerToggle != null && mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        if (mDrawerToggle != null) {
+            mDrawerToggle.syncState();
         }
     }
 

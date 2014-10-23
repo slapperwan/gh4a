@@ -4,22 +4,10 @@
     <item android:id="@+id/follow"
         android:title="@string/user_follow_action"
         app:showAsAction="always" />
-    <item android:id="@+id/search"
-        android:title="@string/search"
-        app:showAsAction="always" />
-    <item android:id="@+id/bookmarks"
-        android:title="@string/bookmarks"
-        app:showAsAction="always" />
     <item android:id="@+id/share"
         android:title="@string/share"
         app:showAsAction="never" />
     <item android:id="@+id/bookmark"
         android:title="@string/bookmark_user"
-        app:showAsAction="never" />
-    <item android:id="@+id/explore"
-        android:title="@string/explore"
-        app:showAsAction="never" />
-    <item android:id="@+id/settings"
-        android:title="@string/settings"
         app:showAsAction="never" />
 </menu>

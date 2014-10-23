@@ -1,6 +1,8 @@
 package com.gh4a.activities;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.eclipse.egit.github.core.service.UserService;
 import android.content.Intent;
@@ -12,12 +14,14 @@ import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ListAdapter;
 
 import com.gh4a.BackgroundTask;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
+import com.gh4a.adapter.DrawerAdapter;
 import com.gh4a.db.BookmarksProvider;
 import com.gh4a.fragment.PrivateEventListFragment;
 import com.gh4a.fragment.PublicEventListFragment;
@@ -29,6 +33,8 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
 
 public class UserActivity extends LoadingFragmentPagerActivity {
+    private static final int REQUEST_SETTINGS = 10000;
+
     private String mUserLogin;
     private String mUserName;
     private boolean mIsLoginUserPage;
@@ -45,6 +51,23 @@ public class UserActivity extends LoadingFragmentPagerActivity {
     private static final int[] TITLES_OTHER = new int[] {
         R.string.about, R.string.user_public_activity
     };
+
+    private static final int ITEM_SEARCH = 1;
+    private static final int ITEM_BOOKMARKS = 2;
+    private static final int ITEM_SETTINGS = 3;
+    private static final int ITEM_TIMELINE = 4;
+    private static final int ITEM_TRENDING = 5;
+    private static final int ITEM_BLOG = 6;
+    private static final List<DrawerAdapter.Item> DRAWER_ITEMS = Arrays.asList(
+        new DrawerAdapter.SectionItem(R.string.navigation),
+        new DrawerAdapter.SectionEntryItem(R.string.search, 0, ITEM_SEARCH),
+        new DrawerAdapter.SectionEntryItem(R.string.bookmarks, 0, ITEM_BOOKMARKS),
+        new DrawerAdapter.SectionItem(R.string.explore),
+        new DrawerAdapter.SectionEntryItem(R.string.pub_timeline, 0, ITEM_TIMELINE),
+        new DrawerAdapter.SectionEntryItem(R.string.trend, 0, ITEM_TRENDING),
+        new DrawerAdapter.SectionEntryItem(R.string.blog, 0, ITEM_BLOG),
+        new DrawerAdapter.MiscItem(R.string.settings, 0, ITEM_SETTINGS)
+    );
 
     private LoaderCallbacks<Boolean> mIsFollowingCallback = new LoaderCallbacks<Boolean>() {
         @Override
@@ -72,8 +95,9 @@ public class UserActivity extends LoadingFragmentPagerActivity {
 
         ActionBar actionBar = getSupportActionBar();
         if (mIsLoginUserPage) {
-            actionBar.setDisplayShowHomeEnabled(false);
-            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setDisplayShowHomeEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
         } else {
             actionBar.setTitle(mUserLogin);
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -81,6 +105,39 @@ public class UserActivity extends LoadingFragmentPagerActivity {
                 getSupportLoaderManager().initLoader(4, null, mIsFollowingCallback);
             }
         }
+    }
+
+    @Override
+    protected ListAdapter getNavigationDrawerAdapter() {
+        if (mIsLoginUserPage) {
+            return new DrawerAdapter(this, DRAWER_ITEMS);
+        }
+        return super.getNavigationDrawerAdapter();
+    }
+
+    @Override
+    protected boolean onDrawerItemSelected(int position) {
+        switch (DRAWER_ITEMS.get(position).getId()) {
+            case ITEM_SETTINGS:
+                startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
+                return true;
+            case ITEM_SEARCH:
+                startActivity(new Intent(this, SearchActivity.class));
+                return true;
+            case ITEM_BOOKMARKS:
+                startActivity(new Intent(this, BookmarkListActivity.class));
+                return true;
+            case ITEM_TIMELINE:
+                startActivity(new Intent(this, TimelineActivity.class));
+                return true;
+            case ITEM_BLOG:
+                startActivity(new Intent(this, BlogListActivity.class));
+                return true;
+            case ITEM_TRENDING:
+                startActivity(new Intent(this, TrendingActivity.class));
+                return true;
+        }
+        return super.onDrawerItemSelected(position);
     }
 
     @Override
@@ -113,6 +170,9 @@ public class UserActivity extends LoadingFragmentPagerActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        if (mIsLoginUserPage) {
+            return false;
+        }
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.user_menu, menu);
         return true;
@@ -120,10 +180,8 @@ public class UserActivity extends LoadingFragmentPagerActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        boolean authorized = Gh4Application.get(this).isAuthorized();
-
         MenuItem followAction = menu.findItem(R.id.follow);
-        followAction.setVisible(!mIsLoginUserPage && authorized);
+        followAction.setVisible(Gh4Application.get(this).isAuthorized());
         if (followAction.isVisible()) {
             if (mIsFollowing == null) {
                 MenuItemCompat.setActionView(followAction, R.layout.ab_loading);
@@ -135,11 +193,20 @@ public class UserActivity extends LoadingFragmentPagerActivity {
             }
         }
 
-        menu.findItem(R.id.bookmarks).setVisible(mIsLoginUserPage);
-        menu.findItem(R.id.share).setVisible(!mIsLoginUserPage);
-        menu.findItem(R.id.bookmark).setVisible(!mIsLoginUserPage);
-
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_SETTINGS) {
+            if (data.getBooleanExtra(SettingsActivity.RESULT_EXTRA_THEME_CHANGED, false)
+                    || data.getBooleanExtra(SettingsActivity.RESULT_EXTRA_AUTH_CHANGED, false)) {
+                goToToplevelActivity(false);
+                finish();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override

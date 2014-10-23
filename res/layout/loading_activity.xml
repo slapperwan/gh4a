@@ -1,42 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.gh4a.widget.SwipeRefreshLayout
+<android.support.v4.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/swipe_container"
+    android:id="@+id/drawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
+    <com.gh4a.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/swipe_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <fr.castorflex.android.smoothprogressbar.SmoothProgressBar
-            android:id="@+id/progress"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:indeterminate="true"
-            android:visibility="gone"
-            app:spb_sections_count="6"
-            app:spb_speed="1.0"
-            app:spb_progressiveStart_activated="true"
-            app:spb_progressiveStart_speed="1.5"
-            app:spb_progressiveStop_speed="3.4"
-            app:spb_interpolator="spb_interpolator_acceleratedecelerate" />
-
         <FrameLayout
-            android:id="@+id/content_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <TextView
-                android:id="@android:id/empty"
+            <fr.castorflex.android.smoothprogressbar.SmoothProgressBar
+                android:id="@+id/progress"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:textAppearance="?android:attr/textAppearanceSmall"/>
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:visibility="gone"
+                app:spb_sections_count="6"
+                app:spb_speed="1.0"
+                app:spb_progressiveStart_activated="true"
+                app:spb_progressiveStart_speed="1.5"
+                app:spb_progressiveStop_speed="3.4"
+                app:spb_interpolator="spb_interpolator_acceleratedecelerate" />
+
+            <FrameLayout
+                android:id="@+id/content_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@android:id/empty"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+            </FrameLayout>
 
         </FrameLayout>
 
-    </FrameLayout>
+    </com.gh4a.widget.SwipeRefreshLayout>
 
-</com.gh4a.widget.SwipeRefreshLayout>
+    <ListView
+        android:id="@+id/drawer_list"
+        android:layout_width="280dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="left"
+        android:choiceMode="singleChoice"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
+        android:background="?android:attr/colorBackground" />
+
+</android.support.v4.widget.DrawerLayout>

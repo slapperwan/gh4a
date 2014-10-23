@@ -22,15 +22,20 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ListAdapter;
 
 import com.gh4a.Constants;
 import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
+import com.gh4a.adapter.DrawerAdapter;
 import com.gh4a.fragment.IssueListFragment;
 import com.gh4a.loader.CollaboratorListLoader;
 import com.gh4a.loader.IsCollaboratorLoader;
@@ -45,6 +50,7 @@ import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,9 +65,12 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
     private int mSelectedMilestone;
     private String mSelectedAssignee;
 
+    private DrawerAdapter mDrawerAdapter;
+    private ArrayList<DrawerAdapter.Item> mDrawerItems;
+
     private IssueListFragment mOpenFragment;
     private IssueListFragment mClosedFragment;
-    private boolean mIsCollaborator;
+    private Boolean mIsCollaborator;
     private ProgressDialog mProgressDialog;
     private List<Label> mLabels;
     private List<Milestone> mMilestones;
@@ -74,6 +83,38 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
     private static final String SORT_MODE_CREATED = "created";
     private static final String SORT_MODE_UPDATED = "updated";
     private static final String SORT_MODE_COMMENTS = "comments";
+
+    private static final int ITEM_FILTER_MILESTONE = 1;
+    private static final int ITEM_FILTER_ASSIGNEE = 2;
+    private static final int ITEM_FILTER_LABEL = 3;
+    private static final int ITEM_MANAGE_LABELS = 4;
+    private static final int ITEM_MANAGE_MILESTONES = 5;
+    private static final int ITEM_SORT_CREATED_DESC = 6;
+    private static final int ITEM_SORT_CREATED_ASC = 7;
+    private static final int ITEM_SORT_UPDATED_DESC = 8;
+    private static final int ITEM_SORT_UPDATED_ASC = 9;
+    private static final int ITEM_SORT_COMMENTS_DESC = 10;
+    private static final int ITEM_SORT_COMMENTS_ASC = 11;
+    private static final int ITEM_SORT_FIRST = ITEM_SORT_CREATED_DESC;
+
+    private static final List<DrawerAdapter.Item> DRAWER_ITEMS = Arrays.asList(
+        new DrawerAdapter.SectionItem(R.string.issue_sort_order),
+        new DrawerAdapter.RadioItem(R.string.issue_sort_created_desc, ITEM_SORT_CREATED_DESC),
+        new DrawerAdapter.RadioItem(R.string.issue_sort_created_asc, ITEM_SORT_CREATED_ASC),
+        new DrawerAdapter.RadioItem(R.string.issue_sort_updated_desc, ITEM_SORT_UPDATED_DESC),
+        new DrawerAdapter.RadioItem(R.string.issue_sort_updated_asc, ITEM_SORT_UPDATED_ASC),
+        new DrawerAdapter.RadioItem(R.string.issue_sort_comments_desc, ITEM_SORT_COMMENTS_DESC),
+        new DrawerAdapter.RadioItem(R.string.issue_sort_comments_asc, ITEM_SORT_COMMENTS_ASC),
+        new DrawerAdapter.SectionItem(R.string.issue_filter),
+        new DrawerAdapter.SectionEntryItem(R.string.issue_filter_by_milestone, 0, ITEM_FILTER_MILESTONE),
+        new DrawerAdapter.SectionEntryItem(R.string.issue_filter_by_assignee, 0, ITEM_FILTER_ASSIGNEE),
+        new DrawerAdapter.SectionEntryItem(R.string.issue_filter_by_labels, 0, ITEM_FILTER_LABEL)
+    );
+
+    private static final List<DrawerAdapter.MiscItem> COLLAB_DRAWER_ITEMS = Arrays.asList(
+        new DrawerAdapter.MiscItem(R.string.issue_manage_labels, 0, ITEM_MANAGE_LABELS),
+        new DrawerAdapter.MiscItem(R.string.issue_manage_milestones, 0, ITEM_MANAGE_MILESTONES)
+    );
 
     private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
         @Override
@@ -144,8 +185,13 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
             if (checkForError(result)) {
                 return;
             }
-            mIsCollaborator = result.getData();
-            invalidateOptionsMenu();
+            if (mIsCollaborator == null) {
+                mIsCollaborator = result.getData();
+                if (mIsCollaborator) {
+                    mDrawerItems.addAll(COLLAB_DRAWER_ITEMS);
+                    mDrawerAdapter.notifyDataSetChanged();
+                }
+            }
         }
     };
 
@@ -161,6 +207,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         mRepoName = data.getString(Constants.Repository.NAME);
         mSortMode = SORT_MODE_CREATED;
         mSortAscending = false;
+        updateSortDrawerItemState(ITEM_SORT_CREATED_DESC);
 
         if (TextUtils.equals(data.getString(Constants.Issue.STATE), Constants.Issue.STATE_CLOSED)) {
             getPager().setCurrentItem(1);
@@ -215,84 +262,27 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
         return false;
     }
 
+
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.issues_menu, menu);
-        if (!mIsCollaborator) {
-            menu.removeItem(R.id.view_labels);
-            menu.removeItem(R.id.view_milestones);
-        }
-
-        int selectedSortItemId;
-        if (TextUtils.equals(mSortMode, SORT_MODE_CREATED)) {
-            selectedSortItemId = mSortAscending ? R.id.sort_created_asc : R.id.sort_created_desc;
-        } else if (TextUtils.equals(mSortMode, SORT_MODE_UPDATED)) {
-            selectedSortItemId = mSortAscending ? R.id.sort_updated_asc : R.id.sort_updated_desc;
-        } else { /* SORT_MODE_COMMENTS */
-            selectedSortItemId = mSortAscending ? R.id.sort_comments_asc : R.id.sort_comments_desc;
-        }
-        menu.findItem(selectedSortItemId).setChecked(true);
-
-        return super.onCreateOptionsMenu(menu);
+    protected boolean isRightSideDrawer() {
+        return true;
     }
 
     @Override
-    protected Intent navigateUp() {
-        return IntentUtils.getRepoActivityIntent(this, mRepoOwner, mRepoName, null);
+    protected ListAdapter getNavigationDrawerAdapter() {
+        mDrawerItems = new ArrayList<DrawerAdapter.Item>(DRAWER_ITEMS);
+        if (mIsCollaborator != null && mIsCollaborator) {
+            mDrawerItems.addAll(COLLAB_DRAWER_ITEMS);
+        }
+        mDrawerAdapter = new DrawerAdapter(this, mDrawerItems);
+        return mDrawerAdapter;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+    protected boolean onDrawerItemSelected(int position) {
+        int id = mDrawerItems.get(position).getId();
         switch (id) {
-            case R.id.sort_created_asc:
-                updateSortModeAndReload(item, SORT_MODE_CREATED, true);
-                return true;
-            case R.id.sort_created_desc:
-                updateSortModeAndReload(item, SORT_MODE_CREATED, false);
-                return true;
-            case R.id.sort_updated_asc:
-                updateSortModeAndReload(item, SORT_MODE_UPDATED, true);
-                return true;
-            case R.id.sort_updated_desc:
-                updateSortModeAndReload(item, SORT_MODE_UPDATED, false);
-                return true;
-            case R.id.sort_comments_asc:
-                updateSortModeAndReload(item, SORT_MODE_COMMENTS, true);
-                return true;
-            case R.id.sort_comments_desc:
-                updateSortModeAndReload(item, SORT_MODE_COMMENTS, false);
-                return true;
-            case R.id.view_labels:
-                Intent intent = new Intent(this, IssueLabelListActivity.class);
-                intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-                intent.putExtra(Constants.Repository.NAME, mRepoName);
-                startActivity(intent);
-                return true;
-            case R.id.view_milestones:
-                intent = new Intent(this, IssueMilestoneListActivity.class);
-                intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-                intent.putExtra(Constants.Repository.NAME, mRepoName);
-                startActivity(intent);
-                return true;
-            case R.id.labels:
-                if (mLabels == null) {
-                    mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-                    getSupportLoaderManager().initLoader(0, null, mLabelCallback);
-                } else {
-                    showLabelsDialog();
-                }
-                return true;
-            case R.id.milestones:
-                if (mMilestones == null) {
-                    mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-                    getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
-                } else {
-                    showMilestonesDialog();
-                }
-                return true;
-            case R.id.assignees:
+            case ITEM_FILTER_ASSIGNEE:
                 if (mAssignees == null) {
                     mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
                     getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
@@ -300,12 +290,93 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
                     showAssigneesDialog();
                 }
                 return true;
+            case ITEM_FILTER_LABEL:
+                if (mLabels == null) {
+                    mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+                    getSupportLoaderManager().initLoader(0, null, mLabelCallback);
+                } else {
+                    showLabelsDialog();
+                }
+                return true;
+            case ITEM_FILTER_MILESTONE:
+                if (mMilestones == null) {
+                    mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+                    getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
+                } else {
+                    showMilestonesDialog();
+                }
+                return true;
+            case ITEM_MANAGE_LABELS:
+                Intent intent = new Intent(this, IssueLabelListActivity.class);
+                intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+                intent.putExtra(Constants.Repository.NAME, mRepoName);
+                startActivity(intent);
+                return true;
+            case ITEM_MANAGE_MILESTONES:
+                intent = new Intent(this, IssueMilestoneListActivity.class);
+                intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+                intent.putExtra(Constants.Repository.NAME, mRepoName);
+                startActivity(intent);
+                return true;
+            case ITEM_SORT_CREATED_ASC:
+                updateSortModeAndReload(SORT_MODE_CREATED, true, id);
+                return true;
+            case ITEM_SORT_CREATED_DESC:
+                updateSortModeAndReload(SORT_MODE_CREATED, false, id);
+                return true;
+            case ITEM_SORT_UPDATED_ASC:
+                updateSortModeAndReload(SORT_MODE_UPDATED, true, id);
+                return true;
+            case ITEM_SORT_UPDATED_DESC:
+                updateSortModeAndReload(SORT_MODE_UPDATED, false, id);
+                return true;
+            case ITEM_SORT_COMMENTS_ASC:
+                updateSortModeAndReload(SORT_MODE_COMMENTS, true, id);
+                return true;
+            case ITEM_SORT_COMMENTS_DESC:
+                updateSortModeAndReload(SORT_MODE_COMMENTS, false, id);
+                return true;
+        }
+        return super.onDrawerItemSelected(position);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuItem item = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.actions)
+                .setIcon(R.drawable.abc_ic_menu_moreoverflow_mtrl_alpha);
+        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == Menu.FIRST) {
+            if (mDrawerLayout.isDrawerOpen(Gravity.RIGHT)) {
+                mDrawerLayout.closeDrawer(Gravity.RIGHT);
+            } else {
+                mDrawerLayout.openDrawer(Gravity.RIGHT);
+            }
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void updateSortModeAndReload(MenuItem item, String sortMode, boolean ascending) {
-        item.setChecked(true);
+    @Override
+    protected Intent navigateUp() {
+        return IntentUtils.getRepoActivityIntent(this, mRepoOwner, mRepoName, null);
+    }
+
+    private void updateSortDrawerItemState(int activeItemId) {
+        for (DrawerAdapter.Item item : mDrawerItems) {
+            if (item.getId() >= ITEM_SORT_FIRST) {
+                ((DrawerAdapter.RadioItem) item).setChecked(item.getId() == activeItemId);
+            }
+        }
+        mDrawerAdapter.notifyDataSetChanged();
+    }
+
+    private void updateSortModeAndReload(String sortMode, boolean ascending, int itemId) {
+        updateSortDrawerItemState(itemId);
         mSortAscending = ascending;
         mSortMode = sortMode;
         reloadIssueList();

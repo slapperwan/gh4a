@@ -38,8 +38,6 @@ import com.gh4a.utils.ToastUtils;
  * The Base activity.
  */
 public abstract class BaseFragmentActivity extends ActionBarActivity {
-    private static final int REQUEST_SETTINGS = 10000;
-
     private boolean mHasErrorView = false;
 
     @Override
@@ -67,8 +65,7 @@ public abstract class BaseFragmentActivity extends ActionBarActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
-        switch (item.getItemId()) {
-        case android.R.id.home: {
+        if (item.getItemId() == android.R.id.home) {
             Intent intent = navigateUp();
             if (intent != null) {
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -78,33 +75,7 @@ public abstract class BaseFragmentActivity extends ActionBarActivity {
             }
             return true;
         }
-        case R.id.settings:
-            startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
-            return true;
-        case R.id.explore:
-            startActivity(new Intent(this, ExploreActivity.class));
-            return true;
-        case R.id.search:
-            startActivity(new Intent(this, SearchActivity.class));
-            return true;
-        case R.id.bookmarks:
-            startActivity(new Intent(this, BookmarkListActivity.class));
-            return true;
-        }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_SETTINGS) {
-            if (data.getBooleanExtra(SettingsActivity.RESULT_EXTRA_THEME_CHANGED, false)
-                    || data.getBooleanExtra(SettingsActivity.RESULT_EXTRA_AUTH_CHANGED, false)) {
-                goToToplevelActivity(false);
-                finish();
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
     }
 
     protected Intent navigateUp() {
@@ -140,7 +111,7 @@ public abstract class BaseFragmentActivity extends ActionBarActivity {
         });
     }
 
-    private void goToToplevelActivity(boolean newTask) {
+    protected void goToToplevelActivity(boolean newTask) {
         Intent intent = getToplevelActivityIntent();
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         if (newTask) {

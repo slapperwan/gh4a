@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TODO: underline -->
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/title"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:gravity="bottom"
+    android:paddingBottom="4dp"
+    android:paddingLeft="16dp"
+    android:textAppearance="?android:attr/textAppearanceSmall"
+    android:textAllCaps="true"
+    android:textStyle="bold" />

@@ -16,6 +16,7 @@
 package com.gh4a.activities;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -39,6 +40,7 @@ import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -47,6 +49,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
+import com.gh4a.adapter.DrawerAdapter;
 import com.gh4a.adapter.IssueEventAdapter;
 import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.IssueCommentListLoader;
@@ -162,8 +165,8 @@ public class IssueActivity extends LoadingFragmentActivity implements
         mHeader = (LinearLayout) getLayoutInflater().inflate(R.layout.issue_header, listView, false);
         mHeader.setClickable(false);
 
-        UiUtils.assignTypeface(mHeader, Gh4Application.get(this).boldCondensed, new int[] {
-            R.id.tv_title, R.id.desc_title
+        UiUtils.assignTypeface(mHeader, Gh4Application.get(this).boldCondensed, new int[]{
+                R.id.tv_title, R.id.desc_title
         });
 
         int cardMargin = getResources().getDimensionPixelSize(R.dimen.card_margin);
@@ -285,6 +288,8 @@ public class IssueActivity extends LoadingFragmentActivity implements
 
         View infoBox = mHeader.findViewById(R.id.info_box);
         infoBox.setVisibility(showInfoBox ? View.VISIBLE : View.GONE);
+
+        refreshDone();
     }
 
     @Override
@@ -351,14 +356,23 @@ public class IssueActivity extends LoadingFragmentActivity implements
                 shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
                 return true;
-            case R.id.refresh:
-                setContentShown(false);
-                getSupportLoaderManager().restartLoader(0, null, mIssueCallback);
-                getSupportLoaderManager().restartLoader(1, null, mCollaboratorCallback);
-                getSupportLoaderManager().restartLoader(2, null, mEventCallback);
-                break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected boolean canSwipeToRefresh() {
+        return true;
+    }
+
+    @Override
+    public void onRefresh() {
+        mIssue = null;
+        mEventsLoaded = false;
+        setContentShown(false);
+        getSupportLoaderManager().restartLoader(0, null, mIssueCallback);
+        getSupportLoaderManager().restartLoader(1, null, mCollaboratorCallback);
+        getSupportLoaderManager().restartLoader(2, null, mEventCallback);
     }
 
     private boolean checkForAuthOrExit() {

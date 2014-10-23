@@ -17,52 +17,50 @@ package com.gh4a.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBar;
 
+import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.BlogListFragment;
 
-public class BlogListActivity extends BaseFragmentActivity {
+public class BlogListActivity extends LoadingFragmentActivity {
+    private BlogListFragment mFragment;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.frame_layout);
+
+        FragmentManager fm = getSupportFragmentManager();
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().add(android.R.id.content,
-                    new BlogListFragment()).commit();
+            mFragment = BlogListFragment.newInstance();
+            fm.beginTransaction()
+                    .add(R.id.details, mFragment)
+                    .commit();
+        } else {
+            mFragment = (BlogListFragment) fm.findFragmentById(R.id.details);
         }
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(R.string.blog);
+        actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.explore_menu, menu);
-        menu.removeItem(R.id.refresh);
-        menu.removeItem(R.id.blog);
-        return super.onCreateOptionsMenu(menu);
+    protected boolean canSwipeToRefresh() {
+        return true;
+    }
+
+    @Override
+    public void onRefresh() {
+        mFragment.refresh();
+        refreshDone();
     }
 
     @Override
     protected Intent navigateUp() {
         return getToplevelActivityIntent();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.pub_timeline:
-                Intent intent = new Intent(this, TimelineActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                return true;
-            case R.id.trend:
-                intent = new Intent(this, TrendingActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 }
