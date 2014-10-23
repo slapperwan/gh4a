@@ -46,19 +46,19 @@ public class IssueAdapter extends RootAdapter<Issue> implements View.OnClickList
     protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_issue, parent, false);
         ViewHolder viewHolder = new ViewHolder();
-
         Gh4Application app = (Gh4Application) mContext.getApplicationContext();
-        Typeface boldCondensed = app.boldCondensed;
-        Typeface regular = app.regular;
 
         viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
         viewHolder.ivGravatar.setOnClickListener(this);
 
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvDesc.setTypeface(boldCondensed);
+        viewHolder.tvDesc.setTypeface(app.boldCondensed);
 
-        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-        viewHolder.tvExtra.setTypeface(regular);
+        viewHolder.tvCreator = (TextView) v.findViewById(R.id.tv_creator);
+        viewHolder.tvCreator.setTypeface(app.regular);
+
+        viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
+        viewHolder.tvTimestamp.setTypeface(app.regular);
 
         viewHolder.llLabels = (LinearLayout) v.findViewById(R.id.ll_labels);
         viewHolder.tvNumber = (TextView) v.findViewById(R.id.tv_number);
@@ -82,8 +82,9 @@ public class IssueAdapter extends RootAdapter<Issue> implements View.OnClickList
         makeLabelBadges(viewHolder.llLabels, issue.getLabels());
 
         viewHolder.tvDesc.setText(issue.getTitle());
-        viewHolder.tvExtra.setText(StringUtils.createUserWithDateText(mContext,
-                issue.getUser(), issue.getCreatedAt()));
+        viewHolder.tvCreator.setText(issue.getUser().getLogin());
+        viewHolder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
+                issue.getCreatedAt(), true));
 
         if (issue.getAssignee() != null) {
             viewHolder.ivAssignee.setVisibility(View.VISIBLE);
@@ -158,7 +159,8 @@ public class IssueAdapter extends RootAdapter<Issue> implements View.OnClickList
     private static class ViewHolder {
         public ImageView ivGravatar;
         public TextView tvDesc;
-        public TextView tvExtra;
+        public TextView tvCreator;
+        public TextView tvTimestamp;
         public LinearLayout llLabels;
         public TextView tvNumber;
         public ImageView ivAssignee;

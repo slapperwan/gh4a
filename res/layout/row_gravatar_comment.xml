@@ -9,40 +9,60 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     style="?attr/cardViewTheme">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingLeft="@dimen/content_padding"
-        android:paddingRight="@dimen/content_padding"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp" >
-        <com.gh4a.widget.FixedSizeImageView
-            android:id="@+id/iv_gravatar"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginRight="5dp" />
-        <ImageView
-            android:id="@+id/iv_edit"
-            android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:src="?attr/contentEditIcon"
-            style="@style/SelectableItem" />
-        <TextView
-            android:id="@+id/tv_extra"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:layout_toRightOf="@id/iv_gravatar"
-            android:layout_toLeftOf="@id/iv_edit"
-            android:layout_alignWithParentIfMissing="true" />
+            android:paddingLeft="@dimen/content_padding"
+            android:paddingRight="@dimen/content_padding"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp" >
+            <com.gh4a.widget.FixedSizeImageView
+                android:id="@+id/iv_gravatar"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginRight="10dp"
+                android:layout_centerVertical="true" />
+            <ImageView
+                android:id="@+id/iv_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:src="?attr/contentEditIcon"
+                style="@style/SelectableItem" />
+            <TextView
+                android:id="@+id/tv_extra"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_toRightOf="@id/iv_gravatar"
+                android:layout_toLeftOf="@id/iv_edit"
+                android:layout_alignWithParentIfMissing="true" />
+            <TextView
+                android:id="@+id/tv_timestamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/default_text_micro"
+                android:layout_toRightOf="@id/iv_gravatar"
+                android:layout_toLeftOf="@id/iv_edit"
+                android:layout_below="@id/tv_extra"
+                android:layout_alignWithParentIfMissing="true" />
+        </RelativeLayout>
+
         <TextView
             android:id="@+id/tv_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="8dp"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:layout_below="@id/iv_gravatar"/>
-    </RelativeLayout>
+
+    </LinearLayout>
 
 </android.support.v7.widget.CardView>

@@ -85,6 +85,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
         viewHolder.tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+        viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
         viewHolder.ivEdit = (ImageView) v.findViewById(R.id.iv_edit);
 
         v.setTag(viewHolder);
@@ -107,9 +108,10 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
             viewHolder.tvExtra.setText(StringUtils.applyBoldTags(extra, null));
         } else {
             viewHolder.tvDesc.setText(formatEvent(event.event));
-            viewHolder.tvExtra.setText(StringUtils.formatRelativeTime(mContext,
-                    event.event.getCreatedAt(), true));
         }
+
+        viewHolder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
+                event.getCreatedAt(), true));
 
         if (viewHolder.ivEdit != null) {
             if ((login.equals(ourLogin) || mRepoOwner.equals(ourLogin)) && mEditCallback != null) {
@@ -124,15 +126,12 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
 
     private String formatCommentExtra(Comment comment) {
         String login = comment.getUser().getLogin();
-        CharSequence timestamp = StringUtils.formatRelativeTime(mContext,
-                comment.getCreatedAt(), true);
-
         if (comment instanceof CommitComment) {
             CommitComment commitComment = (CommitComment) comment;
             return mContext.getString(R.string.issue_commit_comment_header, login,
-                    timestamp, FileUtils.getFileName(commitComment.getPath()));
+                    FileUtils.getFileName(commitComment.getPath()));
         } else {
-            return mContext.getString(R.string.issue_comment_header, login, timestamp);
+            return mContext.getString(R.string.issue_comment_header, login);
         }
     }
 
@@ -223,6 +222,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
         public ImageView ivGravatar;
         public TextView tvDesc;
         public TextView tvExtra;
+        public TextView tvTimestamp;
         public ImageView ivEdit;
     }
 }

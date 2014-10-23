@@ -50,7 +50,8 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
         viewHolder.tvDesc.setTypeface(app.boldCondensed);
 
-        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+        viewHolder.tvCreator = (TextView) v.findViewById(R.id.tv_creator);
+        viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
         viewHolder.tvNumber = (TextView) v.findViewById(R.id.tv_number);
         viewHolder.llLabels = (LinearLayout) v.findViewById(R.id.ll_labels);
         viewHolder.ivAssignee = (ImageView) v.findViewById(R.id.iv_assignee);
@@ -77,8 +78,9 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
                 ? issue.getUser().getLogin() : mContext.getString(R.string.deleted);
 
         viewHolder.tvDesc.setText(issue.getTitle());
-        viewHolder.tvExtra.setText(userName + "\n"
-                + StringUtils.formatRelativeTime(mContext, issue.getCreatedAt(), true));
+        viewHolder.tvCreator.setText(userName);
+        viewHolder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
+                issue.getCreatedAt(), true));
 
         if (issue.getComments() > 0) {
             viewHolder.tvComments.setVisibility(View.VISIBLE);
@@ -124,7 +126,8 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
     private static class ViewHolder {
         public ImageView ivGravatar;
         public TextView tvDesc;
-        public TextView tvExtra;
+        public TextView tvCreator;
+        public TextView tvTimestamp;
         public TextView tvNumber;
         public LinearLayout llLabels;
         public ImageView ivAssignee;
