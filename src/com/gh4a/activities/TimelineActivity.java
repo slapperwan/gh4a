@@ -44,6 +44,8 @@ public class TimelineActivity extends LoadingFragmentActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.pub_timeline);
         actionBar.setDisplayHomeAsUpEnabled(true);
+
+        mSwipeLayout.setChildScrollDelegate(mFragment);
     }
 
     @Override

@@ -46,6 +46,8 @@ public class BlogListActivity extends LoadingFragmentActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.blog);
         actionBar.setDisplayHomeAsUpEnabled(true);
+
+        mSwipeLayout.setChildScrollDelegate(mFragment);
     }
 
     @Override
