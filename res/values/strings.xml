@@ -211,15 +211,15 @@
     <string name="repo_issue_on">on %1$s</string>
 
     <!-- Issue events -->
-    <string name="issue_event_closed">Closed by [b]%1$s[/b]</string>
-    <string name="issue_event_closed_with_commit">Closed by [b]%1$s[/b] with commit [commit]</string>
-    <string name="issue_event_reopened">Reopened by [b]%1$s[/b]</string>
-    <string name="issue_event_merged">Merged by [b]%1$s[/b]</string>
-    <string name="issue_event_referenced">Referenced by [b]%1$s[/b]</string>
-    <string name="issue_event_referenced_with_commit">Referenced by [b]%1$s[/b] from commit [commit]</string>
-    <string name="issue_event_assigned">[b]%1$s[/b] assigned this to [b]%2$s[/b]</string>
-    <string name="issue_event_assigned_self">Self-assigned by [b]%1$s[/b]</string>
-    <string name="issue_event_unassigned">Unassigned by [b]%1$s[/b]</string>
+    <string name="issue_event_closed">Issue was closed by %1$s</string>
+    <string name="issue_event_closed_with_commit">Issue was closed by %1$s with commit [commit]</string>
+    <string name="issue_event_reopened">Issue was reopened by %1$s</string>
+    <string name="issue_event_merged">Pull request was merged by %1$s</string>
+    <string name="issue_event_referenced">Issue was referenced by %1$s</string>
+    <string name="issue_event_referenced_with_commit">Issue was referenced by %1$s from commit [commit]</string>
+    <string name="issue_event_assigned">Issue was assigned to [b]%2$s[/b] by %1$s</string>
+    <string name="issue_event_assigned_self">Issue was self-assigned by %1$s</string>
+    <string name="issue_event_unassigned">Issue was unassigned from [b]%2$s[/b] by %1$s</string>
 
     <!-- Commit -->
     <string name="commit_title">Commit %1$s</string>
@@ -258,8 +258,6 @@
     <string name="issue_edit">Edit Issue</string>
     <string name="issue_edit_title">Edit Issue #%1$d</string>
     <string name="issue_success_edit">Successfully edited issue</string>
-    <string name="issue_reopen">Reopen Issue</string>
-    <string name="issue_close">Close Issue</string>
     <string name="issue_success_close">Successfully closed issue</string>
     <string name="issue_error_close">Cannot close issue</string>
     <string name="issue_success_reopen">Successfully reopened issue</string>
@@ -304,7 +302,7 @@
     <string name="issue_comment_update_title">Update</string>
     <string name="issue_comment_hint">Comment on this issue</string>
     <string name="issue_comment_header">[b]%1$s[/b]</string>
-    <string name="issue_commit_comment_header">[b]%1$s[/b] on [b]%2$s[/b]</string>
+    <string name="issue_commit_comment_file">Comment on [b]%1$s[/b]</string>
     <string name="commit_comment_header">%1$s added a note %2$s</string>
 
     <!-- Pull Request -->

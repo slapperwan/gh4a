@@ -17,7 +17,10 @@
     <attr name="textAppearanceWhiteSmall" format="reference" />
     <attr name="textAppearanceMicro" format="reference" />
     <attr name="cardViewTheme" format="reference" />
-    <attr name="headerUnderline" format="reference" />
+    <attr name="listBackground" format="reference" />
+    <attr name="colorIssueOpen" format="color" />
+    <attr name="colorIssueClosed" format="color" />
+    <attr name="colorIssueEditFab" format="reference" />
 
     <attr name="sendIcon" format="reference" />
     <attr name="contentEditIcon" format="reference" />

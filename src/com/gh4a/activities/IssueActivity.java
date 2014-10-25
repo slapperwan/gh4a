@@ -16,7 +16,6 @@
 package com.gh4a.activities;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -42,7 +41,6 @@ import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -51,7 +49,6 @@ import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
-import com.gh4a.adapter.DrawerAdapter;
 import com.gh4a.adapter.IssueEventAdapter;
 import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.IssueCommentListLoader;
@@ -88,9 +85,9 @@ public class IssueActivity extends LoadingFragmentActivity implements
             new ViewTreeObserver.OnGlobalLayoutListener() {
         @Override
         public void onGlobalLayout() {
-            View headerCard = mHeader.findViewById(R.id.header_card);
+            View header = mHeader.findViewById(R.id.header);
             ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) mEditFab.getLayoutParams();
-            lp.topMargin = headerCard.getBottom() - mEditFab.getHeight() / 2;
+            lp.topMargin = header.getBottom() - mEditFab.getHeight() / 2;
             mEditFab.getViewTreeObserver().removeGlobalOnLayoutListener(this);
             mEditFab.setLayoutParams(lp);
         }
@@ -186,15 +183,11 @@ public class IssueActivity extends LoadingFragmentActivity implements
         mHeader = (ViewGroup) getLayoutInflater().inflate(R.layout.issue_header, mListView, false);
         mHeader.setClickable(false);
 
-        UiUtils.assignTypeface(mHeader, Gh4Application.get(this).boldCondensed, new int[]{
-                R.id.tv_title, R.id.desc_title
+        UiUtils.assignTypeface(mHeader, Gh4Application.get(this).condensed, new int[] {
+            R.id.tv_title
         });
 
-        int cardMargin = getResources().getDimensionPixelSize(R.dimen.card_margin);
         mListView.addHeaderView(mHeader, null, false);
-        mListView.setDivider(null);
-        mListView.setDividerHeight(0);
-        mListView.setPadding(cardMargin, 0, cardMargin, 0);
 
         mEventAdapter = new IssueEventAdapter(this, mRepoOwner, mRepoName, this);
         mListView.setAdapter(mEventAdapter);
@@ -234,18 +227,21 @@ public class IssueActivity extends LoadingFragmentActivity implements
         AvatarHandler.assignAvatar(ivGravatar, mIssue.getUser());
         ivGravatar.setOnClickListener(this);
 
-        TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
-        tvExtra.setText(StringUtils.createUserWithDateText(this,
-                mIssue.getUser(), mIssue.getCreatedAt()));
-
         TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
-        if (Constants.Issue.STATE_CLOSED.equals(mIssue.getState())) {
-            tvState.setBackgroundResource(R.drawable.default_red_box);
-            tvState.setText(getString(R.string.closed).toUpperCase(Locale.getDefault()));
-        } else {
-            tvState.setBackgroundResource(R.drawable.default_green_box);
-            tvState.setText(getString(R.string.open).toUpperCase(Locale.getDefault()));
-        }
+        boolean closed = Constants.Issue.STATE_CLOSED.equals(mIssue.getState());
+        int stateTextResId = closed ? R.string.closed : R.string.open;
+        int stateColorAttributeId = closed ? R.attr.colorIssueClosed : R.attr.colorIssueOpen;
+
+        tvState.setText(getString(stateTextResId).toUpperCase(Locale.getDefault()));
+        mHeader.findViewById(R.id.header).setBackgroundColor(
+                UiUtils.resolveColor(this, stateColorAttributeId));
+        mEditFab.setSelected(closed);
+
+        TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
+        tvExtra.setText(mIssue.getUser().getLogin());
+
+        TextView tvTimestamp = (TextView) mHeader.findViewById(R.id.tv_timestamp);
+        tvTimestamp.setText(StringUtils.formatRelativeTime(this, mIssue.getCreatedAt(), true));
 
         TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
         tvTitle.setText(mIssue.getTitle());
@@ -261,26 +257,26 @@ public class IssueActivity extends LoadingFragmentActivity implements
 
         findViewById(R.id.iv_comment).setOnClickListener(this);
 
-        boolean showInfoBox = false;
         TextView tvMilestone = (TextView) mHeader.findViewById(R.id.tv_milestone);
         if (mIssue.getMilestone() != null) {
-            showInfoBox = true;
             tvMilestone.setText(getString(R.string.issue_milestone, mIssue.getMilestone().getTitle()));
         } else {
             tvMilestone.setVisibility(View.GONE);
         }
 
+        TextView tvAssignee = (TextView) mHeader.findViewById(R.id.tv_assignee);
+        ImageView ivAssignee = (ImageView) mHeader.findViewById(R.id.iv_assignee);
         if (mIssue.getAssignee() != null) {
-            showInfoBox = true;
-            TextView tvAssignee = (TextView) mHeader.findViewById(R.id.tv_assignee);
             tvAssignee.setText(getString(R.string.issue_assignee, mIssue.getAssignee().getLogin()));
             tvAssignee.setVisibility(View.VISIBLE);
             tvAssignee.setOnClickListener(this);
 
-            ImageView ivAssignee = (ImageView) mHeader.findViewById(R.id.iv_assignee);
             AvatarHandler.assignAvatar(ivAssignee, mIssue.getAssignee());
             ivAssignee.setVisibility(View.VISIBLE);
             ivAssignee.setOnClickListener(this);
+        } else {
+            tvAssignee.setVisibility(View.GONE);
+            ivAssignee.setVisibility(View.GONE);
         }
 
 
@@ -288,7 +284,6 @@ public class IssueActivity extends LoadingFragmentActivity implements
         List<Label> labels = mIssue.getLabels();
 
         if (labels != null && !labels.isEmpty()) {
-            showInfoBox = true;
             llLabels.removeAllViews();
             llLabels.setVisibility(View.VISIBLE);
 
@@ -311,15 +306,11 @@ public class IssueActivity extends LoadingFragmentActivity implements
 
         TextView tvPull = (TextView) mHeader.findViewById(R.id.tv_pull);
         if (mIssue.getPullRequest() != null && mIssue.getPullRequest().getDiffUrl() != null) {
-            showInfoBox = true;
             tvPull.setVisibility(View.VISIBLE);
             tvPull.setOnClickListener(this);
         } else {
             tvPull.setVisibility(View.GONE);
         }
-
-        View infoBox = mHeader.findViewById(R.id.info_box);
-        infoBox.setVisibility(showInfoBox ? View.VISIBLE : View.GONE);
 
         refreshDone();
     }
@@ -493,9 +484,6 @@ public class IssueActivity extends LoadingFragmentActivity implements
             ToastUtils.showMessage(mContext,
                     mOpen ? R.string.issue_success_reopen : R.string.issue_success_close);
 
-            TextView tvState = (TextView) findViewById(R.id.tv_state);
-            tvState.setBackgroundResource(mOpen ? R.drawable.default_green_box : R.drawable.default_red_box);
-            tvState.setText(getString(mOpen ? R.string.open : R.string.closed).toUpperCase(Locale.getDefault()));
             // reload issue state
             fillDataIfDone();
             // reload events, the action will have triggered an additional one

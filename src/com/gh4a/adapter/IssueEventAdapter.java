@@ -63,20 +63,8 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
     }
 
     @Override
-    public int getViewTypeCount() {
-        return 2;
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        IssueEventHolder holder = getItem(position);
-        return holder.comment != null ? 0 : 1;
-    }
-
-    @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
-        int layoutResId = viewType == 1 ? R.layout.row_issue_event : R.layout.row_gravatar_comment;
-        View v = inflater.inflate(layoutResId, parent, false);
+        View v = inflater.inflate(R.layout.row_gravatar_comment, parent, false);
         ViewHolder viewHolder = new ViewHolder();
 
         viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
@@ -85,6 +73,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
         viewHolder.tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+        viewHolder.tvFile = (TextView) v.findViewById(R.id.tv_file);
         viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
         viewHolder.ivEdit = (ImageView) v.findViewById(R.id.iv_edit);
 
@@ -101,37 +90,36 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
         AvatarHandler.assignAvatar(viewHolder.ivGravatar, event.getUser());
         viewHolder.ivGravatar.setTag(event);
 
+        viewHolder.tvExtra.setText(StringUtils.applyBoldTags(
+                mContext.getString(R.string.issue_comment_header, login), null));
+        viewHolder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
+                event.getCreatedAt(), true));
+
+        if (event.comment instanceof CommitComment) {
+            CommitComment commitComment = (CommitComment) event.comment;
+            String text = mContext.getString(R.string.issue_commit_comment_file,
+                    FileUtils.getFileName(commitComment.getPath()));
+
+            viewHolder.tvFile.setVisibility(View.VISIBLE);
+            viewHolder.tvFile.setText(StringUtils.applyBoldTags(text, null));
+        } else {
+            viewHolder.tvFile.setVisibility(View.GONE);
+        }
+
         if (event.comment != null) {
             mImageGetter.bind(viewHolder.tvDesc, event.comment.getBodyHtml(),
                     event.comment.getId());
-            String extra = formatCommentExtra(event.comment);
-            viewHolder.tvExtra.setText(StringUtils.applyBoldTags(extra, null));
         } else {
             viewHolder.tvDesc.setText(formatEvent(event.event));
         }
 
-        viewHolder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
-                event.getCreatedAt(), true));
-
-        if (viewHolder.ivEdit != null) {
-            if ((login.equals(ourLogin) || mRepoOwner.equals(ourLogin)) && mEditCallback != null) {
-                viewHolder.ivEdit.setVisibility(View.VISIBLE);
-                viewHolder.ivEdit.setTag(event.comment);
-                viewHolder.ivEdit.setOnClickListener(this);
-            } else {
-                viewHolder.ivEdit.setVisibility(View.GONE);
-            }
-        }
-    }
-
-    private String formatCommentExtra(Comment comment) {
-        String login = comment.getUser().getLogin();
-        if (comment instanceof CommitComment) {
-            CommitComment commitComment = (CommitComment) comment;
-            return mContext.getString(R.string.issue_commit_comment_header, login,
-                    FileUtils.getFileName(commitComment.getPath()));
+        boolean canEdit = login.equals(ourLogin) || mRepoOwner.equals(ourLogin);
+        if (event.comment != null && canEdit && mEditCallback != null) {
+            viewHolder.ivEdit.setVisibility(View.VISIBLE);
+            viewHolder.ivEdit.setTag(event.comment);
+            viewHolder.ivEdit.setOnClickListener(this);
         } else {
-            return mContext.getString(R.string.issue_comment_header, login);
+            viewHolder.ivEdit.setVisibility(View.GONE);
         }
     }
 
@@ -158,7 +146,8 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
                         event.getActor().getLogin(), event.getAssignee().getLogin());
             }
         } else if (TextUtils.equals(type, "unassigned")) {
-            textResId = R.string.issue_event_unassigned;
+            textBase = mContext.getString(R.string.issue_event_unassigned,
+                    event.getActor().getLogin(), event.getAssignee().getLogin());
         } else {
             return null;
         }
@@ -200,11 +189,6 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
     }
 
     @Override
-    public boolean isCardStyle() {
-        return true;
-    }
-
-    @Override
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             IssueEventHolder event = (IssueEventHolder) v.getTag();
@@ -222,6 +206,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
         public ImageView ivGravatar;
         public TextView tvDesc;
         public TextView tvExtra;
+        public TextView tvFile;
         public TextView tvTimestamp;
         public ImageView ivEdit;
     }

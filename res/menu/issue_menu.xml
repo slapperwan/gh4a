@@ -2,11 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/issue_reopen"
-        android:title="@string/issue_reopen"
+        android:title="@string/pull_request_reopen"
         app:showAsAction="ifRoom|withText" />
 
     <item android:id="@+id/issue_close"
-        android:title="@string/issue_close"
+        android:title="@string/pull_request_close"
         app:showAsAction="ifRoom|withText" />
 
     <item android:id="@+id/share"

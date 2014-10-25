@@ -11,11 +11,15 @@
         <item name="fileIcon">@drawable/file_dark</item>
         <item name="commentsIcon">@drawable/comments_dark</item>
         <item name="cardViewTheme">@style/Base.CardView.Dark</item>
-        <item name="colorAccent">#43782e</item>
+        <item name="colorAccent">#396426</item>
         <item name="colorPrimary">#396426</item>
         <item name="colorPrimaryDark">#2d501e</item>
         <item name="android:textColorLink">#559639</item>
         <item name="actionBarTabStyle">@style/Widget.ActionBar.TabView</item>
+        <item name="listBackground">@android:color/transparent</item>
+        <item name="colorIssueOpen">@color/issue_open_dark</item>
+        <item name="colorIssueClosed">@color/issue_closed_dark</item>
+        <item name="colorIssueEditFab">@color/issue_edit_fab_dark</item>
     </style>
 
     <style name="LightTheme" parent="Theme.AppCompat.Light.DarkActionBar">
@@ -35,6 +39,10 @@
         <item name="colorPrimaryDark">#5aa03d</item>
         <item name="android:textColorLink">#5aa03d</item>
         <item name="actionBarTabStyle">@style/Widget.ActionBar.TabView</item>
+        <item name="listBackground">@android:color/white</item>
+        <item name="colorIssueOpen">@color/issue_open_light</item>
+        <item name="colorIssueClosed">@color/issue_closed_light</item>
+        <item name="colorIssueEditFab">@color/issue_edit_fab_light</item>
     </style>
 
     <style name="Base.CardView.Light" parent="CardView.Light">

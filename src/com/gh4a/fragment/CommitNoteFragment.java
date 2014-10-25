@@ -77,6 +77,8 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
     @Override
     protected RootAdapter<CommitComment> onCreateAdapter() {
+        getListView().setBackgroundResource(
+                UiUtils.resolveDrawable(getActivity(), R.attr.listBackground));
         return new CommitNoteAdapter(getActivity(), mRepoOwner, this);
     }
 

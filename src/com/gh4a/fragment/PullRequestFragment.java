@@ -166,12 +166,10 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     public void onActivityCreated(Bundle savedInstanceState) {
         mHeader = (ViewGroup) getLayoutInflater(savedInstanceState).inflate(
                 R.layout.issue_header, getListView(), false);
-        mHeader.setClickable(false);
-        mHeader.findViewById(R.id.info_box).setVisibility(View.GONE);
         getListView().addHeaderView(mHeader, null, true);
 
         UiUtils.assignTypeface(mHeader, Gh4Application.get(getActivity()).boldCondensed, new int[] {
-            R.id.tv_title, R.id.desc_title
+            R.id.tv_title
         });
 
         super.onActivityCreated(savedInstanceState);
@@ -256,17 +254,25 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         AvatarHandler.assignAvatar(gravatar, user);
 
         TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
+        int colorAttribute;
+
         if (Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState())) {
-            tvState.setBackgroundResource(R.drawable.default_red_box);
+            colorAttribute = R.attr.colorIssueClosed;
             tvState.setText(getString(R.string.closed).toUpperCase(Locale.getDefault()));
         } else {
-            tvState.setBackgroundResource(R.drawable.default_green_box);
+            colorAttribute = R.attr.colorIssueOpen;
             tvState.setText(getString(R.string.open).toUpperCase(Locale.getDefault()));
         }
 
+        View header = mHeader.findViewById(R.id.header);
+        header.setBackgroundColor(UiUtils.resolveColor(getActivity(), colorAttribute));
+
         TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
-        tvExtra.setText(user.getLogin() + "\n"
-                + StringUtils.formatRelativeTime(getActivity(), mPullRequest.getCreatedAt(), true));
+        tvExtra.setText(user.getLogin());
+
+        TextView tvTimestamp = (TextView) mHeader.findViewById(R.id.tv_timestamp);
+        tvTimestamp.setText(StringUtils.formatRelativeTime(getActivity(),
+                mPullRequest.getCreatedAt(), true));
 
         TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
         tvTitle.setText(mPullRequest.getTitle());
