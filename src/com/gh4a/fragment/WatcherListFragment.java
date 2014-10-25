@@ -54,7 +54,7 @@ public class WatcherListFragment extends PagedDataBaseFragment<User> {
 
     @Override
     protected RootAdapter<User> onCreateAdapter() {
-        return new UserAdapter(getActivity(), false);
+        return new UserAdapter(getActivity());
     }
 
     @Override

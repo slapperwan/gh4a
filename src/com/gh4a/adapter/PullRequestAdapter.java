@@ -20,7 +20,6 @@ import org.eclipse.egit.github.core.User;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,21 +39,18 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> implements View
 
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
-        View v = inflater.inflate(R.layout.row_gravatar_1, parent, false);
+        View v = inflater.inflate(R.layout.row_pull_request, parent, false);
         ViewHolder viewHolder = new ViewHolder();
-
         Gh4Application app = (Gh4Application) mContext.getApplicationContext();
-        Typeface boldCondensed = app.boldCondensed;
-        Typeface regular = app.regular;
 
         viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
         viewHolder.ivGravatar.setOnClickListener(this);
 
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvDesc.setTypeface(boldCondensed);
+        viewHolder.tvDesc.setTypeface(app.condensed);
 
         viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-        viewHolder.tvExtra.setTypeface(regular);
+        viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
 
         v.setTag(viewHolder);
         return v;
@@ -69,9 +65,10 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> implements View
         viewHolder.ivGravatar.setTag(pullRequest.getUser());
 
         viewHolder.tvDesc.setText(pullRequest.getTitle());
-        viewHolder.tvExtra.setText(mContext.getString(R.string.more_issue_data,
-                user != null ? user.getLogin() : "",
-                StringUtils.formatRelativeTime(mContext, pullRequest.getCreatedAt(), true)));
+        viewHolder.tvExtra.setText(
+                user != null ? user.getLogin() : mContext.getString(R.string.unknown));
+        viewHolder.tvTimestamp.setText(
+                StringUtils.formatRelativeTime(mContext, pullRequest.getCreatedAt(), true));
     }
 
     @Override
@@ -89,5 +86,6 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> implements View
         public ImageView ivGravatar;
         public TextView tvDesc;
         public TextView tvExtra;
+        public TextView tvTimestamp;
     }
 }

@@ -31,6 +31,7 @@ import android.widget.TextView;
 import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.PageIteratorLoader;
+import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.client.PageIterator;
 
@@ -51,14 +52,17 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         LayoutInflater vi = getActivity().getLayoutInflater();
         mLoadingView = (TextView) vi.inflate(R.layout.list_loading_view, null);
 
+        ListView listView = getListView();
         mAdapter = onCreateAdapter();
         if (mAdapter.isCardStyle()) {
-            ListView listView = getListView();
             listView.setDivider(null);
             listView.setDividerHeight(0);
 
             int cardMargin = getResources().getDimensionPixelSize(R.dimen.card_margin);
             listView.setPadding(cardMargin, 0, cardMargin, 0);
+        } else {
+            listView.setBackgroundResource(
+                    UiUtils.resolveDrawable(getActivity(), R.attr.listBackground));
         }
 
         getListView().setOnScrollListener(this);

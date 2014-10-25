@@ -42,15 +42,16 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> implements View
     protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_commit, parent, false);
         ViewHolder viewHolder = new ViewHolder();
-        Typeface boldCondensed = Gh4Application.get(mContext).boldCondensed;
+        Gh4Application app = Gh4Application.get(mContext);
 
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvDesc.setTypeface(boldCondensed);
+        viewHolder.tvDesc.setTypeface(app.condensed);
 
         viewHolder.tvSha = (TextView) v.findViewById(R.id.tv_sha);
         viewHolder.tvSha.setTypeface(Typeface.MONOSPACE);
 
         viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+        viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
         viewHolder.tvComments = (TextView) v.findViewById(R.id.tv_comments);
 
         viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
@@ -84,10 +85,9 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> implements View
             viewHolder.tvComments.setVisibility(View.GONE);
         }
 
-        String extra = mContext.getString(R.string.more_commit_data,
-                CommitUtils.getAuthorName(mContext, commit),
+        viewHolder.tvExtra.setText(CommitUtils.getAuthorName(mContext, commit));
+        viewHolder.tvTimestamp.setText(
                 StringUtils.formatRelativeTime(mContext, commit.getCommit().getAuthor().getDate(), false));
-        viewHolder.tvExtra.setText(StringUtils.applyBoldTags(extra, null));
     }
 
     @Override
@@ -102,15 +102,11 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> implements View
         }
     }
 
-    @Override
-    public boolean isCardStyle() {
-        return true;
-    }
-
     private static class ViewHolder {
         public ImageView ivGravatar;
         public TextView tvDesc;
         public TextView tvExtra;
+        public TextView tvTimestamp;
         public TextView tvSha;
         public TextView tvComments;
     }

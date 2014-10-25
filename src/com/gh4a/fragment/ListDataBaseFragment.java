@@ -12,6 +12,7 @@ import android.widget.ListView;
 import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.UiUtils;
 
 public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase implements
         LoaderCallbacks<LoaderResult<List<T>>> {
@@ -22,14 +23,17 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase im
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        ListView listView = getListView();
         mAdapter = onCreateAdapter();
         if (mAdapter.isCardStyle()) {
-            ListView listView = getListView();
             listView.setDivider(null);
             listView.setDividerHeight(0);
 
             int cardMargin = getResources().getDimensionPixelSize(R.dimen.card_margin);
             listView.setPadding(cardMargin, 0, cardMargin, 0);
+        } else {
+            listView.setBackgroundResource(
+                    UiUtils.resolveDrawable(getActivity(), R.attr.listBackground));
         }
 
         int emptyResId = getEmptyTextResId();

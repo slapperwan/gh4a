@@ -3,22 +3,22 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="?attr/listPreferredItemHeight"
+    android:minHeight="?android:attr/listPreferredItemHeight"
     android:padding="@dimen/content_padding">
 
     <com.gh4a.widget.FixedSizeImageView
         android:id="@+id/iv_gravatar"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginTop="8dp"
+        android:layout_centerVertical="true"
         android:layout_marginRight="16dp" />
 
     <TextView
         android:id="@+id/tv_extra"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_toRightOf="@id/iv_gravatar"
+        android:layout_alignParentTop="true"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="?android:attr/textColorPrimary" />
 
@@ -35,20 +35,9 @@
         android:id="@+id/tv_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/iv_gravatar"
-        android:layout_below="@id/tv_extra"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="?android:attr/textColorPrimary"
-        android:textSize="16sp" />
-
-    <TextView
-        android:id="@+id/tv_desc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:layout_toRightOf="@id/iv_gravatar"
-        android:layout_below="@id/tv_title"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:maxLines="2"
-        android:ellipsize="end" />
+        android:layout_below="@id/tv_extra" />
 
 </RelativeLayout>

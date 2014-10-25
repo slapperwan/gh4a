@@ -29,6 +29,7 @@ import com.gh4a.adapter.UserAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.User;
 
@@ -72,11 +73,13 @@ public abstract class UserListActivity extends LoadingFragmentActivity implement
         actionBar.setSubtitle(getSubTitle());
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        mUserAdapter = new UserAdapter(this, getShowExtraData());
+        mUserAdapter = new UserAdapter(this);
 
         ListView listView = (ListView) findViewById(android.R.id.list);
         listView.setOnItemClickListener(this);
         listView.setAdapter(mUserAdapter);
+        listView.setBackgroundResource(
+                UiUtils.resolveDrawable(this, R.attr.listBackground));
 
         getSupportLoaderManager().initLoader(0, null, mUserListCallback);
     }

@@ -38,6 +38,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.ToastUtils;
+import com.gh4a.utils.UiUtils;
 
 public class WikiListActivity extends LoadingFragmentActivity {
     private String mUserLogin;
@@ -93,6 +94,8 @@ public class WikiListActivity extends LoadingFragmentActivity {
                 openViewer(feed);
             }
         });
+        mListView.setBackgroundResource(
+                UiUtils.resolveDrawable(this, R.attr.listBackground));
 
         getSupportLoaderManager().initLoader(0, null, mFeedCallback);
     }

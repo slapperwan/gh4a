@@ -4,8 +4,6 @@
 
     <!-- Common -->
     <string name="record_not_found">%1$s not found</string>
-    <string name="more_commit_data">[b]%1$s[/b] authored %2$s</string>
-    <string name="more_issue_data">%1$s %2$s</string>
     <string name="loading_msg">Loading\u2026</string>
     <string name="saving_msg">Saving\u2026</string>
     <string name="deleting_msg">Deleting\u2026</string>
@@ -60,7 +58,6 @@
     <string name="milestone_extradata_due">%1$d open\u00a0\u00a0\u00a0%2$d closed\u00a0\u00a0\u00a0due on %3$s</string>
     <string name="download_extradata">%1$s\u00a0\u00a0\u00a0%2$d downloads\u00a0\u00a0\u00a0created %3$s</string>
     <string name="release_extradata">%1$s\u00a0\u00a0\u00a0created %2$s</string>
-    <string name="feed_extradata">[b]%1$s[/b]\u00a0\u00a0\u00a0%2$s</string>
     <string name="gist_extradata">[b]%1$s[/b] %2$s\u00a0\u00a0\u00a0%3$s</string>
     <string name="gist_extradata_own">%2$s\u00a0\u00a0\u00a0%3$s</string>
     <string name="go_to">Go to</string>

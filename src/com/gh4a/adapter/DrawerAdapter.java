@@ -1,7 +1,6 @@
 package com.gh4a.adapter;
 
 import android.content.Context;
-import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
