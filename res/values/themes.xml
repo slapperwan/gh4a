@@ -10,6 +10,10 @@
         <item name="dirIcon">@drawable/folder_dark</item>
         <item name="fileIcon">@drawable/file_dark</item>
         <item name="commentsIcon">@drawable/comments_dark</item>
+        <item name="languageSmallIcon">@drawable/language_small_dark</item>
+        <item name="forkSmallIcon">@drawable/fork_small_dark</item>
+        <item name="starSmallIcon">@drawable/star_small_dark</item>
+        <item name="sizeSmallIcon">@drawable/size_small_dark</item>
         <item name="cardViewTheme">@style/Base.CardView.Dark</item>
         <item name="colorAccent">#396426</item>
         <item name="colorPrimary">#396426</item>
@@ -32,6 +36,10 @@
         <item name="dirIcon">@drawable/folder</item>
         <item name="fileIcon">@drawable/file</item>
         <item name="commentsIcon">@drawable/comments</item>
+        <item name="languageSmallIcon">@drawable/language_small</item>
+        <item name="forkSmallIcon">@drawable/fork_small</item>
+        <item name="starSmallIcon">@drawable/star_small</item>
+        <item name="sizeSmallIcon">@drawable/size_small</item>
         <item name="listPopupWindowStyle">@style/Widget.AppCompat.Light.ListPopupWindow</item>
         <item name="cardViewTheme">@style/Base.CardView.Light</item>
         <item name="colorAccent">#65b345</item>

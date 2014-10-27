@@ -1,38 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    Layout
-    ======
-    Title (Large)
-    Description (Medium)
-    Extra (Small)
- -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="?android:attr/listPreferredItemHeight"
-    android:paddingTop="6dp"
-    android:paddingBottom="6dp"
+    android:layout_height="wrap_content"
+    android:minHeight="72dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="12dp"
     android:paddingLeft="@dimen/content_padding"
     android:paddingRight="@dimen/content_padding"
-    style="@style/SelectableItem" >
-    <TextView
-        android:id="@+id/tv_title"
-        android:layout_width="match_parent"
+    android:orientation="horizontal"
+    style="@style/SelectableItem">
+
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="?android:attr/textColorPrimary" />
-    <TextView
-        android:id="@+id/tv_desc"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
         android:layout_weight="1"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:singleLine="true"
-        android:ellipsize="end" />
-    <TextView
-        android:id="@+id/tv_extra"
+        android:layout_gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="?android:attr/textColorPrimary" />
+
+        <TextView
+            android:id="@+id/tv_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:maxLines="2"
+            android:ellipsize="end" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/default_text_micro" />
+        android:layout_marginLeft="8dp"
+        android:layout_gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_forks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="4dp"
+            android:drawableLeft="?attr/forkSmallIcon"
+            android:textAppearance="@style/default_text_micro" />
+        <TextView
+            android:id="@+id/tv_stars"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:drawablePadding="4dp"
+            android:drawableLeft="?attr/starSmallIcon"
+            android:textAppearance="@style/default_text_micro" />
+
+    </LinearLayout>
+
 </LinearLayout>

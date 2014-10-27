@@ -33,4 +33,8 @@
     <attr name="dirIcon" format="reference" />
     <attr name="fileIcon" format="reference" />
     <attr name="commentsIcon" format="reference" />
+    <attr name="languageSmallIcon" format="reference" />
+    <attr name="forkSmallIcon" format="reference" />
+    <attr name="starSmallIcon" format="reference" />
+    <attr name="sizeSmallIcon" format="reference" />
 </resources>

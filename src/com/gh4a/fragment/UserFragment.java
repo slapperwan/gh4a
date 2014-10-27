@@ -303,11 +303,10 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
                 rowView.setTag(repo);
 
                 TextView tvTitle = (TextView) rowView.findViewById(R.id.tv_title);
-                tvTitle.setTypeface(app.boldCondensed);
+                tvTitle.setTypeface(app.condensed);
                 tvTitle.setText(repo.getOwner().getLogin() + "/" + repo.getName());
 
                 TextView tvDesc = (TextView) rowView.findViewById(R.id.tv_desc);
-                tvDesc.setSingleLine(true);
                 if (!StringUtils.isBlank(repo.getDescription())) {
                     tvDesc.setVisibility(View.VISIBLE);
                     tvDesc.setText(repo.getDescription());
@@ -315,12 +314,11 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
                     tvDesc.setVisibility(View.GONE);
                 }
 
-                TextView tvExtra = (TextView) rowView.findViewById(R.id.tv_extra);
-                String language = repo.getLanguage() != null
-                        ? repo.getLanguage() : getString(R.string.unknown);
-                tvExtra.setText(getString(R.string.repo_search_extradata, language,
-                        Formatter.formatFileSize(getActivity(), repo.getSize() * 1000),
-                        repo.getForks(), repo.getWatchers()));
+                TextView tvForks = (TextView) rowView.findViewById(R.id.tv_forks);
+                tvForks.setText(String.valueOf(repo.getForks()));
+
+                TextView tvStars = (TextView) rowView.findViewById(R.id.tv_stars);
+                tvStars.setText(String.valueOf(repo.getWatchers())); // FIXME
 
                 ll.addView(rowView);
             }
