@@ -54,8 +54,8 @@
         android:layout_height="match_parent"
         android:layout_gravity="left"
         android:choiceMode="singleChoice"
-        android:divider="@android:color/transparent"
+        android:divider="@null"
         android:dividerHeight="0dp"
-        android:background="?android:attr/colorBackground" />
+        android:background="?attr/drawerBackground" />
 
 </android.support.v4.widget.DrawerLayout>

@@ -18,6 +18,7 @@
     <attr name="textAppearanceMicro" format="reference" />
     <attr name="cardViewTheme" format="reference" />
     <attr name="listBackground" format="reference" />
+    <attr name="drawerBackground" format="reference" />
     <attr name="colorIssueOpen" format="color" />
     <attr name="colorIssueClosed" format="color" />
     <attr name="colorIssueEditFab" format="reference" />

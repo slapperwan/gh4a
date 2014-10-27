@@ -7,4 +7,5 @@
     android:gravity="center_vertical"
     android:paddingLeft="16dp"
     android:textAppearance="?android:attr/textAppearanceMedium"
-    android:textColor="?android:attr/textColorPrimary" />
+    android:textColor="?android:attr/textColorPrimary"
+    android:textSize="16dp" />
