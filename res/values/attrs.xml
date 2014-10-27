@@ -21,6 +21,8 @@
     <attr name="colorIssueOpen" format="color" />
     <attr name="colorIssueClosed" format="color" />
     <attr name="colorIssueEditFab" format="reference" />
+    <attr name="colorCommitAddition" format="color" />
+    <attr name="colorCommitDeletion" format="color" />
 
     <attr name="sendIcon" format="reference" />
     <attr name="contentEditIcon" format="reference" />

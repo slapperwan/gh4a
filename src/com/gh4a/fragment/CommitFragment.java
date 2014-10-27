@@ -9,7 +9,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -206,6 +208,10 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         int additions = 0, deletions = 0;
         int count = files != null ? files.size() : 0;
         int highlightColor = UiUtils.resolveColor(getActivity(), android.R.attr.textColorPrimary);
+        ForegroundColorSpan addSpan = new ForegroundColorSpan(
+                UiUtils.resolveColor(getActivity(), R.attr.colorCommitAddition));
+        ForegroundColorSpan deleteSpan = new ForegroundColorSpan(
+                UiUtils.resolveColor(getActivity(), R.attr.colorCommitDeletion));
 
         llChanged.removeAllViews();
         llAdded.removeAllViews();
@@ -246,6 +252,20 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
             ViewGroup fileView = (ViewGroup) inflater.inflate(R.layout.commit_filename, parent, false);
             TextView fileNameView = (TextView) fileView.findViewById(R.id.filename);
             fileNameView.setText(file.getFilename());
+
+            TextView statsView = (TextView) fileView.findViewById(R.id.stats);
+            if (file.getPatch() != null) {
+                SpannableStringBuilder stats = new SpannableStringBuilder();
+                stats.append("+" + file.getAdditions());
+                int addLength = stats.length();
+                stats.setSpan(addSpan, 0, addLength, 0);
+                stats.append("\u00a0\u00a0\u00a0-" + file.getDeletions());
+                stats.setSpan(deleteSpan, addLength, stats.length(), 0);
+                statsView.setText(stats);
+                statsView.setVisibility(View.VISIBLE);
+            } else {
+                statsView.setVisibility(View.GONE);
+            }
 
             if (parent != llDeleted &&
                     (file.getPatch() != null || FileUtils.isImage(file.getFilename()))) {
