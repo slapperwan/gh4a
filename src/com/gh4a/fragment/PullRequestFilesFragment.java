@@ -95,8 +95,12 @@ public class PullRequestFilesFragment extends CommitFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mContentView.findViewById(R.id.title).setVisibility(View.GONE);
-        mContentView.findViewById(R.id.committer_info).setVisibility(View.GONE);
+        mContentView.findViewById(R.id.iv_gravatar).setVisibility(View.GONE);
+        mContentView.findViewById(R.id.tv_author).setVisibility(View.GONE);
+        mContentView.findViewById(R.id.tv_timestamp).setVisibility(View.GONE);
+        mContentView.findViewById(R.id.tv_title).setVisibility(View.GONE);
+        mContentView.findViewById(R.id.iv_commit_gravatar).setVisibility(View.GONE);
+        mContentView.findViewById(R.id.tv_commit_extra).setVisibility(View.GONE);
         mContentView.findViewById(R.id.tv_message).setVisibility(View.GONE);
     }
 

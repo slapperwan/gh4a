@@ -176,25 +176,28 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
 
         Commit commit = mCommit.getCommit();
 
-        TextView tvExtra = (TextView) mContentView.findViewById(R.id.tv_extra);
-        String extraText = getString(R.string.commit_info,
-                CommitUtils.getAuthorName(app, mCommit),
-                StringUtils.formatRelativeTime(activity, commit.getAuthor().getDate(), true));
-        tvExtra.setText(StringUtils.applyBoldTags(extraText, null));
+        TextView tvAuthor = (TextView) mContentView.findViewById(R.id.tv_author);
+        tvAuthor.setText(CommitUtils.getAuthorName(app, mCommit));
 
-        ViewGroup committer = (ViewGroup) mContentView.findViewById(R.id.committer_info);
+        TextView tvTimestamp = (TextView) mContentView.findViewById(R.id.tv_timestamp);
+        tvTimestamp.setText(StringUtils.formatRelativeTime(
+                activity, commit.getAuthor().getDate(), true));
+
+
+        ImageView commitGravatar = (ImageView) mContentView.findViewById(R.id.iv_commit_gravatar);
+        TextView commitExtra = (TextView) mContentView.findViewById(R.id.tv_commit_extra);
         if (!CommitUtils.authorEqualsCommitter(mCommit)) {
-            ImageView gravatar = (ImageView) committer.findViewById(R.id.iv_commit_gravatar);
-            TextView extra = (TextView) committer.findViewById(R.id.tv_commit_extra);
-
-            committer.setVisibility(View.VISIBLE);
-            AvatarHandler.assignAvatar(gravatar, mCommit.getCommitter());
+            AvatarHandler.assignAvatar(commitGravatar, mCommit.getCommitter());
             String committerText = getString(R.string.commit_details,
                     CommitUtils.getCommitterName(app, mCommit),
                     StringUtils.formatRelativeTime(activity, commit.getCommitter().getDate(), true));
-            extra.setText(StringUtils.applyBoldTags(committerText, null));
+            commitExtra.setText(StringUtils.applyBoldTags(committerText, null));
+
+            commitGravatar.setVisibility(View.VISIBLE);
+            commitExtra.setVisibility(View.VISIBLE);
         } else {
-            committer.setVisibility(View.GONE);
+            commitGravatar.setVisibility(View.GONE);
+            commitExtra.setVisibility(View.GONE);
         }
     }
 
