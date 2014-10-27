@@ -167,7 +167,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
                 R.layout.issue_header, getListView(), false);
         getListView().addHeaderView(mHeader, null, true);
 
-        UiUtils.assignTypeface(mHeader, Gh4Application.get(getActivity()).boldCondensed, new int[] {
+        UiUtils.assignTypeface(mHeader, Gh4Application.get(getActivity()).condensed, new int[] {
             R.id.tv_title
         });
 
@@ -275,7 +275,6 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
         TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
         tvTitle.setText(mPullRequest.getTitle());
-        tvTitle.setTypeface(app.boldCondensed);
 
         TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
         String body = mPullRequest.getBodyHtml();
