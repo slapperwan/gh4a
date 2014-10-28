@@ -6,6 +6,8 @@
         <item name="contentPictureIcon">@drawable/content_picture_dark</item>
         <item name="searchUserIcon">@drawable/search_users_dark</item>
         <item name="searchRepoIcon">@drawable/search_repos_dark</item>
+        <item name="userBookmarkIcon">@drawable/user_bookmark_dark</item>
+        <item name="repoBookmarkIcon">@drawable/repo_bookmark_dark</item>
         <item name="submoduleIcon">@drawable/submodule_dark</item>
         <item name="dirIcon">@drawable/folder_dark</item>
         <item name="fileIcon">@drawable/file_dark</item>
@@ -35,6 +37,8 @@
         <item name="contentPictureIcon">@drawable/content_picture</item>
         <item name="searchUserIcon">@drawable/search_users</item>
         <item name="searchRepoIcon">@drawable/search_repos</item>
+        <item name="userBookmarkIcon">@drawable/user_bookmark</item>
+        <item name="repoBookmarkIcon">@drawable/repo_bookmark</item>
         <item name="submoduleIcon">@drawable/submodule</item>
         <item name="dirIcon">@drawable/folder</item>
         <item name="fileIcon">@drawable/file</item>

@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.db.BookmarksProvider.Columns;
 import com.gh4a.utils.StringUtils;
@@ -20,8 +21,8 @@ public class BookmarkAdapter extends CursorAdapter {
 
     public BookmarkAdapter(Context context) {
         super(context, null, 0);
-        mRepoIconResId = UiUtils.resolveDrawable(context, R.attr.searchRepoIcon);
-        mUserIconResId = UiUtils.resolveDrawable(context, R.attr.searchUserIcon);
+        mRepoIconResId = UiUtils.resolveDrawable(context, R.attr.repoBookmarkIcon);
+        mUserIconResId = UiUtils.resolveDrawable(context, R.attr.userBookmarkIcon);
     }
 
     @Override
@@ -56,10 +57,12 @@ public class BookmarkAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.row_bookmark, parent, false);
+        Gh4Application app = Gh4Application.get(context);
         ViewHolder holder = new ViewHolder();
 
         holder.icon = (ImageView) view.findViewById(R.id.iv_icon);
         holder.title = (TextView) view.findViewById(R.id.tv_title);
+        holder.title.setTypeface(app.condensed);
         holder.extra = (TextView) view.findViewById(R.id.tv_extra);
         view.setTag(holder);
 

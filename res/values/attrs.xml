@@ -32,6 +32,8 @@
     <attr name="saveIcon" format="reference" />
     <attr name="searchUserIcon" format="reference" />
     <attr name="searchRepoIcon" format="reference" />
+    <attr name="userBookmarkIcon" format="reference" />
+    <attr name="repoBookmarkIcon" format="reference" />
     <attr name="submoduleIcon" format="reference" />
     <attr name="dirIcon" format="reference" />
     <attr name="fileIcon" format="reference" />
