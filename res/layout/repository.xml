@@ -130,7 +130,7 @@
                             android:id="@+id/tv_forks_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/repo_network"
+                            android:text="@string/repo_forks"
                             android:textAppearance="?android:attr/textAppearanceSmall" />
                     </LinearLayout>
 

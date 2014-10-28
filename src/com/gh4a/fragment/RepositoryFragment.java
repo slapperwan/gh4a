@@ -37,6 +37,7 @@ import com.gh4a.R;
 import com.gh4a.activities.CollaboratorListActivity;
 import com.gh4a.activities.ContributorListActivity;
 import com.gh4a.activities.DownloadsActivity;
+import com.gh4a.activities.ForkListActivity;
 import com.gh4a.activities.ReleaseListActivity;
 import com.gh4a.activities.WatcherListActivity;
 import com.gh4a.activities.WikiListActivity;
@@ -159,11 +160,11 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
             R.id.tv_wiki_label, R.id.tv_contributors_label, R.id.tv_collaborators_label,
             R.id.other_info, R.id.tv_downloads_label, R.id.tv_releases_label
         });
-        UiUtils.assignTypeface(mContentView, app.italic, new int[]{
-                R.id.tv_parent
+        UiUtils.assignTypeface(mContentView, app.italic, new int[] {
+            R.id.tv_parent
         });
-        UiUtils.assignTypeface(mContentView, app.regular, new int[]{
-                R.id.tv_desc, R.id.tv_language, R.id.tv_url
+        UiUtils.assignTypeface(mContentView, app.regular, new int[] {
+            R.id.tv_desc, R.id.tv_language, R.id.tv_url
         });
 
         TextView tvRepoName = (TextView) mContentView.findViewById(R.id.tv_repo_name);
@@ -272,10 +273,8 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
                     Constants.Issue.STATE_OPEN);
         } else if (id == R.id.cell_stargazers) {
             intent = new Intent(getActivity(), WatcherListActivity.class);
-            intent.putExtra("pos", 0);
         } else if (id == R.id.cell_forks) {
-            intent = new Intent(getActivity(), WatcherListActivity.class);
-            intent.putExtra("pos", 2);
+            intent = new Intent(getActivity(), ForkListActivity.class);
         } else if (id == R.id.tv_wiki_label) {
             intent = new Intent(getActivity(), WikiListActivity.class);
         } else if (id == R.id.tv_downloads_label) {

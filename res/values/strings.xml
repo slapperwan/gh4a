@@ -201,7 +201,6 @@
     <string name="repo_language">Language %1$s</string>
     <string name="repo_watchers">Watchers</string>
     <string name="repo_stargazers">Stargazers</string>
-    <string name="repo_network">Network</string>
     <string name="repo_watch_action">Watch</string>
     <string name="repo_star_action">Star</string>
     <string name="repo_branches">Branches</string>

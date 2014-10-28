@@ -73,7 +73,7 @@ public class RepositoryAdapter extends RootAdapter<Repository> implements Filter
         viewHolder.tvLanguage.setText(repository.getLanguage() != null
                 ? repository.getLanguage() : mContext.getString(R.string.unknown));
         viewHolder.tvForks.setText(String.valueOf(repository.getForks()));
-        viewHolder.tvStars.setText(String.valueOf(repository.getWatchers())); // FIXME
+        viewHolder.tvStars.setText(String.valueOf(repository.getWatchers()));
         viewHolder.tvSize.setText(Formatter.formatFileSize(mContext, repository.getSize() * 1000));
     }
 

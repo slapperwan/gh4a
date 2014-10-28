@@ -16,23 +16,16 @@
 package com.gh4a.activities;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 
 import com.gh4a.Constants;
-import com.gh4a.LoadingFragmentPagerActivity;
+import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.ForkListFragment;
-import com.gh4a.fragment.StargazerListFragment;
-import com.gh4a.fragment.WatcherListFragment;
 
-public class WatcherListActivity extends LoadingFragmentPagerActivity {
+public class ForkListActivity extends LoadingFragmentActivity {
     private String mRepoOwner;
     private String mRepoName;
-
-    private static final int[] TITLES = new int[] {
-        R.string.repo_stargazers, R.string.repo_watchers
-    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,27 +34,21 @@ public class WatcherListActivity extends LoadingFragmentPagerActivity {
             return;
         }
 
+        setContentView(R.layout.frame_layout);
+
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.OWNER);
         mRepoName = data.getString(Constants.Repository.NAME);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(mRepoOwner + "/" + mRepoName);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-    }
-
-    @Override
-    protected int[] getTabTitleResIds() {
-        return TITLES;
-    }
-
-    @Override
-    protected Fragment getFragment(int position) {
-        switch (position) {
-            case 0: return StargazerListFragment.newInstance(mRepoOwner, mRepoName);
-            case 1: return WatcherListFragment.newInstance(mRepoOwner, mRepoName);
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.details, ForkListFragment.newInstance(mRepoOwner, mRepoName))
+                    .commit();
         }
 
-        return null;
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(R.string.repo_forks);
+        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
+        actionBar.setDisplayHomeAsUpEnabled(true);
     }
 }

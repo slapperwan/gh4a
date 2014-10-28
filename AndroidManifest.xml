@@ -68,6 +68,9 @@
             android:name=".activities.FileViewerActivity"
             android:configChanges="orientation|screenSize" />
         <activity
+            android:name=".activities.ForkListActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
             android:name=".activities.CommitDiffViewerActivity"
             android:configChanges="orientation|screenSize" />
         <activity

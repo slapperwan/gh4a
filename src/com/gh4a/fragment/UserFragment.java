@@ -318,7 +318,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
                 tvForks.setText(String.valueOf(repo.getForks()));
 
                 TextView tvStars = (TextView) rowView.findViewById(R.id.tv_stars);
-                tvStars.setText(String.valueOf(repo.getWatchers())); // FIXME
+                tvStars.setText(String.valueOf(repo.getWatchers()));
 
                 ll.addView(rowView);
             }
