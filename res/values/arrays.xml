@@ -7,36 +7,36 @@
         <!-- item>Public Discussion</item-->
         <!-- item>GitHub Jobs</item-->
     </string-array>
-    <string-array name="repo_list_login_items">
-        <item>All</item>
-        <item>Owner</item>
-        <item>Member</item>
-        <item>Public</item>
-        <item>Private</item>
-        <item>Sources</item>
-        <item>Forks</item>
-        <item>Watched</item>
-        <item>Starred</item>
-    </string-array>
-    <string-array name="repo_list_org_items">
-        <item>All</item>
-        <item>Member</item>
-        <item>Public</item>
-        <item>Private</item>
-        <item>Sources</item>
-        <item>Forks</item>
-        <item>Watched</item>
-        <item>Starred</item>
-    </string-array>
-    <string-array name="repo_list_user_items">
-        <item>All</item>
-        <item>Owner</item>
-        <item>Member</item>
-        <item>Sources</item>
-        <item>Forks</item>
-        <item>Watched</item>
-        <item>Starred</item>
-    </string-array>
+    <array name="repo_list_login_items">
+        <item>@string/repo_type_all</item>
+        <item>@string/repo_type_owner</item>
+        <item>@string/repo_type_member</item>
+        <item>@string/repo_type_public</item>
+        <item>@string/repo_type_private</item>
+        <item>@string/repo_type_sources</item>
+        <item>@string/repo_type_forks</item>
+        <item>@string/repo_type_watched</item>
+        <item>@string/repo_type_starred</item>
+    </array>
+    <array name="repo_list_org_items">
+        <item>@string/repo_type_all</item>
+        <item>@string/repo_type_member</item>
+        <item>@string/repo_type_public</item>
+        <item>@string/repo_type_private</item>
+        <item>@string/repo_type_sources</item>
+        <item>@string/repo_type_forks</item>
+        <item>@string/repo_type_watched</item>
+        <item>@string/repo_type_starred</item>
+    </array>
+    <array name="repo_list_user_items">
+        <item>@string/repo_type_all</item>
+        <item>@string/repo_type_owner</item>
+        <item>@string/repo_type_member</item>
+        <item>@string/repo_type_sources</item>
+        <item>@string/repo_type_forks</item>
+        <item>@string/repo_type_watched</item>
+        <item>@string/repo_type_starred</item>
+    </array>
     <string-array name="repo_list_login_values" translatable="false">
         <item>all</item>
         <item>owner</item>

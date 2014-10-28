@@ -106,6 +106,16 @@
         <item quantity="other">%1$d contributions</item>
     </plurals>
 
+    <string name="repo_type_all">All</string>
+    <string name="repo_type_owner">Owner</string>
+    <string name="repo_type_member">Member</string>
+    <string name="repo_type_public">Public</string>
+    <string name="repo_type_private">Private</string>
+    <string name="repo_type_sources">Sources</string>
+    <string name="repo_type_forks">Forks</string>
+    <string name="repo_type_watched">Watched</string>
+    <string name="repo_type_starred">Starred</string>
+
     <string name="no_blogs_found">No blogs found.</string>
     <string name="no_comments_found">Nobody has commented so far.</string>
     <string name="no_files_found">No files found.</string>
