@@ -329,13 +329,9 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
             btnMore.setOnClickListener(this);
             btnMore.setVisibility(View.VISIBLE);
         } else {
-            View rowView = inflater.inflate(R.layout.top_repo, null);
-            rowView.findViewById(R.id.tv_title).setVisibility(View.GONE);
-            rowView.findViewById(R.id.tv_extra).setVisibility(View.GONE);
-            TextView noRepoView = (TextView) rowView.findViewById(R.id.tv_desc);
-            noRepoView.setText(R.string.user_no_repos);
-            noRepoView.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
-            ll.addView(rowView);
+            TextView hintView = (TextView) inflater.inflate(R.layout.hint_view, ll, false);
+            hintView.setText(R.string.user_no_repos);
+            ll.addView(hintView);
         }
     }
 
