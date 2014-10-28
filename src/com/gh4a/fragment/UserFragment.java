@@ -261,11 +261,11 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
                 intent.putExtra(Constants.Repository.OWNER, mUserLogin);
             } else {
                 intent = new Intent(getActivity(), FollowerFollowingListActivity.class);
-                intent.putExtra("FIND_FOLLOWERS", true);
+                intent.putExtra(FollowerFollowingListActivity.EXTRA_SHOW_FOLLOWERS, true);
             }
         } else if (id == R.id.cell_following) {
             intent = new Intent(getActivity(), FollowerFollowingListActivity.class);
-            intent.putExtra("FIND_FOLLOWERS", false);
+            intent.putExtra(FollowerFollowingListActivity.EXTRA_SHOW_FOLLOWERS, false);
         } else if (id == R.id.cell_repos || id == R.id.btn_repos) {
             intent = new Intent(getActivity(), RepositoryListActivity.class);
         } else if (id == R.id.cell_gists) {

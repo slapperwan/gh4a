@@ -21,18 +21,15 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 
 import com.gh4a.Constants;
-import com.gh4a.LoadingFragmentPagerActivity;
+import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.FollowersFollowingListFragment;
 import com.gh4a.utils.IntentUtils;
 
-public class FollowerFollowingListActivity extends LoadingFragmentPagerActivity {
-
+public class FollowerFollowingListActivity extends LoadingFragmentActivity {
     private String mUserLogin;
 
-    private static final int[] TITLES = new int[] {
-        R.string.user_followers, R.string.user_following
-    };
+    public static final String EXTRA_SHOW_FOLLOWERS = "show_followers";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,27 +38,23 @@ public class FollowerFollowingListActivity extends LoadingFragmentPagerActivity 
             return;
         }
 
+        setContentView(R.layout.frame_layout);
+
         Bundle data = getIntent().getExtras();
+        boolean showFollowers = data.getBoolean(EXTRA_SHOW_FOLLOWERS);
         mUserLogin = data.getString(Constants.User.LOGIN);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(mUserLogin);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
-        if (!data.getBoolean("FIND_FOLLOWERS", true)) {
-            actionBar.selectTab(actionBar.getTabAt(1));
+        if (savedInstanceState == null) {
+            Fragment fragment = FollowersFollowingListFragment.newInstance(mUserLogin, showFollowers);
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.details, fragment)
+                    .commit();
         }
-    }
 
-    @Override
-    protected int[] getTabTitleResIds() {
-        return TITLES;
-    }
-
-    @Override
-    protected Fragment getFragment(int position) {
-        return FollowersFollowingListFragment.newInstance(
-                FollowerFollowingListActivity.this.mUserLogin, position == 0);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(showFollowers ? R.string.user_followers : R.string.user_following);
+        actionBar.setSubtitle(mUserLogin);
+        actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
