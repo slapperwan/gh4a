@@ -50,6 +50,7 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.RepositoryLoader;
 import com.gh4a.loader.TagListLoader;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.UiUtils;
 
 public class RepositoryActivity extends LoadingFragmentPagerActivity implements ParentCallback {
     private static final int LOADER_REPO = 0;
@@ -394,6 +395,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             menu.removeItem(R.id.branches);
             menu.removeItem(R.id.tags);
             menu.removeItem(R.id.bookmark);
+            menu.removeItem(R.id.zip_download);
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -448,6 +450,12 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
                 bookmarkIntent.putExtra(Constants.Repository.SELECTED_REF, mSelectedRef);
                 saveBookmark(mActionBar.getTitle().toString(), BookmarksProvider.Columns.TYPE_REPO,
                         bookmarkIntent, mActionBar.getSubtitle().toString());
+                return true;
+            case R.id.zip_download:
+                String zipUrl = "https://github.com/" + mRepoOwner + "/" + mRepoName
+                        + "/archive/" + getCurrentRef() + ".zip";
+                UiUtils.enqueueDownload(this, zipUrl, "application/zip",
+                        mRepoName + "-" + getCurrentRef() + ".zip", null, null);
                 return true;
         }
         return super.onOptionsItemSelected(item);

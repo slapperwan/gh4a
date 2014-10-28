@@ -18,6 +18,9 @@
     <item android:id="@+id/watch"
         android:title="@string/repo_watch_action"
         app:showAsAction="never" />
+    <item android:id="@+id/zip_download"
+        android:title="@string/repo_download_action"
+        app:showAsAction="never" />
     <item android:id="@+id/bookmark"
         android:title="@string/bookmark_repo"
         app:showAsAction="never" />

@@ -46,7 +46,6 @@
     <string name="download">Download</string>
     <string name="downloads">Downloads</string>
     <string name="releases">Releases</string>
-    <string name="packages">Packages</string>
     <string name="open_in_browser">Open in browser</string>
     <string name="no_browser_found">The link could not be opened: no browser was found on your device</string>
     <string name="error_toast">An error occurred while fetching data</string>
@@ -199,6 +198,7 @@
     <string name="repo_tags">Tags</string>
     <string name="repo_unwatch_action">Unwatch</string>
     <string name="repo_unstar_action">Unstar</string>
+    <string name="repo_download_action">Download code as ZIP</string>
     <string name="repo_contributors">Contributors</string>
     <string name="repo_collaborators">Collaborators</string>
     <string name="repo_files">Files</string>
