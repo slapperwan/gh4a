@@ -44,18 +44,20 @@
 
         <TextView
             android:id="@+id/tv_forks"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawablePadding="4dp"
             android:drawableLeft="?attr/forkSmallIcon"
+            android:gravity="right"
             android:textAppearance="@style/default_text_micro" />
         <TextView
             android:id="@+id/tv_stars"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:drawablePadding="4dp"
             android:drawableLeft="?attr/starSmallIcon"
+            android:gravity="right"
             android:textAppearance="@style/default_text_micro" />
 
     </LinearLayout>
