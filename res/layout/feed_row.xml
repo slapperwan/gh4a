@@ -7,24 +7,25 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="8dp"
         android:paddingLeft="@dimen/content_padding"
         android:paddingRight="@dimen/content_padding"
-        android:paddingTop="8dp">
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <com.gh4a.widget.FixedSizeImageView
+            android:id="@+id/iv_gravatar"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="16dp" />
 
         <TextView
             android:id="@+id/tv_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/overview_header_spacing"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
-        <com.gh4a.widget.FixedSizeImageView
-            android:id="@+id/iv_gravatar"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_below="@id/tv_title"
-            android:layout_marginRight="8dp" />
+            android:layout_toRightOf="@id/iv_gravatar"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="?android:attr/textColorPrimary" />
 
         <TextView
             android:id="@+id/tv_desc"
@@ -32,6 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_title"
             android:layout_toRightOf="@id/iv_gravatar"
+            android:layout_marginTop="2dp"
             android:ellipsize="end"
             android:maxLines="4"
             android:textAppearance="?android:attr/textAppearanceSmall" />
@@ -42,8 +44,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_below="@id/tv_desc"
-            android:layout_marginTop="2dp"
             android:layout_toRightOf="@id/iv_gravatar"
+            android:layout_marginTop="2dp"
             android:textAppearance="@style/default_text_micro" />
 
     </RelativeLayout>
