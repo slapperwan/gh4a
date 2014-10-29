@@ -32,8 +32,9 @@ public class IssueLabelAdapter extends RootAdapter<Label> implements View.OnClic
         holder.collapsedContainer = v.findViewById(R.id.collapsed);
         holder.expandedContainer = v.findViewById(R.id.expanded);
 
-        Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+        Gh4Application app = Gh4Application.get(mContext);
         holder.label.setTypeface(app.condensed);
+        holder.editor.setTypeface(app.condensed);
 
         ViewGroup colors = (ViewGroup) v.findViewById(R.id.colors);
         int count = colors.getChildCount();

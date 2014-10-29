@@ -136,7 +136,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements
         updateFabVisibility();
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(R.string.issue_manage_labels);
+        actionBar.setTitle(R.string.issue_labels);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
@@ -203,7 +203,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuItem saveItem = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.save)
-                .setIcon(UiUtils.resolveDrawable(IssueLabelListActivity.this, R.attr.saveIcon));
+                .setIcon(R.drawable.content_save);
             MenuItemCompat.setShowAsAction(saveItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
 
             if (mLabel != mAddedLabel) {
