@@ -24,6 +24,7 @@ import org.eclipse.egit.github.core.GollumPage;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.Team;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.event.CommitCommentPayload;
 import org.eclipse.egit.github.core.event.CreatePayload;
@@ -43,6 +44,7 @@ import org.eclipse.egit.github.core.event.PullRequestPayload;
 import org.eclipse.egit.github.core.event.PullRequestReviewCommentPayload;
 import org.eclipse.egit.github.core.event.PushPayload;
 import org.eclipse.egit.github.core.event.ReleasePayload;
+import org.eclipse.egit.github.core.event.TeamAddPayload;
 
 import android.content.Context;
 import android.content.Intent;
@@ -407,6 +409,20 @@ public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListe
         } else if (Event.TYPE_RELEASE.equals(eventType)) {
             return res.getString(R.string.event_release_title, actor.getLogin(),
                     formatFromRepoName(eventRepo));
+
+        } else if (Event.TYPE_TEAM_ADD.equals(eventType)) {
+            TeamAddPayload payload = (TeamAddPayload) event.getPayload();
+            Team team = payload.getTeam();
+            if (team != null) {
+                Repository repo = payload.getRepo();
+                if (repo != null) {
+                    return res.getString(R.string.event_team_repo_add,
+                            actor.getLogin(), formatToRepoName(repo), team.getName());
+                } else if (payload.getUser() != null) {
+                    return res.getString(R.string.event_team_user_add,
+                            actor.getLogin(), payload.getUser().getLogin(), team.getName());
+                }
+            }
 
         } else if (Event.TYPE_WATCH.equals(eventType)) {
             return res.getString(R.string.event_watch_title,
