@@ -9,13 +9,18 @@
         android:id="@+id/color_picker"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp" />
+        android:layout_gravity="center_horizontal" />
 
-    <com.larswerkman.holocolorpicker.SVBar
-        android:id="@+id/svbar"
+    <com.larswerkman.holocolorpicker.SaturationBar
+        android:id="@+id/saturation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginTop="16dp" />
+
+    <com.larswerkman.holocolorpicker.ValueBar
+        android:id="@+id/value"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp" />
 
 </LinearLayout>
