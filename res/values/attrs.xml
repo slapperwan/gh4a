@@ -42,4 +42,5 @@
     <attr name="forkSmallIcon" format="reference" />
     <attr name="starSmallIcon" format="reference" />
     <attr name="sizeSmallIcon" format="reference" />
+    <attr name="dueSmallIcon" format="reference" />
 </resources>

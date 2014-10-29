@@ -52,8 +52,6 @@
     <string name="unknown">unknown</string>
     <string name="history">History</string>
     <string name="deleted">(deleted)</string>
-    <string name="milestone_extradata">%1$d open\u00a0\u00a0\u00a0%2$d closed</string>
-    <string name="milestone_extradata_due">%1$d open\u00a0\u00a0\u00a0%2$d closed\u00a0\u00a0\u00a0due on %3$s</string>
     <string name="download_extradata">%1$s\u00a0\u00a0\u00a0%2$d downloads\u00a0\u00a0\u00a0created %3$s</string>
     <string name="release_extradata">%1$s\u00a0\u00a0\u00a0created %2$s</string>
     <string name="gist_extradata">[b]%1$s[/b] %2$s\u00a0\u00a0\u00a0%3$s</string>
@@ -276,6 +274,7 @@
     <string name="issue_sort_comments_desc">Most commented</string>
     <string name="issue_manage_labels">Manage Labels</string>
     <string name="issue_manage_milestones">Manage Milestones</string>
+    <string name="issue_milestones">Milestones</string>
     <string name="issue_dialog_delete_title">Delete %1$s?</string>
     <string name="issue_dialog_delete_message">Are you sure?</string>
     <string name="issue_success_comment">Successfully created comment</string>
@@ -291,6 +290,8 @@
     <string name="issue_milestone">Milestone: %1$s</string>
     <string name="issue_milestone_new">New Milestone</string>
     <string name="issue_milestone_edit">Edit Milestone</string>
+    <string name="issue_milestone_open_issues">%d open</string>
+    <string name="issue_milestone_closed_issues">%d closed</string>
     <string name="issue_filter">Filter</string>
     <string name="issue_filter_by_labels">Filter by labels</string>
     <string name="issue_filter_by_milestone">Filter by milestone</string>

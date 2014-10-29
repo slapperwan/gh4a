@@ -43,15 +43,13 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
         View.OnClickListener {
     private String mRepoOwner;
     private String mRepoName;
-    private String mState;
 
-    public static IssueMilestoneListFragment newInstance(String repoOwner, String repoName, String state) {
+    public static IssueMilestoneListFragment newInstance(String repoOwner, String repoName) {
         IssueMilestoneListFragment f = new IssueMilestoneListFragment();
 
         Bundle args = new Bundle();
         args.putString(Constants.Repository.OWNER, repoOwner);
         args.putString(Constants.Repository.NAME, repoName);
-        args.putString(Constants.Milestone.STATE, state);
         f.setArguments(args);
 
         return f;
@@ -62,30 +60,25 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
         super.onCreate(savedInstanceState);
         mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
         mRepoName = getArguments().getString(Constants.Repository.NAME);
-        mState = getArguments().getString(Constants.Milestone.STATE);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if (TextUtils.equals(mState, Constants.Issue.STATE_OPEN)) {
-            View wrapper = inflater.inflate(R.layout.fab_list_wrapper, container, false);
-            ViewGroup listContainer = (ViewGroup) wrapper.findViewById(R.id.container);
+        View wrapper = inflater.inflate(R.layout.fab_list_wrapper, container, false);
+        ViewGroup listContainer = (ViewGroup) wrapper.findViewById(R.id.container);
 
-            View content = super.onCreateView(inflater, listContainer, savedInstanceState);
-            FloatingActionButton fab = (FloatingActionButton) wrapper.findViewById(R.id.fab_add);
-            ListView list = (ListView) content.findViewById(android.R.id.list);
+        View content = super.onCreateView(inflater, listContainer, savedInstanceState);
+        FloatingActionButton fab = (FloatingActionButton) wrapper.findViewById(R.id.fab_add);
+        ListView list = (ListView) content.findViewById(android.R.id.list);
 
-            if (Gh4Application.get(getActivity()).isAuthorized()) {
-                fab.setOnClickListener(this);
-                list.setOnTouchListener(new ShowHideOnScroll(fab));
-            } else {
-                fab.setVisibility(View.GONE);
-            }
-            listContainer.addView(content);
-            return wrapper;
+        if (Gh4Application.get(getActivity()).isAuthorized()) {
+            fab.setOnClickListener(this);
+            list.setOnTouchListener(new ShowHideOnScroll(fab));
         } else {
-            return super.onCreateView(inflater, container, savedInstanceState);
+            fab.setVisibility(View.GONE);
         }
+        listContainer.addView(content);
+        return wrapper;
     }
 
     @Override
@@ -109,7 +102,7 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
 
     @Override
     public Loader<LoaderResult<List<Milestone>>> onCreateLoader(int id, Bundle args) {
-        return new MilestoneListLoader(getActivity(), mRepoOwner, mRepoName, mState);
+        return new MilestoneListLoader(getActivity(), mRepoOwner, mRepoName);
     }
 
     @Override

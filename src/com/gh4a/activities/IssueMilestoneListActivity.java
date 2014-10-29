@@ -17,22 +17,17 @@ package com.gh4a.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 
 import com.gh4a.Constants;
-import com.gh4a.LoadingFragmentPagerActivity;
+import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueMilestoneListFragment;
 import com.gh4a.utils.IntentUtils;
 
-public class IssueMilestoneListActivity extends LoadingFragmentPagerActivity {
+public class IssueMilestoneListActivity extends LoadingFragmentActivity {
     private String mRepoOwner;
     private String mRepoName;
-
-    private static final int[] TITLES = new int[] {
-        R.string.open, R.string.closed
-    };
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,24 +35,21 @@ public class IssueMilestoneListActivity extends LoadingFragmentPagerActivity {
             return;
         }
 
+        setContentView(R.layout.frame_layout);
+
         mRepoOwner = getIntent().getExtras().getString(Constants.Repository.OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);
 
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.details, IssueMilestoneListFragment.newInstance(mRepoOwner, mRepoName))
+                    .commit();
+        }
+
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(R.string.issue_manage_milestones);
+        actionBar.setTitle(R.string.issue_milestones);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
-    }
-
-    @Override
-    protected int[] getTabTitleResIds() {
-        return TITLES;
-    }
-
-    @Override
-    protected Fragment getFragment(int position) {
-        return IssueMilestoneListFragment.newInstance(mRepoOwner, mRepoName,
-                position == 1 ? Constants.Issue.STATE_CLOSED : Constants.Issue.STATE_OPEN);
     }
 
     @Override
