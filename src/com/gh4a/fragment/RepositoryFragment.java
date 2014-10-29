@@ -154,11 +154,14 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     private void fillData() {
         final Gh4Application app = Gh4Application.get(getActivity());
 
-        UiUtils.assignTypeface(mContentView, app.boldCondensed, new int[] {
-            R.id.readme_title, R.id.tv_repo_name,  R.id.tv_stargazers_count,
+        UiUtils.assignTypeface(mContentView, app.condensed, new int[] {
+            R.id.tv_repo_name,  R.id.tv_stargazers_count,
             R.id.tv_forks_count, R.id.tv_issues_count, R.id.tv_pull_requests_count,
             R.id.tv_wiki_label, R.id.tv_contributors_label, R.id.tv_collaborators_label,
-            R.id.other_info, R.id.tv_downloads_label, R.id.tv_releases_label
+            R.id.tv_downloads_label, R.id.tv_releases_label
+        });
+        UiUtils.assignTypeface(mContentView, app.boldCondensed, new int[] {
+            R.id.readme_title, R.id.other_info
         });
         UiUtils.assignTypeface(mContentView, app.italic, new int[] {
             R.id.tv_parent

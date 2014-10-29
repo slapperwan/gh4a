@@ -30,7 +30,7 @@
                         android:id="@+id/iv_gravatar"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
-                        android:layout_marginRight="8dp" />
+                        android:layout_marginRight="16dp" />
 
                     <TextView
                         android:id="@+id/tv_name"
@@ -46,6 +46,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/tv_name"
                         android:layout_toRightOf="@id/iv_gravatar"
+                        android:layout_marginTop="2dp"
                         android:textAppearance="?android:attr/textAppearanceSmall" />
 
                     <TextView
@@ -54,6 +55,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/tv_created_at"
                         android:layout_toRightOf="@id/iv_gravatar"
+                        android:layout_marginTop="2dp"
                         android:autoLink="email"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColorLink="?android:attr/textColorLink" />
@@ -64,6 +66,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/tv_email"
                         android:layout_toRightOf="@id/iv_gravatar"
+                        android:layout_marginTop="2dp"
                         android:autoLink="web"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColorLink="?android:attr/textColorLink" />
@@ -74,6 +77,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/tv_website"
                         android:layout_toRightOf="@id/iv_gravatar"
+                        android:layout_marginTop="2dp"
                         android:textAppearance="?android:attr/textAppearanceSmall" />
 
                     <TextView
@@ -82,6 +86,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/tv_company"
                         android:layout_toRightOf="@id/iv_gravatar"
+                        android:layout_marginTop="2dp"
                         android:autoLink="map"
                         android:textAppearance="?android:attr/textAppearanceSmall" />
                 </RelativeLayout>

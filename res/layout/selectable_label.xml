@@ -4,6 +4,8 @@
     android:id="@+id/tv_title"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    style="@style/SelectableLabel"
     android:paddingLeft="@dimen/content_padding"
     android:paddingRight="@dimen/content_padding"
-    style="@style/SelectableLabel" />
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp" />

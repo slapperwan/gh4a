@@ -162,9 +162,11 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
     private void fillData() {
         Gh4Application app = (Gh4Application) getActivity().getApplication();
 
-        UiUtils.assignTypeface(mContentView, app.boldCondensed, new int[] {
+        UiUtils.assignTypeface(mContentView, app.condensed, new int[] {
             R.id.tv_name, R.id.tv_followers_count, R.id.tv_members_count,
-            R.id.tv_repos_count, R.id.tv_gists_count, R.id.tv_following_count,
+            R.id.tv_repos_count, R.id.tv_gists_count, R.id.tv_following_count
+        });
+        UiUtils.assignTypeface(mContentView, app.boldCondensed, new int[] {
             R.id.tv_pub_repos_label, R.id.tv_orgs
         });
         UiUtils.assignTypeface(mContentView, app.regular, new int[] {
@@ -347,14 +349,12 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
 
         for (int i = 0; i < count; i++) {
             User org = organizations.get(i);
-            View rowView = inflater.inflate(R.layout.selectable_label, null);
+            TextView rowView = (TextView) inflater.inflate(R.layout.selectable_label, llOrg, false);
 
             rowView.setOnClickListener(this);
+            rowView.setTypeface(app.condensed);
+            rowView.setText(org.getLogin());
             rowView.setTag(org);
-
-            TextView tvTitle = (TextView) rowView.findViewById(R.id.tv_title);
-            tvTitle.setTypeface(app.boldCondensed);
-            tvTitle.setText(org.getLogin());
 
             llOrg.addView(rowView);
         }
