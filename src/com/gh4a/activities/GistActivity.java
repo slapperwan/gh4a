@@ -25,11 +25,13 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.LinearLayout;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.gh4a.Constants;
@@ -77,8 +79,11 @@ public class GistActivity extends LoadingFragmentActivity implements OnClickList
         setContentView(R.layout.gist);
         setContentShown(false);
 
+        UiUtils.assignTypeface(this, Gh4Application.get(this).condensed, new int[] {
+            R.id.tv_desc
+        });
         UiUtils.assignTypeface(this, Gh4Application.get(this).boldCondensed, new int[] {
-            R.id.tv_desc, R.id.files_title
+            R.id.files_title
         });
 
         ActionBar mActionBar = getSupportActionBar();
@@ -93,27 +98,31 @@ public class GistActivity extends LoadingFragmentActivity implements OnClickList
         mGist = gist;
 
         TextView tvDesc = (TextView) findViewById(R.id.tv_desc);
-        tvDesc.setText(gist.getDescription());
-        tvDesc.setVisibility(StringUtils.isBlank(gist.getDescription()) ? View.GONE : View.VISIBLE);
+        tvDesc.setText(TextUtils.isEmpty(gist.getDescription())
+                ? getString(R.string.gist_no_description) : gist.getDescription());
 
         TextView tvCreatedAt = (TextView) findViewById(R.id.tv_created_at);
         tvCreatedAt.setText(StringUtils.formatRelativeTime(this, gist.getCreatedAt(), true));
 
-        LinearLayout llFiles = (LinearLayout) findViewById(R.id.ll_files);
         Map<String, GistFile> files = gist.getFiles();
         if (files != null && !files.isEmpty()) {
-            for (GistFile gistFile : files.values()) {
-                View rowView = getLayoutInflater().inflate(R.layout.selectable_label, null);
-                TextView tvTitle = (TextView) rowView.findViewById(R.id.tv_title);
+            ViewGroup container = (ViewGroup) findViewById(R.id.file_container);
+            LayoutInflater inflater = getLayoutInflater();
+            Gh4Application app = Gh4Application.get(this);
 
-                tvTitle.setText(gistFile.getFilename());
-                tvTitle.setTextColor(UiUtils.resolveColor(this, R.attr.colorPrimaryDark));
-                tvTitle.setOnClickListener(this);
-                tvTitle.setTag(gistFile);
-                llFiles.addView(tvTitle);
+            for (GistFile gistFile : files.values()) {
+                TextView rowView = (TextView) inflater.inflate(R.layout.selectable_label,
+                        container, false);
+
+                rowView.setText(gistFile.getFilename());
+                rowView.setTextColor(UiUtils.resolveColor(this, android.R.attr.textColorPrimary));
+                rowView.setTypeface(app.condensed);
+                rowView.setOnClickListener(this);
+                rowView.setTag(gistFile);
+                container.addView(rowView);
             }
         } else {
-            llFiles.setVisibility(View.GONE);
+            findViewById(R.id.file_card).setVisibility(View.GONE);
         }
     }
 

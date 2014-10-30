@@ -203,6 +203,7 @@
                     android:layout_height="wrap_content"
                     android:paddingLeft="@dimen/content_padding"
                     android:paddingRight="@dimen/content_padding"
+                    android:paddingBottom="@dimen/content_padding"
                     android:visibility="gone" />
 
             </LinearLayout>

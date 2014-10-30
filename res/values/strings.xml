@@ -52,10 +52,6 @@
     <string name="unknown">unknown</string>
     <string name="history">History</string>
     <string name="deleted">(deleted)</string>
-    <string name="download_extradata">%1$s\u00a0\u00a0\u00a0%2$d downloads\u00a0\u00a0\u00a0created %3$s</string>
-    <string name="release_extradata">%1$s\u00a0\u00a0\u00a0created %2$s</string>
-    <string name="gist_extradata">[b]%1$s[/b] %2$s\u00a0\u00a0\u00a0%3$s</string>
-    <string name="gist_extradata_own">%2$s\u00a0\u00a0\u00a0%3$s</string>
     <string name="go_to">Go to</string>
     <string name="forked_from">forked from %1$s</string>
     <string name="enter_username_toast">Please enter your user name instead of your email address</string>
@@ -80,6 +76,7 @@
     <string name="issue_milestone_hint">Milestone</string>
     <string name="issue_assignee_hint">Assignee</string>
     <string name="link_not_openable">Link could not be opened</string>
+    <string name="download_created">Created %1$s</string>
     <string name="download_mobile_warning_title">Mobile connection download</string>
     <string name="download_mobile_warning_message">Do you want to download this file using your mobile connection?\nYou can also schedule it for download when you\'re using your Wi-Fi connection next time.</string>
     <string name="download_now_button">Download now</string>
@@ -93,10 +90,6 @@
     <string name="logout_pref_summary_logged_in">Currently logged in as %1$s</string>
     <string name="logout_pref_summary_logged_out">Currently not logged in</string>
     <string name="copyright_notice">\u00a9 2014 Azwan Adli, Danny Baumann</string>
-    <plurals name="file">
-        <item quantity="one">%1$d File</item>
-        <item quantity="other">%1$d Files</item>
-    </plurals>
     <string name="actions">Actions</string>
 
     <plurals name="contributor_extra_data">
@@ -336,6 +329,7 @@
     <string name="starred">Starred</string>
     <string name="gists">Gists</string>
     <string name="gist_title">Gist %1$s</string>
+    <string name="gist_no_description">&lt;No description&gt;</string>
     <string name="gist_files">Files</string>
 
     <!-- Explore -->

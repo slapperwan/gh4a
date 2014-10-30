@@ -43,6 +43,8 @@
     <attr name="sizeSmallIcon" format="reference" />
     <attr name="dueSmallIcon" format="reference" />
     <attr name="milestoneSmallIcon" format="reference" />
+    <attr name="downloadSmallIcon" format="reference" />
+    <attr name="filesSmallIcon" format="reference" />
 
     <declare-styleable name="LabelBadgeView">
         <attr name="badgeSize" format="dimension"/>

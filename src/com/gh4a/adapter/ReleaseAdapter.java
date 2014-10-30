@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.utils.StringUtils;
 
 public class ReleaseAdapter extends RootAdapter<Release> {
     public ReleaseAdapter(Context context) {
@@ -24,17 +25,15 @@ public class ReleaseAdapter extends RootAdapter<Release> {
 
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
-        View v = inflater.inflate(R.layout.row_simple_3, null);
+        View v = inflater.inflate(R.layout.row_release, null);
         Gh4Application app = Gh4Application.get(mContext);
         ViewHolder viewHolder = new ViewHolder();
 
         viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvTitle.setTypeface(app.boldCondensed);
+        viewHolder.tvTitle.setTypeface(app.condensed);
 
-        v.findViewById(R.id.tv_desc).setVisibility(View.GONE);
-
-        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-        viewHolder.tvExtra.setTextAppearance(mContext, R.style.default_text_micro);
+        viewHolder.tvType = (TextView) v.findViewById(R.id.tv_type);
+        viewHolder.tvCreatedAt  = (TextView) v.findViewById(R.id.tv_created_at);
 
         v.setTag(viewHolder);
         return v;
@@ -45,12 +44,9 @@ public class ReleaseAdapter extends RootAdapter<Release> {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
 
         viewHolder.tvTitle.setText(release.getName());
-
-        CharSequence created = DateUtils.getRelativeTimeSpanString(release.getCreatedAt().getTime(),
-                System.currentTimeMillis(), MINUTE_IN_MILLIS,
-                FORMAT_SHOW_DATE | FORMAT_SHOW_YEAR | FORMAT_NUMERIC_DATE);
-        viewHolder.tvExtra.setText(mContext.getString(R.string.release_extradata,
-                formatReleaseType(release), created));
+        viewHolder.tvType.setText(formatReleaseType(release));
+        viewHolder.tvCreatedAt.setText(mContext.getString(R.string.download_created,
+                StringUtils.formatRelativeTime(mContext, release.getCreatedAt(), true)));
     }
 
     private String formatReleaseType(Release release) {
@@ -65,6 +61,7 @@ public class ReleaseAdapter extends RootAdapter<Release> {
 
     private static class ViewHolder {
         public TextView tvTitle;
-        public TextView tvExtra;
+        public TextView tvType;
+        public TextView tvCreatedAt;
     }
 }
