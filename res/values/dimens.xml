@@ -3,8 +3,8 @@
     <dimen name="content_padding">16dp</dimen>
     <dimen name="overview_item_spacing">12dp</dimen>
     <dimen name="overview_header_spacing">4dp</dimen>
-    <dimen name="label_badge_size">2dp</dimen>
-    <dimen name="label_badge_spacing">2dp</dimen>
+    <dimen name="default_label_badge_size">6dp</dimen>
+    <dimen name="default_label_badge_spacing">2dp</dimen>
     <dimen name="label_spacing">5dp</dimen>
     <dimen name="card_margin">4dp</dimen>
 </resources>

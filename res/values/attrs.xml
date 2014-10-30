@@ -42,4 +42,10 @@
     <attr name="starSmallIcon" format="reference" />
     <attr name="sizeSmallIcon" format="reference" />
     <attr name="dueSmallIcon" format="reference" />
+    <attr name="milestoneSmallIcon" format="reference" />
+
+    <declare-styleable name="LabelBadgeView">
+        <attr name="badgeSize" format="dimension"/>
+        <attr name="badgeSpacing" format="dimension"/>
+    </declare-styleable>
 </resources>

@@ -1,112 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="?attr/listPreferredItemHeightLarge"
-    style="?attr/cardViewTheme">
+    android:padding="@dimen/content_padding">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:id="@+id/info"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingRight="@dimen/content_padding"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="8dp"
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_number"
-            android:layout_width="40dp"
-            android:layout_height="wrap_content"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp"
-            android:singleLine="true"
-            android:textStyle="bold"
-            android:textColor="@android:color/black"
-            android:background="@color/issue_number_bg"
-            android:layout_marginRight="5dp" />
-        <LinearLayout
-            android:id="@+id/ll_labels"
-            android:layout_width="40dp"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tv_number"
-            android:orientation="vertical"
-            android:layout_marginRight="5dp" />
-        <com.gh4a.widget.FixedSizeImageView
-            android:id="@+id/iv_assignee"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="7dp"
-            android:layout_below="@id/ll_labels" />
-        <TextView
-            android:id="@+id/tv_desc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:layout_toRightOf="@id/tv_number"
-            android:layout_alignParentRight="true"
-            android:singleLine="true"
-            android:ellipsize="end" />
-        <TextView
-            android:id="@+id/tv_comments"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_below="@id/tv_desc"
-            android:layout_gravity="center_vertical"
-            android:drawableLeft="?attr/commentsIcon"
-            android:drawablePadding="5dp"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-        <TextView
-            android:id="@+id/tv_repo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:layout_marginTop="4dp"
-            android:layout_toRightOf="@id/ll_labels"
-            android:layout_toLeftOf="@id/tv_comments"
-            android:layout_below="@id/tv_desc"
-            android:visibility="gone" />
         <TextView
             android:id="@+id/tv_milestone"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:layout_marginTop="4dp"
-            android:layout_toRightOf="@id/ll_labels"
-            android:layout_toLeftOf="@id/tv_comments"
-            android:layout_below="@id/tv_repo"
+            android:layout_marginBottom="4dp"
+            android:drawableLeft="?attr/milestoneSmallIcon"
+            android:drawablePadding="4dp"
+            android:textAppearance="@style/default_text_micro"
             android:visibility="gone" />
-        <RelativeLayout
-            android:layout_width="wrap_content"
+
+        <TextView
+            android:id="@+id/tv_comments"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:layout_toRightOf="@id/ll_labels"
-            android:layout_toLeftOf="@id/tv_comments"
-            android:layout_below="@id/tv_milestone">
-            <com.gh4a.widget.FixedSizeImageView
-                android:id="@+id/iv_gravatar"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginRight="5dp"
-                android:layout_centerVertical="true" />
-            <TextView
-                android:id="@+id/tv_creator"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textStyle="bold"
-                android:layout_toRightOf="@id/iv_gravatar" />
-            <TextView
-                android:id="@+id/tv_timestamp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/default_text_micro"
-                android:layout_toRightOf="@id/iv_gravatar"
-                android:layout_below="@id/tv_creator" />
-        </RelativeLayout>
-    </RelativeLayout>
-</android.support.v7.widget.CardView>
+            android:drawableLeft="?attr/commentsIcon"
+            android:drawablePadding="4dp"
+            android:textAppearance="@style/default_text_micro" />
+
+    </LinearLayout>
+
+    <com.gh4a.widget.FixedSizeImageView
+        android:id="@+id/iv_gravatar"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp" />
+
+    <com.gh4a.widget.LabelBadgeView
+        android:id="@+id/labels"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/iv_gravatar"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:id="@+id/tv_creator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="?android:attr/textColorPrimary"
+        android:layout_toRightOf="@id/iv_gravatar" />
+
+    <TextView
+        android:id="@+id/tv_timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/tv_creator"
+        android:layout_alignBaseline="@id/tv_creator"
+        android:layout_marginLeft="16dp"
+        android:textAppearance="@style/default_text_micro" />
+
+    <TextView
+        android:id="@+id/tv_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="?android:attr/textColorPrimary"
+        android:layout_toRightOf="@id/iv_gravatar"
+        android:layout_below="@id/tv_creator"
+        android:layout_toLeftOf="@id/info"
+        android:maxLines="2"
+        android:ellipsize="end" />
+
+    <TextView
+        android:id="@+id/tv_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/iv_gravatar"
+        android:layout_below="@id/tv_desc"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+</RelativeLayout>

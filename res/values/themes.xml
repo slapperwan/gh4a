@@ -17,6 +17,7 @@
         <item name="starSmallIcon">@drawable/star_small_dark</item>
         <item name="sizeSmallIcon">@drawable/size_small_dark</item>
         <item name="dueSmallIcon">@drawable/due_small_dark</item>
+        <item name="milestoneSmallIcon">@drawable/milestone_small_dark</item>
         <item name="cardViewTheme">@style/Base.CardView.Dark</item>
         <item name="colorAccent">#396426</item>
         <item name="colorPrimary">#396426</item>
@@ -49,6 +50,7 @@
         <item name="starSmallIcon">@drawable/star_small</item>
         <item name="sizeSmallIcon">@drawable/size_small</item>
         <item name="dueSmallIcon">@drawable/due_small</item>
+        <item name="milestoneSmallIcon">@drawable/milestone_small</item>
         <item name="listPopupWindowStyle">@style/Widget.AppCompat.Light.ListPopupWindow</item>
         <item name="cardViewTheme">@style/Base.CardView.Light</item>
         <item name="colorAccent">#65b345</item>

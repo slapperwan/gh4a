@@ -18,6 +18,9 @@ package com.gh4a.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +33,7 @@ import com.gh4a.R;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.widget.LabelBadgeView;
 
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
@@ -45,23 +49,19 @@ public class IssueAdapter extends RootAdapter<Issue> implements View.OnClickList
     protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_issue, parent, false);
         ViewHolder viewHolder = new ViewHolder();
-        Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+        Gh4Application app = Gh4Application.get(mContext);
 
         viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
         viewHolder.ivGravatar.setOnClickListener(this);
 
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvDesc.setTypeface(app.boldCondensed);
+        viewHolder.tvDesc.setTypeface(app.condensed);
 
         viewHolder.tvCreator = (TextView) v.findViewById(R.id.tv_creator);
-        viewHolder.tvCreator.setTypeface(app.regular);
-
         viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
-        viewHolder.tvTimestamp.setTypeface(app.regular);
-
-        viewHolder.llLabels = (LinearLayout) v.findViewById(R.id.ll_labels);
         viewHolder.tvNumber = (TextView) v.findViewById(R.id.tv_number);
-        viewHolder.ivAssignee = (ImageView) v.findViewById(R.id.iv_assignee);
+
+        viewHolder.lvLabels = (LabelBadgeView) v.findViewById(R.id.labels);
         viewHolder.tvComments = (TextView) v.findViewById(R.id.tv_comments);
         viewHolder.tvMilestone = (TextView) v.findViewById(R.id.tv_milestone);
 
@@ -76,21 +76,12 @@ public class IssueAdapter extends RootAdapter<Issue> implements View.OnClickList
         AvatarHandler.assignAvatar(viewHolder.ivGravatar, issue.getUser());
         viewHolder.ivGravatar.setTag(issue);
 
-        viewHolder.tvNumber.setText(String.valueOf(issue.getNumber()));
-
-        makeLabelBadges(viewHolder.llLabels, issue.getLabels());
-
+        viewHolder.lvLabels.setLabels(issue.getLabels());
+        viewHolder.tvNumber.setText("#" + issue.getNumber());
         viewHolder.tvDesc.setText(issue.getTitle());
         viewHolder.tvCreator.setText(issue.getUser().getLogin());
         viewHolder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
                 issue.getCreatedAt(), true));
-
-        if (issue.getAssignee() != null) {
-            viewHolder.ivAssignee.setVisibility(View.VISIBLE);
-            AvatarHandler.assignAvatar(viewHolder.ivAssignee, issue.getAssignee());
-        } else {
-            viewHolder.ivAssignee.setVisibility(View.GONE);
-        }
 
         if (issue.getComments() > 0) {
             viewHolder.tvComments.setVisibility(View.VISIBLE);
@@ -101,8 +92,7 @@ public class IssueAdapter extends RootAdapter<Issue> implements View.OnClickList
 
         if (issue.getMilestone() != null) {
             viewHolder.tvMilestone.setVisibility(View.VISIBLE);
-            viewHolder.tvMilestone.setText(mContext.getString(R.string.issue_milestone,
-                    issue.getMilestone().getTitle()));
+            viewHolder.tvMilestone.setText(issue.getMilestone().getTitle());
         } else {
             viewHolder.tvMilestone.setVisibility(View.GONE);
         }
@@ -119,50 +109,13 @@ public class IssueAdapter extends RootAdapter<Issue> implements View.OnClickList
         }
     }
 
-    @Override
-    public boolean isCardStyle() {
-        return true;
-    }
-
-    /* package */ static void makeLabelBadges(LinearLayout badgeLayout, List<Label> labels) {
-        if (labels != null) {
-            int viewCount = badgeLayout.getChildCount();
-            int labelCount = labels.size();
-
-            for (int i = 0; i < labelCount; i++) {
-                View badge;
-                if (i < viewCount) {
-                    badge = badgeLayout.getChildAt(i);
-                } else {
-                    Context context = badgeLayout.getContext();
-                    int height = context.getResources().getDimensionPixelSize(R.dimen.label_badge_size);
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT, height);
-                    params.topMargin = context.getResources().getDimensionPixelSize(R.dimen.label_badge_spacing);
-
-                    badge = new View(context);
-                    badgeLayout.addView(badge, params);
-                }
-
-                badge.setBackgroundColor(Color.parseColor("#" + labels.get(i).getColor()));
-                badge.setVisibility(View.VISIBLE);
-            }
-            for (int i = labelCount; i < viewCount; i++) {
-                badgeLayout.getChildAt(i).setVisibility(View.GONE);
-            }
-        } else {
-            badgeLayout.setVisibility(View.GONE);
-        }
-    }
-
     private static class ViewHolder {
         public ImageView ivGravatar;
+        public TextView tvNumber;
         public TextView tvDesc;
         public TextView tvCreator;
         public TextView tvTimestamp;
-        public LinearLayout llLabels;
-        public TextView tvNumber;
-        public ImageView ivAssignee;
+        public LabelBadgeView lvLabels;
         public TextView tvComments;
         public TextView tvMilestone;
     }

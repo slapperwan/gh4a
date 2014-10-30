@@ -39,18 +39,22 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> implements View
 
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
-        View v = inflater.inflate(R.layout.row_pull_request, parent, false);
+        View v = inflater.inflate(R.layout.row_issue, parent, false);
         ViewHolder viewHolder = new ViewHolder();
-        Gh4Application app = (Gh4Application) mContext.getApplicationContext();
+        Gh4Application app = Gh4Application.get(mContext);
 
         viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
         viewHolder.ivGravatar.setOnClickListener(this);
 
-        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_title);
+        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
         viewHolder.tvDesc.setTypeface(app.condensed);
 
-        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+        viewHolder.tvCreator = (TextView) v.findViewById(R.id.tv_creator);
         viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
+        viewHolder.tvNumber = (TextView) v.findViewById(R.id.tv_number);
+        viewHolder.tvComments = (TextView) v.findViewById(R.id.tv_comments);
+
+        v.findViewById(R.id.labels).setVisibility(View.GONE);
 
         v.setTag(viewHolder);
         return v;
@@ -64,11 +68,20 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> implements View
         AvatarHandler.assignAvatar(viewHolder.ivGravatar, user);
         viewHolder.ivGravatar.setTag(pullRequest.getUser());
 
+        viewHolder.tvNumber.setText("#" + pullRequest.getNumber());
         viewHolder.tvDesc.setText(pullRequest.getTitle());
-        viewHolder.tvExtra.setText(
+        viewHolder.tvCreator.setText(
                 user != null ? user.getLogin() : mContext.getString(R.string.unknown));
         viewHolder.tvTimestamp.setText(
                 StringUtils.formatRelativeTime(mContext, pullRequest.getCreatedAt(), true));
+
+        int comments = pullRequest.getComments() + pullRequest.getReviewComments();
+        if (comments > 0) {
+            viewHolder.tvComments.setVisibility(View.VISIBLE);
+            viewHolder.tvComments.setText(String.valueOf(comments));
+        } else {
+            viewHolder.tvComments.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -84,8 +97,10 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> implements View
 
     private static class ViewHolder {
         public ImageView ivGravatar;
-        public TextView tvDesc;
-        public TextView tvExtra;
+        public TextView tvCreator;
         public TextView tvTimestamp;
+        public TextView tvDesc;
+        public TextView tvNumber;
+        public TextView tvComments;
     }
 }

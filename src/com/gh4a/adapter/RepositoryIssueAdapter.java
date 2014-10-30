@@ -29,7 +29,9 @@ import com.gh4a.R;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.widget.LabelBadgeView;
 
+import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryIssue;
 
 public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> implements
@@ -48,16 +50,13 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
         viewHolder.ivGravatar.setOnClickListener(this);
 
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvDesc.setTypeface(app.boldCondensed);
+        viewHolder.tvDesc.setTypeface(app.condensed);
 
         viewHolder.tvCreator = (TextView) v.findViewById(R.id.tv_creator);
         viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
         viewHolder.tvNumber = (TextView) v.findViewById(R.id.tv_number);
-        viewHolder.llLabels = (LinearLayout) v.findViewById(R.id.ll_labels);
-        viewHolder.ivAssignee = (ImageView) v.findViewById(R.id.iv_assignee);
+        viewHolder.lvLabels = (LabelBadgeView) v.findViewById(R.id.labels);
         viewHolder.tvComments = (TextView) v.findViewById(R.id.tv_comments);
-        viewHolder.tvRepo = (TextView) v.findViewById(R.id.tv_repo);
-        viewHolder.tvRepo.setVisibility(View.VISIBLE);
         viewHolder.tvMilestone = (TextView) v.findViewById(R.id.tv_milestone);
 
         v.setTag(viewHolder);
@@ -70,9 +69,8 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
 
         AvatarHandler.assignAvatar(viewHolder.ivGravatar, issue.getUser());
         viewHolder.ivGravatar.setTag(issue);
-        viewHolder.tvNumber.setText(String.valueOf(issue.getNumber()));
 
-        IssueAdapter.makeLabelBadges(viewHolder.llLabels, issue.getLabels());
+        viewHolder.lvLabels.setLabels(issue.getLabels());
 
         String userName = issue.getUser() != null
                 ? issue.getUser().getLogin() : mContext.getString(R.string.deleted);
@@ -89,15 +87,9 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
             viewHolder.tvComments.setVisibility(View.GONE);
         }
 
-        viewHolder.tvRepo.setText(mContext.getString(R.string.repo_issue_on,
-                issue.getRepository().getOwner().getLogin() + "/" + issue.getRepository().getName()));
-
-        if (issue.getAssignee() != null) {
-            viewHolder.ivAssignee.setVisibility(View.VISIBLE);
-            AvatarHandler.assignAvatar(viewHolder.ivAssignee, issue.getAssignee());
-        } else {
-            viewHolder.ivAssignee.setVisibility(View.GONE);
-        }
+        Repository repo = issue.getRepository();
+        viewHolder.tvNumber.setText(mContext.getString(R.string.repo_issue_on,
+                issue.getNumber(), repo.getOwner().getLogin() + "/" + repo.getName()));
 
         if (issue.getMilestone() != null) {
             viewHolder.tvMilestone.setVisibility(View.VISIBLE);
@@ -118,21 +110,14 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
         }
     }
 
-    @Override
-    public boolean isCardStyle() {
-        return true;
-    }
-
     private static class ViewHolder {
         public ImageView ivGravatar;
+        public TextView tvNumber;
         public TextView tvDesc;
         public TextView tvCreator;
         public TextView tvTimestamp;
-        public TextView tvNumber;
-        public LinearLayout llLabels;
-        public ImageView ivAssignee;
+        public LabelBadgeView lvLabels;
         public TextView tvComments;
-        public TextView tvRepo;
         public TextView tvMilestone;
     }
 }
