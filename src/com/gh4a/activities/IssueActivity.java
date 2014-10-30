@@ -260,6 +260,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
         TextView tvMilestone = (TextView) mHeader.findViewById(R.id.tv_milestone);
         if (mIssue.getMilestone() != null) {
             tvMilestone.setText(getString(R.string.issue_milestone, mIssue.getMilestone().getTitle()));
+            tvMilestone.setVisibility(View.VISIBLE);
         } else {
             tvMilestone.setVisibility(View.GONE);
         }
