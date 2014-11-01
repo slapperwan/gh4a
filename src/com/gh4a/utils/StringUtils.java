@@ -216,8 +216,4 @@ public class StringUtils {
         }
         return ssb;
     }
-
-    public static String capitalizeFirstChar(String s) {
-        return Character.toUpperCase(s.charAt(0)) + s.substring(1);
-    }
 }

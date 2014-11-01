@@ -57,8 +57,7 @@ public class IssueListMineActivity extends IssueListBaseActivity {
         updateSortDrawerItemState(ITEM_SORT_CREATED_DESC);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(getString(R.string.issues_with_state,
-                StringUtils.capitalizeFirstChar(mState)));
+        actionBar.setTitle(R.string.issues_open);
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
@@ -102,16 +101,16 @@ public class IssueListMineActivity extends IssueListBaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         int resIdState = Constants.Issue.STATE_OPEN.equals(mState) ?
-                R.string.closed : R.string.open;
-        MenuItem item = menu.add(Menu.NONE, 2, Menu.NONE, resIdState);
+                R.string.issues_menu_show_closed : R.string.issues_menu_show_open;
+        MenuItem item = menu.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, resIdState);
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == 2) {
-            filterState(item.getTitle().toString());
+        if (item.getItemId() == Menu.FIRST + 1) {
+            toggleStateFilter();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -134,12 +133,12 @@ public class IssueListMineActivity extends IssueListBaseActivity {
         invalidateFragments();
     }
 
-    public void filterState(String state) {
-        mState = state.toLowerCase();
+    private void toggleStateFilter() {
+        mState = Constants.Issue.STATE_CLOSED.equals(mState)
+                ? Constants.Issue.STATE_OPEN : Constants.Issue.STATE_CLOSED;
         reloadIssueList();
 
-        getSupportActionBar().setTitle(getString(R.string.issues_with_state,
-                StringUtils.capitalizeFirstChar(mState)));
+        getSupportActionBar().setTitle(Constants.Issue.STATE_CLOSED.equals(mState)
+                ? R.string.issues_closed : R.string.issues_open);
     }
-
 }

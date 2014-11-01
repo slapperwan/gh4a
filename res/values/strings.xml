@@ -249,7 +249,10 @@
 
     <string name="issues">Issues</string>
     <string name="issue">Issue</string>
-    <string name="issues_with_state">%1$s Issues</string>
+    <string name="issues_open">Open Issues</string>
+    <string name="issues_closed">Closed Issues</string>
+    <string name="issues_menu_show_open">Show Open</string>
+    <string name="issues_menu_show_closed">Show Closed</string>
     <string name="issue_comments">Comments</string>
     <string name="issue_events_with_count">Events (%1$d)</string>
     <string name="issue_title">Title</string>
