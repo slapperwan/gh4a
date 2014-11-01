@@ -91,6 +91,10 @@
     <string name="logout_pref_summary_logged_out">Currently not logged in</string>
     <string name="copyright_notice">\u00a9 2014 Azwan Adli, Danny Baumann</string>
     <string name="actions">Actions</string>
+    <string name="created">Created</string>
+    <string name="assigned">Assigned</string>
+    <string name="mentioned">Mentioned</string>
+    <string name="state">State</string>
 
     <plurals name="contributor_extra_data">
         <item quantity="one">%1$d contribution</item>
@@ -245,6 +249,7 @@
 
     <string name="issues">Issues</string>
     <string name="issue">Issue</string>
+    <string name="issues_with_state">%1$s Issues</string>
     <string name="issue_comments">Comments</string>
     <string name="issue_events_with_count">Events (%1$d)</string>
     <string name="issue_title">Title</string>

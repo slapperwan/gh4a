@@ -99,6 +99,10 @@
             android:configChanges="orientation|screenSize"
             android:uiOptions="splitActionBarWhenNarrow" />
         <activity
+            android:name=".activities.IssueListMineActivity"
+            android:configChanges="orientation|screenSize"
+            android:uiOptions="splitActionBarWhenNarrow" />
+        <activity
             android:name=".activities.IssueMilestoneEditActivity"
             android:configChanges="orientation|screenSize" />
         <activity

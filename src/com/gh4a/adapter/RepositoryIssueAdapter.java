@@ -93,7 +93,7 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
 
         if (issue.getMilestone() != null) {
             viewHolder.tvMilestone.setVisibility(View.VISIBLE);
-            viewHolder.tvMilestone.setText("Milestone : " + issue.getMilestone().getTitle());
+            viewHolder.tvMilestone.setText(issue.getMilestone().getTitle());
         } else {
             viewHolder.tvMilestone.setVisibility(View.GONE);
         }

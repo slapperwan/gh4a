@@ -52,14 +52,16 @@ public class UserActivity extends LoadingFragmentPagerActivity {
         R.string.about, R.string.user_public_activity
     };
 
-    private static final int ITEM_SEARCH = 1;
-    private static final int ITEM_BOOKMARKS = 2;
-    private static final int ITEM_SETTINGS = 3;
-    private static final int ITEM_TIMELINE = 4;
-    private static final int ITEM_TRENDING = 5;
-    private static final int ITEM_BLOG = 6;
+    private static final int ITEM_ISSUES = 1;
+    private static final int ITEM_SEARCH = 2;
+    private static final int ITEM_BOOKMARKS = 3;
+    private static final int ITEM_SETTINGS = 4;
+    private static final int ITEM_TIMELINE = 5;
+    private static final int ITEM_TRENDING = 6;
+    private static final int ITEM_BLOG = 7;
     private static final List<DrawerAdapter.Item> DRAWER_ITEMS = Arrays.asList(
         new DrawerAdapter.SectionItem(R.string.navigation),
+        new DrawerAdapter.SectionEntryItem(R.string.issues, 0, ITEM_ISSUES),
         new DrawerAdapter.SectionEntryItem(R.string.search, 0, ITEM_SEARCH),
         new DrawerAdapter.SectionEntryItem(R.string.bookmarks, 0, ITEM_BOOKMARKS),
         new DrawerAdapter.SectionItem(R.string.explore),
@@ -135,6 +137,9 @@ public class UserActivity extends LoadingFragmentPagerActivity {
                 return true;
             case ITEM_TRENDING:
                 startActivity(new Intent(this, TrendingActivity.class));
+                return true;
+            case ITEM_ISSUES:
+                startActivity(new Intent(this, IssueListMineActivity.class));
                 return true;
         }
         return super.onDrawerItemSelected(position);
