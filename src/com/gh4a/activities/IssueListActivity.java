@@ -22,16 +22,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
-import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.ListAdapter;
 
 import com.gh4a.Constants;
-import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.DrawerAdapter;
 import com.gh4a.fragment.IssueListFragment;
