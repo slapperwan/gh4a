@@ -38,17 +38,13 @@ public class SearchUserAdapter extends RootAdapter<SearchUser> implements View.O
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_gravatar_2, parent, false);
-        Gh4Application app = Gh4Application.get(mContext);
 
         ViewHolder viewHolder = new ViewHolder();
         viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
         viewHolder.ivGravatar.setOnClickListener(this);
 
         viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvTitle.setTypeface(app.boldCondensed);
-
         viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-        viewHolder.tvExtra.setTypeface(app.italic);
 
         v.setTag(viewHolder);
         return v;

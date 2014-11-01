@@ -13,14 +13,13 @@
         android:layout_gravity="center_vertical"
         android:orientation="vertical">
 
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="?android:attr/textColorPrimary" />
+            android:textAppearance="@style/TextAppearance.ItemTitle" />
 
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -37,27 +36,27 @@
         android:layout_gravity="center_vertical"
         android:orientation="vertical">
 
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_open"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/default_text_micro"
+            android:textAppearance="@style/TextAppearance.VerySmall"
             android:textColor="?attr/colorCommitAddition" />
 
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_closed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/default_text_micro"
+            android:textAppearance="@style/TextAppearance.VerySmall"
             android:textColor="?attr/colorCommitDeletion" />
 
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_due"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawableLeft="?attr/dueSmallIcon"
             android:drawablePadding="4dp"
-            android:textAppearance="@style/default_text_micro" />
+            android:textAppearance="@style/TextAppearance.VerySmall" />
 
     </LinearLayout>
 

@@ -7,14 +7,13 @@
     android:padding="@dimen/content_padding"
     android:orientation="vertical">
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="?android:attr/textColorPrimary" />
+        android:textAppearance="@style/TextAppearance.ItemTitle" />
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_desc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -29,40 +28,40 @@
         android:layout_marginTop="2dp"
         android:orientation="horizontal">
 
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_language"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawablePadding="4dp"
             android:drawableLeft="?attr/languageSmallIcon"
-            android:textAppearance="@style/default_text_micro" />
+            android:textAppearance="@style/TextAppearance.VerySmall" />
 
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_forks"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
             android:drawablePadding="4dp"
             android:drawableLeft="?attr/forkSmallIcon"
-            android:textAppearance="@style/default_text_micro" />
+            android:textAppearance="@style/TextAppearance.VerySmall" />
 
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_stars"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
             android:drawablePadding="4dp"
             android:drawableLeft="?attr/starSmallIcon"
-            android:textAppearance="@style/default_text_micro" />
+            android:textAppearance="@style/TextAppearance.VerySmall" />
 
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_size"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
             android:drawablePadding="4dp"
             android:drawableLeft="?attr/sizeSmallIcon"
-            android:textAppearance="@style/default_text_micro" />
+            android:textAppearance="@style/TextAppearance.VerySmall" />
 
     </LinearLayout>
 

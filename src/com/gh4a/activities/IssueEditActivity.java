@@ -20,6 +20,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
@@ -181,9 +182,6 @@ public class IssueEditActivity extends LoadingFragmentActivity implements OnClic
                 : getString(R.string.issue_create));
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
-
-        TextView tvIssueLabelAdd = (TextView) findViewById(R.id.tv_issue_label_add);
-        tvIssueLabelAdd.setTypeface(Gh4Application.get(this).boldCondensed);
 
         mTvSelectedMilestone = (TextView) findViewById(R.id.et_milestone);
         mTvSelectedAssignee = (TextView) findViewById(R.id.et_assignee);
@@ -361,7 +359,6 @@ public class IssueEditActivity extends LoadingFragmentActivity implements OnClic
     }
 
     public void fillLabels(List<Label> labels) {
-        Gh4Application app = Gh4Application.get(this);
         LinearLayout labelLayout = (LinearLayout) findViewById(R.id.ll_labels);
 
         for (final Label label : labels) {
@@ -370,7 +367,6 @@ public class IssueEditActivity extends LoadingFragmentActivity implements OnClic
             viewColor.setBackgroundColor(Color.parseColor("#" + label.getColor()));
 
             final TextView tvLabel = (TextView) rowView.findViewById(R.id.tv_title);
-            tvLabel.setTypeface(app.condensed);
             tvLabel.setText(label.getName());
             tvLabel.setOnClickListener(this);
             tvLabel.setTag(label);
@@ -403,7 +399,7 @@ public class IssueEditActivity extends LoadingFragmentActivity implements OnClic
         Gh4Application app = Gh4Application.get(this);
         if (!select) {
             mSelectedLabels.remove(label);
-            tvLabel.setTypeface(app.condensed);
+            tvLabel.setTypeface(tvLabel.getTypeface(), 0);
             tvLabel.setBackgroundColor(0);
             tvLabel.setTextColor(getResources().getColor(Gh4Application.THEME != R.style.LightTheme
                     ? R.color.label_fg_light : R.color.label_fg_dark));
@@ -411,7 +407,7 @@ public class IssueEditActivity extends LoadingFragmentActivity implements OnClic
             int color = Color.parseColor("#" + label.getColor());
 
             mSelectedLabels.add(label);
-            tvLabel.setTypeface(app.boldCondensed);
+            tvLabel.setTypeface(tvLabel.getTypeface(), Typeface.BOLD);
             tvLabel.setBackgroundColor(color);
             tvLabel.setTextColor(UiUtils.textColorForBackground(this, color));
         }

@@ -15,15 +15,14 @@
             android:layout_width="32dp"
             android:layout_height="32dp" />
 
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_title"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_marginLeft="16dp"
             android:gravity="center_vertical"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="?android:attr/textColorPrimary" />
+            android:textAppearance="@style/TextAppearance.ItemTitle" />
 
     </LinearLayout>
 
@@ -103,7 +102,7 @@
                 android:layout_weight="1"
                 android:tag="e102d8"
                 android:background="#e102d8" />
-            <TextView
+            <com.gh4a.widget.StyleableTextView
                 android:id="@+id/custom"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"

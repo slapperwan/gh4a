@@ -19,15 +19,14 @@
             android:layout_marginTop="8dp"
             android:layout_marginRight="16dp" />
 
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/iv_gravatar"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="?android:attr/textColorPrimary" />
+            android:textAppearance="@style/TextAppearance.ItemTitle" />
 
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -38,7 +37,7 @@
             android:maxLines="4"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_created_at"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -46,7 +45,7 @@
             android:layout_below="@id/tv_desc"
             android:layout_toRightOf="@id/iv_gravatar"
             android:layout_marginTop="2dp"
-            android:textAppearance="@style/default_text_micro" />
+            android:textAppearance="@style/TextAppearance.VerySmall" />
 
     </RelativeLayout>
 

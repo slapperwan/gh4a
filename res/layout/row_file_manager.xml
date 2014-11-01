@@ -16,19 +16,19 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginRight="16dp" />
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="?android:attr/textColorPrimary" />
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_size"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="4dp"
         android:layout_gravity="bottom"
-        android:textAppearance="@style/default_text_micro" />
+        android:textAppearance="@style/TextAppearance.VerySmall" />
 
 </LinearLayout>

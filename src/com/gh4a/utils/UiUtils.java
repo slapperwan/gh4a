@@ -52,21 +52,6 @@ public class UiUtils {
         imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
-    public static void assignTypeface(Activity parent, Typeface typeface, int[] textViewIds) {
-        View decor = parent.getWindow() != null ? parent.getWindow().getDecorView() : null;
-        assignTypeface(decor, typeface, textViewIds);
-    }
-
-    public static void assignTypeface(View parent, Typeface typeface, int[] textViewIds) {
-        if (parent == null) {
-            return;
-        }
-        for (int id : textViewIds) {
-            TextView textView = (TextView) parent.findViewById(id);
-            textView.setTypeface(typeface);
-        }
-    }
-
     public static int textColorForBackground(Context context, int backgroundColor) {
         int red = Color.red(backgroundColor);
         int green = Color.green(backgroundColor);

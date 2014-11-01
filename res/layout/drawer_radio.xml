@@ -9,7 +9,7 @@
     android:paddingLeft="16dp"
     android:paddingRight="16dp">
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

@@ -6,7 +6,7 @@
     android:minHeight="72dp"
     android:padding="@dimen/content_padding">
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_files"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -15,9 +15,9 @@
         android:layout_marginLeft="8dp"
         android:drawableLeft="?attr/filesSmallIcon"
         android:drawablePadding="4dp"
-        android:textAppearance="@style/default_text_micro" />
+        android:textAppearance="@style/TextAppearance.VerySmall" />
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_creator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
         android:textColor="?android:attr/textColorPrimary"
         android:visibility="gone" />
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -35,19 +35,18 @@
         android:layout_toRightOf="@id/tv_creator"
         android:layout_alignBaseline="@id/tv_creator"
         android:layout_alignWithParentIfMissing="true"
-        android:textAppearance="@style/default_text_micro" />
+        android:textAppearance="@style/TextAppearance.VerySmall" />
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@id/tv_files"
         android:layout_alignParentLeft="true"
         android:layout_below="@id/tv_timestamp"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="?android:attr/textColorPrimary" />
+        android:textAppearance="@style/TextAppearance.ItemTitle" />
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_sha"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

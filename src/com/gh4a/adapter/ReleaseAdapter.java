@@ -1,20 +1,13 @@
 package com.gh4a.adapter;
 
-import static android.text.format.DateUtils.FORMAT_NUMERIC_DATE;
-import static android.text.format.DateUtils.FORMAT_SHOW_DATE;
-import static android.text.format.DateUtils.FORMAT_SHOW_YEAR;
-import static android.text.format.DateUtils.MINUTE_IN_MILLIS;
-
 import org.eclipse.egit.github.core.Release;
 
 import android.content.Context;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
@@ -26,12 +19,9 @@ public class ReleaseAdapter extends RootAdapter<Release> {
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_release, null);
-        Gh4Application app = Gh4Application.get(mContext);
         ViewHolder viewHolder = new ViewHolder();
 
         viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvTitle.setTypeface(app.condensed);
-
         viewHolder.tvType = (TextView) v.findViewById(R.id.tv_type);
         viewHolder.tvCreatedAt  = (TextView) v.findViewById(R.id.tv_created_at);
 

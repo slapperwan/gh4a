@@ -35,7 +35,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@android:id/empty"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

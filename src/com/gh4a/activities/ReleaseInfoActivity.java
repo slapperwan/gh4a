@@ -30,7 +30,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.gh4a.Constants;
-import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.DownloadAdapter;
@@ -94,10 +93,6 @@ public class ReleaseInfoActivity extends LoadingFragmentActivity implements
     }
 
     private void fillData() {
-        UiUtils.assignTypeface(this, Gh4Application.get(this).boldCondensed, new int[] {
-            R.id.release_notes_title, R.id.downloads_title
-        });
-
         ImageView gravatar = (ImageView) findViewById(R.id.iv_gravatar);
         AvatarHandler.assignAvatar(gravatar, mRelease.getAuthor());
 

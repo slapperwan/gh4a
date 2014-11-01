@@ -9,7 +9,7 @@
     android:paddingRight="@dimen/content_padding"
     style="@style/SelectableItem">
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/comments"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -21,7 +21,7 @@
         android:visibility="gone"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/filename"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -30,11 +30,11 @@
         android:layout_alignWithParentIfMissing="true"
         android:typeface="monospace" />
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/stats"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/filename"
-        android:textAppearance="@style/default_text_micro" />
+        android:textAppearance="@style/TextAppearance.VerySmall" />
 
 </RelativeLayout>

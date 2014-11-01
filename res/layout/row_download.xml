@@ -15,25 +15,24 @@
         android:layout_gravity="center_vertical"
         android:orientation="vertical">
 
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="?android:attr/textColorPrimary" />
+            android:textAppearance="@style/TextAppearance.ItemTitle" />
 
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:maxLines="2" />
 
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_created_at"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/default_text_micro" />
+            android:textAppearance="@style/TextAppearance.VerySmall" />
 
     </LinearLayout>
 
@@ -44,22 +43,22 @@
         android:layout_marginLeft="8dp"
         android:orientation="vertical">
 
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_size"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableLeft="?attr/sizeSmallIcon"
             android:drawablePadding="4dp"
-            android:textAppearance="@style/default_text_micro" />
+            android:textAppearance="@style/TextAppearance.VerySmall" />
 
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_downloads"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:drawableLeft="?attr/downloadSmallIcon"
             android:drawablePadding="4dp"
-            android:textAppearance="@style/default_text_micro" />
+            android:textAppearance="@style/TextAppearance.VerySmall" />
 
     </LinearLayout>
 

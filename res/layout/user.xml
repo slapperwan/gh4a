@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -32,15 +33,15 @@
                         android:layout_height="60dp"
                         android:layout_marginRight="16dp" />
 
-                    <TextView
+                    <com.gh4a.widget.StyleableTextView
                         android:id="@+id/tv_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentTop="true"
                         android:layout_toRightOf="@id/iv_gravatar"
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
+                        android:textAppearance="@style/TextAppearance.HeaderTitle" />
 
-                    <TextView
+                    <com.gh4a.widget.StyleableTextView
                         android:id="@+id/tv_created_at"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -49,7 +50,7 @@
                         android:layout_marginTop="2dp"
                         android:textAppearance="?android:attr/textAppearanceSmall" />
 
-                    <TextView
+                    <com.gh4a.widget.StyleableTextView
                         android:id="@+id/tv_email"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -60,7 +61,7 @@
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColorLink="?android:attr/textColorLink" />
 
-                    <TextView
+                    <com.gh4a.widget.StyleableTextView
                         android:id="@+id/tv_website"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -71,7 +72,7 @@
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColorLink="?android:attr/textColorLink" />
 
-                    <TextView
+                    <com.gh4a.widget.StyleableTextView
                         android:id="@+id/tv_company"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -80,7 +81,7 @@
                         android:layout_marginTop="2dp"
                         android:textAppearance="?android:attr/textAppearanceSmall" />
 
-                    <TextView
+                    <com.gh4a.widget.StyleableTextView
                         android:id="@+id/tv_location"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -105,14 +106,14 @@
                         android:gravity="center_horizontal"
                         android:orientation="vertical">
 
-                        <TextView
+                        <com.gh4a.widget.StyleableTextView
                             android:id="@+id/tv_members_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/view"
-                            android:textAppearance="?android:attr/textAppearanceLarge" />
+                            android:textAppearance="@style/TextAppearance.CountHeaderItem" />
 
-                        <TextView
+                        <com.gh4a.widget.StyleableTextView
                             android:id="@+id/tv_members_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -129,14 +130,14 @@
                         android:gravity="center_horizontal"
                         android:orientation="vertical">
 
-                        <TextView
+                        <com.gh4a.widget.StyleableTextView
                             android:id="@+id/tv_followers_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:textAppearance="?android:attr/textAppearanceLarge" />
+                            android:textAppearance="@style/TextAppearance.CountHeaderItem" />
 
-                        <TextView
+                        <com.gh4a.widget.StyleableTextView
                             android:id="@+id/tv_followers_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -153,13 +154,13 @@
                         android:gravity="center_horizontal"
                         android:orientation="vertical">
 
-                        <TextView
+                        <com.gh4a.widget.StyleableTextView
                             android:id="@+id/tv_following_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceLarge" />
+                            android:textAppearance="@style/TextAppearance.CountHeaderItem" />
 
-                        <TextView
+                        <com.gh4a.widget.StyleableTextView
                             android:id="@+id/tv_following_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -176,13 +177,13 @@
                         android:gravity="center_horizontal"
                         android:orientation="vertical">
 
-                        <TextView
+                        <com.gh4a.widget.StyleableTextView
                             android:id="@+id/tv_repos_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceLarge" />
+                            android:textAppearance="@style/TextAppearance.CountHeaderItem" />
 
-                        <TextView
+                        <com.gh4a.widget.StyleableTextView
                             android:id="@+id/tv_repos_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -199,13 +200,13 @@
                         android:gravity="center_horizontal"
                         android:orientation="vertical">
 
-                        <TextView
+                        <com.gh4a.widget.StyleableTextView
                             android:id="@+id/tv_gists_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceLarge" />
+                            android:textAppearance="@style/TextAppearance.CountHeaderItem" />
 
-                        <TextView
+                        <com.gh4a.widget.StyleableTextView
                             android:id="@+id/tv_gists_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -229,7 +230,7 @@
                 android:layout_marginBottom="@dimen/overview_header_spacing"
                 android:orientation="vertical">
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_pub_repos_label"
                     style="@style/HeaderLabel"
                     android:layout_width="match_parent"
@@ -271,7 +272,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_orgs"
                     style="@style/HeaderLabel"
                     android:layout_width="match_parent"

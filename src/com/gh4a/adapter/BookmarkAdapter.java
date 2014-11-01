@@ -57,12 +57,10 @@ public class BookmarkAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.row_bookmark, parent, false);
-        Gh4Application app = Gh4Application.get(context);
         ViewHolder holder = new ViewHolder();
 
         holder.icon = (ImageView) view.findViewById(R.id.iv_icon);
         holder.title = (TextView) view.findViewById(R.id.tv_title);
-        holder.title.setTypeface(app.condensed);
         holder.extra = (TextView) view.findViewById(R.id.tv_extra);
         view.setTag(holder);
 

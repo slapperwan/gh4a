@@ -183,10 +183,6 @@ public class IssueActivity extends LoadingFragmentActivity implements
         mHeader = (ViewGroup) getLayoutInflater().inflate(R.layout.issue_header, mListView, false);
         mHeader.setClickable(false);
 
-        UiUtils.assignTypeface(mHeader, Gh4Application.get(this).condensed, new int[] {
-            R.id.tv_title
-        });
-
         mListView.addHeaderView(mHeader, null, false);
 
         mEventAdapter = new IssueEventAdapter(this, mRepoOwner, mRepoName, this);

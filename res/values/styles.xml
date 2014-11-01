@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-    <style name="default_text_small" parent="@android:style/TextAppearance.Medium">
-        <item name="android:textSize">14sp</item>
-    </style>
-
-    <style name="default_text_small_italic" parent="@android:style/TextAppearance.Medium">
-        <item name="android:textSize">14sp</item>
-        <item name="android:textStyle">italic</item>
-    </style>
-
-    <style name="default_text_micro" parent="@android:style/TextAppearance.Small">
+    <style name="TextAppearance.VerySmall" parent="TextAppearance.AppCompat.Small">
         <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="TextAppearance.ItemTitle" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="font">condensed</item>
+    </style>
+
+    <style name="TextAppearance.HeaderTitle" parent="TextAppearance.AppCompat.Large">
+        <item name="font">condensed</item>
+    </style>
+
+    <style name="TextAppearance.CountHeaderItem" parent="TextAppearance.AppCompat.Large">
+        <item name="font">condensed</item>
     </style>
 
     <style name="default_text_small_url" parent="@android:style/TextAppearance.Small">
@@ -19,11 +23,6 @@
 
     <style name="small_highlighted_sha" parent="default_text_small_url">
         <item name="android:typeface">monospace</item>
-    </style>
-
-    <style name="default_text_micro_url" parent="@android:style/TextAppearance.Small">
-        <item name="android:textSize">12sp</item>
-        <item name="android:textColor">?android:attr/textColorLink</item>
     </style>
 
     <style name="LoadingProgress">
@@ -46,20 +45,19 @@
     <style name="SelectableLabel" parent="@style/SelectableItem">
         <item name="android:paddingTop">6dp</item>
         <item name="android:paddingBottom">6dp</item>
-        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textAppearance">@style/TextAppearance.ItemTitle</item>
     </style>
 
-    <style name="HeaderLabelBase">
+    <style name="HeaderLabel">
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Medium</item>
         <item name="android:textColor">?attr/colorPrimary</item>
         <item name="android:paddingLeft">@dimen/content_padding</item>
         <item name="android:paddingRight">@dimen/content_padding</item>
         <item name="android:minHeight">48dp</item>
         <item name="android:gravity">center_vertical</item>
+        <item name="font">boldCondensed</item>
+        <item name="allCaps">true</item>
     </style>
-
-    <style name="HeaderLabel" parent="HeaderLabelBase" />
 
     <style name="Widget.ActionBar.TabView" parent="Widget.AppCompat.ActionBar.TabView">
         <item name="android:background">@drawable/tab_indicator</item>

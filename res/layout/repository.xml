@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -18,13 +20,13 @@
                 android:layout_height="wrap_content"
                 android:padding="@dimen/content_padding">
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_repo_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
+                    android:textAppearance="@style/TextAppearance.HeaderTitle" />
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_parent"
                     style="@style/SelectableItem"
                     android:layout_width="wrap_content"
@@ -33,16 +35,17 @@
                     android:layout_marginBottom="8dp"
                     android:layout_marginTop="8dp"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="?android:attr/textColorLink" />
+                    android:textColor="?android:attr/textColorLink"
+                    app:font="italic" />
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_desc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/tv_parent"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_url"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -52,7 +55,7 @@
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColorLink="?android:attr/textColorLink" />
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_language"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -76,13 +79,13 @@
                         android:gravity="center_horizontal"
                         android:orientation="vertical">
 
-                        <TextView
+                        <com.gh4a.widget.StyleableTextView
                             android:id="@+id/tv_issues_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceLarge" />
+                            android:textAppearance="@style/TextAppearance.CountHeaderItem" />
 
-                        <TextView
+                        <com.gh4a.widget.StyleableTextView
                             android:id="@+id/tv_issues_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -99,13 +102,13 @@
                         android:gravity="center_horizontal"
                         android:orientation="vertical">
 
-                        <TextView
+                        <com.gh4a.widget.StyleableTextView
                             android:id="@+id/tv_stargazers_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceLarge" />
+                            android:textAppearance="@style/TextAppearance.CountHeaderItem" />
 
-                        <TextView
+                        <com.gh4a.widget.StyleableTextView
                             android:id="@+id/tv_stargazers_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -122,13 +125,13 @@
                         android:gravity="center_horizontal"
                         android:orientation="vertical">
 
-                        <TextView
+                        <com.gh4a.widget.StyleableTextView
                             android:id="@+id/tv_forks_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceLarge" />
+                            android:textAppearance="@style/TextAppearance.CountHeaderItem" />
 
-                        <TextView
+                        <com.gh4a.widget.StyleableTextView
                             android:id="@+id/tv_forks_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -154,16 +157,16 @@
                                 style="@style/LoadingProgress"
                                 android:layout_gravity="center" />
 
-                            <TextView
+                            <com.gh4a.widget.StyleableTextView
                                 android:id="@+id/tv_pull_requests_count"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
-                                android:textAppearance="?android:attr/textAppearanceLarge" />
+                                android:textAppearance="@style/TextAppearance.CountHeaderItem" />
 
                         </FrameLayout>
 
-                        <TextView
+                        <com.gh4a.widget.StyleableTextView
                             android:id="@+id/tv_pull_requests_label"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -186,7 +189,7 @@
                 android:layout_marginBottom="@dimen/overview_header_spacing"
                 android:orientation="vertical">
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/readme_title"
                     style="@style/HeaderLabel"
                     android:layout_width="match_parent"
@@ -197,7 +200,7 @@
                     android:id="@+id/pb_readme"
                     style="@style/LoadingProgress" />
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/readme"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -219,14 +222,14 @@
                 android:layout_marginBottom="@dimen/overview_header_spacing"
                 android:orientation="vertical">
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/other_info"
                     style="@style/HeaderLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/other_info" />
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_contributors_label"
                     style="@style/SelectableLabel"
                     android:layout_width="match_parent"
@@ -235,7 +238,7 @@
                     android:paddingRight="@dimen/content_padding"
                     android:text="@string/repo_contributors" />
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_collaborators_label"
                     style="@style/SelectableLabel"
                     android:layout_width="match_parent"
@@ -244,7 +247,7 @@
                     android:paddingRight="@dimen/content_padding"
                     android:text="@string/repo_collaborators" />
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_wiki_label"
                     style="@style/SelectableLabel"
                     android:layout_width="match_parent"
@@ -253,7 +256,7 @@
                     android:paddingRight="@dimen/content_padding"
                     android:text="@string/recent_wiki" />
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_releases_label"
                     style="@style/SelectableLabel"
                     android:layout_width="match_parent"
@@ -262,7 +265,7 @@
                     android:paddingRight="@dimen/content_padding"
                     android:text="@string/releases" />
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_downloads_label"
                     style="@style/SelectableLabel"
                     android:layout_width="match_parent"

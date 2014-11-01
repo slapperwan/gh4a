@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
@@ -22,11 +21,8 @@ public class DownloadAdapter extends RootAdapter<Download> {
     protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_download, null);
         ViewHolder viewHolder = new ViewHolder();
-        Gh4Application app = Gh4Application.get(mContext);
 
         viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvTitle.setTypeface(app.condensed);
-
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
         viewHolder.tvCreatedAt = (TextView) v.findViewById(R.id.tv_created_at);
         viewHolder.tvSize = (TextView) v.findViewById(R.id.tv_size);

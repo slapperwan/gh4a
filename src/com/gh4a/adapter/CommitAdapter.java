@@ -26,7 +26,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.AvatarHandler;
@@ -42,14 +41,11 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> implements View
     protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_commit, parent, false);
         ViewHolder viewHolder = new ViewHolder();
-        Gh4Application app = Gh4Application.get(mContext);
-
-        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvDesc.setTypeface(app.condensed);
 
         viewHolder.tvSha = (TextView) v.findViewById(R.id.tv_sha);
         viewHolder.tvSha.setTypeface(Typeface.MONOSPACE);
 
+        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
         viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
         viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
         viewHolder.tvComments = (TextView) v.findViewById(R.id.tv_comments);

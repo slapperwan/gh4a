@@ -22,7 +22,7 @@
         android:src="?attr/contentEditIcon"
         style="@style/SelectableItem" />
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_extra"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -31,18 +31,18 @@
         android:layout_toRightOf="@id/iv_gravatar"
         android:layout_alignParentTop="true" />
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/default_text_micro"
+        android:textAppearance="@style/TextAppearance.VerySmall"
         android:layout_marginLeft="16dp"
         android:layout_toRightOf="@id/tv_extra"
         android:layout_toLeftOf="@id/iv_edit"
         android:layout_alignBaseline="@id/tv_extra"
         android:layout_alignWithParentIfMissing="true" />
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_file"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -53,7 +53,7 @@
         android:layout_alignWithParentIfMissing="true"
         android:visibility="gone" />
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_desc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

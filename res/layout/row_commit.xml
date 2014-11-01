@@ -13,7 +13,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginRight="16dp" />
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_comments"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -24,7 +24,7 @@
         android:visibility="gone"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_extra"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -33,23 +33,22 @@
         android:layout_toRightOf="@id/iv_gravatar"
         android:layout_alignParentTop="true" />
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/default_text_micro"
+        android:textAppearance="@style/TextAppearance.VerySmall"
         android:layout_marginLeft="16dp"
         android:layout_toRightOf="@id/tv_extra"
         android:layout_alignBaseline="@id/tv_extra"
         android:layout_toLeftOf="@id/tv_comments"
         android:layout_alignWithParentIfMissing="true" />
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_desc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="?android:attr/textColorPrimary"
+        android:textAppearance="@style/TextAppearance.ItemTitle"
         android:maxLines="2"
         android:ellipsize="end"
         android:layout_toRightOf="@id/iv_gravatar"
@@ -57,7 +56,7 @@
         android:layout_alignWithParentIfMissing="true"
         android:layout_below="@id/tv_extra" />
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_sha"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

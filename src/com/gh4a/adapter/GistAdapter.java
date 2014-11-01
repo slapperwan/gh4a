@@ -25,7 +25,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
@@ -40,12 +39,9 @@ public class GistAdapter extends RootAdapter<Gist> {
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_gist, parent, false);
-        Gh4Application app = Gh4Application.get(mContext);
         ViewHolder viewHolder = new ViewHolder();
 
         viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvTitle.setTypeface(app.condensed);
-
         viewHolder.tvCreator = (TextView) v.findViewById(R.id.tv_creator);
         viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
         viewHolder.tvSha = (TextView) v.findViewById(R.id.tv_sha);

@@ -17,12 +17,10 @@ package com.gh4a.fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBarActivity;
 import android.text.format.DateFormat;
-import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,7 +44,6 @@ import com.gh4a.loader.UserLoader;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.User;
@@ -160,20 +157,6 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
     }
 
     private void fillData() {
-        Gh4Application app = (Gh4Application) getActivity().getApplication();
-
-        UiUtils.assignTypeface(mContentView, app.condensed, new int[] {
-            R.id.tv_name, R.id.tv_followers_count, R.id.tv_members_count,
-            R.id.tv_repos_count, R.id.tv_gists_count, R.id.tv_following_count
-        });
-        UiUtils.assignTypeface(mContentView, app.boldCondensed, new int[] {
-            R.id.tv_pub_repos_label, R.id.tv_orgs
-        });
-        UiUtils.assignTypeface(mContentView, app.regular, new int[] {
-            R.id.tv_created_at, R.id.tv_email, R.id.tv_website,
-            R.id.tv_company, R.id.tv_location
-        });
-
         ImageView gravatar = (ImageView) mContentView.findViewById(R.id.iv_gravatar);
         AvatarHandler.assignAvatar(gravatar, mUser);
 
@@ -291,8 +274,6 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
     }
 
     public void fillTopRepos(Collection<Repository> topRepos) {
-        Gh4Application app = Gh4Application.get(getActivity());
-
         LinearLayout ll = (LinearLayout) mContentView.findViewById(R.id.ll_top_repos);
         ll.removeAllViews();
 
@@ -305,7 +286,6 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
                 rowView.setTag(repo);
 
                 TextView tvTitle = (TextView) rowView.findViewById(R.id.tv_title);
-                tvTitle.setTypeface(app.condensed);
                 tvTitle.setText(repo.getOwner().getLogin() + "/" + repo.getName());
 
                 TextView tvDesc = (TextView) rowView.findViewById(R.id.tv_desc);
@@ -338,7 +318,6 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
     }
 
     public void fillOrganizations(List<User> organizations) {
-        Gh4Application app = Gh4Application.get(getActivity());
         ViewGroup llOrgs = (ViewGroup) mContentView.findViewById(R.id.ll_orgs);
         LinearLayout llOrg = (LinearLayout) mContentView.findViewById(R.id.ll_org);
         int count = organizations != null ? organizations.size() : 0;
@@ -352,7 +331,6 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
             TextView rowView = (TextView) inflater.inflate(R.layout.selectable_label, llOrg, false);
 
             rowView.setOnClickListener(this);
-            rowView.setTypeface(app.condensed);
             rowView.setText(org.getLogin());
             rowView.setTag(org);
 

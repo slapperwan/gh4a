@@ -35,7 +35,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.gh4a.Constants;
-import com.gh4a.Gh4Application;
 import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.loader.GistLoader;
@@ -79,13 +78,6 @@ public class GistActivity extends LoadingFragmentActivity implements OnClickList
         setContentView(R.layout.gist);
         setContentShown(false);
 
-        UiUtils.assignTypeface(this, Gh4Application.get(this).condensed, new int[] {
-            R.id.tv_desc
-        });
-        UiUtils.assignTypeface(this, Gh4Application.get(this).boldCondensed, new int[] {
-            R.id.files_title
-        });
-
         ActionBar mActionBar = getSupportActionBar();
         mActionBar.setTitle(getString(R.string.gist_title, mGistId));
         mActionBar.setSubtitle(mUserLogin);
@@ -108,7 +100,6 @@ public class GistActivity extends LoadingFragmentActivity implements OnClickList
         if (files != null && !files.isEmpty()) {
             ViewGroup container = (ViewGroup) findViewById(R.id.file_container);
             LayoutInflater inflater = getLayoutInflater();
-            Gh4Application app = Gh4Application.get(this);
 
             for (GistFile gistFile : files.values()) {
                 TextView rowView = (TextView) inflater.inflate(R.layout.selectable_label,
@@ -116,7 +107,6 @@ public class GistActivity extends LoadingFragmentActivity implements OnClickList
 
                 rowView.setText(gistFile.getFilename());
                 rowView.setTextColor(UiUtils.resolveColor(this, android.R.attr.textColorPrimary));
-                rowView.setTypeface(app.condensed);
                 rowView.setOnClickListener(this);
                 rowView.setTag(gistFile);
                 container.addView(rowView);

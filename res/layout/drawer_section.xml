@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="48dp">
 
-    <TextView
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -14,7 +14,7 @@
         android:paddingLeft="16dp"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textAllCaps="true"
-        android:textStyle="bold" />
+        app:font="bold" />
 
     <View
         android:layout_width="match_parent"

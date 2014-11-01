@@ -52,10 +52,8 @@ import com.gh4a.fragment.SettingsFragment;
  * The Class Gh4Application.
  */
 public class Gh4Application extends Application implements OnSharedPreferenceChangeListener {
-
     public Typeface boldCondensed;
     public Typeface condensed;
-    public Typeface regular;
     public Typeface italic;
     public static int THEME = R.style.DefaultTheme;
 
@@ -93,7 +91,6 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
 
         boldCondensed = Typeface.createFromAsset(getAssets(), "fonts/Roboto-BoldCondensed.ttf");
         condensed = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Condensed.ttf");
-        regular = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Regular.ttf");
         italic = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Italic.ttf");
 
         SharedPreferences prefs = getPrefs();

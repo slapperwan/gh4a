@@ -77,17 +77,11 @@ public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListe
         View v = inflater.inflate(R.layout.feed_row, parent, false);
         ViewHolder viewHolder = new ViewHolder();
 
-        Gh4Application app = (Gh4Application) mContext.getApplicationContext();
-
         viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
         viewHolder.ivGravatar.setOnClickListener(this);
 
         viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvTitle.setTypeface(app.condensed);
-
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvDesc.setTypeface(app.regular);
-
         viewHolder.tvCreatedAt = (TextView) v.findViewById(R.id.tv_created_at);
 
         v.setTag(viewHolder);

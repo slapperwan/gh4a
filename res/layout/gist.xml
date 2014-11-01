@@ -19,18 +19,17 @@
             android:padding="@dimen/content_padding"
             android:orientation="vertical">
 
-            <TextView
+            <com.gh4a.widget.StyleableTextView
                 android:id="@+id/tv_created_at"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
-            <TextView
+            <com.gh4a.widget.StyleableTextView
                 android:id="@+id/tv_desc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="?android:attr/textColorPrimary" />
+                android:textAppearance="@style/TextAppearance.ItemTitle" />
 
             </LinearLayout>
 
@@ -47,7 +46,7 @@
                 android:layout_marginBottom="@dimen/overview_header_spacing"
                 android:orientation="vertical">
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/files_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

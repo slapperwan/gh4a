@@ -167,10 +167,6 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
                 R.layout.issue_header, getListView(), false);
         getListView().addHeaderView(mHeader, null, true);
 
-        UiUtils.assignTypeface(mHeader, Gh4Application.get(getActivity()).condensed, new int[] {
-            R.id.tv_title
-        });
-
         super.onActivityCreated(savedInstanceState);
 
         fillData();

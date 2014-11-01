@@ -110,15 +110,6 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
             Bundle savedInstanceState) {
         mContentView = inflater.inflate(R.layout.commit, null);
 
-        Gh4Application app = Gh4Application.get(getActivity());
-        UiUtils.assignTypeface(mContentView, app.condensed, new int[] {
-            R.id.tv_title
-        });
-        UiUtils.assignTypeface(mContentView, app.boldCondensed, new int[] {
-            R.id.commit_added, R.id.commit_changed,
-            R.id.commit_renamed, R.id.commit_deleted
-        });
-
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 

@@ -27,36 +27,35 @@
                     android:layout_height="40dp"
                     android:layout_marginRight="16dp" />
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_extra"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@color/primary_text_default_material_dark"
-                    android:textStyle="bold"
                     android:textSize="16sp"
                     android:layout_toRightOf="@id/iv_gravatar" />
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_timestamp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/default_text_micro"
+                    android:textAppearance="@style/TextAppearance.VerySmall"
                     android:textColor="@color/secondary_text_default_material_dark"
                     android:layout_marginTop="2dp"
                     android:layout_toRightOf="@id/iv_gravatar"
                     android:layout_below="@id/tv_extra"/>
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textAppearance="@style/TextAppearance.ItemTitle"
                     android:textColor="@color/primary_text_default_material_dark"
                     android:layout_below="@id/iv_gravatar" />
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_milestone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -75,7 +74,7 @@
                     android:layout_below="@id/tv_milestone"
                     android:visibility="gone" />
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_assignee"
                     android:layout_width="wrap_content"
                     android:layout_height="24dp"
@@ -96,7 +95,7 @@
                     android:layout_below="@id/iv_assignee"
                     android:visibility="gone" />
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_pull"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -115,13 +114,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_alignParentRight="true"
-                android:textAppearance="@style/default_text_micro"
+                android:textAppearance="@style/TextAppearance.VerySmall"
                 android:textColor="@color/primary_text_default_material_dark"
                 android:gravity="top|center" />
 
         </LinearLayout>
 
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

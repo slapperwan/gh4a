@@ -15,23 +15,23 @@
         android:layout_marginLeft="8dp"
         android:orientation="vertical">
 
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_milestone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
             android:drawableLeft="?attr/milestoneSmallIcon"
             android:drawablePadding="4dp"
-            android:textAppearance="@style/default_text_micro"
+            android:textAppearance="@style/TextAppearance.VerySmall"
             android:visibility="gone" />
 
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_comments"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableLeft="?attr/commentsIcon"
             android:drawablePadding="4dp"
-            android:textAppearance="@style/default_text_micro" />
+            android:textAppearance="@style/TextAppearance.VerySmall" />
 
     </LinearLayout>
 
@@ -51,7 +51,7 @@
         android:layout_gravity="bottom"
         android:layout_marginTop="8dp" />
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_creator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -59,28 +59,27 @@
         android:textColor="?android:attr/textColorPrimary"
         android:layout_toRightOf="@id/iv_gravatar" />
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/tv_creator"
         android:layout_alignBaseline="@id/tv_creator"
         android:layout_marginLeft="16dp"
-        android:textAppearance="@style/default_text_micro" />
+        android:textAppearance="@style/TextAppearance.VerySmall" />
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_desc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="?android:attr/textColorPrimary"
+        android:textAppearance="@style/TextAppearance.ItemTitle"
         android:layout_toRightOf="@id/iv_gravatar"
         android:layout_below="@id/tv_creator"
         android:layout_toLeftOf="@id/info"
         android:maxLines="2"
         android:ellipsize="end" />
 
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

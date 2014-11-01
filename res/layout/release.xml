@@ -25,14 +25,14 @@
                     android:layout_centerVertical="true"
                     android:layout_marginRight="16dp" />
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_releaseinfo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:layout_toRightOf="@id/iv_gravatar" />
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_releasetype"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
                     android:layout_toRightOf="@id/iv_gravatar"
                     android:layout_below="@id/tv_releaseinfo" />
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_releasetag"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -66,7 +66,7 @@
                 android:layout_marginBottom="@dimen/overview_header_spacing"
                 android:orientation="vertical">
 
-            <TextView
+            <com.gh4a.widget.StyleableTextView
                 android:id="@+id/release_notes_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -77,7 +77,7 @@
                 android:id="@+id/pb_releasenotes"
                 style="@style/LoadingProgress" />
 
-            <TextView
+            <com.gh4a.widget.StyleableTextView
                 android:id="@+id/tv_release_notes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -101,7 +101,7 @@
                 android:layout_marginBottom="@dimen/overview_header_spacing"
                 android:orientation="vertical">
 
-                <TextView
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/downloads_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
