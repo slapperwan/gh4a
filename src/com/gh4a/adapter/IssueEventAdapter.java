@@ -40,6 +40,7 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.StyleableTextView;
 import com.github.mobile.util.HttpImageGetter;
 
 public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
@@ -72,8 +73,8 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
 
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
         viewHolder.tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
-        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-        viewHolder.tvFile = (TextView) v.findViewById(R.id.tv_file);
+        viewHolder.tvExtra = (StyleableTextView) v.findViewById(R.id.tv_extra);
+        viewHolder.tvFile = (StyleableTextView) v.findViewById(R.id.tv_file);
         viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
         viewHolder.ivEdit = (ImageView) v.findViewById(R.id.iv_edit);
 
@@ -90,8 +91,8 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
         AvatarHandler.assignAvatar(viewHolder.ivGravatar, event.getUser());
         viewHolder.ivGravatar.setTag(event);
 
-        viewHolder.tvExtra.setText(StringUtils.applyBoldTags(
-                mContext.getString(R.string.issue_comment_header, login), null));
+        StringUtils.applyBoldTagsAndSetText(viewHolder.tvExtra,
+                mContext.getString(R.string.issue_comment_header, login));
         viewHolder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
                 event.getCreatedAt(), true));
 
@@ -101,7 +102,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
                     FileUtils.getFileName(commitComment.getPath()));
 
             viewHolder.tvFile.setVisibility(View.VISIBLE);
-            viewHolder.tvFile.setText(StringUtils.applyBoldTags(text, null));
+            StringUtils.applyBoldTagsAndSetText(viewHolder.tvFile, text);
         } else {
             viewHolder.tvFile.setVisibility(View.GONE);
         }
@@ -110,7 +111,8 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
             mImageGetter.bind(viewHolder.tvDesc, event.comment.getBodyHtml(),
                     event.comment.getId());
         } else {
-            viewHolder.tvDesc.setText(formatEvent(event.event));
+            viewHolder.tvDesc.setText(formatEvent(event.event,
+                    viewHolder.tvExtra.getTypefaceValue()));
         }
 
         boolean canEdit = login.equals(ourLogin) || mRepoOwner.equals(ourLogin);
@@ -123,7 +125,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
         }
     }
 
-    private CharSequence formatEvent(final IssueEvent event) {
+    private CharSequence formatEvent(final IssueEvent event, int typefaceValue) {
         String type = event.getEvent();
         String textBase = null;
         int textResId = 0;
@@ -155,7 +157,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
         if (textBase == null) {
             textBase = mContext.getString(textResId, event.getActor().getLogin());
         }
-        SpannableStringBuilder text = StringUtils.applyBoldTags(textBase, null);
+        SpannableStringBuilder text = StringUtils.applyBoldTags(mContext, textBase, typefaceValue);
         if (event.getCommitId() == null) {
             return text;
         }
@@ -205,8 +207,8 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
     private static class ViewHolder {
         public ImageView ivGravatar;
         public TextView tvDesc;
-        public TextView tvExtra;
-        public TextView tvFile;
+        public StyleableTextView tvExtra;
+        public StyleableTextView tvFile;
         public TextView tvTimestamp;
         public ImageView ivEdit;
     }

@@ -4,6 +4,7 @@ import org.eclipse.egit.github.core.Label;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +13,10 @@ import android.widget.TextView;
 
 import com.gh4a.ColorPickerDialog;
 import com.gh4a.ColorPickerDialog.OnColorChangedListener;
+import com.gh4a.utils.TypefaceCache;
 import com.gh4a.utils.UiUtils;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.widget.StyleableTextView;
 
 public class IssueLabelAdapter extends RootAdapter<Label> implements View.OnClickListener {
     public IssueLabelAdapter(Context context) {
@@ -27,13 +29,13 @@ public class IssueLabelAdapter extends RootAdapter<Label> implements View.OnClic
         ViewHolder holder = new ViewHolder();
 
         holder.color = v.findViewById(R.id.view_color);
-        holder.label = (TextView) v.findViewById(R.id.tv_title);
+        holder.label = (StyleableTextView) v.findViewById(R.id.tv_title);
         holder.editor = (EditText) v.findViewById(R.id.et_label);
         holder.collapsedContainer = v.findViewById(R.id.collapsed);
         holder.expandedContainer = v.findViewById(R.id.expanded);
 
-        Gh4Application app = Gh4Application.get(mContext);
-        holder.editor.setTypeface(app.condensed);
+        Typeface labelTf = TypefaceCache.getTypeface(mContext, holder.label.getTypefaceValue());
+        holder.editor.setTypeface(labelTf);
 
         ViewGroup colors = (ViewGroup) v.findViewById(R.id.colors);
         int count = colors.getChildCount();
@@ -100,7 +102,7 @@ public class IssueLabelAdapter extends RootAdapter<Label> implements View.OnClic
 
     protected static class ViewHolder {
         public View color;
-        public TextView label;
+        public StyleableTextView label;
         public EditText editor;
         public TextView customColorButton;
         public View collapsedContainer;

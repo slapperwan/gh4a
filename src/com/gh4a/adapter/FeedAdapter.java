@@ -59,13 +59,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.CustomTypefaceSpan;
 import com.gh4a.widget.EllipsizeLineSpan;
+import com.gh4a.widget.StyleableTextView;
 
 public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListener {
     public FeedAdapter(Context context) {
@@ -80,8 +80,8 @@ public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListe
         viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
         viewHolder.ivGravatar.setOnClickListener(this);
 
-        viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+        viewHolder.tvTitle = (StyleableTextView) v.findViewById(R.id.tv_title);
+        viewHolder.tvDesc = (StyleableTextView) v.findViewById(R.id.tv_desc);
         viewHolder.tvCreatedAt = (TextView) v.findViewById(R.id.tv_created_at);
 
         v.setTag(viewHolder);
@@ -96,12 +96,11 @@ public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListe
         AvatarHandler.assignAvatar(viewHolder.ivGravatar, actor);
         viewHolder.ivGravatar.setTag(actor);
 
-        Typeface boldFont = Gh4Application.get(mContext).boldCondensed;
-        viewHolder.tvTitle.setText(StringUtils.applyBoldTags(formatTitle(event), boldFont));
+        StringUtils.applyBoldTagsAndSetText(viewHolder.tvTitle, formatTitle(event));
         viewHolder.tvCreatedAt.setText(StringUtils.formatRelativeTime(
                 mContext, event.getCreatedAt(), false));
 
-        CharSequence content = formatDescription(event);
+        CharSequence content = formatDescription(event, viewHolder.tvDesc.getTypefaceValue());
         viewHolder.tvDesc.setText(content);
         viewHolder.tvDesc.setVisibility(content != null ? View.VISIBLE : View.GONE);
     }
@@ -122,7 +121,7 @@ public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListe
         return true;
     }
 
-    private CharSequence formatDescription(Event event) {
+    private CharSequence formatDescription(Event event, int typefaceValue) {
         String eventType = event.getType();
         EventRepository eventRepo = event.getRepo();
 
@@ -236,7 +235,7 @@ public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListe
                     String text = res.getString(R.string.event_push_desc, count - 3);
                     ssb.append("\n");
                     ssb.append(text);
-                    ssb.setSpan(new CustomTypefaceSpan(Gh4Application.get(mContext).italic),
+                    ssb.setSpan(new CustomTypefaceSpan(mContext, typefaceValue, Typeface.ITALIC),
                             ssb.length() - text.length(), ssb.length(), 0);
                 }
                 return ssb;
@@ -455,8 +454,8 @@ public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListe
      */
     private static class ViewHolder {
         public ImageView ivGravatar;
-        public TextView tvTitle;
-        public TextView tvDesc;
+        public StyleableTextView tvTitle;
+        public StyleableTextView tvDesc;
         public TextView tvCreatedAt;
     }
 }

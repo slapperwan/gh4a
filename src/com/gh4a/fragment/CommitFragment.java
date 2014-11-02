@@ -35,6 +35,7 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.StyleableTextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -176,13 +177,15 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
 
 
         ImageView commitGravatar = (ImageView) mContentView.findViewById(R.id.iv_commit_gravatar);
-        TextView commitExtra = (TextView) mContentView.findViewById(R.id.tv_commit_extra);
+        StyleableTextView commitExtra =
+                (StyleableTextView) mContentView.findViewById(R.id.tv_commit_extra);
+
         if (!CommitUtils.authorEqualsCommitter(mCommit)) {
             AvatarHandler.assignAvatar(commitGravatar, mCommit.getCommitter());
             String committerText = getString(R.string.commit_details,
                     CommitUtils.getCommitterName(app, mCommit),
                     StringUtils.formatRelativeTime(activity, commit.getCommitter().getDate(), true));
-            commitExtra.setText(StringUtils.applyBoldTags(committerText, null));
+            StringUtils.applyBoldTagsAndSetText(commitExtra, committerText);
 
             commitGravatar.setVisibility(View.VISIBLE);
             commitExtra.setVisibility(View.VISIBLE);

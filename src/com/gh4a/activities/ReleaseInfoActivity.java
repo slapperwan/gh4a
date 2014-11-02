@@ -40,6 +40,7 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.StyleableTextView;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
@@ -96,10 +97,10 @@ public class ReleaseInfoActivity extends LoadingFragmentActivity implements
         ImageView gravatar = (ImageView) findViewById(R.id.iv_gravatar);
         AvatarHandler.assignAvatar(gravatar, mRelease.getAuthor());
 
-        TextView details = (TextView) findViewById(R.id.tv_releaseinfo);
+        StyleableTextView details = (StyleableTextView) findViewById(R.id.tv_releaseinfo);
         String detailsText = getString(R.string.release_details, mReleaser.getLogin(),
                 StringUtils.formatRelativeTime(this, mRelease.getCreatedAt(), true));
-        details.setText(StringUtils.applyBoldTags(detailsText, null));
+        StringUtils.applyBoldTagsAndSetText(details, detailsText);
 
         TextView releaseType = (TextView) findViewById(R.id.tv_releasetype);
         if (mRelease.isDraft()) {

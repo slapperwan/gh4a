@@ -1,17 +1,18 @@
 package com.gh4a.widget;
 
+import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.text.TextPaint;
 import android.text.style.MetricAffectingSpan;
 
-public class CustomTypefaceSpan extends MetricAffectingSpan
-{
-    private final Typeface typeface;
+import com.gh4a.utils.TypefaceCache;
 
-    public CustomTypefaceSpan(final Typeface typeface)
-    {
-        this.typeface = typeface;
+public class CustomTypefaceSpan extends MetricAffectingSpan {
+    private final Typeface mTypeface;
+
+    public CustomTypefaceSpan(Context context, int typefaceValue, int style) {
+        mTypeface = TypefaceCache.getTypeface(context, typefaceValue, style);
     }
 
     @Override
@@ -30,18 +31,16 @@ public class CustomTypefaceSpan extends MetricAffectingSpan
     {
         final Typeface oldTypeface = paint.getTypeface();
         final int oldStyle = oldTypeface != null ? oldTypeface.getStyle() : 0;
-        final int fakeStyle = oldStyle & ~typeface.getStyle();
+        final int fakeStyle = oldStyle & ~mTypeface.getStyle();
 
-        if ((fakeStyle & Typeface.BOLD) != 0)
-        {
+        if ((fakeStyle & Typeface.BOLD) != 0) {
             paint.setFakeBoldText(true);
         }
 
-        if ((fakeStyle & Typeface.ITALIC) != 0)
-        {
+        if ((fakeStyle & Typeface.ITALIC) != 0) {
             paint.setTextSkewX(-0.25f);
         }
 
-        paint.setTypeface(typeface);
+        paint.setTypeface(mTypeface);
     }
 }

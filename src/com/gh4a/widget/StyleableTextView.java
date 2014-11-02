@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.utils.TypefaceCache;
 
 import java.util.Locale;
 
@@ -20,11 +21,7 @@ public class StyleableTextView extends TextView {
         android.R.attr.textAppearance
     };
 
-    private static Typeface sTypefaceRegular;
-    private static Typeface sTypefaceBold;
-    private static Typeface sTypefaceItalic;
-    private static Typeface sTypefaceCondensed;
-    private static Typeface sTypefaceBoldCondensed;
+    private int mTypefaceValue = TypefaceCache.TF_REGULAR;
 
     public StyleableTextView(Context context) {
         super(context, null);
@@ -40,12 +37,13 @@ public class StyleableTextView extends TextView {
         initAttributes(context, attrs, defStyle);
     }
 
-    private void initAttributes(Context context, AttributeSet attrs, int defStyle) {
-        initTypefacesIfNeeded(context.getApplicationContext());
+    public int getTypefaceValue() {
+        return mTypefaceValue;
+    }
 
+    private void initAttributes(Context context, AttributeSet attrs, int defStyle) {
         Resources.Theme theme = context.getTheme();
         TypedArray appearance = null;
-        Typeface typeface = sTypefaceRegular;
         boolean allCaps = false;
 
         if (attrs != null) {
@@ -64,7 +62,7 @@ public class StyleableTextView extends TextView {
 
                 switch (attr) {
                     case R.styleable.StyleableTextView_font:
-                        typeface = typefaceForEnumValue(appearance.getInt(i, -1));
+                        mTypefaceValue = appearance.getInt(i, -1);
                         break;
                     case R.styleable.StyleableTextView_allCaps:
                         allCaps = appearance.getBoolean(i, false);
@@ -81,7 +79,7 @@ public class StyleableTextView extends TextView {
 
             switch (attr) {
                 case R.styleable.StyleableTextView_font:
-                    typeface = typefaceForEnumValue(a.getInt(i, -1));
+                    mTypefaceValue = a.getInt(i, -1);
                     break;
                 case R.styleable.StyleableTextView_allCaps:
                     allCaps = a.getBoolean(i, false);
@@ -91,33 +89,10 @@ public class StyleableTextView extends TextView {
 
         a.recycle();
 
-        setTypeface(typeface);
+        setTypeface(TypefaceCache.getTypeface(getContext(), mTypefaceValue));
         if (allCaps) {
             setTransformationMethod(new AllCapsTransformationMethod(getContext()));
         }
-    }
-
-    private Typeface typefaceForEnumValue(int value) {
-        switch (value) {
-            case 1: return sTypefaceBold;
-            case 2: return sTypefaceItalic;
-            case 3: return sTypefaceCondensed;
-            case 4: return sTypefaceBoldCondensed;
-        }
-        return sTypefaceRegular;
-    }
-
-    private void initTypefacesIfNeeded(Context context) {
-        if (sTypefaceRegular != null) {
-            return;
-        }
-
-        AssetManager assets = context.getAssets();
-        sTypefaceRegular = Typeface.createFromAsset(assets, "fonts/Roboto-Regular.ttf");
-        sTypefaceBold = Typeface.createFromAsset(assets, "fonts/Roboto-Bold.ttf");
-        sTypefaceCondensed = Typeface.createFromAsset(assets, "fonts/Roboto-Condensed.ttf");
-        sTypefaceBoldCondensed = Typeface.createFromAsset(assets, "fonts/Roboto-BoldCondensed.ttf");
-        sTypefaceItalic = Typeface.createFromAsset(assets, "fonts/Roboto-Italic.ttf");
     }
 
     private static class AllCapsTransformationMethod implements TransformationMethod {
