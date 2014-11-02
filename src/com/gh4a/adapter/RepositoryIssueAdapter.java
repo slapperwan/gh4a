@@ -29,10 +29,10 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.LabelBadgeView;
 
-import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.RepositoryIssue;
 
-public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> implements
+public class RepositoryIssueAdapter extends RootAdapter<Issue> implements
         View.OnClickListener {
     public RepositoryIssueAdapter(Context context) {
         super(context);
@@ -59,7 +59,7 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
     }
 
     @Override
-    protected void bindView(View v, RepositoryIssue issue) {
+    protected void bindView(View v, Issue issue) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
 
         AvatarHandler.assignAvatar(viewHolder.ivGravatar, issue.getUser());
@@ -82,9 +82,11 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
             viewHolder.tvComments.setVisibility(View.GONE);
         }
 
-        Repository repo = issue.getRepository();
+        // https://api.github.com/repos/batterseapower/pinyin-toolkit/issues/132
+        String[] urlPart = issue.getUrl().split("/");
+        String repoName = urlPart[4] + "/" + urlPart[5];
         viewHolder.tvNumber.setText(mContext.getString(R.string.repo_issue_on,
-                issue.getNumber(), repo.getOwner().getLogin() + "/" + repo.getName()));
+                issue.getNumber(), repoName));
 
         if (issue.getMilestone() != null) {
             viewHolder.tvMilestone.setVisibility(View.VISIBLE);

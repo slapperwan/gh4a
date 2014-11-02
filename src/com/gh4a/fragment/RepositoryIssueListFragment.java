@@ -15,14 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.RepositoryIssue;
-import org.eclipse.egit.github.core.client.PageIterator;
-import org.eclipse.egit.github.core.service.IssueService;
-
 import android.os.Bundle;
 
 import com.gh4a.Constants;
@@ -32,7 +24,14 @@ import com.gh4a.adapter.RepositoryIssueAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.IntentUtils;
 
-public class RepositoryIssueListFragment extends PagedDataBaseFragment<RepositoryIssue> {
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.client.PageIterator;
+import org.eclipse.egit.github.core.service.IssueService;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class RepositoryIssueListFragment extends PagedDataBaseFragment<Issue> {
     private Map<String, String> mFilterData;
 
     public static RepositoryIssueListFragment newInstance(Map<String, String> filterData) {
@@ -64,14 +63,14 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Repositor
     }
 
     @Override
-    public void onItemClick(RepositoryIssue issue) {
-        Repository repo = issue.getRepository();
-        startActivity(IntentUtils.getIssueActivityIntent(getActivity(), repo.getOwner().getLogin(),
-                repo.getName(), issue.getNumber()));
+    public void onItemClick(Issue issue) {
+        String[] urlPart = issue.getUrl().split("/");
+        startActivity(IntentUtils.getIssueActivityIntent(getActivity(), urlPart[4],
+                urlPart[5], issue.getNumber()));
     }
 
     @Override
-    protected RootAdapter<RepositoryIssue> onCreateAdapter() {
+    protected RootAdapter<Issue> onCreateAdapter() {
         return new RepositoryIssueAdapter(getActivity());
     }
 
@@ -81,9 +80,9 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Repositor
     }
 
     @Override
-    protected PageIterator<RepositoryIssue> onCreateIterator() {
+    protected PageIterator<Issue> onCreateIterator() {
         IssueService issueService = (IssueService)
                 Gh4Application.get(getActivity()).getService(Gh4Application.ISSUE_SERVICE);
-        return issueService.pageIssues(mFilterData);
+        return issueService.pageSearchIssues(mFilterData);
     }
 }

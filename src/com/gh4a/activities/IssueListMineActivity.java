@@ -30,15 +30,16 @@ import com.gh4a.R;
 import com.gh4a.adapter.DrawerAdapter;
 import com.gh4a.fragment.RepositoryIssueListFragment;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class IssueListMineActivity extends IssueListBaseActivity {
+    private static final String QUERY = "is:issue is:%s %s:%s";
     private RepositoryIssueListFragment mRepositoryIssueListFragment;
     private String mState;
+    private String mLogin;
 
     private static final int[] TITLES = new int[] {
         R.string.created, R.string.assigned, R.string.mentioned
@@ -51,6 +52,7 @@ public class IssueListMineActivity extends IssueListBaseActivity {
             return;
         }
 
+        mLogin = Gh4Application.get(this).getAuthLogin();
         mSortMode = SORT_MODE_CREATED;
         mSortAscending = false;
         mState = Constants.Issue.STATE_OPEN;
@@ -70,22 +72,21 @@ public class IssueListMineActivity extends IssueListBaseActivity {
     protected Fragment getFragment(int position) {
         Map<String, String> filterData = new HashMap<String, String>();
         filterData.put("sort", mSortMode);
-        filterData.put("direction", mSortAscending ? "asc" : "desc");
-        filterData.put(Constants.Issue.STATE, mState);
+        filterData.put("order", mSortAscending ? "asc" : "desc");
 
+        String action;
         if (position == 1) {
-            filterData.put("filter", "assigned");
-            mRepositoryIssueListFragment = RepositoryIssueListFragment.newInstance(filterData);
-            return mRepositoryIssueListFragment;
+            action = "assignee";
         } else if (position == 2) {
-            filterData.put("filter", "mentioned");
-            mRepositoryIssueListFragment = RepositoryIssueListFragment.newInstance(filterData);
-            return mRepositoryIssueListFragment;
+            action = "mentions";
         } else {
-            filterData.put("filter", "created");
-            mRepositoryIssueListFragment = RepositoryIssueListFragment.newInstance(filterData);
-            return mRepositoryIssueListFragment;
+            action = "author";
         }
+
+        filterData.put("q", String.format(QUERY, mState, action, mLogin));
+
+        mRepositoryIssueListFragment = RepositoryIssueListFragment.newInstance(filterData);
+        return mRepositoryIssueListFragment;
     }
 
     @Override

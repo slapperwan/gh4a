@@ -1,10 +1,5 @@
 package com.gh4a.activities;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.eclipse.egit.github.core.service.UserService;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -25,12 +20,16 @@ import com.gh4a.adapter.DrawerAdapter;
 import com.gh4a.db.BookmarksProvider;
 import com.gh4a.fragment.PrivateEventListFragment;
 import com.gh4a.fragment.PublicEventListFragment;
-import com.gh4a.fragment.RepositoryIssueListFragment;
 import com.gh4a.fragment.UserFragment;
 import com.gh4a.loader.IsFollowingUserLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
+
+import org.eclipse.egit.github.core.service.UserService;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class UserActivity extends LoadingFragmentPagerActivity {
     private static final int REQUEST_SETTINGS = 10000;
@@ -41,12 +40,11 @@ public class UserActivity extends LoadingFragmentPagerActivity {
     private UserFragment mUserFragment;
     private PrivateEventListFragment mPrivateEventListFragment;
     private PublicEventListFragment mPublicEventListFragment;
-    private RepositoryIssueListFragment mRepositoryIssueListFragment;
     private Boolean mIsFollowing;
 
     private static final int[] TITLES_SELF = new int[] {
         R.string.about, R.string.user_news_feed,
-        R.string.user_your_actions, R.string.issues
+        R.string.user_your_actions
     };
     private static final int[] TITLES_OTHER = new int[] {
         R.string.about, R.string.user_public_activity
@@ -164,11 +162,6 @@ public class UserActivity extends LoadingFragmentPagerActivity {
                 mPublicEventListFragment =
                         PublicEventListFragment.newInstance(mUserLogin, false);
                 return mPublicEventListFragment;
-            case 3:
-                Map<String, String> filterData = new HashMap<String, String>();
-                filterData.put("filter", "subscribed");
-                mRepositoryIssueListFragment = RepositoryIssueListFragment.newInstance(filterData);
-                return mRepositoryIssueListFragment;
         }
         return null;
     }
@@ -262,9 +255,6 @@ public class UserActivity extends LoadingFragmentPagerActivity {
         }
         if (mPublicEventListFragment != null) {
             mPublicEventListFragment.refresh();
-        }
-        if (mRepositoryIssueListFragment != null) {
-            mRepositoryIssueListFragment.refresh();
         }
         refreshDone();
     }
