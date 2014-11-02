@@ -51,15 +51,17 @@ public class UserActivity extends LoadingFragmentPagerActivity {
     };
 
     private static final int ITEM_ISSUES = 1;
-    private static final int ITEM_SEARCH = 2;
-    private static final int ITEM_BOOKMARKS = 3;
-    private static final int ITEM_SETTINGS = 4;
-    private static final int ITEM_TIMELINE = 5;
-    private static final int ITEM_TRENDING = 6;
-    private static final int ITEM_BLOG = 7;
+    private static final int ITEM_PULLREQUESTS = 2;
+    private static final int ITEM_SEARCH = 3;
+    private static final int ITEM_BOOKMARKS = 4;
+    private static final int ITEM_SETTINGS = 5;
+    private static final int ITEM_TIMELINE = 6;
+    private static final int ITEM_TRENDING = 7;
+    private static final int ITEM_BLOG = 8;
     private static final List<DrawerAdapter.Item> DRAWER_ITEMS = Arrays.asList(
         new DrawerAdapter.SectionItem(R.string.navigation),
         new DrawerAdapter.SectionEntryItem(R.string.issues, 0, ITEM_ISSUES),
+        new DrawerAdapter.SectionEntryItem(R.string.pull_requests, 0, ITEM_PULLREQUESTS),
         new DrawerAdapter.SectionEntryItem(R.string.search, 0, ITEM_SEARCH),
         new DrawerAdapter.SectionEntryItem(R.string.bookmarks, 0, ITEM_BOOKMARKS),
         new DrawerAdapter.SectionItem(R.string.explore),
@@ -137,7 +139,14 @@ public class UserActivity extends LoadingFragmentPagerActivity {
                 startActivity(new Intent(this, TrendingActivity.class));
                 return true;
             case ITEM_ISSUES:
-                startActivity(new Intent(this, IssueListMineActivity.class));
+                Intent intent = new Intent(this, IssueListMineActivity.class);
+                intent.putExtra("type", "issue");
+                startActivity(intent);
+                return true;
+            case ITEM_PULLREQUESTS:
+                intent = new Intent(this, IssueListMineActivity.class);
+                intent.putExtra("type", "pr");
+                startActivity(intent);
                 return true;
         }
         return super.onDrawerItemSelected(position);

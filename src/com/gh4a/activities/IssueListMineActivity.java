@@ -36,10 +36,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class IssueListMineActivity extends IssueListBaseActivity {
-    private static final String QUERY = "is:issue is:%s %s:%s";
+    private static final String QUERY = "is:%s is:%s %s:%s";
     private RepositoryIssueListFragment mRepositoryIssueListFragment;
     private String mState;
     private String mLogin;
+    private String mType; // issue or pr
 
     private static final int[] TITLES = new int[] {
         R.string.created, R.string.assigned, R.string.mentioned
@@ -52,6 +53,8 @@ public class IssueListMineActivity extends IssueListBaseActivity {
             return;
         }
 
+        Bundle data = getIntent().getExtras();
+        mType = data.getString("type");
         mLogin = Gh4Application.get(this).getAuthLogin();
         mSortMode = SORT_MODE_CREATED;
         mSortAscending = false;
@@ -59,7 +62,8 @@ public class IssueListMineActivity extends IssueListBaseActivity {
         updateSortDrawerItemState(ITEM_SORT_CREATED_DESC);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(R.string.issues_open);
+        actionBar.setTitle("issue".equals(mType) ?
+                R.string.issues_open : R.string.pull_requests_open);
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
@@ -83,7 +87,7 @@ public class IssueListMineActivity extends IssueListBaseActivity {
             action = "author";
         }
 
-        filterData.put("q", String.format(QUERY, mState, action, mLogin));
+        filterData.put("q", String.format(QUERY, mType, mState, action, mLogin));
 
         mRepositoryIssueListFragment = RepositoryIssueListFragment.newInstance(filterData);
         return mRepositoryIssueListFragment;
@@ -139,7 +143,14 @@ public class IssueListMineActivity extends IssueListBaseActivity {
                 ? Constants.Issue.STATE_OPEN : Constants.Issue.STATE_CLOSED;
         reloadIssueList();
 
-        getSupportActionBar().setTitle(Constants.Issue.STATE_CLOSED.equals(mState)
-                ? R.string.issues_closed : R.string.issues_open);
+        int titleResId = Constants.Issue.STATE_CLOSED.equals(mState)
+                ? R.string.issues_closed : R.string.issues_open;
+
+        if ("pr".equals(mType)) {
+            titleResId = Constants.Issue.STATE_CLOSED.equals(mState)
+                    ? R.string.pull_requests_closed : R.string.pull_requests_open;
+        }
+
+        getSupportActionBar().setTitle(titleResId);
     }
 }

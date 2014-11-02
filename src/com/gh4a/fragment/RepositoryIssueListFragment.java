@@ -65,8 +65,14 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Issue> {
     @Override
     public void onItemClick(Issue issue) {
         String[] urlPart = issue.getUrl().split("/");
-        startActivity(IntentUtils.getIssueActivityIntent(getActivity(), urlPart[4],
-                urlPart[5], issue.getNumber()));
+
+        if (issue.getPullRequest() != null) {
+            startActivity(IntentUtils.getPullRequestActivityIntent(getActivity(), urlPart[4],
+                    urlPart[5], issue.getNumber()));
+        } else {
+            startActivity(IntentUtils.getIssueActivityIntent(getActivity(), urlPart[4],
+                    urlPart[5], issue.getNumber()));
+        }
     }
 
     @Override

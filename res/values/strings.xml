@@ -319,6 +319,8 @@
     <string name="pull_request_conversation">Conversation</string>
     <string name="pull_request_files">Files</string>
     <string name="pull_requests">Pull Requests</string>
+    <string name="pull_requests_open">Open Pull Requests</string>
+    <string name="pull_requests_closed">Closed Pull Requests</string>
     <string name="pull_request_comment_hint">Comment on this pull request</string>
     <string name="view_pull_request">View pull request</string>
     <string name="pull_request_reopen">Reopen</string>
