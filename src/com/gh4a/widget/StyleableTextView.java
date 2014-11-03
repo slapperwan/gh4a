@@ -62,10 +62,10 @@ public class StyleableTextView extends TextView {
 
                 switch (attr) {
                     case R.styleable.StyleableTextView_font:
-                        mTypefaceValue = appearance.getInt(i, -1);
+                        mTypefaceValue = appearance.getInt(attr, -1);
                         break;
                     case R.styleable.StyleableTextView_allCaps:
-                        allCaps = appearance.getBoolean(i, false);
+                        allCaps = appearance.getBoolean(attr, false);
                         break;
                 }
             }
@@ -79,10 +79,10 @@ public class StyleableTextView extends TextView {
 
             switch (attr) {
                 case R.styleable.StyleableTextView_font:
-                    mTypefaceValue = a.getInt(i, -1);
+                    mTypefaceValue = a.getInt(attr, -1);
                     break;
                 case R.styleable.StyleableTextView_allCaps:
-                    allCaps = a.getBoolean(i, false);
+                    allCaps = a.getBoolean(attr, false);
                     break;
             }
         }
