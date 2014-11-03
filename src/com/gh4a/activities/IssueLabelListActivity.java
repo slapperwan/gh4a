@@ -60,12 +60,15 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements
     private String mRepoOwner;
     private String mRepoName;
     private EditActionMode mActionMode;
-    private Label mAddedLabel;
-    private boolean mShouldStartAdding;
+    private IssueLabelAdapter.EditableLabel mAddedLabel;
 
     private FloatingActionButton mFab;
     private ShowHideOnScroll mFabListener;
     private ListView mListView;
+    private IssueLabelAdapter mAdapter;
+
+    private static final String STATE_KEY_ADDED_LABEL = "added_label";
+    private static final String STATE_KEY_EDITING_LABEL = "editing_label";
 
     private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
         @Override
@@ -78,7 +81,9 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements
             UiUtils.hideImeForView(getCurrentFocus());
             if (success) {
                 mAdapter.clear();
-                mAdapter.addAll(result.getData());
+                for (Label label : result.getData()) {
+                    mAdapter.add(new IssueLabelAdapter.EditableLabel(label));
+                }
                 mAdapter.notifyDataSetChanged();
             }
             setContentEmpty(!success);
@@ -86,33 +91,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements
         }
     };
 
-    private IssueLabelAdapter mAdapter = new IssueLabelAdapter(this) {
-        @Override
-        protected void bindView(View view, Label label) {
-            ViewHolder holder = (ViewHolder) view.getTag();
-
-            super.bindView(view, label);
-
-            if (label == mAddedLabel && mShouldStartAdding) {
-                holder.editor.setHint(R.string.issue_label_new);
-                mActionMode = new EditActionMode(label, holder.editor);
-                startSupportActionMode(mActionMode);
-                updateFabVisibility();
-                mShouldStartAdding = false;
-            } else {
-                holder.editor.setHint(null);
-            }
-
-            Label editingLabel = mActionMode != null ? mActionMode.mLabel : null;
-            if (label.equals(editingLabel)) {
-                setExpanded(view, true);
-                mActionMode.setEditor(holder.editor);
-            } else {
-                setExpanded(view, false);
-            }
-        }
-    };
-
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -126,6 +105,12 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements
         setContentView(R.layout.issue_label_list);
         setContentShown(false);
 
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(R.string.issue_labels);
+        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
+        mAdapter = new IssueLabelAdapter(this);
         mListView = (ListView) findViewById(R.id.main_content);
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
@@ -135,22 +120,47 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements
         mFabListener = new ShowHideOnScroll(mFab);
         updateFabVisibility();
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(R.string.issue_labels);
-        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
         getSupportLoaderManager().initLoader(0, null, mLabelCallback);
+
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(STATE_KEY_ADDED_LABEL)) {
+                mAddedLabel = (IssueLabelAdapter.EditableLabel)
+                        savedInstanceState.getSerializable(STATE_KEY_EDITING_LABEL);
+                mAdapter.add(mAddedLabel);
+                startEditing(mAddedLabel);
+            } else if (savedInstanceState.containsKey(STATE_KEY_EDITING_LABEL)) {
+                IssueLabelAdapter.EditableLabel label = (IssueLabelAdapter.EditableLabel)
+                        savedInstanceState.getSerializable(STATE_KEY_EDITING_LABEL);
+                int count = mAdapter.getCount();
+                for (int i = 0; i < count; i++) {
+                    IssueLabelAdapter.EditableLabel item = mAdapter.getItem(i);
+                    if (item.getName().equals(label.getName())) {
+                        item.editedName = label.editedName;
+                        item.editedColor = label.editedColor;
+                        startEditing(item);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mActionMode != null) {
+            if (mAddedLabel != null) {
+                outState.putSerializable(STATE_KEY_ADDED_LABEL, mAddedLabel);
+            } else {
+                outState.putSerializable(STATE_KEY_EDITING_LABEL, mActionMode.mLabel);
+            }
+        }
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (mActionMode == null) {
-            mActionMode = new EditActionMode(mAdapter.getItem(position),
-                    (EditText) view.findViewById(R.id.et_label));
-            mAdapter.setExpanded(view, true);
-            startSupportActionMode(mActionMode);
-            updateFabVisibility();
+            startEditing(mAdapter.getItem(position));
         }
     }
 
@@ -163,12 +173,17 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements
     @Override
     public void onClick(View view) {
         if (mActionMode == null) {
-            mAddedLabel = new Label();
-            mAddedLabel.setColor("dddddd");
+            mAddedLabel = new IssueLabelAdapter.EditableLabel("dddddd");
             mAdapter.add(mAddedLabel);
-            mShouldStartAdding = true;
-            mAdapter.notifyDataSetChanged();
+            startEditing(mAddedLabel);
         }
+    }
+
+    private void startEditing(IssueLabelAdapter.EditableLabel label) {
+        mActionMode = new EditActionMode(label);
+        mAdapter.notifyDataSetChanged();
+        startSupportActionMode(mActionMode);
+        updateFabVisibility();
     }
 
     private void updateFabVisibility() {
@@ -179,25 +194,14 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements
             mListView.setOnTouchListener(null);
             mFab.setVisibility(View.GONE);
         }
-
     }
+
     private final class EditActionMode implements ActionMode.Callback {
-        private String mCurrentLabelName;
-        private EditText mEditor;
-        private Label mLabel;
+        private IssueLabelAdapter.EditableLabel mLabel;
 
-        public EditActionMode(Label label, EditText editor) {
-            mCurrentLabelName = label.getName();
-            mEditor = editor;
+        public EditActionMode(IssueLabelAdapter.EditableLabel label) {
             mLabel = label;
-
-            mEditor.setText(mCurrentLabelName);
-        }
-
-        public void setEditor(EditText editor) {
-            Editable currentText = mEditor.getText();
-            mEditor = editor;
-            mEditor.setText(currentText);
+            mLabel.isEditing = true;
         }
 
         @Override
@@ -224,23 +228,20 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
             case Menu.FIRST:
-                String labelName = mEditor.getText().toString();
-                String color = (String) mEditor.getTag();
                 if (mLabel == mAddedLabel) {
-                    new AddIssueLabelTask(labelName, color).execute();
-                    mLabel = null;
+                    new AddIssueLabelTask(mLabel.editedName, mLabel.editedColor).execute();
                 } else {
-                    new EditIssueLabelTask(mCurrentLabelName, labelName, color).execute();
+                    new EditIssueLabelTask(mLabel.getName(), mLabel.editedName, mLabel.editedColor).execute();
                 }
                 break;
             case Menu.FIRST + 1:
                 new AlertDialog.Builder(IssueLabelListActivity.this)
-                        .setTitle(getString(R.string.issue_dialog_delete_title, mCurrentLabelName))
+                        .setTitle(getString(R.string.issue_dialog_delete_title, mLabel.getName()))
                         .setMessage(R.string.issue_dialog_delete_message)
                         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                new DeleteIssueLabelTask(mCurrentLabelName).execute();
+                                new DeleteIssueLabelTask(mLabel.getName()).execute();
                             }
                         })
                         .setNegativeButton(R.string.cancel, null)
@@ -257,6 +258,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             mActionMode = null;
+            mLabel.isEditing = false;
             if (mLabel == mAddedLabel) {
                 mAdapter.remove(mLabel);
                 mAddedLabel = null;

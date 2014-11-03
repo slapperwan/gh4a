@@ -88,6 +88,7 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase im
     @Override
     public void onLoadFinished(Loader<LoaderResult<List<T>>> loader, LoaderResult<List<T>> result) {
         if (!result.handleError(getActivity())) {
+            mAdapter.clear();
             onAddData(mAdapter, result.getData());
         }
         if (isResumed()) {

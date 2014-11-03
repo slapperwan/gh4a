@@ -40,7 +40,6 @@ import java.util.Collection;
 public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase implements
         LoaderManager.LoaderCallbacks<Collection<T>>, OnScrollListener {
     private RootAdapter<T> mAdapter;
-    private boolean mLoadMore;
     private boolean mIsLoadCompleted;
     private TextView mLoadingView;
     private String mCurrentFilter;
@@ -81,26 +80,20 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     }
 
     public void refresh() {
-        mLoadMore = false;
         if (getListView() != null) {
             setListShown(false);
             getLoaderManager().getLoader(0).onContentChanged();
         }
     }
 
-    private void fillData(Collection<T> data) {
+    private void fillData(PageIteratorLoader<T> loader, Collection<T> data) {
         ListView listView = getListView();
-        if (data == null || data.isEmpty()) {
+        if (!loader.hasMoreData()) {
             listView.removeFooterView(mLoadingView);
-            return;
-        }
-        if (getListView().getFooterViewsCount() == 0) {
+        } else if (getListView().getFooterViewsCount() == 0) {
             listView.addFooterView(mLoadingView);
-            setListAdapter(mAdapter);
         }
-        if (!mLoadMore) {
-            mAdapter.clear();
-        }
+        mAdapter.clear();
         onAddData(mAdapter, data);
     }
 
@@ -115,7 +108,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
 
     @Override
     public void onLoadFinished(Loader<Collection<T>> loader, Collection<T> events) {
-        fillData(events);
+        fillData((PageIteratorLoader<T>) loader, events);
         mIsLoadCompleted = true;
         setListShown(true);
         invalidateOptionsMenu();
@@ -131,10 +124,11 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
 
     @Override
     public void onScroll(AbsListView view, int firstVisible, int visibleCount, int totalCount) {
-        boolean loadMore = firstVisible + visibleCount >= totalCount;
+        boolean loadMore = firstVisible > 0 && visibleCount > 0 &&
+                getListView().getFooterViewsCount() != 0 &&
+                firstVisible + visibleCount >= totalCount;
 
         if (loadMore && mIsLoadCompleted) {
-            mLoadMore = true;
             mIsLoadCompleted = false;
             getLoaderManager().getLoader(0).forceLoad();
         }

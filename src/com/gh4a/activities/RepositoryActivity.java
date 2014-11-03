@@ -154,7 +154,6 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         public void onResultReady(LoaderResult<Boolean> result) {
             if (!result.handleError(RepositoryActivity.this)) {
                 mIsWatching = result.getData();
-                mIsFinishLoadingWatching = true;
                 invalidateOptionsMenu();
             }
         }
@@ -169,7 +168,6 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         public void onResultReady(LoaderResult<Boolean> result) {
             if (!result.handleError(RepositoryActivity.this)) {
                 mIsStarring = result.getData();
-                mIsFinishLoadingStarring = true;
                 invalidateOptionsMenu();
             }
         }
@@ -187,10 +185,8 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
     private List<RepositoryTag> mTags;
     private String mSelectedRef;
 
-    private boolean mIsFinishLoadingWatching;
-    private boolean mIsWatching;
-    private boolean mIsFinishLoadingStarring;
-    private boolean mIsStarring;
+    private Boolean mIsWatching;
+    private Boolean mIsStarring;
 
     private RepositoryFragment mRepositoryFragment;
     private ContentListFragment mContentListFragment;
@@ -200,6 +196,9 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
     private Map<String, ArrayList<RepositoryContents>> mContentCache;
     private static final int MAX_CACHE_ENTRIES = 100;
 
+    private static final String STATE_KEY_DIR_STACK = "dir_stack";
+    private static final String STATE_KEY_CONTENT_CACHE_PREFIX = "content_cache_";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -207,14 +206,31 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             return;
         }
 
-        mDirStack = new Stack<String>();
         mContentCache = new LinkedHashMap<String, ArrayList<RepositoryContents>>() {
             private static final long serialVersionUID = -2379579224736389357L;
+
             @Override
             protected boolean removeEldestEntry(Entry<String, ArrayList<RepositoryContents>> eldest) {
                 return size() > MAX_CACHE_ENTRIES;
             }
         };
+
+        if (savedInstanceState != null) {
+            mDirStack = (Stack<String>) savedInstanceState.getSerializable(STATE_KEY_DIR_STACK);
+            int prefixLen = STATE_KEY_CONTENT_CACHE_PREFIX.length();
+            for (String key : savedInstanceState.keySet()) {
+                if (key.startsWith(STATE_KEY_CONTENT_CACHE_PREFIX)) {
+                    String cacheKey = key.substring(prefixLen);
+                    if (cacheKey.equals("/")) {
+                        cacheKey = null;
+                    }
+                    mContentCache.put(cacheKey,
+                            (ArrayList<RepositoryContents>) savedInstanceState.getSerializable(key));
+                }
+            }
+        } else {
+            mDirStack = new Stack<String>();
+        }
 
         Bundle bundle = getIntent().getExtras();
         mRepoOwner = bundle.getString(Constants.Repository.OWNER);
@@ -246,6 +262,19 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             return mSelectedRef;
         }
         return mRepository.getMasterBranch();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(STATE_KEY_DIR_STACK, mDirStack);
+        for (Map.Entry<String, ArrayList<RepositoryContents>> entry : mContentCache.entrySet()) {
+            String key = entry.getKey();
+            if (key == null) {
+                key = "/";
+            }
+            outState.putSerializable(STATE_KEY_CONTENT_CACHE_PREFIX + key, entry.getValue());
+        }
     }
 
     @Override
@@ -367,7 +396,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         MenuItem watchAction = menu.findItem(R.id.watch);
         watchAction.setVisible(authorized);
         if (authorized) {
-            if (!mIsFinishLoadingWatching) {
+            if (mIsWatching == null) {
                 MenuItemCompat.setActionView(watchAction, R.layout.ab_loading);
                 MenuItemCompat.expandActionView(watchAction);
             } else if (mIsWatching) {
@@ -380,7 +409,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         MenuItem starAction = menu.findItem(R.id.star);
         starAction.setVisible(authorized);
         if (authorized) {
-            if (!mIsFinishLoadingStarring) {
+            if (mIsStarring == null) {
                 MenuItemCompat.setActionView(starAction, R.layout.ab_loading);
                 MenuItemCompat.expandActionView(starAction);
             } else if (mIsStarring) {

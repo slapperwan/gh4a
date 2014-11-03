@@ -58,7 +58,9 @@ import org.eclipse.egit.github.core.service.IssueService;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class IssueEditActivity extends LoadingFragmentActivity implements OnClickListener {
     private String mRepoOwner;
@@ -66,6 +68,7 @@ public class IssueEditActivity extends LoadingFragmentActivity implements OnClic
     private int mIssueNumber;
 
     private List<Label> mSelectedLabels;
+    private boolean mLabelSelectionChanged;
     private Milestone mSelectedMilestone;
     private User mSelectedAssignee;
     private List<Milestone> mAllMilestone;
@@ -75,6 +78,9 @@ public class IssueEditActivity extends LoadingFragmentActivity implements OnClic
     private ProgressDialog mProgressDialog;
     private TextView mTvSelectedMilestone;
     private TextView mTvSelectedAssignee;
+    private Map<Label, TextView> mLabelViewMap;
+
+    private static final String STATE_KEY_LABELS = "selected_labels";
 
     private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
         @Override
@@ -192,10 +198,24 @@ public class IssueEditActivity extends LoadingFragmentActivity implements OnClic
             getSupportLoaderManager().initLoader(3, null, mIssueCallback);
         }
         setContentShown(!isInEditMode());
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_KEY_LABELS)) {
+            mSelectedLabels = (ArrayList<Label>) savedInstanceState.getSerializable(STATE_KEY_LABELS);
+            mLabelSelectionChanged = true;
+            applyLabelSelection();
+        }
     }
 
     private boolean isInEditMode() {
         return mIssueNumber != 0;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mLabelSelectionChanged) {
+            outState.putSerializable(STATE_KEY_LABELS, new ArrayList<Label>(mSelectedLabels));
+        }
     }
 
     @Override
@@ -361,6 +381,8 @@ public class IssueEditActivity extends LoadingFragmentActivity implements OnClic
     public void fillLabels(List<Label> labels) {
         LinearLayout labelLayout = (LinearLayout) findViewById(R.id.ll_labels);
 
+        mLabelViewMap = new HashMap<Label, TextView>();
+
         for (final Label label : labels) {
             final View rowView = getLayoutInflater().inflate(R.layout.row_issue_create_label, null);
             View viewColor = rowView.findViewById(R.id.view_color);
@@ -371,45 +393,48 @@ public class IssueEditActivity extends LoadingFragmentActivity implements OnClic
             tvLabel.setOnClickListener(this);
             tvLabel.setTag(label);
 
-            if (isInEditMode()) {
-                handleLabelClick(tvLabel, label, mSelectedLabels.contains(label));
-            }
-
             labelLayout.addView(rowView);
+            mLabelViewMap.put(label, tvLabel);
         }
+        applyLabelSelection();
     }
 
     @Override
     public void onClick(View view) {
         if (view.getTag() instanceof Label) {
             Label label = (Label) view.getTag();
-            TextView tvLabel = (TextView) view;
 
+            mLabelSelectionChanged = true;
             if (mSelectedLabels.contains(label)) {
                 mSelectedLabels.remove(label);
-                handleLabelClick(tvLabel, label, false);
             } else {
                 mSelectedLabels.add(label);
-                handleLabelClick(tvLabel, label, true);
             }
+
+            applyLabelSelection();
         }
     }
 
-    private void handleLabelClick(TextView tvLabel, Label label, boolean select) {
-        Gh4Application app = Gh4Application.get(this);
-        if (!select) {
-            mSelectedLabels.remove(label);
-            tvLabel.setTypeface(tvLabel.getTypeface(), 0);
-            tvLabel.setBackgroundColor(0);
-            tvLabel.setTextColor(getResources().getColor(Gh4Application.THEME != R.style.LightTheme
-                    ? R.color.label_fg_light : R.color.label_fg_dark));
-        } else {
-            int color = Color.parseColor("#" + label.getColor());
+    private void applyLabelSelection() {
+        if (mLabelViewMap == null) {
+            return;
+        }
 
-            mSelectedLabels.add(label);
-            tvLabel.setTypeface(tvLabel.getTypeface(), Typeface.BOLD);
-            tvLabel.setBackgroundColor(color);
-            tvLabel.setTextColor(UiUtils.textColorForBackground(this, color));
+        for (Map.Entry<Label, TextView> entry : mLabelViewMap.entrySet()) {
+            Label label = entry.getKey();
+            TextView view = entry.getValue();
+
+            if (mSelectedLabels.contains(label)) {
+                int color = Color.parseColor("#" + label.getColor());
+                view.setTypeface(view.getTypeface(), Typeface.BOLD);
+                view.setBackgroundColor(color);
+                view.setTextColor(UiUtils.textColorForBackground(this, color));
+            } else {
+                view.setTypeface(view.getTypeface(), 0);
+                view.setBackgroundColor(0);
+                view.setTextColor(getResources().getColor(Gh4Application.THEME != R.style.LightTheme
+                        ? R.color.label_fg_light : R.color.label_fg_dark));
+            }
         }
     }
 
@@ -420,8 +445,11 @@ public class IssueEditActivity extends LoadingFragmentActivity implements OnClic
         EditText etDesc = (EditText) findViewById(R.id.et_desc);
         etDesc.setText(mEditIssue.getBody());
 
-        mSelectedLabels.clear();
-        mSelectedLabels.addAll(mEditIssue.getLabels());
+        if (!mLabelSelectionChanged) {
+            mSelectedLabels.clear();
+            mSelectedLabels.addAll(mEditIssue.getLabels());
+            applyLabelSelection();
+        }
 
         mSelectedMilestone = mEditIssue.getMilestone();
         mSelectedAssignee = mEditIssue.getAssignee();

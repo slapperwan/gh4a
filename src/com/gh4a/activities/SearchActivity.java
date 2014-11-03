@@ -16,6 +16,7 @@
 package com.gh4a.activities;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -43,6 +44,7 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
+import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
@@ -64,6 +66,9 @@ public class SearchActivity extends BaseFragmentActivity implements
     private SearchView mSearch;
     private String mQuery;
     private boolean mSubmitted;
+
+    private static final String STATE_KEY_REPO_RESULTS = "repo_results";
+    private static final String STATE_KEY_USER_RESULTS = "user_results";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -97,6 +102,42 @@ public class SearchActivity extends BaseFragmentActivity implements
         mListViewResults = (ListView) findViewById(android.R.id.list);
         mListViewResults.setOnItemClickListener(this);
         registerForContextMenu(mListViewResults);
+
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(STATE_KEY_REPO_RESULTS)) {
+                mRepoAdapter = new RepositoryAdapter(this);
+                mListViewResults.setAdapter(mRepoAdapter);
+                ArrayList<Repository> data =(ArrayList<Repository>)
+                        savedInstanceState.getSerializable(STATE_KEY_REPO_RESULTS);
+                fillRepositoriesData(data);
+            } else if (savedInstanceState.containsKey(STATE_KEY_USER_RESULTS)) {
+                mUserAdapter = new SearchUserAdapter(this);
+                mListViewResults.setAdapter(mUserAdapter);
+                ArrayList<SearchUser> data =(ArrayList<SearchUser>)
+                        savedInstanceState.getSerializable(STATE_KEY_USER_RESULTS);
+                fillUsersData(data);
+            }
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mRepoAdapter != null) {
+            int count = mRepoAdapter.getCount();
+            ArrayList<Repository> repos = new ArrayList<Repository>(count);
+            for (int i = 0; i < count; i++) {
+                repos.add(mRepoAdapter.getItem(i));
+            }
+            outState.putSerializable(STATE_KEY_REPO_RESULTS, repos);
+        } else if (mUserAdapter != null) {
+            int count = mUserAdapter.getCount();
+            ArrayList<SearchUser> users = new ArrayList<SearchUser>(count);
+            for (int i = 0; i < count; i++) {
+                users.add(mUserAdapter.getItem(i));
+            }
+            outState.putSerializable(STATE_KEY_USER_RESULTS, users);
+        }
     }
 
     protected void searchRepository(final String searchKey) {
@@ -193,6 +234,8 @@ public class SearchActivity extends BaseFragmentActivity implements
         }
     }
 
+    // TODO: replace this by using loaders (would avoid the need for manually
+    //       saving the results into the saved instance state)
     private class LoadRepositoryTask extends ProgressDialogTask<List<Repository>> {
         private String mQuery;
 

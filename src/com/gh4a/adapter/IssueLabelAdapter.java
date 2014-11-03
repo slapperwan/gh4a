@@ -5,6 +5,8 @@ import org.eclipse.egit.github.core.Label;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +20,29 @@ import com.gh4a.utils.UiUtils;
 import com.gh4a.R;
 import com.gh4a.widget.StyleableTextView;
 
-public class IssueLabelAdapter extends RootAdapter<Label> implements View.OnClickListener {
+public class IssueLabelAdapter extends RootAdapter<IssueLabelAdapter.EditableLabel> implements
+        View.OnClickListener {
+    public static class EditableLabel extends Label {
+        public String editedName;
+        public String editedColor;
+        public final boolean newlyAdded;
+        public boolean isEditing;
+
+        public EditableLabel(String color) {
+            super();
+            newlyAdded = true;
+            isEditing = true;
+            editedColor = color;
+        }
+        public EditableLabel(Label label) {
+            newlyAdded = false;
+            isEditing = false;
+            setColor(label.getColor());
+            setName(label.getName());
+            setUrl(label.getUrl());
+        }
+    }
+
     public IssueLabelAdapter(Context context) {
         super(context);
     }
@@ -26,13 +50,28 @@ public class IssueLabelAdapter extends RootAdapter<Label> implements View.OnClic
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_issue_label, parent, false);
-        ViewHolder holder = new ViewHolder();
+        final ViewHolder holder = new ViewHolder();
 
         holder.color = v.findViewById(R.id.view_color);
         holder.label = (StyleableTextView) v.findViewById(R.id.tv_title);
         holder.editor = (EditText) v.findViewById(R.id.et_label);
         holder.collapsedContainer = v.findViewById(R.id.collapsed);
         holder.expandedContainer = v.findViewById(R.id.expanded);
+
+        holder.editor.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (holder.lastAssignedLabel != null) {
+                    holder.lastAssignedLabel.editedName = s.toString();
+                }
+            }
+        });
 
         Typeface labelTf = TypefaceCache.getTypeface(mContext, holder.label.getTypefaceValue());
         holder.editor.setTypeface(labelTf);
@@ -53,11 +92,26 @@ public class IssueLabelAdapter extends RootAdapter<Label> implements View.OnClic
     }
 
     @Override
-    protected void bindView(View v, Label label) {
+    protected void bindView(View v, EditableLabel label) {
         ViewHolder holder = (ViewHolder) v.getTag();
 
-        assignColor(holder, label.getColor());
+        holder.lastAssignedLabel = label;
+
+        holder.collapsedContainer.setVisibility(label.isEditing ? View.GONE : View.VISIBLE);
+        holder.expandedContainer.setVisibility(label.isEditing ? View.VISIBLE : View.GONE);
+        if (label.isEditing) {
+            holder.editor.requestFocus();
+        }
+
+        if (label.newlyAdded) {
+            holder.editor.setHint(R.string.issue_label_new);
+        } else {
+            holder.editor.setHint(null);
+        }
+
+        assignColor(holder, label.editedColor != null ? label.editedColor : label.getColor());
         holder.label.setText(label.getName());
+        holder.editor.setText(label.editedName != null ? label.editedName : label.getName());
     }
 
     private void assignColor(ViewHolder holder, String colorString) {
@@ -69,18 +123,8 @@ public class IssueLabelAdapter extends RootAdapter<Label> implements View.OnClic
         holder.customColorButton.setBackgroundColor(color);
         holder.customColorButton.setTextColor(textColor);
         holder.editor.setTextColor(textColor);
-        holder.editor.setTag(colorString);
-    }
 
-    public void setExpanded(View v, boolean expanded) {
-        ViewHolder holder = (ViewHolder) v.getTag();
-        if (holder != null) {
-            holder.collapsedContainer.setVisibility(expanded ? View.GONE : View.VISIBLE);
-            holder.expandedContainer.setVisibility(expanded ? View.VISIBLE : View.GONE);
-            if (expanded) {
-                holder.editor.requestFocus();
-            }
-        }
+        holder.lastAssignedLabel.editedColor = colorString;
     }
 
     @Override
@@ -100,7 +144,9 @@ public class IssueLabelAdapter extends RootAdapter<Label> implements View.OnClic
         }
     }
 
-    protected static class ViewHolder {
+    private static class ViewHolder {
+        public EditableLabel lastAssignedLabel;
+
         public View color;
         public StyleableTextView label;
         public EditText editor;
