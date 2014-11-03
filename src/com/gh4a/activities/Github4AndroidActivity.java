@@ -58,9 +58,7 @@ public class Github4AndroidActivity extends BaseFragmentActivity {
 
         Gh4Application app = Gh4Application.get(this);
         if (app.isAuthorized()) {
-            Intent intent = IntentUtils.getUserActivityIntent(this, app.getAuthLogin());
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
+            goToToplevelActivity(false);
             finish();
             return;
         }
@@ -171,10 +169,7 @@ public class Github4AndroidActivity extends BaseFragmentActivity {
             editor.putString(Constants.User.LOGIN, mUserName);
             editor.apply();
 
-            Intent intent = IntentUtils.getUserActivityIntent(mContext, mUserName);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-
+            goToToplevelActivity(false);
             finish();
         }
     }

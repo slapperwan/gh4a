@@ -33,10 +33,12 @@ import java.util.List;
 
 public class UserActivity extends LoadingFragmentPagerActivity {
     private static final int REQUEST_SETTINGS = 10000;
+    public static final String EXTRA_TOPLEVEL_MODE = "toplevel_mode";
 
     private String mUserLogin;
     private String mUserName;
-    private boolean mIsLoginUserPage;
+    private boolean mIsTopLevelMode;
+    private boolean mIsSelf;
     private UserFragment mUserFragment;
     private PrivateEventListFragment mPrivateEventListFragment;
     private PublicEventListFragment mPublicEventListFragment;
@@ -88,7 +90,8 @@ public class UserActivity extends LoadingFragmentPagerActivity {
         Bundle data = getIntent().getExtras();
         mUserLogin = data.getString(Constants.User.LOGIN);
         mUserName = data.getString(Constants.User.NAME);
-        mIsLoginUserPage = mUserLogin.equals(Gh4Application.get(this).getAuthLogin());
+        mIsSelf = mUserLogin.equals(Gh4Application.get(this).getAuthLogin());
+        mIsTopLevelMode = mIsSelf && data.getBoolean(EXTRA_TOPLEVEL_MODE, false);
 
         super.onCreate(savedInstanceState);
         if (hasErrorView()) {
@@ -96,7 +99,7 @@ public class UserActivity extends LoadingFragmentPagerActivity {
         }
 
         ActionBar actionBar = getSupportActionBar();
-        if (mIsLoginUserPage) {
+        if (mIsTopLevelMode) {
             actionBar.setDisplayShowHomeEnabled(true);
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -111,7 +114,7 @@ public class UserActivity extends LoadingFragmentPagerActivity {
 
     @Override
     protected ListAdapter getNavigationDrawerAdapter() {
-        if (mIsLoginUserPage) {
+        if (mIsTopLevelMode) {
             return new DrawerAdapter(this, DRAWER_ITEMS);
         }
         return super.getNavigationDrawerAdapter();
@@ -154,7 +157,7 @@ public class UserActivity extends LoadingFragmentPagerActivity {
 
     @Override
     protected int[] getTabTitleResIds() {
-        return mIsLoginUserPage ? TITLES_SELF : TITLES_OTHER;
+        return mIsTopLevelMode ? TITLES_SELF : TITLES_OTHER;
     }
 
     @Override
@@ -165,7 +168,7 @@ public class UserActivity extends LoadingFragmentPagerActivity {
                 return mUserFragment;
             case 1:
                 mPrivateEventListFragment =
-                        PrivateEventListFragment.newInstance(mUserLogin, mIsLoginUserPage);
+                        PrivateEventListFragment.newInstance(mUserLogin, mIsSelf);
                 return mPrivateEventListFragment;
             case 2:
                 mPublicEventListFragment =
@@ -177,7 +180,7 @@ public class UserActivity extends LoadingFragmentPagerActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (mIsLoginUserPage) {
+        if (mIsTopLevelMode) {
             return false;
         }
         MenuInflater inflater = getMenuInflater();
@@ -188,7 +191,7 @@ public class UserActivity extends LoadingFragmentPagerActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem followAction = menu.findItem(R.id.follow);
-        followAction.setVisible(Gh4Application.get(this).isAuthorized());
+        followAction.setVisible(!mIsSelf && Gh4Application.get(this).isAuthorized());
         if (followAction.isVisible()) {
             if (mIsFollowing == null) {
                 MenuItemCompat.setActionView(followAction, R.layout.ab_loading);

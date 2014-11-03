@@ -123,7 +123,9 @@ public abstract class BaseFragmentActivity extends ActionBarActivity {
     protected Intent getToplevelActivityIntent() {
         Gh4Application app = Gh4Application.get(this);
         if (app.isAuthorized()) {
-            return IntentUtils.getUserActivityIntent(this, app.getAuthLogin(), null);
+            Intent intent = IntentUtils.getUserActivityIntent(this, app.getAuthLogin(), null);
+            intent.putExtra(UserActivity.EXTRA_TOPLEVEL_MODE, true);
+            return intent;
         } else {
             return new Intent(this, Github4AndroidActivity.class);
         }
