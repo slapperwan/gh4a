@@ -20,13 +20,13 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
-import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.FollowersFollowingListFragment;
 import com.gh4a.utils.IntentUtils;
 
-public class FollowerFollowingListActivity extends LoadingFragmentActivity {
+public class FollowerFollowingListActivity extends BaseActivity {
     private String mUserLogin;
 
     public static final String EXTRA_SHOW_FOLLOWERS = "show_followers";
@@ -38,8 +38,6 @@ public class FollowerFollowingListActivity extends LoadingFragmentActivity {
             return;
         }
 
-        setContentView(R.layout.frame_layout);
-
         Bundle data = getIntent().getExtras();
         boolean showFollowers = data.getBoolean(EXTRA_SHOW_FOLLOWERS);
         mUserLogin = data.getString(Constants.User.LOGIN);
@@ -47,7 +45,7 @@ public class FollowerFollowingListActivity extends LoadingFragmentActivity {
         if (savedInstanceState == null) {
             Fragment fragment = FollowersFollowingListFragment.newInstance(mUserLogin, showFollowers);
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.details, fragment)
+                    .add(R.id.content_container, fragment)
                     .commit();
         }
 

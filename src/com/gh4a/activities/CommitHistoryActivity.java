@@ -4,11 +4,12 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.fragment.CommitListFragment;
 
-public class CommitHistoryActivity extends BaseFragmentActivity {
+public class CommitHistoryActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,7 +27,7 @@ public class CommitHistoryActivity extends BaseFragmentActivity {
                     filePath);
 
             FragmentManager fm = getSupportFragmentManager();
-            fm.beginTransaction().add(android.R.id.content, fragment).commit();
+            fm.beginTransaction().add(R.id.content_container, fragment).commit();
         }
 
         ActionBar actionBar = getSupportActionBar();

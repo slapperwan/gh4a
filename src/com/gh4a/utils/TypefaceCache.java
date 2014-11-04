@@ -7,13 +7,15 @@ import android.util.SparseArray;
 
 public class TypefaceCache {
     public static final int TF_REGULAR = 0;
-    public static final int TF_BOLD = 1;
-    public static final int TF_ITALIC = 2;
-    public static final int TF_CONDENSED = 3;
-    public static final int TF_BOLDCONDENSED = 4;
+    public static final int TF_MEDIUM = 1;
+    public static final int TF_BOLD = 2;
+    public static final int TF_ITALIC = 3;
+    public static final int TF_CONDENSED = 4;
+    public static final int TF_BOLDCONDENSED = 5;
 
     private static final String[] FONT_FILENAMES = new String[] {
         "fonts/Roboto-Regular.ttf",
+        "fonts/Roboto-Medium.ttf",
         "fonts/Roboto-Bold.ttf",
         "fonts/Roboto-Italic.ttf",
         "fonts/Roboto-Condensed.ttf",

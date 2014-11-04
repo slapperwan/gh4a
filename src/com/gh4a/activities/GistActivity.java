@@ -30,12 +30,11 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
-import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.loader.GistLoader;
 import com.gh4a.loader.LoaderCallbacks;
@@ -43,7 +42,7 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
-public class GistActivity extends LoadingFragmentActivity implements OnClickListener {
+public class GistActivity extends BaseActivity implements View.OnClickListener {
     private String mGistId;
     private String mUserLogin;
     private Gist mGist;

@@ -21,14 +21,14 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 
+import com.gh4a.BasePagerActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
-import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.GistListFragment;
 import com.gh4a.utils.IntentUtils;
 
-public class GistListActivity extends LoadingFragmentPagerActivity {
+public class GistListActivity extends BasePagerActivity {
     private String mUserLogin;
     private boolean mIsSelf;
 

@@ -38,10 +38,11 @@
     <declare-styleable name="StyleableTextView">
         <attr name="font" format="enum">
             <enum name="regular" value="0" />
-            <enum name="bold" value="1" />
-            <enum name="italic" value="2" />
-            <enum name="condensed" value="3" />
-            <enum name="boldCondensed" value="4" />
+            <enum name="medium" value="1" />
+            <enum name="bold" value="2" />
+            <enum name="italic" value="3" />
+            <enum name="condensed" value="4" />
+            <enum name="boldCondensed" value="5" />
         </attr>
         <attr name="allCaps" format="boolean"/>
     </declare-styleable>

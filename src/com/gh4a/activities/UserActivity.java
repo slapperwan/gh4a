@@ -12,9 +12,9 @@ import android.view.MenuItem;
 import android.widget.ListAdapter;
 
 import com.gh4a.BackgroundTask;
+import com.gh4a.BasePagerActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
-import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.DrawerAdapter;
 import com.gh4a.db.BookmarksProvider;
@@ -31,7 +31,7 @@ import org.eclipse.egit.github.core.service.UserService;
 import java.util.Arrays;
 import java.util.List;
 
-public class UserActivity extends LoadingFragmentPagerActivity {
+public class UserActivity extends BasePagerActivity {
     private static final int REQUEST_SETTINGS = 10000;
     public static final String EXTRA_TOPLEVEL_MODE = "toplevel_mode";
 

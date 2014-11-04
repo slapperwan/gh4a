@@ -20,23 +20,21 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 
-import com.gh4a.LoadingFragmentActivity;
+import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.PublicTimelineFragment;
 
-public class TimelineActivity extends LoadingFragmentActivity {
+public class TimelineActivity extends BaseActivity {
     private PublicTimelineFragment mFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.frame_layout);
-
         FragmentManager fm = getSupportFragmentManager();
         if (savedInstanceState == null) {
             mFragment = PublicTimelineFragment.newInstance();
-            fm.beginTransaction().add(R.id.details, mFragment).commit();
+            fm.beginTransaction().add(R.id.content_container, mFragment).commit();
         } else {
             mFragment = (PublicTimelineFragment) fm.findFragmentById(R.id.details);
         }
@@ -45,7 +43,7 @@ public class TimelineActivity extends LoadingFragmentActivity {
         actionBar.setTitle(R.string.pub_timeline);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        mSwipeLayout.setChildScrollDelegate(mFragment);
+        setChildScrollDelegate(mFragment);
     }
 
     @Override

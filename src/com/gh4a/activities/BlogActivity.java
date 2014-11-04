@@ -37,7 +37,7 @@ public class BlogActivity extends WebViewerActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(title);
         actionBar.setSubtitle(R.string.blog);
-        actionBar.setDisplayHomeAsUpEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         loadUnthemedHtml(content);
     }

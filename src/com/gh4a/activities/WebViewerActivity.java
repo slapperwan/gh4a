@@ -37,13 +37,13 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
-import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.utils.ThemeUtils;
 
-public abstract class WebViewerActivity extends LoadingFragmentActivity {
+public abstract class WebViewerActivity extends BaseActivity {
     protected WebView mWebView;
 
     private int[] ZOOM_SIZES = new int[] {

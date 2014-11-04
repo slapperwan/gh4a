@@ -16,14 +16,15 @@
 package com.gh4a.activities;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
-import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.ForkListFragment;
 
-public class ForkListActivity extends LoadingFragmentActivity {
+public class ForkListActivity extends BaseActivity {
     private String mRepoOwner;
     private String mRepoName;
 
@@ -34,15 +35,14 @@ public class ForkListActivity extends LoadingFragmentActivity {
             return;
         }
 
-        setContentView(R.layout.frame_layout);
-
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.OWNER);
         mRepoName = data.getString(Constants.Repository.NAME);
 
         if (savedInstanceState == null) {
+            Fragment fragment = ForkListFragment.newInstance(mRepoOwner, mRepoName);
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.details, ForkListFragment.newInstance(mRepoOwner, mRepoName))
+                    .add(R.id.content_container, fragment)
                     .commit();
         }
 

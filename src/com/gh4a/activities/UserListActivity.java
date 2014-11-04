@@ -23,7 +23,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.gh4a.LoadingFragmentActivity;
+import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.UserAdapter;
 import com.gh4a.loader.LoaderCallbacks;
@@ -35,7 +35,7 @@ import org.eclipse.egit.github.core.User;
 
 import java.util.List;
 
-public abstract class UserListActivity extends LoadingFragmentActivity implements
+public abstract class UserListActivity extends BaseActivity implements
         AdapterView.OnItemClickListener {
     private UserAdapter mUserAdapter;
 
@@ -97,10 +97,6 @@ public abstract class UserListActivity extends LoadingFragmentActivity implement
 
     protected abstract String getActionBarTitle();
     protected abstract String getSubTitle();
-
-    protected boolean getShowExtraData() {
-        return true;
-    }
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {

@@ -21,8 +21,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 
+import com.gh4a.BasePagerActivity;
 import com.gh4a.Constants;
-import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.CommitCompareFragment;
 import com.gh4a.fragment.PullRequestFilesFragment;
@@ -34,7 +34,7 @@ import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.PullRequest;
 
-public class PullRequestActivity extends LoadingFragmentPagerActivity implements
+public class PullRequestActivity extends BasePagerActivity implements
         PullRequestFilesFragment.CommentUpdateListener {
     private String mRepoOwner;
     private String mRepoName;

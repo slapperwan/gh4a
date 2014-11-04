@@ -5,11 +5,11 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 
-import com.gh4a.LoadingFragmentPagerActivity;
+import com.gh4a.BasePagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.TrendingFragment;
 
-public class TrendingActivity extends LoadingFragmentPagerActivity {
+public class TrendingActivity extends BasePagerActivity {
     private static final int[] TITLES = new int[] {
         R.string.trend_today, R.string.trend_week, R.string.trend_month
     };

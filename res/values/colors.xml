@@ -13,4 +13,6 @@
     <color name="issue_open_dark_button">#569639</color>
     <color name="issue_closed_dark">#642626</color>
     <color name="issue_closed_dark_button">#963939</color>
+
+    <color name="tab_indicator_color">#fff</color>
 </resources>

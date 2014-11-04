@@ -32,9 +32,9 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
-import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.loader.LoaderCallbacks;
@@ -52,7 +52,7 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 
-public class IssueMilestoneEditActivity extends LoadingFragmentActivity {
+public class IssueMilestoneEditActivity extends BaseActivity {
     private String mRepoOwner;
     private String mRepoName;
     private int mMilestoneNumber;

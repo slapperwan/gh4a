@@ -44,7 +44,7 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
-import com.gh4a.Constants;
+import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
@@ -54,7 +54,7 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
-public class SearchActivity extends BaseFragmentActivity implements
+public class SearchActivity extends BaseActivity implements
         SearchView.OnQueryTextListener, SearchView.OnCloseListener,
         AdapterView.OnItemSelectedListener, AdapterView.OnItemClickListener {
 

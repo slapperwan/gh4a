@@ -29,8 +29,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
-import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.DownloadAdapter;
 import com.gh4a.loader.LoaderCallbacks;
@@ -44,7 +44,7 @@ import com.gh4a.widget.StyleableTextView;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
-public class ReleaseInfoActivity extends LoadingFragmentActivity implements
+public class ReleaseInfoActivity extends BaseActivity implements
         View.OnClickListener, AdapterView.OnItemClickListener {
     private String mRepoOwner;
     private String mRepoName;

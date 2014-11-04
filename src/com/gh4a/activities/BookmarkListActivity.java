@@ -17,14 +17,15 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.gh4a.LoadingFragmentActivity;
+import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.BookmarkAdapter;
 import com.gh4a.db.BookmarksProvider.Columns;
 import com.gh4a.utils.UiUtils;
 
-public class BookmarkListActivity extends LoadingFragmentActivity implements
-        AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, LoaderCallbacks<Cursor> {
+public class BookmarkListActivity extends BaseActivity implements
+        AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener,
+        LoaderCallbacks<Cursor> {
     private static final String TAG = "BookmarkListActivity";
 
     private BookmarkAdapter mAdapter;

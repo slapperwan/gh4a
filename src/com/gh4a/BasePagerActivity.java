@@ -1,20 +1,22 @@
 package com.gh4a;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBar.Tab;
+import android.support.v7.widget.Toolbar;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
+import com.gh4a.widget.SlidingTabLayout;
 import com.gh4a.widget.SwipeRefreshLayout;
 
-public abstract class LoadingFragmentPagerActivity extends LoadingFragmentActivity implements
+public abstract class BasePagerActivity extends BaseActivity implements
         SwipeRefreshLayout.ChildScrollDelegate {
     private FragmentAdapter mAdapter;
     private ViewPager mPager;
+    private SlidingTabLayout mTabs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,8 +27,10 @@ public abstract class LoadingFragmentPagerActivity extends LoadingFragmentActivi
 
         mAdapter = new FragmentAdapter();
         setContentView(R.layout.view_pager);
+
         mPager = setupPager();
-        mSwipeLayout.setChildScrollDelegate(this);
+
+        setChildScrollDelegate(this);
     }
 
     protected void invalidateFragments() {
@@ -39,9 +43,6 @@ public abstract class LoadingFragmentPagerActivity extends LoadingFragmentActivi
 
     protected void setTabsEnabled(boolean enabled) {
         mPager.setEnabled(enabled);
-        if (enabled) {
-            mPager.setCurrentItem(getSupportActionBar().getSelectedTab().getPosition());
-        }
     }
 
     @Override
@@ -54,33 +55,29 @@ public abstract class LoadingFragmentPagerActivity extends LoadingFragmentActivi
     }
 
     private ViewPager setupPager() {
-        final ActionBar actionBar = getSupportActionBar();
         int[] titleResIds = getTabTitleResIds();
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(mAdapter);
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         // We never have many pages, make sure to keep them all alive
         pager.setOffscreenPageLimit(titleResIds.length - 1);
 
-        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrollStateChanged(int state) {}
+        mTabs = new SlidingTabLayout(this);
+        mTabs.setSelectedIndicatorColors(getResources().getColor(R.color.tab_indicator_color));
+        mTabs.setCustomTabView(R.layout.tab_indicator, R.id.tab_title);
+        mTabs.setDistributeEvenly(true);
+        mTabs.setViewPager(pager);
 
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
-
-            @Override
-            public void onPageSelected(int position) {
-                actionBar.getTabAt(position).select();
-            }
-        });
-
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        for (int i = 0; i < titleResIds.length; i++) {
-            actionBar.addTab(actionBar.newTab()
-                .setText(titleResIds[i])
-                .setTabListener(new TabListener(i, pager)));
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            Toolbar toolBar = (Toolbar) findViewById(R.id.toolbar);
+            toolBar.addView(mTabs, new Toolbar.LayoutParams(
+                    Toolbar.LayoutParams.WRAP_CONTENT,
+                    Toolbar.LayoutParams.MATCH_PARENT));
+        } else {
+            LinearLayout header = (LinearLayout) findViewById(R.id.header);
+            header.addView(mTabs, new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT));
         }
 
         return pager;
@@ -114,6 +111,11 @@ public abstract class LoadingFragmentPagerActivity extends LoadingFragmentActivi
         }
 
         @Override
+        public CharSequence getPageTitle(int position) {
+            return getString(getTabTitleResIds()[position]);
+        }
+
+        @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
             super.destroyItem(container, position, object);
             if (object == mCurrentFragment) {
@@ -133,28 +135,6 @@ public abstract class LoadingFragmentPagerActivity extends LoadingFragmentActivi
                 return POSITION_NONE;
             }
             return POSITION_UNCHANGED;
-        }
-    }
-
-    private static class TabListener implements ActionBar.TabListener {
-        private final int mTag;
-        private ViewPager mPager;
-
-        public TabListener(int tag, ViewPager pager) {
-            mTag = tag;
-            mPager = pager;
-        }
-
-        public void onTabSelected(Tab tab, FragmentTransaction ft) {
-            if (mPager.isEnabled()) {
-                mPager.setCurrentItem(mTag);
-            }
-        }
-
-        public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-        }
-
-        public void onTabReselected(Tab tab, FragmentTransaction ft) {
         }
     }
 }

@@ -28,14 +28,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
-import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.loader.CollaboratorListLoader;
@@ -62,7 +61,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class IssueEditActivity extends LoadingFragmentActivity implements OnClickListener {
+public class IssueEditActivity extends BaseActivity implements View.OnClickListener {
     private String mRepoOwner;
     private String mRepoName;
     private int mIssueNumber;

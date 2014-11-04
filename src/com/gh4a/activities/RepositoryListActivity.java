@@ -8,14 +8,13 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListAdapter;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
-import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.DrawerAdapter;
 import com.gh4a.fragment.RepositoryListFragment;
@@ -26,7 +25,7 @@ import com.gh4a.fragment.WatchedRepositoryListFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RepositoryListActivity extends LoadingFragmentActivity implements
+public class RepositoryListActivity extends BaseActivity implements
         SearchView.OnCloseListener, SearchView.OnQueryTextListener,
         MenuItemCompat.OnActionExpandListener {
     private String mUserLogin;
@@ -185,11 +184,7 @@ public class RepositoryListActivity extends LoadingFragmentActivity implements
                 setSearchVisibility(true);
                 return true;
             case R.id.filter:
-                if (mDrawerLayout.isDrawerOpen(Gravity.RIGHT)) {
-                    mDrawerLayout.closeDrawer(Gravity.RIGHT);
-                } else {
-                    mDrawerLayout.openDrawer(Gravity.RIGHT);
-                }
+                toggleDrawer();
                 return true;
         }
 

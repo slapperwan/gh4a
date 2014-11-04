@@ -37,6 +37,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.ClientForAuthorization;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -51,7 +52,7 @@ import com.gh4a.utils.UiUtils;
 /**
  * The Github4Android activity.
  */
-public class Github4AndroidActivity extends BaseFragmentActivity {
+public class Github4AndroidActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

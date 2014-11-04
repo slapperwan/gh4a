@@ -23,18 +23,16 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
-import android.text.Editable;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.EditText;
 import android.widget.ListView;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
-import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.adapter.IssueLabelAdapter;
@@ -55,7 +53,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.List;
 
-public class IssueLabelListActivity extends LoadingFragmentActivity implements
+public class IssueLabelListActivity extends BaseActivity implements
         OnItemClickListener, View.OnClickListener {
     private String mRepoOwner;
     private String mRepoName;
@@ -111,7 +109,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         mAdapter = new IssueLabelAdapter(this);
-        mListView = (ListView) findViewById(R.id.main_content);
+        mListView = (ListView) findViewById(android.R.id.list);
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(this);
 

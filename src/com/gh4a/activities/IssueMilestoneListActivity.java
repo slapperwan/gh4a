@@ -17,15 +17,16 @@ package com.gh4a.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
-import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueMilestoneListFragment;
 import com.gh4a.utils.IntentUtils;
 
-public class IssueMilestoneListActivity extends LoadingFragmentActivity {
+public class IssueMilestoneListActivity extends BaseActivity {
     private String mRepoOwner;
     private String mRepoName;
 
@@ -35,14 +36,13 @@ public class IssueMilestoneListActivity extends LoadingFragmentActivity {
             return;
         }
 
-        setContentView(R.layout.frame_layout);
-
         mRepoOwner = getIntent().getExtras().getString(Constants.Repository.OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);
 
         if (savedInstanceState == null) {
+            Fragment fragment = IssueMilestoneListFragment.newInstance(mRepoOwner, mRepoName);
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.details, IssueMilestoneListFragment.newInstance(mRepoOwner, mRepoName))
+                    .add(R.id.content_container, fragment)
                     .commit();
         }
 

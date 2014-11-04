@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="DefaultTheme" parent="Theme.AppCompat">
+        <item name="windowActionBar">false</item>
+        <item name="windowActionModeOverlay">true</item>
         <item name="sendIcon">@drawable/social_send_now_dark</item>
         <item name="contentEditIcon">@drawable/content_edit_dark</item>
         <item name="contentPictureIcon">@drawable/content_picture_dark</item>
@@ -36,6 +38,8 @@
     </style>
 
     <style name="LightTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowActionModeOverlay">true</item>
         <item name="sendIcon">@drawable/social_send_now</item>
         <item name="contentEditIcon">@drawable/content_edit</item>
         <item name="contentPictureIcon">@drawable/content_picture</item>

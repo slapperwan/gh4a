@@ -17,6 +17,12 @@
         <item name="font">condensed</item>
     </style>
 
+    <style name="TextAppearance.Tab" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textColor">@color/tab_text_color</item>
+        <item name="font">medium</item>
+        <item name="allCaps">true</item>
+    </style>
+
     <style name="default_text_small_url" parent="@android:style/TextAppearance.Small">
         <item name="android:textColor">?android:attr/textColorLink</item>
     </style>

@@ -9,6 +9,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
@@ -18,7 +19,7 @@ import org.eclipse.egit.github.core.RepositoryId;
 
 import java.io.IOException;
 
-public abstract class EditCommentActivity extends BaseFragmentActivity {
+public abstract class EditCommentActivity extends BaseActivity {
     private String mRepoOwner;
     private String mRepoName;
     private long mCommentId;

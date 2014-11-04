@@ -24,14 +24,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.gh4a.BasePagerActivity;
 import com.gh4a.Constants;
-import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.CommitFragment;
 import com.gh4a.fragment.CommitNoteFragment;
 import com.gh4a.utils.IntentUtils;
 
-public class CommitActivity extends LoadingFragmentPagerActivity {
+public class CommitActivity extends BasePagerActivity {
     private String mRepoOwner;
     private String mRepoName;
     private String mObjectSha;

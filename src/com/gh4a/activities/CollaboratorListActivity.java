@@ -49,11 +49,6 @@ public class CollaboratorListActivity extends UserListActivity {
     }
 
     @Override
-    protected boolean getShowExtraData() {
-        return false;
-    }
-
-    @Override
     protected Loader<LoaderResult<List<User>>> getUserListLoader() {
         return new CollaboratorListLoader(this, mUserLogin, mRepoName);
     }

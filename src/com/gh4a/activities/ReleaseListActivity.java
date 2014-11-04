@@ -27,8 +27,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
-import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.ReleaseAdapter;
 import com.gh4a.loader.LoaderCallbacks;
@@ -36,8 +36,7 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.ReleaseLoader;
 import com.gh4a.utils.IntentUtils;
 
-public class ReleaseListActivity extends LoadingFragmentActivity implements
-        AdapterView.OnItemClickListener {
+public class ReleaseListActivity extends BaseActivity implements AdapterView.OnItemClickListener {
     private String mUserLogin;
     private String mRepoName;
     private ReleaseAdapter mAdapter;

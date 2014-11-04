@@ -35,7 +35,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.EditText;
@@ -44,9 +43,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
-import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.adapter.IssueEventAdapter;
@@ -66,8 +65,9 @@ import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 import com.shamanland.fab.FloatingActionButton;
 
-public class IssueActivity extends LoadingFragmentActivity implements
-        OnClickListener, IssueEventAdapter.OnEditComment, SwipeRefreshLayout.ChildScrollDelegate {
+public class IssueActivity extends BaseActivity implements
+        View.OnClickListener, IssueEventAdapter.OnEditComment,
+        SwipeRefreshLayout.ChildScrollDelegate {
     private static final int REQUEST_EDIT = 1000;
 
     private Issue mIssue;
@@ -188,7 +188,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
         mEventAdapter = new IssueEventAdapter(this, mRepoOwner, mRepoName, this);
         mListView.setAdapter(mEventAdapter);
 
-        mSwipeLayout.setChildScrollDelegate(this);
+        setChildScrollDelegate(this);
 
         if (!Gh4Application.get(this).isAuthorized()) {
             findViewById(R.id.comment).setVisibility(View.GONE);

@@ -18,11 +18,10 @@ package com.gh4a.activities;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.gh4a.LoadingFragmentPagerActivity;
+import com.gh4a.BasePagerActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.DrawerAdapter;
 
@@ -30,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class IssueListBaseActivity extends LoadingFragmentPagerActivity {
+public abstract class IssueListBaseActivity extends BasePagerActivity {
     protected String mSortMode;
     protected boolean mSortAscending;
 
@@ -52,8 +51,6 @@ public abstract class IssueListBaseActivity extends LoadingFragmentPagerActivity
     protected static final int ITEM_SORT_UPDATED_ASC = 9;
     protected static final int ITEM_SORT_COMMENTS_DESC = 10;
     protected static final int ITEM_SORT_COMMENTS_ASC = 11;
-    protected static final int ITEM_STATE_OPEN = 12;
-    protected static final int ITEM_STATE_CLOSED = 13;
     protected static final int ITEM_SORT_FIRST = ITEM_SORT_CREATED_DESC;
 
     protected static final List<DrawerAdapter.Item> DRAWER_ITEMS = Arrays.asList(
@@ -97,11 +94,7 @@ public abstract class IssueListBaseActivity extends LoadingFragmentPagerActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == Menu.FIRST) {
-            if (mDrawerLayout.isDrawerOpen(Gravity.RIGHT)) {
-                mDrawerLayout.closeDrawer(Gravity.RIGHT);
-            } else {
-                mDrawerLayout.openDrawer(Gravity.RIGHT);
-            }
+            toggleDrawer();
             return true;
         }
         return super.onOptionsItemSelected(item);
