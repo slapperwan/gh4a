@@ -13,10 +13,10 @@ import com.gh4a.R;
 import java.util.List;
 
 public class DrawerAdapter extends BaseAdapter {
-    private static final int ITEM_TYPE_SECTION = 0;
-    private static final int ITEM_TYPE_SECTION_ENTRY = 1;
-    private static final int ITEM_TYPE_MISC = 2;
-    private static final int ITEM_TYPE_RADIO = 3;
+    private static final int ITEM_TYPE_SECTION_HEADER = 0;
+    private static final int ITEM_TYPE_ENTRY = 1;
+    private static final int ITEM_TYPE_RADIO = 2;
+    private static final int ITEM_TYPE_DIVIDER = 3;
 
     public static abstract class Item {
         private final int mTitleResId;
@@ -31,39 +31,39 @@ public class DrawerAdapter extends BaseAdapter {
         protected abstract int getItemType();
     }
 
-    public static class SectionItem extends Item {
-        public SectionItem(int titleResId) {
+    public static class SectionHeaderItem extends Item {
+        public SectionHeaderItem(int titleResId) {
             super(titleResId, 0);
         }
 
         @Override
         protected int getItemType() {
-            return ITEM_TYPE_SECTION;
+            return ITEM_TYPE_SECTION_HEADER;
         }
     }
 
-    public static class SectionEntryItem extends Item {
+    public static class EntryItem extends Item {
         private final int mIconResId;
 
-        public SectionEntryItem(int titleResId, int iconResId, int id) {
+        public EntryItem(int titleResId, int iconResId, int id) {
             super(titleResId, id);
             mIconResId = iconResId;
         }
 
         @Override
         protected int getItemType() {
-            return ITEM_TYPE_SECTION_ENTRY;
+            return ITEM_TYPE_ENTRY;
         }
     }
 
-    public static class MiscItem extends Item {
-        public MiscItem(int titleResId, int iconResId, int id) {
-            super(titleResId, id);
+    public static class DividerItem extends Item {
+        public DividerItem() {
+            super(0, 0);
         }
 
         @Override
         protected int getItemType() {
-            return ITEM_TYPE_MISC;
+            return ITEM_TYPE_DIVIDER;
         }
     }
 
@@ -131,16 +131,18 @@ public class DrawerAdapter extends BaseAdapter {
 
         if (convertView == null) {
             final int layoutResId =
-                    type == ITEM_TYPE_MISC ? R.layout.drawer_misc_entry :
+                    type == ITEM_TYPE_DIVIDER ? R.layout.drawer_divider :
                     type == ITEM_TYPE_RADIO ? R.layout.drawer_radio :
-                    type == ITEM_TYPE_SECTION_ENTRY ? R.layout.drawer_section_entry :
-                    R.layout.drawer_section;
+                    type == ITEM_TYPE_SECTION_HEADER ? R.layout.drawer_section_header :
+                    R.layout.drawer_entry;
             convertView = mInflater.inflate(layoutResId, container, false);
         }
 
         // TOOD: ViewHolder, icon?
         TextView title = (TextView) convertView.findViewById(R.id.title);
-        title.setText(item.mTitleResId);
+        if (title != null) {
+            title.setText(item.mTitleResId);
+        }
 
         if (item instanceof RadioItem) {
             boolean checked = ((RadioItem) item).mChecked;

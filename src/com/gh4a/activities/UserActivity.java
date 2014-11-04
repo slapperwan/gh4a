@@ -61,16 +61,18 @@ public class UserActivity extends BasePagerActivity {
     private static final int ITEM_TRENDING = 7;
     private static final int ITEM_BLOG = 8;
     private static final List<DrawerAdapter.Item> DRAWER_ITEMS = Arrays.asList(
-        new DrawerAdapter.SectionItem(R.string.navigation),
-        new DrawerAdapter.SectionEntryItem(R.string.issues, 0, ITEM_ISSUES),
-        new DrawerAdapter.SectionEntryItem(R.string.pull_requests, 0, ITEM_PULLREQUESTS),
-        new DrawerAdapter.SectionEntryItem(R.string.search, 0, ITEM_SEARCH),
-        new DrawerAdapter.SectionEntryItem(R.string.bookmarks, 0, ITEM_BOOKMARKS),
-        new DrawerAdapter.SectionItem(R.string.explore),
-        new DrawerAdapter.SectionEntryItem(R.string.pub_timeline, 0, ITEM_TIMELINE),
-        new DrawerAdapter.SectionEntryItem(R.string.trend, 0, ITEM_TRENDING),
-        new DrawerAdapter.SectionEntryItem(R.string.blog, 0, ITEM_BLOG),
-        new DrawerAdapter.MiscItem(R.string.settings, 0, ITEM_SETTINGS)
+        new DrawerAdapter.SectionHeaderItem(R.string.navigation),
+        new DrawerAdapter.EntryItem(R.string.issues, 0, ITEM_ISSUES),
+        new DrawerAdapter.EntryItem(R.string.pull_requests, 0, ITEM_PULLREQUESTS),
+        new DrawerAdapter.EntryItem(R.string.search, 0, ITEM_SEARCH),
+        new DrawerAdapter.EntryItem(R.string.bookmarks, 0, ITEM_BOOKMARKS),
+        new DrawerAdapter.DividerItem(),
+        new DrawerAdapter.SectionHeaderItem(R.string.explore),
+        new DrawerAdapter.EntryItem(R.string.pub_timeline, 0, ITEM_TIMELINE),
+        new DrawerAdapter.EntryItem(R.string.trend, 0, ITEM_TRENDING),
+        new DrawerAdapter.EntryItem(R.string.blog, 0, ITEM_BLOG),
+        new DrawerAdapter.DividerItem(),
+        new DrawerAdapter.EntryItem(R.string.settings, 0, ITEM_SETTINGS)
     );
 
     private LoaderCallbacks<Boolean> mIsFollowingCallback = new LoaderCallbacks<Boolean>() {

@@ -298,7 +298,7 @@ public abstract class BaseActivity extends ActionBarActivity implements
 
     private void setupNavigationDrawer() {
         ListAdapter adapter = getNavigationDrawerAdapter();
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_container);
 
         Toolbar toolBar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolBar);
@@ -316,13 +316,16 @@ public abstract class BaseActivity extends ActionBarActivity implements
             });
 
             if (isRightSideDrawer()) {
-                DrawerLayout.LayoutParams lp =
-                        (DrawerLayout.LayoutParams) drawerList.getLayoutParams();
+                View drawer = findViewById(R.id.drawer);
+                DrawerLayout.LayoutParams lp = (DrawerLayout.LayoutParams) drawer.getLayoutParams();
                 lp.gravity = Gravity.RIGHT;
-                drawerList.setLayoutParams(lp);
+                drawer.setLayoutParams(lp);
             } else {
                 mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolBar, 0, 0);
                 mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+                ViewGroup title = (ViewGroup) findViewById(R.id.drawer_title);
+                LayoutInflater.from(this).inflate(R.layout.drawer_title_main, title);
             }
         } else {
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
