@@ -215,8 +215,13 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
             }
         };
 
+        mDirStack = new Stack<String>();
+
         if (savedInstanceState != null) {
-            mDirStack = (Stack<String>) savedInstanceState.getSerializable(STATE_KEY_DIR_STACK);
+            for (String entry : savedInstanceState.getStringArrayList(STATE_KEY_DIR_STACK)) {
+                mDirStack.add(entry);
+            }
+
             int prefixLen = STATE_KEY_CONTENT_CACHE_PREFIX.length();
             for (String key : savedInstanceState.keySet()) {
                 if (key.startsWith(STATE_KEY_CONTENT_CACHE_PREFIX)) {
@@ -228,8 +233,6 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
                             (ArrayList<RepositoryContents>) savedInstanceState.getSerializable(key));
                 }
             }
-        } else {
-            mDirStack = new Stack<String>();
         }
 
         Bundle bundle = getIntent().getExtras();
@@ -267,7 +270,7 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable(STATE_KEY_DIR_STACK, mDirStack);
+        outState.putStringArrayList(STATE_KEY_DIR_STACK, new ArrayList<String>(mDirStack));
         for (Map.Entry<String, ArrayList<RepositoryContents>> entry : mContentCache.entrySet()) {
             String key = entry.getKey();
             if (key == null) {
