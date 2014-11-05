@@ -10,7 +10,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:paddingLeft="@dimen/content_padding">
+        android:paddingLeft="@dimen/content_padding"
+        android:paddingRight="@dimen/content_padding"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
 
         <com.gh4a.widget.FixedSizeImageView
             android:id="@+id/iv_gravatar"
@@ -78,7 +81,6 @@
             android:id="@+id/iv_assignee"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_marginTop="8dp"
             android:layout_marginRight="8dp"
             android:layout_below="@id/tv_milestone"
             android:visibility="gone" />
@@ -87,7 +89,6 @@
             android:id="@+id/tv_assignee"
             android:layout_width="wrap_content"
             android:layout_height="24dp"
-            android:layout_marginTop="8dp"
             android:gravity="center_vertical"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/primary_text_default_material_dark"

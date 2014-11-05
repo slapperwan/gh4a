@@ -97,7 +97,7 @@ public class PullRequestActivity extends BasePagerActivity implements
         LinearLayout header = (LinearLayout) findViewById(R.id.header);
         LayoutInflater inflater = getLayoutInflater();
 
-        mHeader = (ViewGroup) inflater.inflate(R.layout.issue_header, header, false);
+        mHeader = (ViewGroup) inflater.inflate(R.layout.pull_request_header, header, false);
         mHeader.setClickable(false);
         mHeader.setVisibility(View.GONE);
         header.addView(mHeader, 1);

@@ -8,7 +8,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:padding="@dimen/content_padding">
+        android:paddingLeft="@dimen/content_padding"
+        android:paddingRight="@dimen/content_padding"
+        android:paddingTop="8dp"
+        android:paddingBottom="@dimen/floating_action_button_margin_mini">
 
         <com.gh4a.widget.FixedSizeImageView
             android:id="@+id/iv_gravatar"
