@@ -22,7 +22,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -40,9 +39,6 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.MilestoneLoader;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
@@ -57,9 +53,10 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class IssueMilestoneEditActivity extends BaseActivity implements View.OnClickListener {
+    public static final String EXTRA_MILESTONE = "milestone";
+
     private String mRepoOwner;
     private String mRepoName;
-    private int mMilestoneNumber;
 
     private Milestone mMilestone;
 
@@ -67,31 +64,14 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
     private EditText mDescriptionView;
     private TextView mDueView;
 
-    private LoaderCallbacks<Milestone> mMilestoneCallback = new LoaderCallbacks<Milestone>() {
-        @Override
-        public Loader<LoaderResult<Milestone>> onCreateLoader(int id, Bundle args) {
-            return new MilestoneLoader(IssueMilestoneEditActivity.this,
-                    mRepoOwner, mRepoName, mMilestoneNumber);
-        }
-        @Override
-        public void onResultReady(LoaderResult<Milestone> result) {
-            boolean success = !result.handleError(IssueMilestoneEditActivity.this);
-            if (success) {
-                mMilestone = result.getData();
-                updateLabels();
-            }
-            setContentEmpty(!success);
-            setContentShown(true);
-        }
-    };
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.OWNER);
-        mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);
-        mMilestoneNumber = getIntent().getExtras().getInt(Constants.Milestone.NUMBER);
+        Bundle data = getIntent().getExtras();
+        mRepoOwner = data.getString(Constants.Repository.OWNER);
+        mRepoName = data.getString(Constants.Repository.NAME);
+        mMilestone = (Milestone) data.getSerializable(EXTRA_MILESTONE);
 
         if (hasErrorView()) {
             return;
@@ -126,18 +106,17 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        if (isInEditMode()) {
-            getSupportLoaderManager().initLoader(0, null, mMilestoneCallback);
-        } else {
+        if (mMilestone == null) {
             mMilestone = new Milestone();
-            updateLabels();
         }
 
-        setContentShown(!isInEditMode());
+        mTitleView.setText(mMilestone.getTitle());
+        mDescriptionView.setText(mMilestone.getDescription());
+        updateLabels();
     }
 
     private boolean isInEditMode() {
-        return mMilestoneNumber != 0;
+        return getIntent().hasExtra(EXTRA_MILESTONE);
     }
 
     private void openIssueMilestones() {
@@ -229,9 +208,6 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
 
     private void updateLabels() {
         Date dueOn = mMilestone.getDueOn();
-
-        mTitleView.setText(mMilestone.getTitle());
-        mDescriptionView.setText(mMilestone.getDescription());
 
         if (dueOn != null) {
             mDueView.setText(DateFormat.getMediumDateFormat(this).format(dueOn));

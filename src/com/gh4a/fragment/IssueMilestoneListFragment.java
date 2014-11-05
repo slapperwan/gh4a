@@ -96,7 +96,7 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
         Intent intent = new Intent(getActivity(), IssueMilestoneEditActivity.class);
         intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.NAME, mRepoName);
-        intent.putExtra(Constants.Milestone.NUMBER, milestone.getNumber());
+        intent.putExtra(IssueMilestoneEditActivity.EXTRA_MILESTONE, milestone);
         startActivity(intent);
     }
 

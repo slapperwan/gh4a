@@ -37,7 +37,6 @@ import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.loader.CollaboratorListLoader;
 import com.gh4a.loader.IsCollaboratorLoader;
-import com.gh4a.loader.IssueLoader;
 import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
@@ -59,9 +58,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class IssueEditActivity extends BaseActivity implements View.OnClickListener {
+    public static final String EXTRA_ISSUE = "issue";
+
     private String mRepoOwner;
     private String mRepoName;
-    private int mIssueNumber;
 
     private boolean mIsCollaborator;
     private List<Milestone> mAllMilestone;
@@ -146,23 +146,6 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         }
     };
 
-    private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>() {
-        @Override
-        public Loader<LoaderResult<Issue>> onCreateLoader(int id, Bundle args) {
-            return new IssueLoader(IssueEditActivity.this, mRepoOwner, mRepoName, mIssueNumber);
-        }
-        @Override
-        public void onResultReady(LoaderResult<Issue> result) {
-            boolean success = !result.handleError(IssueEditActivity.this);
-            if (success) {
-                mEditIssue = result.getData();
-                updateLabelsAndStates();
-            }
-            setContentEmpty(!success);
-            setContentShown(true);
-        }
-    };
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -171,7 +154,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
         mRepoOwner = data.getString(Constants.Repository.OWNER);
         mRepoName = data.getString(Constants.Repository.NAME);
-        mIssueNumber = data.getInt(Constants.Issue.NUMBER);
+        mEditIssue = (Issue) data.getSerializable(EXTRA_ISSUE);
 
         if (hasErrorView()) {
             return;
@@ -198,7 +181,8 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         setHeaderAlignedActionButton(fab);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(isInEditMode() ? getString(R.string.issue_edit_title, mIssueNumber)
+        actionBar.setTitle(isInEditMode()
+                ? getString(R.string.issue_edit_title, mEditIssue.getNumber())
                 : getString(R.string.issue_create));
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -211,23 +195,23 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         mAssigneeContainer = findViewById(R.id.assignee_container);
         mLabelContainer = findViewById(R.id.label_container);
 
-        getSupportLoaderManager().initLoader(4, null, mIsCollaboratorCallback);
-        if (isInEditMode()) {
-            getSupportLoaderManager().initLoader(3, null, mIssueCallback);
-        } else {
-            mEditIssue = new Issue();
-        }
-
-        setContentShown(!isInEditMode());
+        getSupportLoaderManager().initLoader(3, null, mIsCollaboratorCallback);
 
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_KEY_ISSUE)) {
             mEditIssue = (Issue) savedInstanceState.getSerializable(STATE_KEY_ISSUE);
         }
+        if (mEditIssue == null) {
+            mEditIssue = new Issue();
+        }
+
+        mTitleView.setText(mEditIssue.getTitle());
+        mDescView.setText(mEditIssue.getBody());
+
         updateLabelsAndStates();
     }
 
     private boolean isInEditMode() {
-        return mIssueNumber != 0;
+        return getIntent().hasExtra(EXTRA_ISSUE);
     }
 
     @Override
@@ -442,35 +426,33 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
     }
 
     private void updateLabelsAndStates() {
-        if (mEditIssue != null) {
-            mTitleView.setText(mEditIssue.getTitle());
-            mDescView.setText(mEditIssue.getBody());
+        mTitleView.setText(mEditIssue.getTitle());
+        mDescView.setText(mEditIssue.getBody());
 
-            if (mEditIssue.getMilestone() != null) {
-                mTvSelectedMilestone.setText(mEditIssue.getMilestone().getTitle());
-            } else {
-                mTvSelectedMilestone.setText(R.string.issue_clear_milestone);
-            }
+        if (mEditIssue.getMilestone() != null) {
+            mTvSelectedMilestone.setText(mEditIssue.getMilestone().getTitle());
+        } else {
+            mTvSelectedMilestone.setText(R.string.issue_clear_milestone);
+        }
 
-            if (mEditIssue.getAssignee() != null) {
-                mTvSelectedAssignee.setText(mEditIssue.getAssignee().getLogin());
-            } else {
-                mTvSelectedAssignee.setText(R.string.issue_clear_assignee);
-            }
+        if (mEditIssue.getAssignee() != null) {
+            mTvSelectedAssignee.setText(mEditIssue.getAssignee().getLogin());
+        } else {
+            mTvSelectedAssignee.setText(R.string.issue_clear_assignee);
+        }
 
-            List<Label> labels = mEditIssue.getLabels();
-            if (labels == null || labels.isEmpty()) {
-                mTvLabels.setText(R.string.issue_no_labels);
-            } else {
-                StringBuilder labelText = new StringBuilder();
-                for (int i = 0; i < labels.size(); i++) {
-                    if (i != 0) {
-                        labelText.append(", ");
-                    }
-                    labelText.append(labels.get(i).getName());
+        List<Label> labels = mEditIssue.getLabels();
+        if (labels == null || labels.isEmpty()) {
+            mTvLabels.setText(R.string.issue_no_labels);
+        } else {
+            StringBuilder labelText = new StringBuilder();
+            for (int i = 0; i < labels.size(); i++) {
+                if (i != 0) {
+                    labelText.append(", ");
                 }
-                mTvLabels.setText(labelText);
+                labelText.append(labels.get(i).getName());
             }
+            mTvLabels.setText(labelText);
         }
 
         boolean canEdit = mIsCollaborator && mEditIssue != null;

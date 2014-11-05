@@ -404,7 +404,7 @@ public class IssueActivity extends BaseActivity implements
                 intent = new Intent(this, IssueEditActivity.class);
                 intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
                 intent.putExtra(Constants.Repository.NAME, mRepoName);
-                intent.putExtra(Constants.Issue.NUMBER, mIssue.getNumber());
+                intent.putExtra(IssueEditActivity.EXTRA_ISSUE, mIssue);
             }
             break;
         case R.id.iv_gravatar:
