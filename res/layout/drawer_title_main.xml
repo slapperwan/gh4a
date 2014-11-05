@@ -17,6 +17,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:text="@string/app_name"
-        android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse" />
+        android:textAppearance="?attr/drawerTitleTextAppearance" />
 
 </LinearLayout>

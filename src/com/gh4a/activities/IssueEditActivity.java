@@ -24,9 +24,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -48,6 +46,7 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
+import com.shamanland.fab.FloatingActionButton;
 
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
@@ -57,29 +56,32 @@ import org.eclipse.egit.github.core.service.IssueService;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class IssueEditActivity extends BaseActivity implements View.OnClickListener {
     private String mRepoOwner;
     private String mRepoName;
     private int mIssueNumber;
 
-    private List<Label> mSelectedLabels;
-    private boolean mLabelSelectionChanged;
-    private Milestone mSelectedMilestone;
-    private User mSelectedAssignee;
+    private boolean mIsCollaborator;
     private List<Milestone> mAllMilestone;
     private List<User> mAllAssignee;
+    private List<Label> mAllLabels;
     private Issue mEditIssue;
 
-    private ProgressDialog mProgressDialog;
+    private EditText mTitleView;
+    private EditText mDescView;
     private TextView mTvSelectedMilestone;
     private TextView mTvSelectedAssignee;
-    private Map<Label, TextView> mLabelViewMap;
+    private TextView mTvLabels;
 
-    private static final String STATE_KEY_LABELS = "selected_labels";
+    private View mMilestoneContainer;
+    private View mAssigneeContainer;
+    private View mLabelContainer;
+
+    private ProgressDialog mProgressDialog;
+
+    private static final String STATE_KEY_ISSUE = "issue";
 
     private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
         @Override
@@ -90,7 +92,9 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         public void onResultReady(LoaderResult<List<Label>> result) {
             stopProgressDialog(mProgressDialog);
             if (!result.handleError(IssueEditActivity.this)) {
-                fillLabels(result.getData());
+                mAllLabels = result.getData();
+                showLabelDialog(null);
+                getSupportLoaderManager().destroyLoader(0);
             }
         }
     };
@@ -136,8 +140,8 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         @Override
         public void onResultReady(LoaderResult<Boolean> result) {
             if (!result.handleError(IssueEditActivity.this)) {
-                findViewById(R.id.for_collaborator).setVisibility(
-                        result.getData() ? View.VISIBLE : View.GONE);
+                mIsCollaborator = result.getData();
+                updateLabelsAndStates();
             }
         }
     };
@@ -152,7 +156,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
             boolean success = !result.handleError(IssueEditActivity.this);
             if (success) {
                 mEditIssue = result.getData();
-                fillIssueData();
+                updateLabelsAndStates();
             }
             setContentEmpty(!success);
             setContentShown(true);
@@ -163,7 +167,6 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mSelectedLabels = new ArrayList<Label>();
         Bundle data = getIntent().getExtras();
 
         mRepoOwner = data.getString(Constants.Repository.OWNER);
@@ -182,27 +185,45 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         }
         setContentView(R.layout.issue_create);
 
+        LayoutInflater inflater = getLayoutInflater();
+        LinearLayout headerContainer = (LinearLayout) findViewById(R.id.header);
+        View header = inflater.inflate(R.layout.issue_create_header, headerContainer);
+
+        mTitleView = (EditText) header.findViewById(R.id.et_title);
+        mDescView = (EditText) header.findViewById(R.id.et_desc);
+
+        FloatingActionButton fab = (FloatingActionButton) inflater.inflate(R.layout.default_fab, null);
+        fab.setImageResource(R.drawable.navigation_accept);
+        fab.setOnClickListener(this);
+        setHeaderAlignedActionButton(fab);
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(isInEditMode() ? getString(R.string.issue_edit_title, mIssueNumber)
                 : getString(R.string.issue_create));
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        mTvSelectedMilestone = (TextView) findViewById(R.id.et_milestone);
-        mTvSelectedAssignee = (TextView) findViewById(R.id.et_assignee);
+        mTvSelectedMilestone = (TextView) findViewById(R.id.tv_milestone);
+        mTvSelectedAssignee = (TextView) findViewById(R.id.tv_assignee);
+        mTvLabels = (TextView) findViewById(R.id.tv_labels);
 
-        getSupportLoaderManager().initLoader(0, null, mLabelCallback);
+        mMilestoneContainer = findViewById(R.id.milestone_container);
+        mAssigneeContainer = findViewById(R.id.assignee_container);
+        mLabelContainer = findViewById(R.id.label_container);
+
         getSupportLoaderManager().initLoader(4, null, mIsCollaboratorCallback);
         if (isInEditMode()) {
             getSupportLoaderManager().initLoader(3, null, mIssueCallback);
+        } else {
+            mEditIssue = new Issue();
         }
+
         setContentShown(!isInEditMode());
 
-        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_KEY_LABELS)) {
-            mSelectedLabels = (ArrayList<Label>) savedInstanceState.getSerializable(STATE_KEY_LABELS);
-            mLabelSelectionChanged = true;
-            applyLabelSelection();
+        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_KEY_ISSUE)) {
+            mEditIssue = (Issue) savedInstanceState.getSerializable(STATE_KEY_ISSUE);
         }
+        updateLabelsAndStates();
     }
 
     private boolean isInEditMode() {
@@ -210,18 +231,23 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (mLabelSelectionChanged) {
-            outState.putSerializable(STATE_KEY_LABELS, new ArrayList<Label>(mSelectedLabels));
+    public void onClick(View view) {
+        String title = mTitleView.getText() == null ? null : mTitleView.getText().toString();
+        if (StringUtils.isBlank(title)) {
+            mTitleView.setError(getString(R.string.issue_error_title));
+        } else {
+            mEditIssue.setTitle(title);
+            mEditIssue.setBody(mDescView.getText().toString());
+            new SaveIssueTask(mEditIssue).execute();
         }
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.accept_cancel, menu);
-        return super.onCreateOptionsMenu(menu);
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mEditIssue != null) {
+            outState.putSerializable(STATE_KEY_ISSUE, mEditIssue);
+        }
     }
 
     @Override
@@ -230,39 +256,20 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
                 mRepoOwner, mRepoName, Constants.Issue.STATE_OPEN);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case R.id.accept:
-            EditText etTitle = (EditText) findViewById(R.id.et_title);
-            String title = etTitle.getText() == null ? null : etTitle.getText().toString();
-            if (StringUtils.isBlank(title)) {
-                etTitle.setError(getString(R.string.issue_error_title));
-            } else {
-                EditText etDesc = (EditText) findViewById(R.id.et_desc);
-                new SaveIssueTask(title, etDesc.getText().toString()).execute();
-            }
-            return true;
-        case R.id.cancel:
-            finish();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     public void showMilestonesDialog(View view) {
         if (mAllMilestone == null) {
             mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
             getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
         } else {
             final String[] milestones = new String[mAllMilestone.size() + 1];
+            Milestone selectedMilestone = mEditIssue.getMilestone();
             int selected = 0;
 
             milestones[0] = getResources().getString(R.string.issue_clear_milestone);
             for (int i = 1; i <= mAllMilestone.size(); i++) {
                 Milestone m = mAllMilestone.get(i - 1);
                 milestones[i] = m.getTitle();
-                if (mSelectedMilestone != null && m.getNumber() == mSelectedMilestone.getNumber()) {
+                if (selectedMilestone != null && m.getNumber() == selectedMilestone.getNumber()) {
                     selected = i;
                 }
             }
@@ -271,13 +278,11 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if (which == 0) {
-                        mSelectedMilestone = null;
-                        mTvSelectedMilestone.setText(null);
+                        mEditIssue.setMilestone(null);
                     } else {
-                        mSelectedMilestone = mAllMilestone.get(which - 1);
-                        mTvSelectedMilestone.setText(getString(
-                                R.string.issue_milestone, mSelectedMilestone.getTitle()));
+                        mEditIssue.setMilestone(mAllMilestone.get(which - 1));
                     }
+                    updateLabelsAndStates();
                     dialog.dismiss();
                 }
             };
@@ -297,6 +302,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
             getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
         } else {
             final String[] assignees = new String[mAllAssignee.size() + 1];
+            User selectedAssignee = mEditIssue.getAssignee();
             int selected = 0;
 
             assignees[0] = getResources().getString(R.string.issue_clear_assignee);
@@ -304,8 +310,8 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
             for (int i = 1; i <= mAllAssignee.size(); i++) {
                 User u = mAllAssignee.get(i - 1);
                 assignees[i] = u.getLogin();
-                if (mSelectedAssignee != null
-                        && u.getLogin().equalsIgnoreCase(mSelectedAssignee.getLogin())) {
+                if (selectedAssignee != null
+                        && u.getLogin().equalsIgnoreCase(selectedAssignee.getLogin())) {
                     selected = i;
                 }
             }
@@ -314,13 +320,11 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if (which == 0) {
-                        mSelectedAssignee = null;
-                        mTvSelectedAssignee.setText(null);
+                        mEditIssue.setAssignee(null);
                     } else {
-                        mSelectedAssignee = mAllAssignee.get(which - 1);
-                        mTvSelectedAssignee.setText(getString(
-                                R.string.issue_assignee, mSelectedAssignee.getLogin()));
+                        mEditIssue.setAssignee(mAllAssignee.get(which - 1));
                     }
+                    updateLabelsAndStates();
                     dialog.dismiss();
                 }
             };
@@ -334,14 +338,82 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
-    private class SaveIssueTask extends ProgressDialogTask<Void> {
-        private String mTitle;
-        private String mBody;
+    public void showLabelDialog(View view) {
+        if (mAllLabels == null) {
+            mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+            getSupportLoaderManager().initLoader(0, null, mLabelCallback);
+        } else {
+            LayoutInflater inflater = getLayoutInflater();
+            final List<Label> selectedLabels = mEditIssue.getLabels() != null
+                    ? new ArrayList<Label>(mEditIssue.getLabels()) : new ArrayList<Label>();
+            View labelContainerView = inflater.inflate(R.layout.generic_linear_container, null);
+            LinearLayout container = (LinearLayout) labelContainerView.findViewById(R.id.container);
 
-        public SaveIssueTask(String title, String body) {
+            View.OnClickListener clickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Label label = (Label) view.getTag();
+                    if (selectedLabels.contains(label)) {
+                        selectedLabels.remove(label);
+                        setLabelSelection((TextView) view, false);
+                    } else {
+                        selectedLabels.add(label);
+                        setLabelSelection((TextView) view, true);
+                    }
+                }
+            };
+
+            for (final Label label : mAllLabels) {
+                final View rowView = inflater.inflate(R.layout.row_issue_create_label, container, false);
+                View viewColor = rowView.findViewById(R.id.view_color);
+                viewColor.setBackgroundColor(Color.parseColor("#" + label.getColor()));
+
+                final TextView tvLabel = (TextView) rowView.findViewById(R.id.tv_title);
+                tvLabel.setText(label.getName());
+                tvLabel.setOnClickListener(clickListener);
+                tvLabel.setTag(label);
+
+                setLabelSelection(tvLabel, selectedLabels.contains(label));
+                container.addView(rowView);
+            }
+
+            new AlertDialog.Builder(this)
+                    .setCancelable(true)
+                    .setTitle(R.string.issue_labels)
+                    .setView(container)
+                    .setNegativeButton(R.string.cancel, null)
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            mEditIssue.setLabels(selectedLabels);
+                            updateLabelsAndStates();
+                        }
+                    })
+                    .show();
+        }
+    }
+
+    private void setLabelSelection(TextView view, boolean selected) {
+        Label label = (Label) view.getTag();
+        if (selected) {
+            int color = Color.parseColor("#" + label.getColor());
+            view.setTypeface(view.getTypeface(), Typeface.BOLD);
+            view.setBackgroundColor(color);
+            view.setTextColor(UiUtils.textColorForBackground(this, color));
+        } else {
+            view.setTypeface(view.getTypeface(), 0);
+            view.setBackgroundColor(0);
+            view.setTextColor(getResources().getColor(Gh4Application.THEME != R.style.LightTheme
+                    ? R.color.label_fg_light : R.color.label_fg_dark));
+        }
+    }
+
+    private class SaveIssueTask extends ProgressDialogTask<Void> {
+        private Issue mIssue;
+
+        public SaveIssueTask(Issue issue) {
             super(IssueEditActivity.this, 0, R.string.saving_msg);
-            mTitle = title;
-            mBody = body;
+            mIssue = issue;
         }
 
         @Override
@@ -349,18 +421,10 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
             IssueService issueService = (IssueService)
                     Gh4Application.get(mContext).getService(Gh4Application.ISSUE_SERVICE);
 
-            Issue issue = isInEditMode() ? mEditIssue : new Issue();
-            issue.setTitle(mTitle);
-            issue.setBody(mBody);
-
-            issue.setLabels(mSelectedLabels);
-            issue.setMilestone(mSelectedMilestone != null ? mSelectedMilestone : new Milestone());
-            issue.setAssignee(mSelectedAssignee != null ? mSelectedAssignee : new User());
-
             if (isInEditMode()) {
-                mEditIssue = issueService.editIssue(mRepoOwner, mRepoName, issue);
+                mEditIssue = issueService.editIssue(mRepoOwner, mRepoName, mIssue);
             } else {
-                mEditIssue = issueService.createIssue(mRepoOwner, mRepoName, issue);
+                mEditIssue = issueService.createIssue(mRepoOwner, mRepoName, mIssue);
             }
             return null;
         }
@@ -377,90 +441,41 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
-    public void fillLabels(List<Label> labels) {
-        LinearLayout labelLayout = (LinearLayout) findViewById(R.id.ll_labels);
+    private void updateLabelsAndStates() {
+        if (mEditIssue != null) {
+            mTitleView.setText(mEditIssue.getTitle());
+            mDescView.setText(mEditIssue.getBody());
 
-        mLabelViewMap = new HashMap<Label, TextView>();
-
-        for (final Label label : labels) {
-            final View rowView = getLayoutInflater().inflate(R.layout.row_issue_create_label, null);
-            View viewColor = rowView.findViewById(R.id.view_color);
-            viewColor.setBackgroundColor(Color.parseColor("#" + label.getColor()));
-
-            final TextView tvLabel = (TextView) rowView.findViewById(R.id.tv_title);
-            tvLabel.setText(label.getName());
-            tvLabel.setOnClickListener(this);
-            tvLabel.setTag(label);
-
-            labelLayout.addView(rowView);
-            mLabelViewMap.put(label, tvLabel);
-        }
-        applyLabelSelection();
-    }
-
-    @Override
-    public void onClick(View view) {
-        if (view.getTag() instanceof Label) {
-            Label label = (Label) view.getTag();
-
-            mLabelSelectionChanged = true;
-            if (mSelectedLabels.contains(label)) {
-                mSelectedLabels.remove(label);
+            if (mEditIssue.getMilestone() != null) {
+                mTvSelectedMilestone.setText(mEditIssue.getMilestone().getTitle());
             } else {
-                mSelectedLabels.add(label);
+                mTvSelectedMilestone.setText(R.string.issue_clear_milestone);
             }
 
-            applyLabelSelection();
-        }
-    }
-
-    private void applyLabelSelection() {
-        if (mLabelViewMap == null) {
-            return;
-        }
-
-        for (Map.Entry<Label, TextView> entry : mLabelViewMap.entrySet()) {
-            Label label = entry.getKey();
-            TextView view = entry.getValue();
-
-            if (mSelectedLabels.contains(label)) {
-                int color = Color.parseColor("#" + label.getColor());
-                view.setTypeface(view.getTypeface(), Typeface.BOLD);
-                view.setBackgroundColor(color);
-                view.setTextColor(UiUtils.textColorForBackground(this, color));
+            if (mEditIssue.getAssignee() != null) {
+                mTvSelectedAssignee.setText(mEditIssue.getAssignee().getLogin());
             } else {
-                view.setTypeface(view.getTypeface(), 0);
-                view.setBackgroundColor(0);
-                view.setTextColor(getResources().getColor(Gh4Application.THEME != R.style.LightTheme
-                        ? R.color.label_fg_light : R.color.label_fg_dark));
+                mTvSelectedAssignee.setText(R.string.issue_clear_assignee);
+            }
+
+            List<Label> labels = mEditIssue.getLabels();
+            if (labels == null || labels.isEmpty()) {
+                mTvLabels.setText(R.string.issue_no_labels);
+            } else {
+                StringBuilder labelText = new StringBuilder();
+                for (int i = 0; i < labels.size(); i++) {
+                    if (i != 0) {
+                        labelText.append(", ");
+                    }
+                    labelText.append(labels.get(i).getName());
+                }
+                mTvLabels.setText(labelText);
             }
         }
-    }
 
-    private void fillIssueData() {
-        EditText etTitle = (EditText) findViewById(R.id.et_title);
-        etTitle.setText(mEditIssue.getTitle());
-
-        EditText etDesc = (EditText) findViewById(R.id.et_desc);
-        etDesc.setText(mEditIssue.getBody());
-
-        if (!mLabelSelectionChanged) {
-            mSelectedLabels.clear();
-            mSelectedLabels.addAll(mEditIssue.getLabels());
-            applyLabelSelection();
-        }
-
-        mSelectedMilestone = mEditIssue.getMilestone();
-        mSelectedAssignee = mEditIssue.getAssignee();
-
-        if (mSelectedMilestone != null) {
-            mTvSelectedMilestone.setText(getString(
-                    R.string.issue_milestone, mEditIssue.getMilestone().getTitle()));
-        }
-
-        if (mSelectedAssignee != null) {
-            mTvSelectedAssignee.setText(getString(
-                    R.string.issue_assignee, mSelectedAssignee.getLogin()));
-        }
+        boolean canEdit = mIsCollaborator && mEditIssue != null;
+        mMilestoneContainer.setEnabled(canEdit);
+        mAssigneeContainer.setEnabled(canEdit);
+        mLabelContainer.setEnabled(canEdit);
     }
 }

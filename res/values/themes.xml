@@ -23,6 +23,10 @@
         <item name="milestoneSmallIcon">@drawable/milestone_small_dark</item>
         <item name="downloadSmallIcon">@drawable/download_small_dark</item>
         <item name="filesSmallIcon">@drawable/files_small_dark</item>
+        <item name="dueIcon">@drawable/due_dark</item>
+        <item name="milestoneIcon">@drawable/milestone_dark</item>
+        <item name="assigneeIcon">@drawable/assignee_dark</item>
+        <item name="labelsIcon">@drawable/labels_dark</item>
         <item name="cardViewTheme">@style/Base.CardView.Dark</item>
         <item name="colorAccent">#396426</item>
         <item name="colorPrimary">#396426</item>
@@ -36,6 +40,7 @@
         <item name="colorIssueEditFab">@color/issue_edit_fab_dark</item>
         <item name="colorCommitAddition">#79d242</item>
         <item name="colorCommitDeletion">#d25151</item>
+        <item name="colorFab">@color/default_fab_dark</item>
     </style>
 
     <style name="LightTheme" parent="Theme.AppCompat.Light.DarkActionBar">
@@ -61,6 +66,10 @@
         <item name="milestoneSmallIcon">@drawable/milestone_small</item>
         <item name="downloadSmallIcon">@drawable/download_small</item>
         <item name="filesSmallIcon">@drawable/files_small</item>
+        <item name="dueIcon">@drawable/due</item>
+        <item name="milestoneIcon">@drawable/milestone</item>
+        <item name="assigneeIcon">@drawable/assignee</item>
+        <item name="labelsIcon">@drawable/labels</item>
         <item name="listPopupWindowStyle">@style/Widget.AppCompat.Light.ListPopupWindow</item>
         <item name="cardViewTheme">@style/Base.CardView.Light</item>
         <item name="colorAccent">#65b345</item>
@@ -75,6 +84,7 @@
         <item name="colorIssueEditFab">@color/issue_edit_fab_light</item>
         <item name="colorCommitAddition">#65b345</item>
         <item name="colorCommitDeletion">#b34545</item>
+        <item name="colorFab">@color/default_fab_light</item>
     </style>
 
     <style name="Base.CardView.Light" parent="CardView.Light">

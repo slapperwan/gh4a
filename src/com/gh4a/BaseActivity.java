@@ -33,9 +33,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -48,6 +50,7 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
+import com.shamanland.fab.FloatingActionButton;
 
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
@@ -57,11 +60,24 @@ public abstract class BaseActivity extends ActionBarActivity implements
     private TextView mEmptyView;
     private boolean mContentShown;
 
+    private View mHeader;
+    private FrameLayout mOverlay;
+    private FloatingActionButton mHeaderFab;
     private SmoothProgressBar mProgress;
     private SwipeRefreshLayout mSwipeLayout;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private boolean mHasErrorView = false;
+
+    private ViewTreeObserver.OnGlobalLayoutListener mOverlayLayoutListener =
+            new ViewTreeObserver.OnGlobalLayoutListener() {
+        @Override
+        public void onGlobalLayout() {
+            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mHeaderFab.getLayoutParams();
+            params.topMargin = mHeader.getBottom() - mHeaderFab.getHeight() / 2;
+            mHeaderFab.setLayoutParams(params);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,6 +162,21 @@ public abstract class BaseActivity extends ActionBarActivity implements
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
+    }
+
+    protected void setHeaderAlignedActionButton(FloatingActionButton fab) {
+        mHeaderFab = fab;
+
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.gravity = Gravity.RIGHT;
+        params.rightMargin = getResources().getDimensionPixelSize(R.dimen.content_padding);
+
+        ensureContent();
+        mOverlay.getViewTreeObserver().addOnGlobalLayoutListener(mOverlayLayoutListener);
+        mOverlay.addView(fab, params);
     }
 
     protected boolean isOnline() {
@@ -377,6 +408,9 @@ public abstract class BaseActivity extends ActionBarActivity implements
 
         mContentContainer = (ViewGroup) findViewById(R.id.content_container);
         mEmptyView = (TextView) findViewById(android.R.id.empty);
+
+        mOverlay = (FrameLayout) findViewById(R.id.overlay);
+        mHeader = findViewById(R.id.header);
 
         mContentShown = true;
     }

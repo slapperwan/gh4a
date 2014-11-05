@@ -9,6 +9,7 @@
     <attr name="colorIssueEditFab" format="reference" />
     <attr name="colorCommitAddition" format="color" />
     <attr name="colorCommitDeletion" format="color" />
+    <attr name="colorFab" format="color" />
 
     <attr name="sendIcon" format="reference" />
     <attr name="contentEditIcon" format="reference" />
@@ -30,6 +31,10 @@
     <attr name="milestoneSmallIcon" format="reference" />
     <attr name="downloadSmallIcon" format="reference" />
     <attr name="filesSmallIcon" format="reference" />
+    <attr name="dueIcon" format="reference" />
+    <attr name="milestoneIcon" format="reference" />
+    <attr name="assigneeIcon" format="reference" />
+    <attr name="labelsIcon" format="reference" />
 
     <declare-styleable name="LabelBadgeView">
         <attr name="badgeSize" format="dimension"/>

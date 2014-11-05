@@ -3,35 +3,43 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-    <LinearLayout
+
+    <RelativeLayout
+        android:id="@+id/label_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/content_padding"
-        android:orientation="vertical" >
-        <EditText
-            android:id="@+id/et_title"
+        android:layout_height="72dp"
+        android:paddingLeft="@dimen/content_padding"
+        android:paddingRight="@dimen/content_padding"
+        android:paddingTop="@dimen/floating_action_button_margin_mini"
+        android:paddingBottom="@dimen/content_padding"
+        android:gravity="center_vertical"
+        android:clickable="true"
+        android:onClick="showDatePickerDialog">
+
+        <ImageView
+            android:id="@+id/iv_due"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:layout_marginBottom="@dimen/overview_item_spacing"
-            android:inputType="textCapSentences"
-            android:hint="@string/issue_milestone_title" />
-        <EditText
-            android:id="@+id/et_desc"
+            android:layout_marginRight="16dp"
+            android:src="?attr/dueIcon" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_due_label"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:layout_marginBottom="@dimen/overview_item_spacing"
-            android:gravity="top"
-            android:minLines="5"
-            android:inputType="textMultiLine|textCapSentences"
-            android:hint="@string/issue_milestone_desc" />
-        <EditText
-            android:id="@+id/et_due_date"
-            android:layout_width="match_parent"
+            android:layout_toRightOf="@id/iv_due"
+            android:text="@string/issue_milestone_due_date"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="?android:attr/textColorPrimary" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_due"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="@string/issue_milestone_due_date"
-            android:cursorVisible="false"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:onClick="showDatePickerDialog" />
-    </LinearLayout>
+            android:layout_below="@id/tv_due_label"
+            android:layout_toRightOf="@id/iv_due"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+    </RelativeLayout>
+
 </ScrollView>

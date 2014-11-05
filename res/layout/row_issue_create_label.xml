@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:paddingTop="5dp"
     android:paddingBottom="5dp" >
     <View
@@ -14,7 +14,7 @@
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_title"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:paddingLeft="8dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
