@@ -2,13 +2,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:paddingTop="@dimen/content_padding"
+    android:paddingBottom="@dimen/floating_action_button_margin_mini">
 
     <RelativeLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:padding="@dimen/content_padding">
+        android:paddingLeft="@dimen/content_padding">
 
         <com.gh4a.widget.FixedSizeImageView
             android:id="@+id/iv_gravatar"
@@ -45,11 +47,29 @@
             android:layout_below="@id/iv_gravatar" />
 
         <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_pull"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/SelectableLabel"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/primary_text_default_material_dark"
+            android:layout_marginTop="8dp"
+            android:layout_below="@id/tv_title"
+            android:text="@string/view_pull_request"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/content_padding"
+        android:paddingRight="52dp">
+
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_milestone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_below="@id/tv_title"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/secondary_text_default_material_dark"
             android:visibility="gone" />
@@ -58,8 +78,8 @@
             android:id="@+id/iv_assignee"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginRight="8dp"
             android:layout_below="@id/tv_milestone"
             android:visibility="gone" />
 
@@ -82,18 +102,6 @@
             android:orientation="horizontal"
             android:layout_marginTop="8dp"
             android:layout_below="@id/iv_assignee"
-            android:visibility="gone" />
-
-        <com.gh4a.widget.StyleableTextView
-            android:id="@+id/tv_pull"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/SelectableLabel"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@color/primary_text_default_material_dark"
-            android:layout_marginTop="8dp"
-            android:layout_below="@id/ll_labels"
-            android:text="@string/view_pull_request"
             android:visibility="gone" />
 
     </RelativeLayout>

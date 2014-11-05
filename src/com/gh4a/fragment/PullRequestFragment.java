@@ -17,7 +17,6 @@ package com.gh4a.fragment;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.CommitComment;
@@ -25,7 +24,6 @@ import org.eclipse.egit.github.core.MergeStatus;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
@@ -43,7 +41,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.Constants;
@@ -59,8 +56,6 @@ import com.gh4a.loader.PullRequestCommentListLoader;
 import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
@@ -71,7 +66,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         IssueEventAdapter.OnEditComment, View.OnClickListener {
     private static final int REQUEST_EDIT = 1000;
 
-    private ViewGroup mHeader;
+    private TextView mDescriptionView;
     private PullRequest mPullRequest;
     private String mRepoOwner;
     private String mRepoName;
@@ -157,15 +152,17 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         listContainer.addView(listContent);
 
         updateCommentSectionVisibility(v);
+        v.findViewById(R.id.iv_comment).setOnClickListener(this);
 
         return v;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        mHeader = (ViewGroup) getLayoutInflater(savedInstanceState).inflate(
-                R.layout.issue_header, getListView(), false);
-        getListView().addHeaderView(mHeader, null, true);
+        LayoutInflater inflater = getLayoutInflater(savedInstanceState);
+        mDescriptionView = (TextView) inflater.inflate(R.layout.issue_description,
+                getListView(), false);
+        getListView().addHeaderView(mDescriptionView, null, true);
 
         super.onActivityCreated(savedInstanceState);
 
@@ -239,49 +236,13 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     }
 
     private void fillData() {
-        final Gh4Application app = Gh4Application.get(getActivity());
-        View v = getView();
-
-        User user = mPullRequest.getUser();
-        ImageView gravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
-        gravatar.setOnClickListener(this);
-        gravatar.setTag(user);
-        AvatarHandler.assignAvatar(gravatar, user);
-
-        TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
-        int colorAttribute;
-
-        if (Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState())) {
-            colorAttribute = R.attr.colorIssueClosed;
-            tvState.setText(getString(R.string.closed).toUpperCase(Locale.getDefault()));
-        } else {
-            colorAttribute = R.attr.colorIssueOpen;
-            tvState.setText(getString(R.string.open).toUpperCase(Locale.getDefault()));
-        }
-
-        View header = mHeader.findViewById(R.id.header);
-        header.setBackgroundColor(UiUtils.resolveColor(getActivity(), colorAttribute));
-
-        TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
-        tvExtra.setText(user.getLogin());
-
-        TextView tvTimestamp = (TextView) mHeader.findViewById(R.id.tv_timestamp);
-        tvTimestamp.setText(StringUtils.formatRelativeTime(getActivity(),
-                mPullRequest.getCreatedAt(), true));
-
-        TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
-        tvTitle.setText(mPullRequest.getTitle());
-
-        TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
         String body = mPullRequest.getBodyHtml();
-        tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
+        mDescriptionView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         if (!StringUtils.isBlank(body)) {
             HttpImageGetter imageGetter = new HttpImageGetter(getActivity());
             body = HtmlUtils.format(body).toString();
-            imageGetter.bind(tvDesc, body, mPullRequest.getId());
+            imageGetter.bind(mDescriptionView, body, mPullRequest.getId());
         }
-
-        v.findViewById(R.id.iv_comment).setOnClickListener(this);
     }
 
     private void showMergeDialog() {
@@ -308,13 +269,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        if (id == R.id.iv_gravatar) {
-            User user = (User) v.getTag();
-            Intent intent = IntentUtils.getUserActivityIntent(getActivity(), user);
-            if (intent != null) {
-                startActivity(intent);
-            }
-        } else if (id == R.id.iv_comment) {
+        if (id == R.id.iv_comment) {
             EditText etComment = (EditText) getView().findViewById(R.id.et_comment);
             String text = etComment.getText() == null ? null : etComment.getText().toString();
             if (!StringUtils.isBlank(text)) {

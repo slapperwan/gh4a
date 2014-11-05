@@ -89,7 +89,9 @@ public class StyleableTextView extends TextView {
 
         a.recycle();
 
-        setTypeface(TypefaceCache.getTypeface(getContext(), mTypefaceValue));
+        if (!isInEditMode()) {
+            setTypeface(TypefaceCache.getTypeface(getContext(), mTypefaceValue));
+        }
         if (allCaps) {
             setTransformationMethod(new AllCapsTransformationMethod(getContext()));
         }

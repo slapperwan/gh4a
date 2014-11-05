@@ -20,6 +20,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -177,6 +180,16 @@ public abstract class BaseActivity extends ActionBarActivity implements
         ensureContent();
         mOverlay.getViewTreeObserver().addOnGlobalLayoutListener(mOverlayLayoutListener);
         mOverlay.addView(fab, params);
+    }
+
+    protected void transitionHeaderToColor(int color) {
+        View header = findViewById(R.id.header);
+        TransitionDrawable transition = new TransitionDrawable(new Drawable[] {
+            header.getBackground(),
+            new ColorDrawable(color)
+        });
+        header.setBackgroundDrawable(transition);
+        transition.startTransition(200);
     }
 
     protected boolean isOnline() {

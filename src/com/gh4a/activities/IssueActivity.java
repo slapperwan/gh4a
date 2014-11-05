@@ -31,12 +31,12 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -75,23 +75,12 @@ public class IssueActivity extends BaseActivity implements
     private String mRepoName;
     private int mIssueNumber;
     private ViewGroup mHeader;
+    private TextView mDescriptionView;
     private boolean mEventsLoaded;
     private IssueEventAdapter mEventAdapter;
     private ListView mListView;
     private boolean mIsCollaborator;
     private FloatingActionButton mEditFab;
-
-    private ViewTreeObserver.OnGlobalLayoutListener mGlobalLayoutListener =
-            new ViewTreeObserver.OnGlobalLayoutListener() {
-        @Override
-        public void onGlobalLayout() {
-            View header = mHeader.findViewById(R.id.header);
-            ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) mEditFab.getLayoutParams();
-            lp.topMargin = header.getBottom() - mEditFab.getHeight() / 2;
-            mEditFab.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-            mEditFab.setLayoutParams(lp);
-        }
-    };
 
     private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>() {
         @Override
@@ -180,10 +169,16 @@ public class IssueActivity extends BaseActivity implements
 
         mListView = (ListView) findViewById(android.R.id.list);
 
-        mHeader = (ViewGroup) getLayoutInflater().inflate(R.layout.issue_header, mListView, false);
-        mHeader.setClickable(false);
+        LinearLayout header = (LinearLayout) findViewById(R.id.header);
+        LayoutInflater inflater = getLayoutInflater();
 
-        mListView.addHeaderView(mHeader, null, false);
+        mHeader = (ViewGroup) inflater.inflate(R.layout.issue_header, header, false);
+        mHeader.setClickable(false);
+        mHeader.setVisibility(View.GONE);
+        header.addView(mHeader);
+
+        mDescriptionView = (TextView) inflater.inflate(R.layout.issue_description, mListView, false);
+        mListView.addHeaderView(mDescriptionView);
 
         mEventAdapter = new IssueEventAdapter(this, mRepoOwner, mRepoName, this);
         mListView.setAdapter(mEventAdapter);
@@ -195,9 +190,10 @@ public class IssueActivity extends BaseActivity implements
             findViewById(R.id.divider).setVisibility(View.GONE);
         }
 
-        mEditFab = (FloatingActionButton) mHeader.findViewById(R.id.edit_fab);
+        mEditFab = (FloatingActionButton) inflater.inflate(R.layout.issue_edit_fab, null);
         mEditFab.setOnClickListener(this);
-        mEditFab.getViewTreeObserver().addOnGlobalLayoutListener(mGlobalLayoutListener);
+        mEditFab.setVisibility(View.GONE);
+        setHeaderAlignedActionButton(mEditFab);
 
         getSupportLoaderManager().initLoader(0, null, mIssueCallback);
         getSupportLoaderManager().initLoader(1, null, mCollaboratorCallback);
@@ -229,8 +225,7 @@ public class IssueActivity extends BaseActivity implements
         int stateColorAttributeId = closed ? R.attr.colorIssueClosed : R.attr.colorIssueOpen;
 
         tvState.setText(getString(stateTextResId).toUpperCase(Locale.getDefault()));
-        mHeader.findViewById(R.id.header).setBackgroundColor(
-                UiUtils.resolveColor(this, stateColorAttributeId));
+        transitionHeaderToColor(UiUtils.resolveColor(this, stateColorAttributeId));
         mEditFab.setSelected(closed);
 
         TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
@@ -242,14 +237,13 @@ public class IssueActivity extends BaseActivity implements
         TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
         tvTitle.setText(mIssue.getTitle());
 
-        TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
         String body = mIssue.getBodyHtml();
         if (!StringUtils.isBlank(body)) {
             HttpImageGetter imageGetter = new HttpImageGetter(this);
             body = HtmlUtils.format(body).toString();
-            imageGetter.bind(tvDesc, body, mIssue.getNumber());
+            imageGetter.bind(mDescriptionView, body, mIssue.getNumber());
         }
-        tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
+        mDescriptionView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
 
         findViewById(R.id.iv_comment).setOnClickListener(this);
 
@@ -308,6 +302,9 @@ public class IssueActivity extends BaseActivity implements
         } else {
             tvPull.setVisibility(View.GONE);
         }
+
+        mHeader.setVisibility(View.VISIBLE);
+        mEditFab.setVisibility(View.VISIBLE);
 
         refreshDone();
     }
