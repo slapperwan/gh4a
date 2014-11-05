@@ -26,6 +26,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -331,7 +332,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
             final List<Label> selectedLabels = mEditIssue.getLabels() != null
                     ? new ArrayList<Label>(mEditIssue.getLabels()) : new ArrayList<Label>();
             View labelContainerView = inflater.inflate(R.layout.generic_linear_container, null);
-            LinearLayout container = (LinearLayout) labelContainerView.findViewById(R.id.container);
+            ViewGroup container = (ViewGroup) labelContainerView.findViewById(R.id.container);
 
             View.OnClickListener clickListener = new View.OnClickListener() {
                 @Override
@@ -364,7 +365,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
             new AlertDialog.Builder(this)
                     .setCancelable(true)
                     .setTitle(R.string.issue_labels)
-                    .setView(container)
+                    .setView(labelContainerView)
                     .setNegativeButton(R.string.cancel, null)
                     .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
