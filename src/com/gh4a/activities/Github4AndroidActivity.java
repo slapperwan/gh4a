@@ -62,8 +62,9 @@ public class Github4AndroidActivity extends BaseActivity {
             goToToplevelActivity(false);
             finish();
             return;
+        } else if (!hasErrorView()) {
+            setContentView(R.layout.main);
         }
-        setContentView(R.layout.main);
     }
 
     @Override
