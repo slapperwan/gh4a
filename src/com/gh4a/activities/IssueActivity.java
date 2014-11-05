@@ -133,7 +133,7 @@ public class IssueActivity extends BaseActivity implements
         public void onResultReady(LoaderResult<Boolean> result) {
             if (!result.handleError(IssueActivity.this)) {
                 mIsCollaborator = result.getData();
-                if (mIsCollaborator) {
+                if (mIsCollaborator && mIssue != null && mEventsLoaded) {
                     mEditFab.setVisibility(View.VISIBLE);
                 }
                 invalidateOptionsMenu();
@@ -303,8 +303,10 @@ public class IssueActivity extends BaseActivity implements
             tvPull.setVisibility(View.GONE);
         }
 
-        mHeader.setVisibility(View.VISIBLE);
-        mEditFab.setVisibility(View.VISIBLE);
+        if (mHeader.getVisibility() == View.GONE) {
+            mHeader.setVisibility(View.VISIBLE);
+            mEditFab.setVisibility(mIsCollaborator ? View.VISIBLE : View.GONE);
+        }
 
         refreshDone();
     }
