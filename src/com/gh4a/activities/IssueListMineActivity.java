@@ -129,7 +129,7 @@ public class IssueListMineActivity extends IssueListBaseActivity {
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getUserActivityIntent(this, Gh4Application.get(this).getAuthLogin());
+        return getToplevelActivityIntent();
     }
 
     @Override
