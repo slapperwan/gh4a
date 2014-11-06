@@ -40,6 +40,7 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
+import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
@@ -101,8 +102,9 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
         viewHolder.ivGravatar.setTag(event);
 
         if (event.comment != null) {
-            mImageGetter.bind(viewHolder.tvDesc, event.comment.getBodyHtml(),
-                    event.comment.getId());
+            String body = HtmlUtils.format(event.comment.getBodyHtml()).toString();
+            mImageGetter.bind(viewHolder.tvDesc, body, event.comment.getId());
+
             String extra = formatCommentExtra(event.comment);
             viewHolder.tvExtra.setText(StringUtils.applyBoldTags(extra, null));
         } else {
