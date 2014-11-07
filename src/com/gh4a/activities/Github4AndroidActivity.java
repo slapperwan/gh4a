@@ -25,7 +25,6 @@ import org.eclipse.egit.github.core.service.OAuthService;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
@@ -45,7 +44,6 @@ import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.TwoFactorAuthException;
 import com.gh4a.fragment.SettingsFragment;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
@@ -61,7 +59,6 @@ public class Github4AndroidActivity extends BaseActivity {
         if (app.isAuthorized()) {
             goToToplevelActivity(false);
             finish();
-            return;
         } else if (!hasErrorView()) {
             setContentView(R.layout.main);
         }

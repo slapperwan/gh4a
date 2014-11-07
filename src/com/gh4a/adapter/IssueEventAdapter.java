@@ -21,6 +21,7 @@ import org.eclipse.egit.github.core.IssueEvent;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.TextUtils;
@@ -177,7 +178,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
                         mRepoOwner, mRepoName, event.getCommitId()));
             }
             @Override
-            public void updateDrawState(TextPaint ds) {
+            public void updateDrawState(@NonNull TextPaint ds) {
                 ds.setColor(UiUtils.resolveColor(mContext, android.R.attr.textColorLink));
             }
         }, pos, pos + 7, 0);

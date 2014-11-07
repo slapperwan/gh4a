@@ -84,11 +84,6 @@ public interface Constants {
         public static final String LINK = "Blog.link";
     }
 
-    public interface Milestone {
-        public static final String NUMBER = "Milestone.number";
-        public static final String STATE = "Milestone.state";
-    }
-
     public interface Comment {
         public static final String ID = "Comment.id";
         public static final String BODY = "Comment.body";

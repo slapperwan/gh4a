@@ -29,7 +29,6 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.adapter.DrawerAdapter;
 import com.gh4a.fragment.RepositoryIssueListFragment;
-import com.gh4a.utils.IntentUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;

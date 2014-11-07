@@ -22,7 +22,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;

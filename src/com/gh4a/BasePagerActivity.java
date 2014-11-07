@@ -16,7 +16,6 @@ public abstract class BasePagerActivity extends BaseActivity implements
         SwipeRefreshLayout.ChildScrollDelegate {
     private FragmentAdapter mAdapter;
     private ViewPager mPager;
-    private SlidingTabLayout mTabs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,22 +61,24 @@ public abstract class BasePagerActivity extends BaseActivity implements
         // We never have many pages, make sure to keep them all alive
         pager.setOffscreenPageLimit(titleResIds.length - 1);
 
-        mTabs = new SlidingTabLayout(this);
-        mTabs.setSelectedIndicatorColors(getResources().getColor(R.color.tab_indicator_color));
-        mTabs.setCustomTabView(R.layout.tab_indicator, R.id.tab_title);
-        mTabs.setDistributeEvenly(true);
-        mTabs.setViewPager(pager);
+        if (titleResIds.length > 1) {
+            SlidingTabLayout tabs = new SlidingTabLayout(this);
+            tabs.setSelectedIndicatorColors(getResources().getColor(R.color.tab_indicator_color));
+            tabs.setCustomTabView(R.layout.tab_indicator, R.id.tab_title);
+            tabs.setDistributeEvenly(true);
+            tabs.setViewPager(pager);
 
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            Toolbar toolBar = (Toolbar) findViewById(R.id.toolbar);
-            toolBar.addView(mTabs, new Toolbar.LayoutParams(
-                    Toolbar.LayoutParams.WRAP_CONTENT,
-                    Toolbar.LayoutParams.MATCH_PARENT));
-        } else {
-            LinearLayout header = (LinearLayout) findViewById(R.id.header);
-            header.addView(mTabs, new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT));
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                Toolbar toolBar = (Toolbar) findViewById(R.id.toolbar);
+                toolBar.addView(tabs, new Toolbar.LayoutParams(
+                        Toolbar.LayoutParams.WRAP_CONTENT,
+                        Toolbar.LayoutParams.MATCH_PARENT));
+            } else {
+                LinearLayout header = (LinearLayout) findViewById(R.id.header);
+                header.addView(tabs, new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT));
+            }
         }
 
         return pager;

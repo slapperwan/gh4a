@@ -6,7 +6,6 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
@@ -15,12 +14,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.text.Spannable;
 import android.text.method.LinkMovementMethod;
@@ -33,7 +32,8 @@ import android.widget.TextView;
 public class UiUtils {
     public static final LinkMovementMethod CHECKING_LINK_METHOD = new LinkMovementMethod() {
         @Override
-        public boolean onTouchEvent(TextView widget, Spannable buffer, MotionEvent event) {
+        public boolean onTouchEvent(@NonNull TextView widget,
+                @NonNull Spannable buffer, @NonNull MotionEvent event) {
             try {
                 return super.onTouchEvent(widget, buffer, event);
             } catch (ActivityNotFoundException e) {

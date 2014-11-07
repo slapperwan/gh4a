@@ -54,10 +54,6 @@ public class GistListActivity extends BasePagerActivity {
         actionBar.setTitle(R.string.gists);
         actionBar.setSubtitle(mUserLogin);
         actionBar.setDisplayHomeAsUpEnabled(true);
-
-        if (!mIsSelf) {
-            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        }
     }
 
     @Override

@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="explore_item">
-        <item>Public Timeline</item>
-        <item>Trending Repos</item>
-        <item>GitHub Blog</item>
-        <!-- item>Public Discussion</item-->
-        <!-- item>GitHub Jobs</item-->
-    </string-array>
     <array name="repo_list_login_items">
         <item>@string/repo_type_all</item>
         <item>@string/repo_type_owner</item>

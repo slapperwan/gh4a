@@ -54,6 +54,7 @@ public class WikiListActivity extends BaseActivity {
         @Override
         public void onResultReady(LoaderResult<List<Feed>> result) {
             setContentEmpty(true);
+            //noinspection ThrowableResultOfMethodCallIgnored
             if (result.getException() instanceof SAXException) {
                 ToastUtils.notFoundMessage(WikiListActivity.this, getString(R.string.recent_wiki));
             } else if (!result.handleError(WikiListActivity.this)) {

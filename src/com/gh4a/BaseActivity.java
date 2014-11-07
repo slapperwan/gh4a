@@ -157,11 +157,11 @@ public abstract class BaseActivity extends ActionBarActivity implements
         return null;
     }
 
-    public ProgressDialog showProgressDialog(String message, boolean cancelable) {
+    protected ProgressDialog showProgressDialog(String message, boolean cancelable) {
         return ProgressDialog.show(this, "", message, cancelable);
     }
 
-    public void stopProgressDialog(ProgressDialog progressDialog) {
+    protected void stopProgressDialog(ProgressDialog progressDialog) {
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }

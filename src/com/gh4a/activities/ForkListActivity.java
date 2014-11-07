@@ -25,9 +25,6 @@ import com.gh4a.R;
 import com.gh4a.fragment.ForkListFragment;
 
 public class ForkListActivity extends BaseActivity {
-    private String mRepoOwner;
-    private String mRepoName;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,11 +33,11 @@ public class ForkListActivity extends BaseActivity {
         }
 
         Bundle data = getIntent().getExtras();
-        mRepoOwner = data.getString(Constants.Repository.OWNER);
-        mRepoName = data.getString(Constants.Repository.NAME);
+        String repoOwner = data.getString(Constants.Repository.OWNER);
+        String repoName = data.getString(Constants.Repository.NAME);
 
         if (savedInstanceState == null) {
-            Fragment fragment = ForkListFragment.newInstance(mRepoOwner, mRepoName);
+            Fragment fragment = ForkListFragment.newInstance(repoOwner, repoName);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.content_container, fragment)
                     .commit();
@@ -48,7 +45,7 @@ public class ForkListActivity extends BaseActivity {
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.repo_forks);
-        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
+        actionBar.setSubtitle(repoOwner + "/" + repoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
 }

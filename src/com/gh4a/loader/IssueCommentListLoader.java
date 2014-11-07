@@ -40,7 +40,7 @@ public class IssueCommentListLoader extends BaseLoader<List<IssueEventHolder>> {
     }
 
     @Override
-    public List<IssueEventHolder> doLoadInBackground() throws IOException {
+    protected List<IssueEventHolder> doLoadInBackground() throws IOException {
         IssueService issueService = (IssueService)
                 Gh4Application.get(getContext()).getService(Gh4Application.ISSUE_SERVICE);
         List<Comment> comments = issueService.getComments(

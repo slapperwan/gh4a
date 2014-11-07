@@ -84,12 +84,10 @@ public class DrawerAdapter extends BaseAdapter {
         }
     }
 
-    private Context mContext;
     private LayoutInflater mInflater;
     private List<Item> mItems;
 
     public DrawerAdapter(Context context, List<Item> items) {
-        mContext = context;
         mInflater = LayoutInflater.from(context);
         mItems = items;
     }

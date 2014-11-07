@@ -43,7 +43,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Configuration;
-import android.graphics.Typeface;
 
 import com.crashlytics.android.Crashlytics;
 import com.gh4a.fragment.SettingsFragment;

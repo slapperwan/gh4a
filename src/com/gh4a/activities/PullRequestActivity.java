@@ -29,7 +29,6 @@ import android.widget.TextView;
 
 import com.gh4a.BasePagerActivity;
 import com.gh4a.Constants;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.CommitCompareFragment;
 import com.gh4a.fragment.PullRequestFilesFragment;

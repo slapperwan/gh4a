@@ -253,10 +253,10 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
             TextView statsView = (TextView) fileView.findViewById(R.id.stats);
             if (file.getPatch() != null) {
                 SpannableStringBuilder stats = new SpannableStringBuilder();
-                stats.append("+" + file.getAdditions());
+                stats.append("+").append(String.valueOf(file.getAdditions()));
                 int addLength = stats.length();
                 stats.setSpan(addSpan, 0, addLength, 0);
-                stats.append("\u00a0\u00a0\u00a0-" + file.getDeletions());
+                stats.append("\u00a0\u00a0\u00a0-").append(String.valueOf(file.getDeletions()));
                 stats.setSpan(deleteSpan, addLength, stats.length(), 0);
                 statsView.setText(stats);
                 statsView.setVisibility(View.VISIBLE);

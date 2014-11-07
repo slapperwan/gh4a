@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.content.Loader;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
@@ -95,7 +96,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         }
 
         @Override
-        public void updateDrawState(TextPaint ds) {
+        public void updateDrawState(@NonNull TextPaint ds) {
             super.updateDrawState(ds);
             ds.setUnderlineText(false);
             ds.setColor(UiUtils.resolveColor(getActivity(), android.R.attr.textColorLink));

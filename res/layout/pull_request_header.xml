@@ -52,7 +52,6 @@
         android:id="@+id/tv_state"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_alignParentRight="true"
         android:textAppearance="@style/TextAppearance.VerySmall"
         android:textColor="@color/primary_text_default_material_dark"
         android:gravity="top|center" />

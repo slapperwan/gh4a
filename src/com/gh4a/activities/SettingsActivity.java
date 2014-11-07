@@ -4,11 +4,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
-import android.view.MenuItem;
 
 import com.gh4a.BaseActivity;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.SettingsFragment;
 

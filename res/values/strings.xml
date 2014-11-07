@@ -94,7 +94,6 @@
     <string name="created">Created</string>
     <string name="assigned">Assigned</string>
     <string name="mentioned">Mentioned</string>
-    <string name="state">State</string>
 
     <plurals name="contributor_extra_data">
         <item quantity="one">%1$d contribution</item>
@@ -130,8 +129,6 @@
     <string name="no_watched_repos_found">No repositories are being watched yet.</string>
     <string name="no_watchers_found">Nobody is watching this repository yet.</string>
     <string name="no_stargazers_found">Nobody has starred this repository yet.</string>
-    <string name="no_tags_found">No tags were created in this repository yet.</string>
-    <string name="no_branches_found">No branches were created in this repository yet.</string>
     <string name="no_contributors_found">No contributions were made to this repository yet.</string>
     <string name="no_releases_found">No releases were created for this repository yet.</string>
     <string name="no_gists_found">No gists were created so far.</string>
@@ -233,7 +230,6 @@
     <string name="commit_summary">%1$d changed files with %2$d additions and %3$d deletions.</string>
     <string name="commit_compare">Compare View</string>
     <string name="commit_comment_hint">Comment on this commit</string>
-    <string name="commit_info">[b]%1$s[/b] %2$s</string>
     <string name="commit_details">Committed by [b]%1$s[/b] %2$s</string>
     <string name="commit_comment_dialog_title">Comment on line %1$d</string>
     <string name="commit_comment_error_body">Please enter your comment.</string>
@@ -254,13 +250,11 @@
     <string name="issues_menu_show_open">Show Open</string>
     <string name="issues_menu_show_closed">Show Closed</string>
     <string name="issue_comments">Comments</string>
-    <string name="issue_events_with_count">Events (%1$d)</string>
     <string name="issue_title">Title</string>
     <string name="issue_body">Body</string>
     <string name="issue_create">New Issue</string>
     <string name="issue_error_title">Please enter a title</string>
     <string name="issue_success_create">Successfully created issue</string>
-    <string name="issue_edit">Edit Issue</string>
     <string name="issue_edit_title">Edit Issue #%1$d</string>
     <string name="issue_success_edit">Successfully edited issue</string>
     <string name="issue_success_close">Successfully closed issue</string>
@@ -282,13 +276,10 @@
     <string name="issue_dialog_delete_message">Are you sure?</string>
     <string name="issue_success_comment">Successfully created comment</string>
     <string name="issue_error_comment">Cannot create comment</string>
-    <string name="issue_milestone_title">Title</string>
-    <string name="issue_milestone_desc">Description</string>
     <string name="issue_error_create_label">Cannot create label</string>
     <string name="issue_error_edit_label">Cannot edit label</string>
     <string name="issue_error_create_milestone">Cannot create milestone</string>
     <string name="issue_error_milestone_title">Please enter a title</string>
-    <string name="issue_label_add">Labels</string>
     <string name="issue_label_new">New Label</string>
     <string name="issue_milestone">Milestone: %1$s</string>
     <string name="issue_milestone_new">New Milestone</string>
@@ -310,7 +301,6 @@
     <string name="issue_milestone_due_date">Due Date</string>
     <string name="issue_milestone_due_unset">No date set</string>
     <string name="issue_assignee">%1$s is assigned</string>
-    <string name="issue_desc">Description</string>
     <string name="issue_comment_title">Comment</string>
     <string name="issue_comment_update_title">Update</string>
     <string name="issue_comment_hint">Comment on this issue</string>

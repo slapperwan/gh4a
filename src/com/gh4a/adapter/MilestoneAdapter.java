@@ -30,7 +30,7 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
 public class MilestoneAdapter extends RootAdapter<Milestone> {
-    int mTextColorPrimary, mTextColorSecondary;
+    private int mTextColorPrimary, mTextColorSecondary;
 
     public MilestoneAdapter(Context context) {
         super(context);

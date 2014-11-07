@@ -2,11 +2,11 @@ package com.gh4a.widget;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.support.annotation.NonNull;
 import android.text.Layout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.Gravity;
-import android.widget.TextView;
 
 public class VerticalTextView extends StyleableTextView {
     private final boolean mTopDown;
@@ -31,7 +31,7 @@ public class VerticalTextView extends StyleableTextView {
     }
 
     @Override
-    public void onDraw(Canvas canvas) {
+    public void onDraw(@NonNull Canvas canvas) {
         Layout layout = getLayout();
         if (layout == null) {
             return;
