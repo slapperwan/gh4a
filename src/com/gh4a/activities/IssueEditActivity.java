@@ -142,7 +142,8 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         public void onResultReady(LoaderResult<Boolean> result) {
             if (!result.handleError(IssueEditActivity.this)) {
                 mIsCollaborator = result.getData();
-                updateLabelsAndStates();
+                updateLabels();
+                updateLabelStates();
             }
         }
     };
@@ -208,7 +209,8 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         mTitleView.setText(mEditIssue.getTitle());
         mDescView.setText(mEditIssue.getBody());
 
-        updateLabelsAndStates();
+        updateLabels();
+        updateLabelStates();
     }
 
     private boolean isInEditMode() {
@@ -267,7 +269,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
                     } else {
                         mEditIssue.setMilestone(mAllMilestone.get(which - 1));
                     }
-                    updateLabelsAndStates();
+                    updateLabels();
                     dialog.dismiss();
                 }
             };
@@ -309,7 +311,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
                     } else {
                         mEditIssue.setAssignee(mAllAssignee.get(which - 1));
                     }
-                    updateLabelsAndStates();
+                    updateLabels();
                     dialog.dismiss();
                 }
             };
@@ -371,7 +373,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             mEditIssue.setLabels(selectedLabels);
-                            updateLabelsAndStates();
+                            updateLabels();
                         }
                     })
                     .show();
@@ -426,24 +428,27 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
-    private void updateLabelsAndStates() {
-        mTitleView.setText(mEditIssue.getTitle());
-        mDescView.setText(mEditIssue.getBody());
-
+    private void updateLabels() {
         if (mEditIssue.getMilestone() != null) {
             mTvSelectedMilestone.setText(mEditIssue.getMilestone().getTitle());
+        } else if (!mIsCollaborator && !isInEditMode()) {
+            mTvSelectedMilestone.setText(R.string.issue_milestone_collab_only);
         } else {
             mTvSelectedMilestone.setText(R.string.issue_clear_milestone);
         }
 
         if (mEditIssue.getAssignee() != null) {
             mTvSelectedAssignee.setText(mEditIssue.getAssignee().getLogin());
+        } else if (!mIsCollaborator && !isInEditMode()) {
+            mTvSelectedAssignee.setText(R.string.issue_assignee_collab_only);
         } else {
             mTvSelectedAssignee.setText(R.string.issue_clear_assignee);
         }
 
         List<Label> labels = mEditIssue.getLabels();
-        if (labels == null || labels.isEmpty()) {
+        if (!mIsCollaborator && !isInEditMode()) {
+            mTvLabels.setText(R.string.issue_labels_collab_only);
+        } else if (labels == null || labels.isEmpty()) {
             mTvLabels.setText(R.string.issue_no_labels);
         } else {
             StringBuilder labelText = new StringBuilder();
@@ -455,10 +460,17 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
             }
             mTvLabels.setText(labelText);
         }
+    }
 
-        boolean canEdit = mIsCollaborator && mEditIssue != null;
-        mMilestoneContainer.setEnabled(canEdit);
-        mAssigneeContainer.setEnabled(canEdit);
-        mLabelContainer.setEnabled(canEdit);
+    private void updateLabelStates() {
+        mMilestoneContainer.setEnabled(mIsCollaborator);
+        findViewById(R.id.tv_milestone_label).setEnabled(mIsCollaborator);
+        mTvSelectedMilestone.setEnabled(mIsCollaborator);
+        mAssigneeContainer.setEnabled(mIsCollaborator);
+        findViewById(R.id.tv_assignee_label).setEnabled(mIsCollaborator);
+        mTvSelectedAssignee.setEnabled(mIsCollaborator);
+        mLabelContainer.setEnabled(mIsCollaborator);
+        findViewById(R.id.tv_labels_label).setEnabled(mIsCollaborator);
+        mTvLabels.setEnabled(mIsCollaborator);
     }
 }
