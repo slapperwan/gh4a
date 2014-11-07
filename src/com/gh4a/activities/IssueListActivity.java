@@ -72,11 +72,11 @@ public class IssueListActivity extends IssueListBaseActivity {
         new DrawerAdapter.DividerItem(),
         new DrawerAdapter.SectionHeaderItem(R.string.issue_filter),
         new DrawerAdapter.EntryItem(R.string.issue_filter_by_milestone, 0, ITEM_FILTER_MILESTONE),
-        new DrawerAdapter.EntryItem(R.string.issue_filter_by_assignee, 0, ITEM_FILTER_ASSIGNEE),
         new DrawerAdapter.EntryItem(R.string.issue_filter_by_labels, 0, ITEM_FILTER_LABEL)
     );
 
     private static final List<DrawerAdapter.Item> COLLAB_DRAWER_ITEMS = Arrays.asList(
+        new DrawerAdapter.EntryItem(R.string.issue_filter_by_assignee, 0, ITEM_FILTER_ASSIGNEE),
         new DrawerAdapter.DividerItem(),
         new DrawerAdapter.EntryItem(R.string.issue_manage_labels, 0, ITEM_MANAGE_LABELS),
         new DrawerAdapter.EntryItem(R.string.issue_manage_milestones, 0, ITEM_MANAGE_MILESTONES)

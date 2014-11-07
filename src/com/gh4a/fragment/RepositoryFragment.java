@@ -180,12 +180,14 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         mContentView.findViewById(R.id.cell_stargazers).setOnClickListener(this);
         mContentView.findViewById(R.id.cell_forks).setOnClickListener(this);
         mContentView.findViewById(R.id.cell_pull_requests).setOnClickListener(this);
-        mContentView.findViewById(R.id.tv_wiki_label).setOnClickListener(this);
         mContentView.findViewById(R.id.tv_contributors_label).setOnClickListener(this);
-        mContentView.findViewById(R.id.tv_collaborators_label).setOnClickListener(this);
         mContentView.findViewById(R.id.other_info).setOnClickListener(this);
-        mContentView.findViewById(R.id.tv_downloads_label).setOnClickListener(this);
         mContentView.findViewById(R.id.tv_releases_label).setOnClickListener(this);
+
+        updateClickableLabel(R.id.tv_collaborators_label,
+                mRepository.getPermissions().hasPushAccess());
+        updateClickableLabel(R.id.tv_downloads_label, mRepository.isHasDownloads());
+        updateClickableLabel(R.id.tv_wiki_label, mRepository.isHasWiki());
 
         TextView tvStargazersCount = (TextView) mContentView.findViewById(R.id.tv_stargazers_count);
         tvStargazersCount.setText(String.valueOf(mRepository.getWatchers()));
@@ -210,9 +212,15 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
             tvIssues.setVisibility(View.GONE);
             tvIssuesCount.setVisibility(View.GONE);
         }
+    }
 
-        if (!mRepository.isHasWiki()) {
-            mContentView.findViewById(R.id.tv_wiki_label).setVisibility(View.GONE);
+    private void updateClickableLabel(int id, boolean enable) {
+        View view = mContentView.findViewById(id);
+        if (enable) {
+            view.setOnClickListener(this);
+            view.setVisibility(View.VISIBLE);
+        } else {
+            view.setVisibility(View.GONE);
         }
     }
 
