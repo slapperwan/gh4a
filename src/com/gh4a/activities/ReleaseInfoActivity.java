@@ -66,6 +66,9 @@ public class ReleaseInfoActivity extends BaseActivity implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (hasErrorView()) {
+            return;
+        }
 
         setContentView(R.layout.release);
 

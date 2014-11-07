@@ -13,6 +13,9 @@ public class CommitHistoryActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (hasErrorView()) {
+            return;
+        }
 
         setContentView(R.layout.generic_list);
 

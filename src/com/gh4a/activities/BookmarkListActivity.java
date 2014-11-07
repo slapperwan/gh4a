@@ -52,6 +52,12 @@ public class BookmarkListActivity extends BaseActivity implements
     }
 
     @Override
+    protected boolean isOnline() {
+        // we don't need a connection
+        return true;
+    }
+
+    @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Cursor cursor = (Cursor) mAdapter.getItem(position);
         String uri = cursor.getString(cursor.getColumnIndexOrThrow(Columns.URI));

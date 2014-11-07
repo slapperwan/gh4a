@@ -282,13 +282,10 @@ public abstract class BaseActivity extends ActionBarActivity implements
 
     @Override
     public void setContentView(int layoutResId) {
-        if (layoutResId == R.layout.error) {
-            super.setContentView(layoutResId);
-        } else {
-            LayoutInflater layoutInflater = LayoutInflater.from(this);
-            View contentView = layoutInflater.inflate(layoutResId, mContentContainer, false);
-            setContentView(contentView);
-        }
+        ensureContent();
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+        View contentView = layoutInflater.inflate(layoutResId, mContentContainer, false);
+        setContentView(contentView);
     }
 
     @Override
@@ -316,8 +313,7 @@ public abstract class BaseActivity extends ActionBarActivity implements
 
     private void setErrorView() {
         mHasErrorView = true;
-        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.error);
+        super.setContentView(R.layout.error);
 
         findViewById(R.id.btn_home).setOnClickListener(new OnClickListener() {
             @Override
