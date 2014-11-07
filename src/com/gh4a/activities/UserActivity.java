@@ -169,12 +169,16 @@ public class UserActivity extends BasePagerActivity {
                 mUserFragment = UserFragment.newInstance(mUserLogin, mUserName);
                 return mUserFragment;
             case 1:
-                mPrivateEventListFragment =
-                        PrivateEventListFragment.newInstance(mUserLogin, mIsSelf);
-                return mPrivateEventListFragment;
+                if (mIsTopLevelMode) {
+                    mPrivateEventListFragment =
+                            PrivateEventListFragment.newInstance(mUserLogin);
+                    return mPrivateEventListFragment;
+                }
+                // else fall through: in non-toplevel mode, the public
+                // action fragment is at index 1
             case 2:
                 mPublicEventListFragment =
-                        PublicEventListFragment.newInstance(mUserLogin, false);
+                        PublicEventListFragment.newInstance(mUserLogin);
                 return mPublicEventListFragment;
         }
         return null;
