@@ -67,11 +67,13 @@ public class BrowseFilter extends Activity {
             } else if (action == null) {
                 intent = IntentUtils.getRepoActivityIntent(this, user, repo, null);
             } else if ("tree".equals(action)) {
+                String ref = TextUtils.join("/", parts.subList(3, parts.size()));
                 intent = IntentUtils.getRepoActivityIntent(this, user, repo,
-                        id, RepositoryActivity.PAGE_FILES);
+                        ref, RepositoryActivity.PAGE_FILES);
             } else if ("commits".equals(action)) {
+                String ref = TextUtils.join("/", parts.subList(3, parts.size()));
                 intent = IntentUtils.getRepoActivityIntent(this, user, repo,
-                        id, RepositoryActivity.PAGE_COMMITS);
+                        ref, RepositoryActivity.PAGE_COMMITS);
             } else if ("issues".equals(action)) {
                 if (!StringUtils.isBlank(id)) {
                     try {
