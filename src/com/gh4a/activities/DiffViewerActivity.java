@@ -154,8 +154,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
 
         switch (item.getItemId()) {
             case R.id.browser:
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                startActivity(browserIntent);
+                IntentUtils.launchBrowser(this, Uri.parse(url));
                 return true;
             case R.id.share:
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
