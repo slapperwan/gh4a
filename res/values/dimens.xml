@@ -7,6 +7,7 @@
     <dimen name="default_label_badge_spacing">2dp</dimen>
     <dimen name="label_spacing">5dp</dimen>
     <dimen name="card_margin">4dp</dimen>
+    <dimen name="card_top_bottom_margin">0dp</dimen>
 
     <integer name="issue_edit_body_min_lines">3</integer>
     <integer name="issue_edit_body_max_lines">5</integer>
