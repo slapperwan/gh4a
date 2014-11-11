@@ -119,11 +119,6 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements Vie
         }
     }
 
-    @Override
-    public boolean isEnabled(int position) {
-        return false;
-    }
-
     private static class ViewHolder {
         public ImageView ivGravatar;
         public TextView tvDesc;
