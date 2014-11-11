@@ -29,7 +29,7 @@ android {
     buildToolsVersion '21.0.1'
     defaultConfig {
         minSdkVersion 10
-        targetSdkVersion 19
+        targetSdkVersion 21
         versionCode 39
         versionName "3.8 BETA"
     }
