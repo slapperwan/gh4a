@@ -24,6 +24,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -170,14 +171,16 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         }
         setContentView(R.layout.issue_create);
 
-        LayoutInflater inflater = getLayoutInflater();
         LinearLayout headerContainer = (LinearLayout) findViewById(R.id.header);
-        View header = inflater.inflate(R.layout.issue_create_header, headerContainer);
+        LayoutInflater headerInflater = LayoutInflater.from(
+                new ContextThemeWrapper(this, R.style.Theme_Header));
+        View header = headerInflater.inflate(R.layout.issue_create_header, headerContainer);
 
         mTitleView = (EditText) header.findViewById(R.id.et_title);
         mDescView = (EditText) header.findViewById(R.id.et_desc);
 
-        FloatingActionButton fab = (FloatingActionButton) inflater.inflate(R.layout.default_fab, null);
+        FloatingActionButton fab =
+                (FloatingActionButton) getLayoutInflater().inflate(R.layout.default_fab, null);
         fab.setImageResource(R.drawable.navigation_accept);
         fab.setOnClickListener(this);
         setHeaderAlignedActionButton(fab);

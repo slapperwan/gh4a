@@ -87,6 +87,10 @@
         <item name="colorFab">@color/default_fab_light</item>
     </style>
 
+    <style name="Theme.Header" parent="Theme.AppCompat">
+        <item name="colorAccent">#ffffff</item>
+    </style>
+
     <style name="Base.CardView.Light" parent="CardView.Light">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
