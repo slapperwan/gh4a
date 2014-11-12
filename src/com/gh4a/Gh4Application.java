@@ -138,10 +138,12 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     }
 
     /* package */ static void trackVisitedUrl(String url) {
-        Crashlytics.setString("github-url-" + sNextUrlTrackingPosition, url);
-        Crashlytics.setInt("last-url-position", sNextUrlTrackingPosition);
-        if (++sNextUrlTrackingPosition >= MAX_TRACKED_URLS) {
-            sNextUrlTrackingPosition = 0;
+        synchronized (Gh4Application.class) {
+            Crashlytics.setString("github-url-" + sNextUrlTrackingPosition, url);
+            Crashlytics.setInt("last-url-position", sNextUrlTrackingPosition);
+            if (++sNextUrlTrackingPosition >= MAX_TRACKED_URLS) {
+                sNextUrlTrackingPosition = 0;
+            }
         }
     }
 
