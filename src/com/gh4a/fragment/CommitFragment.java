@@ -59,8 +59,8 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         @Override
         public void onResultReady(LoaderResult<RepositoryCommit> result) {
             if (result.handleError(getActivity())) {
-                setContentEmpty(true);
                 setContentShown(true);
+                setContentEmpty(true);
                 return;
             }
             mCommit = result.getData();
@@ -78,8 +78,8 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         @Override
         public void onResultReady(LoaderResult<List<CommitComment>> result) {
             if (result.handleError(getActivity())) {
-                setContentEmpty(true);
                 setContentShown(true);
+                setContentEmpty(true);
                 return;
             }
             mComments = result.getData();

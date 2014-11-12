@@ -71,8 +71,8 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
                 mUser = result.getData();
                 fillData();
             }
-            setContentEmpty(!success);
             setContentShown(true);
+            setContentEmpty(!success);
             invalidateOptionsMenu();
         }
     };
@@ -137,6 +137,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        setEmptyText(R.string.user_no_data);
         setContentView(mContentView);
         setContentShown(false);
 

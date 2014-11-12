@@ -44,8 +44,8 @@ public class PullRequestFilesFragment extends CommitFragment {
         @Override
         public void onResultReady(LoaderResult<List<CommitFile>> result) {
             if (result.handleError(getActivity())) {
-                setContentEmpty(true);
                 setContentShown(true);
+                setContentEmpty(true);
                 return;
             }
             mFiles = result.getData();
@@ -64,8 +64,8 @@ public class PullRequestFilesFragment extends CommitFragment {
         @Override
         public void onResultReady(LoaderResult<List<CommitComment>> result) {
             if (result.handleError(getActivity())) {
-                setContentEmpty(true);
                 setContentShown(true);
+                setContentEmpty(true);
                 return;
             }
             mComments = result.getData();

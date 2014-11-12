@@ -245,6 +245,7 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
         mActionBar.setTitle(mRepoOwner + "/" + mRepoName);
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
+        setEmptyText(R.string.repo_no_data);
         setContentShown(false);
         setTabsEnabled(false);
 

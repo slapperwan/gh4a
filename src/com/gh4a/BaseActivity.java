@@ -38,6 +38,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
+import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
@@ -62,6 +63,7 @@ public abstract class BaseActivity extends ActionBarActivity implements
     private ViewGroup mContentContainer;
     private TextView mEmptyView;
     private boolean mContentShown;
+    private boolean mContentEmpty;
 
     private View mHeader;
     private FrameLayout mOverlay;
@@ -143,14 +145,8 @@ public abstract class BaseActivity extends ActionBarActivity implements
     }
 
     protected void setContentEmpty(boolean isEmpty) {
-        ensureContent();
-        if (isEmpty) {
-            mEmptyView.setVisibility(View.VISIBLE);
-            mContentContainer.setVisibility(View.GONE);
-        } else {
-            mEmptyView.setVisibility(View.GONE);
-            mContentContainer.setVisibility(View.VISIBLE);
-        }
+        mContentEmpty = isEmpty;
+        updateViewVisibility(false);
     }
 
     protected Intent navigateUp() {
@@ -373,36 +369,31 @@ public abstract class BaseActivity extends ActionBarActivity implements
     }
 
     private void setContentShown(boolean shown, boolean animate) {
+        mContentShown = shown;
+        updateViewVisibility(animate);
+    }
+
+    private void updateViewVisibility(boolean animate) {
         ensureContent();
-        if (mContentShown == shown) {
+        updateViewVisibility(mProgress, animate, !mContentEmpty && !mContentShown);
+        updateViewVisibility(mEmptyView, animate, mContentEmpty);
+        updateViewVisibility(mContentContainer, animate, !mContentEmpty && mContentShown);
+    }
+
+    private void updateViewVisibility(View view, boolean animate, boolean show) {
+        int visibility = show ? View.VISIBLE : View.GONE;
+        if (view.getVisibility() == visibility) {
             return;
         }
-        mContentShown = shown;
-        if (shown) {
-            if (animate) {
-                mProgress.startAnimation(
-                        AnimationUtils.loadAnimation(this, android.R.anim.fade_out));
-                mContentContainer.startAnimation(
-                        AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
-            } else {
-                mProgress.clearAnimation();
-                mContentContainer.clearAnimation();
-            }
-            mProgress.setVisibility(View.GONE);
-            mContentContainer.setVisibility(View.VISIBLE);
+
+        if (animate) {
+            Animation anim = AnimationUtils.loadAnimation(view.getContext(),
+                    show ? android.R.anim.fade_in : android.R.anim.fade_out);
+            view.startAnimation(anim);
         } else {
-            if (animate) {
-                mProgress.startAnimation(
-                        AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
-                mContentContainer.startAnimation(
-                        AnimationUtils.loadAnimation(this, android.R.anim.fade_out));
-            } else {
-                mProgress.clearAnimation();
-                mContentContainer.clearAnimation();
-            }
-            mProgress.setVisibility(View.VISIBLE);
-            mContentContainer.setVisibility(View.GONE);
+            view.clearAnimation();
         }
+        view.setVisibility(visibility);
     }
 
     private void ensureContent() {
