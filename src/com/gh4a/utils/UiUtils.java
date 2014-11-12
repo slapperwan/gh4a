@@ -23,6 +23,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.text.Spannable;
 import android.text.method.LinkMovementMethod;
+import android.view.ContextThemeWrapper;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -92,6 +93,14 @@ public class UiUtils {
             builder.setIcon(android.R.drawable.ic_dialog_alert);
         }
         return builder;
+    }
+
+    public static Context makeHeaderThemedContext(Context context) {
+        int themeResId = resolveDrawable(context, R.attr.headerTheme);
+        if (themeResId != 0) {
+            return new ContextThemeWrapper(context, themeResId);
+        }
+        return context;
     }
 
     public static int resolveDrawable(Context context, int styledAttributeId) {

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <attr name="drawerTitleTextAppearance" format="reference" />
+    <attr name="headerTheme" format="reference" />
     <attr name="cardViewTheme" format="reference" />
     <attr name="listBackground" format="reference" />
     <attr name="drawerBackground" format="reference" />

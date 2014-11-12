@@ -25,7 +25,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.text.format.DateFormat;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -44,6 +43,7 @@ import com.gh4a.R;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
+import com.gh4a.utils.UiUtils;
 import com.shamanland.fab.FloatingActionButton;
 
 import org.eclipse.egit.github.core.Milestone;
@@ -89,8 +89,7 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         setContentView(R.layout.issue_create_milestone);
 
         LinearLayout headerContainer = (LinearLayout) findViewById(R.id.header);
-        LayoutInflater headerInflater = LayoutInflater.from(
-                new ContextThemeWrapper(this, R.style.Theme_Header));
+        LayoutInflater headerInflater = LayoutInflater.from(UiUtils.makeHeaderThemedContext(this));
         View header = headerInflater.inflate(R.layout.issue_create_header, headerContainer);
 
         mTitleView = (EditText) header.findViewById(R.id.et_title);

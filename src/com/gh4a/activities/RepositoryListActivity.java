@@ -7,8 +7,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.internal.view.SupportMenuInflater;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ListAdapter;
 
@@ -21,6 +23,7 @@ import com.gh4a.fragment.RepositoryListFragment;
 import com.gh4a.fragment.RepositorySearchFragment;
 import com.gh4a.fragment.StarredRepositoryListFragment;
 import com.gh4a.fragment.WatchedRepositoryListFragment;
+import com.gh4a.utils.UiUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +34,7 @@ public class RepositoryListActivity extends BaseActivity implements
     private String mUserLogin;
     private String mUserType;
 
+    private MenuInflater mMenuInflater;
     private RepositorySearchFragment mSearchFragment;
     private List<DrawerAdapter.Item> mDrawerItems;
     private DrawerAdapter mDrawerAdapter;
@@ -56,6 +60,7 @@ public class RepositoryListActivity extends BaseActivity implements
             return;
         }
 
+        mMenuInflater = new SupportMenuInflater(UiUtils.makeHeaderThemedContext(this));
         setContentView(R.layout.frame_layout);
 
         ActionBar actionBar = getSupportActionBar();
@@ -158,7 +163,7 @@ public class RepositoryListActivity extends BaseActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.repo_list_menu, menu);
+        mMenuInflater.inflate(R.menu.repo_list_menu, menu);
 
         // We can only properly search the 'all repos' list
         if (mSelectedIndex == 0) {

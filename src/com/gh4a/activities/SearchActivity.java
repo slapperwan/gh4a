@@ -82,7 +82,7 @@ public class SearchActivity extends BaseActivity implements
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.search);
 
-        LayoutInflater inflater = LayoutInflater.from(actionBar.getThemedContext());
+        LayoutInflater inflater = LayoutInflater.from(UiUtils.makeHeaderThemedContext(this));
         LinearLayout searchLayout = (LinearLayout) inflater.inflate(R.layout.search_action_bar, null);
         actionBar.setCustomView(searchLayout);
         actionBar.setDisplayShowCustomEnabled(true);

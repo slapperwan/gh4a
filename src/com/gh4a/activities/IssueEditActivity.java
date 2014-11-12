@@ -24,7 +24,6 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -172,8 +171,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         setContentView(R.layout.issue_create);
 
         LinearLayout headerContainer = (LinearLayout) findViewById(R.id.header);
-        LayoutInflater headerInflater = LayoutInflater.from(
-                new ContextThemeWrapper(this, R.style.Theme_Header));
+        LayoutInflater headerInflater = LayoutInflater.from(UiUtils.makeHeaderThemedContext(this));
         View header = headerInflater.inflate(R.layout.issue_create_header, headerContainer);
 
         mTitleView = (EditText) header.findViewById(R.id.et_title);
