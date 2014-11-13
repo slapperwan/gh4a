@@ -39,7 +39,6 @@ import com.gh4a.loader.PullRequestLoader;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.User;
@@ -181,7 +180,8 @@ public class PullRequestActivity extends BasePagerActivity implements
         int stateColorAttributeId = closed ? R.attr.colorIssueClosed : R.attr.colorIssueOpen;
 
         tvState.setText(getString(stateTextResId).toUpperCase(Locale.getDefault()));
-        transitionHeaderToColor(UiUtils.resolveColor(this, stateColorAttributeId));
+        transitionHeaderToColor(stateColorAttributeId,
+                closed ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark);
 
         TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
         tvExtra.setText(user.getLogin());

@@ -225,7 +225,8 @@ public class IssueActivity extends BaseActivity implements
         int stateColorAttributeId = closed ? R.attr.colorIssueClosed : R.attr.colorIssueOpen;
 
         tvState.setText(getString(stateTextResId).toUpperCase(Locale.getDefault()));
-        transitionHeaderToColor(UiUtils.resolveColor(this, stateColorAttributeId));
+        transitionHeaderToColor(stateColorAttributeId,
+                closed ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark);
         mEditFab.setSelected(closed);
 
         TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);

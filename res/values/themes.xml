@@ -38,6 +38,8 @@
         <item name="drawerBackground">@color/background_floating_material_dark</item>
         <item name="colorIssueOpen">@color/issue_open_dark</item>
         <item name="colorIssueClosed">@color/issue_closed_dark</item>
+        <item name="colorIssueOpenDark">@color/issue_open_dark_dark</item>
+        <item name="colorIssueClosedDark">@color/issue_closed_dark_dark</item>
         <item name="colorIssueEditFab">@color/issue_edit_fab_dark</item>
         <item name="colorCommitAddition">#79d242</item>
         <item name="colorCommitDeletion">#d25151</item>
@@ -83,6 +85,8 @@
         <item name="drawerBackground">@color/background_floating_material_light</item>
         <item name="colorIssueOpen">@color/issue_open_light</item>
         <item name="colorIssueClosed">@color/issue_closed_light</item>
+        <item name="colorIssueOpenDark">@color/issue_open_light_dark</item>
+        <item name="colorIssueClosedDark">@color/issue_closed_light_dark</item>
         <item name="colorIssueEditFab">@color/issue_edit_fab_light</item>
         <item name="colorCommitAddition">#65b345</item>
         <item name="colorCommitDeletion">#b34545</item>

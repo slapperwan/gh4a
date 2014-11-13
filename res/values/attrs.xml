@@ -7,6 +7,8 @@
     <attr name="drawerBackground" format="reference" />
     <attr name="colorIssueOpen" format="color" />
     <attr name="colorIssueClosed" format="color" />
+    <attr name="colorIssueOpenDark" format="color" />
+    <attr name="colorIssueClosedDark" format="color" />
     <attr name="colorIssueEditFab" format="reference" />
     <attr name="colorCommitAddition" format="color" />
     <attr name="colorCommitDeletion" format="color" />

@@ -25,6 +25,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -178,14 +179,18 @@ public abstract class BaseActivity extends ActionBarActivity implements
         mOverlay.addView(fab, params);
     }
 
-    protected void transitionHeaderToColor(int color) {
+    protected void transitionHeaderToColor(int colorAttrId, int statusBarColorAttrId) {
         View header = findViewById(R.id.header);
         TransitionDrawable transition = new TransitionDrawable(new Drawable[] {
             header.getBackground(),
-            new ColorDrawable(color)
+            new ColorDrawable(UiUtils.resolveColor(this, colorAttrId))
         });
         header.setBackgroundDrawable(transition);
         transition.startTransition(200);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(UiUtils.resolveColor(this, statusBarColorAttrId));
+        }
     }
 
     protected boolean isOnline() {
