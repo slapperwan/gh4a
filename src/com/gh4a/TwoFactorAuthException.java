@@ -12,4 +12,7 @@ public class TwoFactorAuthException extends IOException {
 		this.twoFactorAuthType = twoFactorAuthType;
 	}
 
+    public String getTwoFactorAuthType() {
+        return twoFactorAuthType;
+    }
 }
