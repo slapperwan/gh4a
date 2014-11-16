@@ -24,6 +24,7 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.OAuthService;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -122,6 +123,10 @@ public class Github4AndroidActivity extends BaseFragmentActivity {
             mOtpCode = otpCode;
         }
 
+        public LoginTask(Context context, int resWaitId, int resWaitMsg) {
+            super(context, resWaitId, resWaitMsg);
+        }
+
         @Override
         protected Authorization run() throws IOException {
             GitHubClient client = new ClientForAuthorization(mOtpCode);
@@ -156,7 +161,11 @@ public class Github4AndroidActivity extends BaseFragmentActivity {
         @Override
         protected void onError(Exception e) {
             if (e instanceof TwoFactorAuthException) {
-                open2FADialog(mUserName, mPassword);
+                if ("sms".equals(((TwoFactorAuthException) e).getTwoFactorAuthType())) {
+                    new DummyPostTask(mUserName, mPassword).execute();
+                } else {
+                    open2FADialog(mUserName, mPassword);
+                }
             } else {
                 Toast.makeText(Github4AndroidActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
@@ -176,6 +185,46 @@ public class Github4AndroidActivity extends BaseFragmentActivity {
             startActivity(intent);
 
             finish();
+        }
+    }
+
+    // POST request so that GitHub trigger the SMS for OTP
+    private class DummyPostTask extends LoginTask {
+        private String mUserName;
+        private String mPassword;
+
+        public DummyPostTask(String userName, String password) {
+            super(Github4AndroidActivity.this, R.string.please_wait, R.string.authenticating);
+            mUserName = userName;
+            mPassword = password;
+        }
+
+        @Override
+        protected Authorization run() throws IOException {
+            GitHubClient client = new ClientForAuthorization(null);
+            client.setCredentials(mUserName, mPassword);
+            client.setUserAgent("Gh4a");
+
+            Authorization auth = new Authorization();
+            auth.setNote("Gh4a");
+            auth.setUrl("http://github.com/slapperwan/gh4a");
+            List<String> scopes = new ArrayList<String>();
+            scopes.add("user");
+            scopes.add("repo");
+            scopes.add("gist");
+            auth.setScopes(scopes);
+
+            OAuthService authService = new OAuthService(client);
+            return authService.createAuthorization(auth);
+        }
+
+        @Override
+        protected void onError(Exception e) {
+            if (e instanceof TwoFactorAuthException) {
+                open2FADialog(mUserName, mPassword);
+            } else {
+                Toast.makeText(Github4AndroidActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         }
     }
     
