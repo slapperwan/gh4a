@@ -129,7 +129,9 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
 
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
-        onItemClick(mAdapter.getItem(position));
+        if (position < mAdapter.getCount()) {
+            onItemClick(mAdapter.getItem(position));
+        }
     }
 
     protected abstract int getEmptyTextResId();
