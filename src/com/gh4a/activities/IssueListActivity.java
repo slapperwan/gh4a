@@ -146,7 +146,7 @@ public class IssueListActivity extends LoadingFragmentPagerActivity {
                 return;
             }
             mIsCollaborator = result.getData();
-            invalidateOptionsMenu();
+            supportInvalidateOptionsMenu();
         }
     };
 

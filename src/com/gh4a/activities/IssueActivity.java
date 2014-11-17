@@ -85,7 +85,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
             if (!result.handleError(IssueActivity.this)) {
                 mIssue = result.getData();
                 fillDataIfDone();
-                invalidateOptionsMenu();
+                supportInvalidateOptionsMenu();
             } else {
                 setContentEmpty(true);
                 setContentShown(true);
@@ -126,7 +126,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
         public void onResultReady(LoaderResult<Boolean> result) {
             if (!result.handleError(IssueActivity.this)) {
                 mIsCollaborator = result.getData();
-                invalidateOptionsMenu();
+                supportInvalidateOptionsMenu();
             }
         }
     };
@@ -462,7 +462,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
             // reload events, the action will have triggered an additional one
             getSupportLoaderManager().getLoader(2).onContentChanged();
             setResult(RESULT_OK);
-            invalidateOptionsMenu();
+            supportInvalidateOptionsMenu();
         }
 
         @Override

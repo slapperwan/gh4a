@@ -88,7 +88,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         public void onResultReady(LoaderResult<Boolean> result) {
             if (!result.handleError(getActivity())) {
                 mIsCollaborator = result.getData();
-                invalidateOptionsMenu();
+                getActivity().supportInvalidateOptionsMenu();
             }
         }
     };
@@ -442,7 +442,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
             fillData();
             // reload events, the action will have triggered an additional one
             PullRequestFragment.super.refresh();
-            invalidateOptionsMenu();
+            getActivity().supportInvalidateOptionsMenu();
         }
 
         @Override

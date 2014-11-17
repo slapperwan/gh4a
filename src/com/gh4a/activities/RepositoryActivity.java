@@ -89,7 +89,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             }
             setContentEmpty(!success);
             setContentShown(true);
-            invalidateOptionsMenu();
+            supportInvalidateOptionsMenu();
         }
     };
 
@@ -153,7 +153,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             if (!result.handleError(RepositoryActivity.this)) {
                 mIsWatching = result.getData();
                 mIsFinishLoadingWatching = true;
-                invalidateOptionsMenu();
+                supportInvalidateOptionsMenu();
             }
         }
     };
@@ -168,7 +168,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             if (!result.handleError(RepositoryActivity.this)) {
                 mIsStarring = result.getData();
                 mIsFinishLoadingStarring = true;
-                invalidateOptionsMenu();
+                supportInvalidateOptionsMenu();
             }
         }
     };
@@ -553,7 +553,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
             if (mRepositoryFragment != null) {
                 mRepositoryFragment.updateStargazerCount(mIsStarring);
             }
-            invalidateOptionsMenu();
+            supportInvalidateOptionsMenu();
         }
     }
 
@@ -578,7 +578,7 @@ public class RepositoryActivity extends LoadingFragmentPagerActivity implements 
         @Override
         protected void onSuccess(Void result) {
             mIsWatching = !mIsWatching;
-            invalidateOptionsMenu();
+            supportInvalidateOptionsMenu();
         }
     }
 }

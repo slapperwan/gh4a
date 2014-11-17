@@ -62,7 +62,7 @@ public class PullRequestActivity extends LoadingFragmentPagerActivity implements
             }
             setContentEmpty(!success);
             setContentShown(true);
-            invalidateOptionsMenu();
+            supportInvalidateOptionsMenu();
         }
     };
 

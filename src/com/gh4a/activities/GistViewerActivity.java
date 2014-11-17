@@ -57,7 +57,7 @@ public class GistViewerActivity extends WebViewerActivity {
                 setContentEmpty(true);
                 setContentShown(true);
             }
-            invalidateOptionsMenu();
+            supportInvalidateOptionsMenu();
         }
     };
 
