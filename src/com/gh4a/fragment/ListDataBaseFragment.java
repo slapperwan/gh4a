@@ -58,12 +58,6 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase im
         adapter.notifyDataSetChanged();
     }
 
-    @SuppressLint("NewApi")
-    public void invalidateOptionsMenu() {
-        ActionBarActivity activity = (ActionBarActivity) getActivity();
-        activity.supportInvalidateOptionsMenu();
-    }
-
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -96,7 +90,7 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase im
         } else {
             setListShownNoAnimation(true);
         }
-        invalidateOptionsMenu();
+        getActivity().supportInvalidateOptionsMenu();
     }
 
     @Override

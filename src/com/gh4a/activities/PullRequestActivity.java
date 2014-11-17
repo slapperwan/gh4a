@@ -76,7 +76,7 @@ public class PullRequestActivity extends BasePagerActivity implements
             }
             setContentEmpty(!success);
             setContentShown(true);
-            invalidateOptionsMenu();
+            supportInvalidateOptionsMenu();
         }
     };
 

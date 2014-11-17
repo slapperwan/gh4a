@@ -91,7 +91,7 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
             setContentEmpty(!success);
             setContentShown(true);
             refreshDone();
-            invalidateOptionsMenu();
+            supportInvalidateOptionsMenu();
         }
     };
 
@@ -154,7 +154,7 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
         public void onResultReady(LoaderResult<Boolean> result) {
             if (!result.handleError(RepositoryActivity.this)) {
                 mIsWatching = result.getData();
-                invalidateOptionsMenu();
+                supportInvalidateOptionsMenu();
             }
         }
     };
@@ -168,7 +168,7 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
         public void onResultReady(LoaderResult<Boolean> result) {
             if (!result.handleError(RepositoryActivity.this)) {
                 mIsStarring = result.getData();
-                invalidateOptionsMenu();
+                supportInvalidateOptionsMenu();
             }
         }
     };
@@ -602,7 +602,7 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
             if (mRepositoryFragment != null) {
                 mRepositoryFragment.updateStargazerCount(mIsStarring);
             }
-            invalidateOptionsMenu();
+            supportInvalidateOptionsMenu();
         }
     }
 
@@ -627,7 +627,7 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
         @Override
         protected void onSuccess(Void result) {
             mIsWatching = !mIsWatching;
-            invalidateOptionsMenu();
+            supportInvalidateOptionsMenu();
         }
     }
 }

@@ -73,7 +73,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
             }
             setContentShown(true);
             setContentEmpty(!success);
-            invalidateOptionsMenu();
+            getActivity().supportInvalidateOptionsMenu();
         }
     };
 
@@ -149,12 +149,6 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
             setContentShown(false);
             getLoaderManager().getLoader(0).onContentChanged();
         }
-    }
-
-    @SuppressLint("NewApi")
-    private void invalidateOptionsMenu() {
-        ActionBarActivity activity = (ActionBarActivity) getActivity();
-        activity.supportInvalidateOptionsMenu();
     }
 
     private void fillData() {

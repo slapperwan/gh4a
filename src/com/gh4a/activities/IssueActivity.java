@@ -92,7 +92,7 @@ public class IssueActivity extends BaseActivity implements
             if (!result.handleError(IssueActivity.this)) {
                 mIssue = result.getData();
                 fillDataIfDone();
-                invalidateOptionsMenu();
+                supportInvalidateOptionsMenu();
             } else {
                 setContentEmpty(true);
                 setContentShown(true);
@@ -136,7 +136,7 @@ public class IssueActivity extends BaseActivity implements
                 if (mIsCollaborator && mIssue != null && mEventsLoaded) {
                     mEditFab.setVisibility(View.VISIBLE);
                 }
-                invalidateOptionsMenu();
+                supportInvalidateOptionsMenu();
             }
         }
     };
@@ -486,7 +486,7 @@ public class IssueActivity extends BaseActivity implements
             // reload events, the action will have triggered an additional one
             getSupportLoaderManager().getLoader(2).onContentChanged();
             setResult(RESULT_OK);
-            invalidateOptionsMenu();
+            supportInvalidateOptionsMenu();
         }
 
         @Override

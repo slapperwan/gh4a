@@ -83,7 +83,7 @@ public class UserActivity extends BasePagerActivity {
         @Override
         public void onResultReady(LoaderResult<Boolean> result) {
             mIsFollowing = result.getData();
-            invalidateOptionsMenu();
+            supportInvalidateOptionsMenu();
         }
     };
 
@@ -300,7 +300,7 @@ public class UserActivity extends BasePagerActivity {
             if (mUserFragment != null) {
                 mUserFragment.updateFollowingAction(mIsFollowing);
             }
-            invalidateOptionsMenu();
+            supportInvalidateOptionsMenu();
         }
     }
 }

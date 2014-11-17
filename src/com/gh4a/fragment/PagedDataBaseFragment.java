@@ -73,12 +73,6 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         getLoaderManager().initLoader(0, null, this);
     }
 
-    @SuppressLint("NewApi")
-    public void invalidateOptionsMenu() {
-        ActionBarActivity activity = (ActionBarActivity) getActivity();
-        activity.supportInvalidateOptionsMenu();
-    }
-
     public void refresh() {
         if (getListView() != null) {
             setListShown(false);
@@ -111,7 +105,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         fillData((PageIteratorLoader<T>) loader, events);
         mIsLoadCompleted = true;
         setListShown(true);
-        invalidateOptionsMenu();
+        getActivity().supportInvalidateOptionsMenu();
         mAdapter.notifyDataSetChanged();
         if (!TextUtils.isEmpty(mCurrentFilter)) {
             mAdapter.getFilter().filter(mCurrentFilter);
