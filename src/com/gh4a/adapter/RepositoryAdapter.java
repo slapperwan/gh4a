@@ -71,7 +71,7 @@ public class RepositoryAdapter extends RootAdapter<Repository> implements Filter
         String language = repository.getLanguage() != null
                 ? repository.getLanguage() : mContext.getString(R.string.unknown);
         viewHolder.tvExtra.setText(mContext.getString(R.string.repo_search_extradata,
-                language, Formatter.formatFileSize(mContext, repository.getSize() * 1000),
+                language, Formatter.formatFileSize(mContext, 1024L * repository.getSize()),
                 repository.getForks(), repository.getWatchers()));
     }
 
