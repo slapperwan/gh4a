@@ -69,6 +69,7 @@ public class IssueActivity extends BaseActivity implements
         View.OnClickListener, IssueEventAdapter.OnEditComment,
         SwipeRefreshLayout.ChildScrollDelegate {
     private static final int REQUEST_EDIT = 1000;
+    private static final int REQUEST_EDIT_ISSUE = 1001;
 
     private Issue mIssue;
     private String mRepoOwner;
@@ -401,10 +402,11 @@ public class IssueActivity extends BaseActivity implements
         switch (v.getId()) {
         case R.id.edit_fab:
             if (checkForAuthOrExit()) {
-                intent = new Intent(this, IssueEditActivity.class);
-                intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-                intent.putExtra(Constants.Repository.NAME, mRepoName);
-                intent.putExtra(IssueEditActivity.EXTRA_ISSUE, mIssue);
+                Intent editIntent = new Intent(this, IssueEditActivity.class);
+                editIntent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+                editIntent.putExtra(Constants.Repository.NAME, mRepoName);
+                editIntent.putExtra(IssueEditActivity.EXTRA_ISSUE, mIssue);
+                startActivityForResult(editIntent, REQUEST_EDIT_ISSUE);
             }
             break;
         case R.id.iv_gravatar:
@@ -437,6 +439,11 @@ public class IssueActivity extends BaseActivity implements
         if (requestCode == REQUEST_EDIT) {
             if (resultCode == Activity.RESULT_OK) {
                 getSupportLoaderManager().getLoader(2).onContentChanged();
+                setResult(RESULT_OK);
+            }
+        } else if (requestCode == REQUEST_EDIT_ISSUE) {
+            if (resultCode == Activity.RESULT_OK) {
+                getSupportLoaderManager().getLoader(0).onContentChanged();
                 setResult(RESULT_OK);
             }
         } else {

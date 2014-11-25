@@ -45,6 +45,7 @@ import com.shamanland.fab.ShowHideOnScroll;
 public class IssueListFragment extends PagedDataBaseFragment<Issue> implements
         View.OnClickListener {
     private static final int REQUEST_ISSUE = 1000;
+    private static final int REQUEST_ISSUE_CREATE = 1001;
 
     private String mRepoOwner;
     private String mRepoName;
@@ -130,7 +131,7 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> implements
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_ISSUE) {
+        if (requestCode == REQUEST_ISSUE || requestCode == REQUEST_ISSUE_CREATE) {
             if (resultCode == Activity.RESULT_OK) {
                 super.refresh();
             }
@@ -151,6 +152,6 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> implements
         Intent intent = new Intent(getActivity(), IssueEditActivity.class);
         intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.NAME, mRepoName);
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_ISSUE_CREATE);
     }
 }
