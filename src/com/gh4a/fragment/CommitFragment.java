@@ -164,7 +164,8 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
 
         tvTitle.setText(title);
         tvMessage.setText(message);
-        tvMessage.setVisibility(message != null ? View.VISIBLE : View.GONE);
+        tvTitle.setVisibility(StringUtils.isBlank(title) ? View.GONE : View.VISIBLE);
+        tvMessage.setVisibility(StringUtils.isBlank(message) ? View.GONE : View.VISIBLE);
 
         Commit commit = mCommit.getCommit();
 
@@ -175,23 +176,22 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         tvTimestamp.setText(StringUtils.formatRelativeTime(
                 activity, commit.getAuthor().getDate(), true));
 
-
-        ImageView commitGravatar = (ImageView) mContentView.findViewById(R.id.iv_commit_gravatar);
-        StyleableTextView commitExtra =
-                (StyleableTextView) mContentView.findViewById(R.id.tv_commit_extra);
+        View committerContainer = mContentView.findViewById(R.id.committer);
 
         if (!CommitUtils.authorEqualsCommitter(mCommit)) {
+            ImageView commitGravatar = (ImageView) mContentView.findViewById(R.id.iv_commit_gravatar);
+            StyleableTextView commitExtra =
+                    (StyleableTextView) mContentView.findViewById(R.id.tv_commit_extra);
+
             AvatarHandler.assignAvatar(commitGravatar, mCommit.getCommitter());
             String committerText = getString(R.string.commit_details,
                     CommitUtils.getCommitterName(app, mCommit),
                     StringUtils.formatRelativeTime(activity, commit.getCommitter().getDate(), true));
             StringUtils.applyBoldTagsAndSetText(commitExtra, committerText);
 
-            commitGravatar.setVisibility(View.VISIBLE);
-            commitExtra.setVisibility(View.VISIBLE);
+            committerContainer.setVisibility(View.VISIBLE);
         } else {
-            commitGravatar.setVisibility(View.GONE);
-            commitExtra.setVisibility(View.GONE);
+            committerContainer.setVisibility(View.GONE);
         }
     }
 

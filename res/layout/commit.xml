@@ -13,67 +13,77 @@
         <android.support.v7.widget.CardView
             style="?attr/cardViewTheme">
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="vertical"
                 android:padding="@dimen/content_padding">
 
-                <com.gh4a.widget.FixedSizeImageView
-                    android:id="@+id/iv_gravatar"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginRight="16dp" />
+                <RelativeLayout
+                    android:id="@+id/author"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-                <com.gh4a.widget.StyleableTextView
-                    android:id="@+id/tv_author"
-                    android:layout_width="wrap_content"
+                    <com.gh4a.widget.FixedSizeImageView
+                        android:id="@+id/iv_gravatar"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginRight="16dp" />
+
+                    <com.gh4a.widget.StyleableTextView
+                        android:id="@+id/tv_author"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@id/iv_gravatar"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textSize="16sp" />
+
+                    <com.gh4a.widget.StyleableTextView
+                        android:id="@+id/tv_timestamp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.VerySmall"
+                        android:layout_marginTop="2dp"
+                        android:layout_toRightOf="@id/iv_gravatar"
+                        android:layout_below="@id/tv_author" />
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/committer"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/iv_gravatar"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="16sp" />
-
-                <com.gh4a.widget.StyleableTextView
-                    android:id="@+id/tv_timestamp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.VerySmall"
-                    android:layout_marginTop="2dp"
-                    android:layout_toRightOf="@id/iv_gravatar"
-                    android:layout_below="@id/tv_author" />
-
-                <com.gh4a.widget.FixedSizeImageView
-                    android:id="@+id/iv_commit_gravatar"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_below="@id/iv_gravatar"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginTop="8dp" />
-
-                <com.gh4a.widget.StyleableTextView
-                    android:id="@+id/tv_commit_extra"
-                    android:layout_width="wrap_content"
-                    android:layout_height="24dp"
-                    android:layout_below="@id/iv_gravatar"
-                    android:layout_toRightOf="@id/iv_commit_gravatar"
                     android:layout_marginTop="8dp"
-                    android:gravity="center_vertical"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="?android:attr/textColorPrimary" />
+                    android:orientation="horizontal">
+
+                    <com.gh4a.widget.FixedSizeImageView
+                        android:id="@+id/iv_commit_gravatar"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginRight="8dp" />
+
+                    <com.gh4a.widget.StyleableTextView
+                        android:id="@+id/tv_commit_extra"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="?android:attr/textColorPrimary" />
+
+                </LinearLayout>
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:textAppearance="@style/TextAppearance.ItemTitle"
-                    android:layout_below="@id/iv_commit_gravatar" />
+                    android:textAppearance="@style/TextAppearance.ItemTitle" />
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_message"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/tv_title"
                     android:layout_marginTop="8dp"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -81,12 +91,11 @@
                     android:id="@+id/tv_desc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/tv_message"
                     android:layout_marginTop="8dp"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     app:font="italic" />
 
-            </RelativeLayout>
+            </LinearLayout>
 
         </android.support.v7.widget.CardView>
 
