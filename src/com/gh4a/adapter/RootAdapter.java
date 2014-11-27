@@ -137,17 +137,20 @@ public abstract class RootAdapter<T> extends BaseAdapter implements Filterable {
         if (objects != null) {
             mUnfilteredObjects.addAll(objects);
             mObjects.addAll(objects);
+            notifyDataSetChanged();
         }
     }
 
     public void remove(T object) {
         mUnfilteredObjects.remove(object);
         mObjects.remove(object);
+        notifyDataSetChanged();
     }
 
     public void clear() {
         mUnfilteredObjects.clear();
         mObjects.clear();
+        notifyDataSetChanged();
     }
 
     protected boolean isFiltered(CharSequence filter, T object) {
