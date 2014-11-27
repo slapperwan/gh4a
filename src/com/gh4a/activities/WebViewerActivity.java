@@ -17,6 +17,7 @@ package com.gh4a.activities;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -63,11 +64,14 @@ public abstract class WebViewerActivity extends BaseActivity {
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            if (handleUrlLoad(url)) {
-                return true;
+            if (!handleUrlLoad(url)) {
+                try {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    startActivity(intent);
+                } catch (ActivityNotFoundException e) {
+                    // ignore
+                }
             }
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            startActivity(intent);
             return true;
         }
     };
