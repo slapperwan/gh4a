@@ -173,6 +173,7 @@ public class IssueLabelListActivity extends BaseActivity implements
         if (mActionMode == null) {
             mAddedLabel = new IssueLabelAdapter.EditableLabel("dddddd");
             mAdapter.add(mAddedLabel);
+            mAdapter.notifyDataSetChanged();
             startEditing(mAddedLabel);
         }
     }

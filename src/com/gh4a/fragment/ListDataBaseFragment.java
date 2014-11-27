@@ -51,6 +51,7 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase im
         setListShown(false);
         mAdapter.clear();
         getLoaderManager().getLoader(0).onContentChanged();
+        setListAdapter(mAdapter);
     }
 
     protected void onAddData(RootAdapter<T> adapter, List<T> data) {

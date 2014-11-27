@@ -77,6 +77,7 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
                     adapter.add(repository);
                 }
             }
+            adapter.notifyDataSetChanged();
         } else {
             adapter.addAll(repositories);
         }
