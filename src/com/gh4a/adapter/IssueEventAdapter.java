@@ -96,7 +96,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
     protected void bindView(View view, IssueEventHolder event) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         String ourLogin = Gh4Application.get(mContext).getAuthLogin();
-        String login = event.getUser().getLogin();
+        String login = event.getUser() != null ? event.getUser().getLogin() : null;
 
         AvatarHandler.assignAvatar(viewHolder.ivGravatar, event.getUser());
         viewHolder.ivGravatar.setTag(event);
@@ -114,7 +114,8 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
         }
 
         if (viewHolder.ivEdit != null) {
-            if ((login.equals(ourLogin) || mRepoOwner.equals(ourLogin)) && mEditCallback != null) {
+            if (((login != null && login.equals(ourLogin)) || mRepoOwner.equals(ourLogin)) &&
+                    mEditCallback != null) {
                 viewHolder.ivEdit.setVisibility(View.VISIBLE);
                 viewHolder.ivEdit.setTag(event.comment);
                 viewHolder.ivEdit.setOnClickListener(this);
@@ -125,7 +126,8 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
     }
 
     private String formatCommentExtra(Comment comment) {
-        String login = comment.getUser().getLogin();
+        String login = comment.getUser() != null
+                ? comment.getUser().getLogin() : mContext.getString(R.string.unknown);
         CharSequence timestamp = StringUtils.formatRelativeTime(mContext,
                 comment.getCreatedAt(), true);
 
