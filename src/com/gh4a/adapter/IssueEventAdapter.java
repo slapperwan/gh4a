@@ -88,13 +88,14 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
     protected void bindView(View view, IssueEventHolder event) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
         String ourLogin = Gh4Application.get(mContext).getAuthLogin();
-        String login = event.getUser().getLogin();
+        String login = event.getUser() != null ? event.getUser().getLogin() : null;
 
         AvatarHandler.assignAvatar(viewHolder.ivGravatar, event.getUser());
         viewHolder.ivGravatar.setTag(event);
 
         StringUtils.applyBoldTagsAndSetText(viewHolder.tvExtra,
-                mContext.getString(R.string.issue_comment_header, login));
+                mContext.getString(R.string.issue_comment_header,
+                login != null ? login : mContext.getString(R.string.unknown)));
         viewHolder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
                 event.getCreatedAt(), true));
 
@@ -117,7 +118,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
                     viewHolder.tvExtra.getTypefaceValue()));
         }
 
-        boolean canEdit = login.equals(ourLogin) || mRepoOwner.equals(ourLogin);
+        boolean canEdit = (login != null && login.equals(ourLogin)) || mRepoOwner.equals(ourLogin);
         if (event.comment != null && canEdit && mEditCallback != null) {
             viewHolder.ivEdit.setVisibility(View.VISIBLE);
             viewHolder.ivEdit.setTag(event.comment);
