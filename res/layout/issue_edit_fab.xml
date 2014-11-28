@@ -9,5 +9,6 @@
     android:layout_marginRight="16dp"
     android:src="@drawable/content_edit_fab"
     android:visibility="invisible"
+    android:padding="0dp"
     app:floatingActionButtonColor="?attr/colorIssueEditFab"
     app:floatingActionButtonSize="mini" />
