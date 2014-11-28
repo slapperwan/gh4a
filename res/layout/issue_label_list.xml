@@ -17,6 +17,6 @@
         android:layout_gravity="bottom|right"
         android:layout_margin="16dp"
         android:src="@drawable/content_new"
-        app:floatingActionButtonColor="?attr/colorPrimary" />
+        app:floatingActionButtonColor="?attr/colorFab" />
 
 </FrameLayout>
