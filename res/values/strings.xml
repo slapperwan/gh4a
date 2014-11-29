@@ -94,6 +94,8 @@
     <string name="created">Created</string>
     <string name="assigned">Assigned</string>
     <string name="mentioned">Mentioned</string>
+    <string name="my_issues">My issues</string>
+    <string name="my_pull_requests">My pull requests</string>
 
     <plurals name="contributor_extra_data">
         <item quantity="one">%1$d contribution</item>
