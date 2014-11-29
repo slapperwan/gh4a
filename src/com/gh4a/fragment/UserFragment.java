@@ -301,7 +301,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
             }
         }
 
-        Button btnMore = (Button) getView().findViewById(R.id.btn_repos);
+        View btnMore = getView().findViewById(R.id.btn_repos);
         if (topRepos != null && !topRepos.isEmpty()) {
             btnMore.setOnClickListener(this);
             btnMore.setVisibility(View.VISIBLE);

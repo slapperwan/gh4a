@@ -247,13 +247,14 @@
                     android:orientation="vertical"
                     android:visibility="gone" />
 
-                <Button
+                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/btn_repos"
                     style="@style/MoreButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/content_padding"
-                    android:layout_marginRight="@dimen/content_padding"
+                    android:paddingLeft="@dimen/content_padding"
+                    android:paddingRight="@dimen/content_padding"
+                    android:gravity="center_horizontal"
                     android:text="@string/view_more"
                     android:visibility="gone" />
 

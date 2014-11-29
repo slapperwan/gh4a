@@ -53,15 +53,18 @@
         <item name="android:layout_gravity">center_horizontal</item>
     </style>
 
-    <style name="MoreButton">
+    <style name="MoreButton" parent="SelectableLabel">
+        <item name="android:textColor">?attr/colorPrimaryDark</item>
         <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
+        <item name="android:textSize">@dimen/abc_text_size_button_material</item>
+        <item name="allCaps">true</item>
     </style>
 
     <style name="SelectableItem">
         <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 
-    <style name="SelectableLabel" parent="@style/SelectableItem">
+    <style name="SelectableLabel" parent="SelectableItem">
         <item name="android:paddingTop">6dp</item>
         <item name="android:paddingBottom">6dp</item>
         <item name="android:textAppearance">@style/TextAppearance.ItemTitle</item>
