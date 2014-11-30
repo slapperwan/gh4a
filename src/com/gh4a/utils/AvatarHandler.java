@@ -20,12 +20,13 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.util.SparseArrayCompat;
 import android.util.Log;
 import android.widget.ImageView;
 
 import com.gh4a.R;
-import com.gh4a.widget.RoundedAvatarDrawable;
 
 public class AvatarHandler {
     private static final String TAG = "GravatarHandler";
@@ -79,7 +80,7 @@ public class AvatarHandler {
                 sCache.put(request.id, bitmap);
 
                 for (ImageView view : request.views) {
-                    view.setImageDrawable(new RoundedAvatarDrawable(bitmap));
+                    applyAvatarToView(view, bitmap);
                 }
             }
             sRequests.delete(requestId);
@@ -100,7 +101,7 @@ public class AvatarHandler {
 
         Bitmap bitmap = sCache.get(userId);
         if (bitmap != null) {
-            view.setImageDrawable(new RoundedAvatarDrawable(bitmap));
+            applyAvatarToView(view, bitmap);
             return;
         }
 
@@ -108,7 +109,7 @@ public class AvatarHandler {
             Resources res = view.getContext().getResources();
             sDefaultAvatarBitmap = BitmapFactory.decodeResource(res, R.drawable.default_avatar);
         }
-        view.setImageDrawable(new RoundedAvatarDrawable(sDefaultAvatarBitmap));
+        applyAvatarToView(view, sDefaultAvatarBitmap);
         if (userId <= 0) {
             return;
         }
@@ -150,6 +151,13 @@ public class AvatarHandler {
         return Uri.parse(url).buildUpon()
                 .appendQueryParameter("s", String.valueOf(MAX_CACHED_IMAGE_SIZE))
                 .toString();
+    }
+
+    private static void applyAvatarToView(ImageView view, Bitmap avatar) {
+        RoundedBitmapDrawable d = RoundedBitmapDrawableFactory.create(view.getResources(), avatar);
+        d.setCornerRadius(Math.max(avatar.getWidth() / 2, avatar.getHeight() / 2));
+        d.setAntiAlias(true);
+        view.setImageDrawable(d);
     }
 
     private static Request getRequestForId(int id) {
