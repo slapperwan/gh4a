@@ -16,6 +16,7 @@
 package com.gh4a.fragment;
 
 import android.annotation.SuppressLint;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -56,6 +57,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         if (mAdapter.isCardStyle()) {
             listView.setDivider(null);
             listView.setDividerHeight(0);
+            listView.setSelector(new ColorDrawable(android.R.color.transparent));
 
             int cardMargin = getResources().getDimensionPixelSize(R.dimen.card_margin);
             listView.setPadding(cardMargin, 0, cardMargin, 0);
