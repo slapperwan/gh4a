@@ -28,7 +28,7 @@
         <item name="milestoneIcon">@drawable/milestone_dark</item>
         <item name="assigneeIcon">@drawable/assignee_dark</item>
         <item name="labelsIcon">@drawable/labels_dark</item>
-        <item name="cardViewTheme">@style/Base.CardView.Dark</item>
+        <item name="cardViewTheme">@style/Theme.CardView.Dark</item>
         <item name="colorAccent">#396426</item>
         <item name="colorPrimary">#396426</item>
         <item name="colorPrimaryDark">#2d501e</item>
@@ -75,7 +75,7 @@
         <item name="assigneeIcon">@drawable/assignee</item>
         <item name="labelsIcon">@drawable/labels</item>
         <item name="listPopupWindowStyle">@style/Widget.AppCompat.Light.ListPopupWindow</item>
-        <item name="cardViewTheme">@style/Base.CardView.Light</item>
+        <item name="cardViewTheme">@style/Theme.CardView.Light</item>
         <item name="colorAccent">#65b345</item>
         <item name="colorPrimary">#65b345</item>
         <item name="colorPrimaryDark">#5aa03d</item>
@@ -100,29 +100,5 @@
 
     <style name="Theme.Header.Light" parent="Theme.Header">
         <item name="android:spinnerStyle">@style/Widget.Spinner.ActionBar.Light</item>
-    </style>
-
-    <style name="Widget.Spinner.ActionBar.Light" parent="Widget.AppCompat.Spinner">
-        <item name="android:popupBackground">@drawable/abc_popup_background_mtrl_mult</item>
-    </style>
-
-    <style name="Base.CardView.Light" parent="CardView.Light">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginLeft">@dimen/card_margin</item>
-        <item name="android:layout_marginRight">@dimen/card_margin</item>
-        <item name="android:layout_marginTop">@dimen/card_top_bottom_margin</item>
-        <item name="android:layout_marginBottom">@dimen/card_top_bottom_margin</item>
-        <item name="android:foreground">?android:attr/selectableItemBackground</item>
-    </style>
-
-    <style name="Base.CardView.Dark" parent="CardView.Dark">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginLeft">@dimen/card_margin</item>
-        <item name="android:layout_marginRight">@dimen/card_margin</item>
-        <item name="android:layout_marginTop">@dimen/card_top_bottom_margin</item>
-        <item name="android:layout_marginBottom">@dimen/card_top_bottom_margin</item>
-        <item name="android:foreground">?android:attr/selectableItemBackground</item>
     </style>
 </resources>

@@ -3,4 +3,12 @@
     <style name="SelectableItem">
         <item name="android:background">?android:attr/selectableItemBackground</item>
     </style>
+
+    <style name="Theme.CardView.Light" parent="Base.CardView.Light">
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+    </style>
+
+    <style name="Theme.CardView.Dark" parent="Base.CardView.Dark">
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+    </style>
 </resources>
