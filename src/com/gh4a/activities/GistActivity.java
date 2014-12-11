@@ -15,10 +15,12 @@
  */
 package com.gh4a.activities;
 
+import java.io.IOException;
 import java.util.Map;
 
 import org.eclipse.egit.github.core.Gist;
 import org.eclipse.egit.github.core.GistFile;
+import org.eclipse.egit.github.core.service.GistService;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -33,10 +35,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.gh4a.BackgroundTask;
 import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.loader.GistLoader;
+import com.gh4a.loader.GistStarLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
@@ -46,6 +51,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
     private String mGistId;
     private String mUserLogin;
     private Gist mGist;
+    private Boolean mIsStarred;
 
     private LoaderCallbacks<Gist> mGistCallback = new LoaderCallbacks<Gist>() {
         @Override
@@ -60,6 +66,20 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
             }
             setContentEmpty(!success);
             setContentShown(true);
+        }
+    };
+
+    private LoaderCallbacks<Boolean> mStarCallback = new LoaderCallbacks<Boolean>() {
+        @Override
+        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
+            return new GistStarLoader(GistActivity.this, mGistId);
+        }
+        @Override
+        public void onResultReady(LoaderResult<Boolean> result) {
+            if (!result.handleError(GistActivity.this)) {
+                mIsStarred = result.getData();
+                supportInvalidateOptionsMenu();
+            }
         }
     };
 
@@ -83,6 +103,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
         getSupportLoaderManager().initLoader(0, null, mGistCallback);
+        getSupportLoaderManager().initLoader(1, null, mStarCallback);
     }
 
     private void fillData(final Gist gist) {
@@ -126,10 +147,37 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuItem item = menu.add(0, R.id.share, 0, R.string.share)
+        MenuItem starItem = menu.add(0, R.id.star, 0, R.string.repo_star_action)
+                .setIcon(R.drawable.star);
+        MenuItemCompat.setShowAsAction(starItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+
+        MenuItem shareItem = menu.add(0, R.id.share, 0, R.string.share)
                 .setIcon(R.drawable.social_share);
-        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+        MenuItemCompat.setShowAsAction(shareItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        boolean authorized = Gh4Application.get(this).isAuthorized();
+
+        MenuItem starAction = menu.findItem(R.id.star);
+        starAction.setVisible(authorized);
+        if (authorized) {
+            if (mIsStarred == null) {
+                MenuItemCompat.setActionView(starAction, R.layout.ab_loading);
+                MenuItemCompat.expandActionView(starAction);
+            } else if (mIsStarred) {
+                starAction.setTitle(R.string.repo_unstar_action);
+                starAction.setIcon(R.drawable.unstar);
+            } else {
+                starAction.setTitle(R.string.repo_star_action);
+                starAction.setIcon(R.drawable.star);
+            }
+        }
+
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -144,6 +192,11 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
                 shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
                 return true;
+            case R.id.star:
+                MenuItemCompat.setActionView(item, R.layout.ab_loading);
+                MenuItemCompat.expandActionView(item);
+                new UpdateStarTask().execute();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -153,5 +206,29 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
         Intent intent = new Intent(this, GistListActivity.class);
         intent.putExtra(Constants.User.LOGIN, mUserLogin);
         return intent;
+    }
+
+    private class UpdateStarTask extends BackgroundTask<Void> {
+        public UpdateStarTask() {
+            super(GistActivity.this);
+        }
+
+        @Override
+        protected Void run() throws IOException {
+            GistService gistService = (GistService)
+                    Gh4Application.get(mContext).getService(Gh4Application.GIST_SERVICE);
+            if (mIsStarred) {
+                gistService.unstarGist(mGistId);
+            } else {
+                gistService.starGist(mGistId);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onSuccess(Void result) {
+            mIsStarred = !mIsStarred;
+            supportInvalidateOptionsMenu();
+        }
     }
 }
