@@ -44,7 +44,7 @@ public class GitModuleParserLoader extends BaseLoader<Map<String, String>> {
         if (StringUtils.isBlank(data)) {
             return null;
         }
-        Map<String, String> gitModuleMap = new HashMap<String, String>();
+        Map<String, String> gitModuleMap = new HashMap<>();
         String[] lines = data.split("\n");
         String path = null;
         for (String line : lines) {

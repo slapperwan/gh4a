@@ -280,7 +280,7 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         private boolean mStopping;
 
         @Override
-        public Dialog onCreateDialog(@NonNull Bundle savedInstanceState) {
+        public @NonNull Dialog onCreateDialog(@NonNull Bundle savedInstanceState) {
             final IssueMilestoneEditActivity activity = (IssueMilestoneEditActivity) getActivity();
             final Calendar c = Calendar.getInstance();
 

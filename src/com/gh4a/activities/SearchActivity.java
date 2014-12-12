@@ -128,14 +128,14 @@ public class SearchActivity extends BaseActivity implements
         super.onSaveInstanceState(outState);
         if (mRepoAdapter != null) {
             int count = mRepoAdapter.getCount();
-            ArrayList<Repository> repos = new ArrayList<Repository>(count);
+            ArrayList<Repository> repos = new ArrayList<>(count);
             for (int i = 0; i < count; i++) {
                 repos.add(mRepoAdapter.getItem(i));
             }
             outState.putSerializable(STATE_KEY_REPO_RESULTS, repos);
         } else if (mUserAdapter != null) {
             int count = mUserAdapter.getCount();
-            ArrayList<SearchUser> users = new ArrayList<SearchUser>(count);
+            ArrayList<SearchUser> users = new ArrayList<>(count);
             for (int i = 0; i < count; i++) {
                 users.add(mUserAdapter.getItem(i));
             }
@@ -255,7 +255,7 @@ public class SearchActivity extends BaseActivity implements
 
             RepositoryService repoService = (RepositoryService)
                     Gh4Application.get(mContext).getService(Gh4Application.REPO_SERVICE);
-            HashMap<String, String> params = new HashMap<String, String>();
+            HashMap<String, String> params = new HashMap<>();
             params.put("fork", "true");
 
             return repoService.searchRepositories(mQuery, params);

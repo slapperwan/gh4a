@@ -333,7 +333,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         } else {
             LayoutInflater inflater = getLayoutInflater();
             final List<Label> selectedLabels = mEditIssue.getLabels() != null
-                    ? new ArrayList<Label>(mEditIssue.getLabels()) : new ArrayList<Label>();
+                    ? new ArrayList<>(mEditIssue.getLabels()) : new ArrayList<Label>();
             View labelContainerView = inflater.inflate(R.layout.generic_linear_container, null);
             ViewGroup container = (ViewGroup) labelContainerView.findViewById(R.id.container);
 

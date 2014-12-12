@@ -18,7 +18,7 @@ public class PageIteratorLoader<T> extends AsyncTaskLoader<Collection<T>> {
     public PageIteratorLoader(Context context, PageIterator<T> pageIterator) {
         super(context);
         mPageIterator = pageIterator;
-        mPreviouslyLoadedData = new ArrayList<T>();
+        mPreviouslyLoadedData = new ArrayList<>();
         onContentChanged();
     }
 
@@ -45,7 +45,7 @@ public class PageIteratorLoader<T> extends AsyncTaskLoader<Collection<T>> {
         if (mPageIterator.hasNext()) {
             try {
                 Collection<T> newData = mPageIterator.next();
-                mPreviouslyLoadedData = new ArrayList<T>(mPreviouslyLoadedData);
+                mPreviouslyLoadedData = new ArrayList<>(mPreviouslyLoadedData);
                 mPreviouslyLoadedData.addAll(newData);
             } catch (Exception e) {
                 Log.e(Constants.LOG_TAG, e.getMessage(), e);

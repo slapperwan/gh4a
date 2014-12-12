@@ -32,7 +32,7 @@ public class BranchListLoader extends BaseLoader<List<RepositoryBranch>> {
             return null;
         }
 
-        ArrayList<RepositoryBranch> result = new ArrayList<RepositoryBranch>();
+        ArrayList<RepositoryBranch> result = new ArrayList<>();
         for (RepositoryBranch branch : branches) {
             if (branch != null) {
                 result.add(branch);

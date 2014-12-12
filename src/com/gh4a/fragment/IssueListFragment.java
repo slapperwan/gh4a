@@ -98,7 +98,7 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> implements
         mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
         mRepoName = getArguments().getString(Constants.Repository.NAME);
 
-        mFilterData = new HashMap<String, String>();
+        mFilterData = new HashMap<>();
 
         Bundle args = getArguments();
         for (String key : args.keySet()) {

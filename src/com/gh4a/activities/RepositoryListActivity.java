@@ -87,7 +87,7 @@ public class RepositoryListActivity extends BaseActivity implements
         }
 
         mTypes = getResources().getStringArray(valueResId);
-        mDrawerItems = new ArrayList<DrawerAdapter.Item>();
+        mDrawerItems = new ArrayList<>();
 
         TypedArray itemResIds = getResources().obtainTypedArray(itemResId);
         for (int i = 0; i < itemResIds.length(); i++) {
@@ -119,12 +119,16 @@ public class RepositoryListActivity extends BaseActivity implements
 
         if (position < mTypes.length) {
             String type = mTypes[position];
-            if (type.equals("starred")) {
-                fragment = StarredRepositoryListFragment.newInstance(mUserLogin);
-            } else if (type.equals("watched")) {
-                fragment = WatchedRepositoryListFragment.newInstance(mUserLogin);
-            } else {
-                fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, type);
+            switch (type) {
+                case "starred":
+                    fragment = StarredRepositoryListFragment.newInstance(mUserLogin);
+                    break;
+                case "watched":
+                    fragment = WatchedRepositoryListFragment.newInstance(mUserLogin);
+                    break;
+                default:
+                    fragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, type);
+                    break;
             }
         }
 

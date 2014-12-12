@@ -39,7 +39,7 @@ public class CommitCommentListLoader extends BaseLoader<List<CommitComment>> {
         if (comments == null || (mIncludePositional && mIncludeUnpositional)) {
             return comments;
         }
-        ArrayList<CommitComment> result = new ArrayList<CommitComment>();
+        ArrayList<CommitComment> result = new ArrayList<>();
         for (CommitComment comment : comments) {
             int pos = comment.getPosition();
             if ((pos < 0 && mIncludeUnpositional) || (pos >= 0 && mIncludePositional)) {

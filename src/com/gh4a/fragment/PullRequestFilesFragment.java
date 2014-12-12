@@ -131,7 +131,7 @@ public class PullRequestFilesFragment extends CommitFragment {
         intent.putExtra(Constants.Object.REF, commitSha);
         intent.putExtra(Constants.Object.OBJECT_SHA, commitSha);
         intent.putExtra(Constants.Commit.DIFF, file.getPatch());
-        intent.putExtra(Constants.Commit.COMMENTS, new ArrayList<CommitComment>(mComments));
+        intent.putExtra(Constants.Commit.COMMENTS, new ArrayList<>(mComments));
         intent.putExtra(Constants.Object.PATH, file.getFilename());
         startActivityForResult(intent, REQUEST_DIFF_VIEWER);
     }

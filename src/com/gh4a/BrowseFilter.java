@@ -28,7 +28,7 @@ public class BrowseFilter extends Activity {
             return;
         }
 
-        List<String> parts = new ArrayList<String>(uri.getPathSegments());
+        List<String> parts = new ArrayList<>(uri.getPathSegments());
         Intent intent = null;
 
         String first = parts.isEmpty() ? null : parts.get(0);

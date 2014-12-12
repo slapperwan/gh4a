@@ -215,7 +215,7 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
             }
         };
 
-        mDirStack = new Stack<String>();
+        mDirStack = new Stack<>();
 
         if (savedInstanceState != null) {
             for (String entry : savedInstanceState.getStringArrayList(STATE_KEY_DIR_STACK)) {
@@ -271,7 +271,7 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putStringArrayList(STATE_KEY_DIR_STACK, new ArrayList<String>(mDirStack));
+        outState.putStringArrayList(STATE_KEY_DIR_STACK, new ArrayList<>(mDirStack));
         for (Map.Entry<String, ArrayList<RepositoryContents>> entry : mContentCache.entrySet()) {
             String key = entry.getKey();
             if (key == null) {
@@ -340,7 +340,7 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
         if (contents == null) {
             return;
         }
-        mContentCache.put(fragment.getPath(), new ArrayList<RepositoryContents>(contents));
+        mContentCache.put(fragment.getPath(), new ArrayList<>(contents));
         if (fragment.getPath() == null) {
             for (RepositoryContents content : contents) {
                 if (RepositoryContents.TYPE_FILE.equals(content.getType())) {

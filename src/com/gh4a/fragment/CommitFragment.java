@@ -217,23 +217,27 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
 
         for (int i = 0; i < count; i++) {
             CommitFile file = files.get(i);
-            String status = file.getStatus();
             final LinearLayout parent;
 
-            if ("added".equals(status)) {
-                parent = llAdded;
-                added++;
-            } else if ("modified".equals(status)) {
-                parent = llChanged;
-                changed++;
-            } else if ("renamed".equals(status)) {
-                parent = llRenamed;
-                renamed++;
-            } else if ("removed".equals(status)) {
-                parent = llDeleted;
-                deleted++;
-            } else {
-                continue;
+            switch (file.getStatus()) {
+                case "added":
+                    parent = llAdded;
+                    added++;
+                    break;
+                case "modified":
+                    parent = llChanged;
+                    changed++;
+                    break;
+                case "renamed":
+                    parent = llRenamed;
+                    renamed++;
+                    break;
+                case "removed":
+                    parent = llDeleted;
+                    deleted++;
+                    break;
+                default:
+                    continue;
             }
 
             additions += file.getAdditions();
@@ -311,7 +315,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
             intent.putExtra(Constants.Object.REF, mObjectSha);
             intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
             intent.putExtra(Constants.Commit.DIFF, file.getPatch());
-            intent.putExtra(Constants.Commit.COMMENTS, new ArrayList<CommitComment>(mComments));
+            intent.putExtra(Constants.Commit.COMMENTS, new ArrayList<>(mComments));
             intent.putExtra(Constants.Object.PATH, file.getFilename());
             startActivityForResult(intent, REQUEST_DIFF_VIEWER);
         }

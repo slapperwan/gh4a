@@ -22,7 +22,7 @@ public class TypefaceCache {
         "fonts/Roboto-BoldCondensed.ttf"
     };
 
-    private static SparseArray<Typeface> sTypefaces = new SparseArray<Typeface>();
+    private static SparseArray<Typeface> sTypefaces = new SparseArray<>();
 
     public static Typeface getTypeface(Context context, int typeface, int style) {
         switch (style) {

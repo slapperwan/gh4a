@@ -31,7 +31,7 @@ public class PullRequestCommentsLoader extends BaseLoader<List<CommitComment>> {
                 Gh4Application.get(getContext()).getService(Gh4Application.PULL_SERVICE);
         List<CommitComment> comments = pullRequestService.getComments(
                 new RepositoryId(mRepoOwner, mRepoName), mPullRequestNumber);
-        List<CommitComment> result = new ArrayList<CommitComment>();
+        List<CommitComment> result = new ArrayList<>();
         for (CommitComment comment : comments) {
             if (comment.getPosition() >= 0) {
                 result.add(comment);

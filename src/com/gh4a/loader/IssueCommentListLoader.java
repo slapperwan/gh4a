@@ -46,7 +46,7 @@ public class IssueCommentListLoader extends BaseLoader<List<IssueEventHolder>> {
         List<Comment> comments = issueService.getComments(
                 new RepositoryId(mRepoOwner, mRepoName), mIssueNumber);
         List<IssueEvent> events = issueService.getIssueEvents(mRepoOwner, mRepoName, mIssueNumber);
-        List<IssueEventHolder> result = new ArrayList<IssueEventHolder>();
+        List<IssueEventHolder> result = new ArrayList<>();
 
         for (Comment comment : comments) {
             result.add(new IssueEventHolder(comment));

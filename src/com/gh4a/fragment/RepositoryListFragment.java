@@ -94,7 +94,7 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
         boolean isSelf = mLogin.equals(app.getAuthLogin());
         RepositoryService repoService = (RepositoryService) app.getService(Gh4Application.REPO_SERVICE);
 
-        Map<String, String> filterData = new HashMap<String, String>();
+        Map<String, String> filterData = new HashMap<>();
         if (!mIsOrg && ("sources".equals(mRepoType) || "forks".equals(mRepoType))) {
             filterData.put("type", "all");
         } else {

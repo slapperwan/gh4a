@@ -32,7 +32,7 @@ public class TagListLoader extends BaseLoader<List<RepositoryTag>> {
             return null;
         }
 
-        ArrayList<RepositoryTag> result = new ArrayList<RepositoryTag>();
+        ArrayList<RepositoryTag> result = new ArrayList<>();
         for (RepositoryTag tag : tags) {
             if (tag != null) {
                 result.add(tag);

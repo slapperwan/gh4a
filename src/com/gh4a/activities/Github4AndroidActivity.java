@@ -144,7 +144,7 @@ public class Github4AndroidActivity extends BaseActivity {
                 auth = new Authorization();
                 auth.setNote("Gh4a");
                 auth.setUrl("http://github.com/slapperwan/gh4a");
-                List<String> scopes = new ArrayList<String>();
+                List<String> scopes = new ArrayList<>();
                 scopes.add("user");
                 scopes.add("repo");
                 scopes.add("gist");
@@ -202,7 +202,7 @@ public class Github4AndroidActivity extends BaseActivity {
             Authorization auth = new Authorization();
             auth.setNote("Gh4a");
             auth.setUrl("http://github.com/slapperwan/gh4a");
-            List<String> scopes = new ArrayList<String>();
+            List<String> scopes = new ArrayList<>();
             scopes.add("user");
             scopes.add("repo");
             scopes.add("gist");

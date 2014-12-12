@@ -23,6 +23,7 @@ import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v4.util.LongSparseArray;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.ListPopupWindow;
@@ -60,7 +61,6 @@ import org.eclipse.egit.github.core.User;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public abstract class DiffViewerActivity extends WebViewerActivity implements
@@ -72,9 +72,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
 
     private String mDiff;
     private String[] mDiffLines;
-    private SparseArray<List<CommitComment>> mCommitCommentsByPos =
-            new SparseArray<List<CommitComment>>();
-    private HashMap<Long, CommitComment> mCommitComments = new HashMap<Long, CommitComment>();
+    private SparseArray<List<CommitComment>> mCommitCommentsByPos = new SparseArray<>();
+    private LongSparseArray<CommitComment> mCommitComments = new LongSparseArray<>();
 
     private Point mLastTouchDown = new Point();
 
@@ -181,7 +180,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             int position = comment.getPosition();
             List<CommitComment> commentsByPos = mCommitCommentsByPos.get(position);
             if (commentsByPos == null) {
-                commentsByPos = new ArrayList<CommitComment>();
+                commentsByPos = new ArrayList<>();
                 mCommitCommentsByPos.put(position, commentsByPos);
             }
             commentsByPos.add(comment);
@@ -335,7 +334,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             mPosition = position;
             mLineText = lineText;
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(DiffViewerActivity.this,
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(DiffViewerActivity.this,
                     R.layout.popup_menu_item, populateChoices(isOwnComment(id)));
             setAdapter(adapter);
             setContentWidth(measureContentWidth(adapter));

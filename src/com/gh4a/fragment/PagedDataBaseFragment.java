@@ -15,12 +15,10 @@
  */
 package com.gh4a.fragment;
 
-import android.annotation.SuppressLint;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -99,7 +97,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
 
     @Override
     public Loader<Collection<T>> onCreateLoader(int id, Bundle args) {
-        return new PageIteratorLoader<T>(getActivity(), onCreateIterator());
+        return new PageIteratorLoader<>(getActivity(), onCreateIterator());
     }
 
     @Override

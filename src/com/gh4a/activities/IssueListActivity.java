@@ -194,7 +194,7 @@ public class IssueListActivity extends IssueListBaseActivity {
 
     @Override
     protected Fragment getFragment(int position) {
-        Map<String, String> filterData = new HashMap<String, String>();
+        Map<String, String> filterData = new HashMap<>();
         filterData.put("sort", mSortMode);
         filterData.put("direction", mSortAscending ? "asc" : "desc");
         if (mSelectedLabels != null) {
@@ -230,7 +230,7 @@ public class IssueListActivity extends IssueListBaseActivity {
 
     @Override
     protected ListAdapter getNavigationDrawerAdapter() {
-        mDrawerItems = new ArrayList<DrawerAdapter.Item>(DRAWER_ITEMS);
+        mDrawerItems = new ArrayList<>(DRAWER_ITEMS);
         mDrawerItems.addAll(FILTER_DRAWER_ITEMS);
         if (mIsCollaborator != null && mIsCollaborator) {
             mDrawerItems.addAll(COLLAB_DRAWER_ITEMS);
@@ -271,7 +271,7 @@ public class IssueListActivity extends IssueListBaseActivity {
         DialogInterface.OnClickListener okCb = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int whichButton) {
-                mSelectedLabels = new ArrayList<String>();
+                mSelectedLabels = new ArrayList<>();
                 for (int i = 0; i < allLabelArray.length; i++) {
                     if (checkedItems[i]) {
                         mSelectedLabels.add(allLabelArray[i]);

@@ -4,9 +4,7 @@ import android.content.Context;
 
 import com.gh4a.Gh4Application;
 
-import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.GistService;
-import org.eclipse.egit.github.core.service.StarService;
 
 import java.io.IOException;
 

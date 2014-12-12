@@ -36,7 +36,7 @@ public class AvatarHandler {
 
     private static Bitmap sDefaultAvatarBitmap;
     private static final SparseArrayCompat<Bitmap> sCache =
-            new SparseArrayCompat<Bitmap>(MAX_CACHE_SIZE);
+            new SparseArrayCompat<>(MAX_CACHE_SIZE);
     private static int sNextRequestId = 1;
 
     private static class Request {
@@ -44,7 +44,7 @@ public class AvatarHandler {
         String url;
         ArrayList<ImageView> views;
     }
-    private static final SparseArrayCompat<Request> sRequests = new SparseArrayCompat<Request>();
+    private static final SparseArrayCompat<Request> sRequests = new SparseArrayCompat<>();
     private static int sMaxImageSizePx = -1;
 
     private static final int MSG_LOAD = 1;
@@ -129,7 +129,7 @@ public class AvatarHandler {
         request = new Request();
         request.id = userId;
         request.url = makeUrl(url, userId);
-        request.views = new ArrayList<ImageView>();
+        request.views = new ArrayList<>();
         request.views.add(view);
         sRequests.put(requestId, request);
 

@@ -162,7 +162,7 @@ public class IntentUtils {
         final PackageManager pm = context.getPackageManager();
         final List<ResolveInfo> activities = pm.queryIntentActivities(browserIntent,
                 PackageManager.MATCH_DEFAULT_ONLY);
-        final ArrayList<Intent> chooserIntents = new ArrayList<Intent>();
+        final ArrayList<Intent> chooserIntents = new ArrayList<>();
         final String ourPackageName = context.getPackageName();
 
         Collections.sort(activities, new ResolveInfo.DisplayNameComparator(pm));

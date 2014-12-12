@@ -96,7 +96,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         mClient = new DefaultClient();
         mClient.setOAuth2Token(getAuthToken());
 
-        mServices = new HashMap<String, GitHubService>();
+        mServices = new HashMap<>();
         mServices.put(STAR_SERVICE, new StarService(mClient));
         mServices.put(WATCHER_SERVICE, new WatcherService(mClient));
         mServices.put(LABEL_SERVICE, new LabelService(mClient));

@@ -73,7 +73,7 @@ public class IssueListMineActivity extends IssueListBaseActivity {
 
     @Override
     protected Fragment getFragment(int position) {
-        Map<String, String> filterData = new HashMap<String, String>();
+        Map<String, String> filterData = new HashMap<>();
         filterData.put("sort", mSortMode);
         filterData.put("order", mSortAscending ? "asc" : "desc");
 
@@ -121,7 +121,7 @@ public class IssueListMineActivity extends IssueListBaseActivity {
 
     @Override
     protected ListAdapter getNavigationDrawerAdapter() {
-        mDrawerItems = new ArrayList<DrawerAdapter.Item>(DRAWER_ITEMS);
+        mDrawerItems = new ArrayList<>(DRAWER_ITEMS);
         mDrawerAdapter = new DrawerAdapter(this, mDrawerItems);
         return mDrawerAdapter;
     }

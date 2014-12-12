@@ -51,7 +51,7 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Issue> {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mFilterData = new HashMap<String, String>();
+        mFilterData = new HashMap<>();
 
         Bundle args = getArguments();
         for (String key : args.keySet()) {
