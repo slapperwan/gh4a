@@ -268,7 +268,8 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
                 statsView.setVisibility(View.GONE);
             }
 
-            if (file.getPatch() != null || FileUtils.isImage(file.getFilename())) {
+            if (file.getPatch() != null ||
+                    (parent != llDeleted && FileUtils.isImage(file.getFilename()))) {
                 fileNameView.setTextColor(highlightColor);
                 fileView.setOnClickListener(this);
                 fileView.setTag(file);
