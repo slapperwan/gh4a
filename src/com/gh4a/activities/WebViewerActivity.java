@@ -92,7 +92,7 @@ public abstract class WebViewerActivity extends BaseActivity {
 
         // We also use the dark CAB for the light theme, so we have to inflate
         // the WebView using a dark theme
-        Context inflateContext = new ContextThemeWrapper(this, R.style.DefaultTheme);
+        Context inflateContext = new ContextThemeWrapper(this, R.style.DarkTheme);
         setContentView(LayoutInflater.from(inflateContext).inflate(R.layout.web_viewer, null));
 
         setContentShown(false);
@@ -112,7 +112,7 @@ public abstract class WebViewerActivity extends BaseActivity {
     }
 
     private void applyDefaultDarkColors(EditText view) {
-        TypedArray a = getTheme().obtainStyledAttributes(R.style.DefaultTheme, new int[] {
+        TypedArray a = getTheme().obtainStyledAttributes(R.style.DarkTheme, new int[] {
             android.R.attr.textColorPrimary, android.R.attr.textColorHint
         });
         view.setTextColor(a.getColor(0, 0));
@@ -187,7 +187,7 @@ public abstract class WebViewerActivity extends BaseActivity {
     }
 
     protected void loadUnthemedHtml(String html) {
-        if (Gh4Application.THEME == R.style.DefaultTheme) {
+        if (Gh4Application.THEME == R.style.DarkTheme) {
             html = "<style type=\"text/css\">" +
                     "body { color: #A3A3A5 !important }" +
                     "a { color: #4183C4 !important }</style><body>" +

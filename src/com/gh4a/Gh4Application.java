@@ -51,7 +51,7 @@ import com.gh4a.fragment.SettingsFragment;
  * The Class Gh4Application.
  */
 public class Gh4Application extends Application implements OnSharedPreferenceChangeListener {
-    public static int THEME = R.style.DefaultTheme;
+    public static int THEME = R.style.LightTheme;
 
     public static String STAR_SERVICE = "github.star";
     public static String WATCHER_SERVICE = "github.watcher";
@@ -86,7 +86,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         super.onCreate();
 
         SharedPreferences prefs = getPrefs();
-        selectTheme(prefs.getInt(SettingsFragment.KEY_THEME, Constants.Theme.DARK));
+        selectTheme(prefs.getInt(SettingsFragment.KEY_THEME, Constants.Theme.LIGHT));
         prefs.registerOnSharedPreferenceChangeListener(this);
 
         Crashlytics.start(this);
@@ -122,7 +122,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     private void selectTheme(int theme) {
         switch (theme) {
             case Constants.Theme.DARK:
-                THEME = R.style.DefaultTheme;
+                THEME = R.style.DarkTheme;
                 break;
             case Constants.Theme.LIGHT:
             case Constants.Theme.LIGHTDARK: /* backwards compat with old settings */
@@ -183,7 +183,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         if (key.equals(Constants.User.AUTH_TOKEN)) {
             mClient.setOAuth2Token(getAuthToken());
         } else if (key.equals(SettingsFragment.KEY_THEME)) {
-            selectTheme(sharedPreferences.getInt(key, Constants.Theme.DARK));
+            selectTheme(sharedPreferences.getInt(key, Constants.Theme.LIGHT));
         }
     }
 }
