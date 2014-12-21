@@ -98,7 +98,7 @@
 
                     <LinearLayout
                         android:id="@+id/cell_org_members"
-                        style="@style/SelectableItem"
+                        style="@style/SelectableBorderlessItem"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -122,7 +122,7 @@
 
                     <LinearLayout
                         android:id="@+id/cell_followers"
-                        style="@style/SelectableItem"
+                        style="@style/SelectableBorderlessItem"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -146,7 +146,7 @@
 
                     <LinearLayout
                         android:id="@+id/cell_following"
-                        style="@style/SelectableItem"
+                        style="@style/SelectableBorderlessItem"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -169,7 +169,7 @@
 
                     <LinearLayout
                         android:id="@+id/cell_repos"
-                        style="@style/SelectableItem"
+                        style="@style/SelectableBorderlessItem"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -192,7 +192,7 @@
 
                     <LinearLayout
                         android:id="@+id/cell_gists"
-                        style="@style/SelectableItem"
+                        style="@style/SelectableBorderlessItem"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"

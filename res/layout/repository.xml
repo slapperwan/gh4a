@@ -28,7 +28,6 @@
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_parent"
-                    style="@style/SelectableItem"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/tv_repo_name"
@@ -72,7 +71,7 @@
 
                     <LinearLayout
                         android:id="@+id/cell_issues"
-                        style="@style/SelectableItem"
+                        style="@style/SelectableBorderlessItem"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -95,7 +94,7 @@
 
                     <LinearLayout
                         android:id="@+id/cell_stargazers"
-                        style="@style/SelectableItem"
+                        style="@style/SelectableBorderlessItem"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -118,7 +117,7 @@
 
                     <LinearLayout
                         android:id="@+id/cell_forks"
-                        style="@style/SelectableItem"
+                        style="@style/SelectableBorderlessItem"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -141,7 +140,7 @@
 
                     <LinearLayout
                         android:id="@+id/cell_pull_requests"
-                        style="@style/SelectableItem"
+                        style="@style/SelectableBorderlessItem"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
