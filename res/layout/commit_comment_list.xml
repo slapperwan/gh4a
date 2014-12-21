@@ -43,7 +43,7 @@
             android:layout_height="40dp"
             android:layout_gravity="bottom"
             android:src="?attr/sendIcon"
-            style="@style/SelectableItem"
+            style="@style/SelectableBorderlessItem"
             android:scaleType="centerInside" />
 
     </LinearLayout>

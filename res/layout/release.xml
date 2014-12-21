@@ -48,7 +48,6 @@
                     android:layout_marginTop="@dimen/overview_header_spacing"
                     android:textColor="?attr/colorPrimaryDark"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    style="@style/SelectableItem"
                     android:layout_toRightOf="@id/iv_gravatar"
                     android:layout_below="@id/tv_releasetype" />
 

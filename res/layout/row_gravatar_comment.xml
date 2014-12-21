@@ -20,7 +20,7 @@
         android:layout_marginRight="-8dp"
         android:layout_alignParentRight="true"
         android:src="?attr/contentEditIcon"
-        style="@style/SelectableItem" />
+        style="@style/SelectableBorderlessItem" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_extra"
