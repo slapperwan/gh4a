@@ -25,4 +25,8 @@
         android:key="about"
         android:title="@string/about" />
 
+    <Preference
+        android:key="open_source_components"
+        android:title="@string/open_source_components" />
+
 </PreferenceScreen>
