@@ -26,6 +26,7 @@ import org.eclipse.egit.github.core.service.OAuthService;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
@@ -52,6 +53,8 @@ import com.gh4a.utils.UiUtils;
  * The Github4Android activity.
  */
 public class Github4AndroidActivity extends BaseActivity {
+    private static final int REQUEST_SETTINGS = 10000;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,11 +77,41 @@ public class Github4AndroidActivity extends BaseActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.login) {
-            doLogin();
-            return true;
+        switch (item.getItemId()) {
+            case R.id.login:
+                doLogin();
+                return true;
+            case R.id.bookmarks:
+                startActivity(new Intent(this, BookmarkListActivity.class));
+                return true;
+            case R.id.search:
+                startActivity(new Intent(this, SearchActivity.class));
+                return true;
+            case R.id.blog:
+                startActivity(new Intent(this, BlogListActivity.class));
+                return true;
+            case R.id.trending:
+                startActivity(new Intent(this, TrendingActivity.class));
+                return true;
+            case R.id.settings:
+                startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
+                return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_SETTINGS) {
+            if (data.getBooleanExtra(SettingsActivity.RESULT_EXTRA_THEME_CHANGED, false)) {
+                Intent intent = new Intent(getIntent());
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     private void doLogin() {

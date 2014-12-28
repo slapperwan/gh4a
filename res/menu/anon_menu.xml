@@ -4,12 +4,14 @@
     <item android:id="@+id/login"
         android:title="@string/login"
         app:showAsAction="always" />
-    <item android:id="@+id/explore"
-        android:title="@string/explore" />
     <item android:id="@+id/bookmarks"
         android:title="@string/bookmarks" />
     <item android:id="@+id/search"
         android:title="@string/search" />
+    <item android:id="@+id/blog"
+        android:title="@string/blog" />
+    <item android:id="@+id/trending"
+        android:title="@string/trend" />
     <item android:id="@+id/settings"
         android:title="@string/settings" />
 </menu>
