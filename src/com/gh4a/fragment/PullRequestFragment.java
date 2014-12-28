@@ -63,7 +63,7 @@ import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> implements
-        IssueEventAdapter.OnEditComment, View.OnClickListener {
+        IssueEventAdapter.OnEditComment, CommentBoxFragment.Callback {
     private static final int REQUEST_EDIT = 1000;
 
     private TextView mDescriptionView;
@@ -152,7 +152,6 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         listContainer.addView(listContent);
 
         updateCommentSectionVisibility(v);
-        v.findViewById(R.id.iv_comment).setOnClickListener(this);
 
         return v;
     }
@@ -231,8 +230,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
         int commentVisibility = mListShown && Gh4Application.get(getActivity()).isAuthorized()
                 ? View.VISIBLE : View.GONE;
-        v.findViewById(R.id.comment).setVisibility(commentVisibility);
-        v.findViewById(R.id.divider).setVisibility(commentVisibility);
+        v.findViewById(R.id.comment_box).setVisibility(commentVisibility);
     }
 
     private void fillData() {
@@ -264,19 +262,6 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
                 })
                 .setNegativeButton(getString(R.string.cancel), null)
                 .show();
-    }
-
-    @Override
-    public void onClick(View v) {
-        int id = v.getId();
-        if (id == R.id.iv_comment) {
-            EditText etComment = (EditText) getView().findViewById(R.id.et_comment);
-            String text = etComment.getText() == null ? null : etComment.getText().toString();
-            if (!StringUtils.isBlank(text)) {
-                new CommentIssueTask(text).execute();
-            }
-            UiUtils.hideImeForView(getActivity().getCurrentFocus());
-        }
     }
 
     @Override
@@ -312,42 +297,27 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         startActivityForResult(intent, REQUEST_EDIT);
     }
 
-    public void refreshComments() {
-        // no need to refresh pull request and collaborator status in that case
+    @Override
+    public int getCommentEditorHintResId() {
+        return R.string.pull_request_comment_hint;
+    }
+
+    @Override
+    public void onSendCommentInBackground(String comment) throws IOException {
+        IssueService issueService = (IssueService)
+                Gh4Application.get(getActivity()).getService(Gh4Application.ISSUE_SERVICE);
+        issueService.createComment(mRepoOwner, mRepoName, mPullRequest.getNumber(), comment);
+    }
+
+    @Override
+    public void onCommentSent() {
+        // reload comments
         super.refresh();
     }
 
-    private class CommentIssueTask extends ProgressDialogTask<Void> {
-        private String mText;
-
-        public CommentIssueTask(String text) {
-            super(getActivity(), 0, R.string.loading_msg);
-            mText = text;
-        }
-
-        @Override
-        protected Void run() throws IOException {
-            IssueService issueService = (IssueService)
-                    Gh4Application.get(getActivity()).getService(Gh4Application.ISSUE_SERVICE);
-            issueService.createComment(mRepoOwner, mRepoName, mPullRequest.getNumber(), mText);
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            ToastUtils.showMessage(mContext, R.string.issue_success_comment);
-            // reload comments
-            PullRequestFragment.super.refresh();
-
-            EditText etComment = (EditText) getView().findViewById(R.id.et_comment);
-            etComment.setText(null);
-            etComment.clearFocus();
-        }
-
-        @Override
-        protected void onError(Exception e) {
-            ToastUtils.showMessage(mContext, R.string.issue_error_comment);
-        }
+    public void refreshComments() {
+        // no need to refresh pull request and collaborator status in that case
+        super.refresh();
     }
 
     private class PullRequestOpenCloseTask extends ProgressDialogTask<PullRequest> {

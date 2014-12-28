@@ -37,7 +37,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -49,6 +48,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.adapter.IssueEventAdapter;
+import com.gh4a.fragment.CommentBoxFragment;
 import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.IssueCommentListLoader;
 import com.gh4a.loader.IssueEventHolder;
@@ -67,7 +67,7 @@ import com.shamanland.fab.FloatingActionButton;
 
 public class IssueActivity extends BaseActivity implements
         View.OnClickListener, IssueEventAdapter.OnEditComment,
-        SwipeRefreshLayout.ChildScrollDelegate {
+        SwipeRefreshLayout.ChildScrollDelegate, CommentBoxFragment.Callback {
     private static final int REQUEST_EDIT = 1000;
     private static final int REQUEST_EDIT_ISSUE = 1001;
 
@@ -163,11 +163,6 @@ public class IssueActivity extends BaseActivity implements
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        if (!Gh4Application.get(this).isAuthorized()) {
-            findViewById(R.id.comment).setVisibility(View.GONE);
-            findViewById(R.id.divider).setVisibility(View.GONE);
-        }
-
         mListView = (ListView) findViewById(android.R.id.list);
 
         LinearLayout header = (LinearLayout) findViewById(R.id.header);
@@ -187,8 +182,7 @@ public class IssueActivity extends BaseActivity implements
         setChildScrollDelegate(this);
 
         if (!Gh4Application.get(this).isAuthorized()) {
-            findViewById(R.id.comment).setVisibility(View.GONE);
-            findViewById(R.id.divider).setVisibility(View.GONE);
+            findViewById(R.id.comment_box).setVisibility(View.GONE);
         }
 
         mEditFab = (FloatingActionButton) inflater.inflate(R.layout.issue_edit_fab, null);
@@ -246,8 +240,6 @@ public class IssueActivity extends BaseActivity implements
             imageGetter.bind(mDescriptionView, body, mIssue.getNumber());
         }
         mDescriptionView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
-
-        findViewById(R.id.iv_comment).setOnClickListener(this);
 
         TextView tvMilestone = (TextView) mHeader.findViewById(R.id.tv_milestone);
         if (mIssue.getMilestone() != null) {
@@ -416,14 +408,6 @@ public class IssueActivity extends BaseActivity implements
         case R.id.iv_assignee:
             intent = IntentUtils.getUserActivityIntent(this, mIssue.getAssignee());
             break;
-        case R.id.iv_comment:
-            EditText etComment = (EditText) findViewById(R.id.et_comment);
-            String comment = etComment.getText() == null ? null : etComment.getText().toString();
-            if (!StringUtils.isBlank(comment)) {
-                new CommentIssueTask(comment).execute();
-            }
-            UiUtils.hideImeForView(getCurrentFocus());
-            break;
         case R.id.tv_pull:
             intent = IntentUtils.getPullRequestActivityIntent(this,
                     mRepoOwner, mRepoName, mIssueNumber);
@@ -460,6 +444,25 @@ public class IssueActivity extends BaseActivity implements
         intent.putExtra(Constants.Comment.ID, comment.getId());
         intent.putExtra(Constants.Comment.BODY, comment.getBody());
         startActivityForResult(intent, REQUEST_EDIT);
+    }
+
+    @Override
+    public int getCommentEditorHintResId() {
+        return R.string.issue_comment_hint;
+    }
+
+    @Override
+    public void onSendCommentInBackground(String comment) throws IOException {
+        IssueService issueService = (IssueService)
+                Gh4Application.get(this).getService(Gh4Application.ISSUE_SERVICE);
+        issueService.createComment(mRepoOwner, mRepoName, mIssueNumber, comment);
+    }
+
+    @Override
+    public void onCommentSent() {
+        //reload comments
+        getSupportLoaderManager().getLoader(2).onContentChanged();
+        setResult(RESULT_OK);
     }
 
     private class IssueOpenCloseTask extends ProgressDialogTask<Issue> {
@@ -499,40 +502,6 @@ public class IssueActivity extends BaseActivity implements
         @Override
         protected void onError(Exception e) {
             ToastUtils.showMessage(mContext, R.string.issue_error_close);
-        }
-    }
-
-    private class CommentIssueTask extends ProgressDialogTask<Void> {
-        private String mComment;
-
-        public CommentIssueTask(String comment) {
-            super(IssueActivity.this, 0, R.string.loading_msg);
-            mComment = comment;
-        }
-
-        @Override
-        protected Void run() throws IOException {
-            IssueService issueService = (IssueService)
-                    Gh4Application.get(mContext).getService(Gh4Application.ISSUE_SERVICE);
-            issueService.createComment(mRepoOwner, mRepoName, mIssueNumber, mComment);
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            ToastUtils.showMessage(mContext, R.string.issue_success_comment);
-            //reload comments
-            getSupportLoaderManager().getLoader(2).onContentChanged();
-            setResult(RESULT_OK);
-
-            EditText etComment = (EditText) findViewById(R.id.et_comment);
-            etComment.setText(null);
-            etComment.clearFocus();
-        }
-
-        @Override
-        protected void onError(Exception e) {
-            ToastUtils.showMessage(mContext, R.string.issue_error_comment);
         }
     }
 }

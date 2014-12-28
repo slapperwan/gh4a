@@ -14,24 +14,19 @@ import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
-import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.activities.EditCommitCommentActivity;
 import com.gh4a.adapter.CommitNoteAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.ToastUtils;
-import com.gh4a.utils.UiUtils;
 
 public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> implements
-        View.OnClickListener, CommitNoteAdapter.OnEditComment {
+        CommitNoteAdapter.OnEditComment, CommentBoxFragment.Callback {
     private static final int REQUEST_EDIT = 1000;
 
     private String mRepoOwner;
@@ -66,11 +61,8 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         listContainer.addView(listContent);
 
         if (!Gh4Application.get(getActivity()).isAuthorized()) {
-            v.findViewById(R.id.comment).setVisibility(View.GONE);
-            v.findViewById(R.id.divider).setVisibility(View.GONE);
+            v.findViewById(R.id.comment_box).setVisibility(View.GONE);
         }
-
-        v.findViewById(R.id.iv_comment).setOnClickListener(this);
 
         return v;
     }
@@ -107,17 +99,6 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     }
 
     @Override
-    public void onClick(View v) {
-        EditText etComment = (EditText) getView().findViewById(R.id.et_comment);
-        String text = etComment.getText() == null ? null : etComment.getText().toString();
-
-        if (!StringUtils.isBlank(text)) {
-            new CommentCommitTask(text).execute();
-        }
-        UiUtils.hideImeForView(getActivity().getCurrentFocus());
-    }
-
-    @Override
     public void editComment(CommitComment comment) {
         Intent intent = new Intent(getActivity(), EditCommitCommentActivity.class);
 
@@ -128,35 +109,22 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         startActivityForResult(intent, REQUEST_EDIT);
     }
 
-    private class CommentCommitTask extends ProgressDialogTask<Void> {
-        private String mText;
+    @Override
+    public int getCommentEditorHintResId() {
+        return R.string.commit_comment_hint;
+    }
 
-        public CommentCommitTask(String text) {
-            super(getActivity(), 0, R.string.loading_msg);
-            mText = text;
-        }
+    @Override
+    public void onSendCommentInBackground(String comment) throws IOException {
+        CommitService commitService = (CommitService)
+                Gh4Application.get(getActivity()).getService(Gh4Application.COMMIT_SERVICE);
+        CommitComment commitComment = new CommitComment();
+        commitComment.setBody(comment);
+        commitService.addComment(new RepositoryId(mRepoOwner, mRepoName), mObjectSha, commitComment);
+    }
 
-        @Override
-        protected Void run() throws IOException {
-            CommitService commitService = (CommitService) Gh4Application.get(mContext).getService(
-                    Gh4Application.COMMIT_SERVICE);
-            CommitComment commitComment = new CommitComment();
-            commitComment.setBody(mText);
-            commitService.addComment(new RepositoryId(mRepoOwner, mRepoName), mObjectSha, commitComment);
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            refresh();
-            EditText etComment = (EditText) getView().findViewById(R.id.et_comment);
-            etComment.setText(null);
-            etComment.clearFocus();
-        }
-
-        @Override
-        protected void onError(Exception e) {
-            ToastUtils.showMessage(mContext, R.string.issue_error_comment);
-        }
+    @Override
+    public void onCommentSent() {
+        refresh();
     }
 }
