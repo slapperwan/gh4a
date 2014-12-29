@@ -17,6 +17,7 @@ package com.gh4a.activities;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.egit.github.core.Authorization;
@@ -31,12 +32,14 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.support.v4.os.AsyncTaskCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.Toast;
 
 import com.gh4a.BaseActivity;
@@ -46,6 +49,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.TwoFactorAuthException;
+import com.gh4a.adapter.DrawerAdapter;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
@@ -55,6 +59,26 @@ import com.gh4a.utils.UiUtils;
  */
 public class Github4AndroidActivity extends BaseActivity {
     private static final int REQUEST_SETTINGS = 10000;
+
+    private static final int ITEM_SEARCH = 1;
+    private static final int ITEM_BOOKMARKS = 2;
+    private static final int ITEM_SETTINGS = 3;
+    private static final int ITEM_TIMELINE = 4;
+    private static final int ITEM_TRENDING = 5;
+    private static final int ITEM_BLOG = 6;
+
+    private static final List<DrawerAdapter.Item> DRAWER_ITEMS = Arrays.asList(
+        new DrawerAdapter.SectionHeaderItem(R.string.navigation),
+        new DrawerAdapter.EntryItem(R.string.search, 0, ITEM_SEARCH),
+        new DrawerAdapter.EntryItem(R.string.bookmarks, 0, ITEM_BOOKMARKS),
+        new DrawerAdapter.DividerItem(),
+        new DrawerAdapter.SectionHeaderItem(R.string.explore),
+        new DrawerAdapter.EntryItem(R.string.pub_timeline, 0, ITEM_TIMELINE),
+        new DrawerAdapter.EntryItem(R.string.trend, 0, ITEM_TRENDING),
+        new DrawerAdapter.EntryItem(R.string.blog, 0, ITEM_BLOG),
+        new DrawerAdapter.DividerItem(),
+        new DrawerAdapter.EntryItem(R.string.settings, 0, ITEM_SETTINGS)
+    );
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,32 +94,48 @@ public class Github4AndroidActivity extends BaseActivity {
     }
 
     @Override
+    protected ListAdapter getNavigationDrawerAdapter() {
+        return new DrawerAdapter(this, DRAWER_ITEMS);
+    }
+
+    @Override
+    protected boolean onDrawerItemSelected(int position) {
+        switch (DRAWER_ITEMS.get(position).getId()) {
+            case ITEM_SETTINGS:
+                startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
+                return true;
+            case ITEM_SEARCH:
+                startActivity(new Intent(this, SearchActivity.class));
+                return true;
+            case ITEM_BOOKMARKS:
+                startActivity(new Intent(this, BookmarkListActivity.class));
+                return true;
+            case ITEM_TIMELINE:
+                startActivity(new Intent(this, TimelineActivity.class));
+                return true;
+            case ITEM_BLOG:
+                startActivity(new Intent(this, BlogListActivity.class));
+                return true;
+            case ITEM_TRENDING:
+                startActivity(new Intent(this, TrendingActivity.class));
+                return true;
+        }
+        return super.onDrawerItemSelected(position);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.anon_menu, menu);
+        MenuItem item = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.login);
+        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.login:
+            case Menu.FIRST:
                 doLogin();
-                return true;
-            case R.id.bookmarks:
-                startActivity(new Intent(this, BookmarkListActivity.class));
-                return true;
-            case R.id.search:
-                startActivity(new Intent(this, SearchActivity.class));
-                return true;
-            case R.id.blog:
-                startActivity(new Intent(this, BlogListActivity.class));
-                return true;
-            case R.id.trending:
-                startActivity(new Intent(this, TrendingActivity.class));
-                return true;
-            case R.id.settings:
-                startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
                 return true;
         }
         return super.onOptionsItemSelected(item);
