@@ -36,6 +36,7 @@ public class BookmarkListActivity extends BaseActivity implements
 
         setContentView(R.layout.generic_list);
         setContentShown(false);
+        setEmptyText(R.string.no_bookmarks);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.bookmarks);
@@ -96,10 +97,12 @@ public class BookmarkListActivity extends BaseActivity implements
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mAdapter.swapCursor(data);
         setContentShown(true);
+        setContentEmpty(data.getCount() == 0);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.swapCursor(null);
+        setContentEmpty(true);
     }
 }
