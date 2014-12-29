@@ -16,6 +16,7 @@
         android:label="@string/app_name">
         <activity
             android:name=".activities.Github4AndroidActivity"
+            android:windowSoftInputMode="adjustResize"
             android:configChanges="orientation|screenSize" >
             <intent-filter>
                 <action
