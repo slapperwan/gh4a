@@ -23,6 +23,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -226,7 +227,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         } else {
             mEditIssue.setTitle(title);
             mEditIssue.setBody(mDescView.getText().toString());
-            new SaveIssueTask(mEditIssue).execute();
+            AsyncTaskCompat.executeParallel(new SaveIssueTask(mEditIssue));
         }
     }
 

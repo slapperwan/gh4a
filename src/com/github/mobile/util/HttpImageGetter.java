@@ -23,6 +23,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.support.v4.os.AsyncTaskCompat;
 import android.text.Html.ImageGetter;
 import android.text.TextUtils;
 import android.view.WindowManager;
@@ -187,7 +188,7 @@ public class HttpImageGetter implements ImageGetter {
         show(view, encoded);
         view.setTag(id);
         ImageGetterAsyncTask asyncTask = new ImageGetterAsyncTask();
-        asyncTask.execute(html, id, view);
+        AsyncTaskCompat.executeParallel(asyncTask, html, id, view);
         return this;
     }
 

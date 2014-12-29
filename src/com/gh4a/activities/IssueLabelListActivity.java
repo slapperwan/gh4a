@@ -20,6 +20,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
@@ -228,9 +229,11 @@ public class IssueLabelListActivity extends BaseActivity implements
             switch (item.getItemId()) {
             case Menu.FIRST:
                 if (mLabel == mAddedLabel) {
-                    new AddIssueLabelTask(mLabel.editedName, mLabel.editedColor).execute();
+                    AsyncTaskCompat.executeParallel(new AddIssueLabelTask(
+                            mLabel.editedName, mLabel.editedColor));
                 } else {
-                    new EditIssueLabelTask(mLabel.getName(), mLabel.editedName, mLabel.editedColor).execute();
+                    AsyncTaskCompat.executeParallel(new EditIssueLabelTask(
+                            mLabel.getName(), mLabel.editedName, mLabel.editedColor));
                 }
                 break;
             case Menu.FIRST + 1:
@@ -240,7 +243,8 @@ public class IssueLabelListActivity extends BaseActivity implements
                         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                new DeleteIssueLabelTask(mLabel.getName()).execute();
+                                AsyncTaskCompat.executeParallel(new DeleteIssueLabelTask(
+                                        mLabel.getName()));
                             }
                         })
                         .setNegativeButton(R.string.cancel, null)

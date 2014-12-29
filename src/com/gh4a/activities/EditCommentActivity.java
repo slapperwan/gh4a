@@ -3,6 +3,7 @@ package com.gh4a.activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -63,7 +64,7 @@ public abstract class EditCommentActivity extends BaseActivity {
             case R.id.accept:
                 String text = mEditText.getText().toString();
                 if (!StringUtils.isBlank(text)) {
-                    new EditCommentTask(mCommentId, text).execute();
+                    AsyncTaskCompat.executeParallel(new EditCommentTask(mCommentId, text));
                 }
                 return true;
             case R.id.delete:
@@ -72,7 +73,7 @@ public abstract class EditCommentActivity extends BaseActivity {
                         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                new DeleteCommentTask(mCommentId).execute();
+                                AsyncTaskCompat.executeParallel(new DeleteCommentTask(mCommentId));
                             }
                         })
                         .setNegativeButton(R.string.cancel, null)

@@ -30,6 +30,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -347,7 +348,7 @@ public class IssueActivity extends BaseActivity implements
             case R.id.issue_close:
             case R.id.issue_reopen:
                 if (checkForAuthOrExit()) {
-                    new IssueOpenCloseTask(itemId == R.id.issue_reopen).execute();
+                    AsyncTaskCompat.executeParallel(new IssueOpenCloseTask(itemId == R.id.issue_reopen));
                 }
                 return true;
             case R.id.share:

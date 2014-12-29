@@ -25,6 +25,7 @@ import org.eclipse.egit.github.core.service.GistService;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
@@ -195,7 +196,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
             case R.id.star:
                 MenuItemCompat.setActionView(item, R.layout.ab_loading);
                 MenuItemCompat.expandActionView(item);
-                new UpdateStarTask().execute();
+                AsyncTaskCompat.executeParallel(new UpdateStarTask());
                 return true;
         }
         return super.onOptionsItemSelected(item);

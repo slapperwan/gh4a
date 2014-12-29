@@ -27,6 +27,7 @@ import org.eclipse.egit.github.core.service.UserService;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
 import android.view.ContextMenu;
@@ -146,13 +147,13 @@ public class SearchActivity extends BaseActivity implements
     protected void searchRepository(final String searchKey) {
         mRepoAdapter = new RepositoryAdapter(this);
         mListViewResults.setAdapter(mRepoAdapter);
-        new LoadRepositoryTask(searchKey).execute();
+        AsyncTaskCompat.executeParallel(new LoadRepositoryTask(searchKey));
     }
 
     protected void searchUser(final String searchKey) {
         mUserAdapter = new SearchUserAdapter(this);
         mListViewResults.setAdapter(mUserAdapter);
-        new LoadUserTask(searchKey).execute();
+        AsyncTaskCompat.executeParallel(new LoadUserTask(searchKey));
     }
 
     private static class SearchTypeAdapter extends BaseAdapter implements SpinnerAdapter {

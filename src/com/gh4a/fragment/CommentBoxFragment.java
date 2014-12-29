@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
+import android.support.v4.os.AsyncTaskCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -65,7 +66,7 @@ public class CommentBoxFragment extends Fragment implements View.OnClickListener
     @Override
     public void onClick(View view) {
         Editable comment = mCommentEditor.getText();
-        new CommentTask(comment.toString()).execute();
+        AsyncTaskCompat.executeParallel(new CommentTask(comment.toString()));
         UiUtils.hideImeForView(getActivity().getCurrentFocus());
     }
 

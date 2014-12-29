@@ -33,6 +33,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v4.os.AsyncTaskCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -193,7 +194,8 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
                 break;
             case R.id.pull_close:
             case R.id.pull_reopen:
-                new PullRequestOpenCloseTask(item.getItemId() == R.id.pull_reopen).execute();
+                AsyncTaskCompat.executeParallel(
+                        new PullRequestOpenCloseTask(item.getItemId() == R.id.pull_reopen));
                 break;
             case R.id.share:
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
@@ -257,7 +259,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String text = editor.getText() == null ? null : editor.getText().toString();
-                        new PullRequestMergeTask(text).execute();
+                        AsyncTaskCompat.executeParallel(new PullRequestMergeTask(text));
                     }
                 })
                 .setNegativeButton(getString(R.string.cancel), null)

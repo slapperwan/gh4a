@@ -30,6 +30,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.support.v4.os.AsyncTaskCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -125,7 +126,7 @@ public class Github4AndroidActivity extends BaseActivity {
         String password = passwordView.getText().toString();
 
         if (!StringUtils.checkEmail(username)) {
-            new LoginTask(username, password).execute();
+            AsyncTaskCompat.executeParallel(new LoginTask(username, password));
         } else {
             Toast.makeText(Github4AndroidActivity.this,
                     getString(R.string.enter_username_toast), Toast.LENGTH_LONG).show();
@@ -192,7 +193,7 @@ public class Github4AndroidActivity extends BaseActivity {
         protected void onError(Exception e) {
             if (e instanceof TwoFactorAuthException) {
                 if ("sms".equals(((TwoFactorAuthException) e).getTwoFactorAuthType())) {
-                    new DummyPostTask(mUserName, mPassword).execute();
+                    AsyncTaskCompat.executeParallel(new DummyPostTask(mUserName, mPassword));
                 } else {
                     open2FADialog(mUserName, mPassword);
                 }
@@ -267,7 +268,9 @@ public class Github4AndroidActivity extends BaseActivity {
                 .setPositiveButton(R.string.verify, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        new LoginTask(username, password, authCode.getText().toString()).execute();
+                        LoginTask task = new LoginTask(username,
+                                password, authCode.getText().toString());
+                        AsyncTaskCompat.executeParallel(task);
                     }
                 })
                 .setNegativeButton(R.string.cancel, null)

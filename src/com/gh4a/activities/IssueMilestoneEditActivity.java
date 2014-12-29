@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -160,7 +161,7 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
 
             mMilestone.setTitle(title);
             mMilestone.setDescription(desc);
-            new SaveIssueMilestoneTask(mMilestone).execute();
+            AsyncTaskCompat.executeParallel(new SaveIssueMilestoneTask(mMilestone));
         }
     }
 
@@ -175,7 +176,8 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
                         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                new DeleteIssueMilestoneTask(mMilestone.getNumber()).execute();
+                                AsyncTaskCompat.executeParallel(
+                                        new DeleteIssueMilestoneTask(mMilestone.getNumber()));
                             }
                         })
                         .setNegativeButton(R.string.cancel, null)

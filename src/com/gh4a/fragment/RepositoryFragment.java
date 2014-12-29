@@ -21,6 +21,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.Loader;
+import android.support.v4.os.AsyncTaskCompat;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
@@ -68,7 +69,8 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         public void onResultReady(LoaderResult<String> result) {
             TextView readmeView = (TextView) mContentView.findViewById(R.id.readme);
             View progress = mContentView.findViewById(R.id.pb_readme);
-            new FillReadmeTask(mRepository.getId(), readmeView, progress).execute(result.getData());
+            AsyncTaskCompat.executeParallel(new FillReadmeTask(
+                    mRepository.getId(), readmeView, progress), result.getData());
         }
     };
 

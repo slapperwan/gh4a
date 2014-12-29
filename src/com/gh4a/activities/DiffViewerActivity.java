@@ -23,6 +23,7 @@ import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.util.LongSparseArray;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
@@ -263,7 +264,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             public void onClick(DialogInterface dialog, int which) {
                 String text = body.getText().toString();
                 if (!StringUtils.isBlank(text)) {
-                    new CommentTask(id, text, position).execute();
+                    AsyncTaskCompat.executeParallel(new CommentTask(id, text, position));
                 } else {
                     ToastUtils.showMessage(DiffViewerActivity.this, R.string.commit_comment_error_body);
                 }
@@ -356,7 +357,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                new DeleteCommentTask(mId).execute();
+                                AsyncTaskCompat.executeParallel(new DeleteCommentTask(mId));
                             }
                         })
                         .setNegativeButton(R.string.cancel, null)
