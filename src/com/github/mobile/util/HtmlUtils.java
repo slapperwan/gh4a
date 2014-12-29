@@ -197,7 +197,7 @@ public class HtmlUtils {
                 return;
             }
 
-            if (TAG_LI.equalsIgnoreCase(tag) && opening) {
+            if (TAG_LI.equalsIgnoreCase(tag) && opening && indentLevel > 0) {
                 listElements.getFirst().append(output, indentLevel);
                 return;
             }
