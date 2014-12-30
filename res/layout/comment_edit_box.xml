@@ -28,7 +28,7 @@
             android:layout_weight="1"
             android:layout_gravity="center_vertical"
             android:padding="8dp"
-            android:maxLines="4"
+            android:maxLines="@integer/comment_box_max_lines"
             android:inputType="textMultiLine|textCapSentences" />
 
         <ImageView
