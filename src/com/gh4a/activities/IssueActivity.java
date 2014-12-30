@@ -223,6 +223,8 @@ public class IssueActivity extends BaseActivity implements
         tvState.setText(getString(stateTextResId).toUpperCase(Locale.getDefault()));
         transitionHeaderToColor(stateColorAttributeId,
                 closed ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark);
+        UiUtils.trySetListOverscrollColor(mListView,
+                UiUtils.resolveColor(this, stateColorAttributeId));
         mEditFab.setSelected(closed);
 
         TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);

@@ -164,6 +164,11 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
                 getListView(), false);
         getListView().addHeaderView(mDescriptionView, null, true);
 
+        boolean closed = Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState());
+        int stateColor = UiUtils.resolveColor(getActivity(),
+                closed ? R.attr.colorIssueClosed : R.attr.colorIssueOpen);
+        UiUtils.trySetListOverscrollColor(getListView(), stateColor);
+
         super.onActivityCreated(savedInstanceState);
 
         fillData();

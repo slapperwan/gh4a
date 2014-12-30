@@ -1,11 +1,13 @@
 package com.gh4a.utils;
 
 import java.io.File;
+import java.lang.reflect.Field;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
@@ -28,6 +30,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
+import android.widget.EdgeEffect;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class UiUtils {
@@ -63,6 +67,29 @@ public class UiUtils {
             return context.getResources().getColor(R.color.label_fg_dark);
         }
         return context.getResources().getColor(R.color.label_fg_light);
+    }
+
+    public static void trySetListOverscrollColor(ListView view, int color) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            trySetEdgeEffectColor(view, "mEdgeGlowTop", color);
+            trySetEdgeEffectColor(view, "mEdgeGlowBottom", color);
+        }
+    }
+
+    @TargetApi(21)
+    private static void trySetEdgeEffectColor(ListView view, String fieldName, int color) {
+        try {
+            Field effectField = AbsListView.class.getDeclaredField(fieldName);
+            effectField.setAccessible(true);
+            EdgeEffect effect = (EdgeEffect) effectField.get(view);
+            final int alpha = Color.alpha(effect.getColor());
+            effect.setColor(Color.argb(alpha, Color.red(color),
+                    Color.green(color), Color.blue(color)));
+        } catch (NoSuchFieldException e) {
+            // ignored
+        } catch (IllegalAccessException e) {
+            // ignored
+        }
     }
 
     public static boolean canViewScrollUp(View view) {
