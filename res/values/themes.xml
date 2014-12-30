@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="DarkTheme" parent="Theme.AppCompat">
+    <style name="DarkThemeBase" parent="Theme.AppCompat">
         <item name="windowActionBar">false</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="headerTheme">@style/Theme.Header</item>
@@ -29,10 +29,10 @@
         <item name="assigneeIcon">@drawable/assignee_dark</item>
         <item name="labelsIcon">@drawable/labels_dark</item>
         <item name="cardViewTheme">@style/Theme.CardView.Dark</item>
-        <item name="colorAccent">#396426</item>
-        <item name="colorPrimary">#396426</item>
-        <item name="colorPrimaryDark">#2d501e</item>
-        <item name="android:textColorLink">#559639</item>
+        <item name="colorAccent">@color/dark_accent</item>
+        <item name="colorPrimary">@color/dark_accent</item>
+        <item name="colorPrimaryDark">@color/dark_accent_dark</item>
+        <item name="android:textColorLink">@color/dark_link_color</item>
         <item name="actionBarTabStyle">@style/Widget.ActionBar.TabView</item>
         <item name="listBackground">@android:color/transparent</item>
         <item name="drawerBackground">@color/background_floating_material_dark</item>
@@ -46,7 +46,9 @@
         <item name="colorFab">@color/default_fab_dark</item>
     </style>
 
-    <style name="LightTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="DarkTheme" parent="DarkThemeBase" />
+
+    <style name="LightThemeBase" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="headerTheme">@style/Theme.Header.Light</item>
@@ -76,10 +78,10 @@
         <item name="labelsIcon">@drawable/labels</item>
         <item name="listPopupWindowStyle">@style/Widget.AppCompat.Light.ListPopupWindow</item>
         <item name="cardViewTheme">@style/Theme.CardView.Light</item>
-        <item name="colorAccent">#65b345</item>
-        <item name="colorPrimary">#65b345</item>
-        <item name="colorPrimaryDark">#5aa03d</item>
-        <item name="android:textColorLink">#5aa03d</item>
+        <item name="colorAccent">@color/light_accent</item>
+        <item name="colorPrimary">@color/light_accent</item>
+        <item name="colorPrimaryDark">@color/light_accent_dark</item>
+        <item name="android:textColorLink">@color/light_link_color</item>
         <item name="actionBarTabStyle">@style/Widget.ActionBar.TabView</item>
         <item name="listBackground">@android:color/white</item>
         <item name="drawerBackground">@color/background_floating_material_light</item>
@@ -92,6 +94,8 @@
         <item name="colorCommitDeletion">#b34545</item>
         <item name="colorFab">@color/default_fab_light</item>
     </style>
+
+    <style name="LightTheme" parent="LightThemeBase" />
 
     <style name="Theme.Header" parent="Theme.AppCompat">
         <item name="colorAccent">#ffffff</item>

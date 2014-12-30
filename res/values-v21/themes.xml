@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="DarkTheme" parent="DarkThemeBase">
+        <item name="android:alertDialogTheme">@style/DarkAlertDialogTheme</item>
+    </style>
+
+    <style name="DarkAlertDialogTheme" parent="android:Theme.Material.Dialog.Alert">
+        <item name="android:colorPrimary">@color/dark_accent</item>
+        <item name="android:colorAccent">@color/dark_accent</item>
+    </style>
+
+    <style name="LightTheme" parent="LightThemeBase">
+        <item name="android:alertDialogTheme">@style/LightAlertDialogTheme</item>
+    </style>
+
+    <style name="LightAlertDialogTheme" parent="android:Theme.Material.Light.Dialog.Alert">
+        <item name="android:colorPrimary">@color/light_accent</item>
+        <item name="android:colorAccent">@color/light_accent</item>
+    </style>
+</resources>
