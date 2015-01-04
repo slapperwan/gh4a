@@ -92,6 +92,11 @@
         <item name="android:popupBackground">@drawable/abc_popup_background_mtrl_mult</item>
     </style>
 
+    <style name="TextAppearance.Widget.ActionBar.Menu" parent="TextAppearance.AppCompat.Widget.ActionBar.Menu">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="Base.CardView.Light" parent="CardView.Light">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>

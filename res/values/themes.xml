@@ -5,6 +5,7 @@
         <item name="windowActionModeOverlay">true</item>
         <item name="headerTheme">@style/Theme.Header</item>
         <item name="drawerTitleTextAppearance">@style/TextAppearance.AppCompat.Widget.ActionBar.Title</item>
+        <item name="actionMenuTextAppearance">@style/TextAppearance.Widget.ActionBar.Menu</item>
         <item name="sendIcon">@drawable/social_send_dark</item>
         <item name="contentEditIcon">@drawable/content_edit_dark</item>
         <item name="contentPictureIcon">@drawable/content_picture_dark</item>
@@ -55,6 +56,7 @@
         <item name="windowActionModeOverlay">true</item>
         <item name="headerTheme">@style/Theme.Header.Light</item>
         <item name="drawerTitleTextAppearance">@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse</item>
+        <item name="actionMenuTextAppearance">@style/TextAppearance.Widget.ActionBar.Menu</item>
         <item name="sendIcon">@drawable/social_send</item>
         <item name="contentEditIcon">@drawable/content_edit</item>
         <item name="contentPictureIcon">@drawable/content_picture</item>
