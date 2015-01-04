@@ -134,7 +134,6 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
                 menu.removeItem(R.id.pull_merge);
             } else if (mPullRequest.isMerged()) {
                 MenuItem mergeItem = menu.findItem(R.id.pull_merge);
-                mergeItem.setTitle(R.string.pull_request_merged);
                 mergeItem.setEnabled(false);
             } else if (!mPullRequest.isMergeable()) {
                 menu.findItem(R.id.pull_merge).setEnabled(false);
@@ -164,9 +163,15 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
                 getListView(), false);
         getListView().addHeaderView(mDescriptionView, null, true);
 
-        boolean closed = Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState());
-        int stateColor = UiUtils.resolveColor(getActivity(),
-                closed ? R.attr.colorIssueClosed : R.attr.colorIssueOpen);
+        final int stateColor;
+        if (mPullRequest.isMerged()) {
+            stateColor = R.attr.colorPullRequestMerged;
+        } else if (Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState())) {
+            stateColor = R.attr.colorIssueClosed;
+        } else {
+            stateColor = R.attr.colorIssueOpen;
+        }
+
         UiUtils.trySetListOverscrollColor(getListView(), stateColor);
 
         super.onActivityCreated(savedInstanceState);

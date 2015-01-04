@@ -175,13 +175,24 @@ public class PullRequestActivity extends BasePagerActivity implements
         AvatarHandler.assignAvatar(gravatar, user);
 
         TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
-        boolean closed = Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState());
-        int stateTextResId = closed ? R.string.closed : R.string.open;
-        int stateColorAttributeId = closed ? R.attr.colorIssueClosed : R.attr.colorIssueOpen;
+        final int stateTextResId, stateColorAttributeId, statusBarColorAttributeId;
+
+        if (mPullRequest.isMerged()) {
+            stateTextResId = R.string.pull_request_merged;
+            stateColorAttributeId = R.attr.colorPullRequestMerged;
+            statusBarColorAttributeId = R.attr.colorPullRequestMergedDark;
+        } else if (Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState())) {
+            stateTextResId = R.string.closed;
+            stateColorAttributeId = R.attr.colorIssueClosed;
+            statusBarColorAttributeId = R.attr.colorIssueClosedDark;
+        } else {
+            stateTextResId = R.string.open;
+            stateColorAttributeId = R.attr.colorIssueOpen;
+            statusBarColorAttributeId = R.attr.colorIssueOpenDark;
+        }
 
         tvState.setText(getString(stateTextResId).toUpperCase(Locale.getDefault()));
-        transitionHeaderToColor(stateColorAttributeId,
-                closed ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark);
+        transitionHeaderToColor(stateColorAttributeId, statusBarColorAttributeId);
 
         TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
         tvExtra.setText(user.getLogin());

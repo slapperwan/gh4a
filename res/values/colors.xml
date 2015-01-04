@@ -13,15 +13,19 @@
 
     <color name="issue_open_light">#65b345</color>
     <color name="issue_closed_light">#b34545</color>
+    <color name="pr_merged_light">#6945b3</color>
     <color name="issue_open_light_dark">#5ba03d</color>
     <color name="issue_closed_light_dark">#a03d3d</color>
+    <color name="pr_merged_light_dark">#5e3da0</color>
     <color name="issue_open_light_button">#83e658</color>
     <color name="issue_closed_light_button">#e65858</color>
 
     <color name="issue_open_dark">#396426</color>
     <color name="issue_closed_dark">#642626</color>
+    <color name="pr_merged_dark">#3a2664</color>
     <color name="issue_open_dark_dark">#2e501e</color>
     <color name="issue_closed_dark_dark">#501e1e</color>
+    <color name="pr_merged_dark_dark">#2e1e50</color>
     <color name="issue_open_dark_button">#569639</color>
     <color name="issue_closed_dark_button">#963939</color>
 
