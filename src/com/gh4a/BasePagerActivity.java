@@ -9,13 +9,16 @@ import android.support.v7.widget.Toolbar;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SlidingTabLayout;
 import com.gh4a.widget.SwipeRefreshLayout;
 
 public abstract class BasePagerActivity extends BaseActivity implements
-        SwipeRefreshLayout.ChildScrollDelegate {
+        SwipeRefreshLayout.ChildScrollDelegate, ViewPager.OnPageChangeListener {
     private FragmentAdapter mAdapter;
     private ViewPager mPager;
+    private int[][] mTabHeaderColors;
+    private boolean mScrolling;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +29,9 @@ public abstract class BasePagerActivity extends BaseActivity implements
 
         mAdapter = new FragmentAdapter();
         setContentView(R.layout.view_pager);
+
+        mTabHeaderColors = getTabHeaderColors();
+        updateHeaderColor(0, 0);
 
         mPager = setupPager();
 
@@ -67,6 +73,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
             tabs.setCustomTabView(R.layout.tab_indicator, R.id.tab_title);
             tabs.setDistributeEvenly(true);
             tabs.setViewPager(pager);
+            tabs.setOnPageChangeListener(this);
 
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 Toolbar toolBar = (Toolbar) findViewById(R.id.toolbar);
@@ -88,6 +95,41 @@ public abstract class BasePagerActivity extends BaseActivity implements
     protected abstract Fragment getFragment(int position);
     protected boolean fragmentNeedsRefresh(Fragment object) {
         return false;
+    }
+
+    /* expected format: int[tabCount][2] - 0 is header, 1 is status bar */
+    protected int[][] getTabHeaderColors() {
+        return null;
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        updateHeaderColor(position, positionOffset);
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        if (!mScrolling) {
+            updateHeaderColor(position, 0);
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+        mScrolling = state != ViewPager.SCROLL_STATE_IDLE;
+    }
+
+    private void updateHeaderColor(int position, float fraction) {
+        if (mTabHeaderColors == null) {
+            return;
+        }
+
+        int nextIndex = Math.max(position, mTabHeaderColors.length - 1);
+        int headerColor = UiUtils.mixColors(mTabHeaderColors[position][0],
+                mTabHeaderColors[nextIndex][0], fraction);
+        int statusBarColor = UiUtils.mixColors(mTabHeaderColors[position][1],
+                mTabHeaderColors[nextIndex][1], fraction);
+        setHeaderColor(headerColor, statusBarColor);
     }
 
     private class FragmentAdapter extends FragmentStatePagerAdapter {

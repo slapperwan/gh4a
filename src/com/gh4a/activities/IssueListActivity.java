@@ -37,6 +37,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
@@ -190,6 +191,20 @@ public class IssueListActivity extends IssueListBaseActivity {
     @Override
     protected int[] getTabTitleResIds() {
         return TITLES;
+    }
+
+    @Override
+    protected int[][] getTabHeaderColors() {
+        return new int[][] {
+            {
+                UiUtils.resolveColor(this, R.attr.colorIssueOpen),
+                UiUtils.resolveColor(this, R.attr.colorIssueOpenDark)
+            },
+            {
+                UiUtils.resolveColor(this, R.attr.colorIssueClosed),
+                UiUtils.resolveColor(this, R.attr.colorIssueClosedDark)
+            }
+        };
     }
 
     @Override

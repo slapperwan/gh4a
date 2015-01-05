@@ -64,6 +64,7 @@ public class IssueListMineActivity extends IssueListBaseActivity {
         actionBar.setTitle("issue".equals(mType) ?
                 R.string.issues_open : R.string.pull_requests_open);
         actionBar.setDisplayHomeAsUpEnabled(true);
+        updateHeaderColor();
     }
 
     @Override
@@ -141,6 +142,7 @@ public class IssueListMineActivity extends IssueListBaseActivity {
         mState = Constants.Issue.STATE_CLOSED.equals(mState)
                 ? Constants.Issue.STATE_OPEN : Constants.Issue.STATE_CLOSED;
         reloadIssueList();
+        updateHeaderColor();
 
         int titleResId = Constants.Issue.STATE_CLOSED.equals(mState)
                 ? R.string.issues_closed : R.string.issues_open;
@@ -151,5 +153,14 @@ public class IssueListMineActivity extends IssueListBaseActivity {
         }
 
         getSupportActionBar().setTitle(titleResId);
+    }
+
+    private void updateHeaderColor() {
+        boolean showingClosed = Constants.Issue.STATE_CLOSED.equals(mState);
+        int headerColorAttrId = showingClosed
+                ? R.attr.colorIssueClosed : R.attr.colorIssueOpen;
+        int statusBarColorAttrId = showingClosed
+                ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark;
+        transitionHeaderToColor(headerColorAttrId, statusBarColorAttrId);
     }
 }

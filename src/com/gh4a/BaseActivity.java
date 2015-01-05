@@ -20,9 +20,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.TransitionDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -38,6 +36,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
@@ -53,7 +52,11 @@ import com.gh4a.db.BookmarksProvider;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.ColorDrawable;
 import com.gh4a.widget.SwipeRefreshLayout;
+import com.nineoldandroids.animation.AnimatorSet;
+import com.nineoldandroids.animation.ArgbEvaluator;
+import com.nineoldandroids.animation.ObjectAnimator;
 import com.shamanland.fab.FloatingActionButton;
 
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
@@ -74,6 +77,9 @@ public abstract class BaseActivity extends ActionBarActivity implements
     private ActionBarDrawerToggle mDrawerToggle;
     private boolean mHasErrorView = false;
 
+    private ColorDrawable mHeaderBackground;
+    private ColorDrawable mDrawerTitleBackground;
+
     private ViewTreeObserver.OnGlobalLayoutListener mOverlayLayoutListener =
             new ViewTreeObserver.OnGlobalLayoutListener() {
         @Override
@@ -91,6 +97,7 @@ public abstract class BaseActivity extends ActionBarActivity implements
 
         if (isOnline()) {
             super.setContentView(R.layout.base_activity);
+            setupHeaderDrawable();
             setupSwipeToRefresh();
             setupNavigationDrawer();
         } else {
@@ -178,18 +185,34 @@ public abstract class BaseActivity extends ActionBarActivity implements
         mOverlay.addView(fab, params);
     }
 
+    protected void setHeaderColor(int color, int statusBarColor) {
+        mHeaderBackground.setColor(color);
+        mDrawerTitleBackground.setColor(color);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(statusBarColor);
+        }
+    }
+
     protected void transitionHeaderToColor(int colorAttrId, int statusBarColorAttrId) {
-        View header = findViewById(R.id.header);
-        TransitionDrawable transition = new TransitionDrawable(new Drawable[] {
-            header.getBackground(),
-            new ColorDrawable(UiUtils.resolveColor(this, colorAttrId))
-        });
-        header.setBackgroundDrawable(transition);
-        transition.startTransition(200);
+        final AnimatorSet animation = new AnimatorSet();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(UiUtils.resolveColor(this, statusBarColorAttrId));
+            final Window window = getWindow();
+            final ObjectAnimator statusBarAnimation = ObjectAnimator.ofInt(window,
+                    "statusBarColor", window.getStatusBarColor(),
+                    UiUtils.resolveColor(this, statusBarColorAttrId));
+            statusBarAnimation.setEvaluator(new ArgbEvaluator());
+
+            animation.playTogether(createColorTransition(mHeaderBackground, colorAttrId),
+                    createColorTransition(mDrawerTitleBackground, colorAttrId),
+                    statusBarAnimation);
+        } else {
+            animation.playTogether(createColorTransition(mHeaderBackground, colorAttrId),
+                    createColorTransition(mDrawerTitleBackground, colorAttrId));
         }
+
+        animation.setDuration(200);
+        animation.start();
     }
 
     protected boolean isOnline() {
@@ -321,6 +344,32 @@ public abstract class BaseActivity extends ActionBarActivity implements
                 goToToplevelActivity(true);
             }
         });
+    }
+
+    private void setupHeaderDrawable() {
+        int primaryColor = UiUtils.resolveColor(this, R.attr.colorPrimary);
+        mHeaderBackground = new ColorDrawable(primaryColor);
+        mDrawerTitleBackground = new ColorDrawable(primaryColor);
+
+        assignBackground(R.id.drawer_title, mHeaderBackground);
+        assignBackground(R.id.header, mDrawerTitleBackground);
+    }
+
+    private ObjectAnimator createColorTransition(ColorDrawable drawable, int colorAttrId) {
+        final ObjectAnimator animation = ObjectAnimator.ofInt(drawable,
+                "color", drawable.getColor(), UiUtils.resolveColor(this, colorAttrId));
+        animation.setEvaluator(new ArgbEvaluator());
+        return animation;
+    }
+
+    @SuppressWarnings("deprecation")
+    private void assignBackground(int viewId, Drawable background) {
+        View view = findViewById(viewId);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            view.setBackground(background);
+        } else {
+            view.setBackgroundDrawable(background);
+        }
     }
 
     private void setupSwipeToRefresh() {

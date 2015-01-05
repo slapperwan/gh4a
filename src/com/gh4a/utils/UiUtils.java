@@ -92,6 +92,24 @@ public class UiUtils {
         }
     }
 
+    public static int mixColors(int startColor, int endColor, float fraction) {
+        // taken from ArgbEvaluator.evaluate
+        int startA = (startColor >> 24) & 0xff;
+        int startR = (startColor >> 16) & 0xff;
+        int startG = (startColor >> 8) & 0xff;
+        int startB = startColor & 0xff;
+
+        int endA = (endColor >> 24) & 0xff;
+        int endR = (endColor >> 16) & 0xff;
+        int endG = (endColor >> 8) & 0xff;
+        int endB = endColor & 0xff;
+
+        return ((startA + (int)(fraction * (endA - startA))) << 24) |
+                ((startR + (int)(fraction * (endR - startR))) << 16) |
+                ((startG + (int)(fraction * (endG - startG))) << 8) |
+                ((startB + (int)(fraction * (endB - startB))));
+    }
+
     public static boolean canViewScrollUp(View view) {
         if (view == null) {
             return false;
