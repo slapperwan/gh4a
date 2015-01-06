@@ -37,4 +37,5 @@
 
     <color name="tab_indicator_color">#fff</color>
     <color name="divider_bg">#bdbdbd</color>
+    <color name="drawer_scrim">#60000000</color>
 </resources>

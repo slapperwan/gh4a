@@ -416,6 +416,10 @@ public abstract class BaseActivity extends ActionBarActivity implements
                 ViewGroup title = (ViewGroup) findViewById(R.id.drawer_title);
                 LayoutInflater.from(this).inflate(R.layout.drawer_title_main, title);
             }
+
+            mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow_left, Gravity.LEFT);
+            mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow_right, Gravity.RIGHT);
+            mDrawerLayout.setScrimColor(getResources().getColor(R.color.drawer_scrim));
         } else {
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         }
