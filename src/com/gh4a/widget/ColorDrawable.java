@@ -16,12 +16,15 @@
 
 package com.gh4a.widget;
 
+import android.annotation.TargetApi;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
+import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 
 // Copy of framework's ColorDrawable as of API 19, needed for getColor() and setColor()
 public class ColorDrawable extends Drawable {
@@ -66,8 +69,8 @@ public class ColorDrawable extends Drawable {
 
     public void setColor(int color) {
         if (mState.mBaseColor != color || mState.mUseColor != color) {
-            invalidateSelf();
             mState.mBaseColor = mState.mUseColor = color;
+            invalidateSelf();
         }
     }
 
@@ -105,6 +108,13 @@ public class ColorDrawable extends Drawable {
     public ConstantState getConstantState() {
         mState.mChangingConfigurations = getChangingConfigurations();
         return mState;
+    }
+
+    @Override
+    @TargetApi(21)
+    public void getOutline(@NonNull Outline outline) {
+        outline.setRect(getBounds());
+        outline.setAlpha(getAlpha() / 255.0f);
     }
 
     final static class ColorState extends ConstantState {
