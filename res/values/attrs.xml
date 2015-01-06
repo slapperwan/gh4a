@@ -40,6 +40,8 @@
     <attr name="milestoneIcon" format="reference" />
     <attr name="assigneeIcon" format="reference" />
     <attr name="labelsIcon" format="reference" />
+    <attr name="branchIcon" format="reference" />
+    <attr name="tagIcon" format="reference" />
 
     <declare-styleable name="LabelBadgeView">
         <attr name="badgeSize" format="dimension"/>

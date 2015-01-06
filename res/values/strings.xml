@@ -201,6 +201,8 @@
     <string name="repo_stargazers">Stargazers</string>
     <string name="repo_watch_action">Watch</string>
     <string name="repo_star_action">Star</string>
+    <string name="repo_select_ref">Select branch</string>
+    <string name="repo_select_ref_dialog_title">Select branch or tag</string>
     <string name="repo_branches">Branches</string>
     <string name="repo_tags">Tags</string>
     <string name="repo_unwatch_action">Unwatch</string>

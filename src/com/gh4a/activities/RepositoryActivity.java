@@ -25,12 +25,19 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.os.AsyncTaskCompat;
+import android.support.v4.util.Pair;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.gh4a.BackgroundTask;
 import com.gh4a.BasePagerActivity;
@@ -42,6 +49,7 @@ import com.gh4a.fragment.CommitListFragment;
 import com.gh4a.fragment.ContentListFragment;
 import com.gh4a.fragment.ContentListFragment.ParentCallback;
 import com.gh4a.fragment.RepositoryFragment;
+import com.gh4a.loader.BaseLoader;
 import com.gh4a.loader.BranchListLoader;
 import com.gh4a.loader.GitModuleParserLoader;
 import com.gh4a.loader.IsStarringLoader;
@@ -55,11 +63,10 @@ import com.gh4a.utils.UiUtils;
 
 public class RepositoryActivity extends BasePagerActivity implements ParentCallback {
     private static final int LOADER_REPO = 0;
-    private static final int LOADER_BRANCHES = 1;
-    private static final int LOADER_TAGS = 2;
-    private static final int LOADER_WATCHING = 3;
-    private static final int LOADER_STARRING = 4;
-    private static final int LOADER_MODULEMAP = 5;
+    private static final int LOADER_BRANCHES_AND_TAGS = 1;
+    private static final int LOADER_WATCHING = 2;
+    private static final int LOADER_STARRING = 3;
+    private static final int LOADER_MODULEMAP = 4;
 
     public static final String EXTRA_INITIAL_PAGE = "initial_page";
     public static final int PAGE_REPO_OVERVIEW = 0;
@@ -112,36 +119,27 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
         }
     };
 
-    private LoaderCallbacks<List<RepositoryBranch>> mBranchCallback =
-            new LoaderCallbacks<List<RepositoryBranch>>() {
+    private LoaderCallbacks<Pair<List<RepositoryBranch>, List<RepositoryTag>>> mBranchesAndTagsCallback =
+            new LoaderCallbacks<Pair<List<RepositoryBranch>, List<RepositoryTag>>>() {
         @Override
-        public Loader<LoaderResult<List<RepositoryBranch>>> onCreateLoader(int id, Bundle args) {
-            return new BranchListLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
+        public Loader<LoaderResult<Pair<List<RepositoryBranch>, List<RepositoryTag>>>> onCreateLoader(
+                int id, Bundle args) {
+            return new BaseLoader<Pair<List<RepositoryBranch>, List<RepositoryTag>>>(RepositoryActivity.this) {
+                @Override
+                protected Pair<List<RepositoryBranch>, List<RepositoryTag>> doLoadInBackground() throws Exception {
+                    return Pair.create(new BranchListLoader(getContext(), mRepoOwner, mRepoName).doLoadInBackground(),
+                            new TagListLoader(getContext(), mRepoOwner, mRepoName).doLoadInBackground());
+                }
+            };
         }
         @Override
-        public void onResultReady(LoaderResult<List<RepositoryBranch>> result) {
+        public void onResultReady(LoaderResult<Pair<List<RepositoryBranch>, List<RepositoryTag>>> result) {
             if (!result.handleError(RepositoryActivity.this)) {
                 stopProgressDialog(mProgressDialog);
-                mBranches = result.getData();
-                showBranchesDialog();
-                getSupportLoaderManager().destroyLoader(LOADER_BRANCHES);
-            }
-        }
-    };
-
-    private LoaderCallbacks<List<RepositoryTag>> mTagCallback =
-            new LoaderCallbacks<List<RepositoryTag>>() {
-        @Override
-        public Loader<LoaderResult<List<RepositoryTag>>> onCreateLoader(int id, Bundle args) {
-            return new TagListLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
-        }
-        @Override
-        public void onResultReady(LoaderResult<List<RepositoryTag>> result) {
-            if (!result.handleError(RepositoryActivity.this)) {
-                stopProgressDialog(mProgressDialog);
-                mTags = result.getData();
-                showTagsDialog();
-                getSupportLoaderManager().destroyLoader(LOADER_TAGS);
+                mBranches = result.getData().first;
+                mTags = result.getData().second;
+                showRefSelectionDialog();
+                getSupportLoaderManager().destroyLoader(LOADER_BRANCHES_AND_TAGS);
             }
         }
     };
@@ -426,8 +424,7 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
             }
         }
         if (mRepository == null) {
-            menu.removeItem(R.id.branches);
-            menu.removeItem(R.id.tags);
+            menu.removeItem(R.id.ref);
             menu.removeItem(R.id.bookmark);
             menu.removeItem(R.id.zip_download);
         }
@@ -453,20 +450,13 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
                 MenuItemCompat.expandActionView(item);
                 AsyncTaskCompat.executeParallel(new UpdateStarTask());
                 return true;
-            case R.id.branches:
+            case R.id.ref:
                 if (mBranches == null) {
                     mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-                    getSupportLoaderManager().initLoader(LOADER_BRANCHES, null, mBranchCallback);
+                    getSupportLoaderManager().initLoader(LOADER_BRANCHES_AND_TAGS,
+                            null, mBranchesAndTagsCallback);
                 } else {
-                    showBranchesDialog();
-                }
-                return true;
-            case R.id.tags:
-                if (mTags == null) {
-                    mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-                    getSupportLoaderManager().initLoader(LOADER_TAGS, null, mTagCallback);
-                } else {
-                    showTagsDialog();
+                    showRefSelectionDialog();
                 }
                 return true;
             case R.id.share:
@@ -495,59 +485,30 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
         return super.onOptionsItemSelected(item);
     }
 
-    private void showBranchesDialog() {
-        String[] branchList = new String[mBranches.size()];
-        int current = -1, master = -1;
-        for (int i = 0; i < mBranches.size(); i++) {
-            RepositoryBranch branch = mBranches.get(i);
-            branchList[i] = branch.getName();
-            if (branch.getName().equals(mSelectedRef)
-                    || branch.getCommit().getSha().equals(mSelectedRef)) {
+    private void showRefSelectionDialog() {
+        final BranchAndTagAdapter adapter = new BranchAndTagAdapter();
+        int current = -1, master = -1, count = adapter.getCount();
+
+        for (int i = 0; i < count; i++) {
+            String name = adapter.getName(i);
+            if (name.equals(mSelectedRef) || adapter.getSha(i).equals(mSelectedRef)) {
                 current = i;
             }
-            if (branch.getName().equals(mRepository.getMasterBranch())) {
+            if (name.equals(mRepository.getMasterBranch())) {
                 master = i;
             }
         }
-
         if (mSelectedRef == null && current == -1) {
             current = master;
         }
 
         new AlertDialog.Builder(this)
                 .setCancelable(true)
-                .setTitle(R.string.repo_branches)
-                .setSingleChoiceItems(branchList, current, new DialogInterface.OnClickListener() {
+                .setTitle(R.string.repo_select_ref_dialog_title)
+                .setSingleChoiceItems(adapter, current, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        setSelectedRef(mBranches.get(which).getName());
-                        dialog.dismiss();
-                    }
-                })
-                .setNegativeButton(R.string.cancel, null)
-                .show();
-    }
-
-    private void showTagsDialog() {
-        String[] tagList = new String[mTags.size()];
-        int current = -1;
-        for (int i = 0; i < mTags.size(); i++) {
-            RepositoryTag tag = mTags.get(i);
-            tagList[i] = tag.getName();
-            if (tag.getName().equals(mSelectedRef)
-                    || tag.getCommit().getSha().equals(mSelectedRef)) {
-                current = i;
-                break;
-            }
-        }
-
-        new AlertDialog.Builder(this)
-                .setCancelable(true)
-                .setTitle(R.string.repo_tags)
-                .setSingleChoiceItems(tagList, current, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        setSelectedRef(mTags.get(which).getName());
+                        setSelectedRef(adapter.getName(which));
                         dialog.dismiss();
                     }
                 })
@@ -577,6 +538,70 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
         clearRefDependentFragments();
         setContentShown(false);
         getSupportLoaderManager().getLoader(LOADER_REPO).onContentChanged();
+    }
+
+    private class BranchAndTagAdapter extends BaseAdapter {
+        private ArrayList<Object> mItems;
+        private LayoutInflater mInflater;
+        private int mBranchDrawableResId;
+        private int mTagDrawableResId;
+
+        public BranchAndTagAdapter() {
+            mItems = new ArrayList<>();
+            mItems.addAll(mBranches);
+            mItems.addAll(mTags);
+            mInflater = LayoutInflater.from(RepositoryActivity.this);
+            mBranchDrawableResId = UiUtils.resolveDrawable(RepositoryActivity.this, R.attr.branchIcon);
+            mTagDrawableResId = UiUtils.resolveDrawable(RepositoryActivity.this, R.attr.tagIcon);
+        }
+
+        private String getName(int position) {
+            Object item = mItems.get(position);
+            if (item instanceof RepositoryBranch) {
+                return ((RepositoryBranch) item).getName();
+            } else {
+                return ((RepositoryTag) item).getName();
+            }
+        }
+
+        private String getSha(int position) {
+            Object item = mItems.get(position);
+            if (item instanceof RepositoryBranch) {
+                return ((RepositoryBranch) item).getCommit().getSha();
+            } else {
+                return ((RepositoryTag) item).getCommit().getSha();
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return mItems.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return getName(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = mInflater.inflate(R.layout.row_branch, parent, false);
+            }
+            ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
+            TextView title = (TextView) convertView.findViewById(R.id.title);
+
+            icon.setImageResource(mItems.get(position) instanceof RepositoryTag
+                    ? mTagDrawableResId : mBranchDrawableResId);
+            title.setText(getName(position));
+
+            return convertView;
+        }
     }
 
     private class UpdateStarTask extends BackgroundTask<Void> {

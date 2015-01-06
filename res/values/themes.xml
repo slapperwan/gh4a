@@ -29,6 +29,8 @@
         <item name="milestoneIcon">@drawable/milestone_dark</item>
         <item name="assigneeIcon">@drawable/assignee_dark</item>
         <item name="labelsIcon">@drawable/labels_dark</item>
+        <item name="branchIcon">@drawable/branch_dark</item>
+        <item name="tagIcon">@drawable/label_dark</item>
         <item name="cardViewTheme">@style/Theme.CardView.Dark</item>
         <item name="colorAccent">@color/dark_accent</item>
         <item name="colorPrimary">@color/dark_accent</item>
@@ -80,6 +82,8 @@
         <item name="milestoneIcon">@drawable/milestone</item>
         <item name="assigneeIcon">@drawable/assignee</item>
         <item name="labelsIcon">@drawable/labels</item>
+        <item name="branchIcon">@drawable/branch</item>
+        <item name="tagIcon">@drawable/label</item>
         <item name="listPopupWindowStyle">@style/Widget.AppCompat.Light.ListPopupWindow</item>
         <item name="cardViewTheme">@style/Theme.CardView.Light</item>
         <item name="colorAccent">@color/light_accent</item>

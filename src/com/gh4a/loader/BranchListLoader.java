@@ -13,7 +13,6 @@ import android.content.Context;
 import com.gh4a.Gh4Application;
 
 public class BranchListLoader extends BaseLoader<List<RepositoryBranch>> {
-
     private String mRepoOwner;
     private String mRepoName;
 
@@ -28,14 +27,13 @@ public class BranchListLoader extends BaseLoader<List<RepositoryBranch>> {
         RepositoryService repoService = (RepositoryService)
                 Gh4Application.get(getContext()).getService(Gh4Application.REPO_SERVICE);
         List<RepositoryBranch> branches = repoService.getBranches(new RepositoryId(mRepoOwner, mRepoName));
-        if (branches == null) {
-            return null;
-        }
-
         ArrayList<RepositoryBranch> result = new ArrayList<>();
-        for (RepositoryBranch branch : branches) {
-            if (branch != null) {
-                result.add(branch);
+
+        if (branches != null) {
+            for (RepositoryBranch branch : branches) {
+                if (branch != null) {
+                    result.add(branch);
+                }
             }
         }
         return result;
