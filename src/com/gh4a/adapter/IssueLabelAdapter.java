@@ -131,7 +131,7 @@ public class IssueLabelAdapter extends RootAdapter<IssueLabelAdapter.EditableLab
     public void onClick(View v) {
         final ViewHolder holder = (ViewHolder) ((View) v.getParent()).getTag();
         if (v == holder.customColorButton) {
-            String color = (String) holder.editor.getTag();
+            final String color = holder.lastAssignedLabel.editedColor;
             ColorPickerDialog dialog = new ColorPickerDialog(mContext, color, new OnColorChangedListener() {
                 @Override
                 public void colorChanged(String color) {
