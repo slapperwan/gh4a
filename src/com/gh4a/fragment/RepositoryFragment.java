@@ -52,6 +52,7 @@ import com.gh4a.utils.UiUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
+import org.eclipse.egit.github.core.Permissions;
 import org.eclipse.egit.github.core.Repository;
 
 public class RepositoryFragment extends LoadingFragmentBase implements OnClickListener {
@@ -187,8 +188,9 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         mContentView.findViewById(R.id.other_info).setOnClickListener(this);
         mContentView.findViewById(R.id.tv_releases_label).setOnClickListener(this);
 
+        Permissions permissions = mRepository.getPermissions();
         updateClickableLabel(R.id.tv_collaborators_label,
-                mRepository.getPermissions().hasPushAccess());
+                permissions != null && permissions.hasPushAccess());
         updateClickableLabel(R.id.tv_downloads_label, mRepository.isHasDownloads());
         updateClickableLabel(R.id.tv_wiki_label, mRepository.isHasWiki());
 
