@@ -87,7 +87,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
     @Override
     protected void bindView(View view, IssueEventHolder event) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
-        String ourLogin = Gh4Application.get(mContext).getAuthLogin();
+        String ourLogin = Gh4Application.get().getAuthLogin();
         String login = event.getUser() != null ? event.getUser().getLogin() : null;
 
         AvatarHandler.assignAvatar(viewHolder.ivGravatar, event.getUser());

@@ -84,7 +84,7 @@ public class Github4AndroidActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Gh4Application app = Gh4Application.get(this);
+        Gh4Application app = Gh4Application.get();
         if (app.isAuthorized()) {
             goToToplevelActivity(false);
             finish();

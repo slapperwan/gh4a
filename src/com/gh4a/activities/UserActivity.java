@@ -93,7 +93,7 @@ public class UserActivity extends BasePagerActivity {
         Bundle data = getIntent().getExtras();
         mUserLogin = data.getString(Constants.User.LOGIN);
         mUserName = data.getString(Constants.User.NAME);
-        mIsSelf = mUserLogin.equals(Gh4Application.get(this).getAuthLogin());
+        mIsSelf = mUserLogin.equals(Gh4Application.get().getAuthLogin());
         mIsTopLevelMode = mIsSelf && data.getBoolean(EXTRA_TOPLEVEL_MODE, false);
 
         super.onCreate(savedInstanceState);
@@ -109,7 +109,7 @@ public class UserActivity extends BasePagerActivity {
         } else {
             actionBar.setTitle(mUserLogin);
             actionBar.setDisplayHomeAsUpEnabled(true);
-            if (Gh4Application.get(this).isAuthorized()) {
+            if (Gh4Application.get().isAuthorized()) {
                 getSupportLoaderManager().initLoader(4, null, mIsFollowingCallback);
             }
         }
@@ -198,7 +198,7 @@ public class UserActivity extends BasePagerActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem followAction = menu.findItem(R.id.follow);
-        followAction.setVisible(!mIsSelf && Gh4Application.get(this).isAuthorized());
+        followAction.setVisible(!mIsSelf && Gh4Application.get().isAuthorized());
         if (followAction.isVisible()) {
             if (mIsFollowing == null) {
                 MenuItemCompat.setActionView(followAction, R.layout.ab_loading);
@@ -286,7 +286,7 @@ public class UserActivity extends BasePagerActivity {
         @Override
         protected Void run() throws Exception {
             UserService userService = (UserService)
-                    Gh4Application.get(mContext).getService(Gh4Application.USER_SERVICE);
+                    Gh4Application.get().getService(Gh4Application.USER_SERVICE);
             if (mIsFollowing) {
                 userService.unfollow(mUserLogin);
             } else {

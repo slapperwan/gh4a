@@ -169,7 +169,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         mContentView.findViewById(R.id.cell_repos).setOnClickListener(this);
 
         TextView tvReposCount = (TextView) mContentView.findViewById(R.id.tv_repos_count);
-        if (mUserLogin.equals(Gh4Application.get(getActivity()).getAuthLogin())) {
+        if (mUserLogin.equals(Gh4Application.get().getAuthLogin())) {
             tvReposCount.setText(String.valueOf(mUser.getTotalPrivateRepos() + mUser.getPublicRepos()));
         } else {
             tvReposCount.setText(String.valueOf(mUser.getPublicRepos()));

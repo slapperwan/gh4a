@@ -75,7 +75,7 @@ public class RepositoryListActivity extends BaseActivity implements
     protected ListAdapter getNavigationDrawerAdapter() {
         final int itemResId, valueResId;
 
-        if (mUserLogin.equals(Gh4Application.get(this).getAuthLogin())) {
+        if (mUserLogin.equals(Gh4Application.get().getAuthLogin())) {
             itemResId = R.array.repo_list_login_items;
             valueResId = R.array.repo_list_login_values;
         } else if (Constants.User.TYPE_ORG.equals(mUserType)) {

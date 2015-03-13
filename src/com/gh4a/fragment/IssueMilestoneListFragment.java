@@ -70,7 +70,7 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
         FloatingActionButton fab = (FloatingActionButton) wrapper.findViewById(R.id.fab_add);
         ListView list = (ListView) content.findViewById(android.R.id.list);
 
-        if (Gh4Application.get(getActivity()).isAuthorized()) {
+        if (Gh4Application.get().isAuthorized()) {
             fab.setOnClickListener(this);
             list.setOnTouchListener(new ShowHideOnScroll(fab));
         } else {

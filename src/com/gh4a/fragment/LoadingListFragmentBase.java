@@ -42,6 +42,6 @@ public class LoadingListFragmentBase extends ProgressListFragment implements
 
     @Override
     public boolean canChildScrollUp() {
-        return UiUtils.canViewScrollUp(getListView());
+        return getView() != null && UiUtils.canViewScrollUp(getListView());
     }
 }

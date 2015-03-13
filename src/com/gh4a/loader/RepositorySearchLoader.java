@@ -34,7 +34,7 @@ public class RepositorySearchLoader extends BaseLoader<List<Repository>> {
         }
 
         RepositoryService repoService = (RepositoryService)
-                Gh4Application.get(getContext()).getService(Gh4Application.REPO_SERVICE);
+                Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
         HashMap<String, String> params = new HashMap<>();
         params.put("fork", "true");
         params.put("user", mUserLogin);

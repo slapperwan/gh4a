@@ -54,7 +54,7 @@ public class IssueListMineActivity extends IssueListBaseActivity {
 
         Bundle data = getIntent().getExtras();
         mType = data.getString("type");
-        mLogin = Gh4Application.get(this).getAuthLogin();
+        mLogin = Gh4Application.get().getAuthLogin();
         mSortMode = SORT_MODE_CREATED;
         mSortAscending = false;
         mState = Constants.Issue.STATE_OPEN;

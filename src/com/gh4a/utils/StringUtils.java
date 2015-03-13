@@ -189,7 +189,7 @@ public class StringUtils {
         if (showDateIfLongAgo && duration >= DateUtils.WEEK_IN_MILLIS) {
             return DateUtils.getRelativeTimeSpanString(context, time, true);
         }
-        return Gh4Application.get(context).getPrettyTimeInstance().format(date);
+        return Gh4Application.get().getPrettyTimeInstance().format(date);
     }
 
     public static void applyBoldTagsAndSetText(StyleableTextView view, String input) {

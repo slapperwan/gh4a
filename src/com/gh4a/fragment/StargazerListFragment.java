@@ -73,7 +73,7 @@ public class StargazerListFragment extends PagedDataBaseFragment<User> {
     @Override
     protected PageIterator<User> onCreateIterator() {
         StarService starService = (StarService)
-                Gh4Application.get(getActivity()).getService(Gh4Application.STAR_SERVICE);
+                Gh4Application.get().getService(Gh4Application.STAR_SERVICE);
         return starService.pageStargazers(new RepositoryId(mRepoOwner, mRepoName));
     }
 }

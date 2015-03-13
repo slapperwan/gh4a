@@ -29,7 +29,7 @@ public class RepositoryListLoader extends BaseLoader<Collection<Repository>> {
 
     @Override
     public Collection<Repository> doLoadInBackground() throws IOException {
-        Gh4Application app = Gh4Application.get(getContext());
+        Gh4Application app = Gh4Application.get();
         RepositoryService repoService = (RepositoryService) app.getService(Gh4Application.REPO_SERVICE);
         if (mLogin.equals(app.getAuthLogin())) {
             if (mSize > 0) {

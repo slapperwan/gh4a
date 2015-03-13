@@ -190,7 +190,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
 
     protected void showDiff() {
         StringBuilder content = new StringBuilder();
-        boolean authorized = Gh4Application.get(this).isAuthorized();
+        boolean authorized = Gh4Application.get().isAuthorized();
 
         content.append("<html><head><title></title>");
         content.append("<link href='file:///android_asset/text-");
@@ -369,7 +369,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         }
 
         private boolean isOwnComment(long id) {
-            String login = Gh4Application.get(DiffViewerActivity.this).getAuthLogin();
+            String login = Gh4Application.get().getAuthLogin();
             CommitComment comment = mCommitComments.get(id);
             User user = comment.getUser();
             return user != null && TextUtils.equals(login, comment.getUser().getLogin());

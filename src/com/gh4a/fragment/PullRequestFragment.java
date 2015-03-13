@@ -112,7 +112,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        Gh4Application app = Gh4Application.get(getActivity());
+        Gh4Application app = Gh4Application.get();
         if (app.isAuthorized()) {
             inflater.inflate(R.menu.pullrequest_menu, menu);
 
@@ -240,7 +240,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
             return;
         }
 
-        int commentVisibility = mListShown && Gh4Application.get(getActivity()).isAuthorized()
+        int commentVisibility = mListShown && Gh4Application.get().isAuthorized()
                 ? View.VISIBLE : View.GONE;
         v.findViewById(R.id.comment_box).setVisibility(commentVisibility);
     }
@@ -317,7 +317,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     @Override
     public void onSendCommentInBackground(String comment) throws IOException {
         IssueService issueService = (IssueService)
-                Gh4Application.get(getActivity()).getService(Gh4Application.ISSUE_SERVICE);
+                Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
         issueService.createComment(mRepoOwner, mRepoName, mPullRequest.getNumber(), comment);
     }
 
@@ -343,7 +343,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         @Override
         protected PullRequest run() throws IOException {
             PullRequestService pullService = (PullRequestService)
-                    Gh4Application.get(mContext).getService(Gh4Application.PULL_SERVICE);
+                    Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
             RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
 
             PullRequest pullRequest = new PullRequest();
@@ -383,7 +383,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         @Override
         protected MergeStatus run() throws Exception {
             PullRequestService pullService = (PullRequestService)
-                    Gh4Application.get(mContext).getService(Gh4Application.PULL_SERVICE);
+                    Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
             RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
 
             return pullService.merge(repoId, mPullRequest.getNumber(), mCommitMessage);

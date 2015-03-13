@@ -231,7 +231,7 @@ public abstract class BaseActivity extends ActionBarActivity implements
     }
 
     protected Intent getToplevelActivityIntent() {
-        Gh4Application app = Gh4Application.get(this);
+        Gh4Application app = Gh4Application.get();
         if (app.isAuthorized()) {
             Intent intent = IntentUtils.getUserActivityIntent(this, app.getAuthLogin(), null);
             intent.putExtra(UserActivity.EXTRA_TOPLEVEL_MODE, true);

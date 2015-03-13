@@ -249,7 +249,7 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
         setTabsEnabled(false);
 
         getSupportLoaderManager().initLoader(LOADER_REPO, null, mRepoCallback);
-        if (Gh4Application.get(this).isAuthorized()) {
+        if (Gh4Application.get().isAuthorized()) {
             getSupportLoaderManager().initLoader(LOADER_WATCHING, null, mWatchCallback);
             getSupportLoaderManager().initLoader(LOADER_STARRING, null, mStarCallback);
         }
@@ -395,7 +395,7 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        boolean authorized = Gh4Application.get(this).isAuthorized();
+        boolean authorized = Gh4Application.get().isAuthorized();
         MenuItem watchAction = menu.findItem(R.id.watch);
         watchAction.setVisible(authorized);
         if (authorized) {
@@ -612,7 +612,7 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
         @Override
         protected Void run() throws IOException {
             StarService starService = (StarService)
-                    Gh4Application.get(mContext).getService(Gh4Application.STAR_SERVICE);
+                    Gh4Application.get().getService(Gh4Application.STAR_SERVICE);
             RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
             if (mIsStarring) {
                 starService.unstar(repoId);
@@ -640,7 +640,7 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
         @Override
         protected Void run() throws IOException {
             WatcherService watcherService = (WatcherService)
-                    Gh4Application.get(mContext).getService(Gh4Application.WATCHER_SERVICE);
+                    Gh4Application.get().getService(Gh4Application.WATCHER_SERVICE);
             RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
             if (mIsWatching) {
                 watcherService.unwatch(repoId);

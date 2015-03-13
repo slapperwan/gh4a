@@ -25,7 +25,7 @@ public class CollaboratorListLoader extends BaseLoader<List<User>> {
     @Override
     public List<User> doLoadInBackground() throws IOException {
         CollaboratorService collabService = (CollaboratorService)
-                Gh4Application.get(getContext()).getService(Gh4Application.COLLAB_SERVICE);
+                Gh4Application.get().getService(Gh4Application.COLLAB_SERVICE);
         return collabService.getCollaborators(new RepositoryId(mRepoOwner, mRepoName));
     }
 }

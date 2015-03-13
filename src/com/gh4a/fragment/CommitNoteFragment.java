@@ -60,7 +60,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         FrameLayout listContainer = (FrameLayout) v.findViewById(R.id.list_container);
         listContainer.addView(listContent);
 
-        if (!Gh4Application.get(getActivity()).isAuthorized()) {
+        if (!Gh4Application.get().isAuthorized()) {
             v.findViewById(R.id.comment_box).setVisibility(View.GONE);
         }
 
@@ -117,7 +117,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     @Override
     public void onSendCommentInBackground(String comment) throws IOException {
         CommitService commitService = (CommitService)
-                Gh4Application.get(getActivity()).getService(Gh4Application.COMMIT_SERVICE);
+                Gh4Application.get().getService(Gh4Application.COMMIT_SERVICE);
         CommitComment commitComment = new CommitComment();
         commitComment.setBody(comment);
         commitService.addComment(new RepositoryId(mRepoOwner, mRepoName), mObjectSha, commitComment);

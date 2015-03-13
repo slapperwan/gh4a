@@ -163,7 +163,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
             return;
         }
 
-        if (!Gh4Application.get(this).isAuthorized()) {
+        if (!Gh4Application.get().isAuthorized()) {
             Intent intent = new Intent(this, Github4AndroidActivity.class);
             startActivity(intent);
             finish();
@@ -408,7 +408,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         @Override
         protected Void run() throws IOException {
             IssueService issueService = (IssueService)
-                    Gh4Application.get(mContext).getService(Gh4Application.ISSUE_SERVICE);
+                    Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
 
             if (isInEditMode()) {
                 mEditIssue = issueService.editIssue(mRepoOwner, mRepoName, mIssue);

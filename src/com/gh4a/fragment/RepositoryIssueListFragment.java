@@ -88,7 +88,7 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Issue> {
     @Override
     protected PageIterator<Issue> onCreateIterator() {
         IssueService issueService = (IssueService)
-                Gh4Application.get(getActivity()).getService(Gh4Application.ISSUE_SERVICE);
+                Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
         return issueService.pageSearchIssues(mFilterData);
     }
 }

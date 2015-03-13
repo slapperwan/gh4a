@@ -25,7 +25,7 @@ public class DownloadsLoader extends BaseLoader<List<Download>> {
     @Override
     public List<Download> doLoadInBackground() throws IOException {
         DownloadService downloadService = (DownloadService)
-                Gh4Application.get(getContext()).getService(Gh4Application.DOWNLOAD_SERVICE);
+                Gh4Application.get().getService(Gh4Application.DOWNLOAD_SERVICE);
         return downloadService.getDownloads(new RepositoryId(mRepoOwner, mRepoName));
     }
 }

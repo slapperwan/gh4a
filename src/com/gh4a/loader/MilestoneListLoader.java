@@ -33,7 +33,7 @@ public class MilestoneListLoader extends BaseLoader<List<Milestone>> {
     @Override
     public List<Milestone> doLoadInBackground() throws IOException {
         MilestoneService milestoneService = (MilestoneService)
-                Gh4Application.get(getContext()).getService(Gh4Application.MILESTONE_SERVICE);
+                Gh4Application.get().getService(Gh4Application.MILESTONE_SERVICE);
         List<Milestone> milestones = milestoneService.getMilestones(mRepoOwner, mRepoName, null);
 
         if (milestones != null && mState == null) {

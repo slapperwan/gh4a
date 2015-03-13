@@ -20,7 +20,7 @@ public class IsFollowingUserLoader extends BaseLoader<Boolean> {
     @Override
     public Boolean doLoadInBackground() throws IOException {
         UserService userService = (UserService)
-                Gh4Application.get(getContext()).getService(Gh4Application.USER_SERVICE);
+                Gh4Application.get().getService(Gh4Application.USER_SERVICE);
         return userService.isFollowing(mLogin);
     }
 }

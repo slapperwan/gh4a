@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.support.v4.preference.PreferenceFragment;
@@ -89,7 +88,7 @@ public class SettingsFragment extends PreferenceFragment implements
 
     @Override
     public boolean onPreferenceClick(Preference pref) {
-        Gh4Application app = Gh4Application.get(getActivity());
+        Gh4Application app = Gh4Application.get();
         if (pref == mLogoutPref) {
             app.logout();
             updateLogoutPrefState();
@@ -109,7 +108,7 @@ public class SettingsFragment extends PreferenceFragment implements
     }
 
     private void updateLogoutPrefState() {
-        Gh4Application app = Gh4Application.get(getActivity());
+        Gh4Application app = Gh4Application.get();
         if (app.isAuthorized()) {
             mLogoutPref.setEnabled(true);
             mLogoutPref.setSummary(getString(R.string.logout_pref_summary_logged_in,

@@ -24,7 +24,7 @@ public class LabelListLoader extends BaseLoader<List<Label>> {
     @Override
     public List<Label> doLoadInBackground() throws IOException {
         LabelService labelService = (LabelService)
-                Gh4Application.get(getContext()).getService(Gh4Application.LABEL_SERVICE);
+                Gh4Application.get().getService(Gh4Application.LABEL_SERVICE);
         return labelService.getLabels(mRepoOwner, mRepoName);
     }
 }

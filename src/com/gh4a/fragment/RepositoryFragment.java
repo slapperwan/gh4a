@@ -15,6 +15,7 @@
  */
 package com.gh4a.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
@@ -24,7 +25,6 @@ import android.support.v4.content.Loader;
 import android.support.v4.os.AsyncTaskCompat;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
-import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -102,7 +102,10 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         public void updateDrawState(@NonNull TextPaint ds) {
             super.updateDrawState(ds);
             ds.setUnderlineText(false);
-            ds.setColor(UiUtils.resolveColor(getActivity(), android.R.attr.textColorLink));
+            Context context = getActivity();
+            if (context != null) {
+                ds.setColor(UiUtils.resolveColor(context, android.R.attr.textColorLink));
+            }
         }
     };
 
@@ -162,7 +165,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         repoName.append(mRepository.getName());
         repoName.setSpan(mLoginClickSpan, 0, mRepository.getOwner().getLogin().length(), 0);
         tvRepoName.setText(repoName);
-        tvRepoName.setMovementMethod(LinkMovementMethod.getInstance());
+        tvRepoName.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
 
         TextView tvParentRepo = (TextView) mContentView.findViewById(R.id.tv_parent);
         if (mRepository.isFork() && mRepository.getParent() != null) {

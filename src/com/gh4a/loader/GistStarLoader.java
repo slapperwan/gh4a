@@ -19,7 +19,7 @@ public class GistStarLoader extends BaseLoader<Boolean> {
     @Override
     public Boolean doLoadInBackground() throws IOException {
         GistService gistService = (GistService)
-                Gh4Application.get(getContext()).getService(Gh4Application.GIST_SERVICE);
+                Gh4Application.get().getService(Gh4Application.GIST_SERVICE);
         return gistService.isStarred(mGistId);
     }
 }

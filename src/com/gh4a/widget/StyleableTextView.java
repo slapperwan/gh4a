@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
+import android.text.method.LinkMovementMethod;
 import android.text.method.TransformationMethod;
 import android.util.AttributeSet;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.utils.TypefaceCache;
+import com.gh4a.utils.UiUtils;
 
 import java.util.Locale;
 
@@ -92,6 +94,14 @@ public class StyleableTextView extends TextView {
         }
         if (allCaps) {
             setTransformationMethod(new AllCapsTransformationMethod(getContext()));
+        }
+    }
+
+    @Override
+    public void setText(CharSequence text, BufferType type) {
+        super.setText(text, type);
+        if (getMovementMethod() == LinkMovementMethod.getInstance()) {
+            setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         }
     }
 

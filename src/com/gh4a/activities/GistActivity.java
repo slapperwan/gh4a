@@ -161,7 +161,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        boolean authorized = Gh4Application.get(this).isAuthorized();
+        boolean authorized = Gh4Application.get().isAuthorized();
 
         MenuItem starAction = menu.findItem(R.id.star);
         starAction.setVisible(authorized);
@@ -217,7 +217,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
         @Override
         protected Void run() throws IOException {
             GistService gistService = (GistService)
-                    Gh4Application.get(mContext).getService(Gh4Application.GIST_SERVICE);
+                    Gh4Application.get().getService(Gh4Application.GIST_SERVICE);
             if (mIsStarred) {
                 gistService.unstarGist(mGistId);
             } else {

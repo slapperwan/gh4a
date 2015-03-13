@@ -182,7 +182,7 @@ public class IssueActivity extends BaseActivity implements
 
         setChildScrollDelegate(this);
 
-        if (!Gh4Application.get(this).isAuthorized()) {
+        if (!Gh4Application.get().isAuthorized()) {
             findViewById(R.id.comment_box).setVisibility(View.GONE);
         }
 
@@ -310,7 +310,7 @@ public class IssueActivity extends BaseActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (Gh4Application.get(this).isAuthorized()) {
+        if (Gh4Application.get().isAuthorized()) {
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.issue_menu, menu);
 
@@ -324,7 +324,7 @@ public class IssueActivity extends BaseActivity implements
             }
 
             boolean isCreator = mIssue != null &&
-                    mIssue.getUser().getLogin().equals(Gh4Application.get(this).getAuthLogin());
+                    mIssue.getUser().getLogin().equals(Gh4Application.get().getAuthLogin());
 
             if (!mIsCollaborator && !isCreator) {
                 menu.removeItem(R.id.issue_close);
@@ -382,7 +382,7 @@ public class IssueActivity extends BaseActivity implements
     }
 
     private boolean checkForAuthOrExit() {
-        if (Gh4Application.get(this).isAuthorized()) {
+        if (Gh4Application.get().isAuthorized()) {
             return true;
         }
         Intent intent = new Intent(this, Github4AndroidActivity.class);
@@ -457,7 +457,7 @@ public class IssueActivity extends BaseActivity implements
     @Override
     public void onSendCommentInBackground(String comment) throws IOException {
         IssueService issueService = (IssueService)
-                Gh4Application.get(this).getService(Gh4Application.ISSUE_SERVICE);
+                Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
         issueService.createComment(mRepoOwner, mRepoName, mIssueNumber, comment);
     }
 
@@ -479,7 +479,7 @@ public class IssueActivity extends BaseActivity implements
         @Override
         protected Issue run() throws IOException {
             IssueService issueService = (IssueService)
-                    Gh4Application.get(mContext).getService(Gh4Application.ISSUE_SERVICE);
+                    Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
             RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
 
             Issue issue = issueService.getIssue(repoId, mIssueNumber);

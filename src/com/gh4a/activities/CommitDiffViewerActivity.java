@@ -49,7 +49,7 @@ public class CommitDiffViewerActivity extends DiffViewerActivity {
         commitComment.setPath(mPath);
         commitComment.setBody(body);
 
-        Gh4Application app = Gh4Application.get(CommitDiffViewerActivity.this);
+        Gh4Application app = Gh4Application.get();
         CommitService commitService = (CommitService) app.getService(Gh4Application.COMMIT_SERVICE);
         RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
 
@@ -62,7 +62,7 @@ public class CommitDiffViewerActivity extends DiffViewerActivity {
 
     @Override
     public void deleteComment(long id) throws IOException {
-        Gh4Application app = Gh4Application.get(CommitDiffViewerActivity.this);
+        Gh4Application app = Gh4Application.get();
         CommitService commitService = (CommitService) app.getService(Gh4Application.COMMIT_SERVICE);
 
         commitService.deleteComment(new RepositoryId(mRepoOwner, mRepoName), id);

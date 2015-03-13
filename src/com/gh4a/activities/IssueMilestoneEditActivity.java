@@ -80,7 +80,7 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
             return;
         }
 
-        if (!Gh4Application.get(this).isAuthorized()) {
+        if (!Gh4Application.get().isAuthorized()) {
             Intent intent = new Intent(this, Github4AndroidActivity.class);
             startActivity(intent);
             finish();
@@ -232,7 +232,7 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         @Override
         protected Void run() throws IOException {
             MilestoneService milestoneService = (MilestoneService)
-                    Gh4Application.get(mContext).getService(Gh4Application.MILESTONE_SERVICE);
+                    Gh4Application.get().getService(Gh4Application.MILESTONE_SERVICE);
 
             RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
             if (isInEditMode()) {
@@ -266,7 +266,7 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         @Override
         protected Void run() throws IOException {
             MilestoneService milestoneService = (MilestoneService)
-                    Gh4Application.get(mContext).getService(Gh4Application.MILESTONE_SERVICE);
+                    Gh4Application.get().getService(Gh4Application.MILESTONE_SERVICE);
             milestoneService.deleteMilestone(mRepoOwner, mRepoName, mNumber);
             return null;
         }

@@ -70,7 +70,7 @@ public class ForkListFragment extends PagedDataBaseFragment<Repository> {
     @Override
     protected PageIterator<Repository> onCreateIterator() {
         RepositoryService repoService = (RepositoryService)
-                Gh4Application.get(getActivity()).getService(Gh4Application.REPO_SERVICE);
+                Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
         return repoService.pageForks(new RepositoryId(mRepoOwner, mRepoName));
     }
 }

@@ -70,6 +70,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     public static String EVENT_SERVICE = "github.event";
     public static String MARKDOWN_SERVICE = "github.markdown";
 
+    private static Gh4Application sInstance;
     private GitHubClient mClient;
     private HashMap<String, GitHubService> mServices;
     private PrettyTime mPt;
@@ -84,6 +85,8 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     @Override
     public void onCreate() {
         super.onCreate();
+
+        sInstance = this;
 
         SharedPreferences prefs = getPrefs();
         selectTheme(prefs.getInt(SettingsFragment.KEY_THEME, Constants.Theme.LIGHT));
@@ -170,8 +173,8 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         return getSharedPreferences(SettingsFragment.PREF_NAME, MODE_PRIVATE);
     }
 
-    public static Gh4Application get(Context context) {
-        return (Gh4Application) context.getApplicationContext();
+    public static Gh4Application get() {
+        return sInstance;
     }
 
     public boolean isAuthorized() {

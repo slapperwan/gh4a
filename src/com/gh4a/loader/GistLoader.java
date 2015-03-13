@@ -20,7 +20,7 @@ public class GistLoader extends BaseLoader<Gist> {
     @Override
     public Gist doLoadInBackground() throws IOException {
         GistService gistService = (GistService)
-                Gh4Application.get(getContext()).getService(Gh4Application.GIST_SERVICE);
+                Gh4Application.get().getService(Gh4Application.GIST_SERVICE);
         return gistService.getGist(mGistId);
     }
 }

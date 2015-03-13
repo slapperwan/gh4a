@@ -28,7 +28,7 @@ public class PullRequestCommentsLoader extends BaseLoader<List<CommitComment>> {
     @Override
     public List<CommitComment> doLoadInBackground() throws IOException {
         PullRequestService pullRequestService = (PullRequestService)
-                Gh4Application.get(getContext()).getService(Gh4Application.PULL_SERVICE);
+                Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
         List<CommitComment> comments = pullRequestService.getComments(
                 new RepositoryId(mRepoOwner, mRepoName), mPullRequestNumber);
         List<CommitComment> result = new ArrayList<>();

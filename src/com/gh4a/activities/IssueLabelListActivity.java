@@ -187,7 +187,7 @@ public class IssueLabelListActivity extends BaseActivity implements
     }
 
     private void updateFabVisibility() {
-        if (Gh4Application.get(this).isAuthorized() && mActionMode == null) {
+        if (Gh4Application.get().isAuthorized() && mActionMode == null) {
             mListView.setOnTouchListener(mFabListener);
             mFab.setVisibility(View.VISIBLE);
         } else {
@@ -282,7 +282,7 @@ public class IssueLabelListActivity extends BaseActivity implements
         @Override
         protected Void run() throws IOException {
             LabelService labelService = (LabelService)
-                    Gh4Application.get(mContext).getService(Gh4Application.LABEL_SERVICE);
+                    Gh4Application.get().getService(Gh4Application.LABEL_SERVICE);
             labelService.deleteLabel(mRepoOwner, mRepoName, URLEncoder.encode(mLabelName, "UTF-8"));
             return null;
         }
@@ -308,7 +308,7 @@ public class IssueLabelListActivity extends BaseActivity implements
         @Override
         protected Void run() throws IOException {
             LabelService labelService = (LabelService)
-                    Gh4Application.get(mContext).getService(Gh4Application.LABEL_SERVICE);
+                    Gh4Application.get().getService(Gh4Application.LABEL_SERVICE);
 
             Label label = new Label();
             label.setName(mNewLabelName);
@@ -343,7 +343,7 @@ public class IssueLabelListActivity extends BaseActivity implements
         @Override
         protected Void run() throws IOException {
             LabelService labelService = (LabelService)
-                    Gh4Application.get(mContext).getService(Gh4Application.LABEL_SERVICE);
+                    Gh4Application.get().getService(Gh4Application.LABEL_SERVICE);
 
             Label label = new Label();
             label.setName(mLabelName);

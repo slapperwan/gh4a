@@ -42,7 +42,7 @@ public class GistListActivity extends BasePagerActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         mUserLogin = getIntent().getExtras().getString(Constants.User.LOGIN);
-        mIsSelf = TextUtils.equals(mUserLogin, Gh4Application.get(this).getAuthLogin());
+        mIsSelf = TextUtils.equals(mUserLogin, Gh4Application.get().getAuthLogin());
 
         super.onCreate(savedInstanceState);
 

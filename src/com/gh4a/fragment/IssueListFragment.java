@@ -78,7 +78,7 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> implements
             FloatingActionButton fab = (FloatingActionButton) wrapper.findViewById(R.id.fab_add);
             ListView list = (ListView) content.findViewById(android.R.id.list);
 
-            if (Gh4Application.get(getActivity()).isAuthorized()) {
+            if (Gh4Application.get().isAuthorized()) {
                 fab.setOnClickListener(this);
                 list.setOnTouchListener(new ShowHideOnScroll(fab));
             } else {
@@ -143,7 +143,7 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> implements
     @Override
     protected PageIterator<Issue> onCreateIterator() {
         IssueService issueService = (IssueService)
-                Gh4Application.get(getActivity()).getService(Gh4Application.ISSUE_SERVICE);
+                Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
         return issueService.pageIssues(new RepositoryId(mRepoOwner, mRepoName), mFilterData);
     }
 

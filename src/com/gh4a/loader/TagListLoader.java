@@ -25,7 +25,7 @@ public class TagListLoader extends BaseLoader<List<RepositoryTag>> {
     @Override
     public List<RepositoryTag> doLoadInBackground() throws IOException {
         RepositoryService repoService = (RepositoryService)
-                Gh4Application.get(getContext()).getService(Gh4Application.REPO_SERVICE);
+                Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
         List<RepositoryTag> tags = repoService.getTags(new RepositoryId(mRepoOwner, mRepoName));
         ArrayList<RepositoryTag> result = new ArrayList<>();
 

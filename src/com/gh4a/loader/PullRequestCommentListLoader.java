@@ -31,7 +31,7 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
         List<IssueEventHolder> events = super.doLoadInBackground();
 
         PullRequestService pullRequestService = (PullRequestService)
-                Gh4Application.get(getContext()).getService(Gh4Application.PULL_SERVICE);
+                Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
         List<CommitComment> commitComments =
                 pullRequestService.getComments(new RepositoryId(mRepoOwner, mRepoName), mIssueNumber);
 

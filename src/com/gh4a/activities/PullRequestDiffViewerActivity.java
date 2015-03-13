@@ -68,7 +68,7 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity {
         commitComment.setPath(mPath);
         commitComment.setBody(body);
 
-        Gh4Application app = Gh4Application.get(PullRequestDiffViewerActivity.this);
+        Gh4Application app = Gh4Application.get();
         PullRequestService pullRequestService = (PullRequestService)
                 app.getService(Gh4Application.PULL_SERVICE);
         RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
@@ -81,7 +81,7 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity {
 
     @Override
     protected void deleteComment(long id) throws IOException {
-        Gh4Application app = Gh4Application.get(PullRequestDiffViewerActivity.this);
+        Gh4Application app = Gh4Application.get();
         PullRequestService pullRequestService = (PullRequestService)
                 app.getService(Gh4Application.PULL_SERVICE);
 

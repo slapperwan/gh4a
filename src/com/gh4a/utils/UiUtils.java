@@ -227,8 +227,12 @@ public class UiUtils {
 
     public static void enqueueDownload(final Context context, String url, final String mimeType,
             final String fileName, final String description, final String mediaType) {
+        if (url == null) {
+            return;
+        }
+
         final Uri uri = Uri.parse(url).buildUpon()
-                .appendQueryParameter("access_token", Gh4Application.get(context).getAuthToken())
+                .appendQueryParameter("access_token", Gh4Application.get().getAuthToken())
                 .build();
         final Uri destinationUri = buildDownloadDestinationUri(fileName);
         if (destinationUri == null) {

@@ -255,7 +255,7 @@ public class SearchActivity extends BaseActivity implements
             }
 
             RepositoryService repoService = (RepositoryService)
-                    Gh4Application.get(mContext).getService(Gh4Application.REPO_SERVICE);
+                    Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
             HashMap<String, String> params = new HashMap<>();
             params.put("fork", "true");
 
@@ -283,7 +283,7 @@ public class SearchActivity extends BaseActivity implements
             }
 
             UserService userService = (UserService)
-                    Gh4Application.get(mContext).getService(Gh4Application.USER_SERVICE);
+                    Gh4Application.get().getService(Gh4Application.USER_SERVICE);
             return userService.searchUsers(mQuery);
         }
 

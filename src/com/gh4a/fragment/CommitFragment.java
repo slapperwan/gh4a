@@ -139,7 +139,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
 
     private void fillHeader() {
         final Activity activity = getActivity();
-        final Gh4Application app = Gh4Application.get(activity);
+        final Gh4Application app = Gh4Application.get();
 
         ImageView ivGravatar = (ImageView) mContentView.findViewById(R.id.iv_gravatar);
         AvatarHandler.assignAvatar(ivGravatar, mCommit.getAuthor());

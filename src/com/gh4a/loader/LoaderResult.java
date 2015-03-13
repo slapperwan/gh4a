@@ -47,7 +47,7 @@ public class LoaderResult<T> {
         }
 
         if (isAuthError()) {
-            Gh4Application.get(context).logout();
+            Gh4Application.get().logout();
         }
         Toast.makeText(context, getErrorMessage(), Toast.LENGTH_SHORT).show();
         return true;

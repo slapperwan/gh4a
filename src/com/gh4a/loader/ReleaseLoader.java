@@ -27,7 +27,7 @@ public class ReleaseLoader extends BaseLoader<List<Release>> {
     @Override
     public List<Release> doLoadInBackground() throws IOException {
         RepositoryService repoService = (RepositoryService)
-                Gh4Application.get(getContext()).getService(Gh4Application.REPO_SERVICE);
+                Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
         List<Release> releases = repoService.getReleases(new RepositoryId(mRepoOwner, mRepoName));
         Collections.sort(releases, new Comparator<Release>() {
 

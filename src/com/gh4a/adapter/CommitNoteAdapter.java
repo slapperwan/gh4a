@@ -74,7 +74,7 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements Vie
     @Override
     protected void bindView(View v, CommitComment comment) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
-        String ourLogin = Gh4Application.get(mContext).getAuthLogin();
+        String ourLogin = Gh4Application.get().getAuthLogin();
         User user = comment.getUser();
 
         AvatarHandler.assignAvatar(viewHolder.ivGravatar, user);
