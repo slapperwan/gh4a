@@ -1,45 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <attr name="red_box" format="reference" />
-    <attr name="green_box" format="reference" />
-    <attr name="textAppearanceCode" format="reference" />
-    <attr name="textAppearanceUrl" format="reference" />
-    <attr name="textAppearanceLargeUrl" format="reference" />
-    <attr name="textAppearanceMediumUrl" format="reference" />
-    <attr name="textAppearanceSmallUrl" format="reference" />
-    <attr name="textAppearanceMicroUrl" format="reference" />
-    <attr name="textAppearanceMedium" format="reference" />
-    <!-- attr name="textAppearanceSmall" format="reference" /-->
-    <attr name="textAppearanceLink" format="reference" />
-    <attr name="button_dashboard" format="reference" />
-    <attr name="comment_box" format="reference" />
-    <attr name="textAppearanceSubtitle" format="reference" />
-    <attr name="textAppearanceWhiteSmall" format="reference" />
-    <attr name="textAppearanceMicro" format="reference" />
+    <attr name="drawerTitleTextAppearance" format="reference" />
+    <attr name="headerTheme" format="reference" />
+    <attr name="cardViewTheme" format="reference" />
+    <attr name="listBackground" format="reference" />
+    <attr name="drawerBackground" format="reference" />
+    <attr name="colorIssueOpen" format="color" />
+    <attr name="colorIssueClosed" format="color" />
+    <attr name="colorPullRequestMerged" format="color" />
+    <attr name="colorIssueOpenDark" format="color" />
+    <attr name="colorIssueClosedDark" format="color" />
+    <attr name="colorPullRequestMergedDark" format="color" />
+    <attr name="colorIssueEditFab" format="reference" />
+    <attr name="colorCommitAddition" format="color" />
+    <attr name="colorCommitDeletion" format="color" />
+    <attr name="colorFab" format="color" />
 
     <attr name="sendIcon" format="reference" />
     <attr name="contentEditIcon" format="reference" />
-    <attr name="downloadIcon" format="reference" />
-    <attr name="searchIcon" format="reference" />
-    <attr name="shareIcon" format="reference" />
-    <attr name="webIcon" format="reference" />
-    <attr name="cancelIcon" format="reference" />
-    <attr name="discardIcon" format="reference" />
-    <attr name="acceptIcon" format="reference" />
-    <attr name="newIcon" format="reference" />
-    <attr name="refreshIcon" format="reference" />
     <attr name="sortIcon" format="reference" />
-    <attr name="labelListIcon" format="reference" />
-    <attr name="milestoneListIcon" format="reference" />
-    <attr name="personIcon" format="reference" />
     <attr name="contentPictureIcon" format="reference" />
-    <attr name="saveIcon" format="reference" />
     <attr name="searchUserIcon" format="reference" />
     <attr name="searchRepoIcon" format="reference" />
-    <attr name="searchUserMenuIcon" format="reference" />
-    <attr name="searchRepoMenuIcon" format="reference" />
+    <attr name="userBookmarkIcon" format="reference" />
+    <attr name="repoBookmarkIcon" format="reference" />
+    <attr name="submoduleIcon" format="reference" />
     <attr name="dirIcon" format="reference" />
     <attr name="fileIcon" format="reference" />
     <attr name="commentsIcon" format="reference" />
+    <attr name="languageSmallIcon" format="reference" />
+    <attr name="forkSmallIcon" format="reference" />
+    <attr name="starSmallIcon" format="reference" />
+    <attr name="sizeSmallIcon" format="reference" />
+    <attr name="dueSmallIcon" format="reference" />
+    <attr name="milestoneSmallIcon" format="reference" />
+    <attr name="downloadSmallIcon" format="reference" />
+    <attr name="filesSmallIcon" format="reference" />
+    <attr name="dueIcon" format="reference" />
+    <attr name="milestoneIcon" format="reference" />
+    <attr name="assigneeIcon" format="reference" />
+    <attr name="labelsIcon" format="reference" />
+    <attr name="branchIcon" format="reference" />
+    <attr name="tagIcon" format="reference" />
 
+    <declare-styleable name="LabelBadgeView">
+        <attr name="badgeSize" format="dimension"/>
+        <attr name="badgeSpacing" format="dimension"/>
+    </declare-styleable>
+
+    <declare-styleable name="StyleableTextView">
+        <attr name="font" format="enum">
+            <enum name="regular" value="0" />
+            <enum name="medium" value="1" />
+            <enum name="bold" value="2" />
+            <enum name="italic" value="3" />
+            <enum name="condensed" value="4" />
+            <enum name="boldCondensed" value="5" />
+        </attr>
+        <attr name="allCaps" format="boolean"/>
+    </declare-styleable>
 </resources>

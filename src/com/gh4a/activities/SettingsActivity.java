@@ -4,14 +4,12 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
-import android.view.MenuItem;
 
-import com.gh4a.Gh4Application;
+import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.SettingsFragment;
 
-public class SettingsActivity extends ActionBarActivity implements
+public class SettingsActivity extends BaseActivity implements
         SettingsFragment.OnStateChangeListener {
     public static final String RESULT_EXTRA_THEME_CHANGED = "theme_changed";
     public static final String RESULT_EXTRA_AUTH_CHANGED = "auth_changed";
@@ -22,7 +20,6 @@ public class SettingsActivity extends ActionBarActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
         ActionBar actionBar = getSupportActionBar();
@@ -34,7 +31,7 @@ public class SettingsActivity extends ActionBarActivity implements
 
             getSupportFragmentManager()
                     .beginTransaction()
-                    .add(android.R.id.content, new SettingsFragment())
+                    .add(R.id.content_container, new SettingsFragment())
                     .commit();
         } else {
             mResultIntent = savedInstanceState.getParcelable(STATE_KEY_RESULT);
@@ -47,15 +44,6 @@ public class SettingsActivity extends ActionBarActivity implements
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(STATE_KEY_RESULT, mResultIntent);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override

@@ -1,0 +1,118 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingTop="@dimen/content_padding"
+    android:paddingBottom="@dimen/floating_action_button_margin_mini">
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingLeft="@dimen/content_padding"
+        android:paddingRight="@dimen/content_padding"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <com.gh4a.widget.FixedSizeImageView
+            android:id="@+id/iv_gravatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginRight="16dp" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_extra"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/primary_text_default_material_dark"
+            android:textSize="16sp"
+            android:layout_toRightOf="@id/iv_gravatar" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_timestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.VerySmall"
+            android:textColor="@color/secondary_text_default_material_dark"
+            android:layout_marginTop="2dp"
+            android:layout_toRightOf="@id/iv_gravatar"
+            android:layout_below="@id/tv_extra"/>
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textAppearance="@style/TextAppearance.ItemTitle"
+            android:textColor="@color/primary_text_default_material_dark"
+            android:layout_below="@id/iv_gravatar" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_pull"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/SelectableLabel"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/primary_text_default_material_dark"
+            android:layout_marginTop="8dp"
+            android:layout_below="@id/tv_title"
+            android:text="@string/view_pull_request"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/content_padding"
+        android:paddingRight="52dp">
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_milestone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/secondary_text_default_material_dark"
+            android:visibility="gone" />
+
+        <com.gh4a.widget.FixedSizeImageView
+            android:id="@+id/iv_assignee"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginRight="8dp"
+            android:layout_below="@id/tv_milestone"
+            android:visibility="gone" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_assignee"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:gravity="center_vertical"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/primary_text_default_material_dark"
+            android:layout_below="@id/tv_milestone"
+            android:layout_toRightOf="@id/iv_assignee"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/ll_labels"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:layout_below="@id/iv_assignee"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+
+    <com.gh4a.widget.VerticalTextView
+        android:id="@+id/tv_state"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:textAppearance="@style/TextAppearance.VerySmall"
+        android:textColor="@color/primary_text_default_material_dark"
+        android:gravity="top|center" />
+
+</LinearLayout>

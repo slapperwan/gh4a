@@ -65,7 +65,7 @@ public class WatchedRepositoryListFragment extends PagedDataBaseFragment<Reposit
     @Override
     protected PageIterator<Repository> onCreateIterator() {
         WatcherService watcherService = (WatcherService)
-                Gh4Application.get(getActivity()).getService(Gh4Application.WATCHER_SERVICE);
+                Gh4Application.get().getService(Gh4Application.WATCHER_SERVICE);
         return watcherService.pageWatched(mLogin);
     }
 }

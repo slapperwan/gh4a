@@ -65,7 +65,7 @@ public class StarredRepositoryListFragment extends PagedDataBaseFragment<Reposit
     @Override
     protected PageIterator<Repository> onCreateIterator() {
         StarService starService = (StarService)
-                Gh4Application.get(getActivity()).getService(Gh4Application.STAR_SERVICE);
+                Gh4Application.get().getService(Gh4Application.STAR_SERVICE);
         return starService.pageStarred(mLogin);
     }
 }

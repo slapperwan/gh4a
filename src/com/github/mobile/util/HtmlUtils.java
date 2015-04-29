@@ -158,7 +158,7 @@ public class HtmlUtils {
 
         private int indentLevel;
 
-        private LinkedList<ListSeparator> listElements = new LinkedList<ListSeparator>();
+        private LinkedList<ListSeparator> listElements = new LinkedList<>();
 
         public void handleTag(final boolean opening, final String tag,
                 final Editable output, final XMLReader xmlReader) {
@@ -197,7 +197,7 @@ public class HtmlUtils {
                 return;
             }
 
-            if (TAG_LI.equalsIgnoreCase(tag) && opening) {
+            if (TAG_LI.equalsIgnoreCase(tag) && opening && indentLevel > 0) {
                 listElements.getFirst().append(output, indentLevel);
                 return;
             }

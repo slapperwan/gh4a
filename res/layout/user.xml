@@ -1,267 +1,292 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="@dimen/content_padding"
-        android:paddingTop="@dimen/content_padding">
+        android:orientation="vertical">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/content_padding"
-            android:paddingRight="@dimen/content_padding">
-
-            <com.gh4a.widget.FixedSizeImageView
-                android:id="@+id/iv_gravatar"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_marginRight="8dp" />
-
-            <TextView
-                android:id="@+id/tv_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@id/iv_gravatar"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
-
-            <TextView
-                android:id="@+id/tv_created_at"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_name"
-                android:layout_toRightOf="@id/iv_gravatar"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-
-            <TextView
-                android:id="@+id/tv_email"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_created_at"
-                android:layout_toRightOf="@id/iv_gravatar"
-                android:autoLink="email"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColorLink="@color/highlight" />
-
-            <TextView
-                android:id="@+id/tv_website"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_email"
-                android:layout_toRightOf="@id/iv_gravatar"
-                android:autoLink="web"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColorLink="@color/highlight" />
-
-            <TextView
-                android:id="@+id/tv_company"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_website"
-                android:layout_toRightOf="@id/iv_gravatar"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-
-            <TextView
-                android:id="@+id/tv_location"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_company"
-                android:layout_toRightOf="@id/iv_gravatar"
-                android:autoLink="map"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-        </RelativeLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/overview_item_spacing"
-            android:paddingLeft="@dimen/content_padding"
-            android:paddingRight="@dimen/content_padding">
+        <!-- user info section -->
+        <android.support.v7.widget.CardView
+            style="?attr/cardViewTheme">
 
             <LinearLayout
-                android:id="@+id/cell_org_members"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal"
-                style="@style/SelectableItem"
-                android:orientation="vertical">
+                android:layout_marginBottom="@dimen/overview_header_spacing"
+                android:layout_marginTop="@dimen/overview_header_spacing"
+                android:orientation="vertical"
+                android:padding="@dimen/content_padding">
 
-                <TextView
-                    android:id="@+id/tv_members_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/view"
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/tv_members_label"
-                    android:layout_width="wrap_content"
+                    <com.gh4a.widget.FixedSizeImageView
+                        android:id="@+id/iv_gravatar"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_marginRight="16dp" />
+
+                    <com.gh4a.widget.StyleableTextView
+                        android:id="@+id/tv_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_toRightOf="@id/iv_gravatar"
+                        android:textAppearance="@style/TextAppearance.HeaderTitle" />
+
+                    <com.gh4a.widget.StyleableTextView
+                        android:id="@+id/tv_created_at"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tv_name"
+                        android:layout_toRightOf="@id/iv_gravatar"
+                        android:layout_marginTop="2dp"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                    <com.gh4a.widget.StyleableTextView
+                        android:id="@+id/tv_email"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tv_created_at"
+                        android:layout_toRightOf="@id/iv_gravatar"
+                        android:layout_marginTop="2dp"
+                        android:autoLink="email"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColorLink="?android:attr/textColorLink" />
+
+                    <com.gh4a.widget.StyleableTextView
+                        android:id="@+id/tv_website"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tv_email"
+                        android:layout_toRightOf="@id/iv_gravatar"
+                        android:layout_marginTop="2dp"
+                        android:autoLink="web"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColorLink="?android:attr/textColorLink" />
+
+                    <com.gh4a.widget.StyleableTextView
+                        android:id="@+id/tv_company"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tv_website"
+                        android:layout_toRightOf="@id/iv_gravatar"
+                        android:layout_marginTop="2dp"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                    <com.gh4a.widget.StyleableTextView
+                        android:id="@+id/tv_location"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tv_company"
+                        android:layout_toRightOf="@id/iv_gravatar"
+                        android:layout_marginTop="2dp"
+                        android:autoLink="map"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/user_members"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                    android:layout_marginTop="@dimen/overview_item_spacing">
+
+                    <LinearLayout
+                        android:id="@+id/cell_org_members"
+                        style="@style/SelectableBorderlessItem"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <com.gh4a.widget.StyleableTextView
+                            android:id="@+id/tv_members_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/view"
+                            android:textAppearance="@style/TextAppearance.CountHeaderItem" />
+
+                        <com.gh4a.widget.StyleableTextView
+                            android:id="@+id/tv_members_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/user_members"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/cell_followers"
+                        style="@style/SelectableBorderlessItem"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <com.gh4a.widget.StyleableTextView
+                            android:id="@+id/tv_followers_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textAppearance="@style/TextAppearance.CountHeaderItem" />
+
+                        <com.gh4a.widget.StyleableTextView
+                            android:id="@+id/tv_followers_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/user_followers"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/cell_following"
+                        style="@style/SelectableBorderlessItem"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <com.gh4a.widget.StyleableTextView
+                            android:id="@+id/tv_following_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="@style/TextAppearance.CountHeaderItem" />
+
+                        <com.gh4a.widget.StyleableTextView
+                            android:id="@+id/tv_following_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/user_following"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/cell_repos"
+                        style="@style/SelectableBorderlessItem"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <com.gh4a.widget.StyleableTextView
+                            android:id="@+id/tv_repos_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="@style/TextAppearance.CountHeaderItem" />
+
+                        <com.gh4a.widget.StyleableTextView
+                            android:id="@+id/tv_repos_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/repo_short"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/cell_gists"
+                        style="@style/SelectableBorderlessItem"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <com.gh4a.widget.StyleableTextView
+                            android:id="@+id/tv_gists_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="@style/TextAppearance.CountHeaderItem" />
+
+                        <com.gh4a.widget.StyleableTextView
+                            android:id="@+id/tv_gists_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/gists"
+                            android:textAppearance="?android:attr/textAppearanceSmall" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/cell_followers"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal"
-                style="@style/SelectableItem"
-                android:orientation="vertical">
+        </android.support.v7.widget.CardView>
 
-                <TextView
-                    android:id="@+id/tv_followers_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
-
-                <TextView
-                    android:id="@+id/tv_followers_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/user_followers"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/cell_following"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal"
-                style="@style/SelectableItem"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tv_following_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
-
-                <TextView
-                    android:id="@+id/tv_following_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/user_following"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/cell_repos"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal"
-                style="@style/SelectableItem"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tv_repos_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
-
-                <TextView
-                    android:id="@+id/tv_repos_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/repo_short"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/cell_gists"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center_horizontal"
-                style="@style/SelectableItem"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tv_gists_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
-
-                <TextView
-                    android:id="@+id/tv_gists_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/gists"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-            </LinearLayout>
-        </LinearLayout>
         <!-- Repository section -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingLeft="@dimen/content_padding"
-            android:paddingRight="@dimen/content_padding">
+        <android.support.v7.widget.CardView
+            style="?attr/cardViewTheme">
 
-            <TextView
-                android:id="@+id/tv_pub_repos_label"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/overview_item_spacing"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
-                style="@style/HeaderLabel"
-                android:text="@string/user_pub_repos" />
+                android:orientation="vertical">
 
-            <ProgressBar
-                android:id="@+id/pb_top_repos"
-                style="@style/LoadingProgress" />
-        </LinearLayout>
+                <com.gh4a.widget.StyleableTextView
+                    android:id="@+id/tv_pub_repos_label"
+                    style="@style/HeaderLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/user_pub_repos"/>
 
+                <ProgressBar
+                    android:id="@+id/pb_top_repos"
+                    style="@style/LoadingProgress" />
 
-        <LinearLayout
-            android:id="@+id/ll_top_repos"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone" />
+                <LinearLayout
+                    android:id="@+id/ll_top_repos"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone" />
 
-        <Button
-            android:id="@+id/btn_repos"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/content_padding"
-            android:layout_marginRight="@dimen/content_padding"
-            android:text="@string/view_more"
-            style="@style/MoreButton"
-            android:visibility="gone" />
+                <com.gh4a.widget.StyleableTextView
+                    android:id="@+id/btn_repos"
+                    style="@style/MoreButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/content_padding"
+                    android:paddingRight="@dimen/content_padding"
+                    android:gravity="center_horizontal"
+                    android:text="@string/view_more"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
         <!-- Organizations section -->
-        <LinearLayout
+        <android.support.v7.widget.CardView
             android:id="@+id/ll_orgs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/overview_item_spacing"
-            android:orientation="vertical"
-            android:paddingLeft="@dimen/content_padding"
-            android:paddingRight="@dimen/content_padding">
+            style="?attr/cardViewTheme">
 
-            <TextView
-                android:id="@+id/tv_orgs"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/overview_header_spacing"
-                style="@style/HeaderLabel"
-                android:text="@string/user_organizations" />
-        </LinearLayout>
+                android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/ll_org"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
+                <com.gh4a.widget.StyleableTextView
+                    android:id="@+id/tv_orgs"
+                    style="@style/HeaderLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/user_organizations" />
+
+                <LinearLayout
+                    android:id="@+id/ll_org"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="@dimen/overview_header_spacing" />
+
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
     </LinearLayout>
 </ScrollView>

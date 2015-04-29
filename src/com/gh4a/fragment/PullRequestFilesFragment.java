@@ -44,8 +44,8 @@ public class PullRequestFilesFragment extends CommitFragment {
         @Override
         public void onResultReady(LoaderResult<List<CommitFile>> result) {
             if (result.handleError(getActivity())) {
-                setContentEmpty(true);
                 setContentShown(true);
+                setContentEmpty(true);
                 return;
             }
             mFiles = result.getData();
@@ -64,8 +64,8 @@ public class PullRequestFilesFragment extends CommitFragment {
         @Override
         public void onResultReady(LoaderResult<List<CommitComment>> result) {
             if (result.handleError(getActivity())) {
-                setContentEmpty(true);
                 setContentShown(true);
+                setContentEmpty(true);
                 return;
             }
             mComments = result.getData();
@@ -95,8 +95,12 @@ public class PullRequestFilesFragment extends CommitFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mContentView.findViewById(R.id.title).setVisibility(View.GONE);
-        mContentView.findViewById(R.id.committer_info).setVisibility(View.GONE);
+        mContentView.findViewById(R.id.iv_gravatar).setVisibility(View.GONE);
+        mContentView.findViewById(R.id.tv_author).setVisibility(View.GONE);
+        mContentView.findViewById(R.id.tv_timestamp).setVisibility(View.GONE);
+        mContentView.findViewById(R.id.tv_title).setVisibility(View.GONE);
+        mContentView.findViewById(R.id.iv_commit_gravatar).setVisibility(View.GONE);
+        mContentView.findViewById(R.id.tv_commit_extra).setVisibility(View.GONE);
         mContentView.findViewById(R.id.tv_message).setVisibility(View.GONE);
     }
 
@@ -127,7 +131,7 @@ public class PullRequestFilesFragment extends CommitFragment {
         intent.putExtra(Constants.Object.REF, commitSha);
         intent.putExtra(Constants.Object.OBJECT_SHA, commitSha);
         intent.putExtra(Constants.Commit.DIFF, file.getPatch());
-        intent.putExtra(Constants.Commit.COMMENTS, new ArrayList<CommitComment>(mComments));
+        intent.putExtra(Constants.Commit.COMMENTS, new ArrayList<>(mComments));
         intent.putExtra(Constants.Object.PATH, file.getFilename());
         startActivityForResult(intent, REQUEST_DIFF_VIEWER);
     }

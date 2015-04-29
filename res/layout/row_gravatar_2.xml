@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:padding="@dimen/content_padding">
+
+    <com.gh4a.widget.FixedSizeImageView
+        android:id="@+id/iv_gravatar"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="16dp" />
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.ItemTitle"
+        app:font="boldCondensed"
+        android:layout_toRightOf="@id/iv_gravatar"
+        android:layout_alignParentTop="true" />
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/tv_extra"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/iv_gravatar"
+        android:layout_below="@id/tv_title"
+        android:textAppearance="@style/TextAppearance.VerySmall"
+        app:font="italic" />
+
+</RelativeLayout>

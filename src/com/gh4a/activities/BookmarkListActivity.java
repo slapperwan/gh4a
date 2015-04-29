@@ -17,14 +17,15 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.gh4a.LoadingFragmentActivity;
+import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.BookmarkAdapter;
 import com.gh4a.db.BookmarksProvider.Columns;
 import com.gh4a.utils.UiUtils;
 
-public class BookmarkListActivity extends LoadingFragmentActivity implements
-        AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, LoaderCallbacks<Cursor> {
+public class BookmarkListActivity extends BaseActivity implements
+        AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener,
+        LoaderCallbacks<Cursor> {
     private static final String TAG = "BookmarkListActivity";
 
     private BookmarkAdapter mAdapter;
@@ -35,18 +36,26 @@ public class BookmarkListActivity extends LoadingFragmentActivity implements
 
         setContentView(R.layout.generic_list);
         setContentShown(false);
+        setEmptyText(R.string.no_bookmarks);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.bookmarks);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        ListView listView = (ListView) findViewById(R.id.list_view);
+        ListView listView = (ListView) findViewById(android.R.id.list);
         mAdapter = new BookmarkAdapter(this);
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
         listView.setOnItemLongClickListener(this);
+        listView.setBackgroundResource(UiUtils.resolveDrawable(this, R.attr.listBackground));
 
         getSupportLoaderManager().initLoader(0, null, this);
+    }
+
+    @Override
+    protected boolean isOnline() {
+        // we don't need a connection
+        return true;
     }
 
     @Override
@@ -88,10 +97,12 @@ public class BookmarkListActivity extends LoadingFragmentActivity implements
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mAdapter.swapCursor(data);
         setContentShown(true);
+        setContentEmpty(data.getCount() == 0);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.swapCursor(null);
+        setContentEmpty(true);
     }
 }

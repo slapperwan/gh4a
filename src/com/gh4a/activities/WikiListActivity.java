@@ -28,8 +28,8 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
-import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.CommonFeedAdapter;
 import com.gh4a.holder.Feed;
@@ -38,8 +38,9 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.ToastUtils;
+import com.gh4a.utils.UiUtils;
 
-public class WikiListActivity extends LoadingFragmentActivity {
+public class WikiListActivity extends BaseActivity {
     private String mUserLogin;
     private String mRepoName;
     private ListView mListView;
@@ -53,6 +54,7 @@ public class WikiListActivity extends LoadingFragmentActivity {
         @Override
         public void onResultReady(LoaderResult<List<Feed>> result) {
             setContentEmpty(true);
+            //noinspection ThrowableResultOfMethodCallIgnored
             if (result.getException() instanceof SAXException) {
                 ToastUtils.notFoundMessage(WikiListActivity.this, getString(R.string.recent_wiki));
             } else if (!result.handleError(WikiListActivity.this)) {
@@ -82,7 +84,7 @@ public class WikiListActivity extends LoadingFragmentActivity {
         actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        mListView = (ListView) findViewById(R.id.list_view);
+        mListView = (ListView) findViewById(android.R.id.list);
         //mListView.setOnScrollListener(new WikiScrollListener(this));
         CommonFeedAdapter adapter = new CommonFeedAdapter(this, false);
         mListView.setAdapter(adapter);
@@ -93,6 +95,8 @@ public class WikiListActivity extends LoadingFragmentActivity {
                 openViewer(feed);
             }
         });
+        mListView.setBackgroundResource(
+                UiUtils.resolveDrawable(this, R.attr.listBackground));
 
         getSupportLoaderManager().initLoader(0, null, mFeedCallback);
     }

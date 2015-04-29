@@ -1,15 +1,21 @@
 package com.gh4a.fragment;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.support.v4.preference.PreferenceFragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.gh4a.Constants;
@@ -31,11 +37,13 @@ public class SettingsFragment extends PreferenceFragment implements
     public static final String KEY_TEXT_SIZE = "webview_initial_zoom";
     private static final String KEY_LOGOUT = "logout";
     private static final String KEY_ABOUT = "about";
+    private static final String KEY_OPEN_SOURCE_COMPONENTS = "open_source_components";
 
     private OnStateChangeListener mListener;
     private IntegerListPreference mThemePref;
     private Preference mLogoutPref;
     private Preference mAboutPref;
+    private Preference mOpenSourcePref;
 
     @Override
     public void onAttach(Activity activity) {
@@ -58,10 +66,14 @@ public class SettingsFragment extends PreferenceFragment implements
 
         mLogoutPref = findPreference(KEY_LOGOUT);
         mLogoutPref.setOnPreferenceClickListener(this);
+
         mAboutPref = findPreference(KEY_ABOUT);
         mAboutPref.setOnPreferenceClickListener(this);
-
         mAboutPref.setSummary(getAppName());
+
+        mOpenSourcePref = findPreference(KEY_OPEN_SOURCE_COMPONENTS);
+        mOpenSourcePref.setOnPreferenceClickListener(this);
+
         updateLogoutPrefState();
     }
 
@@ -76,7 +88,7 @@ public class SettingsFragment extends PreferenceFragment implements
 
     @Override
     public boolean onPreferenceClick(Preference pref) {
-        Gh4Application app = Gh4Application.get(getActivity());
+        Gh4Application app = Gh4Application.get();
         if (pref == mLogoutPref) {
             app.logout();
             updateLogoutPrefState();
@@ -87,12 +99,16 @@ public class SettingsFragment extends PreferenceFragment implements
             d.setTitle(getAppName());
             d.show();
             return true;
+        } else if (pref == mOpenSourcePref) {
+            OpenSourceComponentListDialog d = new OpenSourceComponentListDialog(getActivity());
+            d.show();
+            return true;
         }
         return false;
     }
 
     private void updateLogoutPrefState() {
-        Gh4Application app = Gh4Application.get(getActivity());
+        Gh4Application app = Gh4Application.get();
         if (app.isAuthorized()) {
             mLogoutPref.setEnabled(true);
             mLogoutPref.setSummary(getString(R.string.logout_pref_summary_logged_in,
@@ -161,6 +177,72 @@ public class SettingsFragment extends PreferenceFragment implements
                         context.getString(R.string.my_repo));
                 context.startActivity(intent);
             }
+        }
+    }
+
+    private static class OpenSourceComponentListDialog extends AlertDialog {
+        public OpenSourceComponentListDialog(Context context) {
+            super(context);
+
+            LayoutInflater inflater = LayoutInflater.from(context);
+            ListView lv = (ListView) inflater.inflate(R.layout.open_source_component_list, null);
+            lv.setAdapter(new OpenSourceComponentAdapter(context));
+
+            setView(lv);
+            setTitle(R.string.open_source_components);
+            setButton(DialogInterface.BUTTON_POSITIVE, context.getString(R.string.ok),
+                    (DialogInterface.OnClickListener) null);
+        }
+    }
+
+    private static class OpenSourceComponentAdapter extends BaseAdapter {
+        private static final String[][] COMPONENTS = new String[][] {
+            { "Android-ProgressFragment", "https://github.com/johnkil/Android-ProgressFragment" },
+            { "android-support-v4-preferencefragment",
+                    "https://github.com/kolavar/android-support-v4-preferencefragment" },
+            { "Floating Action Button", "https://github.com/shamanland/floating-action-button" },
+            { "Github Java bindings", "https://github.com/maniac103/egit-github" },
+            { "HoloColorPicker", "https://github.com/LarsWerkman/HoloColorPicker" },
+            { "Material Design Icons", "https://github.com/google/material-design-icons" },
+            { "Nine Old Androids", "https://github.com/JakeWharton/NineOldAndroids" },
+            { "PrettyTime", "https://github.com/ocpsoft/prettytime" },
+            { "SmoothProgressBar", "https://github.com/castorflex/SmoothProgressBar" }
+        };
+
+        private LayoutInflater mInflater;
+
+        public OpenSourceComponentAdapter(Context context) {
+            mInflater = LayoutInflater.from(context);
+        }
+
+        @Override
+        public int getCount() {
+            return COMPONENTS.length;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return COMPONENTS[position];
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = mInflater.inflate(R.layout.open_source_component_item, parent, false);
+            }
+
+            TextView title = (TextView) convertView.findViewById(R.id.title);
+            TextView url = (TextView) convertView.findViewById(R.id.url);
+
+            title.setText(COMPONENTS[position][0]);
+            url.setText(COMPONENTS[position][1]);
+
+            return convertView;
         }
     }
 }

@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/refresh"
-        android:icon="?attr/refreshIcon"
-        android:title="@string/refresh"
-        app:showAsAction="always" />
     <item android:id="@+id/star"
         android:title="@string/repo_star_action"
+        android:icon="@drawable/star"
         app:showAsAction="always" />
+    <item android:id="@+id/ref"
+        android:title="@string/repo_select_ref"
+        android:icon="@drawable/branch_dark"
+        app:showAsAction="ifRoom" />
+    <item android:id="@+id/share"
+        android:title="@string/share"
+        android:icon="@drawable/social_share"
+        app:showAsAction="never" />
     <item android:id="@+id/watch"
         android:title="@string/repo_watch_action"
-        app:showAsAction="always" />
-    <item android:id="@+id/branches"
-        android:title="@string/repo_branches"
         app:showAsAction="never" />
-    <item android:id="@+id/tags"
-        android:title="@string/repo_tags"
+    <item android:id="@+id/zip_download"
+        android:title="@string/repo_download_action"
         app:showAsAction="never" />
     <item android:id="@+id/bookmark"
         android:title="@string/bookmark_repo"
-        app:showAsAction="never" />
-    <item android:id="@+id/share"
-        android:title="@string/share"
         app:showAsAction="never" />
 </menu>

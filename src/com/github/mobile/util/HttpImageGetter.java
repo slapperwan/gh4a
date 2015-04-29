@@ -23,6 +23,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.support.v4.os.AsyncTaskCompat;
 import android.text.Html.ImageGetter;
 import android.text.TextUtils;
 import android.view.WindowManager;
@@ -79,9 +80,9 @@ public class HttpImageGetter implements ImageGetter {
 
     private final int width;
 
-    private final Map<Object, CharSequence> rawHtmlCache = new HashMap<Object, CharSequence>();
+    private final Map<Object, CharSequence> rawHtmlCache = new HashMap<>();
 
-    private final Map<Object, CharSequence> fullHtmlCache = new HashMap<Object, CharSequence>();
+    private final Map<Object, CharSequence> fullHtmlCache = new HashMap<>();
 
     /**
      * Create image getter for context
@@ -118,11 +119,7 @@ public class HttpImageGetter implements ImageGetter {
         if (TextUtils.isEmpty(html))
             return hide(view);
 
-        try {
-            view.setText(html);
-        }
-        catch (Exception e) {
-        }
+        view.setText(html);
         view.setVisibility(VISIBLE);
         view.setTag(null);
         return this;
@@ -191,7 +188,7 @@ public class HttpImageGetter implements ImageGetter {
         show(view, encoded);
         view.setTag(id);
         ImageGetterAsyncTask asyncTask = new ImageGetterAsyncTask();
-        asyncTask.execute(html, id, view);
+        AsyncTaskCompat.executeParallel(asyncTask, html, id, view);
         return this;
     }
 

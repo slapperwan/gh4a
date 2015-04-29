@@ -18,27 +18,33 @@ package com.gh4a.activities;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.content.res.TypedArray;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
+import android.support.annotation.NonNull;
+import android.util.AttributeSet;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.EditText;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
-import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.utils.ThemeUtils;
 
-public abstract class WebViewerActivity extends LoadingFragmentActivity {
+public abstract class WebViewerActivity extends BaseActivity {
     protected WebView mWebView;
 
     private int[] ZOOM_SIZES = new int[] {
@@ -84,14 +90,34 @@ public abstract class WebViewerActivity extends LoadingFragmentActivity {
             }
         }
 
-        ActionBar actionBar = getSupportActionBar();
-        // Inflate from action bar context to get the correct foreground color
-        // when using the DarkActionBar theme
-        LayoutInflater inflater = LayoutInflater.from(actionBar.getThemedContext());
-        setContentView(inflater.inflate(R.layout.web_viewer, null));
+        // We also use the dark CAB for the light theme, so we have to inflate
+        // the WebView using a dark theme
+        Context inflateContext = new ContextThemeWrapper(this, R.style.DarkTheme);
+        setContentView(LayoutInflater.from(inflateContext).inflate(R.layout.web_viewer, null));
 
         setContentShown(false);
         setupWebView();
+    }
+
+    @Override
+    public View onCreateView(String name, @NonNull Context context, @NonNull AttributeSet attrs) {
+        View view = super.onCreateView(name, context, attrs);
+        // When tinting the views, the support library discards the passed context,
+        // thus the search view input box is black-on-black when using the light
+        // theme. Fix that by post-processing the EditText instance
+        if (view instanceof EditText) {
+            applyDefaultDarkColors((EditText) view);
+        }
+        return view;
+    }
+
+    private void applyDefaultDarkColors(EditText view) {
+        TypedArray a = getTheme().obtainStyledAttributes(R.style.DarkTheme, new int[] {
+            android.R.attr.textColorPrimary, android.R.attr.textColorHint
+        });
+        view.setTextColor(a.getColor(0, 0));
+        view.setHintTextColor(a.getColor(1, 0));
+        a.recycle();
     }
 
     @SuppressWarnings("deprecation")
@@ -161,7 +187,7 @@ public abstract class WebViewerActivity extends LoadingFragmentActivity {
     }
 
     protected void loadUnthemedHtml(String html) {
-        if (Gh4Application.THEME == R.style.DefaultTheme) {
+        if (Gh4Application.THEME == R.style.DarkTheme) {
             html = "<style type=\"text/css\">" +
                     "body { color: #A3A3A5 !important }" +
                     "a { color: #4183C4 !important }</style><body>" +

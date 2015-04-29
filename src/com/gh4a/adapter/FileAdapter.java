@@ -76,7 +76,7 @@ public class FileAdapter extends RootAdapter<RepositoryContents> {
     private int getIconId(String type, String fileName) {
         int iconId;
         if (mSubModuleNames != null && mSubModuleNames.contains(fileName)) {
-            iconId = R.attr.searchRepoIcon;
+            iconId = R.attr.submoduleIcon;
         } else if (RepositoryContents.TYPE_DIR.equals(type)) {
             iconId = R.attr.dirIcon;
         } else if (RepositoryContents.TYPE_FILE.equals(type) && FileUtils.isImage(fileName)) {

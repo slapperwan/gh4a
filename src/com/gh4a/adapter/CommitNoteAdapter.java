@@ -20,6 +20,9 @@ import org.eclipse.egit.github.core.User;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,6 +64,7 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements Vie
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
         viewHolder.tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+        viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
         viewHolder.ivEdit = (ImageView) v.findViewById(R.id.iv_edit);
 
         v.setTag(viewHolder);
@@ -70,14 +74,18 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements Vie
     @Override
     protected void bindView(View v, CommitComment comment) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
-        String ourLogin = Gh4Application.get(mContext).getAuthLogin();
+        String ourLogin = Gh4Application.get().getAuthLogin();
         User user = comment.getUser();
 
         AvatarHandler.assignAvatar(viewHolder.ivGravatar, user);
 
+        SpannableString userName = new SpannableString(comment.getUser().getLogin());
+        userName.setSpan(new StyleSpan(Typeface.BOLD), 0, userName.length(), 0);
+
         viewHolder.ivGravatar.setTag(comment);
-        viewHolder.tvExtra.setText(StringUtils.createUserWithDateText(mContext,
-                comment.getUser(), comment.getCreatedAt()));
+        viewHolder.tvExtra.setText(userName);
+        viewHolder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
+                comment.getCreatedAt(), true));
 
         String body = HtmlUtils.format(comment.getBodyHtml()).toString();
         mImageGetter.bind(viewHolder.tvDesc, body, comment.getId());
@@ -111,15 +119,11 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment> implements Vie
         }
     }
 
-    @Override
-    public boolean isEnabled(int position) {
-        return false;
-    }
-
     private static class ViewHolder {
         public ImageView ivGravatar;
         public TextView tvDesc;
         public TextView tvExtra;
+        public TextView tvTimestamp;
         public ImageView ivEdit;
     }
 }

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/comment_editor"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="?attr/listBackground"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true">
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_bg"
+        android:layout_marginBottom="2dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/et_comment"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:padding="8dp"
+            android:maxLines="@integer/comment_box_max_lines"
+            android:inputType="textMultiLine|textCapSentences" />
+
+        <ImageView
+            android:id="@+id/iv_comment"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="bottom"
+            android:src="?attr/sendIcon"
+            style="@style/SelectableBorderlessItem"
+            android:scaleType="centerInside" />
+
+    </LinearLayout>
+
+</LinearLayout>

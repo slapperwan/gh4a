@@ -29,7 +29,7 @@ public interface Constants {
     public interface Theme {
         public static final int DARK = 0;
         public static final int LIGHT = 1;
-        public static final int LIGHTDARK = 2;
+        public static final int LIGHTDARK = 2; /* backwards compat with old settings */
     }
 
     public interface User {
@@ -82,11 +82,6 @@ public interface Constants {
         public static final String CONTENT = "Blog.content";
         public static final String TITLE = "Blog.title";
         public static final String LINK = "Blog.link";
-    }
-
-    public interface Milestone {
-        public static final String NUMBER = "Milestone.number";
-        public static final String STATE = "Milestone.state";
     }
 
     public interface Comment {

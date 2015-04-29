@@ -1,0 +1,59 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingLeft="@dimen/content_padding"
+        android:paddingRight="@dimen/content_padding"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <com.gh4a.widget.FixedSizeImageView
+            android:id="@+id/iv_gravatar"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginRight="16dp" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_extra"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/iv_gravatar"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/primary_text_default_material_dark" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_timestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/tv_extra"
+            android:layout_alignBaseline="@id/tv_extra"
+            android:layout_marginLeft="16dp"
+            android:textAppearance="@style/TextAppearance.VerySmall"
+            android:textColor="@color/secondary_text_default_material_dark" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textAppearance="@style/TextAppearance.ItemTitle"
+            android:textColor="@color/primary_text_default_material_dark"
+            android:layout_below="@id/iv_gravatar" />
+
+    </RelativeLayout>
+
+    <com.gh4a.widget.VerticalTextView
+        android:id="@+id/tv_state"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:textAppearance="@style/TextAppearance.VerySmall"
+        android:textColor="@color/primary_text_default_material_dark"
+        android:gravity="top|center" />
+
+</LinearLayout>

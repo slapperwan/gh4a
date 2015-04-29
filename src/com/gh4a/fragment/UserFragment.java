@@ -15,23 +15,17 @@
  */
 package com.gh4a.fragment;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBarActivity;
 import android.text.format.DateFormat;
-import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.devspark.progressfragment.ProgressFragment;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -47,7 +41,6 @@ import com.gh4a.loader.UserLoader;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.User;
@@ -57,7 +50,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class UserFragment extends ProgressFragment implements View.OnClickListener {
+public class UserFragment extends LoadingFragmentBase implements View.OnClickListener {
     private String mUserLogin;
     private String mUserName;
     private User mUser;
@@ -75,8 +68,8 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
                 mUser = result.getData();
                 fillData();
             }
-            setContentEmpty(!success);
             setContentShown(true);
+            setContentEmpty(!success);
             getActivity().supportInvalidateOptionsMenu();
         }
     };
@@ -85,7 +78,7 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
             new LoaderCallbacks<Collection<Repository>>() {
         @Override
         public Loader<LoaderResult<Collection<Repository>>> onCreateLoader(int id, Bundle args) {
-            Map<String, String> filterData = new HashMap<String, String>();
+            Map<String, String> filterData = new HashMap<>();
             filterData.put("sort", "pushed");
             return new RepositoryListLoader(getActivity(), mUserLogin,
                     mUser.getType(), filterData, 5);
@@ -133,6 +126,7 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         mContentView = inflater.inflate(R.layout.user, null);
+
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -140,6 +134,7 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        setEmptyText(R.string.user_no_data);
         setContentView(mContentView);
         setContentShown(false);
 
@@ -147,23 +142,13 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
     }
 
     public void refresh() {
-        setContentShown(false);
-        getLoaderManager().getLoader(0).onContentChanged();
+        if (mContentView != null) {
+            setContentShown(false);
+            getLoaderManager().getLoader(0).onContentChanged();
+        }
     }
 
     private void fillData() {
-        Gh4Application app = (Gh4Application) getActivity().getApplication();
-
-        UiUtils.assignTypeface(mContentView, app.boldCondensed, new int[] {
-            R.id.tv_name, R.id.tv_followers_count, R.id.tv_members_count,
-            R.id.tv_repos_count, R.id.tv_gists_count, R.id.tv_following_count,
-            R.id.tv_pub_repos_label, R.id.tv_orgs
-        });
-        UiUtils.assignTypeface(mContentView, app.regular, new int[] {
-            R.id.tv_created_at, R.id.tv_email, R.id.tv_website,
-            R.id.tv_company, R.id.tv_location
-        });
-
         ImageView gravatar = (ImageView) mContentView.findViewById(R.id.iv_gravatar);
         AvatarHandler.assignAvatar(gravatar, mUser);
 
@@ -184,7 +169,7 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
         mContentView.findViewById(R.id.cell_repos).setOnClickListener(this);
 
         TextView tvReposCount = (TextView) mContentView.findViewById(R.id.tv_repos_count);
-        if (mUserLogin.equals(Gh4Application.get(getActivity()).getAuthLogin())) {
+        if (mUserLogin.equals(Gh4Application.get().getAuthLogin())) {
             tvReposCount.setText(String.valueOf(mUser.getTotalPrivateRepos() + mUser.getPublicRepos()));
         } else {
             tvReposCount.setText(String.valueOf(mUser.getPublicRepos()));
@@ -253,11 +238,11 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
                 intent.putExtra(Constants.Repository.OWNER, mUserLogin);
             } else {
                 intent = new Intent(getActivity(), FollowerFollowingListActivity.class);
-                intent.putExtra("FIND_FOLLOWERS", true);
+                intent.putExtra(FollowerFollowingListActivity.EXTRA_SHOW_FOLLOWERS, true);
             }
         } else if (id == R.id.cell_following) {
             intent = new Intent(getActivity(), FollowerFollowingListActivity.class);
-            intent.putExtra("FIND_FOLLOWERS", false);
+            intent.putExtra(FollowerFollowingListActivity.EXTRA_SHOW_FOLLOWERS, false);
         } else if (id == R.id.cell_repos || id == R.id.btn_repos) {
             intent = new Intent(getActivity(), RepositoryListActivity.class);
         } else if (id == R.id.cell_gists) {
@@ -281,8 +266,6 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
     }
 
     public void fillTopRepos(Collection<Repository> topRepos) {
-        Gh4Application app = Gh4Application.get(getActivity());
-
         LinearLayout ll = (LinearLayout) mContentView.findViewById(R.id.ll_top_repos);
         ll.removeAllViews();
 
@@ -295,11 +278,9 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
                 rowView.setTag(repo);
 
                 TextView tvTitle = (TextView) rowView.findViewById(R.id.tv_title);
-                tvTitle.setTypeface(app.boldCondensed);
                 tvTitle.setText(repo.getOwner().getLogin() + "/" + repo.getName());
 
                 TextView tvDesc = (TextView) rowView.findViewById(R.id.tv_desc);
-                tvDesc.setSingleLine(true);
                 if (!StringUtils.isBlank(repo.getDescription())) {
                     tvDesc.setVisibility(View.VISIBLE);
                     tvDesc.setText(repo.getDescription());
@@ -307,35 +288,29 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
                     tvDesc.setVisibility(View.GONE);
                 }
 
-                TextView tvExtra = (TextView) rowView.findViewById(R.id.tv_extra);
-                String language = repo.getLanguage() != null
-                        ? repo.getLanguage() : getString(R.string.unknown);
-                tvExtra.setText(getString(R.string.repo_search_extradata, language,
-                        Formatter.formatFileSize(getActivity(), repo.getSize() * 1000),
-                        repo.getForks(), repo.getWatchers()));
+                TextView tvForks = (TextView) rowView.findViewById(R.id.tv_forks);
+                tvForks.setText(String.valueOf(repo.getForks()));
+
+                TextView tvStars = (TextView) rowView.findViewById(R.id.tv_stars);
+                tvStars.setText(String.valueOf(repo.getWatchers()));
 
                 ll.addView(rowView);
             }
         }
 
-        Button btnMore = (Button) getView().findViewById(R.id.btn_repos);
+        View btnMore = getView().findViewById(R.id.btn_repos);
         if (topRepos != null && !topRepos.isEmpty()) {
             btnMore.setOnClickListener(this);
             btnMore.setVisibility(View.VISIBLE);
         } else {
-            View rowView = inflater.inflate(R.layout.top_repo, null);
-            rowView.findViewById(R.id.tv_title).setVisibility(View.GONE);
-            rowView.findViewById(R.id.tv_extra).setVisibility(View.GONE);
-            TextView noRepoView = (TextView) rowView.findViewById(R.id.tv_desc);
-            noRepoView.setText(R.string.user_no_repos);
-            noRepoView.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
-            ll.addView(rowView);
+            TextView hintView = (TextView) inflater.inflate(R.layout.hint_view, ll, false);
+            hintView.setText(R.string.user_no_repos);
+            ll.addView(hintView);
         }
     }
 
     public void fillOrganizations(List<User> organizations) {
-        Gh4Application app = Gh4Application.get(getActivity());
-        LinearLayout llOrgs = (LinearLayout) mContentView.findViewById(R.id.ll_orgs);
+        ViewGroup llOrgs = (ViewGroup) mContentView.findViewById(R.id.ll_orgs);
         LinearLayout llOrg = (LinearLayout) mContentView.findViewById(R.id.ll_org);
         int count = organizations != null ? organizations.size() : 0;
         LayoutInflater inflater = getLayoutInflater(null);
@@ -345,14 +320,11 @@ public class UserFragment extends ProgressFragment implements View.OnClickListen
 
         for (int i = 0; i < count; i++) {
             User org = organizations.get(i);
-            View rowView = inflater.inflate(R.layout.selectable_label, null);
+            TextView rowView = (TextView) inflater.inflate(R.layout.selectable_label, llOrg, false);
 
             rowView.setOnClickListener(this);
+            rowView.setText(org.getLogin());
             rowView.setTag(org);
-
-            TextView tvTitle = (TextView) rowView.findViewById(R.id.tv_title);
-            tvTitle.setTypeface(app.boldCondensed);
-            tvTitle.setText(org.getLogin());
 
             llOrg.addView(rowView);
         }

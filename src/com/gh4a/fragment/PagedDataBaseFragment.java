@@ -15,12 +15,10 @@
  */
 package com.gh4a.fragment;
 
-import android.annotation.SuppressLint;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,15 +30,15 @@ import android.widget.TextView;
 import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.PageIteratorLoader;
+import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.client.PageIterator;
 
 import java.util.Collection;
 
-public abstract class PagedDataBaseFragment<T> extends ListFragment implements
+public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase implements
         LoaderManager.LoaderCallbacks<Collection<T>>, OnScrollListener {
     private RootAdapter<T> mAdapter;
-    private boolean mLoadMore;
     private boolean mIsLoadCompleted;
     private TextView mLoadingView;
     private String mCurrentFilter;
@@ -50,11 +48,21 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
         super.onActivityCreated(savedInstanceState);
 
         LayoutInflater vi = getActivity().getLayoutInflater();
-        mLoadingView = (TextView) vi.inflate(R.layout.row_simple, null);
-        mLoadingView.setText(R.string.loading_msg);
-        mLoadingView.setTextColor(getResources().getColor(R.color.highlight));
+        mLoadingView = (TextView) vi.inflate(R.layout.list_loading_view, null);
 
+        ListView listView = getListView();
         mAdapter = onCreateAdapter();
+        if (mAdapter.isCardStyle()) {
+            listView.setDivider(null);
+            listView.setDividerHeight(0);
+            listView.setSelector(new ColorDrawable(android.R.color.transparent));
+
+            int cardMargin = getResources().getDimensionPixelSize(R.dimen.card_margin);
+            listView.setPadding(cardMargin, 0, cardMargin, 0);
+        } else {
+            listView.setBackgroundResource(
+                    UiUtils.resolveDrawable(getActivity(), R.attr.listBackground));
+        }
 
         getListView().setOnScrollListener(this);
         getListView().setTextFilterEnabled(true);
@@ -66,24 +74,20 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
     }
 
     public void refresh() {
-        mLoadMore = false;
-        setListShown(false);
-        getLoaderManager().getLoader(0).onContentChanged();
+        if (getListView() != null) {
+            setListShown(false);
+            getLoaderManager().getLoader(0).onContentChanged();
+        }
     }
 
-    private void fillData(Collection<T> data) {
+    private void fillData(PageIteratorLoader<T> loader, Collection<T> data) {
         ListView listView = getListView();
-        if (data == null || data.isEmpty()) {
+        if (!loader.hasMoreData()) {
             listView.removeFooterView(mLoadingView);
-            return;
-        }
-        if (getListView().getFooterViewsCount() == 0) {
+        } else if (getListView().getFooterViewsCount() == 0) {
             listView.addFooterView(mLoadingView);
-            setListAdapter(mAdapter);
         }
-        if (!mLoadMore) {
-            mAdapter.clear();
-        }
+        mAdapter.clear();
         onAddData(mAdapter, data);
     }
 
@@ -93,12 +97,12 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
 
     @Override
     public Loader<Collection<T>> onCreateLoader(int id, Bundle args) {
-        return new PageIteratorLoader<T>(getActivity(), onCreateIterator());
+        return new PageIteratorLoader<>(getActivity(), onCreateIterator());
     }
 
     @Override
     public void onLoadFinished(Loader<Collection<T>> loader, Collection<T> events) {
-        fillData(events);
+        fillData((PageIteratorLoader<T>) loader, events);
         mIsLoadCompleted = true;
         setListShown(true);
         getActivity().supportInvalidateOptionsMenu();
@@ -114,10 +118,11 @@ public abstract class PagedDataBaseFragment<T> extends ListFragment implements
 
     @Override
     public void onScroll(AbsListView view, int firstVisible, int visibleCount, int totalCount) {
-        boolean loadMore = firstVisible + visibleCount >= totalCount;
+        boolean loadMore = firstVisible > 0 && visibleCount > 0 &&
+                getListView().getFooterViewsCount() != 0 &&
+                firstVisible + visibleCount >= totalCount;
 
         if (loadMore && mIsLoadCompleted) {
-            mLoadMore = true;
             mIsLoadCompleted = false;
             getLoaderManager().getLoader(0).forceLoad();
         }

@@ -7,7 +7,7 @@
         android:summary="%s"
         android:entries="@array/theme_items"
         android:entryValues="@array/theme_values"
-        android:defaultValue="0" />
+        android:defaultValue="1" />
 
     <com.gh4a.widget.IntegerListPreference
         android:key="webview_initial_zoom"
@@ -24,5 +24,9 @@
     <Preference
         android:key="about"
         android:title="@string/about" />
+
+    <Preference
+        android:key="open_source_components"
+        android:title="@string/open_source_components" />
 
 </PreferenceScreen>

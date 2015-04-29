@@ -18,38 +18,36 @@ package com.gh4a.adapter;
 import org.eclipse.egit.github.core.Milestone;
 
 import android.content.Context;
-import android.text.TextUtils.TruncateAt;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.gh4a.Gh4Application;
+import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.UiUtils;
 
 public class MilestoneAdapter extends RootAdapter<Milestone> {
+    private int mTextColorPrimary, mTextColorSecondary;
+
     public MilestoneAdapter(Context context) {
         super(context);
+        mTextColorPrimary = UiUtils.resolveColor(context, android.R.attr.textColorPrimary);
+        mTextColorSecondary = UiUtils.resolveColor(context, android.R.attr.textColorSecondary);
     }
 
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
-        View v = inflater.inflate(R.layout.row_simple_3, null);
-        Gh4Application app = Gh4Application.get(mContext);
+        View v = inflater.inflate(R.layout.row_milestone, null);
         ViewHolder viewHolder = new ViewHolder();
 
         viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvTitle.setTypeface(app.boldCondensed);
-
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvDesc.setTypeface(app.regular);
-        viewHolder.tvDesc.setMaxLines(2);
-        viewHolder.tvDesc.setEllipsize(TruncateAt.END);
-
-        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-        viewHolder.tvExtra.setTextAppearance(mContext, R.style.default_text_micro);
+        viewHolder.tvOpen = (TextView) v.findViewById(R.id.tv_open);
+        viewHolder.tvClosed = (TextView) v.findViewById(R.id.tv_closed);
+        viewHolder.tvDue = (TextView) v.findViewById(R.id.tv_due);
 
         v.setTag(viewHolder);
         return v;
@@ -60,6 +58,8 @@ public class MilestoneAdapter extends RootAdapter<Milestone> {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
 
         viewHolder.tvTitle.setText(milestone.getTitle());
+        viewHolder.tvTitle.setTextColor(Constants.Issue.STATE_CLOSED.equals(milestone.getState())
+                ? mTextColorSecondary : mTextColorPrimary);
 
         if (!StringUtils.isBlank(milestone.getDescription())) {
             viewHolder.tvDesc.setVisibility(View.VISIBLE);
@@ -68,21 +68,25 @@ public class MilestoneAdapter extends RootAdapter<Milestone> {
             viewHolder.tvDesc.setVisibility(View.GONE);
         }
 
-        String extraData;
+        viewHolder.tvOpen.setText(mContext.getString(R.string.issue_milestone_open_issues,
+                milestone.getOpenIssues()));
+        viewHolder.tvClosed.setText(mContext.getString(R.string.issue_milestone_closed_issues,
+                milestone.getClosedIssues()));
+
         if (milestone.getDueOn() != null) {
-            extraData = mContext.getString(R.string.milestone_extradata_due,
-                    milestone.getClosedIssues(), milestone.getOpenIssues(),
+            viewHolder.tvDue.setText(
                     DateFormat.getMediumDateFormat(mContext).format(milestone.getDueOn()));
+            viewHolder.tvDue.setVisibility(View.VISIBLE);
         } else {
-            extraData = mContext.getString(R.string.milestone_extradata,
-                    milestone.getClosedIssues(), milestone.getOpenIssues());
+            viewHolder.tvDue.setVisibility(View.GONE);
         }
-        viewHolder.tvExtra.setText(extraData);
     }
 
     private static class ViewHolder {
         public TextView tvTitle;
         public TextView tvDesc;
-        public TextView tvExtra;
+        public TextView tvOpen;
+        public TextView tvClosed;
+        public TextView tvDue;
     }
 }

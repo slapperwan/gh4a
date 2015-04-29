@@ -21,18 +21,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.widget.LabelBadgeView;
 
+import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.RepositoryIssue;
 
-public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> implements
+public class RepositoryIssueAdapter extends RootAdapter<Issue> implements
         View.OnClickListener {
     public RepositoryIssueAdapter(Context context) {
         super(context);
@@ -41,22 +41,17 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_issue, parent, false);
-        Gh4Application app = (Gh4Application) mContext.getApplicationContext();
         ViewHolder viewHolder = new ViewHolder();
 
         viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
         viewHolder.ivGravatar.setOnClickListener(this);
 
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvDesc.setTypeface(app.boldCondensed);
-
-        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+        viewHolder.tvCreator = (TextView) v.findViewById(R.id.tv_creator);
+        viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
         viewHolder.tvNumber = (TextView) v.findViewById(R.id.tv_number);
-        viewHolder.llLabels = (LinearLayout) v.findViewById(R.id.ll_labels);
-        viewHolder.ivAssignee = (ImageView) v.findViewById(R.id.iv_assignee);
+        viewHolder.lvLabels = (LabelBadgeView) v.findViewById(R.id.labels);
         viewHolder.tvComments = (TextView) v.findViewById(R.id.tv_comments);
-        viewHolder.tvRepo = (TextView) v.findViewById(R.id.tv_repo);
-        viewHolder.tvRepo.setVisibility(View.VISIBLE);
         viewHolder.tvMilestone = (TextView) v.findViewById(R.id.tv_milestone);
 
         v.setTag(viewHolder);
@@ -64,21 +59,21 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
     }
 
     @Override
-    protected void bindView(View v, RepositoryIssue issue) {
+    protected void bindView(View v, Issue issue) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
 
         AvatarHandler.assignAvatar(viewHolder.ivGravatar, issue.getUser());
         viewHolder.ivGravatar.setTag(issue);
-        viewHolder.tvNumber.setText(String.valueOf(issue.getNumber()));
 
-        IssueAdapter.makeLabelBadges(viewHolder.llLabels, issue.getLabels());
+        viewHolder.lvLabels.setLabels(issue.getLabels());
 
         String userName = issue.getUser() != null
                 ? issue.getUser().getLogin() : mContext.getString(R.string.deleted);
 
         viewHolder.tvDesc.setText(issue.getTitle());
-        viewHolder.tvExtra.setText(userName + "\n"
-                + StringUtils.formatRelativeTime(mContext, issue.getCreatedAt(), true));
+        viewHolder.tvCreator.setText(userName);
+        viewHolder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
+                issue.getCreatedAt(), true));
 
         if (issue.getComments() > 0) {
             viewHolder.tvComments.setVisibility(View.VISIBLE);
@@ -87,19 +82,15 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
             viewHolder.tvComments.setVisibility(View.GONE);
         }
 
-        viewHolder.tvRepo.setText(mContext.getString(R.string.repo_issue_on,
-                issue.getRepository().getOwner().getLogin() + "/" + issue.getRepository().getName()));
-
-        if (issue.getAssignee() != null) {
-            viewHolder.ivAssignee.setVisibility(View.VISIBLE);
-            AvatarHandler.assignAvatar(viewHolder.ivAssignee, issue.getAssignee());
-        } else {
-            viewHolder.ivAssignee.setVisibility(View.GONE);
-        }
+        // https://api.github.com/repos/batterseapower/pinyin-toolkit/issues/132
+        String[] urlPart = issue.getUrl().split("/");
+        String repoName = urlPart[4] + "/" + urlPart[5];
+        viewHolder.tvNumber.setText(mContext.getString(R.string.repo_issue_on,
+                issue.getNumber(), repoName));
 
         if (issue.getMilestone() != null) {
             viewHolder.tvMilestone.setVisibility(View.VISIBLE);
-            viewHolder.tvMilestone.setText("Milestone : " + issue.getMilestone().getTitle());
+            viewHolder.tvMilestone.setText(issue.getMilestone().getTitle());
         } else {
             viewHolder.tvMilestone.setVisibility(View.GONE);
         }
@@ -118,13 +109,12 @@ public class RepositoryIssueAdapter extends RootAdapter<RepositoryIssue> impleme
 
     private static class ViewHolder {
         public ImageView ivGravatar;
-        public TextView tvDesc;
-        public TextView tvExtra;
         public TextView tvNumber;
-        public LinearLayout llLabels;
-        public ImageView ivAssignee;
+        public TextView tvDesc;
+        public TextView tvCreator;
+        public TextView tvTimestamp;
+        public LabelBadgeView lvLabels;
         public TextView tvComments;
-        public TextView tvRepo;
         public TextView tvMilestone;
     }
 }

@@ -20,9 +20,15 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.gh4a.BasePagerActivity;
 import com.gh4a.Constants;
-import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.CommitCompareFragment;
 import com.gh4a.fragment.PullRequestFilesFragment;
@@ -30,18 +36,25 @@ import com.gh4a.fragment.PullRequestFragment;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestLoader;
+import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.StringUtils;
 
 import org.eclipse.egit.github.core.PullRequest;
+import org.eclipse.egit.github.core.User;
 
-public class PullRequestActivity extends LoadingFragmentPagerActivity implements
-        PullRequestFilesFragment.CommentUpdateListener {
+import java.util.Locale;
+
+public class PullRequestActivity extends BasePagerActivity implements
+        View.OnClickListener, PullRequestFilesFragment.CommentUpdateListener {
     private String mRepoOwner;
     private String mRepoName;
     private int mPullRequestNumber;
 
     private PullRequest mPullRequest;
     private PullRequestFragment mPullRequestFragment;
+
+    private ViewGroup mHeader;
 
     private static final int[] TITLES = new int[] {
         R.string.pull_request_conversation, R.string.commits, R.string.pull_request_files
@@ -58,6 +71,7 @@ public class PullRequestActivity extends LoadingFragmentPagerActivity implements
             boolean success = !result.handleError(PullRequestActivity.this);
             if (success) {
                 mPullRequest = result.getData();
+                fillHeader();
                 setTabsEnabled(true);
             }
             setContentEmpty(!success);
@@ -78,6 +92,14 @@ public class PullRequestActivity extends LoadingFragmentPagerActivity implements
         mRepoName = data.getString(Constants.Repository.NAME);
         mPullRequestNumber = data.getInt(Constants.PullRequest.NUMBER);
 
+        LinearLayout header = (LinearLayout) findViewById(R.id.header);
+        LayoutInflater inflater = getLayoutInflater();
+
+        mHeader = (ViewGroup) inflater.inflate(R.layout.pull_request_header, header, false);
+        mHeader.setClickable(false);
+        mHeader.setVisibility(View.GONE);
+        header.addView(mHeader, 1);
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getResources().getString(R.string.pull_request_title) + " #" + mPullRequestNumber);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
@@ -87,6 +109,19 @@ public class PullRequestActivity extends LoadingFragmentPagerActivity implements
         setTabsEnabled(false);
 
         getSupportLoaderManager().initLoader(0, null, mPullRequestCallback);
+    }
+
+    @Override
+    protected boolean canSwipeToRefresh() {
+        return true;
+    }
+
+    @Override
+    public void onRefresh() {
+        if (mPullRequestFragment != null) {
+            mPullRequestFragment.refresh();
+        }
+        refreshDone();
     }
 
     @Override
@@ -118,5 +153,57 @@ public class PullRequestActivity extends LoadingFragmentPagerActivity implements
         if (mPullRequestFragment != null) {
             mPullRequestFragment.refreshComments();
         }
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.iv_gravatar) {
+            User user = (User) v.getTag();
+            Intent intent = IntentUtils.getUserActivityIntent(this, user);
+            if (intent != null) {
+                startActivity(intent);
+            }
+        }
+    }
+
+    private void fillHeader() {
+        User user = mPullRequest.getUser();
+
+        ImageView gravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
+        gravatar.setOnClickListener(this);
+        gravatar.setTag(user);
+        AvatarHandler.assignAvatar(gravatar, user);
+
+        TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
+        final int stateTextResId, stateColorAttributeId, statusBarColorAttributeId;
+
+        if (mPullRequest.isMerged()) {
+            stateTextResId = R.string.pull_request_merged;
+            stateColorAttributeId = R.attr.colorPullRequestMerged;
+            statusBarColorAttributeId = R.attr.colorPullRequestMergedDark;
+        } else if (Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState())) {
+            stateTextResId = R.string.closed;
+            stateColorAttributeId = R.attr.colorIssueClosed;
+            statusBarColorAttributeId = R.attr.colorIssueClosedDark;
+        } else {
+            stateTextResId = R.string.open;
+            stateColorAttributeId = R.attr.colorIssueOpen;
+            statusBarColorAttributeId = R.attr.colorIssueOpenDark;
+        }
+
+        tvState.setText(getString(stateTextResId).toUpperCase(Locale.getDefault()));
+        transitionHeaderToColor(stateColorAttributeId, statusBarColorAttributeId);
+
+        TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
+        tvExtra.setText(user.getLogin());
+
+        TextView tvTimestamp = (TextView) mHeader.findViewById(R.id.tv_timestamp);
+        tvTimestamp.setText(StringUtils.formatRelativeTime(this,
+                mPullRequest.getCreatedAt(), true));
+
+        TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
+        tvTitle.setText(mPullRequest.getTitle());
+
+        mHeader.setVisibility(View.VISIBLE);
     }
 }

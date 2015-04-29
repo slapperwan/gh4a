@@ -30,8 +30,6 @@ public class FileUtils {
                 out.write(bytes, 0, read);
             }
             return true;
-        } catch (FileNotFoundException e) {
-            Log.e(Constants.LOG_TAG, e.getMessage(), e);
         } catch (IOException e) {
             Log.e(Constants.LOG_TAG, e.getMessage(), e);
         } finally {

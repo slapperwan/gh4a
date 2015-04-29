@@ -8,6 +8,7 @@ import java.util.List;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.client.RequestException;
 import org.eclipse.egit.github.core.service.ContentsService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
@@ -33,7 +34,7 @@ public class ContentListLoader extends BaseLoader<List<RepositoryContents>> {
 
     @Override
     public List<RepositoryContents> doLoadInBackground() throws IOException {
-        Gh4Application app = Gh4Application.get(getContext());
+        Gh4Application app = Gh4Application.get();
         ContentsService contentService = (ContentsService) app.getService(Gh4Application.CONTENTS_SERVICE);
         RepositoryService repoService = (RepositoryService) app.getService(Gh4Application.REPO_SERVICE);
 
@@ -42,8 +43,16 @@ public class ContentListLoader extends BaseLoader<List<RepositoryContents>> {
             mRef = repo.getMasterBranch();
         }
 
-        List<RepositoryContents> contents = contentService.getContents(new RepositoryId(
-                mRepoOwner, mRepoName), mPath, mRef);
+        List<RepositoryContents> contents;
+        try {
+            contents = contentService.getContents(new RepositoryId(mRepoOwner, mRepoName), mPath, mRef);
+        } catch (RequestException e) {
+            if (e.getStatus() == 404) {
+                contents = null;
+            } else {
+                throw e;
+            }
+        }
 
         if (contents != null && !contents.isEmpty()) {
             Comparator<RepositoryContents> comp = new Comparator<RepositoryContents>() {

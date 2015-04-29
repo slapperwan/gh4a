@@ -12,8 +12,8 @@ import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.gh4a.activities.BlogListActivity;
-import com.gh4a.activities.ExploreActivity;
 import com.gh4a.activities.RepositoryActivity;
+import com.gh4a.activities.TrendingActivity;
 import com.gh4a.activities.WikiListActivity;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
@@ -28,7 +28,7 @@ public class BrowseFilter extends Activity {
             return;
         }
 
-        List<String> parts = new ArrayList<String>(uri.getPathSegments());
+        List<String> parts = new ArrayList<>(uri.getPathSegments());
         Intent intent = null;
 
         String first = parts.isEmpty() ? null : parts.get(0);
@@ -46,7 +46,7 @@ public class BrowseFilter extends Activity {
                 || "features".equals(first)) {
             IntentUtils.launchBrowser(this, uri);
         } else if ("explore".equals(first)) {
-            intent = new Intent(this, ExploreActivity.class);
+            intent = new Intent(this, TrendingActivity.class);
         } else if ("blog".equals(first)) {
             intent = new Intent(this, BlogListActivity.class);
         } else {
@@ -67,11 +67,13 @@ public class BrowseFilter extends Activity {
             } else if (action == null) {
                 intent = IntentUtils.getRepoActivityIntent(this, user, repo, null);
             } else if ("tree".equals(action)) {
+                String ref = TextUtils.join("/", parts.subList(3, parts.size()));
                 intent = IntentUtils.getRepoActivityIntent(this, user, repo,
-                        id, RepositoryActivity.PAGE_FILES);
+                        ref, RepositoryActivity.PAGE_FILES);
             } else if ("commits".equals(action)) {
+                String ref = TextUtils.join("/", parts.subList(3, parts.size()));
                 intent = IntentUtils.getRepoActivityIntent(this, user, repo,
-                        id, RepositoryActivity.PAGE_COMMITS);
+                        ref, RepositoryActivity.PAGE_COMMITS);
             } else if ("issues".equals(action)) {
                 if (!StringUtils.isBlank(id)) {
                     try {

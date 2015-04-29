@@ -6,12 +6,11 @@ import android.view.MenuItem;
 import com.gh4a.Constants;
 
 public class PublicEventListFragment extends EventListFragment {
-    public static PublicEventListFragment newInstance(String login, boolean isPrivate) {
+    public static PublicEventListFragment newInstance(String login) {
         PublicEventListFragment f = new PublicEventListFragment();
 
         Bundle args = new Bundle();
         args.putString(Constants.User.LOGIN, login);
-        args.putBoolean("private", isPrivate);
         f.setArguments(args);
 
         return f;

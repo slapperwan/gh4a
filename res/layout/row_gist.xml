@@ -1,27 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/content_padding"
-    android:paddingRight="@dimen/content_padding"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp" >
-    <TextView
-        android:id="@+id/tv_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:typeface="monospace"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-    <TextView
-        android:id="@+id/tv_desc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-    <TextView
-        android:id="@+id/tv_extra"
+    android:minHeight="72dp"
+    android:padding="@dimen/content_padding">
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/tv_files"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/default_text_micro" />
-</LinearLayout>
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="8dp"
+        android:drawableLeft="?attr/filesSmallIcon"
+        android:drawablePadding="4dp"
+        android:textAppearance="@style/TextAppearance.VerySmall" />
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/tv_creator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginRight="16dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="?android:attr/textColorPrimary"
+        android:visibility="gone" />
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/tv_timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/tv_files"
+        android:layout_toRightOf="@id/tv_creator"
+        android:layout_alignBaseline="@id/tv_creator"
+        android:layout_alignWithParentIfMissing="true"
+        android:textAppearance="@style/TextAppearance.VerySmall" />
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/tv_files"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/tv_timestamp"
+        android:textAppearance="@style/TextAppearance.ItemTitle" />
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/tv_sha"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/tv_files"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/tv_title"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+</RelativeLayout>

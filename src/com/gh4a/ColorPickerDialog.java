@@ -9,9 +9,9 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import com.gh4a.R;
 import com.larswerkman.holocolorpicker.ColorPicker;
-import com.larswerkman.holocolorpicker.SVBar;
+import com.larswerkman.holocolorpicker.SaturationBar;
+import com.larswerkman.holocolorpicker.ValueBar;
 
 public class ColorPickerDialog extends AlertDialog {
     public interface OnColorChangedListener {
@@ -34,7 +34,8 @@ public class ColorPickerDialog extends AlertDialog {
         View view = LayoutInflater.from(context).inflate(R.layout.color_picker_dialog, null);
 
         mColorPicker = (ColorPicker) view.findViewById(R.id.color_picker);
-        mColorPicker.addSVBar((SVBar) view.findViewById(R.id.svbar));
+        mColorPicker.addSaturationBar((SaturationBar) view.findViewById(R.id.saturation));
+        mColorPicker.addValueBar((ValueBar) view.findViewById(R.id.value));
         setColor(color);
 
         setView(view);

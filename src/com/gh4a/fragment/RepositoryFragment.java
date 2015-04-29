@@ -15,14 +15,16 @@
  */
 package com.gh4a.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.content.Loader;
+import android.support.v4.os.AsyncTaskCompat;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
-import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,13 +33,12 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.devspark.progressfragment.ProgressFragment;
 import com.gh4a.Constants;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.CollaboratorListActivity;
 import com.gh4a.activities.ContributorListActivity;
 import com.gh4a.activities.DownloadsActivity;
+import com.gh4a.activities.ForkListActivity;
 import com.gh4a.activities.ReleaseListActivity;
 import com.gh4a.activities.WatcherListActivity;
 import com.gh4a.activities.WikiListActivity;
@@ -51,9 +52,10 @@ import com.gh4a.utils.UiUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
+import org.eclipse.egit.github.core.Permissions;
 import org.eclipse.egit.github.core.Repository;
 
-public class RepositoryFragment extends ProgressFragment implements OnClickListener {
+public class RepositoryFragment extends LoadingFragmentBase implements OnClickListener {
     private Repository mRepository;
     private View mContentView;
     private String mRef;
@@ -68,7 +70,8 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
         public void onResultReady(LoaderResult<String> result) {
             TextView readmeView = (TextView) mContentView.findViewById(R.id.readme);
             View progress = mContentView.findViewById(R.id.pb_readme);
-            new FillReadmeTask(mRepository.getId(), readmeView, progress).execute(result.getData());
+            AsyncTaskCompat.executeParallel(new FillReadmeTask(
+                    mRepository.getId(), readmeView, progress), result.getData());
         }
     };
 
@@ -96,10 +99,13 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
         }
 
         @Override
-        public void updateDrawState(TextPaint ds) {
+        public void updateDrawState(@NonNull TextPaint ds) {
             super.updateDrawState(ds);
             ds.setUnderlineText(false);
-            ds.setColor(getResources().getColor(R.color.highlight));
+            Context context = getActivity();
+            if (context != null) {
+                ds.setColor(UiUtils.resolveColor(context, android.R.attr.textColorLink));
+            }
         }
     };
 
@@ -152,21 +158,6 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
     }
 
     private void fillData() {
-        final Gh4Application app = Gh4Application.get(getActivity());
-
-        UiUtils.assignTypeface(mContentView, app.boldCondensed, new int[] {
-            R.id.readme_title, R.id.tv_repo_name,  R.id.tv_stargazers_count,
-            R.id.tv_forks_count, R.id.tv_issues_count, R.id.tv_pull_requests_count,
-            R.id.tv_wiki_label, R.id.tv_contributors_label, R.id.tv_collaborators_label,
-            R.id.other_info, R.id.tv_downloads_label, R.id.tv_releases_label
-        });
-        UiUtils.assignTypeface(mContentView, app.italic, new int[]{
-                R.id.tv_parent
-        });
-        UiUtils.assignTypeface(mContentView, app.regular, new int[]{
-                R.id.tv_desc, R.id.tv_language, R.id.tv_url
-        });
-
         TextView tvRepoName = (TextView) mContentView.findViewById(R.id.tv_repo_name);
         SpannableStringBuilder repoName = new SpannableStringBuilder();
         repoName.append(mRepository.getOwner().getLogin());
@@ -174,13 +165,13 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
         repoName.append(mRepository.getName());
         repoName.setSpan(mLoginClickSpan, 0, mRepository.getOwner().getLogin().length(), 0);
         tvRepoName.setText(repoName);
-        tvRepoName.setMovementMethod(LinkMovementMethod.getInstance());
+        tvRepoName.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
 
         TextView tvParentRepo = (TextView) mContentView.findViewById(R.id.tv_parent);
         if (mRepository.isFork() && mRepository.getParent() != null) {
             Repository parent = mRepository.getParent();
             tvParentRepo.setVisibility(View.VISIBLE);
-            tvParentRepo.setText(app.getString(R.string.forked_from,
+            tvParentRepo.setText(getString(R.string.forked_from,
                     parent.getOwner().getLogin() + "/" + parent.getName()));
             tvParentRepo.setOnClickListener(this);
             tvParentRepo.setTag(parent);
@@ -196,12 +187,15 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
         mContentView.findViewById(R.id.cell_stargazers).setOnClickListener(this);
         mContentView.findViewById(R.id.cell_forks).setOnClickListener(this);
         mContentView.findViewById(R.id.cell_pull_requests).setOnClickListener(this);
-        mContentView.findViewById(R.id.tv_wiki_label).setOnClickListener(this);
         mContentView.findViewById(R.id.tv_contributors_label).setOnClickListener(this);
-        mContentView.findViewById(R.id.tv_collaborators_label).setOnClickListener(this);
         mContentView.findViewById(R.id.other_info).setOnClickListener(this);
-        mContentView.findViewById(R.id.tv_downloads_label).setOnClickListener(this);
         mContentView.findViewById(R.id.tv_releases_label).setOnClickListener(this);
+
+        Permissions permissions = mRepository.getPermissions();
+        updateClickableLabel(R.id.tv_collaborators_label,
+                permissions != null && permissions.hasPushAccess());
+        updateClickableLabel(R.id.tv_downloads_label, mRepository.isHasDownloads());
+        updateClickableLabel(R.id.tv_wiki_label, mRepository.isHasWiki());
 
         TextView tvStargazersCount = (TextView) mContentView.findViewById(R.id.tv_stargazers_count);
         tvStargazersCount.setText(String.valueOf(mRepository.getWatchers()));
@@ -226,9 +220,15 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
             tvIssues.setVisibility(View.GONE);
             tvIssuesCount.setVisibility(View.GONE);
         }
+    }
 
-        if (!mRepository.isHasWiki()) {
-            mContentView.findViewById(R.id.tv_wiki_label).setVisibility(View.GONE);
+    private void updateClickableLabel(int id, boolean enable) {
+        View view = mContentView.findViewById(id);
+        if (enable) {
+            view.setOnClickListener(this);
+            view.setVisibility(View.VISIBLE);
+        } else {
+            view.setVisibility(View.GONE);
         }
     }
 
@@ -273,10 +273,8 @@ public class RepositoryFragment extends ProgressFragment implements OnClickListe
                     Constants.Issue.STATE_OPEN);
         } else if (id == R.id.cell_stargazers) {
             intent = new Intent(getActivity(), WatcherListActivity.class);
-            intent.putExtra("pos", 0);
         } else if (id == R.id.cell_forks) {
-            intent = new Intent(getActivity(), WatcherListActivity.class);
-            intent.putExtra("pos", 2);
+            intent = new Intent(getActivity(), ForkListActivity.class);
         } else if (id == R.id.tv_wiki_label) {
             intent = new Intent(getActivity(), WikiListActivity.class);
         } else if (id == R.id.tv_downloads_label) {

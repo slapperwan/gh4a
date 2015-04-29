@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minHeight="72dp"
+    android:orientation="horizontal"
+    android:padding="@dimen/content_padding">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_gravity="center_vertical"
+        android:orientation="vertical">
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.ItemTitle" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:maxLines="2" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_created_at"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.VerySmall" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="8dp"
+        android:orientation="vertical">
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_size"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="?attr/sizeSmallIcon"
+            android:drawablePadding="4dp"
+            android:textAppearance="@style/TextAppearance.VerySmall" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_downloads"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:drawableLeft="?attr/downloadSmallIcon"
+            android:drawablePadding="4dp"
+            android:textAppearance="@style/TextAppearance.VerySmall" />
+
+    </LinearLayout>
+
+</LinearLayout>

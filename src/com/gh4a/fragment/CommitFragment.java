@@ -9,7 +9,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -18,7 +20,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.devspark.progressfragment.ProgressFragment;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -34,11 +35,12 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.StyleableTextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommitFragment extends ProgressFragment implements OnClickListener {
+public class CommitFragment extends LoadingFragmentBase implements OnClickListener {
     private static final int REQUEST_DIFF_VIEWER = 1000;
 
     private String mRepoOwner;
@@ -57,8 +59,8 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
         @Override
         public void onResultReady(LoaderResult<RepositoryCommit> result) {
             if (result.handleError(getActivity())) {
-                setContentEmpty(true);
                 setContentShown(true);
+                setContentEmpty(true);
                 return;
             }
             mCommit = result.getData();
@@ -76,8 +78,8 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
         @Override
         public void onResultReady(LoaderResult<List<CommitComment>> result) {
             if (result.handleError(getActivity())) {
-                setContentEmpty(true);
                 setContentShown(true);
+                setContentEmpty(true);
                 return;
             }
             mComments = result.getData();
@@ -109,15 +111,6 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
             Bundle savedInstanceState) {
         mContentView = inflater.inflate(R.layout.commit, null);
 
-        Gh4Application app = Gh4Application.get(getActivity());
-        UiUtils.assignTypeface(mContentView, app.condensed, new int[] {
-            R.id.tv_title
-        });
-        UiUtils.assignTypeface(mContentView, app.boldCondensed, new int[] {
-            R.id.commit_added, R.id.commit_changed,
-            R.id.commit_renamed, R.id.commit_deleted
-        });
-
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -146,7 +139,7 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
 
     private void fillHeader() {
         final Activity activity = getActivity();
-        final Gh4Application app = Gh4Application.get(activity);
+        final Gh4Application app = Gh4Application.get();
 
         ImageView ivGravatar = (ImageView) mContentView.findViewById(R.id.iv_gravatar);
         AvatarHandler.assignAvatar(ivGravatar, mCommit.getAuthor());
@@ -171,29 +164,34 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
 
         tvTitle.setText(title);
         tvMessage.setText(message);
-        tvMessage.setVisibility(message != null ? View.VISIBLE : View.GONE);
+        tvTitle.setVisibility(StringUtils.isBlank(title) ? View.GONE : View.VISIBLE);
+        tvMessage.setVisibility(StringUtils.isBlank(message) ? View.GONE : View.VISIBLE);
 
         Commit commit = mCommit.getCommit();
 
-        TextView tvExtra = (TextView) mContentView.findViewById(R.id.tv_extra);
-        String extraText = getString(R.string.commit_info,
-                CommitUtils.getAuthorName(app, mCommit),
-                StringUtils.formatRelativeTime(activity, commit.getAuthor().getDate(), true));
-        tvExtra.setText(StringUtils.applyBoldTags(extraText, null));
+        TextView tvAuthor = (TextView) mContentView.findViewById(R.id.tv_author);
+        tvAuthor.setText(CommitUtils.getAuthorName(app, mCommit));
 
-        ViewGroup committer = (ViewGroup) mContentView.findViewById(R.id.committer_info);
+        TextView tvTimestamp = (TextView) mContentView.findViewById(R.id.tv_timestamp);
+        tvTimestamp.setText(StringUtils.formatRelativeTime(
+                activity, commit.getAuthor().getDate(), true));
+
+        View committerContainer = mContentView.findViewById(R.id.committer);
+
         if (!CommitUtils.authorEqualsCommitter(mCommit)) {
-            ImageView gravatar = (ImageView) committer.findViewById(R.id.iv_commit_gravatar);
-            TextView extra = (TextView) committer.findViewById(R.id.tv_commit_extra);
+            ImageView commitGravatar = (ImageView) mContentView.findViewById(R.id.iv_commit_gravatar);
+            StyleableTextView commitExtra =
+                    (StyleableTextView) mContentView.findViewById(R.id.tv_commit_extra);
 
-            committer.setVisibility(View.VISIBLE);
-            AvatarHandler.assignAvatar(gravatar, mCommit.getCommitter());
+            AvatarHandler.assignAvatar(commitGravatar, mCommit.getCommitter());
             String committerText = getString(R.string.commit_details,
                     CommitUtils.getCommitterName(app, mCommit),
                     StringUtils.formatRelativeTime(activity, commit.getCommitter().getDate(), true));
-            extra.setText(StringUtils.applyBoldTags(committerText, null));
+            StringUtils.applyBoldTagsAndSetText(commitExtra, committerText);
+
+            committerContainer.setVisibility(View.VISIBLE);
         } else {
-            committer.setVisibility(View.GONE);
+            committerContainer.setVisibility(View.GONE);
         }
     }
 
@@ -206,6 +204,11 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
         int added = 0, changed = 0, renamed = 0, deleted = 0;
         int additions = 0, deletions = 0;
         int count = files != null ? files.size() : 0;
+        int highlightColor = UiUtils.resolveColor(getActivity(), android.R.attr.textColorPrimary);
+        ForegroundColorSpan addSpan = new ForegroundColorSpan(
+                UiUtils.resolveColor(getActivity(), R.attr.colorCommitAddition));
+        ForegroundColorSpan deleteSpan = new ForegroundColorSpan(
+                UiUtils.resolveColor(getActivity(), R.attr.colorCommitDeletion));
 
         llChanged.removeAllViews();
         llAdded.removeAllViews();
@@ -214,23 +217,27 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
 
         for (int i = 0; i < count; i++) {
             CommitFile file = files.get(i);
-            String status = file.getStatus();
             final LinearLayout parent;
 
-            if ("added".equals(status)) {
-                parent = llAdded;
-                added++;
-            } else if ("modified".equals(status)) {
-                parent = llChanged;
-                changed++;
-            } else if ("renamed".equals(status)) {
-                parent = llRenamed;
-                renamed++;
-            } else if ("removed".equals(status)) {
-                parent = llDeleted;
-                deleted++;
-            } else {
-                continue;
+            switch (file.getStatus()) {
+                case "added":
+                    parent = llAdded;
+                    added++;
+                    break;
+                case "modified":
+                    parent = llChanged;
+                    changed++;
+                    break;
+                case "renamed":
+                    parent = llRenamed;
+                    renamed++;
+                    break;
+                case "removed":
+                    parent = llDeleted;
+                    deleted++;
+                    break;
+                default:
+                    continue;
             }
 
             additions += file.getAdditions();
@@ -247,9 +254,23 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
             TextView fileNameView = (TextView) fileView.findViewById(R.id.filename);
             fileNameView.setText(file.getFilename());
 
-            if (parent != llDeleted &&
-                    (file.getPatch() != null || FileUtils.isImage(file.getFilename()))) {
-                fileNameView.setTextColor(getResources().getColor(R.color.highlight));
+            TextView statsView = (TextView) fileView.findViewById(R.id.stats);
+            if (file.getPatch() != null) {
+                SpannableStringBuilder stats = new SpannableStringBuilder();
+                stats.append("+").append(String.valueOf(file.getAdditions()));
+                int addLength = stats.length();
+                stats.setSpan(addSpan, 0, addLength, 0);
+                stats.append("\u00a0\u00a0\u00a0-").append(String.valueOf(file.getDeletions()));
+                stats.setSpan(deleteSpan, addLength, stats.length(), 0);
+                statsView.setText(stats);
+                statsView.setVisibility(View.VISIBLE);
+            } else {
+                statsView.setVisibility(View.GONE);
+            }
+
+            if (file.getPatch() != null ||
+                    (parent != llDeleted && FileUtils.isImage(file.getFilename()))) {
+                fileNameView.setTextColor(highlightColor);
                 fileView.setOnClickListener(this);
                 fileView.setTag(file);
             }
@@ -262,20 +283,19 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
             parent.addView(fileView);
         }
 
-        adjustVisibility(llAdded, R.id.commit_added, added);
-        adjustVisibility(llChanged, R.id.commit_changed, changed);
-        adjustVisibility(llRenamed, R.id.commit_renamed, renamed);
-        adjustVisibility(llDeleted, R.id.commit_deleted, deleted);
+        adjustVisibility(R.id.card_added, added);
+        adjustVisibility(R.id.card_changed, changed);
+        adjustVisibility(R.id.card_renamed, renamed);
+        adjustVisibility(R.id.card_deleted, deleted);
 
         TextView tvSummary = (TextView) mContentView.findViewById(R.id.tv_desc);
         tvSummary.setText(getString(R.string.commit_summary, added + changed + renamed + deleted,
                 additions, deletions));
     }
 
-    private void adjustVisibility(View container, int headerRes, int count) {
+    private void adjustVisibility(int containerResId, int count) {
         int visibility = count > 0 ? View.VISIBLE : View.GONE;
-        container.setVisibility(visibility);
-        mContentView.findViewById(headerRes).setVisibility(visibility);
+        mContentView.findViewById(containerResId).setVisibility(visibility);
     }
 
     @Override
@@ -296,7 +316,7 @@ public class CommitFragment extends ProgressFragment implements OnClickListener 
             intent.putExtra(Constants.Object.REF, mObjectSha);
             intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
             intent.putExtra(Constants.Commit.DIFF, file.getPatch());
-            intent.putExtra(Constants.Commit.COMMENTS, new ArrayList<CommitComment>(mComments));
+            intent.putExtra(Constants.Commit.COMMENTS, new ArrayList<>(mComments));
             intent.putExtra(Constants.Object.PATH, file.getFilename());
             startActivityForResult(intent, REQUEST_DIFF_VIEWER);
         }

@@ -27,7 +27,6 @@ import android.view.ViewGroup;
 import android.widget.Filterable;
 import android.widget.TextView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
@@ -38,18 +37,15 @@ public class RepositoryAdapter extends RootAdapter<Repository> implements Filter
 
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
-        View v = inflater.inflate(R.layout.row_simple_3, null);
-        Gh4Application app = Gh4Application.get(mContext);
+        View v = inflater.inflate(R.layout.row_repo, parent, false);
         ViewHolder viewHolder = new ViewHolder();
 
         viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvTitle.setTypeface(app.boldCondensed);
-
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvDesc.setTypeface(app.regular);
-
-        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-        viewHolder.tvExtra.setTextAppearance(mContext, R.style.default_text_micro);
+        viewHolder.tvLanguage = (TextView) v.findViewById(R.id.tv_language);
+        viewHolder.tvForks = (TextView) v.findViewById(R.id.tv_forks);
+        viewHolder.tvStars = (TextView) v.findViewById(R.id.tv_stars);
+        viewHolder.tvSize = (TextView) v.findViewById(R.id.tv_size);
 
         v.setTag(viewHolder);
         return v;
@@ -68,11 +64,11 @@ public class RepositoryAdapter extends RootAdapter<Repository> implements Filter
             viewHolder.tvDesc.setVisibility(View.GONE);
         }
 
-        String language = repository.getLanguage() != null
-                ? repository.getLanguage() : mContext.getString(R.string.unknown);
-        viewHolder.tvExtra.setText(mContext.getString(R.string.repo_search_extradata,
-                language, Formatter.formatFileSize(mContext, 1024L * repository.getSize()),
-                repository.getForks(), repository.getWatchers()));
+        viewHolder.tvLanguage.setText(repository.getLanguage() != null
+                ? repository.getLanguage() : mContext.getString(R.string.unknown));
+        viewHolder.tvForks.setText(String.valueOf(repository.getForks()));
+        viewHolder.tvStars.setText(String.valueOf(repository.getWatchers()));
+        viewHolder.tvSize.setText(Formatter.formatFileSize(mContext, 1024L * repository.getSize()));
     }
 
     @Override
@@ -85,6 +81,9 @@ public class RepositoryAdapter extends RootAdapter<Repository> implements Filter
     private static class ViewHolder {
         public TextView tvTitle;
         public TextView tvDesc;
-        public TextView tvExtra;
+        public TextView tvLanguage;
+        public TextView tvForks;
+        public TextView tvStars;
+        public TextView tvSize;
     }
 }

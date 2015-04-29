@@ -16,6 +16,7 @@
 package com.gh4a.activities;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,6 +27,7 @@ import org.eclipse.egit.github.core.service.UserService;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
 import android.view.ContextMenu;
@@ -43,6 +45,7 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
@@ -52,7 +55,7 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
-public class SearchActivity extends BaseFragmentActivity implements
+public class SearchActivity extends BaseActivity implements
         SearchView.OnQueryTextListener, SearchView.OnCloseListener,
         AdapterView.OnItemSelectedListener, AdapterView.OnItemClickListener {
 
@@ -65,23 +68,29 @@ public class SearchActivity extends BaseFragmentActivity implements
     private String mQuery;
     private boolean mSubmitted;
 
+    private static final String STATE_KEY_REPO_RESULTS = "repo_results";
+    private static final String STATE_KEY_USER_RESULTS = "user_results";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (hasErrorView()) {
+            return;
+        }
 
         setContentView(R.layout.generic_list);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.search);
 
-        LayoutInflater inflater = LayoutInflater.from(actionBar.getThemedContext());
+        LayoutInflater inflater = LayoutInflater.from(UiUtils.makeHeaderThemedContext(this));
         LinearLayout searchLayout = (LinearLayout) inflater.inflate(R.layout.search_action_bar, null);
         actionBar.setCustomView(searchLayout);
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         mSearchType = (Spinner) searchLayout.findViewById(R.id.search_type);
-        mSearchType.setAdapter(new SearchTypeAdapter(actionBar.getThemedContext()));
+        mSearchType.setAdapter(new SearchTypeAdapter(actionBar.getThemedContext(), this));
         mSearchType.setOnItemSelectedListener(this);
 
         mSearch = (SearchView) searchLayout.findViewById(R.id.search_view);
@@ -94,35 +103,75 @@ public class SearchActivity extends BaseFragmentActivity implements
 
         updateSearchTypeHint();
 
-        mListViewResults = (ListView) findViewById(R.id.list_view);
+        mListViewResults = (ListView) findViewById(android.R.id.list);
         mListViewResults.setOnItemClickListener(this);
         registerForContextMenu(mListViewResults);
+
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(STATE_KEY_REPO_RESULTS)) {
+                mRepoAdapter = new RepositoryAdapter(this);
+                mListViewResults.setAdapter(mRepoAdapter);
+                ArrayList<Repository> data =(ArrayList<Repository>)
+                        savedInstanceState.getSerializable(STATE_KEY_REPO_RESULTS);
+                fillRepositoriesData(data);
+            } else if (savedInstanceState.containsKey(STATE_KEY_USER_RESULTS)) {
+                mUserAdapter = new SearchUserAdapter(this);
+                mListViewResults.setAdapter(mUserAdapter);
+                ArrayList<SearchUser> data =(ArrayList<SearchUser>)
+                        savedInstanceState.getSerializable(STATE_KEY_USER_RESULTS);
+                fillUsersData(data);
+            }
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mRepoAdapter != null) {
+            int count = mRepoAdapter.getCount();
+            ArrayList<Repository> repos = new ArrayList<>(count);
+            for (int i = 0; i < count; i++) {
+                repos.add(mRepoAdapter.getItem(i));
+            }
+            outState.putSerializable(STATE_KEY_REPO_RESULTS, repos);
+        } else if (mUserAdapter != null) {
+            int count = mUserAdapter.getCount();
+            ArrayList<SearchUser> users = new ArrayList<>(count);
+            for (int i = 0; i < count; i++) {
+                users.add(mUserAdapter.getItem(i));
+            }
+            outState.putSerializable(STATE_KEY_USER_RESULTS, users);
+        }
     }
 
     protected void searchRepository(final String searchKey) {
         mRepoAdapter = new RepositoryAdapter(this);
         mListViewResults.setAdapter(mRepoAdapter);
-        new LoadRepositoryTask(searchKey).execute();
+        AsyncTaskCompat.executeParallel(new LoadRepositoryTask(searchKey));
     }
 
     protected void searchUser(final String searchKey) {
         mUserAdapter = new SearchUserAdapter(this);
         mListViewResults.setAdapter(mUserAdapter);
-        new LoadUserTask(searchKey).execute();
+        AsyncTaskCompat.executeParallel(new LoadUserTask(searchKey));
     }
 
     private static class SearchTypeAdapter extends BaseAdapter implements SpinnerAdapter {
         private Context mContext;
+        private LayoutInflater mInflater;
+        private LayoutInflater mPopupInflater;
 
         private final int[][] mResources = new int[][] {
-            { R.string.search_type_repo, R.attr.searchRepoMenuIcon, 0 },
-            { R.string.search_type_user, R.attr.searchUserMenuIcon, 0 }
+            { R.string.search_type_repo, R.drawable.search_repos_dark, R.attr.searchRepoIcon, 0 },
+            { R.string.search_type_user, R.drawable.search_users_dark, R.attr.searchUserIcon, 0 }
         };
 
-        SearchTypeAdapter(Context context) {
+        SearchTypeAdapter(Context context, Context popupContext) {
             mContext = context;
+            mInflater = LayoutInflater.from(context);
+            mPopupInflater = LayoutInflater.from(popupContext);
             for (int i = 0; i < mResources.length; i++) {
-                mResources[i][2] = UiUtils.resolveDrawable(context, mResources[i][1]);
+                mResources[i][3] = UiUtils.resolveDrawable(popupContext, mResources[i][2]);
             }
         }
 
@@ -144,12 +193,11 @@ public class SearchActivity extends BaseFragmentActivity implements
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                LayoutInflater inflater = LayoutInflater.from(mContext);
-                convertView = inflater.inflate(R.layout.search_type_small, null);
+                convertView = mInflater.inflate(R.layout.search_type_small, null);
             }
 
             ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
-            icon.setImageResource(mResources[position][2]);
+            icon.setImageResource(mResources[position][1]);
 
             return convertView;
         }
@@ -157,12 +205,11 @@ public class SearchActivity extends BaseFragmentActivity implements
         @Override
         public View getDropDownView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                LayoutInflater inflater = LayoutInflater.from(mContext);
-                convertView = inflater.inflate(R.layout.search_type_popup, null);
+                convertView = mPopupInflater.inflate(R.layout.search_type_popup, null);
             }
 
             ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
-            icon.setImageResource(mResources[position][2]);
+            icon.setImageResource(mResources[position][3]);
 
             TextView label = (TextView) convertView.findViewById(R.id.label);
             label.setText(mResources[position][0]);
@@ -191,6 +238,8 @@ public class SearchActivity extends BaseFragmentActivity implements
         }
     }
 
+    // TODO: replace this by using loaders (would avoid the need for manually
+    //       saving the results into the saved instance state)
     private class LoadRepositoryTask extends ProgressDialogTask<List<Repository>> {
         private String mQuery;
 
@@ -206,8 +255,8 @@ public class SearchActivity extends BaseFragmentActivity implements
             }
 
             RepositoryService repoService = (RepositoryService)
-                    Gh4Application.get(mContext).getService(Gh4Application.REPO_SERVICE);
-            HashMap<String, String> params = new HashMap<String, String>();
+                    Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
+            HashMap<String, String> params = new HashMap<>();
             params.put("fork", "true");
 
             return repoService.searchRepositories(mQuery, params);
@@ -234,7 +283,7 @@ public class SearchActivity extends BaseFragmentActivity implements
             }
 
             UserService userService = (UserService)
-                    Gh4Application.get(mContext).getService(Gh4Application.USER_SERVICE);
+                    Gh4Application.get().getService(Gh4Application.USER_SERVICE);
             return userService.searchUsers(mQuery);
         }
 
@@ -248,7 +297,7 @@ public class SearchActivity extends BaseFragmentActivity implements
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         menu.clear();// clear items
 
-        if (v.getId() == R.id.list_view) {
+        if (v.getId() == android.R.id.list) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
             ListAdapter listAdapter = mListViewResults.getAdapter();
             Object object = listAdapter.getItem(info.position);

@@ -11,7 +11,7 @@ import java.io.IOException;
 public class EditPullRequestCommentActivity extends EditCommentActivity {
     @Override
     protected void editComment(RepositoryId repoId, long id, String body) throws IOException {
-        Gh4Application app = Gh4Application.get(this);
+        Gh4Application app = Gh4Application.get();
         PullRequestService pullService =
                 (PullRequestService) app.getService(Gh4Application.PULL_SERVICE);
 
@@ -24,7 +24,7 @@ public class EditPullRequestCommentActivity extends EditCommentActivity {
 
     @Override
     protected void deleteComment(RepositoryId repoId, long id) throws IOException {
-        Gh4Application app = Gh4Application.get(this);
+        Gh4Application app = Gh4Application.get();
         PullRequestService pullService =
                 (PullRequestService) app.getService(Gh4Application.PULL_SERVICE);
 

@@ -24,10 +24,10 @@ public abstract class BaseLoader<T> extends AsyncTaskLoader<LoaderResult<T>> {
     public LoaderResult<T> loadInBackground() {
         try {
             T data = doLoadInBackground();
-            return new LoaderResult<T>(data);
+            return new LoaderResult<>(data);
         } catch (Exception e) {
             Log.e(Constants.LOG_TAG, e.getMessage(), e);
-            return new LoaderResult<T>(e);
+            return new LoaderResult<>(e);
         }
     }
 
@@ -37,7 +37,7 @@ public abstract class BaseLoader<T> extends AsyncTaskLoader<LoaderResult<T>> {
             if (mPrefilledData == null) {
                 forceLoad();
             } else {
-                LoaderResult<T> result = new LoaderResult<T>(mPrefilledData);
+                LoaderResult<T> result = new LoaderResult<>(mPrefilledData);
                 deliverResult(result);
                 mPrefilledData = null;
             }

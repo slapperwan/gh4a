@@ -43,7 +43,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Configuration;
-import android.graphics.Typeface;
 
 import com.crashlytics.android.Crashlytics;
 import com.gh4a.fragment.SettingsFragment;
@@ -52,12 +51,7 @@ import com.gh4a.fragment.SettingsFragment;
  * The Class Gh4Application.
  */
 public class Gh4Application extends Application implements OnSharedPreferenceChangeListener {
-
-    public Typeface boldCondensed;
-    public Typeface condensed;
-    public Typeface regular;
-    public Typeface italic;
-    public static int THEME = R.style.DefaultTheme;
+    public static int THEME = R.style.LightTheme;
 
     public static String STAR_SERVICE = "github.star";
     public static String WATCHER_SERVICE = "github.watcher";
@@ -76,6 +70,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     public static String EVENT_SERVICE = "github.event";
     public static String MARKDOWN_SERVICE = "github.markdown";
 
+    private static Gh4Application sInstance;
     private GitHubClient mClient;
     private HashMap<String, GitHubService> mServices;
     private PrettyTime mPt;
@@ -91,13 +86,10 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     public void onCreate() {
         super.onCreate();
 
-        boldCondensed = Typeface.createFromAsset(getAssets(), "fonts/Roboto-BoldCondensed.ttf");
-        condensed = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Condensed.ttf");
-        regular = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Regular.ttf");
-        italic = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Italic.ttf");
+        sInstance = this;
 
         SharedPreferences prefs = getPrefs();
-        selectTheme(prefs.getInt(SettingsFragment.KEY_THEME, Constants.Theme.DARK));
+        selectTheme(prefs.getInt(SettingsFragment.KEY_THEME, Constants.Theme.LIGHT));
         prefs.registerOnSharedPreferenceChangeListener(this);
 
         Crashlytics.start(this);
@@ -107,7 +99,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         mClient = new DefaultClient();
         mClient.setOAuth2Token(getAuthToken());
 
-        mServices = new HashMap<String, GitHubService>();
+        mServices = new HashMap<>();
         mServices.put(STAR_SERVICE, new StarService(mClient));
         mServices.put(WATCHER_SERVICE, new WatcherService(mClient));
         mServices.put(LABEL_SERVICE, new LabelService(mClient));
@@ -133,13 +125,11 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     private void selectTheme(int theme) {
         switch (theme) {
             case Constants.Theme.DARK:
-                THEME = R.style.DefaultTheme;
+                THEME = R.style.DarkTheme;
                 break;
             case Constants.Theme.LIGHT:
+            case Constants.Theme.LIGHTDARK: /* backwards compat with old settings */
                 THEME = R.style.LightTheme;
-                break;
-            case Constants.Theme.LIGHTDARK:
-                THEME = R.style.LightDarkTheme;
                 break;
         }
     }
@@ -151,10 +141,12 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     }
 
     /* package */ static void trackVisitedUrl(String url) {
-        Crashlytics.setString("github-url-" + sNextUrlTrackingPosition, url);
-        Crashlytics.setInt("last-url-position", sNextUrlTrackingPosition);
-        if (++sNextUrlTrackingPosition >= MAX_TRACKED_URLS) {
-            sNextUrlTrackingPosition = 0;
+        synchronized (Gh4Application.class) {
+            Crashlytics.setString("github-url-" + sNextUrlTrackingPosition, url);
+            Crashlytics.setInt("last-url-position", sNextUrlTrackingPosition);
+            if (++sNextUrlTrackingPosition >= MAX_TRACKED_URLS) {
+                sNextUrlTrackingPosition = 0;
+            }
         }
     }
 
@@ -181,8 +173,8 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         return getSharedPreferences(SettingsFragment.PREF_NAME, MODE_PRIVATE);
     }
 
-    public static Gh4Application get(Context context) {
-        return (Gh4Application) context.getApplicationContext();
+    public static Gh4Application get() {
+        return sInstance;
     }
 
     public boolean isAuthorized() {
@@ -194,7 +186,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         if (key.equals(Constants.User.AUTH_TOKEN)) {
             mClient.setOAuth2Token(getAuthToken());
         } else if (key.equals(SettingsFragment.KEY_THEME)) {
-            selectTheme(sharedPreferences.getInt(key, Constants.Theme.DARK));
+            selectTheme(sharedPreferences.getInt(key, Constants.Theme.LIGHT));
         }
     }
 }

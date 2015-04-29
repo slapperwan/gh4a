@@ -12,10 +12,10 @@ public class ThemeUtils {
     private static final String LIGHT_CSS_THEME = "light";
 
     public static String getCssTheme(int theme) {
-        return theme == R.style.DefaultTheme ? DARK_CSS_THEME : LIGHT_CSS_THEME;
+        return theme == R.style.DarkTheme ? DARK_CSS_THEME : LIGHT_CSS_THEME;
     }
 
     public static int getWebViewBackgroundColor(int theme) {
-        return theme == R.style.DefaultTheme ? DARK_BACKGROUND_COLOR : LIGHT_BACKGROUND_COLOR;
+        return theme == R.style.DarkTheme ? DARK_BACKGROUND_COLOR : LIGHT_BACKGROUND_COLOR;
     }
 }

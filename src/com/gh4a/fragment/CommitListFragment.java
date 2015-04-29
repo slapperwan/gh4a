@@ -102,7 +102,7 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
     @Override
     protected PageIterator<RepositoryCommit> onCreateIterator() {
         CommitService commitService = (CommitService)
-                Gh4Application.get(getActivity()).getService(Gh4Application.COMMIT_SERVICE);
+                Gh4Application.get().getService(Gh4Application.COMMIT_SERVICE);
         return commitService.pageCommits(
                 new RepositoryId(mRepoOwner, mRepoName), mRef, mFilePath);
     }

@@ -30,24 +30,26 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.EditText;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
-import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.adapter.IssueEventAdapter;
+import com.gh4a.fragment.CommentBoxFragment;
 import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.IssueCommentListLoader;
 import com.gh4a.loader.IssueEventHolder;
@@ -59,21 +61,28 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.SwipeRefreshLayout;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
+import com.shamanland.fab.FloatingActionButton;
 
-public class IssueActivity extends LoadingFragmentActivity implements
-        OnClickListener, IssueEventAdapter.OnEditComment {
+public class IssueActivity extends BaseActivity implements
+        View.OnClickListener, IssueEventAdapter.OnEditComment,
+        SwipeRefreshLayout.ChildScrollDelegate, CommentBoxFragment.Callback {
     private static final int REQUEST_EDIT = 1000;
+    private static final int REQUEST_EDIT_ISSUE = 1001;
 
     private Issue mIssue;
     private String mRepoOwner;
     private String mRepoName;
     private int mIssueNumber;
-    private LinearLayout mHeader;
+    private ViewGroup mHeader;
+    private TextView mDescriptionView;
     private boolean mEventsLoaded;
     private IssueEventAdapter mEventAdapter;
+    private ListView mListView;
     private boolean mIsCollaborator;
+    private FloatingActionButton mEditFab;
 
     private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>() {
         @Override
@@ -126,6 +135,9 @@ public class IssueActivity extends LoadingFragmentActivity implements
         public void onResultReady(LoaderResult<Boolean> result) {
             if (!result.handleError(IssueActivity.this)) {
                 mIsCollaborator = result.getData();
+                if (mIsCollaborator && mIssue != null && mEventsLoaded) {
+                    mEditFab.setVisibility(View.VISIBLE);
+                }
                 supportInvalidateOptionsMenu();
             }
         }
@@ -152,34 +164,41 @@ public class IssueActivity extends LoadingFragmentActivity implements
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        if (!Gh4Application.get(this).isAuthorized()) {
-            findViewById(R.id.comment).setVisibility(View.GONE);
-            findViewById(R.id.divider).setVisibility(View.GONE);
-        }
+        mListView = (ListView) findViewById(android.R.id.list);
 
-        ListView listView = (ListView) findViewById(R.id.list_view);
+        LinearLayout header = (LinearLayout) findViewById(R.id.header);
+        LayoutInflater inflater = getLayoutInflater();
 
-        mHeader = (LinearLayout) getLayoutInflater().inflate(R.layout.issue_header, listView, false);
+        mHeader = (ViewGroup) inflater.inflate(R.layout.issue_header, header, false);
         mHeader.setClickable(false);
+        mHeader.setVisibility(View.GONE);
+        header.addView(mHeader);
 
-        UiUtils.assignTypeface(mHeader, Gh4Application.get(this).boldCondensed, new int[] {
-                R.id.comment_title, R.id.tv_title, R.id.desc_title
-        });
-
-        listView.addHeaderView(mHeader, null, false);
-        listView.setHeaderDividersEnabled(false);
+        mDescriptionView = (TextView) inflater.inflate(R.layout.issue_description, mListView, false);
+        mListView.addHeaderView(mDescriptionView);
 
         mEventAdapter = new IssueEventAdapter(this, mRepoOwner, mRepoName, this);
-        listView.setAdapter(mEventAdapter);
+        mListView.setAdapter(mEventAdapter);
 
-        if (!Gh4Application.get(this).isAuthorized()) {
-            findViewById(R.id.comment).setVisibility(View.GONE);
-            findViewById(R.id.divider).setVisibility(View.GONE);
+        setChildScrollDelegate(this);
+
+        if (!Gh4Application.get().isAuthorized()) {
+            findViewById(R.id.comment_box).setVisibility(View.GONE);
         }
+
+        mEditFab = (FloatingActionButton) inflater.inflate(R.layout.issue_edit_fab, null);
+        mEditFab.setOnClickListener(this);
+        mEditFab.setVisibility(View.GONE);
+        setHeaderAlignedActionButton(mEditFab);
 
         getSupportLoaderManager().initLoader(0, null, mIssueCallback);
         getSupportLoaderManager().initLoader(1, null, mCollaboratorCallback);
         getSupportLoaderManager().initLoader(2, null, mEventCallback);
+    }
+
+    @Override
+    public boolean canChildScrollUp() {
+        return UiUtils.canViewScrollUp(mListView);
     }
 
     private void fillDataIfDone() {
@@ -192,62 +211,60 @@ public class IssueActivity extends LoadingFragmentActivity implements
 
     private void fillData() {
         // set details inside listview header
-        TextView tvCommentTitle = (TextView) mHeader.findViewById(R.id.comment_title);
-        int eventCount = mEventAdapter.getCount();
-        tvCommentTitle.setText(getString(R.string.issue_events_with_count, eventCount));
-        tvCommentTitle.setVisibility(eventCount == 0 ? View.GONE : View.VISIBLE);
-
         ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
         AvatarHandler.assignAvatar(ivGravatar, mIssue.getUser());
         ivGravatar.setOnClickListener(this);
 
-        TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
-        tvExtra.setText(StringUtils.createUserWithDateText(this,
-                mIssue.getUser(), mIssue.getCreatedAt()));
-
         TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
-        if (Constants.Issue.STATE_CLOSED.equals(mIssue.getState())) {
-            tvState.setBackgroundResource(R.drawable.default_red_box);
-            tvState.setText(getString(R.string.closed).toUpperCase(Locale.getDefault()));
-        } else {
-            tvState.setBackgroundResource(R.drawable.default_green_box);
-            tvState.setText(getString(R.string.open).toUpperCase(Locale.getDefault()));
-        }
+        boolean closed = Constants.Issue.STATE_CLOSED.equals(mIssue.getState());
+        int stateTextResId = closed ? R.string.closed : R.string.open;
+        int stateColorAttributeId = closed ? R.attr.colorIssueClosed : R.attr.colorIssueOpen;
+
+        tvState.setText(getString(stateTextResId).toUpperCase(Locale.getDefault()));
+        transitionHeaderToColor(stateColorAttributeId,
+                closed ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark);
+        UiUtils.trySetListOverscrollColor(mListView,
+                UiUtils.resolveColor(this, stateColorAttributeId));
+        mEditFab.setSelected(closed);
+
+        TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
+        tvExtra.setText(mIssue.getUser().getLogin());
+
+        TextView tvTimestamp = (TextView) mHeader.findViewById(R.id.tv_timestamp);
+        tvTimestamp.setText(StringUtils.formatRelativeTime(this, mIssue.getCreatedAt(), true));
 
         TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
         tvTitle.setText(mIssue.getTitle());
 
-        TextView tvDesc = (TextView) mHeader.findViewById(R.id.tv_desc);
         String body = mIssue.getBodyHtml();
         if (!StringUtils.isBlank(body)) {
             HttpImageGetter imageGetter = new HttpImageGetter(this);
             body = HtmlUtils.format(body).toString();
-            imageGetter.bind(tvDesc, body, mIssue.getNumber());
+            imageGetter.bind(mDescriptionView, body, mIssue.getNumber());
         }
-        tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
+        mDescriptionView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
 
-        findViewById(R.id.iv_comment).setOnClickListener(this);
-
-        boolean showInfoBox = false;
         TextView tvMilestone = (TextView) mHeader.findViewById(R.id.tv_milestone);
         if (mIssue.getMilestone() != null) {
-            showInfoBox = true;
             tvMilestone.setText(getString(R.string.issue_milestone, mIssue.getMilestone().getTitle()));
+            tvMilestone.setVisibility(View.VISIBLE);
         } else {
             tvMilestone.setVisibility(View.GONE);
         }
 
+        TextView tvAssignee = (TextView) mHeader.findViewById(R.id.tv_assignee);
+        ImageView ivAssignee = (ImageView) mHeader.findViewById(R.id.iv_assignee);
         if (mIssue.getAssignee() != null) {
-            showInfoBox = true;
-            TextView tvAssignee = (TextView) mHeader.findViewById(R.id.tv_assignee);
             tvAssignee.setText(getString(R.string.issue_assignee, mIssue.getAssignee().getLogin()));
             tvAssignee.setVisibility(View.VISIBLE);
             tvAssignee.setOnClickListener(this);
 
-            ImageView ivAssignee = (ImageView) mHeader.findViewById(R.id.iv_assignee);
             AvatarHandler.assignAvatar(ivAssignee, mIssue.getAssignee());
             ivAssignee.setVisibility(View.VISIBLE);
             ivAssignee.setOnClickListener(this);
+        } else {
+            tvAssignee.setVisibility(View.GONE);
+            ivAssignee.setVisibility(View.GONE);
         }
 
 
@@ -255,7 +272,6 @@ public class IssueActivity extends LoadingFragmentActivity implements
         List<Label> labels = mIssue.getLabels();
 
         if (labels != null && !labels.isEmpty()) {
-            showInfoBox = true;
             llLabels.removeAllViews();
             llLabels.setVisibility(View.VISIBLE);
 
@@ -278,20 +294,23 @@ public class IssueActivity extends LoadingFragmentActivity implements
 
         TextView tvPull = (TextView) mHeader.findViewById(R.id.tv_pull);
         if (mIssue.getPullRequest() != null && mIssue.getPullRequest().getDiffUrl() != null) {
-            showInfoBox = true;
             tvPull.setVisibility(View.VISIBLE);
             tvPull.setOnClickListener(this);
         } else {
             tvPull.setVisibility(View.GONE);
         }
 
-        View infoBox = mHeader.findViewById(R.id.info_box);
-        infoBox.setVisibility(showInfoBox ? View.VISIBLE : View.GONE);
+        if (mHeader.getVisibility() == View.GONE) {
+            mHeader.setVisibility(View.VISIBLE);
+            mEditFab.setVisibility(mIsCollaborator ? View.VISIBLE : View.GONE);
+        }
+
+        refreshDone();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (Gh4Application.get(this).isAuthorized()) {
+        if (Gh4Application.get().isAuthorized()) {
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.issue_menu, menu);
 
@@ -305,12 +324,11 @@ public class IssueActivity extends LoadingFragmentActivity implements
             }
 
             boolean isCreator = mIssue != null &&
-                    mIssue.getUser().getLogin().equals(Gh4Application.get(this).getAuthLogin());
+                    mIssue.getUser().getLogin().equals(Gh4Application.get().getAuthLogin());
 
             if (!mIsCollaborator && !isCreator) {
                 menu.removeItem(R.id.issue_close);
                 menu.removeItem(R.id.issue_reopen);
-                menu.removeItem(R.id.issue_edit);
             }
             if (mIssue == null) {
                 menu.removeItem(R.id.share);
@@ -329,22 +347,10 @@ public class IssueActivity extends LoadingFragmentActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         switch (itemId) {
-            case R.id.issue_create:
-            case R.id.issue_edit:
-                if (checkForAuthOrExit()) {
-                    Intent intent = new Intent(this, IssueEditActivity.class);
-                    intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-                    intent.putExtra(Constants.Repository.NAME, mRepoName);
-                    if (itemId == R.id.issue_edit) {
-                        intent.putExtra(Constants.Issue.NUMBER, mIssue.getNumber());
-                    }
-                    startActivity(intent);
-                }
-                return true;
             case R.id.issue_close:
             case R.id.issue_reopen:
                 if (checkForAuthOrExit()) {
-                    new IssueOpenCloseTask(itemId == R.id.issue_reopen).execute();
+                    AsyncTaskCompat.executeParallel(new IssueOpenCloseTask(itemId == R.id.issue_reopen));
                 }
                 return true;
             case R.id.share:
@@ -356,18 +362,27 @@ public class IssueActivity extends LoadingFragmentActivity implements
                 shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
                 return true;
-            case R.id.refresh:
-                setContentShown(false);
-                getSupportLoaderManager().restartLoader(0, null, mIssueCallback);
-                getSupportLoaderManager().restartLoader(1, null, mCollaboratorCallback);
-                getSupportLoaderManager().restartLoader(2, null, mEventCallback);
-                break;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected boolean canSwipeToRefresh() {
+        return true;
+    }
+
+    @Override
+    public void onRefresh() {
+        mIssue = null;
+        mEventsLoaded = false;
+        setContentShown(false);
+        getSupportLoaderManager().restartLoader(0, null, mIssueCallback);
+        getSupportLoaderManager().restartLoader(1, null, mCollaboratorCallback);
+        getSupportLoaderManager().restartLoader(2, null, mEventCallback);
+    }
+
     private boolean checkForAuthOrExit() {
-        if (Gh4Application.get(this).isAuthorized()) {
+        if (Gh4Application.get().isAuthorized()) {
             return true;
         }
         Intent intent = new Intent(this, Github4AndroidActivity.class);
@@ -380,20 +395,21 @@ public class IssueActivity extends LoadingFragmentActivity implements
     public void onClick(View v) {
         Intent intent = null;
         switch (v.getId()) {
+        case R.id.edit_fab:
+            if (checkForAuthOrExit()) {
+                Intent editIntent = new Intent(this, IssueEditActivity.class);
+                editIntent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+                editIntent.putExtra(Constants.Repository.NAME, mRepoName);
+                editIntent.putExtra(IssueEditActivity.EXTRA_ISSUE, mIssue);
+                startActivityForResult(editIntent, REQUEST_EDIT_ISSUE);
+            }
+            break;
         case R.id.iv_gravatar:
             intent = IntentUtils.getUserActivityIntent(this, mIssue.getUser());
             break;
         case R.id.tv_assignee:
         case R.id.iv_assignee:
             intent = IntentUtils.getUserActivityIntent(this, mIssue.getAssignee());
-            break;
-        case R.id.iv_comment:
-            EditText etComment = (EditText) findViewById(R.id.et_comment);
-            String comment = etComment.getText() == null ? null : etComment.getText().toString();
-            if (!StringUtils.isBlank(comment)) {
-                new CommentIssueTask(comment).execute();
-            }
-            UiUtils.hideImeForView(getCurrentFocus());
             break;
         case R.id.tv_pull:
             intent = IntentUtils.getPullRequestActivityIntent(this,
@@ -412,6 +428,11 @@ public class IssueActivity extends LoadingFragmentActivity implements
                 getSupportLoaderManager().getLoader(2).onContentChanged();
                 setResult(RESULT_OK);
             }
+        } else if (requestCode == REQUEST_EDIT_ISSUE) {
+            if (resultCode == Activity.RESULT_OK) {
+                getSupportLoaderManager().getLoader(0).onContentChanged();
+                setResult(RESULT_OK);
+            }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
@@ -428,6 +449,25 @@ public class IssueActivity extends LoadingFragmentActivity implements
         startActivityForResult(intent, REQUEST_EDIT);
     }
 
+    @Override
+    public int getCommentEditorHintResId() {
+        return R.string.issue_comment_hint;
+    }
+
+    @Override
+    public void onSendCommentInBackground(String comment) throws IOException {
+        IssueService issueService = (IssueService)
+                Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
+        issueService.createComment(mRepoOwner, mRepoName, mIssueNumber, comment);
+    }
+
+    @Override
+    public void onCommentSent() {
+        //reload comments
+        getSupportLoaderManager().getLoader(2).onContentChanged();
+        setResult(RESULT_OK);
+    }
+
     private class IssueOpenCloseTask extends ProgressDialogTask<Issue> {
         private boolean mOpen;
 
@@ -439,7 +479,7 @@ public class IssueActivity extends LoadingFragmentActivity implements
         @Override
         protected Issue run() throws IOException {
             IssueService issueService = (IssueService)
-                    Gh4Application.get(mContext).getService(Gh4Application.ISSUE_SERVICE);
+                    Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
             RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
 
             Issue issue = issueService.getIssue(repoId, mIssueNumber);
@@ -454,9 +494,6 @@ public class IssueActivity extends LoadingFragmentActivity implements
             ToastUtils.showMessage(mContext,
                     mOpen ? R.string.issue_success_reopen : R.string.issue_success_close);
 
-            TextView tvState = (TextView) findViewById(R.id.tv_state);
-            tvState.setBackgroundResource(mOpen ? R.drawable.default_green_box : R.drawable.default_red_box);
-            tvState.setText(getString(mOpen ? R.string.open : R.string.closed).toUpperCase(Locale.getDefault()));
             // reload issue state
             fillDataIfDone();
             // reload events, the action will have triggered an additional one
@@ -468,40 +505,6 @@ public class IssueActivity extends LoadingFragmentActivity implements
         @Override
         protected void onError(Exception e) {
             ToastUtils.showMessage(mContext, R.string.issue_error_close);
-        }
-    }
-
-    private class CommentIssueTask extends ProgressDialogTask<Void> {
-        private String mComment;
-
-        public CommentIssueTask(String comment) {
-            super(IssueActivity.this, 0, R.string.loading_msg);
-            mComment = comment;
-        }
-
-        @Override
-        protected Void run() throws IOException {
-            IssueService issueService = (IssueService)
-                    Gh4Application.get(mContext).getService(Gh4Application.ISSUE_SERVICE);
-            issueService.createComment(mRepoOwner, mRepoName, mIssueNumber, mComment);
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            ToastUtils.showMessage(mContext, R.string.issue_success_comment);
-            //reload comments
-            getSupportLoaderManager().getLoader(2).onContentChanged();
-            setResult(RESULT_OK);
-
-            EditText etComment = (EditText) findViewById(R.id.et_comment);
-            etComment.setText(null);
-            etComment.clearFocus();
-        }
-
-        @Override
-        protected void onError(Exception e) {
-            ToastUtils.showMessage(mContext, R.string.issue_error_comment);
         }
     }
 }

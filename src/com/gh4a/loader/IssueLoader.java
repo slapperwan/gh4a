@@ -25,7 +25,7 @@ public class IssueLoader extends BaseLoader<Issue> {
     @Override
     public Issue doLoadInBackground() throws IOException {
         IssueService issueService = (IssueService)
-                Gh4Application.get(getContext()).getService(Gh4Application.ISSUE_SERVICE);
+                Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
         return issueService.getIssue(mRepoOwner, mRepoName, mIssueNumber);
     }
 }

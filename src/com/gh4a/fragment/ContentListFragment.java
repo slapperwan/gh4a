@@ -16,11 +16,18 @@
 package com.gh4a.fragment;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 
 import com.gh4a.Constants;
 import com.gh4a.R;
+import com.gh4a.activities.CommitHistoryActivity;
 import com.gh4a.adapter.FileAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.ContentListLoader;
@@ -35,6 +42,8 @@ import java.util.List;
 import java.util.Set;
 
 public class ContentListFragment extends ListDataBaseFragment<RepositoryContents> {
+    private static final int MENU_HISTORY = 1;
+
     private Repository mRepository;
     private String mPath;
     private String mRef;
@@ -74,6 +83,12 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        registerForContextMenu(getListView());
+    }
+
+    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
@@ -81,6 +96,34 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
         } catch (ClassCastException e) {
             throw new ClassCastException(activity + " must implement OnTreeSelectedListener");
         }
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+        RepositoryContents contents = mAdapter.getItem(info.position);
+        Set<String> submodules = mCallback.getSubModuleNames(this);
+
+        if (submodules == null || !submodules.contains(contents.getName())) {
+            menu.add(Menu.NONE, MENU_HISTORY, Menu.NONE, R.string.history);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info =
+                (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        RepositoryContents contents = mAdapter.getItem(info.position);
+
+        Intent intent = new Intent(getActivity(), CommitHistoryActivity.class);
+        intent.putExtra(Constants.Repository.OWNER, mRepository.getOwner().getLogin());
+        intent.putExtra(Constants.Repository.NAME, mRepository.getName());
+        intent.putExtra(Constants.Object.PATH, contents.getPath());
+        intent.putExtra(Constants.Object.REF, mRef);
+        startActivity(intent);
+        return true;
     }
 
     @Override

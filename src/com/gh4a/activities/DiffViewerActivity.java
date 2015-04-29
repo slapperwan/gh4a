@@ -23,9 +23,11 @@ import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v4.os.AsyncTaskCompat;
+import android.support.v4.util.LongSparseArray;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.internal.widget.ListPopupWindow;
+import android.support.v7.widget.ListPopupWindow;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.SparseArray;
@@ -60,7 +62,6 @@ import org.eclipse.egit.github.core.User;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public abstract class DiffViewerActivity extends WebViewerActivity implements
@@ -72,9 +73,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
 
     private String mDiff;
     private String[] mDiffLines;
-    private SparseArray<List<CommitComment>> mCommitCommentsByPos =
-            new SparseArray<List<CommitComment>>();
-    private HashMap<Long, CommitComment> mCommitComments = new HashMap<Long, CommitComment>();
+    private SparseArray<List<CommitComment>> mCommitCommentsByPos = new SparseArray<>();
+    private LongSparseArray<CommitComment> mCommitComments = new LongSparseArray<>();
 
     private Point mLastTouchDown = new Point();
 
@@ -154,8 +154,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
 
         switch (item.getItemId()) {
             case R.id.browser:
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                startActivity(browserIntent);
+                IntentUtils.launchBrowser(this, Uri.parse(url));
                 return true;
             case R.id.share:
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
@@ -182,7 +181,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             int position = comment.getPosition();
             List<CommitComment> commentsByPos = mCommitCommentsByPos.get(position);
             if (commentsByPos == null) {
-                commentsByPos = new ArrayList<CommitComment>();
+                commentsByPos = new ArrayList<>();
                 mCommitCommentsByPos.put(position, commentsByPos);
             }
             commentsByPos.add(comment);
@@ -191,7 +190,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
 
     protected void showDiff() {
         StringBuilder content = new StringBuilder();
-        boolean authorized = Gh4Application.get(this).isAuthorized();
+        boolean authorized = Gh4Application.get().isAuthorized();
 
         content.append("<html><head><title></title>");
         content.append("<link href='file:///android_asset/text-");
@@ -265,7 +264,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             public void onClick(DialogInterface dialog, int which) {
                 String text = body.getText().toString();
                 if (!StringUtils.isBlank(text)) {
-                    new CommentTask(id, text, position).execute();
+                    AsyncTaskCompat.executeParallel(new CommentTask(id, text, position));
                 } else {
                     ToastUtils.showMessage(DiffViewerActivity.this, R.string.commit_comment_error_body);
                 }
@@ -336,7 +335,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             mPosition = position;
             mLineText = lineText;
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(DiffViewerActivity.this,
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(DiffViewerActivity.this,
                     R.layout.popup_menu_item, populateChoices(isOwnComment(id)));
             setAdapter(adapter);
             setContentWidth(measureContentWidth(adapter));
@@ -358,7 +357,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                new DeleteCommentTask(mId).execute();
+                                AsyncTaskCompat.executeParallel(new DeleteCommentTask(mId));
                             }
                         })
                         .setNegativeButton(R.string.cancel, null)
@@ -370,7 +369,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         }
 
         private boolean isOwnComment(long id) {
-            String login = Gh4Application.get(DiffViewerActivity.this).getAuthLogin();
+            String login = Gh4Application.get().getAuthLogin();
             CommitComment comment = mCommitComments.get(id);
             User user = comment.getUser();
             return user != null && TextUtils.equals(login, comment.getUser().getLogin());

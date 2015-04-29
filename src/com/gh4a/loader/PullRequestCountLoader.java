@@ -23,7 +23,7 @@ public class PullRequestCountLoader extends BaseLoader<Integer> {
     @Override
     public Integer doLoadInBackground() throws IOException {
         PullRequestService pullRequestService = (PullRequestService)
-                Gh4Application.get(getContext()).getService(Gh4Application.PULL_SERVICE);
+                Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
         return pullRequestService.getPullRequests(mRepository, mState).size();
     }
 }

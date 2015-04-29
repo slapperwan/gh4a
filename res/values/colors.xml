@@ -1,7 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="highlight">#0099cc</color>
-    <color name="issue_number_bg">#ddd</color>
+    <color name="dark_accent">#396426</color>
+    <color name="light_accent">#65b345</color>
+
+    <color name="dark_accent_dark">#2d501e</color>
+    <color name="light_accent_dark">#5aa03d</color>
+    <color name="dark_link_color">#559639</color>
+    <color name="light_link_color">@color/light_accent_dark</color>
+
     <color name="label_fg_dark">#ff000000</color>
     <color name="label_fg_light">#fff3f3f3</color>
+
+    <color name="issue_open_light">#65b345</color>
+    <color name="issue_closed_light">#b34545</color>
+    <color name="pr_merged_light">#6945b3</color>
+    <color name="issue_open_light_dark">#5ba03d</color>
+    <color name="issue_closed_light_dark">#a03d3d</color>
+    <color name="pr_merged_light_dark">#5e3da0</color>
+    <color name="issue_open_light_button">#83e658</color>
+    <color name="issue_closed_light_button">#e65858</color>
+
+    <color name="issue_open_dark">#396426</color>
+    <color name="issue_closed_dark">#642626</color>
+    <color name="pr_merged_dark">#3a2664</color>
+    <color name="issue_open_dark_dark">#2e501e</color>
+    <color name="issue_closed_dark_dark">#501e1e</color>
+    <color name="pr_merged_dark_dark">#2e1e50</color>
+    <color name="issue_open_dark_button">#569639</color>
+    <color name="issue_closed_dark_button">#963939</color>
+
+    <color name="fab_light">#89f05c</color>
+    <color name="fab_pressed_light">#5aa03d</color>
+
+    <color name="fab_dark">#569639</color>
+    <color name="fab_pressed_dark">#2d501e</color>
+
+    <color name="tab_indicator_color">#fff</color>
+    <color name="divider_bg">#bdbdbd</color>
+    <color name="drawer_scrim">#60000000</color>
 </resources>

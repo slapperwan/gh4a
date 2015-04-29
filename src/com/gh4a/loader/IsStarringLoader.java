@@ -23,7 +23,7 @@ public class IsStarringLoader extends BaseLoader<Boolean> {
     @Override
     public Boolean doLoadInBackground() throws IOException {
         StarService starService = (StarService)
-                Gh4Application.get(getContext()).getService(Gh4Application.STAR_SERVICE);
+                Gh4Application.get().getService(Gh4Application.STAR_SERVICE);
         return starService.isStarring(new RepositoryId(mRepoOwner, mRepoName));
     }
 }

@@ -23,7 +23,7 @@ public class IsWatchingLoader extends BaseLoader<Boolean> {
     @Override
     public Boolean doLoadInBackground() throws IOException {
         WatcherService watcherService = (WatcherService)
-                Gh4Application.get(getContext()).getService(Gh4Application.WATCHER_SERVICE);
+                Gh4Application.get().getService(Gh4Application.WATCHER_SERVICE);
         return watcherService.isWatching(new RepositoryId(mRepoOwner, mRepoName));
     }
 }

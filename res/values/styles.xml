@@ -1,29 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-    <style name="default_text_small" parent="@android:style/TextAppearance.Medium">
-        <item name="android:textSize">14sp</item>
-    </style>
-
-    <style name="default_text_small_italic" parent="@android:style/TextAppearance.Medium">
-        <item name="android:textSize">14sp</item>
-        <item name="android:textStyle">italic</item>
-    </style>
-
-    <style name="default_text_micro" parent="@android:style/TextAppearance.Small">
+    <style name="TextAppearance.VerySmall" parent="TextAppearance.AppCompat.Small">
         <item name="android:textSize">12sp</item>
     </style>
 
+    <style name="TextAppearance.ItemTitle" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="font">condensed</item>
+    </style>
+
+    <style name="TextAppearance.HeaderTitle" parent="TextAppearance.AppCompat.Large">
+        <item name="font">condensed</item>
+    </style>
+
+    <style name="TextAppearance.CountHeaderItem" parent="TextAppearance.AppCompat.Large">
+        <item name="font">condensed</item>
+    </style>
+
+    <style name="TextAppearance.Tab" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textColor">@color/tab_text_color</item>
+        <item name="font">medium</item>
+        <item name="allCaps">true</item>
+    </style>
+
+    <style name="TextAppearance.Header" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textColor">@color/abc_primary_text_material_dark</item>
+    </style>
+
+    <style name="TextAppearance.Header.Caption" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textColor">@color/abc_secondary_text_material_dark</item>
+        <item name="allCaps">true</item>
+    </style>
+
+    <style name="TextAppearance.Caption" parent="TextAppearance.AppCompat.Caption">
+        <item name="allCaps">true</item>
+    </style>
+
     <style name="default_text_small_url" parent="@android:style/TextAppearance.Small">
-        <item name="android:textColor">@color/highlight</item>
+        <item name="android:textColor">?android:attr/textColorLink</item>
     </style>
 
     <style name="small_highlighted_sha" parent="default_text_small_url">
         <item name="android:typeface">monospace</item>
-    </style>
-
-    <style name="default_text_micro_url" parent="@android:style/TextAppearance.Small">
-        <item name="android:textSize">12sp</item>
-        <item name="android:textColor">@color/highlight</item>
     </style>
 
     <style name="LoadingProgress">
@@ -35,24 +53,74 @@
         <item name="android:layout_gravity">center_horizontal</item>
     </style>
 
-    <style name="MoreButton">
+    <style name="MoreButton" parent="SelectableLabel">
+        <item name="android:textColor">?attr/colorPrimaryDark</item>
         <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
+        <item name="android:textSize">@dimen/abc_text_size_button_material</item>
+        <item name="allCaps">true</item>
     </style>
 
     <style name="SelectableItem">
         <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 
-    <style name="SelectableLabel" parent="@style/SelectableItem">
+    <style name="SelectableBorderlessItem" parent="SelectableItem" />
+
+    <style name="SelectableLabel" parent="SelectableItem">
         <item name="android:paddingTop">6dp</item>
         <item name="android:paddingBottom">6dp</item>
-        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+        <item name="android:textAppearance">@style/TextAppearance.ItemTitle</item>
     </style>
 
     <style name="HeaderLabel">
-        <item name="android:background">@drawable/header_underline</item>
-        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
-        <item name="android:textColor">@color/highlight</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Medium</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:paddingLeft">@dimen/content_padding</item>
+        <item name="android:paddingRight">@dimen/content_padding</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="font">boldCondensed</item>
+        <item name="allCaps">true</item>
+    </style>
+
+    <style name="Widget.ActionBar.TabView" parent="Widget.AppCompat.ActionBar.TabView">
+        <item name="android:background">@drawable/tab_indicator</item>
+    </style>
+
+
+    <style name="Widget.Spinner.ActionBar.Light" parent="Widget.AppCompat.Spinner">
+        <item name="android:popupBackground">@drawable/abc_popup_background_mtrl_mult</item>
+    </style>
+
+    <style name="TextAppearance.Widget.ActionBar.Menu" parent="TextAppearance.AppCompat.Widget.ActionBar.Menu">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Base.CardView.Light" parent="CardView.Light">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">@dimen/card_margin</item>
+        <item name="android:layout_marginRight">@dimen/card_margin</item>
+        <item name="android:layout_marginTop">@dimen/card_top_bottom_margin</item>
+        <item name="android:layout_marginBottom">@dimen/card_top_bottom_margin</item>
+    </style>
+
+    <style name="Theme.CardView.Light" parent="Base.CardView.Light">
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+    </style>
+
+    <style name="Base.CardView.Dark" parent="CardView.Dark">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">@dimen/card_margin</item>
+        <item name="android:layout_marginRight">@dimen/card_margin</item>
+        <item name="android:layout_marginTop">@dimen/card_top_bottom_margin</item>
+        <item name="android:layout_marginBottom">@dimen/card_top_bottom_margin</item>
+    </style>
+
+    <style name="Theme.CardView.Dark" parent="Base.CardView.Dark">
+        <item name="android:foreground">?attr/selectableItemBackground</item>
     </style>
 
 </resources>

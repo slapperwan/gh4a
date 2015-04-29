@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -7,25 +7,34 @@
     android:paddingBottom="4dp"
     android:paddingLeft="@dimen/content_padding"
     android:paddingRight="@dimen/content_padding"
-    style="@style/SelectableItem"
-    android:orientation="horizontal">
+    style="@style/SelectableItem">
 
-    <TextView
-        android:id="@+id/filename"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_gravity="center_vertical"
-        android:typeface="monospace" />
-
-    <TextView
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/comments"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|right"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
         android:drawableLeft="?attr/commentsIcon"
-        android:drawablePadding="5dp"
+        android:drawablePadding="4dp"
+        android:layout_marginLeft="4dp"
         android:visibility="gone"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
-</LinearLayout>
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/filename"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/comments"
+        android:layout_alignParentLeft="true"
+        android:layout_alignWithParentIfMissing="true"
+        android:typeface="monospace" />
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/stats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/filename"
+        android:textAppearance="@style/TextAppearance.VerySmall" />
+
+</RelativeLayout>

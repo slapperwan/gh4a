@@ -33,7 +33,7 @@ public class FeedHandler extends DefaultHandler {
     @Override
     public void startDocument() throws SAXException {
         super.startDocument();
-        mFeeds = new ArrayList<Feed>();
+        mFeeds = new ArrayList<>();
         mBuilder = new StringBuilder();
     }
 

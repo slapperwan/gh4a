@@ -1,42 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    Layout
-    ======
-    Avatar  Title (Large)
-            Extra (Small)
- -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="?android:attr/listPreferredItemHeight"
-    android:orientation="horizontal"
     android:paddingLeft="@dimen/content_padding"
     android:paddingRight="@dimen/content_padding"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp" >
+    android:orientation="horizontal">
+
     <com.gh4a.widget.FixedSizeImageView
         android:id="@+id/iv_gravatar"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginRight="8dp" />
-    <LinearLayout
+        android:layout_marginRight="16dp" />
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/tv_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_gravity="center_vertical"
-        android:orientation="vertical" >
-        <TextView
-            android:id="@+id/tv_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:layout_gravity="center_vertical" />
-        <TextView
-            android:id="@+id/tv_extra"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/default_text_micro" />
-    </LinearLayout>
+        android:textAppearance="@style/TextAppearance.ItemTitle"
+        app:font="boldCondensed"
+        android:layout_gravity="center_vertical" />
+
 </LinearLayout>

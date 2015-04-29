@@ -25,7 +25,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
@@ -40,13 +39,13 @@ public class GistAdapter extends RootAdapter<Gist> {
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_gist, parent, false);
-        Gh4Application app = (Gh4Application) mContext.getApplicationContext();
         ViewHolder viewHolder = new ViewHolder();
 
         viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvDesc.setTypeface(app.boldCondensed);
-        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
+        viewHolder.tvCreator = (TextView) v.findViewById(R.id.tv_creator);
+        viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
+        viewHolder.tvSha = (TextView) v.findViewById(R.id.tv_sha);
+        viewHolder.tvFiles = (TextView) v.findViewById(R.id.tv_files);
 
         v.setTag(viewHolder);
         return v;
@@ -56,28 +55,30 @@ public class GistAdapter extends RootAdapter<Gist> {
     protected void bindView(View v, Gist gist) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
 
-        viewHolder.tvTitle.setText(gist.getId());
-        if (StringUtils.isBlank(gist.getDescription())) {
-            viewHolder.tvDesc.setVisibility(View.GONE);
+        User user = gist.getUser();
+        boolean isSelf = user != null && TextUtils.equals(user.getLogin(), mOwnerLogin);
+
+        if (isSelf) {
+            viewHolder.tvCreator.setVisibility(View.GONE);
         } else {
-            viewHolder.tvDesc.setText(gist.getDescription());
-            viewHolder.tvDesc.setVisibility(View.VISIBLE);
+            viewHolder.tvCreator.setText(user != null
+                    ? user.getLogin() : mContext.getString(R.string.unknown));
+            viewHolder.tvCreator.setVisibility(View.VISIBLE);
         }
 
-        String count = v.getResources().getQuantityString(R.plurals.file,
-                gist.getFiles().size(), gist.getFiles().size());
-        User user = gist.getUser();
-        int extraResId = user != null && TextUtils.equals(user.getLogin(), mOwnerLogin)
-                ? R.string.gist_extradata_own : R.string.gist_extradata;
-        String extra = mContext.getString(extraResId,
-                user != null ? user.getLogin() : mContext.getString(R.string.unknown),
-                StringUtils.formatRelativeTime(mContext, gist.getCreatedAt(), false), count);
-        viewHolder.tvExtra.setText(StringUtils.applyBoldTags(extra, null));
+        viewHolder.tvTimestamp.setText(
+                StringUtils.formatRelativeTime(mContext, gist.getCreatedAt(), false));
+        viewHolder.tvTitle.setText(TextUtils.isEmpty(gist.getDescription())
+                ? mContext.getString(R.string.gist_no_description) : gist.getDescription());
+        viewHolder.tvSha.setText(gist.getId());
+        viewHolder.tvFiles.setText(String.valueOf(gist.getFiles().size()));
     }
 
     private static class ViewHolder {
+        public TextView tvCreator;
+        public TextView tvTimestamp;
         public TextView tvTitle;
-        public TextView tvDesc;
-        public TextView tvExtra;
+        public TextView tvSha;
+        public TextView tvFiles;
     }
 }

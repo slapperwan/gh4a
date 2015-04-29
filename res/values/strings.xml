@@ -4,8 +4,6 @@
 
     <!-- Common -->
     <string name="record_not_found">%1$s not found</string>
-    <string name="more_commit_data">[b]%1$s[/b] authored %2$s</string>
-    <string name="more_issue_data">%1$s %2$s</string>
     <string name="loading_msg">Loading\u2026</string>
     <string name="saving_msg">Saving\u2026</string>
     <string name="deleting_msg">Deleting\u2026</string>
@@ -20,6 +18,7 @@
     <string name="cancel">Cancel</string>
     <string name="settings">Settings</string>
     <string name="about">About</string>
+    <string name="open_source_components">Open source components</string>
     <string name="my_email">slapperwan@gmail.com</string>
     <string name="my_web">http://slapperwan.github.com/gh4a</string>
     <string name="my_username">slapperwan</string>
@@ -48,21 +47,12 @@
     <string name="download">Download</string>
     <string name="downloads">Downloads</string>
     <string name="releases">Releases</string>
-    <string name="packages">Packages</string>
     <string name="open_in_browser">Open in browser</string>
     <string name="no_browser_found">The link could not be opened: no browser was found on your device</string>
     <string name="error_toast">An error occurred while fetching data</string>
     <string name="unknown">unknown</string>
     <string name="history">History</string>
     <string name="deleted">(deleted)</string>
-    <string name="repo_search_extradata">%1$s\u00a0\u00a0\u00a0%2$s\u00a0\u00a0\u00a0%3$d forks\u00a0\u00a0\u00a0%4$d watchers</string>
-    <string name="milestone_extradata">%1$d open\u00a0\u00a0\u00a0%2$d closed</string>
-    <string name="milestone_extradata_due">%1$d open\u00a0\u00a0\u00a0%2$d closed\u00a0\u00a0\u00a0due on %3$s</string>
-    <string name="download_extradata">%1$s\u00a0\u00a0\u00a0%2$d downloads\u00a0\u00a0\u00a0created %3$s</string>
-    <string name="release_extradata">%1$s\u00a0\u00a0\u00a0created %2$s</string>
-    <string name="feed_extradata">[b]%1$s[/b]\u00a0\u00a0\u00a0%2$s</string>
-    <string name="gist_extradata">[b]%1$s[/b] %2$s\u00a0\u00a0\u00a0%3$s</string>
-    <string name="gist_extradata_own">%2$s\u00a0\u00a0\u00a0%3$s</string>
     <string name="go_to">Go to</string>
     <string name="forked_from">forked from %1$s</string>
     <string name="enter_username_toast">Please enter your user name instead of your email address</string>
@@ -77,7 +67,6 @@
     <string name="menu_wiki">Wiki in browser</string>
     <string name="menu_pull">Pull request %1$d</string>
     <string name="menu_issues">Open issues</string>
-    <string name="refresh">Refresh</string>
     <string name="delete_comment_message">Delete this comment?</string>
     <string name="please_wait">Please wait</string>
     <string name="bookmark_user">Bookmark user</string>
@@ -88,6 +77,7 @@
     <string name="issue_milestone_hint">Milestone</string>
     <string name="issue_assignee_hint">Assignee</string>
     <string name="link_not_openable">Link could not be opened</string>
+    <string name="download_created">Created %1$s</string>
     <string name="download_mobile_warning_title">Mobile connection download</string>
     <string name="download_mobile_warning_message">Do you want to download this file using your mobile connection?\nYou can also schedule it for download when you\'re using your Wi-Fi connection next time.</string>
     <string name="download_now_button">Download now</string>
@@ -101,16 +91,27 @@
     <string name="logout_pref_summary_logged_in">Currently logged in as %1$s</string>
     <string name="logout_pref_summary_logged_out">Currently not logged in</string>
     <string name="copyright_notice">\u00a9 2014 Azwan Adli, Danny Baumann</string>
-
-    <plurals name="file">
-        <item quantity="one">%1$d File</item>
-        <item quantity="other">%1$d Files</item>
-    </plurals>
+    <string name="actions">Actions</string>
+    <string name="created">Created</string>
+    <string name="assigned">Assigned</string>
+    <string name="mentioned">Mentioned</string>
+    <string name="my_issues">My issues</string>
+    <string name="my_pull_requests">My pull requests</string>
 
     <plurals name="contributor_extra_data">
         <item quantity="one">%1$d contribution</item>
         <item quantity="other">%1$d contributions</item>
     </plurals>
+
+    <string name="repo_type_all">All</string>
+    <string name="repo_type_owner">Owner</string>
+    <string name="repo_type_member">Member</string>
+    <string name="repo_type_public">Public</string>
+    <string name="repo_type_private">Private</string>
+    <string name="repo_type_sources">Sources</string>
+    <string name="repo_type_forks">Forks</string>
+    <string name="repo_type_watched">Watched</string>
+    <string name="repo_type_starred">Starred</string>
 
     <string name="no_blogs_found">No blogs found.</string>
     <string name="no_comments_found">Nobody has commented so far.</string>
@@ -131,12 +132,11 @@
     <string name="no_watched_repos_found">No repositories are being watched yet.</string>
     <string name="no_watchers_found">Nobody is watching this repository yet.</string>
     <string name="no_stargazers_found">Nobody has starred this repository yet.</string>
-    <string name="no_tags_found">No tags were created in this repository yet.</string>
-    <string name="no_branches_found">No branches were created in this repository yet.</string>
     <string name="no_contributors_found">No contributions were made to this repository yet.</string>
     <string name="no_releases_found">No releases were created for this repository yet.</string>
     <string name="no_gists_found">No gists were created so far.</string>
     <string name="no_starred_gists_found">No gists were starred so far.</string>
+    <string name="no_bookmarks">No bookmarks were created so far.</string>
 
     <!-- Activity event -->
     <string name="event_push_title">[b]%1$s[/b] pushed to [b]%2$s[/b] at [b]%3$s[/b]</string>
@@ -161,7 +161,8 @@
     <string name="event_release_title">[b]%1$s[/b] created a release in [b]%2$s[/b]</string>
     <string name="event_issue_comment">[b]%1$s[/b] commented on issue [b]%2$d[/b] in [b]%3$s[/b]</string>
     <string name="event_pull_request_comment">[b]%1$s[/b] commented on pull request [b]%2$d[/b] in [b]%3$s[/b]</string>
-
+    <string name="event_team_user_add">[b]%1$s[/b] added [b]%2$s[/b] to the team [b]%3$s[/b]</string>
+    <string name="event_team_repo_add">[b]%1$s[/b] added the repository [b]%2$s[/b] to the team [b]%3$s[/b]</string>
     <plurals name="page">
         <item quantity="one">a page</item>
         <item quantity="other">%d pages</item>
@@ -190,6 +191,7 @@
     <string name="user_follow_action">Follow</string>
     <string name="user_unfollow_action">Unfollow</string>
     <string name="user_no_repos">No repositories found</string>
+    <string name="user_no_data">Data for this user can\'t be loaded.</string>
 
     <!-- Repository -->
     <string name="repository">Repository</string>
@@ -197,30 +199,33 @@
     <string name="repo_language">Language %1$s</string>
     <string name="repo_watchers">Watchers</string>
     <string name="repo_stargazers">Stargazers</string>
-    <string name="repo_network">Network</string>
     <string name="repo_watch_action">Watch</string>
     <string name="repo_star_action">Star</string>
+    <string name="repo_select_ref">Select branch</string>
+    <string name="repo_select_ref_dialog_title">Select branch or tag</string>
     <string name="repo_branches">Branches</string>
     <string name="repo_tags">Tags</string>
     <string name="repo_unwatch_action">Unwatch</string>
     <string name="repo_unstar_action">Unstar</string>
+    <string name="repo_download_action">Download code as ZIP</string>
     <string name="repo_contributors">Contributors</string>
     <string name="repo_collaborators">Collaborators</string>
     <string name="repo_files">Files</string>
     <string name="repo_short">Repos</string>
     <string name="repo_no_readme">No README file found</string>
-    <string name="repo_issue_on">on %1$s</string>
+    <string name="repo_issue_on">#%1$d on %2$s</string>
+    <string name="repo_no_data">Data for this repository can\'t be loaded.</string>
 
     <!-- Issue events -->
-    <string name="issue_event_closed">Closed by [b]%1$s[/b]</string>
-    <string name="issue_event_closed_with_commit">Closed by [b]%1$s[/b] with commit [commit]</string>
-    <string name="issue_event_reopened">Reopened by [b]%1$s[/b]</string>
-    <string name="issue_event_merged">Merged by [b]%1$s[/b]</string>
-    <string name="issue_event_referenced">Referenced by [b]%1$s[/b]</string>
-    <string name="issue_event_referenced_with_commit">Referenced by [b]%1$s[/b] from commit [commit]</string>
-    <string name="issue_event_assigned">[b]%1$s[/b] assigned this to [b]%2$s[/b]</string>
-    <string name="issue_event_assigned_self">Self-assigned by [b]%1$s[/b]</string>
-    <string name="issue_event_unassigned">Unassigned by [b]%1$s[/b]</string>
+    <string name="issue_event_closed">Issue was closed by %1$s</string>
+    <string name="issue_event_closed_with_commit">Issue was closed by %1$s with commit [commit]</string>
+    <string name="issue_event_reopened">Issue was reopened by %1$s</string>
+    <string name="issue_event_merged">Pull request was merged by %1$s</string>
+    <string name="issue_event_referenced">Issue was referenced by %1$s</string>
+    <string name="issue_event_referenced_with_commit">Issue was referenced by %1$s from commit [commit]</string>
+    <string name="issue_event_assigned">Issue was assigned to [b]%2$s[/b] by %1$s</string>
+    <string name="issue_event_assigned_self">Issue was self-assigned by %1$s</string>
+    <string name="issue_event_unassigned">Issue was unassigned from [b]%2$s[/b] by %1$s</string>
 
     <!-- Commit -->
     <string name="commit_title">Commit %1$s</string>
@@ -233,7 +238,6 @@
     <string name="commit_summary">%1$d changed files with %2$d additions and %3$d deletions.</string>
     <string name="commit_compare">Compare View</string>
     <string name="commit_comment_hint">Comment on this commit</string>
-    <string name="commit_info">[b]%1$s[/b] %2$s</string>
     <string name="commit_details">Committed by [b]%1$s[/b] %2$s</string>
     <string name="commit_comment_dialog_title">Comment on line %1$d</string>
     <string name="commit_comment_error_body">Please enter your comment.</string>
@@ -249,18 +253,18 @@
 
     <string name="issues">Issues</string>
     <string name="issue">Issue</string>
+    <string name="issues_open">Open Issues</string>
+    <string name="issues_closed">Closed Issues</string>
+    <string name="issues_menu_show_open">Show Open</string>
+    <string name="issues_menu_show_closed">Show Closed</string>
     <string name="issue_comments">Comments</string>
-    <string name="issue_events_with_count">Events (%1$d)</string>
     <string name="issue_title">Title</string>
     <string name="issue_body">Body</string>
     <string name="issue_create">New Issue</string>
     <string name="issue_error_title">Please enter a title</string>
     <string name="issue_success_create">Successfully created issue</string>
-    <string name="issue_edit">Edit Issue</string>
     <string name="issue_edit_title">Edit Issue #%1$d</string>
     <string name="issue_success_edit">Successfully edited issue</string>
-    <string name="issue_reopen">Reopen Issue</string>
-    <string name="issue_close">Close Issue</string>
     <string name="issue_success_close">Successfully closed issue</string>
     <string name="issue_error_close">Cannot close issue</string>
     <string name="issue_success_reopen">Successfully reopened issue</string>
@@ -274,21 +278,23 @@
     <string name="issue_sort_comments_desc">Most commented</string>
     <string name="issue_manage_labels">Manage Labels</string>
     <string name="issue_manage_milestones">Manage Milestones</string>
+    <string name="issue_labels">Labels</string>
+    <string name="issue_milestones">Milestones</string>
     <string name="issue_dialog_delete_title">Delete %1$s?</string>
     <string name="issue_dialog_delete_message">Are you sure?</string>
     <string name="issue_success_comment">Successfully created comment</string>
     <string name="issue_error_comment">Cannot create comment</string>
-    <string name="issue_milestone_title">Title</string>
-    <string name="issue_milestone_desc">Description</string>
     <string name="issue_error_create_label">Cannot create label</string>
     <string name="issue_error_edit_label">Cannot edit label</string>
     <string name="issue_error_create_milestone">Cannot create milestone</string>
     <string name="issue_error_milestone_title">Please enter a title</string>
-    <string name="issue_label_add">Labels</string>
     <string name="issue_label_new">New Label</string>
     <string name="issue_milestone">Milestone: %1$s</string>
     <string name="issue_milestone_new">New Milestone</string>
     <string name="issue_milestone_edit">Edit Milestone</string>
+    <string name="issue_milestone_open_issues">%d open</string>
+    <string name="issue_milestone_closed_issues">%d closed</string>
+    <string name="issue_filter">Filter</string>
     <string name="issue_filter_by_labels">Filter by labels</string>
     <string name="issue_filter_by_milestone">Filter by milestone</string>
     <string name="issue_filter_by_assignee">Filter by assignee</string>
@@ -296,15 +302,18 @@
     <string name="issue_filter_by_any_assignee">Any assignee</string>
     <string name="issue_clear_milestone">No milestone</string>
     <string name="issue_clear_assignee">No assignee</string>
+    <string name="issue_no_labels">No labels assigned</string>
+    <string name="issue_milestone_collab_only">Milestone can only be set by repo collaborators</string>
+    <string name="issue_assignee_collab_only">Assignee can only be set by repo collaborators</string>
+    <string name="issue_labels_collab_only">Labels can only be set by repo collaborators</string>
     <string name="issue_milestone_due_date">Due Date</string>
-    <string name="issue_milestone_due">Due on %1$s</string>
+    <string name="issue_milestone_due_unset">No date set</string>
     <string name="issue_assignee">%1$s is assigned</string>
-    <string name="issue_desc">Description</string>
     <string name="issue_comment_title">Comment</string>
     <string name="issue_comment_update_title">Update</string>
     <string name="issue_comment_hint">Comment on this issue</string>
-    <string name="issue_comment_header">[b]%1$s[/b] commented %2$s</string>
-    <string name="issue_commit_comment_header">[b]%1$s[/b] added a note %2$s on [b]%3$s[/b]</string>
+    <string name="issue_comment_header">[b]%1$s[/b]</string>
+    <string name="issue_commit_comment_file">Comment on [b]%1$s[/b]</string>
     <string name="commit_comment_header">%1$s added a note %2$s</string>
 
     <!-- Pull Request -->
@@ -312,6 +321,8 @@
     <string name="pull_request_conversation">Conversation</string>
     <string name="pull_request_files">Files</string>
     <string name="pull_requests">Pull Requests</string>
+    <string name="pull_requests_open">Open Pull Requests</string>
+    <string name="pull_requests_closed">Closed Pull Requests</string>
     <string name="pull_request_comment_hint">Comment on this pull request</string>
     <string name="view_pull_request">View pull request</string>
     <string name="pull_request_reopen">Reopen</string>
@@ -330,9 +341,11 @@
     <string name="starred">Starred</string>
     <string name="gists">Gists</string>
     <string name="gist_title">Gist %1$s</string>
+    <string name="gist_no_description">&lt;No description&gt;</string>
     <string name="gist_files">Files</string>
 
     <!-- Explore -->
+    <string name="navigation">Navigation</string>
     <string name="explore">Explore</string>
 
     <!-- Trending repos -->

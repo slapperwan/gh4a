@@ -16,6 +16,7 @@
         android:label="@string/app_name">
         <activity
             android:name=".activities.Github4AndroidActivity"
+            android:windowSoftInputMode="adjustResize"
             android:configChanges="orientation|screenSize" >
             <intent-filter>
                 <action
@@ -24,142 +25,58 @@
                     android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity-alias
             android:name=".Github4AndroidActivity"
             android:label="@string/app_name"
             android:targetActivity=".activities.Github4AndroidActivity"/>
-        <activity
-            android:name=".activities.BlogActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.BlogListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.BookmarkListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.CollaboratorListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.CommitActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.CommitHistoryActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.CompareActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.ContributorListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.DownloadsActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.EditCommitCommentActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.EditIssueCommentActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.EditPullRequestCommentActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.ExploreActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.FileViewerActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.CommitDiffViewerActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.FollowerFollowingListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.GistActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.GistListActivity"
-            android:configChanges="orientation|screenSize"/>
-        <activity
-            android:name=".activities.GistViewerActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.IssueActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.IssueEditActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.IssueLabelListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.IssueListActivity"
-            android:configChanges="orientation|screenSize">
-            <meta-data android:name="android.support.UI_OPTIONS"
-                android:value="splitActionBarWhenNarrow" />
-        </activity>
-        <activity
-            android:name=".activities.IssueMilestoneEditActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.IssueMilestoneListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.OrganizationMemberListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.PullRequestActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.PullRequestListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.PullRequestDiffViewerActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.ReleaseInfoActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.ReleaseListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.RepositoryActivity"
-            android:configChanges="orientation|screenSize">
-            <meta-data android:name="android.support.UI_OPTIONS"
-                android:value="splitActionBarWhenNarrow" />
-        </activity>
-        <activity
-            android:name=".activities.RepositoryListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.SearchActivity"
-            android:configChanges="orientation|screenSize" />
+
+        <activity android:name=".activities.BlogActivity" />
+        <activity android:name=".activities.BlogListActivity" />
+        <activity android:name=".activities.BookmarkListActivity" />
+        <activity android:name=".activities.CollaboratorListActivity" />
+        <activity android:name=".activities.CommitActivity" />
+        <activity android:name=".activities.CommitDiffViewerActivity" />
+        <activity android:name=".activities.CommitHistoryActivity" />
+        <activity android:name=".activities.CompareActivity" />
+        <activity android:name=".activities.ContributorListActivity" />
+        <activity android:name=".activities.DownloadsActivity" />
+        <activity android:name=".activities.EditCommitCommentActivity" />
+        <activity android:name=".activities.EditIssueCommentActivity" />
+        <activity android:name=".activities.EditPullRequestCommentActivity" />
+        <activity android:name=".activities.FileViewerActivity" />
+        <activity android:name=".activities.ForkListActivity" />
+        <activity android:name=".activities.FollowerFollowingListActivity" />
+        <activity android:name=".activities.GistActivity" />
+        <activity android:name=".activities.GistListActivity" />
+        <activity android:name=".activities.GistViewerActivity" />
+        <activity android:name=".activities.IssueActivity" />
+        <activity android:name=".activities.IssueEditActivity" />
+        <activity android:name=".activities.IssueLabelListActivity" />
+        <activity android:name=".activities.IssueListActivity" />
+        <activity android:name=".activities.IssueListMineActivity" />
+        <activity android:name=".activities.IssueMilestoneEditActivity" />
+        <activity android:name=".activities.IssueMilestoneListActivity" />
+        <activity android:name=".activities.OrganizationMemberListActivity" />
+        <activity android:name=".activities.PullRequestActivity" />
+        <activity android:name=".activities.PullRequestListActivity" />
+        <activity android:name=".activities.PullRequestDiffViewerActivity" />
+        <activity android:name=".activities.ReleaseInfoActivity" />
+        <activity android:name=".activities.ReleaseListActivity" />
+        <activity android:name=".activities.RepositoryActivity" />
+        <activity android:name=".activities.RepositoryListActivity" />
+        <activity android:name=".activities.SearchActivity" />
+        <activity android:name=".activities.TimelineActivity" />
+        <activity android:name=".activities.TrendingActivity" />
+        <activity android:name=".activities.UserActivity" />
+        <activity android:name=".activities.WatcherListActivity" />
+        <activity android:name=".activities.WikiActivity" />
+        <activity android:name=".activities.WikiListActivity" />
+
         <activity
             android:name=".activities.SettingsActivity"
             android:title="@string/settings" />
-        <activity
-            android:name=".activities.TimelineActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.TrendingActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.UserActivity"
-            android:configChanges="orientation|screenSize">
-            <meta-data android:name="android.support.UI_OPTIONS"
-                android:value="splitActionBarWhenNarrow" />
-        </activity>
-        <activity
-            android:name=".activities.WatcherListActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.WikiActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".activities.WikiListActivity"
-            android:configChanges="orientation|screenSize" />
+
         <activity android:name="BrowseFilter">
             <intent-filter>
                 <action
@@ -182,10 +99,12 @@
                     android:scheme="http" />
             </intent-filter>
         </activity>
+
         <provider
             android:name=".db.BookmarksProvider"
             android:authorities="com.gh4a"
             android:exported="false" />
+
         <receiver
             android:name="EventReceiver">
             <intent-filter>

@@ -1,49 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    Layout
-    ======
-    Avatar  Title (Large)
-            Description (Medium)
-            Extra (Small)
- -->
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="?android:attr/listPreferredItemHeight"
-    android:orientation="horizontal"
-    android:paddingLeft="@dimen/content_padding"
-    android:paddingRight="@dimen/content_padding"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp" >
+    android:minHeight="?attr/listPreferredItemHeight"
+    android:padding="@dimen/content_padding">
+
     <com.gh4a.widget.FixedSizeImageView
         android:id="@+id/iv_gravatar"
         android:layout_width="40dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_vertical"
-        android:layout_marginRight="8dp" />
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical" >
-        <TextView
-            android:id="@+id/tv_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-        <TextView
-            android:id="@+id/tv_desc"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:maxLines="2"
-            android:ellipsize="end" />
-        <TextView
-            android:id="@+id/tv_extra"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/default_text_micro" />
-    </LinearLayout>
-</LinearLayout>
+        android:layout_height="40dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="16dp" />
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/tv_extra"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/iv_gravatar"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="?android:attr/textColorPrimary" />
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/tv_timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/tv_extra"
+        android:layout_alignBaseline="@id/tv_extra"
+        android:layout_marginLeft="16dp"
+        android:textAppearance="@style/TextAppearance.VerySmall" />
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/iv_gravatar"
+        android:layout_below="@id/tv_extra"
+        android:textAppearance="@style/TextAppearance.ItemTitle"
+        app:font="boldCondensed"
+        android:textSize="16sp" />
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/tv_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/iv_gravatar"
+        android:layout_below="@id/tv_title"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:maxLines="2"
+        android:ellipsize="end" />
+
+</RelativeLayout>

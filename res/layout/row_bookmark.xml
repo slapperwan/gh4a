@@ -4,33 +4,31 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="?android:attr/listPreferredItemHeight"
-    android:paddingLeft="@dimen/content_padding"
+    android:padding="@dimen/content_padding"
     android:paddingRight="@dimen/content_padding"
-    android:paddingTop="4dp"
-    android:paddingBottom="4dp"
     android:orientation="horizontal" >
     <ImageView
         android:id="@+id/iv_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_marginRight="8dp" />
+        android:layout_marginRight="16dp" />
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:layout_gravity="center_vertical"
         android:orientation="vertical" >
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textAppearance="@style/TextAppearance.ItemTitle"
             android:gravity="center_vertical" />
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_extra"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/default_text_micro" />
+            android:textAppearance="@style/TextAppearance.VerySmall" />
     </LinearLayout>
 </LinearLayout>

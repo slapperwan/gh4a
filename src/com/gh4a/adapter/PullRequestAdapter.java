@@ -20,14 +20,12 @@ import org.eclipse.egit.github.core.User;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
@@ -40,21 +38,19 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> implements View
 
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
-        View v = inflater.inflate(R.layout.row_gravatar_1, parent, false);
+        View v = inflater.inflate(R.layout.row_issue, parent, false);
         ViewHolder viewHolder = new ViewHolder();
-
-        Gh4Application app = (Gh4Application) mContext.getApplicationContext();
-        Typeface boldCondensed = app.boldCondensed;
-        Typeface regular = app.regular;
 
         viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
         viewHolder.ivGravatar.setOnClickListener(this);
 
-        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvDesc.setTypeface(boldCondensed);
+        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
+        viewHolder.tvCreator = (TextView) v.findViewById(R.id.tv_creator);
+        viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
+        viewHolder.tvNumber = (TextView) v.findViewById(R.id.tv_number);
+        viewHolder.tvComments = (TextView) v.findViewById(R.id.tv_comments);
 
-        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-        viewHolder.tvExtra.setTypeface(regular);
+        v.findViewById(R.id.labels).setVisibility(View.GONE);
 
         v.setTag(viewHolder);
         return v;
@@ -68,10 +64,20 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> implements View
         AvatarHandler.assignAvatar(viewHolder.ivGravatar, user);
         viewHolder.ivGravatar.setTag(pullRequest.getUser());
 
+        viewHolder.tvNumber.setText("#" + pullRequest.getNumber());
         viewHolder.tvDesc.setText(pullRequest.getTitle());
-        viewHolder.tvExtra.setText(mContext.getString(R.string.more_issue_data,
-                user != null ? user.getLogin() : "",
-                StringUtils.formatRelativeTime(mContext, pullRequest.getCreatedAt(), true)));
+        viewHolder.tvCreator.setText(
+                user != null ? user.getLogin() : mContext.getString(R.string.unknown));
+        viewHolder.tvTimestamp.setText(
+                StringUtils.formatRelativeTime(mContext, pullRequest.getCreatedAt(), true));
+
+        int comments = pullRequest.getComments() + pullRequest.getReviewComments();
+        if (comments > 0) {
+            viewHolder.tvComments.setVisibility(View.VISIBLE);
+            viewHolder.tvComments.setText(String.valueOf(comments));
+        } else {
+            viewHolder.tvComments.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -87,7 +93,10 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> implements View
 
     private static class ViewHolder {
         public ImageView ivGravatar;
+        public TextView tvCreator;
+        public TextView tvTimestamp;
         public TextView tvDesc;
-        public TextView tvExtra;
+        public TextView tvNumber;
+        public TextView tvComments;
     }
 }

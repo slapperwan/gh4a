@@ -30,12 +30,12 @@ public class RepositorySearchLoader extends BaseLoader<List<Repository>> {
     @Override
     public List<Repository> doLoadInBackground() throws Exception {
         if (TextUtils.isEmpty(mQuery)) {
-            return new ArrayList<Repository>();
+            return new ArrayList<>();
         }
 
         RepositoryService repoService = (RepositoryService)
-                Gh4Application.get(getContext()).getService(Gh4Application.REPO_SERVICE);
-        HashMap<String, String> params = new HashMap<String, String>();
+                Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
+        HashMap<String, String> params = new HashMap<>();
         params.put("fork", "true");
         params.put("user", mUserLogin);
 
@@ -48,7 +48,7 @@ public class RepositorySearchLoader extends BaseLoader<List<Repository>> {
                 // With that status code, Github wants to tell us there are no
                 // repositories to search in. Just pretend no error and return
                 // an empty list in that case.
-                result = new ArrayList<Repository>();
+                result = new ArrayList<>();
             } else {
                 throw e;
             }

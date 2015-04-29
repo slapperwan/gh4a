@@ -49,7 +49,7 @@ public abstract class RootAdapter<T> extends BaseAdapter implements Filterable {
                 results.values = mUnfilteredObjects;
                 results.count = mUnfilteredObjects.size();
             } else {
-                final ArrayList<T> filtered = new ArrayList<T>();
+                final ArrayList<T> filtered = new ArrayList<>();
                 for (T object : mUnfilteredObjects) {
                     if (isFiltered(constraint, object)) {
                         filtered.add(object);
@@ -75,8 +75,8 @@ public abstract class RootAdapter<T> extends BaseAdapter implements Filterable {
      * @param context the context
      */
     public RootAdapter(Context context) {
-        mObjects = new ArrayList<T>();
-        mUnfilteredObjects = new ArrayList<T>();
+        mObjects = new ArrayList<>();
+        mUnfilteredObjects = new ArrayList<>();
         mContext = context;
     }
 
@@ -160,6 +160,10 @@ public abstract class RootAdapter<T> extends BaseAdapter implements Filterable {
     @Override
     public Filter getFilter() {
         return mFilter;
+    }
+
+    public boolean isCardStyle() {
+        return false;
     }
 
     protected abstract View createView(LayoutInflater inflater, ViewGroup parent, int viewType);

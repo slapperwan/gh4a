@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/progress_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+
+        <fr.castorflex.android.smoothprogressbar.SmoothProgressBar
+            android:id="@+id/progress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            app:spb_sections_count="6"
+            app:spb_speed="1.0"
+            app:spb_progressiveStart_activated="true"
+            app:spb_progressiveStart_speed="1.5"
+            app:spb_progressiveStop_speed="3.4"
+            app:spb_interpolator="spb_interpolator_acceleratedecelerate" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/content_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@android:id/empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+    </FrameLayout>
+
+</FrameLayout>

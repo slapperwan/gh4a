@@ -13,7 +13,6 @@ import android.content.Context;
 import com.gh4a.Gh4Application;
 
 public class TagListLoader extends BaseLoader<List<RepositoryTag>> {
-
     private String mRepoOwner;
     private String mRepoName;
 
@@ -26,16 +25,15 @@ public class TagListLoader extends BaseLoader<List<RepositoryTag>> {
     @Override
     public List<RepositoryTag> doLoadInBackground() throws IOException {
         RepositoryService repoService = (RepositoryService)
-                Gh4Application.get(getContext()).getService(Gh4Application.REPO_SERVICE);
+                Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
         List<RepositoryTag> tags = repoService.getTags(new RepositoryId(mRepoOwner, mRepoName));
-        if (tags == null) {
-            return null;
-        }
+        ArrayList<RepositoryTag> result = new ArrayList<>();
 
-        ArrayList<RepositoryTag> result = new ArrayList<RepositoryTag>();
-        for (RepositoryTag tag : tags) {
-            if (tag != null) {
-                result.add(tag);
+        if (tags != null) {
+            for (RepositoryTag tag : tags) {
+                if (tag != null) {
+                    result.add(tag);
+                }
             }
         }
         return result;

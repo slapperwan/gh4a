@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="issue_edit_body_min_lines">2</integer>
+    <integer name="issue_edit_body_max_lines">3</integer>
+    <integer name="comment_box_max_lines">3</integer>
+</resources>

@@ -1,42 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp"
-    android:paddingLeft="@dimen/content_padding"
-    android:paddingRight="@dimen/content_padding" >
-    <TextView
-        android:id="@+id/tv_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/overview_header_spacing"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-    <com.gh4a.widget.FixedSizeImageView
-        android:id="@+id/iv_gravatar"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginRight="8dp"
-        android:layout_below="@id/tv_title" />
-    <TextView
-        android:id="@+id/tv_desc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tv_title"
-        android:layout_toRightOf="@id/iv_gravatar"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:maxLines="4"
-        android:ellipsize="end" />
-    <TextView
-        android:id="@+id/tv_created_at"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:layout_below="@id/tv_desc"
-        android:layout_alignParentBottom="true"
-        android:textAppearance="@style/default_text_micro"
-        android:layout_toRightOf="@id/iv_gravatar" />
 
-</RelativeLayout>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <android.support.v7.widget.CardView
+        style="?attr/cardViewTheme">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingLeft="@dimen/content_padding"
+            android:paddingRight="@dimen/content_padding"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+            <com.gh4a.widget.FixedSizeImageView
+                android:id="@+id/iv_gravatar"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginRight="16dp" />
+
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/tv_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/iv_gravatar"
+                android:textAppearance="@style/TextAppearance.ItemTitle" />
+
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/tv_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_title"
+                android:layout_toRightOf="@id/iv_gravatar"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="4"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/tv_created_at"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_below="@id/tv_desc"
+                android:layout_toRightOf="@id/iv_gravatar"
+                android:layout_marginTop="2dp"
+                android:textAppearance="@style/TextAppearance.VerySmall" />
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+</FrameLayout>

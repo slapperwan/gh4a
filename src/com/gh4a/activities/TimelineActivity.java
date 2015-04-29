@@ -18,13 +18,13 @@ package com.gh4a.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.support.v7.app.ActionBar;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.PublicTimelineFragment;
 
-public class TimelineActivity extends BaseFragmentActivity {
+public class TimelineActivity extends BaseActivity {
     private PublicTimelineFragment mFragment;
 
     @Override
@@ -34,41 +34,31 @@ public class TimelineActivity extends BaseFragmentActivity {
         FragmentManager fm = getSupportFragmentManager();
         if (savedInstanceState == null) {
             mFragment = PublicTimelineFragment.newInstance();
-            fm.beginTransaction().add(android.R.id.content, mFragment).commit();
+            fm.beginTransaction().add(R.id.content_container, mFragment).commit();
         } else {
-            mFragment = (PublicTimelineFragment) fm.findFragmentById(android.R.id.content);
+            mFragment = (PublicTimelineFragment) fm.findFragmentById(R.id.details);
         }
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(R.string.pub_timeline);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
+        setChildScrollDelegate(mFragment);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.explore_menu, menu);
-        menu.findItem(R.id.pub_timeline).setVisible(false);
-        return super.onCreateOptionsMenu(menu);
+    protected boolean canSwipeToRefresh() {
+        return true;
+    }
+
+    @Override
+    public void onRefresh() {
+        mFragment.refresh();
+        refreshDone();
     }
 
     @Override
     protected Intent navigateUp() {
         return getToplevelActivityIntent();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.trend:
-                Intent intent = new Intent(this, TrendingActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                return true;
-            case R.id.blog:
-                intent = new Intent(this, BlogListActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                return true;
-            case R.id.refresh:
-                mFragment.refresh();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 }

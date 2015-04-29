@@ -1,21 +1,14 @@
 package com.gh4a.adapter;
 
-import static android.text.format.DateUtils.FORMAT_NUMERIC_DATE;
-import static android.text.format.DateUtils.FORMAT_SHOW_DATE;
-import static android.text.format.DateUtils.FORMAT_SHOW_YEAR;
-import static android.text.format.DateUtils.MINUTE_IN_MILLIS;
-
 import org.eclipse.egit.github.core.Download;
 
 import android.content.Context;
-import android.text.format.DateUtils;
 import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
@@ -26,17 +19,14 @@ public class DownloadAdapter extends RootAdapter<Download> {
 
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
-        View v = inflater.inflate(R.layout.row_simple_3, null);
+        View v = inflater.inflate(R.layout.row_download, null);
         ViewHolder viewHolder = new ViewHolder();
-        Gh4Application app = Gh4Application.get(mContext);
 
         viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvTitle.setTypeface(app.boldCondensed);
-
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-
-        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-        viewHolder.tvExtra.setTextAppearance(mContext, R.style.default_text_micro);
+        viewHolder.tvCreatedAt = (TextView) v.findViewById(R.id.tv_created_at);
+        viewHolder.tvSize = (TextView) v.findViewById(R.id.tv_size);
+        viewHolder.tvDownloads = (TextView) v.findViewById(R.id.tv_downloads);
 
         v.setTag(viewHolder);
         return v;
@@ -54,17 +44,17 @@ public class DownloadAdapter extends RootAdapter<Download> {
             viewHolder.tvDesc.setVisibility(View.GONE);
         }
 
-        CharSequence created = DateUtils.getRelativeTimeSpanString(download.getCreatedAt().getTime(),
-                System.currentTimeMillis(), MINUTE_IN_MILLIS,
-                FORMAT_SHOW_DATE | FORMAT_SHOW_YEAR | FORMAT_NUMERIC_DATE);
-        viewHolder.tvExtra.setText(mContext.getString(R.string.download_extradata,
-                Formatter.formatFileSize(mContext, download.getSize()),
-                download.getDownloadCount(), created));
+        viewHolder.tvCreatedAt.setText(mContext.getString(R.string.download_created,
+                StringUtils.formatRelativeTime(mContext, download.getCreatedAt(), true)));
+        viewHolder.tvSize.setText(Formatter.formatFileSize(mContext, download.getSize()));
+        viewHolder.tvDownloads.setText(String.valueOf(download.getDownloadCount()));
     }
 
     private static class ViewHolder {
         public TextView tvTitle;
         public TextView tvDesc;
-        public TextView tvExtra;
+        public TextView tvSize;
+        public TextView tvDownloads;
+        public TextView tvCreatedAt;
     }
 }

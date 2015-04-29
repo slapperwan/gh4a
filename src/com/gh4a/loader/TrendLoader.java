@@ -29,7 +29,7 @@ public class TrendLoader extends BaseLoader<List<Trend>> {
         HttpClient httpClient = new DefaultHttpClient();
         HttpGet pageGet = new HttpGet(new URL(mUrl).toURI());
         HttpResponse response = httpClient.execute(pageGet);
-        List<Trend> trends = new ArrayList<Trend>();
+        List<Trend> trends = new ArrayList<>();
         String json = EntityUtils.toString(response.getEntity(), "UTF-8");
         if (json == null) {
             return trends;

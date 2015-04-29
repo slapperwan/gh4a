@@ -1,12 +1,13 @@
 package com.gh4a.utils;
 
 import java.io.File;
+import java.lang.reflect.Field;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
@@ -15,23 +16,29 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.support.annotation.NonNull;
+import android.support.v4.view.ViewCompat;
 import android.text.Spannable;
 import android.text.method.LinkMovementMethod;
+import android.view.ContextThemeWrapper;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
+import android.widget.EdgeEffect;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class UiUtils {
     public static final LinkMovementMethod CHECKING_LINK_METHOD = new LinkMovementMethod() {
         @Override
-        public boolean onTouchEvent(TextView widget, Spannable buffer, MotionEvent event) {
+        public boolean onTouchEvent(@NonNull TextView widget,
+                @NonNull Spannable buffer, @NonNull MotionEvent event) {
             try {
                 return super.onTouchEvent(widget, buffer, event);
             } catch (ActivityNotFoundException e) {
@@ -50,21 +57,6 @@ public class UiUtils {
         imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
-    public static void assignTypeface(Activity parent, Typeface typeface, int[] textViewIds) {
-        View decor = parent.getWindow() != null ? parent.getWindow().getDecorView() : null;
-        assignTypeface(decor, typeface, textViewIds);
-    }
-
-    public static void assignTypeface(View parent, Typeface typeface, int[] textViewIds) {
-        if (parent == null) {
-            return;
-        }
-        for (int id : textViewIds) {
-            TextView textView = (TextView) parent.findViewById(id);
-            textView.setTypeface(typeface);
-        }
-    }
-
     public static int textColorForBackground(Context context, int backgroundColor) {
         int red = Color.red(backgroundColor);
         int green = Color.green(backgroundColor);
@@ -77,6 +69,67 @@ public class UiUtils {
         return context.getResources().getColor(R.color.label_fg_light);
     }
 
+    public static void trySetListOverscrollColor(ListView view, int color) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            trySetEdgeEffectColor(view, "mEdgeGlowTop", color);
+            trySetEdgeEffectColor(view, "mEdgeGlowBottom", color);
+        }
+    }
+
+    @TargetApi(21)
+    private static void trySetEdgeEffectColor(ListView view, String fieldName, int color) {
+        try {
+            Field effectField = AbsListView.class.getDeclaredField(fieldName);
+            effectField.setAccessible(true);
+            EdgeEffect effect = (EdgeEffect) effectField.get(view);
+            final int alpha = Color.alpha(effect.getColor());
+            effect.setColor(Color.argb(alpha, Color.red(color),
+                    Color.green(color), Color.blue(color)));
+        } catch (NoSuchFieldException e) {
+            // ignored
+        } catch (IllegalAccessException e) {
+            // ignored
+        }
+    }
+
+    public static int mixColors(int startColor, int endColor, float fraction) {
+        // taken from ArgbEvaluator.evaluate
+        int startA = (startColor >> 24) & 0xff;
+        int startR = (startColor >> 16) & 0xff;
+        int startG = (startColor >> 8) & 0xff;
+        int startB = startColor & 0xff;
+
+        int endA = (endColor >> 24) & 0xff;
+        int endR = (endColor >> 16) & 0xff;
+        int endG = (endColor >> 8) & 0xff;
+        int endB = endColor & 0xff;
+
+        return ((startA + (int)(fraction * (endA - startA))) << 24) |
+                ((startR + (int)(fraction * (endR - startR))) << 16) |
+                ((startG + (int)(fraction * (endG - startG))) << 8) |
+                ((startB + (int)(fraction * (endB - startB))));
+    }
+
+    public static boolean canViewScrollUp(View view) {
+        if (view == null) {
+            return false;
+        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            if (view instanceof AbsListView) {
+                final AbsListView absListView = (AbsListView) view;
+                if (absListView.getChildCount() == 0) {
+                    return false;
+                }
+                return absListView.getFirstVisiblePosition() > 0
+                        || absListView.getChildAt(0).getTop() < absListView.getPaddingTop();
+            } else {
+                return view.getScrollY() > 0;
+            }
+        } else {
+            return ViewCompat.canScrollVertically(view, -1);
+        }
+    }
+
     public static AlertDialog.Builder createDialogBuilderWithAlertIcon(Context context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
@@ -87,13 +140,30 @@ public class UiUtils {
         return builder;
     }
 
+    public static Context makeHeaderThemedContext(Context context) {
+        int themeResId = resolveDrawable(context, R.attr.headerTheme);
+        if (themeResId != 0) {
+            return new ContextThemeWrapper(context, themeResId);
+        }
+        return context;
+    }
+
     public static int resolveDrawable(Context context, int styledAttributeId) {
-        TypedArray a = context.getTheme().obtainStyledAttributes(Gh4Application.THEME, new int[] {
+        TypedArray a = context.obtainStyledAttributes(Gh4Application.THEME, new int[] {
             styledAttributeId
         });
         int resource = a.getResourceId(0, 0);
         a.recycle();
         return resource;
+    }
+
+    public static int resolveColor(Context context, int styledAttributeId) {
+        TypedArray a = context.obtainStyledAttributes(Gh4Application.THEME, new int[] {
+            styledAttributeId
+        });
+        int color = a.getColor(0, 0);
+        a.recycle();
+        return color;
     }
 
     private static void enqueueDownload(Context context, Uri uri, Uri destinationUri,
@@ -157,8 +227,12 @@ public class UiUtils {
 
     public static void enqueueDownload(final Context context, String url, final String mimeType,
             final String fileName, final String description, final String mediaType) {
+        if (url == null) {
+            return;
+        }
+
         final Uri uri = Uri.parse(url).buildUpon()
-                .appendQueryParameter("access_token", Gh4Application.get(context).getAuthToken())
+                .appendQueryParameter("access_token", Gh4Application.get().getAuthToken())
                 .build();
         final Uri destinationUri = buildDownloadDestinationUri(fileName);
         if (destinationUri == null) {

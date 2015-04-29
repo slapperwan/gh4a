@@ -40,7 +40,7 @@ public class PublicTimelineFragment extends EventListFragment {
     @Override
     protected PageIterator<Event> onCreateIterator() {
         EventService eventService = (EventService)
-                Gh4Application.get(getActivity()).getService(Gh4Application.EVENT_SERVICE);
+                Gh4Application.get().getService(Gh4Application.EVENT_SERVICE);
         return eventService.pagePublicEvents();
     }
 

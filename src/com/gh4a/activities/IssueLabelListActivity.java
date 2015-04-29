@@ -20,21 +20,20 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
-import android.text.Editable;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.EditText;
 import android.widget.ListView;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
-import com.gh4a.LoadingFragmentActivity;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.adapter.IssueLabelAdapter;
@@ -44,6 +43,8 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
+import com.shamanland.fab.FloatingActionButton;
+import com.shamanland.fab.ShowHideOnScroll;
 
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -53,12 +54,20 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.List;
 
-public class IssueLabelListActivity extends LoadingFragmentActivity implements OnItemClickListener {
+public class IssueLabelListActivity extends BaseActivity implements
+        OnItemClickListener, View.OnClickListener {
     private String mRepoOwner;
     private String mRepoName;
     private EditActionMode mActionMode;
-    private Label mAddedLabel;
-    private boolean mShouldStartAdding;
+    private IssueLabelAdapter.EditableLabel mAddedLabel;
+
+    private FloatingActionButton mFab;
+    private ShowHideOnScroll mFabListener;
+    private ListView mListView;
+    private IssueLabelAdapter mAdapter;
+
+    private static final String STATE_KEY_ADDED_LABEL = "added_label";
+    private static final String STATE_KEY_EDITING_LABEL = "editing_label";
 
     private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
         @Override
@@ -71,7 +80,9 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
             UiUtils.hideImeForView(getCurrentFocus());
             if (success) {
                 mAdapter.clear();
-                mAdapter.addAll(result.getData());
+                for (Label label : result.getData()) {
+                    mAdapter.add(new IssueLabelAdapter.EditableLabel(label));
+                }
                 mAdapter.notifyDataSetChanged();
             }
             setContentEmpty(!success);
@@ -79,32 +90,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
         }
     };
 
-    private IssueLabelAdapter mAdapter = new IssueLabelAdapter(this) {
-        @Override
-        protected void bindView(View view, Label label) {
-            ViewHolder holder = (ViewHolder) view.getTag();
-
-            super.bindView(view, label);
-
-            if (label == mAddedLabel && mShouldStartAdding) {
-                holder.editor.setHint(R.string.issue_label_new);
-                mActionMode = new EditActionMode(label, holder.editor);
-                startSupportActionMode(mActionMode);
-                mShouldStartAdding = false;
-            } else {
-                holder.editor.setHint(null);
-            }
-
-            Label editingLabel = mActionMode != null ? mActionMode.mLabel : null;
-            if (label.equals(editingLabel)) {
-                setExpanded(view, true);
-                mActionMode.setEditor(holder.editor);
-            } else {
-                setExpanded(view, false);
-            }
-        }
-    };
-
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -118,36 +104,63 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
         setContentView(R.layout.issue_label_list);
         setContentShown(false);
 
-        ListView listView = (ListView) findViewById(R.id.main_content);
-        listView.setAdapter(mAdapter);
-        listView.setOnItemClickListener(this);
-
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(R.string.issue_manage_labels);
+        actionBar.setTitle(R.string.issue_labels);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
+        mAdapter = new IssueLabelAdapter(this);
+        mListView = (ListView) findViewById(android.R.id.list);
+        mListView.setAdapter(mAdapter);
+        mListView.setOnItemClickListener(this);
+
+        mFab = (FloatingActionButton) findViewById(R.id.fab_add);
+        mFab.setOnClickListener(this);
+        mFabListener = new ShowHideOnScroll(mFab);
+        updateFabVisibility();
+
         getSupportLoaderManager().initLoader(0, null, mLabelCallback);
+
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(STATE_KEY_ADDED_LABEL)) {
+                mAddedLabel = (IssueLabelAdapter.EditableLabel)
+                        savedInstanceState.getSerializable(STATE_KEY_EDITING_LABEL);
+                mAdapter.add(mAddedLabel);
+                startEditing(mAddedLabel);
+            } else if (savedInstanceState.containsKey(STATE_KEY_EDITING_LABEL)) {
+                IssueLabelAdapter.EditableLabel label = (IssueLabelAdapter.EditableLabel)
+                        savedInstanceState.getSerializable(STATE_KEY_EDITING_LABEL);
+                int count = mAdapter.getCount();
+                for (int i = 0; i < count; i++) {
+                    IssueLabelAdapter.EditableLabel item = mAdapter.getItem(i);
+                    if (item.getName().equals(label.getName())) {
+                        item.editedName = label.editedName;
+                        item.editedColor = label.editedColor;
+                        startEditing(item);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mActionMode != null) {
+            if (mAddedLabel != null) {
+                outState.putSerializable(STATE_KEY_ADDED_LABEL, mAddedLabel);
+            } else {
+                outState.putSerializable(STATE_KEY_EDITING_LABEL, mActionMode.mLabel);
+            }
+        }
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (mActionMode == null) {
-            mActionMode = new EditActionMode(mAdapter.getItem(position),
-                    (EditText) view.findViewById(R.id.et_label));
-            mAdapter.setExpanded(view, true);
-            startSupportActionMode(mActionMode);
+            startEditing(mAdapter.getItem(position));
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (Gh4Application.get(this).isAuthorized()) {
-            MenuItem createItem = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.issue_label_new)
-                    .setIcon(UiUtils.resolveDrawable(this, R.attr.newIcon));
-            MenuItemCompat.setShowAsAction(createItem, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-        }
-        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -157,49 +170,49 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case Menu.FIRST:
-            if (mActionMode == null) {
-                mAddedLabel = new Label();
-                mAddedLabel.setColor("dddddd");
-                mAdapter.add(mAddedLabel);
-                mShouldStartAdding = true;
-                mAdapter.notifyDataSetChanged();
-            }
-            return true;
+    public void onClick(View view) {
+        if (mActionMode == null) {
+            mAddedLabel = new IssueLabelAdapter.EditableLabel("dddddd");
+            mAdapter.add(mAddedLabel);
+            mAdapter.notifyDataSetChanged();
+            startEditing(mAddedLabel);
         }
-        return super.onOptionsItemSelected(item);
+    }
+
+    private void startEditing(IssueLabelAdapter.EditableLabel label) {
+        mActionMode = new EditActionMode(label);
+        mAdapter.notifyDataSetChanged();
+        startSupportActionMode(mActionMode);
+        updateFabVisibility();
+    }
+
+    private void updateFabVisibility() {
+        if (Gh4Application.get().isAuthorized() && mActionMode == null) {
+            mListView.setOnTouchListener(mFabListener);
+            mFab.setVisibility(View.VISIBLE);
+        } else {
+            mListView.setOnTouchListener(null);
+            mFab.setVisibility(View.GONE);
+        }
     }
 
     private final class EditActionMode implements ActionMode.Callback {
-        private String mCurrentLabelName;
-        private EditText mEditor;
-        private Label mLabel;
+        private IssueLabelAdapter.EditableLabel mLabel;
 
-        public EditActionMode(Label label, EditText editor) {
-            mCurrentLabelName = label.getName();
-            mEditor = editor;
+        public EditActionMode(IssueLabelAdapter.EditableLabel label) {
             mLabel = label;
-
-            mEditor.setText(mCurrentLabelName);
-        }
-
-        public void setEditor(EditText editor) {
-            Editable currentText = mEditor.getText();
-            mEditor = editor;
-            mEditor.setText(currentText);
+            mLabel.isEditing = true;
         }
 
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuItem saveItem = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.save)
-                .setIcon(UiUtils.resolveDrawable(IssueLabelListActivity.this, R.attr.saveIcon));
+                .setIcon(R.drawable.content_save);
             MenuItemCompat.setShowAsAction(saveItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
 
             if (mLabel != mAddedLabel) {
                 MenuItem deleteItem = menu.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, R.string.delete)
-                    .setIcon(UiUtils.resolveDrawable(IssueLabelListActivity.this, R.attr.discardIcon));
+                    .setIcon(R.drawable.content_discard);
                 MenuItemCompat.setShowAsAction(deleteItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
             }
 
@@ -215,23 +228,23 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
             case Menu.FIRST:
-                String labelName = mEditor.getText().toString();
-                String color = (String) mEditor.getTag();
                 if (mLabel == mAddedLabel) {
-                    new AddIssueLabelTask(labelName, color).execute();
-                    mLabel = null;
+                    AsyncTaskCompat.executeParallel(new AddIssueLabelTask(
+                            mLabel.editedName, mLabel.editedColor));
                 } else {
-                    new EditIssueLabelTask(mCurrentLabelName, labelName, color).execute();
+                    AsyncTaskCompat.executeParallel(new EditIssueLabelTask(
+                            mLabel.getName(), mLabel.editedName, mLabel.editedColor));
                 }
                 break;
             case Menu.FIRST + 1:
                 new AlertDialog.Builder(IssueLabelListActivity.this)
-                        .setTitle(getString(R.string.issue_dialog_delete_title, mCurrentLabelName))
+                        .setTitle(getString(R.string.issue_dialog_delete_title, mLabel.getName()))
                         .setMessage(R.string.issue_dialog_delete_message)
                         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                new DeleteIssueLabelTask(mCurrentLabelName).execute();
+                                AsyncTaskCompat.executeParallel(new DeleteIssueLabelTask(
+                                        mLabel.getName()));
                             }
                         })
                         .setNegativeButton(R.string.cancel, null)
@@ -248,11 +261,13 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             mActionMode = null;
+            mLabel.isEditing = false;
             if (mLabel == mAddedLabel) {
                 mAdapter.remove(mLabel);
                 mAddedLabel = null;
             }
             mAdapter.notifyDataSetChanged();
+            updateFabVisibility();
         }
     }
 
@@ -267,7 +282,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
         @Override
         protected Void run() throws IOException {
             LabelService labelService = (LabelService)
-                    Gh4Application.get(mContext).getService(Gh4Application.LABEL_SERVICE);
+                    Gh4Application.get().getService(Gh4Application.LABEL_SERVICE);
             labelService.deleteLabel(mRepoOwner, mRepoName, URLEncoder.encode(mLabelName, "UTF-8"));
             return null;
         }
@@ -293,7 +308,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
         @Override
         protected Void run() throws IOException {
             LabelService labelService = (LabelService)
-                    Gh4Application.get(mContext).getService(Gh4Application.LABEL_SERVICE);
+                    Gh4Application.get().getService(Gh4Application.LABEL_SERVICE);
 
             Label label = new Label();
             label.setName(mNewLabelName);
@@ -328,7 +343,7 @@ public class IssueLabelListActivity extends LoadingFragmentActivity implements O
         @Override
         protected Void run() throws IOException {
             LabelService labelService = (LabelService)
-                    Gh4Application.get(mContext).getService(Gh4Application.LABEL_SERVICE);
+                    Gh4Application.get().getService(Gh4Application.LABEL_SERVICE);
 
             Label label = new Label();
             label.setName(mLabelName);

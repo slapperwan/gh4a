@@ -3,12 +3,14 @@ package com.gh4a.activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
@@ -18,7 +20,7 @@ import org.eclipse.egit.github.core.RepositoryId;
 
 import java.io.IOException;
 
-public abstract class EditCommentActivity extends BaseFragmentActivity {
+public abstract class EditCommentActivity extends BaseActivity {
     private String mRepoOwner;
     private String mRepoName;
     private long mCommentId;
@@ -27,6 +29,9 @@ public abstract class EditCommentActivity extends BaseFragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (hasErrorView()) {
+            return;
+        }
 
         setContentView(R.layout.edit_text);
 
@@ -59,7 +64,7 @@ public abstract class EditCommentActivity extends BaseFragmentActivity {
             case R.id.accept:
                 String text = mEditText.getText().toString();
                 if (!StringUtils.isBlank(text)) {
-                    new EditCommentTask(mCommentId, text).execute();
+                    AsyncTaskCompat.executeParallel(new EditCommentTask(mCommentId, text));
                 }
                 return true;
             case R.id.delete:
@@ -68,7 +73,7 @@ public abstract class EditCommentActivity extends BaseFragmentActivity {
                         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                new DeleteCommentTask(mCommentId).execute();
+                                AsyncTaskCompat.executeParallel(new DeleteCommentTask(mCommentId));
                             }
                         })
                         .setNegativeButton(R.string.cancel, null)

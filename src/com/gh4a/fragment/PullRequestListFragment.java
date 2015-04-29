@@ -73,7 +73,7 @@ public class PullRequestListFragment extends PagedDataBaseFragment<PullRequest> 
     @Override
     protected PageIterator<PullRequest> onCreateIterator() {
         PullRequestService pullRequestService = (PullRequestService)
-                Gh4Application.get(getActivity()).getService(Gh4Application.PULL_SERVICE);
+                Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
         return pullRequestService.pagePullRequests(new RepositoryId(mRepoOwner, mRepoName), mState);
     }
 }

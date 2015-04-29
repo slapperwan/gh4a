@@ -3,31 +3,26 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingLeft="@dimen/content_padding"
-    android:paddingRight="@dimen/content_padding"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp" >
+    android:padding="@dimen/content_padding">
 
     <LinearLayout
         android:id="@+id/collapsed"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp" >
+        android:layout_height="wrap_content">
 
         <View
             android:id="@+id/view_color"
-            android:layout_width="20dp"
-            android:layout_height="match_parent" />
+            android:layout_width="32dp"
+            android:layout_height="32dp" />
 
-        <TextView
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_title"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_marginLeft="8dp"
+            android:layout_marginLeft="16dp"
             android:gravity="center_vertical"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="@style/TextAppearance.ItemTitle" />
 
     </LinearLayout>
 
@@ -48,71 +43,69 @@
             android:id="@+id/colors"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp" >
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
 
             <View
                 android:layout_width="0dp"
                 android:layout_height="40dp"
-                android:layout_marginRight="5dp"
+                android:layout_marginRight="6dp"
                 android:layout_weight="1"
                 android:tag="dddddd"
                 android:background="#dddddd" />
             <View
                 android:layout_width="0dp"
                 android:layout_height="40dp"
-                android:layout_marginRight="5dp"
+                android:layout_marginRight="6dp"
                 android:layout_weight="1"
                 android:tag="444444"
                 android:background="#444444" />
             <View
                 android:layout_width="0dp"
                 android:layout_height="40dp"
-                android:layout_marginRight="5dp"
+                android:layout_marginRight="6dp"
                 android:layout_weight="1"
                 android:tag="e10c02"
                 android:background="#e10c02" />
             <View
                 android:layout_width="0dp"
                 android:layout_height="40dp"
-                android:layout_marginRight="5dp"
+                android:layout_marginRight="6dp"
                 android:layout_weight="1"
                 android:tag="d7e102"
                 android:background="#d7e102" />
             <View
                 android:layout_width="0dp"
                 android:layout_height="40dp"
-                android:layout_marginRight="5dp"
+                android:layout_marginRight="6dp"
                 android:layout_weight="1"
                 android:tag="02e10c"
                 android:background="#02e10c" />
             <View
                 android:layout_width="0dp"
                 android:layout_height="40dp"
-                android:layout_marginRight="5dp"
+                android:layout_marginRight="6dp"
                 android:layout_weight="1"
                 android:tag="02d7e1"
                 android:background="#02d7e1" />
             <View
                 android:layout_width="0dp"
                 android:layout_height="40dp"
-                android:layout_marginRight="5dp"
+                android:layout_marginRight="6dp"
                 android:layout_weight="1"
                 android:tag="0b02e1"
                 android:background="#0b02e1" />
             <View
                 android:layout_width="0dp"
                 android:layout_height="40dp"
-                android:layout_marginRight="5dp"
+                android:layout_marginRight="6dp"
                 android:layout_weight="1"
                 android:tag="e102d8"
                 android:background="#e102d8" />
-            <TextView
+            <com.gh4a.widget.StyleableTextView
                 android:id="@+id/custom"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:layout_marginRight="5dp"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="@string/ellipse" />

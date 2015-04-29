@@ -20,8 +20,8 @@ public class BookmarkAdapter extends CursorAdapter {
 
     public BookmarkAdapter(Context context) {
         super(context, null, 0);
-        mRepoIconResId = UiUtils.resolveDrawable(context, R.attr.searchRepoIcon);
-        mUserIconResId = UiUtils.resolveDrawable(context, R.attr.searchUserIcon);
+        mRepoIconResId = UiUtils.resolveDrawable(context, R.attr.repoBookmarkIcon);
+        mUserIconResId = UiUtils.resolveDrawable(context, R.attr.userBookmarkIcon);
     }
 
     @Override

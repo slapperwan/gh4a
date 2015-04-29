@@ -19,12 +19,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.fragment.ContributorListFragment;
 import com.gh4a.utils.IntentUtils;
 
-public class ContributorListActivity extends BaseFragmentActivity {
+public class ContributorListActivity extends BaseActivity {
     private String mUserLogin;
     private String mRepoName;
 
@@ -40,7 +41,7 @@ public class ContributorListActivity extends BaseFragmentActivity {
             ContributorListFragment fragment = ContributorListFragment.newInstance(
                     mUserLogin, mRepoName);
             getSupportFragmentManager().beginTransaction()
-                    .add(android.R.id.content, fragment)
+                    .add(R.id.content_container, fragment)
                     .commit();
         }
 

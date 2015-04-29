@@ -24,7 +24,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.holder.Trend;
 
@@ -35,17 +34,11 @@ public class TrendAdapter extends RootAdapter<Trend> {
 
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
-        View v = inflater.inflate(R.layout.row_simple_3, null);
-        Gh4Application app = Gh4Application.get(mContext);
+        View v = inflater.inflate(R.layout.row_trend, null);
         ViewHolder viewHolder = new ViewHolder();
 
         viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
         viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-
-        viewHolder.tvTitle.setTypeface(app.condensed);
-        viewHolder.tvDesc.setTypeface(app.regular);
-        viewHolder.tvExtra.setVisibility(View.GONE);
 
         v.setTag(viewHolder);
         return v;
@@ -70,6 +63,5 @@ public class TrendAdapter extends RootAdapter<Trend> {
     private static class ViewHolder {
         public TextView tvTitle;
         public TextView tvDesc;
-        public TextView tvExtra;
     }
 }

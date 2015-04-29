@@ -1,23 +1,19 @@
 package com.gh4a.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
-import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
-import com.gh4a.fragment.DownloadBranchesFragment;
-import com.gh4a.fragment.DownloadTagsFragment;
 import com.gh4a.fragment.DownloadsFragment;
+import com.gh4a.utils.IntentUtils;
 
-public class DownloadsActivity extends LoadingFragmentPagerActivity {
+public class DownloadsActivity extends BaseActivity {
     private String mRepoOwner;
     private String mRepoName;
-
-    private static final int[] TITLES = new int[] {
-        R.string.packages, R.string.repo_branches, R.string.repo_tags
-    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -30,6 +26,13 @@ public class DownloadsActivity extends LoadingFragmentPagerActivity {
         mRepoOwner = data.getString(Constants.Repository.OWNER);
         mRepoName = data.getString(Constants.Repository.NAME);
 
+        if (savedInstanceState == null) {
+            Fragment fragment = DownloadsFragment.newInstance(mRepoOwner, mRepoName);
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.content_container, fragment)
+                    .commit();
+        }
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.downloads);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
@@ -37,17 +40,7 @@ public class DownloadsActivity extends LoadingFragmentPagerActivity {
     }
 
     @Override
-    protected int[] getTabTitleResIds() {
-        return TITLES;
-    }
-
-    @Override
-    protected Fragment getFragment(int position) {
-        switch (position) {
-            case 0: return DownloadsFragment.newInstance(mRepoOwner, mRepoName);
-            case 1: return DownloadBranchesFragment.newInstance(mRepoOwner, mRepoName);
-            case 2: return DownloadTagsFragment.newInstance(mRepoOwner, mRepoName);
-        }
-        return null;
+    protected Intent navigateUp() {
+        return IntentUtils.getRepoActivityIntent(this, mRepoOwner, mRepoName, null);
     }
 }

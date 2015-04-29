@@ -20,13 +20,14 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 
+import com.gh4a.BasePagerActivity;
 import com.gh4a.Constants;
-import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.PullRequestListFragment;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.UiUtils;
 
-public class PullRequestListActivity extends LoadingFragmentPagerActivity {
+public class PullRequestListActivity extends BasePagerActivity {
     private String mRepoOwner;
     private String mRepoName;
 
@@ -53,6 +54,20 @@ public class PullRequestListActivity extends LoadingFragmentPagerActivity {
     @Override
     protected int[] getTabTitleResIds() {
         return TITLES;
+    }
+
+    @Override
+    protected int[][] getTabHeaderColors() {
+        return new int[][] {
+            {
+                UiUtils.resolveColor(this, R.attr.colorIssueOpen),
+                UiUtils.resolveColor(this, R.attr.colorIssueOpenDark)
+            },
+            {
+                UiUtils.resolveColor(this, R.attr.colorIssueClosed),
+                UiUtils.resolveColor(this, R.attr.colorIssueClosedDark)
+            }
+        };
     }
 
     @Override

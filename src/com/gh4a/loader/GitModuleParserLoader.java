@@ -33,7 +33,7 @@ public class GitModuleParserLoader extends BaseLoader<Map<String, String>> {
     @Override
     public Map<String, String> doLoadInBackground() throws IOException {
         ContentsService contentService = (ContentsService)
-                Gh4Application.get(getContext()).getService(Gh4Application.CONTENTS_SERVICE);
+                Gh4Application.get().getService(Gh4Application.CONTENTS_SERVICE);
         List<RepositoryContents> contents =
                 contentService.getContents(new RepositoryId(mRepoOwner, mRepoName), mPath, mRef);
 
@@ -44,7 +44,7 @@ public class GitModuleParserLoader extends BaseLoader<Map<String, String>> {
         if (StringUtils.isBlank(data)) {
             return null;
         }
-        Map<String, String> gitModuleMap = new HashMap<String, String>();
+        Map<String, String> gitModuleMap = new HashMap<>();
         String[] lines = data.split("\n");
         String path = null;
         for (String line : lines) {

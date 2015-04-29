@@ -20,13 +20,11 @@ import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
-import android.text.style.StyleSpan;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.widget.CustomTypefaceSpan;
-
-import org.eclipse.egit.github.core.User;
+import com.gh4a.widget.StyleableTextView;
 
 import java.util.Date;
 import java.util.regex.Pattern;
@@ -191,10 +189,17 @@ public class StringUtils {
         if (showDateIfLongAgo && duration >= DateUtils.WEEK_IN_MILLIS) {
             return DateUtils.getRelativeTimeSpanString(context, time, true);
         }
-        return Gh4Application.get(context).getPrettyTimeInstance().format(date);
+        return Gh4Application.get().getPrettyTimeInstance().format(date);
     }
 
-    public static SpannableStringBuilder applyBoldTags(String input, Typeface boldFont) {
+    public static void applyBoldTagsAndSetText(StyleableTextView view, String input) {
+        SpannableStringBuilder text = applyBoldTags(view.getContext(),
+                input, view.getTypefaceValue());
+        view.setText(text);
+    }
+
+    public static SpannableStringBuilder applyBoldTags(Context context,
+            String input, int baseTypefaceValue) {
         SpannableStringBuilder ssb = new SpannableStringBuilder();
         int pos = 0;
 
@@ -206,9 +211,8 @@ public class StringUtils {
                 ssb.append(input.substring(pos, start));
                 ssb.append(input.substring(start + 3, end));
 
-                Object span = boldFont != null
-                        ? new CustomTypefaceSpan(boldFont) : new StyleSpan(Typeface.BOLD);
-                    ssb.setSpan(span, ssb.length() - tokenLength, ssb.length(), 0);
+                Object span = new CustomTypefaceSpan(context, baseTypefaceValue, Typeface.BOLD);
+                ssb.setSpan(span, ssb.length() - tokenLength, ssb.length(), 0);
 
                 pos = end + 4;
             } else {
@@ -217,13 +221,5 @@ public class StringUtils {
             }
         }
         return ssb;
-    }
-
-    public static CharSequence createUserWithDateText(Context context, User user, Date date) {
-        SpannableStringBuilder text = new SpannableStringBuilder();
-        text.append(user.getLogin()).append("\n");
-        text.append(formatRelativeTime(context, date, true));
-        text.setSpan(new StyleSpan(Typeface.BOLD), 0, user.getLogin().length(), 0);
-        return text;
     }
 }

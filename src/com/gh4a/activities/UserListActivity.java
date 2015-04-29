@@ -23,18 +23,19 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.gh4a.LoadingFragmentActivity;
+import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.UserAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.User;
 
 import java.util.List;
 
-public abstract class UserListActivity extends LoadingFragmentActivity implements
+public abstract class UserListActivity extends BaseActivity implements
         AdapterView.OnItemClickListener {
     private UserAdapter mUserAdapter;
 
@@ -72,11 +73,13 @@ public abstract class UserListActivity extends LoadingFragmentActivity implement
         actionBar.setSubtitle(getSubTitle());
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        mUserAdapter = new UserAdapter(this, getShowExtraData());
+        mUserAdapter = new UserAdapter(this);
 
-        ListView listView = (ListView) findViewById(R.id.list_view);
+        ListView listView = (ListView) findViewById(android.R.id.list);
         listView.setOnItemClickListener(this);
         listView.setAdapter(mUserAdapter);
+        listView.setBackgroundResource(
+                UiUtils.resolveDrawable(this, R.attr.listBackground));
 
         getSupportLoaderManager().initLoader(0, null, mUserListCallback);
     }
@@ -94,10 +97,6 @@ public abstract class UserListActivity extends LoadingFragmentActivity implement
 
     protected abstract String getActionBarTitle();
     protected abstract String getSubTitle();
-
-    protected boolean getShowExtraData() {
-        return true;
-    }
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {

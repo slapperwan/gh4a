@@ -32,14 +32,14 @@ public class CommitCommentListLoader extends BaseLoader<List<CommitComment>> {
     @Override
     public List<CommitComment> doLoadInBackground() throws IOException {
         CommitService commitService = (CommitService)
-                Gh4Application.get(getContext()).getService(Gh4Application.COMMIT_SERVICE);
+                Gh4Application.get().getService(Gh4Application.COMMIT_SERVICE);
         List<CommitComment> comments = commitService.getComments(
                 new RepositoryId(mRepoOwner, mRepoName), mSha);
 
         if (comments == null || (mIncludePositional && mIncludeUnpositional)) {
             return comments;
         }
-        ArrayList<CommitComment> result = new ArrayList<CommitComment>();
+        ArrayList<CommitComment> result = new ArrayList<>();
         for (CommitComment comment : comments) {
             int pos = comment.getPosition();
             if ((pos < 0 && mIncludeUnpositional) || (pos >= 0 && mIncludePositional)) {

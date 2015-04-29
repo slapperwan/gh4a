@@ -20,12 +20,13 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.fragment.CommitCompareFragment;
 import com.gh4a.utils.IntentUtils;
 
-public class CompareActivity extends BaseFragmentActivity {
+public class CompareActivity extends BaseActivity {
     private String mRepoOwner;
     private String mRepoName;
 
@@ -47,7 +48,7 @@ public class CompareActivity extends BaseFragmentActivity {
             Fragment fragment =
                     CommitCompareFragment.newInstance(mRepoOwner, mRepoName, base, head);
             getSupportFragmentManager().beginTransaction()
-                    .add(android.R.id.content, fragment)
+                    .add(R.id.content_container, fragment)
                     .commit();
         }
 

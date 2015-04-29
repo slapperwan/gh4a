@@ -53,7 +53,7 @@ public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> 
 
     @Override
     protected RootAdapter<User> onCreateAdapter() {
-        return new UserAdapter(getActivity(), false);
+        return new UserAdapter(getActivity());
     }
 
     @Override
@@ -72,7 +72,7 @@ public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> 
     @Override
     protected PageIterator<User> onCreateIterator() {
         UserService userService = (UserService)
-                Gh4Application.get(getActivity()).getService(Gh4Application.USER_SERVICE);
+                Gh4Application.get().getService(Gh4Application.USER_SERVICE);
         return mFindFollowers ? userService.pageFollowers(mLogin) : userService.pageFollowing(mLogin);
     }
 }

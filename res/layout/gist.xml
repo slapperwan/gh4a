@@ -2,43 +2,61 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingTop="@dimen/content_padding"
-    android:paddingBottom="@dimen/content_padding" >
+    android:layout_height="match_parent">
+
     <LinearLayout
-        android:id="@+id/main_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
-        <TextView
-            android:id="@+id/tv_desc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/content_padding"
-            android:paddingRight="@dimen/content_padding"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-        <TextView
-            android:id="@+id/tv_created_at"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/content_padding"
-            android:paddingRight="@dimen/content_padding"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:orientation="vertical">
+
+        <android.support.v7.widget.CardView
+            style="?attr/cardViewTheme">
+
         <LinearLayout
-            android:id="@+id/ll_files"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="@dimen/overview_item_spacing" >
-            <TextView
-                android:id="@+id/files_title"
+            android:layout_marginBottom="@dimen/overview_header_spacing"
+            android:padding="@dimen/content_padding"
+            android:orientation="vertical">
+
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/tv_created_at"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/tv_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.ItemTitle" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/file_card"
+            style="?attr/cardViewTheme">
+
+            <LinearLayout
+                android:id="@+id/file_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
-                android:layout_marginLeft="@dimen/content_padding"
-                android:layout_marginRight="@dimen/content_padding"
-                style="@style/HeaderLabel"
-                android:text="@string/gist_files" />
-        </LinearLayout>
+                android:orientation="vertical">
+
+                <com.gh4a.widget.StyleableTextView
+                    android:id="@+id/files_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/HeaderLabel"
+                    android:text="@string/gist_files" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
     </LinearLayout>
+
 </ScrollView>

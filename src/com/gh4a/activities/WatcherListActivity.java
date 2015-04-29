@@ -19,19 +19,18 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 
+import com.gh4a.BasePagerActivity;
 import com.gh4a.Constants;
-import com.gh4a.LoadingFragmentPagerActivity;
 import com.gh4a.R;
-import com.gh4a.fragment.ForkListFragment;
 import com.gh4a.fragment.StargazerListFragment;
 import com.gh4a.fragment.WatcherListFragment;
 
-public class WatcherListActivity extends LoadingFragmentPagerActivity {
+public class WatcherListActivity extends BasePagerActivity {
     private String mRepoOwner;
     private String mRepoName;
 
     private static final int[] TITLES = new int[] {
-        R.string.repo_stargazers, R.string.repo_watchers, R.string.repo_forks
+        R.string.repo_stargazers, R.string.repo_watchers
     };
 
     @Override
@@ -48,7 +47,6 @@ public class WatcherListActivity extends LoadingFragmentPagerActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.selectTab(actionBar.getTabAt(data.getInt("pos")));
     }
 
     @Override
@@ -61,7 +59,6 @@ public class WatcherListActivity extends LoadingFragmentPagerActivity {
         switch (position) {
             case 0: return StargazerListFragment.newInstance(mRepoOwner, mRepoName);
             case 1: return WatcherListFragment.newInstance(mRepoOwner, mRepoName);
-            case 2: return ForkListFragment.newInstance(mRepoOwner, mRepoName);
         }
 
         return null;

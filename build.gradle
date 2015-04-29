@@ -5,7 +5,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.12.+'
+        classpath 'com.android.tools.build:gradle:1.0.0'
         classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
     }
 }
@@ -25,21 +25,21 @@ android {
     signingConfigs {
         playStore
     }
-    compileSdkVersion 19
-    buildToolsVersion '19.1.0'
+    compileSdkVersion 21
+    buildToolsVersion '21.0.1'
     defaultConfig {
         minSdkVersion 10
-        targetSdkVersion 19
+        targetSdkVersion 21
         versionCode 39
-        versionName "3.7.2"
+        versionName "3.8 BETA"
     }
 
     buildTypes {
         debug {
-            zipAlign true
+            zipAlignEnabled true
         }
         release {
-            zipAlign true
+            zipAlignEnabled true
             signingConfig signingConfigs.playStore
         }
     }
@@ -57,15 +57,18 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
 
-    compile 'com.android.support:support-v4:19.+'
-    compile 'com.android.support:appcompat-v7:19.+'
-    compile 'com.viewpagerindicator:library:2.4.1@aar'
+    compile 'com.android.support:support-v4:21.+'
+    compile 'com.android.support:appcompat-v7:21.+'
+    compile 'com.android.support:cardview-v7:21.+'
     compile 'com.larswerkman:HoloColorPicker:1.4@aar'
     compile 'com.github.johnkil.android-progressfragment:progressfragment:1.4.0@aar'
     compile 'com.android.support:support-v4-preferencefragment:1.0.0@aar'
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.squareup.okhttp:okhttp:1.5.4'
     compile 'org.ocpsoft.prettytime:prettytime:3.2.4.Final'
+    compile 'com.shamanland:fab:0.0.6'
+    compile 'com.github.castorflex.smoothprogressbar:library:1.0.0'
+    compile 'com.nineoldandroids:library:2.4.0+'
     compile 'com.crashlytics.android:crashlytics:1.+'
 }
 

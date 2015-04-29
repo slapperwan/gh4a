@@ -1,88 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@id/main_content"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/content_padding"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+        <!-- header -->
+        <android.support.v7.widget.CardView
+            style="?attr/cardViewTheme">
 
-            <com.gh4a.widget.FixedSizeImageView
-                android:id="@+id/iv_gravatar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="8dp" />
-            <TextView
-                android:id="@+id/tv_releaseinfo"
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:layout_toRightOf="@id/iv_gravatar" />
-            <TextView
-                android:id="@+id/tv_releasetype"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/overview_header_spacing"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:layout_toRightOf="@id/iv_gravatar"
-                android:layout_below="@id/tv_releaseinfo" />
-            <TextView
-                android:id="@+id/tv_releasetag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/overview_header_spacing"
-                android:textColor="@color/highlight"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                style="@style/SelectableItem"
-                android:layout_toRightOf="@id/iv_gravatar"
-                android:layout_below="@id/tv_releasetype" />
-        </RelativeLayout>
+                android:padding="16dp">
 
-        <!-- Release notes section -->
-        <TextView
-            android:id="@+id/release_notes_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/overview_item_spacing"
-            android:layout_marginBottom="@dimen/overview_header_spacing"
-            style="@style/HeaderLabel"
-            android:text="@string/release_notes" />
-        <ProgressBar
-            android:id="@+id/pb_releasenotes"
-            style="@style/LoadingProgress" />
-        <TextView
-            android:id="@+id/tv_release_notes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone" />
+                <com.gh4a.widget.FixedSizeImageView
+                    android:id="@+id/iv_gravatar"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="16dp" />
 
-        <!-- Downloads section -->
-        <LinearLayout
-            android:id="@+id/downloads"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/overview_item_spacing"
-            android:orientation="vertical">
+                <com.gh4a.widget.StyleableTextView
+                    android:id="@+id/tv_releaseinfo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:layout_toRightOf="@id/iv_gravatar" />
 
-            <TextView
-                android:id="@+id/downloads_title"
+                <com.gh4a.widget.StyleableTextView
+                    android:id="@+id/tv_releasetype"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/overview_header_spacing"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:layout_toRightOf="@id/iv_gravatar"
+                    android:layout_below="@id/tv_releaseinfo" />
+
+                <com.gh4a.widget.StyleableTextView
+                    android:id="@+id/tv_releasetag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/overview_header_spacing"
+                    android:textColor="?attr/colorPrimaryDark"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:layout_toRightOf="@id/iv_gravatar"
+                    android:layout_below="@id/tv_releasetype" />
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <!-- release notes section -->
+        <android.support.v7.widget.CardView
+            style="?attr/cardViewTheme">
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
-                style="@style/HeaderLabel"
-                android:text="@string/downloads" />
-            <ListView
-                android:id="@+id/download_list"
+                android:orientation="vertical">
+
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/release_notes_title"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-        </LinearLayout>
+                android:layout_height="wrap_content"
+                style="@style/HeaderLabel"
+                android:text="@string/release_notes" />
+
+            <ProgressBar
+                android:id="@+id/pb_releasenotes"
+                style="@style/LoadingProgress" />
+
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/tv_release_notes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/content_padding"
+                android:paddingRight="@dimen/content_padding"
+                android:paddingBottom="@dimen/content_padding"
+                android:visibility="gone" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <!-- downloads section -->
+        <android.support.v7.widget.CardView
+            android:id="@+id/downloads"
+            style="?attr/cardViewTheme">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/overview_header_spacing"
+                android:orientation="vertical">
+
+                <com.gh4a.widget.StyleableTextView
+                    android:id="@+id/downloads_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/HeaderLabel"
+                    android:text="@string/downloads" />
+
+                <ListView
+                    android:id="@+id/download_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
     </LinearLayout>
+
 </ScrollView>

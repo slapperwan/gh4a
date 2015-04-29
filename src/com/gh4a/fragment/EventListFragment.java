@@ -82,8 +82,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
     private static final int MENU_DOWNLOAD_END = 199;
     private static final int MENU_PUSH_COMMIT_START = 200;
 
-    private String mLogin;
-    private boolean mIsPrivate;
+    protected String mLogin;
     private FeedAdapter mAdapter;
 
     private static final String[] REPO_EVENTS = new String[] {
@@ -97,7 +96,6 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mLogin = getArguments().getString(Constants.User.LOGIN);
-        mIsPrivate = getArguments().getBoolean("private");
     }
 
     @Override
@@ -120,16 +118,13 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
     @Override
     protected PageIterator<Event> onCreateIterator() {
         EventService eventService = (EventService)
-                Gh4Application.get(getActivity()).getService(Gh4Application.EVENT_SERVICE);
-        if (mIsPrivate) {
-            return eventService.pageUserReceivedEvents(mLogin, true);
-        }
+                Gh4Application.get().getService(Gh4Application.EVENT_SERVICE);
         return eventService.pageUserEvents(mLogin, false);
     }
 
     @Override
     protected void onItemClick(Event event) {
-        Gh4Application context = Gh4Application.get(getActivity());
+        Gh4Application context = Gh4Application.get();
 
         if (FeedAdapter.hasInvalidPayload(event)) {
             return;
