@@ -31,10 +31,10 @@ import java.util.Locale;
 
 public class TrendingFragment extends ListDataBaseFragment<Trend> {
     private static final String URL_TEMPLATE =
-            "https://www.kimonolabs.com/api/%s?apikey=H9SjV6OZ7Y4A5zGFBFwQ9J5zYTPSRbRI";
-    public static final String TYPE_DAILY = "3b1kwvo8";
-    public static final String TYPE_WEEKLY = "4uzm2xze";
-    public static final String TYPE_MONTHLY = "c9xfekz2";
+            "https://www.kimonolabs.com/api/%s?apikey=wZxelPRQ32TprAqJlGzSENFqAnUq6Ftg&kimmodify=1";
+    public static final String TYPE_DAILY = "cejoedfo";
+    public static final String TYPE_WEEKLY = "571jhjha";
+    public static final String TYPE_MONTHLY = "6i48wygc";
 
     private String mUrl;
 
@@ -69,9 +69,10 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
 
     @Override
     protected void onItemClick(Trend trend) {
-        String[] repo = trend.getRepo();
-        if (repo != null) {
-            startActivity(IntentUtils.getRepoActivityIntent(getActivity(), repo[0], repo[1], null));
+        String owner = trend.getRepoOwner();
+        String name = trend.getRepoName();
+        if (owner != null && name != null) {
+            startActivity(IntentUtils.getRepoActivityIntent(getActivity(), owner, name, null));
         }
     }
 

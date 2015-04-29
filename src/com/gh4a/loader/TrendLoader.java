@@ -39,17 +39,14 @@ public class TrendLoader extends BaseLoader<List<Trend>> {
         JSONObject resultObject = jsonObject.getJSONObject("results");
         JSONArray repositoryArray = resultObject.getJSONArray("repositories");
         for (int i = 0; i < repositoryArray.length(); i++) {
-            JSONObject repositoryObject = repositoryArray.getJSONObject(i);
-            JSONObject titleObject = repositoryObject.getJSONObject("title");
-            String repoName = titleObject.getString("text").replaceAll("\n", "");
-            String link = titleObject.getString("href");
-            String description = repositoryObject.getString("description");
+            JSONObject repoObject = repositoryArray.getJSONObject(i);
+            JSONObject titleObject = repoObject.getJSONObject("title");
 
             Trend trend = new Trend();
-            trend.setTitle(repoName);
-            trend.setRepo(repoName);
-            trend.setLink(link);
-            trend.setDescription(description);
+            trend.setTitle(titleObject.getString("text"));
+            trend.setRepo(repoObject.optString("owner"), repoObject.optString("repo"));
+            trend.setLink(titleObject.optString("href"));
+            trend.setDescription(repoObject.optString("description"));
 
             trends.add(trend);
         }

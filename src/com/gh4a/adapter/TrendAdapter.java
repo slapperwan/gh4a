@@ -48,11 +48,12 @@ public class TrendAdapter extends RootAdapter<Trend> {
     protected void bindView(View v, Trend trend) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
 
-        String[] repo = trend.getRepo();
-        if (repo != null) {
+        String owner = trend.getRepoOwner();
+        String name = trend.getRepoName();
+        if (owner != null && name != null) {
             SpannableStringBuilder title = new SpannableStringBuilder();
-            title.append(repo[0]).append("/").append(repo[1]);
-            title.setSpan(new StyleSpan(Typeface.BOLD), 0, repo[0].length(), 0);
+            title.append(owner).append("/").append(name);
+            title.setSpan(new StyleSpan(Typeface.BOLD), 0, owner.length(), 0);
             viewHolder.tvTitle.setText(title);
         } else {
             viewHolder.tvTitle.setText(trend.getTitle());
