@@ -178,7 +178,7 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
     private ProgressDialog mProgressDialog;
     private int mInitialPage;
 
-    private Stack<String> mDirStack;
+    private Stack<String> mDirStack = new Stack<>();
     private Repository mRepository;
     private List<RepositoryBranch> mBranches;
     private List<RepositoryTag> mTags;
@@ -192,7 +192,16 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
     private CommitListFragment mCommitListFragment;
 
     private Map<String, String> mGitModuleMap;
-    private Map<String, ArrayList<RepositoryContents>> mContentCache;
+    private Map<String, ArrayList<RepositoryContents>> mContentCache =
+            new LinkedHashMap<String, ArrayList<RepositoryContents>>() {
+        private static final long serialVersionUID = -2379579224736389357L;
+
+        @Override
+        protected boolean removeEldestEntry(Entry<String, ArrayList<RepositoryContents>> eldest) {
+            return size() > MAX_CACHE_ENTRIES;
+        }
+    };
+
     private static final int MAX_CACHE_ENTRIES = 100;
 
     private static final String STATE_KEY_DIR_STACK = "dir_stack";
@@ -204,17 +213,6 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
         if (hasErrorView()) {
             return;
         }
-
-        mContentCache = new LinkedHashMap<String, ArrayList<RepositoryContents>>() {
-            private static final long serialVersionUID = -2379579224736389357L;
-
-            @Override
-            protected boolean removeEldestEntry(Entry<String, ArrayList<RepositoryContents>> eldest) {
-                return size() > MAX_CACHE_ENTRIES;
-            }
-        };
-
-        mDirStack = new Stack<>();
 
         if (savedInstanceState != null) {
             for (String entry : savedInstanceState.getStringArrayList(STATE_KEY_DIR_STACK)) {
@@ -378,7 +376,7 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
 
     @Override
     public void onBackPressed() {
-        if (mDirStack != null && mDirStack.size() > 1 && getPager().getCurrentItem() == 1) {
+        if (mDirStack.size() > 1 && getPager().getCurrentItem() == 1) {
             mDirStack.pop();
             invalidateFragments();
         } else {
