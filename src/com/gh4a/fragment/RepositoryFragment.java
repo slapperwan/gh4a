@@ -94,8 +94,10 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     private ClickableSpan mLoginClickSpan = new ClickableSpan() {
         @Override
         public void onClick(View view) {
-            startActivity(IntentUtils.getUserActivityIntent(view.getContext(),
-                    mRepository.getOwner()));
+            Context context = getActivity();
+            if (context != null) {
+                startActivity(IntentUtils.getUserActivityIntent(context, mRepository.getOwner()));
+            }
         }
 
         @Override
