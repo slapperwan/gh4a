@@ -59,6 +59,10 @@ public class IntentUtils {
         }
     }
 
+    public static Intent getRepoActivityIntent(Context context, Repository repo) {
+        return getRepoActivityIntent(context, repo.getOwner().getLogin(), repo.getName(), null);
+    }
+
     public static Intent getRepoActivityIntent(Context context,
             String repoOwner, String repoName, String ref) {
         return getRepoActivityIntent(context, repoOwner, repoName, ref,

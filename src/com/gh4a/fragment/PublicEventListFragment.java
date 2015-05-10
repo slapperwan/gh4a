@@ -15,18 +15,4 @@ public class PublicEventListFragment extends EventListFragment {
 
         return f;
     }
-
-    @Override
-    public int getMenuGroupId() {
-        return 2;
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        if (item.getGroupId() == 2) {
-            open(item);
-            return true;
-        }
-        return false;
-    }
 }

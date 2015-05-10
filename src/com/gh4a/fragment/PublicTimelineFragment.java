@@ -43,15 +43,4 @@ public class PublicTimelineFragment extends EventListFragment {
                 Gh4Application.get().getService(Gh4Application.EVENT_SERVICE);
         return eventService.pagePublicEvents();
     }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        open(item);
-        return true;
-    }
-
-    @Override
-    public int getMenuGroupId() {
-        return 1;
-    }
 }

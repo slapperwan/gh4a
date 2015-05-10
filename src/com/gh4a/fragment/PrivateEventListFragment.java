@@ -27,18 +27,4 @@ public class PrivateEventListFragment extends EventListFragment {
                 Gh4Application.get().getService(Gh4Application.EVENT_SERVICE);
         return eventService.pageUserReceivedEvents(mLogin);
     }
-
-    @Override
-    public int getMenuGroupId() {
-        return 1;
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        if (item.getGroupId() == 1) {
-            open(item);
-            return true;
-        }
-        return false;
-    }
 }
