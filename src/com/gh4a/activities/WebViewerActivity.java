@@ -50,6 +50,7 @@ public abstract class WebViewerActivity extends BaseActivity {
     private int[] ZOOM_SIZES = new int[] {
         50, 75, 100, 150, 200
     };
+    @SuppressWarnings("deprecation")
     private WebSettings.TextSize[] ZOOM_SIZES_API10 = new WebSettings.TextSize[] {
         WebSettings.TextSize.SMALLEST, WebSettings.TextSize.SMALLER,
         WebSettings.TextSize.NORMAL, WebSettings.TextSize.LARGER,

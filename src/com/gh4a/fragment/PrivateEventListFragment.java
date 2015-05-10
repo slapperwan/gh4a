@@ -1,7 +1,6 @@
 package com.gh4a.fragment;
 
 import android.os.Bundle;
-import android.view.MenuItem;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;

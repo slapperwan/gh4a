@@ -39,7 +39,6 @@ import org.eclipse.egit.github.core.service.WatcherService;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import android.app.Application;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Configuration;

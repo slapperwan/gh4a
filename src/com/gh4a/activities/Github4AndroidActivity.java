@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -282,9 +281,9 @@ public class Github4AndroidActivity extends BaseActivity {
                 }
                 return sb.toString();
             } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+                // won't happen
+                return androidId;
             }
-
-            return androidId;
         }
     }
 

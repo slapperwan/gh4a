@@ -20,7 +20,6 @@ import org.eclipse.egit.github.core.event.Event;
 import org.eclipse.egit.github.core.service.EventService;
 
 import android.os.Bundle;
-import android.view.MenuItem;
 
 import com.gh4a.Gh4Application;
 
