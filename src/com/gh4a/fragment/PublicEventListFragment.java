@@ -1,7 +1,6 @@
 package com.gh4a.fragment;
 
 import android.os.Bundle;
-import android.view.MenuItem;
 
 import com.gh4a.Constants;
 
@@ -14,19 +13,5 @@ public class PublicEventListFragment extends EventListFragment {
         f.setArguments(args);
 
         return f;
-    }
-
-    @Override
-    public int getMenuGroupId() {
-        return 2;
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        if (item.getGroupId() == 2) {
-            open(item);
-            return true;
-        }
-        return false;
     }
 }

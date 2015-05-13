@@ -46,6 +46,7 @@ import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.Release;
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.event.CommitCommentPayload;
 import org.eclipse.egit.github.core.event.CreatePayload;
@@ -68,15 +69,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
-    private static final int MENU_USER = 1;
-    private static final int MENU_REPO = 2;
     private static final int MENU_OPEN_ISSUES = 4;
     private static final int MENU_ISSUE = 5;
     private static final int MENU_GIST = 6;
-    private static final int MENU_FORKED_REPO = 7;
-    private static final int MENU_WIKI_IN_BROWSER = 8;
-    private static final int MENU_PULL_REQ = 9;
-    private static final int MENU_COMPARE = 10;
     private static final int MENU_COMMENT_COMMIT = 11;
     private static final int MENU_DOWNLOAD_START = 100;
     private static final int MENU_DOWNLOAD_END = 199;
@@ -292,15 +287,12 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         }
     }
 
-    protected abstract int getMenuGroupId();
-
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
 
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         Event event = mAdapter.getItem(info.position);
-        int groupId = getMenuGroupId();
 
         if (FeedAdapter.hasInvalidPayload(event)) {
             return;
@@ -310,70 +302,93 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         EventRepository eventRepo = event.getRepo();
         String[] repoNamePart = eventRepo.getName().split("/");
         String repoOwner = repoNamePart.length == 2 ? repoNamePart[0] : null;
+        String repoName = repoNamePart.length == 2 ? repoNamePart[1] : null;
 
         menu.setHeaderTitle(R.string.go_to);
 
         /** Common menu */
-        menu.add(groupId, MENU_USER, Menu.NONE, getString(R.string.menu_user, event.getActor().getLogin()));
+        menu.add(getString(R.string.menu_user, event.getActor().getLogin()))
+                .setIntent(IntentUtils.getUserActivityIntent(getActivity(), event.getActor().getLogin()));
         if (repoOwner != null) {
-            menu.add(groupId, MENU_REPO, Menu.NONE, getString(R.string.menu_repo, eventRepo.getName()));
+            menu.add(getString(R.string.menu_repo, eventRepo.getName()))
+                    .setIntent(IntentUtils.getRepoActivityIntent(getActivity(), repoOwner, repoName, null));
         }
 
         if (Event.TYPE_COMMIT_COMMENT.equals(eventType) && repoOwner != null) {
             CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
-            menu.add(groupId, MENU_COMMENT_COMMIT, Menu.NONE,
-                    getString(R.string.menu_commit, payload.getComment().getCommitId().substring(0, 7)));
+            String sha = payload.getComment().getCommitId();
+            menu.add(getString(R.string.menu_commit, sha.substring(0, 7)))
+                    .setIntent(IntentUtils.getCommitInfoActivityIntent(getActivity(), repoOwner, repoName, sha));
 
         } else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
             DownloadPayload payload = (DownloadPayload) event.getPayload();
-            menu.add(groupId, MENU_DOWNLOAD_START, Menu.NONE,
+            menu.add(Menu.NONE, MENU_DOWNLOAD_START, Menu.NONE,
                     getString(R.string.menu_file, payload.getDownload().getName()));
 
         } else if (Event.TYPE_FOLLOW.equals(eventType)) {
             FollowPayload payload = (FollowPayload) event.getPayload();
-            if (payload.getTarget() != null) {
-                menu.add(groupId, MENU_USER, Menu.NONE,
-                        getString(R.string.menu_user, payload.getTarget().getLogin()));
+            User target = payload.getTarget();
+            if (target != null) {
+                menu.add(getString(R.string.menu_user, target.getLogin()))
+                        .setIntent(IntentUtils.getUserActivityIntent(getActivity(), target.getLogin()));
             }
 
         } else if (Event.TYPE_FORK.equals(eventType)) {
             ForkPayload payload = (ForkPayload) event.getPayload();
             Repository forkee = payload.getForkee();
             if (forkee != null) {
-                menu.add(groupId, MENU_FORKED_REPO, Menu.NONE,
-                        getString(R.string.menu_fork, forkee.getOwner().getLogin() + "/" + forkee.getName()));
+                menu.add(getString(R.string.menu_fork, forkee.getOwner().getLogin() + "/" + forkee.getName()))
+                        .setIntent(IntentUtils.getRepoActivityIntent(getActivity(), forkee));
             }
 
         } else if (Event.TYPE_GIST.equals(eventType)) {
             GistPayload payload = (GistPayload) event.getPayload();
-            menu.add(groupId, MENU_GIST, Menu.NONE,
-                    getString(R.string.menu_gist, payload.getGist().getId()));
+            String gistId = payload.getGist().getId();
+            String user = payload.getGist().getUser().getLogin();
+            menu.add(getString(R.string.menu_gist, gistId))
+                    .setIntent(IntentUtils.getGistActivityIntent(getActivity(), user, gistId));
 
         } else if (Event.TYPE_GOLLUM.equals(eventType)) {
-            menu.add(groupId, MENU_WIKI_IN_BROWSER, Menu.NONE, getString(R.string.menu_wiki));
+            GollumPayload payload = (GollumPayload) event.getPayload();
+            List<GollumPage> pages = payload.getPages();
+            if (pages != null && !pages.isEmpty()) { //TODO: now just open the first page
+                menu.add(getString(R.string.menu_wiki))
+                        .setIntent(new Intent(Intent.ACTION_VIEW, Uri.parse(pages.get(0).getHtmlUrl())));
+            }
 
         } else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
-            menu.add(groupId, MENU_OPEN_ISSUES, Menu.NONE, getString(R.string.menu_issues));
+            menu.add(getString(R.string.menu_issues))
+                    .setIntent(IntentUtils.getIssueListActivityIntent(getActivity(),
+                            repoOwner, repoName, Constants.Issue.STATE_OPEN));
 
         } else if (Event.TYPE_ISSUES.equals(eventType)) {
             IssuesPayload payload = (IssuesPayload) event.getPayload();
-            menu.add(groupId, MENU_ISSUE, Menu.NONE,
-                    getString(R.string.menu_issue, payload.getIssue().getNumber()));
-
+            int issueNumber = payload.getIssue().getNumber();
+            menu.add(getString(R.string.menu_issue, issueNumber))
+                    .setIntent(IntentUtils.getIssueActivityIntent(getActivity(), repoOwner, repoName, issueNumber));
 
         } else if (Event.TYPE_PULL_REQUEST.equals(eventType)) {
             PullRequestPayload payload = (PullRequestPayload) event.getPayload();
-            menu.add(groupId, MENU_PULL_REQ, Menu.NONE, getString(R.string.menu_pull, payload.getNumber()));
+            menu.add(getString(R.string.menu_pull, payload.getNumber()))
+                    .setIntent(IntentUtils.getPullRequestActivityIntent(getActivity(),
+                            repoOwner, repoName, payload.getNumber()));
 
         } else if (Event.TYPE_PUSH.equals(eventType) && repoOwner != null) {
             PushPayload payload = (PushPayload) event.getPayload();
-            menu.add(groupId, MENU_COMPARE, Menu.NONE,
-                    getString(R.string.menu_compare, payload.getHead()));
+            Intent intent = new Intent(getActivity(), CompareActivity.class);
+            intent.putExtra(Constants.Repository.OWNER, repoOwner);
+            intent.putExtra(Constants.Repository.NAME, repoName);
+            intent.putExtra(Constants.Repository.HEAD, payload.getHead());
+            intent.putExtra(Constants.Repository.BASE, payload.getBefore());
+
+            menu.add(getString(R.string.menu_compare, payload.getHead().substring(0, 7)))
+                    .setIntent(intent);
 
             List<Commit> commits = payload.getCommits();
             for (int i = 0; i < commits.size(); i++) {
-                menu.add(groupId, MENU_PUSH_COMMIT_START + i, Menu.NONE,
-                        getString(R.string.menu_commit, commits.get(i).getSha()));
+                String sha = commits.get(i).getSha();
+                menu.add(getString(R.string.menu_commit, sha.substring(0, 7)))
+                        .setIntent(IntentUtils.getCommitInfoActivityIntent(getActivity(), repoOwner, repoName, sha));
             }
 
         } else if (Event.TYPE_RELEASE.equals(eventType)) {
@@ -382,105 +397,42 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             int count = downloads != null ? downloads.size() : 0;
 
             for (int i = 0; i < count; i++) {
-                menu.add(groupId, MENU_DOWNLOAD_START + i, Menu.NONE,
+                menu.add(Menu.NONE, MENU_DOWNLOAD_START + i, Menu.NONE,
                         getString(R.string.menu_file, downloads.get(i).getName()));
             }
         }
     }
 
-    public void open(MenuItem item) {
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info =
                 (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-
-        Event event = mAdapter.getItem(info.position);
-        String[] repoNamePart = event.getRepo().getName().split("/");
-        String repoOwner = null;
-        String repoName = null;
-        if (repoNamePart.length == 2) {
-            repoOwner = repoNamePart[0];
-            repoName = repoNamePart[1];
+        if (info.position >= mAdapter.getCount()) {
+            return false;
         }
 
         int id = item.getItemId();
-        Intent intent = null;
+        Event event = mAdapter.getItem(info.position);
 
-        if (id == MENU_USER) {
-            intent = IntentUtils.getUserActivityIntent(getActivity(), event.getActor().getLogin());
-        } else if (id == MENU_REPO) {
-            intent = IntentUtils.getRepoActivityIntent(getActivity(), repoOwner, repoName, null);
-        } else if (id >= MENU_PUSH_COMMIT_START || id == MENU_COMMENT_COMMIT) {
-            if (repoOwner != null) {
-                String sha = null;
-                if (Event.TYPE_PUSH.equals(event.getType())) {
-                    int offset = id - MENU_PUSH_COMMIT_START;
-                    sha = ((PushPayload) event.getPayload()).getCommits().get(offset).getSha();
-                } else if (Event.TYPE_COMMIT_COMMENT.equals(event.getType())) {
-                    sha = ((CommitCommentPayload) event.getPayload()).getComment().getCommitId();
-                }
-                if (sha != null) {
-                    intent = IntentUtils.getCommitInfoActivityIntent(getActivity(),
-                            repoOwner, repoName, sha);
-                }
-            } else {
-                ToastUtils.notFoundMessage(getActivity(), R.string.repository);
-            }
-        } else if (id == MENU_OPEN_ISSUES) {
-            intent = IntentUtils.getIssueListActivityIntent(getActivity(), repoOwner, repoName,
-                    Constants.Issue.STATE_OPEN);
-        } else if (id == MENU_ISSUE) {
-            IssuesPayload payload = (IssuesPayload) event.getPayload();
-            intent = IntentUtils.getIssueActivityIntent(getActivity(), repoOwner, repoName,
-                    payload.getIssue().getNumber());
-        } else if (id == MENU_GIST) {
-            GistPayload payload = (GistPayload) event.getPayload();
-            intent = IntentUtils.getGistActivityIntent(getActivity(),
-                    payload.getGist().getUser().getLogin(), payload.getGist().getId());
-        } else if (id >= MENU_DOWNLOAD_START && id <= MENU_DOWNLOAD_END) {
-            Download download = null;
+        if (id >= MENU_DOWNLOAD_START && id <= MENU_DOWNLOAD_END) {
+            final Download download;
             if (Event.TYPE_RELEASE.equals(event.getType())) {
                 ReleasePayload payload = (ReleasePayload) event.getPayload();
-                int offset = id - MENU_DOWNLOAD_START;
-                download = payload.getRelease().getAssets().get(offset);
+                download = payload.getRelease().getAssets().get(id - MENU_DOWNLOAD_START);
             } else if (Event.TYPE_DOWNLOAD.equals(event.getType())) {
                 DownloadPayload payload = (DownloadPayload) event.getPayload();
                 download = payload.getDownload();
+            } else {
+                download = null;
             }
+
             if (download != null) {
                 UiUtils.enqueueDownload(getActivity(), download.getHtmlUrl(), download.getContentType(),
                         download.getName(), download.getDescription(), null);
             }
-        } else if (id == MENU_FORKED_REPO) {
-            ForkPayload payload = (ForkPayload) event.getPayload();
-            Repository forkee = payload.getForkee();
-            if (forkee != null) {
-                IntentUtils.openRepositoryInfoActivity(getActivity(), forkee);
-            } else {
-                ToastUtils.notFoundMessage(getActivity(), R.string.repository);
-            }
-        } else if (id == MENU_WIKI_IN_BROWSER) {
-            GollumPayload payload = (GollumPayload) event.getPayload();
-            List<GollumPage> pages = payload.getPages();
-            if (pages != null && !pages.isEmpty()) { //TODO: now just open the first page
-                intent = new Intent(Intent.ACTION_VIEW, Uri.parse(pages.get(0).getHtmlUrl()));
-            }
-        } else if (id == MENU_PULL_REQ) {
-            PullRequestPayload payload = (PullRequestPayload) event.getPayload();
-            intent = IntentUtils.getPullRequestActivityIntent(getActivity(),
-                    repoOwner, repoName, payload.getNumber());
-        } else if (id == MENU_COMPARE) {
-            if (repoOwner != null) {
-                PushPayload payload = (PushPayload) event.getPayload();
-
-                intent = new Intent(getActivity(), CompareActivity.class);
-                intent.putExtra(Constants.Repository.OWNER, repoOwner);
-                intent.putExtra(Constants.Repository.NAME, repoName);
-                intent.putExtra(Constants.Repository.HEAD, payload.getHead());
-                intent.putExtra(Constants.Repository.BASE, payload.getBefore());
-            }
+            return true;
         }
 
-        if (intent != null) {
-            startActivity(intent);
-        }
+        return false;
     }
 }

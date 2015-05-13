@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.SearchUser;
+import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.egit.github.core.service.UserService;
 
@@ -306,36 +307,19 @@ public class SearchActivity extends BaseActivity implements
             if (object instanceof SearchUser) {
                 /** Menu for user */
                 SearchUser user = (SearchUser) object;
-                menu.add(getString(R.string.menu_user, StringUtils.formatName(user.getLogin(), user.getName())));
+                menu.add(getString(R.string.menu_user, StringUtils.formatName(user.getLogin(), user.getName())))
+                        .setIntent(IntentUtils.getUserActivityIntent(this, user.getLogin(), user.getName()));
             } else {
                 /** Menu for repository */
                 Repository repository = (Repository) object;
-                menu.add(getString(R.string.menu_user, repository.getOwner()));
-                menu.add(getString(R.string.menu_repo, repository.getName()));
+                User owner = repository.getOwner();
+                menu.add(getString(R.string.menu_user, StringUtils.formatName(owner.getLogin(), owner.getName())))
+                        .setIntent(IntentUtils.getUserActivityIntent(this, owner.getLogin(), owner.getName()));
+                menu.add(getString(R.string.menu_repo, repository.getName()))
+                        .setIntent(IntentUtils.getRepoActivityIntent(this, owner.getLogin(), repository.getName(), null));
             }
         }
         super.onCreateContextMenu(menu, v, menuInfo);
-    }
-
-    @Override
-    public boolean onContextItemSelected(android.view.MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item
-                .getMenuInfo();
-
-        ListAdapter listAdapter = mListViewResults.getAdapter();
-        Object object = listAdapter.getItem(info.position);
-
-        if (object instanceof SearchUser) {
-            /** User item */
-            SearchUser user = (SearchUser) object;
-            startActivity(IntentUtils.getUserActivityIntent(this, user.getLogin(), user.getName()));
-        } else {
-            /** Repo item */
-            Repository repository = (Repository) object;
-            startActivity(IntentUtils.getRepoActivityIntent(this,
-                    repository.getOwner().getLogin(), repository.getName(), null));
-        }
-        return true;
     }
 
     private void updateSearchTypeHint() {

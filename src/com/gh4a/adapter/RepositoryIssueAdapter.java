@@ -30,7 +30,6 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.LabelBadgeView;
 
 import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.RepositoryIssue;
 
 public class RepositoryIssueAdapter extends RootAdapter<Issue> implements
         View.OnClickListener {
@@ -99,7 +98,7 @@ public class RepositoryIssueAdapter extends RootAdapter<Issue> implements
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
-            RepositoryIssue issue = (RepositoryIssue) v.getTag();
+            Issue issue = (Issue) v.getTag();
             Intent intent = IntentUtils.getUserActivityIntent(mContext, issue.getUser());
             if (intent != null) {
                 mContext.startActivity(intent);

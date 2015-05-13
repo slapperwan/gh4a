@@ -21,7 +21,6 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.view.ContextMenu;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 
@@ -107,23 +106,14 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
         Set<String> submodules = mCallback.getSubModuleNames(this);
 
         if (submodules == null || !submodules.contains(contents.getName())) {
-            menu.add(Menu.NONE, MENU_HISTORY, Menu.NONE, R.string.history);
+            Intent historyIntent = new Intent(getActivity(), CommitHistoryActivity.class);
+            historyIntent.putExtra(Constants.Repository.OWNER, mRepository.getOwner().getLogin());
+            historyIntent.putExtra(Constants.Repository.NAME, mRepository.getName());
+            historyIntent.putExtra(Constants.Object.PATH, contents.getPath());
+            historyIntent.putExtra(Constants.Object.REF, mRef);
+
+            menu.add(Menu.NONE, MENU_HISTORY, Menu.NONE, R.string.history).setIntent(historyIntent);
         }
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info =
-                (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        RepositoryContents contents = mAdapter.getItem(info.position);
-
-        Intent intent = new Intent(getActivity(), CommitHistoryActivity.class);
-        intent.putExtra(Constants.Repository.OWNER, mRepository.getOwner().getLogin());
-        intent.putExtra(Constants.Repository.NAME, mRepository.getName());
-        intent.putExtra(Constants.Object.PATH, contents.getPath());
-        intent.putExtra(Constants.Object.REF, mRef);
-        startActivity(intent);
-        return true;
     }
 
     @Override

@@ -20,7 +20,6 @@ import org.eclipse.egit.github.core.event.Event;
 import org.eclipse.egit.github.core.service.EventService;
 
 import android.os.Bundle;
-import android.view.MenuItem;
 
 import com.gh4a.Gh4Application;
 
@@ -42,16 +41,5 @@ public class PublicTimelineFragment extends EventListFragment {
         EventService eventService = (EventService)
                 Gh4Application.get().getService(Gh4Application.EVENT_SERVICE);
         return eventService.pagePublicEvents();
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        open(item);
-        return true;
-    }
-
-    @Override
-    public int getMenuGroupId() {
-        return 1;
     }
 }

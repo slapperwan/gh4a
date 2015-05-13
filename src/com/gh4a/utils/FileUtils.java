@@ -5,7 +5,6 @@ import android.util.Log;
 import com.gh4a.Constants;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;

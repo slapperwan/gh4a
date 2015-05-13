@@ -14,16 +14,16 @@ import android.util.Log;
 public class BookmarksProvider extends ContentProvider {
     private static final String TAG = "BookmarksProvider";
 
-    public static interface Columns extends BaseColumns {
-        public static Uri CONTENT_URI = Uri.parse("content://com.gh4a/bookmarks");
+    public interface Columns extends BaseColumns {
+        Uri CONTENT_URI = Uri.parse("content://com.gh4a/bookmarks");
 
-        public static final String NAME = "name";
-        public static final String TYPE = "type";
-        public static final String URI = "uri";
-        public static final String EXTRA = "extra_data";
+        String NAME = "name";
+        String TYPE = "type";
+        String URI = "uri";
+        String EXTRA = "extra_data";
 
-        public static final int TYPE_USER = 0;
-        public static final int TYPE_REPO = 1;
+        int TYPE_USER = 0;
+        int TYPE_REPO = 1;
     }
 
     private static final int MATCH_ALL = 0;
