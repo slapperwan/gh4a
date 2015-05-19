@@ -71,7 +71,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
             SlidingTabLayout tabs = new SlidingTabLayout(this);
             tabs.setSelectedIndicatorColors(getResources().getColor(R.color.tab_indicator_color));
             tabs.setCustomTabView(R.layout.tab_indicator, R.id.tab_title);
-            tabs.setDistributeEvenly(true);
+            tabs.setFillContainer(true);
             tabs.setViewPager(pager);
             tabs.setOnPageChangeListener(this);
 

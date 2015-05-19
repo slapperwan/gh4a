@@ -7,5 +7,6 @@
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:gravity="center"
+    android:singleLine="true"
     android:textAppearance="@style/TextAppearance.Tab"
     style="@style/SelectableItem" />

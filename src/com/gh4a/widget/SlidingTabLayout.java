@@ -75,7 +75,7 @@ public class SlidingTabLayout extends HorizontalScrollView {
 
     private int mTabViewLayoutId;
     private int mTabViewTextViewId;
-    private boolean mDistributeEvenly;
+    private boolean mFillContainer;
 
     private ViewPager mViewPager;
     private ViewPager.OnPageChangeListener mViewPagerPageChangeListener;
@@ -115,8 +115,8 @@ public class SlidingTabLayout extends HorizontalScrollView {
         mTabStrip.setCustomTabColorizer(tabColorizer);
     }
 
-    public void setDistributeEvenly(boolean distributeEvenly) {
-        mDistributeEvenly = distributeEvenly;
+    public void setFillContainer(boolean fillContainer) {
+        mFillContainer = fillContainer;
     }
 
     /**
@@ -226,9 +226,8 @@ public class SlidingTabLayout extends HorizontalScrollView {
                 tabTitleView = (TextView) tabView;
             }
 
-            if (mDistributeEvenly) {
+            if (mFillContainer) {
                 LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) tabView.getLayoutParams();
-                lp.width = 0;
                 lp.weight = 1;
             }
 
