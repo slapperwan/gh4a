@@ -25,11 +25,11 @@ android {
     signingConfigs {
         playStore
     }
-    compileSdkVersion 21
+    compileSdkVersion 22
     buildToolsVersion '22.0.1'
     defaultConfig {
         minSdkVersion 10
-        targetSdkVersion 21
+        targetSdkVersion 22
         versionCode 40
         versionName "3.8"
     }
@@ -57,9 +57,9 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
 
-    compile 'com.android.support:support-v4:21.+'
-    compile 'com.android.support:appcompat-v7:21.+'
-    compile 'com.android.support:cardview-v7:21.+'
+    compile 'com.android.support:support-v4:22.1.1'
+    compile 'com.android.support:appcompat-v7:22.1.1'
+    compile 'com.android.support:cardview-v7:22.1.1'
     compile 'com.larswerkman:HoloColorPicker:1.4@aar'
     compile 'com.github.johnkil.android-progressfragment:progressfragment:1.4.0@aar'
     compile 'com.android.support:support-v4-preferencefragment:1.0.0@aar'

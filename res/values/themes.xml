@@ -2,6 +2,7 @@
 <resources>
     <style name="DarkThemeBase" parent="Theme.AppCompat">
         <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="headerTheme">@style/Theme.Header</item>
         <item name="drawerTitleTextAppearance">@style/TextAppearance.AppCompat.Widget.ActionBar.Title</item>
@@ -55,6 +56,7 @@
 
     <style name="LightThemeBase" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="headerTheme">@style/Theme.Header.Light</item>
         <item name="drawerTitleTextAppearance">@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse</item>
