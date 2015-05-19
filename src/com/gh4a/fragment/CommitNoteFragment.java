@@ -10,6 +10,7 @@ import org.eclipse.egit.github.core.service.CommitService;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +33,8 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     private String mRepoOwner;
     private String mRepoName;
     private String mObjectSha;
+
+    private CommentBoxFragment mCommentFragment;
 
     public static CommitNoteFragment newInstance(String repoOwner, String repoName, String objectSha) {
         CommitNoteFragment f = new CommitNoteFragment();
@@ -65,6 +68,22 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         }
 
         return v;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        FragmentManager fm = getChildFragmentManager();
+        mCommentFragment = (CommentBoxFragment) fm.findFragmentById(R.id.comment_box);
+    }
+
+    @Override
+    public boolean canChildScrollUp() {
+        if (mCommentFragment != null && mCommentFragment.canChildScrollUp()) {
+            return true;
+        }
+        return super.canChildScrollUp();
     }
 
     @Override

@@ -29,6 +29,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
@@ -83,6 +84,7 @@ public class IssueActivity extends BaseActivity implements
     private ListView mListView;
     private boolean mIsCollaborator;
     private FloatingActionButton mEditFab;
+    private CommentBoxFragment mCommentFragment;
 
     private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>() {
         @Override
@@ -186,6 +188,9 @@ public class IssueActivity extends BaseActivity implements
             findViewById(R.id.comment_box).setVisibility(View.GONE);
         }
 
+        FragmentManager fm = getSupportFragmentManager();
+        mCommentFragment = (CommentBoxFragment) fm.findFragmentById(R.id.comment_box);
+
         mEditFab = (FloatingActionButton) inflater.inflate(R.layout.issue_edit_fab, null);
         mEditFab.setOnClickListener(this);
         mEditFab.setVisibility(View.GONE);
@@ -198,6 +203,9 @@ public class IssueActivity extends BaseActivity implements
 
     @Override
     public boolean canChildScrollUp() {
+        if (mCommentFragment != null && mCommentFragment.canChildScrollUp()) {
+            return true;
+        }
         return UiUtils.canViewScrollUp(mListView);
     }
 

@@ -18,10 +18,12 @@ import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.SwipeRefreshLayout;
 
 import java.io.IOException;
 
-public class CommentBoxFragment extends Fragment implements View.OnClickListener, TextWatcher {
+public class CommentBoxFragment extends Fragment implements
+        View.OnClickListener, TextWatcher, SwipeRefreshLayout.ChildScrollDelegate {
     public interface Callback {
         @StringRes int getCommentEditorHintResId();
         void onSendCommentInBackground(String comment) throws IOException;
@@ -68,6 +70,12 @@ public class CommentBoxFragment extends Fragment implements View.OnClickListener
         Editable comment = mCommentEditor.getText();
         AsyncTaskCompat.executeParallel(new CommentTask(comment.toString()));
         UiUtils.hideImeForView(getActivity().getCurrentFocus());
+    }
+
+    @Override
+    public boolean canChildScrollUp() {
+        return mCommentEditor != null && mCommentEditor.hasFocus()
+                && UiUtils.canViewScrollUp(mCommentEditor);
     }
 
     @Override

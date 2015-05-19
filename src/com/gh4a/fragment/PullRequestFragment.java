@@ -32,6 +32,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
 import android.support.v4.os.AsyncTaskCompat;
 import android.view.LayoutInflater;
@@ -73,6 +74,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     private String mRepoName;
     private boolean mIsCollaborator;
     private boolean mListShown;
+    private CommentBoxFragment mCommentFragment;
 
     private LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>() {
         @Override
@@ -163,6 +165,9 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
                 getListView(), false);
         getListView().addHeaderView(mDescriptionView, null, true);
 
+        FragmentManager fm = getChildFragmentManager();
+        mCommentFragment = (CommentBoxFragment) fm.findFragmentById(R.id.comment_box);
+
         final int stateColor;
         if (mPullRequest.isMerged()) {
             stateColor = R.attr.colorPullRequestMerged;
@@ -178,6 +183,14 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
         fillData();
         getLoaderManager().initLoader(1, null, mCollaboratorCallback);
+    }
+
+    @Override
+    public boolean canChildScrollUp() {
+        if (mCommentFragment != null && mCommentFragment.canChildScrollUp()) {
+            return true;
+        }
+        return super.canChildScrollUp();
     }
 
     @Override
