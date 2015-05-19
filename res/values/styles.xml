@@ -17,7 +17,7 @@
         <item name="font">condensed</item>
     </style>
 
-    <style name="TextAppearance.Tab" parent="TextAppearance.AppCompat.Caption">
+    <style name="TextAppearance.Tab" parent="TextAppearance.AppCompat.Button">
         <item name="android:textColor">@color/tab_text_color</item>
         <item name="font">medium</item>
         <item name="allCaps">true</item>
