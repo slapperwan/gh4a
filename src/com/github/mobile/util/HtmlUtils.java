@@ -155,9 +155,6 @@ public class HtmlUtils {
     }
 
     private static final TagHandler TAG_HANDLER = new TagHandler() {
-
-        private int indentLevel;
-
         private LinkedList<ListSeparator> listElements = new LinkedList<>();
 
         public void handleTag(final boolean opening, final String tag,
@@ -170,35 +167,20 @@ public class HtmlUtils {
                 return;
             }
 
-            if (TAG_UL.equalsIgnoreCase(tag)) {
+            if (TAG_UL.equalsIgnoreCase(tag) || TAG_OL.equalsIgnoreCase(tag)) {
                 if (opening) {
-                    listElements.addFirst(new ListSeparator(false));
-                    indentLevel++;
-                } else {
-                    listElements.removeFirst();
-                    indentLevel--;
+                    listElements.add(new ListSeparator(TAG_OL.equalsIgnoreCase(tag)));
+                } else if (!listElements.isEmpty()) {
+                    listElements.removeLast();
                 }
 
-                if (!opening && indentLevel == 0)
+                if (!opening && listElements.isEmpty())
                     output.append('\n');
                 return;
             }
 
-            if (TAG_OL.equalsIgnoreCase(tag)) {
-                if (opening) {
-                    listElements.addFirst(new ListSeparator(true));
-                    indentLevel++;
-                } else {
-                    listElements.removeFirst();
-                    indentLevel--;
-                }
-                if (!opening && indentLevel == 0)
-                    output.append('\n');
-                return;
-            }
-
-            if (TAG_LI.equalsIgnoreCase(tag) && opening && indentLevel > 0) {
-                listElements.getFirst().append(output, indentLevel);
+            if (TAG_LI.equalsIgnoreCase(tag) && opening && !listElements.isEmpty()) {
+                listElements.getLast().append(output, listElements.size());
                 return;
             }
 
