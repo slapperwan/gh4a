@@ -23,6 +23,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.os.AsyncTaskCompat;
 import android.text.Html.ImageGetter;
 import android.text.TextUtils;
@@ -57,7 +58,7 @@ public class HttpImageGetter implements ImageGetter {
         private LoadingImageGetter(final Context context, final int size) {
             int imageSize = Math.round(context.getResources()
                     .getDisplayMetrics().density * size + 0.5F);
-            image = context.getResources().getDrawable(
+            image = ContextCompat.getDrawable(context,
                     UiUtils.resolveDrawable(context, R.attr.contentPictureIcon));
 
             image.setBounds(0, 0, imageSize, imageSize);
