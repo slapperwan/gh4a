@@ -34,6 +34,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     private String mRepoName;
     private String mObjectSha;
 
+    private CommitNoteAdapter mAdapter;
     private CommentBoxFragment mCommentFragment;
 
     public static CommitNoteFragment newInstance(String repoOwner, String repoName, String objectSha) {
@@ -71,6 +72,15 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mAdapter != null) {
+            mAdapter.destroy();
+            mAdapter = null;
+        }
+    }
+
+    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
@@ -88,7 +98,8 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
     @Override
     protected RootAdapter<CommitComment> onCreateAdapter() {
-        return new CommitNoteAdapter(getActivity(), mRepoOwner, this);
+        mAdapter = new CommitNoteAdapter(getActivity(), mRepoOwner, this);
+        return mAdapter;
     }
 
     @Override

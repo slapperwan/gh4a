@@ -65,6 +65,10 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
         mEditCallback = editCallback;
     }
 
+    public void destroy() {
+        mImageGetter.destroy();
+    }
+
     @Override
     protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_gravatar_comment, parent, false);
@@ -190,6 +194,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
     @Override
     public void clear() {
         super.clear();
+        mImageGetter.destroy();
         mImageGetter = new HttpImageGetter(mContext);
     }
 

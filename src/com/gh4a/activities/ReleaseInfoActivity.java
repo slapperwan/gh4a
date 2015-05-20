@@ -51,6 +51,8 @@ public class ReleaseInfoActivity extends BaseActivity implements
     private Release mRelease;
     private User mReleaser;
 
+    private HttpImageGetter mImageGetter;
+
     private LoaderCallbacks<String> mBodyCallback = new LoaderCallbacks<String>() {
         @Override
         public Loader<LoaderResult<String>> onCreateLoader(int id, Bundle args) {
@@ -81,6 +83,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
             mReleaser = (User) extras.getSerializable(Constants.Release.RELEASER);
         }
 
+        mImageGetter = new HttpImageGetter(this);
         fillData();
 
         ActionBar actionBar = getSupportActionBar();
@@ -89,6 +92,12 @@ public class ReleaseInfoActivity extends BaseActivity implements
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         getSupportLoaderManager().initLoader(0, null, mBodyCallback);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mImageGetter.destroy();
     }
 
     @Override
@@ -133,10 +142,8 @@ public class ReleaseInfoActivity extends BaseActivity implements
         TextView body = (TextView) findViewById(R.id.tv_release_notes);
 
         if (!StringUtils.isBlank(bodyHtml)) {
-            HttpImageGetter imageGetter = new HttpImageGetter(this);
-
             bodyHtml = HtmlUtils.format(bodyHtml).toString();
-            imageGetter.bind(body, bodyHtml, mRelease.getId());
+            mImageGetter.bind(body, bodyHtml, mRelease.getId());
             body.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         } else {
             body.setText(R.string.release_no_releasenotes);

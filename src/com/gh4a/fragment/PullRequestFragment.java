@@ -75,6 +75,8 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     private boolean mIsCollaborator;
     private boolean mListShown;
     private CommentBoxFragment mCommentFragment;
+    private IssueEventAdapter mAdapter;
+    private HttpImageGetter mImageGetter;
 
     private LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>() {
         @Override
@@ -153,9 +155,21 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         FrameLayout listContainer = (FrameLayout) v.findViewById(R.id.list_container);
         listContainer.addView(listContent);
 
+        mImageGetter = new HttpImageGetter(inflater.getContext());
         updateCommentSectionVisibility(v);
 
         return v;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mImageGetter.destroy();
+        mImageGetter = null;
+        if (mAdapter != null) {
+            mAdapter.destroy();
+            mAdapter = null;
+        }
     }
 
     @Override
@@ -201,7 +215,8 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
     @Override
     protected RootAdapter<IssueEventHolder> onCreateAdapter() {
-        return new IssueEventAdapter(getActivity(), mRepoOwner, mRepoName, this);
+        mAdapter = new IssueEventAdapter(getActivity(), mRepoOwner, mRepoName, this);
+        return mAdapter;
     }
 
     @Override
@@ -262,9 +277,8 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         String body = mPullRequest.getBodyHtml();
         mDescriptionView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         if (!StringUtils.isBlank(body)) {
-            HttpImageGetter imageGetter = new HttpImageGetter(getActivity());
             body = HtmlUtils.format(body).toString();
-            imageGetter.bind(mDescriptionView, body, mPullRequest.getId());
+            mImageGetter.bind(mDescriptionView, body, mPullRequest.getId());
         }
     }
 

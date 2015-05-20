@@ -59,6 +59,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     private Repository mRepository;
     private View mContentView;
     private String mRef;
+    private HttpImageGetter mImageGetter;
 
     private LoaderCallbacks<String> mReadmeCallback = new LoaderCallbacks<String>() {
         @Override
@@ -71,7 +72,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
             TextView readmeView = (TextView) mContentView.findViewById(R.id.readme);
             View progress = mContentView.findViewById(R.id.pb_readme);
             AsyncTaskCompat.executeParallel(new FillReadmeTask(
-                    mRepository.getId(), readmeView, progress), result.getData());
+                    mRepository.getId(), readmeView, progress, mImageGetter), result.getData());
         }
     };
 
@@ -133,7 +134,15 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         mContentView = inflater.inflate(R.layout.repository, null);
+        mImageGetter = new HttpImageGetter(inflater.getContext());
         return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mImageGetter.destroy();
+        mImageGetter = null;
     }
 
     @Override
@@ -301,11 +310,12 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         private View mProgressView;
         private HttpImageGetter mImageGetter;
 
-        public FillReadmeTask(long id, TextView readmeView, View progressView) {
+        public FillReadmeTask(long id, TextView readmeView, View progressView,
+                HttpImageGetter imageGetter) {
             mId = id;
             mReadmeView = readmeView;
             mProgressView = progressView;
-            mImageGetter = new HttpImageGetter(readmeView.getContext());
+            mImageGetter = imageGetter;
         }
 
         @Override

@@ -37,7 +37,9 @@ import com.gh4a.utils.UiUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -85,6 +87,10 @@ public class HttpImageGetter implements ImageGetter {
 
     private final Map<Object, CharSequence> fullHtmlCache = new HashMap<>();
 
+    private ArrayList<WeakReference<Bitmap>> loadedBitmaps;
+
+    private boolean destroyed;
+
     /**
      * Create image getter for context
      *
@@ -101,7 +107,18 @@ public class HttpImageGetter implements ImageGetter {
             width = fetchDisplayWidth(wm);
         }
 
+        loadedBitmaps = new ArrayList<>();
         loading = new LoadingImageGetter(context, 24);
+    }
+
+    public void destroy() {
+        for (WeakReference<Bitmap> ref : loadedBitmaps) {
+            Bitmap bitmap = ref.get();
+            if (bitmap != null) {
+                bitmap.recycle();
+            }
+        }
+        destroyed = true;
     }
 
     @SuppressWarnings("deprecation")
@@ -225,6 +242,9 @@ public class HttpImageGetter implements ImageGetter {
 
     public Drawable getDrawable(String source) {
         File output = null;
+        if (destroyed) {
+            return loading.getDrawable(source);
+        }
         try {
             output = File.createTempFile("image", ".jpg", dir);
             InputStream is = fetch(source);
@@ -235,6 +255,7 @@ public class HttpImageGetter implements ImageGetter {
                     if (bitmap == null) {
                         return loading.getDrawable(source);
                     }
+                    loadedBitmaps.add(new WeakReference<Bitmap>(bitmap));
                     BitmapDrawable drawable = new BitmapDrawable(
                             context.getResources(), bitmap);
                     drawable.setBounds(0, 0, bitmap.getWidth(), bitmap.getHeight());

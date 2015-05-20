@@ -85,6 +85,7 @@ public class IssueActivity extends BaseActivity implements
     private boolean mIsCollaborator;
     private FloatingActionButton mEditFab;
     private CommentBoxFragment mCommentFragment;
+    private HttpImageGetter mImageGetter;
 
     private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>() {
         @Override
@@ -167,6 +168,7 @@ public class IssueActivity extends BaseActivity implements
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         mListView = (ListView) findViewById(android.R.id.list);
+        mImageGetter = new HttpImageGetter(this);
 
         LinearLayout header = (LinearLayout) findViewById(R.id.header);
         LayoutInflater inflater = getLayoutInflater();
@@ -199,6 +201,13 @@ public class IssueActivity extends BaseActivity implements
         getSupportLoaderManager().initLoader(0, null, mIssueCallback);
         getSupportLoaderManager().initLoader(1, null, mCollaboratorCallback);
         getSupportLoaderManager().initLoader(2, null, mEventCallback);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mImageGetter.destroy();
+        mEventAdapter.destroy();
     }
 
     @Override
@@ -246,9 +255,8 @@ public class IssueActivity extends BaseActivity implements
 
         String body = mIssue.getBodyHtml();
         if (!StringUtils.isBlank(body)) {
-            HttpImageGetter imageGetter = new HttpImageGetter(this);
             body = HtmlUtils.format(body).toString();
-            imageGetter.bind(mDescriptionView, body, mIssue.getNumber());
+            mImageGetter.bind(mDescriptionView, body, mIssue.getNumber());
         }
         mDescriptionView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
 
