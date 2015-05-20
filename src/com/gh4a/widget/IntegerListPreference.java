@@ -4,7 +4,7 @@ import android.content.Context;
 import android.preference.ListPreference;
 import android.util.AttributeSet;
 
-public class IntegerListPreference extends ListPreference {
+public class IntegerListPreference extends AppCompatListPreference {
     public IntegerListPreference(Context context) {
         super(context);
     }
