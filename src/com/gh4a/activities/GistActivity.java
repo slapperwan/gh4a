@@ -67,6 +67,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
             }
             setContentEmpty(!success);
             setContentShown(true);
+            supportInvalidateOptionsMenu();
         }
     };
 
@@ -152,9 +153,11 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
                 .setIcon(R.drawable.star);
         MenuItemCompat.setShowAsAction(starItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
 
-        MenuItem shareItem = menu.add(0, R.id.share, 0, R.string.share)
-                .setIcon(R.drawable.social_share);
-        MenuItemCompat.setShowAsAction(shareItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+        if (mGist != null) {
+            MenuItem shareItem = menu.add(0, R.id.share, 0, R.string.share)
+                    .setIcon(R.drawable.social_share);
+            MenuItemCompat.setShowAsAction(shareItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+        }
 
         return super.onCreateOptionsMenu(menu);
     }
