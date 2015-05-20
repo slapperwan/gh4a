@@ -348,8 +348,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     private void setupHeaderDrawable() {
         int primaryColor = UiUtils.resolveColor(this, R.attr.colorPrimary);
-        mHeaderBackground = new ColorDrawable(primaryColor);
-        mDrawerTitleBackground = new ColorDrawable(primaryColor);
+        mHeaderBackground = ColorDrawable.create(primaryColor);
+        mDrawerTitleBackground = ColorDrawable.create(primaryColor);
 
         assignBackground(R.id.drawer_title, mHeaderBackground);
         assignBackground(R.id.header, mDrawerTitleBackground);

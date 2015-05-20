@@ -24,6 +24,7 @@ import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.NonNull;
 
 // Copy of framework's ColorDrawable as of API 19, needed for getColor() and setColor()
@@ -32,7 +33,27 @@ public class ColorDrawable extends Drawable {
     private final Paint mPaint = new Paint();
     private boolean mMutated;
 
-    public ColorDrawable(int color) {
+    public static ColorDrawable create(int color) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return new ColorDrawableApi21(color);
+        }
+        return new ColorDrawable(color);
+    }
+
+    @TargetApi(21)
+    private static class ColorDrawableApi21 extends ColorDrawable {
+        protected ColorDrawableApi21(int color) {
+            super(color);
+        }
+
+        @Override
+        public void getOutline(@NonNull Outline outline) {
+            outline.setRect(getBounds());
+            outline.setAlpha(getAlpha() / 255.0f);
+        }
+    }
+
+    protected ColorDrawable(int color) {
         this(null);
         setColor(color);
     }
@@ -108,13 +129,6 @@ public class ColorDrawable extends Drawable {
     public ConstantState getConstantState() {
         mState.mChangingConfigurations = getChangingConfigurations();
         return mState;
-    }
-
-    @Override
-    @TargetApi(21)
-    public void getOutline(@NonNull Outline outline) {
-        outline.setRect(getBounds());
-        outline.setAlpha(getAlpha() / 255.0f);
     }
 
     final static class ColorState extends ConstantState {
