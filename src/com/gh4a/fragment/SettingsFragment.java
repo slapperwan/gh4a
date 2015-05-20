@@ -1,8 +1,6 @@
 package com.gh4a.fragment;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,6 +9,8 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.support.v4.preference.PreferenceFragment;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -135,7 +135,7 @@ public class SettingsFragment extends PreferenceFragment implements
         }
     }
 
-    private static class AboutDialog extends Dialog implements View.OnClickListener {
+    private static class AboutDialog extends AppCompatDialog implements View.OnClickListener {
         public AboutDialog(Context context, boolean loggedIn) {
             super(context);
 

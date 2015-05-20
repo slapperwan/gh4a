@@ -8,7 +8,6 @@ import com.gh4a.R;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
@@ -23,6 +22,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.app.AlertDialog;
 import android.text.Spannable;
 import android.text.method.LinkMovementMethod;
 import android.view.ContextThemeWrapper;

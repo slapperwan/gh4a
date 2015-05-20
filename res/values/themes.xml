@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="DarkThemeBase" parent="Theme.AppCompat">
+    <style name="DarkTheme" parent="Theme.AppCompat">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="headerTheme">@style/Theme.Header</item>
+        <item name="alertDialogTheme">@style/DarkAlertDialogTheme</item>
         <item name="drawerTitleTextAppearance">@style/TextAppearance.AppCompat.Widget.ActionBar.Title</item>
         <item name="actionMenuTextAppearance">@style/TextAppearance.Widget.ActionBar.Menu</item>
         <item name="sendIcon">@drawable/social_send_dark</item>
@@ -52,13 +53,17 @@
         <item name="colorFab">@color/default_fab_dark</item>
     </style>
 
-    <style name="DarkTheme" parent="DarkThemeBase" />
+    <style name="DarkAlertDialogTheme" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="colorPrimary">@color/dark_accent</item>
+        <item name="colorAccent">@color/dark_accent</item>
+    </style>
 
-    <style name="LightThemeBase" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="LightTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="headerTheme">@style/Theme.Header.Light</item>
+        <item name="alertDialogTheme">@style/LightAlertDialogTheme</item>
         <item name="drawerTitleTextAppearance">@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse</item>
         <item name="actionMenuTextAppearance">@style/TextAppearance.Widget.ActionBar.Menu</item>
         <item name="sendIcon">@drawable/social_send</item>
@@ -107,7 +112,10 @@
         <item name="colorFab">@color/default_fab_light</item>
     </style>
 
-    <style name="LightTheme" parent="LightThemeBase" />
+    <style name="LightAlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorPrimary">@color/light_accent</item>
+        <item name="colorAccent">@color/light_accent</item>
+    </style>
 
     <style name="Theme.Header" parent="Theme.AppCompat">
         <item name="colorAccent">#ffffff</item>

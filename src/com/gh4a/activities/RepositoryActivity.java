@@ -16,7 +16,6 @@ import org.eclipse.egit.github.core.RepositoryTag;
 import org.eclipse.egit.github.core.service.StarService;
 import org.eclipse.egit.github.core.service.WatcherService;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,6 +27,7 @@ import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.util.Pair;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;

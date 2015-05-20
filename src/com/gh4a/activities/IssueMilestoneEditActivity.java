@@ -15,7 +15,6 @@
  */
 package com.gh4a.activities;
 
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -25,6 +24,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -297,7 +297,7 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
                 month = c.get(Calendar.MONTH);
                 day = c.get(Calendar.DAY_OF_MONTH);
             }
-            AlertDialog dialog = new DatePickerDialog(activity, this, year, month, day) {
+            DatePickerDialog dialog = new DatePickerDialog(activity, this, year, month, day) {
                 @Override
                 protected void onStop() {
                     mStopping = true;
