@@ -198,15 +198,17 @@ public class UserActivity extends BasePagerActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem followAction = menu.findItem(R.id.follow);
-        followAction.setVisible(!mIsSelf && Gh4Application.get().isAuthorized());
-        if (followAction.isVisible()) {
-            if (mIsFollowing == null) {
-                MenuItemCompat.setActionView(followAction, R.layout.ab_loading);
-                MenuItemCompat.expandActionView(followAction);
-            } else if (mIsFollowing) {
-                followAction.setTitle(R.string.user_unfollow_action);
-            } else {
-                followAction.setTitle(R.string.user_follow_action);
+        if (followAction != null) {
+            followAction.setVisible(!mIsSelf && Gh4Application.get().isAuthorized());
+            if (followAction.isVisible()) {
+                if (mIsFollowing == null) {
+                    MenuItemCompat.setActionView(followAction, R.layout.ab_loading);
+                    MenuItemCompat.expandActionView(followAction);
+                } else if (mIsFollowing) {
+                    followAction.setTitle(R.string.user_unfollow_action);
+                } else {
+                    followAction.setTitle(R.string.user_follow_action);
+                }
             }
         }
 
