@@ -8,20 +8,19 @@ import java.util.ArrayList;
 
 import org.eclipse.egit.github.core.User;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Rect;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.support.v4.util.LruCache;
 import android.support.v4.util.SparseArrayCompat;
 import android.util.Log;
 import android.widget.ImageView;
@@ -31,12 +30,10 @@ import com.gh4a.R;
 public class AvatarHandler {
     private static final String TAG = "GravatarHandler";
 
-    private static final int MAX_CACHE_SIZE = 100;
     private static final int MAX_CACHED_IMAGE_SIZE = 60; /* dp - maximum gravatar view size used */
 
     private static Bitmap sDefaultAvatarBitmap;
-    private static final SparseArrayCompat<Bitmap> sCache =
-            new SparseArrayCompat<>(MAX_CACHE_SIZE);
+    private static LruCache<Integer, Bitmap> sCache;
     private static int sNextRequestId = 1;
 
     private static class Request {
@@ -73,10 +70,6 @@ public class AvatarHandler {
         private void processResult(int requestId, Bitmap bitmap) {
             final Request request = sRequests.get(requestId);
             if (request != null && bitmap != null) {
-                if (sCache.size() >= MAX_CACHE_SIZE) {
-                    sCache.get(sCache.keyAt(0)).recycle();
-                    sCache.removeAt(0);
-                }
                 sCache.put(request.id, bitmap);
 
                 for (ImageView view : request.views) {
@@ -99,24 +92,18 @@ public class AvatarHandler {
     public static void assignAvatar(ImageView view, int userId, String url) {
         removeOldRequest(view);
 
+        if (sCache == null) {
+            initialize(view.getContext());
+        }
         Bitmap bitmap = sCache.get(userId);
         if (bitmap != null) {
             applyAvatarToView(view, bitmap);
             return;
         }
 
-        if (sDefaultAvatarBitmap == null) {
-            Resources res = view.getContext().getResources();
-            sDefaultAvatarBitmap = BitmapFactory.decodeResource(res, R.drawable.default_avatar);
-        }
         applyAvatarToView(view, sDefaultAvatarBitmap);
         if (userId <= 0) {
             return;
-        }
-
-        if (sMaxImageSizePx < 0) {
-            float density = view.getContext().getResources().getDisplayMetrics().density;
-            sMaxImageSizePx = Math.round(density * MAX_CACHED_IMAGE_SIZE);
         }
 
         Request request = getRequestForId(userId);
@@ -144,12 +131,41 @@ public class AvatarHandler {
         msg.sendToTarget();
     }
 
+    private static void initialize(Context context) {
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
+        // Use 10% of the available memory or 1MB for the cache, whatever is larger
+        final int limit = Math.max(maxMemory / 10, 1024);
+
+        sCache = new LruCache<Integer, Bitmap>(limit) {
+            @Override
+            protected void entryRemoved(boolean evicted, Integer key, Bitmap oldValue, Bitmap newValue) {
+                super.entryRemoved(evicted, key, oldValue, newValue);
+                oldValue.recycle();
+            }
+
+            @Override
+            protected int sizeOf(Integer key, Bitmap value) {
+                final long sizeInBytes;
+                if (Build.VERSION.SDK_INT >= 19) {
+                    sizeInBytes = value.getAllocationByteCount();
+                } else {
+                    sizeInBytes = value.getRowBytes() * value.getHeight();
+                }
+                return (int) (sizeInBytes / 1024);
+            }
+        };
+
+        Resources res = context.getResources();
+        sDefaultAvatarBitmap = BitmapFactory.decodeResource(res, R.drawable.default_avatar);
+        sMaxImageSizePx = Math.round(res.getDisplayMetrics().density * MAX_CACHED_IMAGE_SIZE);
+    }
+
     private static String makeUrl(String url, int userId) {
         if (url == null) {
             url = "https://avatars.githubusercontent.com/u/" + userId;
         }
         return Uri.parse(url).buildUpon()
-                .appendQueryParameter("s", String.valueOf(MAX_CACHED_IMAGE_SIZE))
+                .appendQueryParameter("s", String.valueOf(sMaxImageSizePx))
                 .toString();
     }
 
@@ -200,31 +216,36 @@ public class AvatarHandler {
         }
 
         byte[] data = output.toByteArray();
-        return BitmapFactory.decodeByteArray(data, 0, data.length);
-    }
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
 
-    private static Bitmap getResizedBitmap(Bitmap bitmap) {
-        float widthScale = (float) sMaxImageSizePx / (float) bitmap.getWidth();
-        float heightScale = (float) sMaxImageSizePx / (float) bitmap.getHeight();
-        float scaleFactor = Math.min(widthScale, heightScale);
+        BitmapFactory.decodeByteArray(data, 0, data.length, options);
 
-        if (scaleFactor <= 1) {
-            return bitmap;
+        options.inJustDecodeBounds = false;
+
+        final int widthRatio = options.outWidth / sMaxImageSizePx;
+        final int heightRatio = options.outHeight / sMaxImageSizePx;
+        options.inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
+
+        Bitmap unscaled = BitmapFactory.decodeByteArray(data, 0, data.length, options);
+        if (unscaled == null) {
+            return null;
         }
 
-        Bitmap output = Bitmap.createBitmap(Math.round(scaleFactor * bitmap.getWidth()),
-                Math.round(scaleFactor * bitmap.getHeight()), Config.ARGB_8888);
-        Canvas canvas = new Canvas(output);
-        final Paint paint = new Paint();
-        final Rect srcRect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-        final Rect rect = new Rect(0, 0, output.getWidth(), output.getHeight());
+        // We'll scale the image to the desired density
+        unscaled.setDensity(0);
 
-        paint.setAntiAlias(true);
-        canvas.drawBitmap(bitmap, srcRect, rect, paint);
+        float widthScale = (float) sMaxImageSizePx / (float) unscaled.getWidth();
+        float heightScale = (float) sMaxImageSizePx / (float) unscaled.getHeight();
+        float scaleFactor = Math.min(1, Math.min(widthScale, heightScale));
 
-        bitmap.recycle();
-
-        return output;
+        Bitmap scaled = Bitmap.createScaledBitmap(unscaled,
+                (int) (scaleFactor * unscaled.getWidth()),
+                (int) (scaleFactor * unscaled.getHeight()), true);
+        if (scaled != unscaled) {
+            unscaled.recycle();
+        }
+        return scaled;
     }
 
     private static void shutdownWorker() {
@@ -250,9 +271,6 @@ public class AvatarHandler {
                         bitmap = fetchBitmap(url);
                     } catch (IOException e) {
                         Log.e(TAG, "Couldn't fetch gravatar from URL " + url, e);
-                    }
-                    if (bitmap != null) {
-                        bitmap = getResizedBitmap(bitmap);
                     }
                     sHandler.obtainMessage(MSG_LOADED, msg.arg1, 0, bitmap).sendToTarget();
                     break;
