@@ -4,12 +4,12 @@
 
     <!-- Common -->
     <string name="record_not_found">%1$s wurde nicht gefunden</string>
-    <string name="loading_msg">Lade\u2026</string>
-    <string name="saving_msg">Speichere\u2026</string>
-    <string name="deleting_msg">Lösche\u2026</string>
-    <string name="closing_msg">Schließe\u2026</string>
-    <string name="opening_msg">Öffne\u2026</string>
-    <string name="merging_msg">Übernehme\u2026</string>
+    <string name="loading_msg">Wird geladen\u2026</string>
+    <string name="saving_msg">Wird gespeichert\u2026</string>
+    <string name="deleting_msg">Wird gelöscht\u2026</string>
+    <string name="closing_msg">Wird geschlossen\u2026</string>
+    <string name="opening_msg">Wird geöffnet\u2026</string>
+    <string name="merging_msg">Wird übernommen\u2026</string>
     <string name="authenticating">Anmeldung läuft\u2026</string>
     <string name="search">Suchen</string>
     <string name="logout">Abmelden</string>
@@ -78,9 +78,9 @@
     <string name="download_now_button">Jetzt herunterladen</string>
     <string name="download_wifi_button">Über WLAN herunterladen</string>
     <string name="download_fail_no_storage_toast">Die Datei konnte nicht heruntergeladen werden - der interne Speicher oder die SD-Karte ist nicht verfügbar.</string>
-	<string name="auth_code">Bestätigungscode</string>
-	<string name="two_factor_auth">2-Faktor-Authentifizierung</string>
-	<string name="verify">Überprüfen</string>
+    <string name="auth_code">Bestätigungscode</string>
+    <string name="two_factor_auth">2-Faktor-Authentifizierung</string>
+    <string name="verify">Überprüfen</string>
     <string name="confirmation">Sind Sie sicher?</string>
     <string name="unset">Aufheben</string>
     <string name="logout_pref_summary_logged_in">Zur Zeit als %1$s angemeldet</string>
@@ -134,16 +134,16 @@
     <string name="no_bookmarks">Es wurden noch keine Lesezeichen angelegt.</string>
 
     <!-- Activity event -->
-    <string name="event_push_title">[b]%1$s[/b] veröffentlichte Beitrag zu Branch [b]%2$s[/b] von [b]%3$s[/b]</string>
+    <string name="event_push_title">[b]%1$s[/b] veröffentlichte Commit zu Branch [b]%2$s[/b] von [b]%3$s[/b]</string>
     <string name="event_watch_title">[b]%1$s[/b] favorisierte [b]%2$s[/b]</string>
     <string name="event_create_gist_title">[b]%1$s[/b] erstellte den Gist [b]%2$s[/b]</string>
     <string name="event_update_gist_title">[b]%1$s[/b] aktualisierte den Gist [b]%2$s[/b]</string>
     <string name="event_fork_title">[b]%1$s[/b] erstellte Fork von [b]%2$s[/b]</string>
-    <string name="event_commit_comment_title">[b]%1$s[/b] kommentierte den Beitrag [b]%2$s[/b] bei [b]%3$s[/b]</string>
-    <string name="event_fork_apply_title">[b]%1$s[/b] wendete Beitrag eines Forks auf [b]%2$s[/b] an</string>
+    <string name="event_commit_comment_title">[b]%1$s[/b] kommentierte den Commit [b]%2$s[/b] bei [b]%3$s[/b]</string>
+    <string name="event_fork_apply_title">[b]%1$s[/b] wendete den Commit eines Forks auf [b]%2$s[/b] an</string>
     <string name="event_follow_title">[b]%1$s[/b] folgt jetzt [b]%2$s[/b]</string>
     <string name="event_create_repo_title">[b]%1$s[/b] erstellte Repository [b]%2$s[/b]</string>
-    <string name="event_create_branch_title">[b]%1$s[/b] erstellte Brach %2$s [b]%3$s[/b] für [b]%4$s[/b]</string>
+    <string name="event_create_branch_title">[b]%1$s[/b] erstellte Branch %2$s [b]%3$s[/b] für [b]%4$s[/b]</string>
     <string name="event_issues_title">[b]%1$s[/b] %2$s Problem [b]%3$s[/b] bei [b]%4$s[/b]</string>
     <string name="event_delete_repo_title">[b]%1$s[/b] löschte Repository [b]%2$s[/b]</string>
     <string name="event_delete_branch_title">[b]%1$s[/b] löschte %2$s [b]%3$s[/b] bei [b]%4$s[/b]</string>
@@ -167,7 +167,7 @@
     <string name="event_follow_desc">%1$s hat %2$d Repositories und %3$d Follower</string>
     <string name="event_fork_desc">Die Repository %1$s wurde angelegt</string>
     <string name="event_create_repo_desc">Die neue Repository befindet sich bei %1$s</string>
-    <string name="event_create_branch_desc">Die neue Branch %1$s befindet sich bei %2$s/tree/%3$s</string>
+    <string name="event_create_branch_desc">Der neue Branch %1$s befindet sich bei %2$s/tree/%3$s</string>
     <string name="event_gollum_desc">Siehe %1$s</string>
     <string name="event_push_desc">%1$d zusätzliche Beiträge\u2026</string>
 
@@ -184,7 +184,7 @@
     <string name="user_public_activity">Öffentliche Aktivitäten</string>
     <string name="user_organizations">Organisationen</string>
     <string name="user_follow_action">Folgen</string>
-    <string name="user_unfollow_action">Entfolgen</string>
+    <string name="user_unfollow_action">Nicht me</string>
     <string name="user_no_repos">Es wurden keine Repositories gefunden</string>
     <string name="user_no_data">Für diesen Benutzer konnten keine Daten geladen werden.</string>
 
@@ -213,26 +213,26 @@
 
     <!-- Issue events -->
     <string name="issue_event_closed">Das Problem wurde von %1$s gelöst</string>
-    <string name="issue_event_closed_with_commit">Das Problem wurde von %1$s mit dem Beitrag [commit] gelöst</string>
+    <string name="issue_event_closed_with_commit">Das Problem wurde von %1$s mit dem Commit [commit] gelöst</string>
     <string name="issue_event_reopened">Das Problem wurde von %1$s erneut geöffnet</string>
     <string name="issue_event_merged">Der Pull-Request wurde von %1$s eingefügt</string>
     <string name="issue_event_referenced">Das Problem wurde von %1$s referenziert</string>
-    <string name="issue_event_referenced_with_commit">Das Problem wurde von %1$s durch den Beitrag [commit] referenziert</string>
+    <string name="issue_event_referenced_with_commit">Das Problem wurde von %1$s durch den Commit [commit] referenziert</string>
     <string name="issue_event_assigned">Das Problem wurde [b]%2$s[/b] durch %1$s zugewiesen</string>
     <string name="issue_event_assigned_self">%1$s hat sich das Problem selbst zugewiesen</string>
     <string name="issue_event_unassigned">Die Zuweisung an [b]%2$s[/b] wurde von %1$s entfernt</string>
 
     <!-- Commit -->
-    <string name="commit_title">Beitrag %1$s</string>
-    <string name="commit">Beitrag</string>
-    <string name="commits">Beiträge</string>
+    <string name="commit_title">Commit %1$s</string>
+    <string name="commit">Commit</string>
+    <string name="commits">Commits</string>
     <string name="commit_changed">Geänderte Dateien</string>
     <string name="commit_added">Hinzugefügte Dateien</string>
     <string name="commit_renamed">Umbenannte Dateien</string>
     <string name="commit_deleted">Gelöschte Dateien</string>
-    <string name="commit_summary">%1$d änderte Dateien mit %2$d neuen und %3$d gelöschten Zeilen.</string>
+    <string name="commit_summary">%1$d geänderte Dateien mit %2$d neuen und %3$d gelöschten Zeilen.</string>
     <string name="commit_compare">Vergleichsansicht</string>
-    <string name="commit_comment_hint">Den Beitrag kommentieren</string>
+    <string name="commit_comment_hint">Den Commit kommentieren</string>
     <string name="commit_details">Von [b]%1$s[/b] %2$s beigetragen</string>
     <string name="commit_comment_dialog_title">Zeile %1$d kommentieren</string>
     <string name="commit_comment_error_body">Bitte geben Sie Ihren Kommentar ein.</string>
@@ -271,36 +271,36 @@
     <string name="issue_sort_updated_desc">Zuletzt aktualisiert</string>
     <string name="issue_sort_comments_asc">Am wenigsten kommentiert</string>
     <string name="issue_sort_comments_desc">Meistkommentiert</string>
-    <string name="issue_manage_labels">Label verwalten</string>
+    <string name="issue_manage_labels">Markierungen verwalten</string>
     <string name="issue_manage_milestones">Meilensteine verwalten</string>
-    <string name="issue_labels">Labels</string>
+    <string name="issue_labels">Markierungen</string>
     <string name="issue_milestones">Meilensteine</string>
     <string name="issue_dialog_delete_title">%1$s löschen?</string>
     <string name="issue_dialog_delete_message">Sind Sie sicher?</string>
     <string name="issue_success_comment">Kommentar wurde erfolgreich erstellt</string>
     <string name="issue_error_comment">Kommentar konnte nicht erstellt werden</string>
-    <string name="issue_error_create_label">Label konnte nicht erstellt werden</string>
-    <string name="issue_error_edit_label">Label konnte nicht bearbeitet werden</string>
+    <string name="issue_error_create_label">Markierung konnte nicht erstellt werden</string>
+    <string name="issue_error_edit_label">Markierung konnte nicht bearbeitet werden</string>
     <string name="issue_error_create_milestone">Meilenstein konnte nicht erstellt werden</string>
     <string name="issue_error_milestone_title">Bitte geben Sie einen Titel an</string>
-    <string name="issue_label_new">Neues Label</string>
+    <string name="issue_label_new">Neue Markierung</string>
     <string name="issue_milestone">Meilenstein: %1$s</string>
     <string name="issue_milestone_new">Neuer Meilenstein</string>
     <string name="issue_milestone_edit">Meilenstein bearbeiten</string>
     <string name="issue_milestone_open_issues">%d offen</string>
     <string name="issue_milestone_closed_issues">%d gelöst</string>
     <string name="issue_filter">Filter</string>
-    <string name="issue_filter_by_labels">Nach Label filtern</string>
+    <string name="issue_filter_by_labels">Nach Markierung filtern</string>
     <string name="issue_filter_by_milestone">Nach Meilenstein filtern</string>
     <string name="issue_filter_by_assignee">Nach Zuweisung filtern</string>
     <string name="issue_filter_by_any_milestone">Jeder Meilenstein</string>
     <string name="issue_filter_by_any_assignee">Jeder Benutzer</string>
     <string name="issue_clear_milestone">Kein Meilenstein</string>
     <string name="issue_clear_assignee">Kein Benutzer</string>
-    <string name="issue_no_labels">Es wurden keine Labels zugewiesen</string>
+    <string name="issue_no_labels">Es wurden keine Markierungen zugewiesen</string>
     <string name="issue_milestone_collab_only">Meilensteine können nur von Repository-Mitarbeitern gesetzt werden</string>
     <string name="issue_assignee_collab_only">Zuweisungen können nur durch Repository-Mitarbeiter gesetzt werden</string>
-    <string name="issue_labels_collab_only">Labels können nur durch Repository-Mitarbeiter zugewiesen werden</string>
+    <string name="issue_labels_collab_only">Markierungen können nur durch Repository-Mitarbeiter zugewiesen werden</string>
     <string name="issue_milestone_due_date">Fälligkeitsdatum</string>
     <string name="issue_milestone_due_unset">Es wurde kein Datum festgelegt</string>
     <string name="issue_assignee">%1$s wurde zugewiesen</string>
@@ -326,7 +326,7 @@
     <string name="pull_request_merged">Zusammengefügt</string>
     <string name="pull_error_merge">Der Pull-Request konnte nicht zusammengeführt werden</string>
     <string name="pull_message_dialog_title">Pull-Request #%1$d zusammenführen</string>
-    <string name="pull_merge_message_description">Wenn Sie weitere Details zur Beitragsbeschreibung hinzufügen möchten, geben Sie diese bitte unten ein.</string>
+    <string name="pull_merge_message_description">Wenn Sie weitere Details zur Beschreibung des Commits hinzufügen möchten, geben Sie diese bitte unten ein.</string>
 
     <!-- Object -->
     <string name="object_view_file_at">Datei @ %1$s ansehen</string>
@@ -373,7 +373,7 @@
     <string name="share_gist_subject">Gist %1$s von %2$s</string>
     <string name="share_issue_subject">Problem # %1$d (%2$s) bei %3$s</string>
     <string name="share_pull_subject">Pull-Request # %1$d (%2$s) für %3$s</string>
-    <string name="share_commit_subject">Beitrag #%1$s zu %2$s</string>
+    <string name="share_commit_subject">Commit #%1$s zu %2$s</string>
     <string name="share_user_subject">Benutzer %1$s (%2$s)</string>
     <string name="share_user_subject_loginonly">Benutzer %1$s</string>
 
