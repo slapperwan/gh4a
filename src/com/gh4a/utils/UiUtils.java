@@ -149,7 +149,7 @@ public class UiUtils {
     }
 
     public static int resolveDrawable(Context context, int styledAttributeId) {
-        TypedArray a = context.obtainStyledAttributes(Gh4Application.THEME, new int[] {
+        TypedArray a = context.obtainStyledAttributes(new int[] {
             styledAttributeId
         });
         int resource = a.getResourceId(0, 0);
@@ -158,7 +158,7 @@ public class UiUtils {
     }
 
     public static int resolveColor(Context context, int styledAttributeId) {
-        TypedArray a = context.obtainStyledAttributes(Gh4Application.THEME, new int[] {
+        TypedArray a = context.obtainStyledAttributes(new int[] {
             styledAttributeId
         });
         int color = a.getColor(0, 0);
