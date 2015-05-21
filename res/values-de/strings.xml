@@ -147,7 +147,7 @@
     <string name="event_fork_apply_title">[b]%1$s[/b] wendete Beitrag eines Forks auf [b]%2$s[/b] an</string>
     <string name="event_follow_title">[b]%1$s[/b] folgt jetzt [b]%2$s[/b]</string>
     <string name="event_create_repo_title">[b]%1$s[/b] erstellte Repository [b]%2$s[/b]</string>
-    <string name="event_create_branch_title">[b]%1$s[/b] created %2$s [b]%3$s[/b] at [b]%4$s[/b]</string>
+    <string name="event_create_branch_title">[b]%1$s[/b] erstellte Brach %2$s [b]%3$s[/b] für [b]%4$s[/b]</string>
     <string name="event_issues_title">[b]%1$s[/b] %2$s Problem [b]%3$s[/b] bei [b]%4$s[/b]</string>
     <string name="event_delete_repo_title">[b]%1$s[/b] löschte Repository [b]%2$s[/b]</string>
     <string name="event_delete_branch_title">[b]%1$s[/b] löschte %2$s [b]%3$s[/b] bei [b]%4$s[/b]</string>
