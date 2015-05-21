@@ -23,7 +23,6 @@ import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -36,9 +35,7 @@ import com.gh4a.fragment.PullRequestFragment;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestLoader;
-import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.StringUtils;
 
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.User;
@@ -95,7 +92,7 @@ public class PullRequestActivity extends BasePagerActivity implements
         LinearLayout header = (LinearLayout) findViewById(R.id.header);
         LayoutInflater inflater = getLayoutInflater();
 
-        mHeader = (ViewGroup) inflater.inflate(R.layout.pull_request_header, header, false);
+        mHeader = (ViewGroup) inflater.inflate(R.layout.issue_header, header, false);
         mHeader.setClickable(false);
         mHeader.setVisibility(View.GONE);
         header.addView(mHeader, 1);
@@ -167,13 +164,6 @@ public class PullRequestActivity extends BasePagerActivity implements
     }
 
     private void fillHeader() {
-        User user = mPullRequest.getUser();
-
-        ImageView gravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
-        gravatar.setOnClickListener(this);
-        gravatar.setTag(user);
-        AvatarHandler.assignAvatar(gravatar, user);
-
         TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
         final int stateTextResId, stateColorAttributeId, statusBarColorAttributeId;
 
@@ -193,13 +183,6 @@ public class PullRequestActivity extends BasePagerActivity implements
 
         tvState.setText(getString(stateTextResId).toUpperCase(Locale.getDefault()));
         transitionHeaderToColor(stateColorAttributeId, statusBarColorAttributeId);
-
-        TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
-        tvExtra.setText(user.getLogin());
-
-        TextView tvTimestamp = (TextView) mHeader.findViewById(R.id.tv_timestamp);
-        tvTimestamp.setText(StringUtils.formatRelativeTime(this,
-                mPullRequest.getCreatedAt(), true));
 
         TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
         tvTitle.setText(mPullRequest.getTitle());

@@ -24,6 +24,7 @@ import org.eclipse.egit.github.core.MergeStatus;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
@@ -43,6 +44,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.Constants;
@@ -58,6 +60,8 @@ import com.gh4a.loader.PullRequestCommentListLoader;
 import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.AvatarHandler;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
@@ -65,10 +69,10 @@ import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> implements
-        IssueEventAdapter.OnEditComment, CommentBoxFragment.Callback {
+        View.OnClickListener, IssueEventAdapter.OnEditComment, CommentBoxFragment.Callback {
     private static final int REQUEST_EDIT = 1000;
 
-    private TextView mDescriptionView;
+    private View mListHeaderView;
     private PullRequest mPullRequest;
     private String mRepoOwner;
     private String mRepoName;
@@ -175,9 +179,9 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         LayoutInflater inflater = getLayoutInflater(savedInstanceState);
-        mDescriptionView = (TextView) inflater.inflate(R.layout.issue_description,
-                getListView(), false);
-        getListView().addHeaderView(mDescriptionView, null, true);
+        mListHeaderView = inflater.inflate(R.layout.issue_comment_list_header, getListView(), false);
+
+        getListView().addHeaderView(mListHeaderView, null, true);
 
         FragmentManager fm = getChildFragmentManager();
         mCommentFragment = (CommentBoxFragment) fm.findFragmentById(R.id.comment_box);
@@ -274,11 +278,47 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     }
 
     private void fillData() {
+        ImageView ivGravatar = (ImageView) mListHeaderView.findViewById(R.id.iv_gravatar);
+        AvatarHandler.assignAvatar(ivGravatar, mPullRequest.getUser());
+        ivGravatar.setTag(mPullRequest.getUser());
+        ivGravatar.setOnClickListener(this);
+
+        TextView tvExtra = (TextView) mListHeaderView.findViewById(R.id.tv_extra);
+        tvExtra.setText(mPullRequest.getUser().getLogin());
+
+        TextView tvTimestamp = (TextView) mListHeaderView.findViewById(R.id.tv_timestamp);
+        tvTimestamp.setText(StringUtils.formatRelativeTime(getActivity(),
+                mPullRequest.getCreatedAt(), true));
+
         String body = mPullRequest.getBodyHtml();
-        mDescriptionView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
+        TextView descriptionView = (TextView) mListHeaderView.findViewById(R.id.tv_desc);
+        descriptionView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         if (!StringUtils.isBlank(body)) {
             body = HtmlUtils.format(body).toString();
-            mImageGetter.bind(mDescriptionView, body, mPullRequest.getId());
+            mImageGetter.bind(descriptionView, body, mPullRequest.getId());
+        }
+
+        View milestoneGroup = mListHeaderView.findViewById(R.id.milestone_container);
+        if (mPullRequest.getMilestone() != null) {
+            TextView tvMilestone = (TextView) mListHeaderView.findViewById(R.id.tv_milestone);
+            tvMilestone.setText(mPullRequest.getMilestone().getTitle());
+            milestoneGroup.setVisibility(View.VISIBLE);
+        } else {
+            milestoneGroup.setVisibility(View.GONE);
+        }
+
+        View assigneeGroup = mListHeaderView.findViewById(R.id.assignee_container);
+        if (mPullRequest.getAssignee() != null) {
+            TextView tvAssignee = (TextView) mListHeaderView.findViewById(R.id.tv_assignee);
+            tvAssignee.setText(mPullRequest.getAssignee().getLogin());
+
+            ImageView ivAssignee = (ImageView) mListHeaderView.findViewById(R.id.iv_assignee);
+            AvatarHandler.assignAvatar(ivAssignee, mPullRequest.getAssignee());
+            ivAssignee.setTag(mPullRequest.getAssignee());
+            ivAssignee.setOnClickListener(this);
+            assigneeGroup.setVisibility(View.VISIBLE);
+        } else {
+            assigneeGroup.setVisibility(View.GONE);
         }
     }
 
@@ -301,6 +341,15 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
                 })
                 .setNegativeButton(getString(R.string.cancel), null)
                 .show();
+    }
+
+    @Override
+    public void onClick(View v) {
+        User user = (User) v.getTag();
+        Intent intent = IntentUtils.getUserActivityIntent(getActivity(), user);
+        if (intent != null) {
+            startActivity(intent);
+        }
     }
 
     @Override

@@ -78,7 +78,7 @@ public class IssueActivity extends BaseActivity implements
     private String mRepoName;
     private int mIssueNumber;
     private ViewGroup mHeader;
-    private TextView mDescriptionView;
+    private View mListHeaderView;
     private boolean mEventsLoaded;
     private IssueEventAdapter mEventAdapter;
     private ListView mListView;
@@ -178,8 +178,8 @@ public class IssueActivity extends BaseActivity implements
         mHeader.setVisibility(View.GONE);
         header.addView(mHeader);
 
-        mDescriptionView = (TextView) inflater.inflate(R.layout.issue_description, mListView, false);
-        mListView.addHeaderView(mDescriptionView);
+        mListHeaderView = inflater.inflate(R.layout.issue_comment_list_header, mListView, false);
+        mListView.addHeaderView(mListHeaderView);
 
         mEventAdapter = new IssueEventAdapter(this, mRepoOwner, mRepoName, this);
         mListView.setAdapter(mEventAdapter);
@@ -228,7 +228,7 @@ public class IssueActivity extends BaseActivity implements
 
     private void fillData() {
         // set details inside listview header
-        ImageView ivGravatar = (ImageView) mHeader.findViewById(R.id.iv_gravatar);
+        ImageView ivGravatar = (ImageView) mListHeaderView.findViewById(R.id.iv_gravatar);
         AvatarHandler.assignAvatar(ivGravatar, mIssue.getUser());
         ivGravatar.setOnClickListener(this);
 
@@ -244,50 +244,49 @@ public class IssueActivity extends BaseActivity implements
                 UiUtils.resolveColor(this, stateColorAttributeId));
         mEditFab.setSelected(closed);
 
-        TextView tvExtra = (TextView) mHeader.findViewById(R.id.tv_extra);
+        TextView tvExtra = (TextView) mListHeaderView.findViewById(R.id.tv_extra);
         tvExtra.setText(mIssue.getUser().getLogin());
 
-        TextView tvTimestamp = (TextView) mHeader.findViewById(R.id.tv_timestamp);
+        TextView tvTimestamp = (TextView) mListHeaderView.findViewById(R.id.tv_timestamp);
         tvTimestamp.setText(StringUtils.formatRelativeTime(this, mIssue.getCreatedAt(), true));
 
         TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
         tvTitle.setText(mIssue.getTitle());
 
         String body = mIssue.getBodyHtml();
+        TextView descriptionView = (TextView) mListHeaderView.findViewById(R.id.tv_desc);
         if (!StringUtils.isBlank(body)) {
             body = HtmlUtils.format(body).toString();
-            mImageGetter.bind(mDescriptionView, body, mIssue.getNumber());
+            mImageGetter.bind(descriptionView, body, mIssue.getNumber());
         }
-        mDescriptionView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
+        descriptionView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
 
-        TextView tvMilestone = (TextView) mHeader.findViewById(R.id.tv_milestone);
+        View milestoneGroup = mListHeaderView.findViewById(R.id.milestone_container);
         if (mIssue.getMilestone() != null) {
-            tvMilestone.setText(getString(R.string.issue_milestone, mIssue.getMilestone().getTitle()));
-            tvMilestone.setVisibility(View.VISIBLE);
+            TextView tvMilestone = (TextView) mListHeaderView.findViewById(R.id.tv_milestone);
+            tvMilestone.setText(mIssue.getMilestone().getTitle());
+            milestoneGroup.setVisibility(View.VISIBLE);
         } else {
-            tvMilestone.setVisibility(View.GONE);
+            milestoneGroup.setVisibility(View.GONE);
         }
 
-        TextView tvAssignee = (TextView) mHeader.findViewById(R.id.tv_assignee);
-        ImageView ivAssignee = (ImageView) mHeader.findViewById(R.id.iv_assignee);
+        View assigneeGroup = mListHeaderView.findViewById(R.id.assignee_container);
         if (mIssue.getAssignee() != null) {
-            tvAssignee.setText(getString(R.string.issue_assignee, mIssue.getAssignee().getLogin()));
-            tvAssignee.setVisibility(View.VISIBLE);
-            tvAssignee.setOnClickListener(this);
+            TextView tvAssignee = (TextView) mListHeaderView.findViewById(R.id.tv_assignee);
+            tvAssignee.setText(mIssue.getAssignee().getLogin());
 
+            ImageView ivAssignee = (ImageView) mListHeaderView.findViewById(R.id.iv_assignee);
             AvatarHandler.assignAvatar(ivAssignee, mIssue.getAssignee());
-            ivAssignee.setVisibility(View.VISIBLE);
             ivAssignee.setOnClickListener(this);
+            assigneeGroup.setVisibility(View.VISIBLE);
         } else {
-            tvAssignee.setVisibility(View.GONE);
-            ivAssignee.setVisibility(View.GONE);
+            assigneeGroup.setVisibility(View.GONE);
         }
 
-
-        LinearLayout llLabels = (LinearLayout) findViewById(R.id.ll_labels);
         List<Label> labels = mIssue.getLabels();
-
+        View labelGroup = mListHeaderView.findViewById(R.id.label_container);
         if (labels != null && !labels.isEmpty()) {
+            LinearLayout llLabels = (LinearLayout) mListHeaderView.findViewById(R.id.ll_labels);
             llLabels.removeAllViews();
             llLabels.setVisibility(View.VISIBLE);
 
@@ -301,14 +300,14 @@ public class IssueActivity extends BaseActivity implements
 
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                params.rightMargin = getResources().getDimensionPixelSize(R.dimen.label_spacing);
                 llLabels.addView(tvLabel, params);
             }
+            labelGroup.setVisibility(View.VISIBLE);
         } else {
-            llLabels.setVisibility(View.GONE);
+            labelGroup.setVisibility(View.GONE);
         }
 
-        TextView tvPull = (TextView) mHeader.findViewById(R.id.tv_pull);
+        TextView tvPull = (TextView) mListHeaderView.findViewById(R.id.tv_pull);
         if (mIssue.getPullRequest() != null && mIssue.getPullRequest().getDiffUrl() != null) {
             tvPull.setVisibility(View.VISIBLE);
             tvPull.setOnClickListener(this);
