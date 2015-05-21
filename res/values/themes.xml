@@ -122,7 +122,9 @@
         <item name="colorControlActivated">#ffffff</item>
     </style>
 
-    <style name="Theme.Header.Light" parent="Theme.Header">
+    <style name="Theme.Header.Light">
         <item name="android:spinnerStyle">@style/Widget.Spinner.ActionBar.Light</item>
+        <!-- used by appcompat to tint the spinner background drawable -->
+        <item name="android:colorBackground">#ffffff</item>
     </style>
 </resources>
