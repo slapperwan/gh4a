@@ -114,7 +114,7 @@
     <string name="no_trends_found">Zur Zeit sind keine Repositories angesagt.</string>
     <string name="no_downloads_found">Diese Repository enthält keine Downloads.</string>
     <string name="no_milestones_found">Diese Repository hat keine Meilensteine konfiguriert.</string>
-    <string name="no_commits_found">Es wurden keine Beiträge gefunden.</string>
+    <string name="no_commits_found">Es wurden keine Commits gefunden.</string>
     <string name="no_followers_found">Es wurden keine Follower gefunden.</string>
     <string name="no_following_found">Derzeit folgt diese Person noch keinen Benutzern.</string>
     <string name="no_forks_found">Diese Repository wurde noch nicht geforked.</string>
@@ -163,13 +163,13 @@
         <item quantity="other">%d Seiten</item>
     </plurals>
 
-    <string name="event_pull_request_desc">%1$s\n%2$d Beiträge mit %3$d neuen Zeilen und %4$d gelöschten Zeilen</string>
+    <string name="event_pull_request_desc">%1$s\n%2$d Commits mit %3$d neuen Zeilen und %4$d gelöschten Zeilen</string>
     <string name="event_follow_desc">%1$s hat %2$d Repositories und %3$d Follower</string>
     <string name="event_fork_desc">Die Repository %1$s wurde angelegt</string>
     <string name="event_create_repo_desc">Die neue Repository befindet sich bei %1$s</string>
     <string name="event_create_branch_desc">Der neue Branch %1$s befindet sich bei %2$s/tree/%3$s</string>
     <string name="event_gollum_desc">Siehe %1$s</string>
-    <string name="event_push_desc">%1$d zusätzliche Beiträge\u2026</string>
+    <string name="event_push_desc">%1$d zusätzliche Commits\u2026</string>
 
     <string name="user_username">Benutzername</string>
     <string name="user_password">Passwort</string>
