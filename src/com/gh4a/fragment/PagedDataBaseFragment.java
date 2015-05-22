@@ -34,6 +34,7 @@ import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.client.PageIterator;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase implements
@@ -87,8 +88,23 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         } else if (getListView().getFooterViewsCount() == 0) {
             listView.addFooterView(mLoadingView);
         }
-        mAdapter.clear();
-        onAddData(mAdapter, data);
+
+        if (mAdapter.getCount() > 0 && data.iterator().next() == mAdapter.getItem(0)) {
+            // there are common items, preserve them in order to keep the scroll position
+            ArrayList<T> newData = new ArrayList<>();
+            int index = 0, count = mAdapter.getCount();
+            for (T item : data) {
+                if (index < count && item == mAdapter.getItem(index++)) {
+                    // we already know about the item
+                    continue;
+                }
+                newData.add(item);
+            }
+            onAddData(mAdapter, newData);
+        } else {
+            mAdapter.clear();
+            onAddData(mAdapter, data);
+        }
     }
 
     protected void onAddData(RootAdapter<T> adapter, Collection<T> data) {
