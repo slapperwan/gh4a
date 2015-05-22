@@ -176,7 +176,8 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         }
 
         //hide gists repos if organization
-        fillCountIfUser(R.id.cell_gists, R.id.tv_gists_count, mUser.getPublicGists());
+        fillCountIfUser(R.id.cell_gists, R.id.tv_gists_count,
+                mUser.getPublicGists() + mUser.getPrivateGists());
         //hide following if organization
         fillCountIfUser(R.id.cell_following, R.id.tv_following_count, mUser.getFollowing());
 
