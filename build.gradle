@@ -63,6 +63,7 @@ dependencies {
     compile 'com.larswerkman:HoloColorPicker:1.4@aar'
     compile 'com.github.johnkil.android-progressfragment:progressfragment:1.4.0@aar'
     compile 'com.android.support:support-v4-preferencefragment:1.0.0@aar'
+    compile 'org.apmem.tools:layouts:1.9@aar'
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.squareup.okhttp:okhttp:1.5.4'
     compile 'org.ocpsoft.prettytime:prettytime:3.2.4.Final'

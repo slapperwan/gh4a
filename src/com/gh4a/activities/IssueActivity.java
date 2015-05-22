@@ -40,7 +40,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -170,7 +169,7 @@ public class IssueActivity extends BaseActivity implements
         mListView = (ListView) findViewById(android.R.id.list);
         mImageGetter = new HttpImageGetter(this);
 
-        LinearLayout header = (LinearLayout) findViewById(R.id.header);
+        ViewGroup header = (ViewGroup) findViewById(R.id.header);
         LayoutInflater inflater = getLayoutInflater();
 
         mHeader = (ViewGroup) inflater.inflate(R.layout.issue_header, header, false);
@@ -286,23 +285,22 @@ public class IssueActivity extends BaseActivity implements
         List<Label> labels = mIssue.getLabels();
         View labelGroup = mListHeaderView.findViewById(R.id.label_container);
         if (labels != null && !labels.isEmpty()) {
-            LinearLayout llLabels = (LinearLayout) mListHeaderView.findViewById(R.id.ll_labels);
-            llLabels.removeAllViews();
-            llLabels.setVisibility(View.VISIBLE);
+            ViewGroup labelContainer = (ViewGroup) mListHeaderView.findViewById(R.id.labels);
+            labelContainer.removeAllViews();
 
             for (Label label : labels) {
-                TextView tvLabel = (TextView) getLayoutInflater().inflate(R.layout.issue_label, null);
+                TextView tvLabel = (TextView) getLayoutInflater().inflate(R.layout.issue_label,
+                        labelContainer, false);
                 int color = Color.parseColor("#" + label.getColor());
 
                 tvLabel.setText(label.getName());
                 tvLabel.setBackgroundColor(color);
                 tvLabel.setTextColor(UiUtils.textColorForBackground(this, color));
 
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                llLabels.addView(tvLabel, params);
+                labelContainer.addView(tvLabel);
             }
             labelGroup.setVisibility(View.VISIBLE);
+            labelContainer.setVisibility(View.VISIBLE);
         } else {
             labelGroup.setVisibility(View.GONE);
         }

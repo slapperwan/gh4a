@@ -152,11 +152,11 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textColor="?android:attr/textColorPrimary" />
 
-        <LinearLayout
-            android:id="@+id/ll_labels"
-            android:layout_width="wrap_content"
+        <org.apmem.tools.layouts.FlowLayout
+            android:id="@+id/labels"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:layout_below="@id/tv_labels_label"
             android:layout_toRightOf="@id/iv_labels"
             android:visibility="gone" />
