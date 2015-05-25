@@ -17,7 +17,7 @@
     <string name="ok">OK</string>
     <string name="cancel">Abbrechen</string>
     <string name="settings">Einstellungen</string>
-    <string name="about">Mein Profil</string>
+    <string name="about">Über uns</string>
     <string name="open_source_components">Open-Source-Komponenten</string>
     <string name="feedback_text">Wenn Sie irgendwelche Probleme oder Vorschläge haben, kontaktieren Sie mich bitte. Ich freue mich über jede Art von Feedback.</string>
     <string name="feedback_by_email">Via E-Mail</string>
@@ -134,7 +134,7 @@
     <string name="no_bookmarks">Es wurden noch keine Lesezeichen angelegt.</string>
 
     <!-- Activity event -->
-    <string name="event_push_title">[b]%1$s[/b] veröffentlichte Commit zu Branch [b]%2$s[/b] von [b]%3$s[/b]</string>
+    <string name="event_push_title">[b]%1$s[/b] fügte einen Commit zu Branch [b]%2$s[/b] von [b]%3$s[/b] hinzu</string>
     <string name="event_watch_title">[b]%1$s[/b] favorisierte [b]%2$s[/b]</string>
     <string name="event_create_gist_title">[b]%1$s[/b] erstellte den Gist [b]%2$s[/b]</string>
     <string name="event_update_gist_title">[b]%1$s[/b] aktualisierte den Gist [b]%2$s[/b]</string>
@@ -153,7 +153,7 @@
     <string name="event_download_title">[b]%1$s[/b] hat eine Datei zu [b]%2$s[/b] hochgeladen</string>
     <string name="event_gollum_title">[b]%1$s[/b] bearbeitete %2$s in dem Wiki von [b]%3$s[/b]</string>
     <string name="event_public_title">[b]%1$s[/b] veröffentlichte Projekt [b]%2$s[/b] als Open-Source-Projekt</string>
-    <string name="event_release_title">[b]%1$s[/b] erstellte eine Veröffentlichung von [b]%2$s[/b]</string>
+    <string name="event_release_title">[b]%1$s[/b] veröffentlichte eine neue Version von [b]%2$s[/b]</string>
     <string name="event_issue_comment">[b]%1$s[/b] kommentierte das Problem [b]%2$d[/b] bei [b]%3$s[/b]</string>
     <string name="event_pull_request_comment">[b]%1$s[/b] kommentierte den Pull-Request [b]%2$d[/b] für [b]%3$s[/b]</string>
     <string name="event_team_user_add">[b]%1$s[/b] fügte [b]%2$s[/b] zum Team [b]%3$s[/b] hinzu</string>
@@ -187,6 +187,8 @@
     <string name="user_unfollow_action">Nicht me</string>
     <string name="user_no_repos">Es wurden keine Repositories gefunden</string>
     <string name="user_no_data">Für diesen Benutzer konnten keine Daten geladen werden.</string>
+    <string name="user_about_self">Mein Profil</string>
+    <string name="user_about">Übersicht</string>
 
     <!-- Repository -->
     <string name="repository">Repository</string>
@@ -210,6 +212,7 @@
     <string name="repo_no_readme">Es wurde keine README-Datei gefunden</string>
     <string name="repo_issue_on">#%1$d auf %2$s</string>
     <string name="repo_no_data">Für diese Repository konnten keine Daten geladen werden.</string>
+    <string name="repo_about">Übersicht</string>
 
     <!-- Issue events -->
     <string name="issue_event_closed">Das Problem wurde von %1$s gelöst</string>

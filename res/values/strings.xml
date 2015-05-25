@@ -192,6 +192,8 @@
     <string name="user_unfollow_action">Unfollow</string>
     <string name="user_no_repos">No repositories found</string>
     <string name="user_no_data">Data for this user can\'t be loaded.</string>
+    <string name="user_about_self">About</string>
+    <string name="user_about">About</string>
 
     <!-- Repository -->
     <string name="repository">Repository</string>
@@ -215,6 +217,7 @@
     <string name="repo_no_readme">No README file found</string>
     <string name="repo_issue_on">#%1$d on %2$s</string>
     <string name="repo_no_data">Data for this repository can\'t be loaded.</string>
+    <string name="repo_about">About</string>
 
     <!-- Issue events -->
     <string name="issue_event_closed">Issue was closed by %1$s</string>

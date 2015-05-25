@@ -46,11 +46,11 @@ public class UserActivity extends BasePagerActivity {
     private Boolean mIsFollowing;
 
     private static final int[] TITLES_SELF = new int[] {
-        R.string.about, R.string.user_news_feed,
+        R.string.user_about_self, R.string.user_news_feed,
         R.string.user_your_actions
     };
     private static final int[] TITLES_OTHER = new int[] {
-        R.string.about, R.string.user_public_activity
+        R.string.user_about, R.string.user_public_activity
     };
 
     private static final int ITEM_ISSUES = 1;
