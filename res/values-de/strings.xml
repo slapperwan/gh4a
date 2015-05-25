@@ -184,7 +184,7 @@
     <string name="user_public_activity">Öffentliche Aktivitäten</string>
     <string name="user_organizations">Organisationen</string>
     <string name="user_follow_action">Folgen</string>
-    <string name="user_unfollow_action">Nicht me</string>
+    <string name="user_unfollow_action">Nicht mehr folgen</string>
     <string name="user_no_repos">Es wurden keine Repositories gefunden</string>
     <string name="user_no_data">Für diesen Benutzer konnten keine Daten geladen werden.</string>
     <string name="user_about_self">Mein Profil</string>
@@ -196,13 +196,13 @@
     <string name="repo_language">Sprache %1$s</string>
     <string name="repo_watchers">Follower</string>
     <string name="repo_stargazers">Favorisierende</string>
-    <string name="repo_watch_action">Folgen</string>
+    <string name="repo_watch_action">Beobachten</string>
     <string name="repo_star_action">Favorisieren</string>
     <string name="repo_select_ref">Branch auswählen</string>
     <string name="repo_select_ref_dialog_title">Branch oder Tag auswählen</string>
     <string name="repo_branches">Branches</string>
     <string name="repo_tags">Tags</string>
-    <string name="repo_unwatch_action">Entfolgen</string>
+    <string name="repo_unwatch_action">Nicht mehr beobachten</string>
     <string name="repo_unstar_action">Favorisierung entfernen</string>
     <string name="repo_download_action">Quellcode als ZIP herunterladen</string>
     <string name="repo_contributors">Beitragende</string>
