@@ -165,7 +165,7 @@ public class Github4AndroidActivity extends BaseActivity {
         UiUtils.hideImeForView(loginView);
         UiUtils.hideImeForView(passwordView);
 
-        String username = loginView.getText().toString();
+        String username = loginView.getText().toString().trim();
         String password = passwordView.getText().toString();
 
         if (!StringUtils.checkEmail(username)) {
