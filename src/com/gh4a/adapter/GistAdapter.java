@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.StringUtils;
 
 public class GistAdapter extends RootAdapter<Gist> {
@@ -61,8 +62,7 @@ public class GistAdapter extends RootAdapter<Gist> {
         if (isSelf) {
             viewHolder.tvCreator.setVisibility(View.GONE);
         } else {
-            viewHolder.tvCreator.setText(user != null
-                    ? user.getLogin() : mContext.getString(R.string.unknown));
+            viewHolder.tvCreator.setText(CommitUtils.getUserLogin(mContext, user));
             viewHolder.tvCreator.setVisibility(View.VISIBLE);
         }
 

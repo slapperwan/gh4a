@@ -36,6 +36,7 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.loader.IssueEventHolder;
+import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
@@ -99,7 +100,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
 
         StringUtils.applyBoldTagsAndSetText(viewHolder.tvExtra,
                 mContext.getString(R.string.issue_comment_header,
-                login != null ? login : mContext.getString(R.string.unknown)));
+                        CommitUtils.getUserLogin(mContext, event.getUser())));
         viewHolder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
                 event.getCreatedAt(), true));
 
@@ -137,11 +138,6 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
         String textBase = null;
         int textResId = 0;
 
-        String actorLogin = event.getActor() != null ? event.getActor().getLogin() : null;
-        if (actorLogin == null) {
-            actorLogin = mContext.getString(R.string.unknown);
-        }
-
         if (TextUtils.equals(type, "closed")) {
             textResId = event.getCommitId() != null
                     ? R.string.issue_event_closed_with_commit : R.string.issue_event_closed;
@@ -153,6 +149,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
             textResId = event.getCommitId() != null
                     ? R.string.issue_event_referenced_with_commit : R.string.issue_event_referenced;
         } else if (TextUtils.equals(type, "assigned")) {
+            String actorLogin = event.getActor() != null ? event.getActor().getLogin() : null;
             String assigneeLogin = event.getAssignee() != null ? event.getAssignee().getLogin() : null;
             if (assigneeLogin != null && assigneeLogin.equals(actorLogin)) {
                 textResId = R.string.issue_event_assigned_self;
@@ -168,7 +165,8 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
         }
 
         if (textBase == null) {
-            textBase = mContext.getString(textResId, actorLogin);
+            textBase = mContext.getString(textResId,
+                    CommitUtils.getUserLogin(mContext, event.getActor()));
         }
         SpannableStringBuilder text = StringUtils.applyBoldTags(mContext, textBase, typefaceValue);
         if (event.getCommitId() == null) {

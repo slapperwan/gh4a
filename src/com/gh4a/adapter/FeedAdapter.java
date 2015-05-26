@@ -61,6 +61,7 @@ import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.utils.AvatarHandler;
+import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.CustomTypefaceSpan;
@@ -324,11 +325,7 @@ public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListe
             Gist gist = payload.getGist();
             String login = actor.getLogin();
             if (TextUtils.isEmpty(login)) {
-                if (gist != null && gist.getUser() != null) {
-                    login = gist.getUser().getLogin();
-                } else {
-                    login = mContext.getString(R.string.unknown);
-                }
+                login = CommitUtils.getUserLogin(mContext, gist.getUser());
             }
 
             String id = gist != null ? gist.getId() : mContext.getString(R.string.deleted);

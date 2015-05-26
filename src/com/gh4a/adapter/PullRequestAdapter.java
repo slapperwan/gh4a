@@ -28,6 +28,7 @@ import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.utils.AvatarHandler;
+import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
@@ -66,8 +67,7 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> implements View
 
         viewHolder.tvNumber.setText("#" + pullRequest.getNumber());
         viewHolder.tvDesc.setText(pullRequest.getTitle());
-        viewHolder.tvCreator.setText(
-                user != null ? user.getLogin() : mContext.getString(R.string.unknown));
+        viewHolder.tvCreator.setText(CommitUtils.getUserLogin(mContext, user));
         viewHolder.tvTimestamp.setText(
                 StringUtils.formatRelativeTime(mContext, pullRequest.getCreatedAt(), true));
 

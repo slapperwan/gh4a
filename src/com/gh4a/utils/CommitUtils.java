@@ -7,6 +7,7 @@ import com.gh4a.R;
 
 import org.eclipse.egit.github.core.CommitUser;
 import org.eclipse.egit.github.core.RepositoryCommit;
+import org.eclipse.egit.github.core.User;
 
 public class CommitUtils {
 
@@ -51,4 +52,10 @@ public class CommitUtils {
         return TextUtils.equals(author.getName(), committer.getName());
     }
 
+    public static String getUserLogin(Context context, User user) {
+        if (user != null && user.getLogin() != null) {
+            return user.getLogin();
+        }
+        return context.getString(R.string.unknown);
+    }
 }
