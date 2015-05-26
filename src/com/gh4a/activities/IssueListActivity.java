@@ -21,11 +21,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ListAdapter;
 
+import com.gh4a.BasePagerActivity;
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.adapter.DrawerAdapter;
@@ -49,7 +53,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class IssueListActivity extends IssueListBaseActivity {
+public class IssueListActivity extends BasePagerActivity {
     private String mRepoOwner;
     private String mRepoName;
 
@@ -64,6 +68,14 @@ public class IssueListActivity extends IssueListBaseActivity {
     private List<Label> mLabels;
     private List<Milestone> mMilestones;
     private List<User> mAssignees;
+
+    protected IssueListFragment.SortDrawerAdapter mDrawerAdapter;
+
+    protected static final int ITEM_FILTER_MILESTONE = 1;
+    protected static final int ITEM_FILTER_ASSIGNEE = 2;
+    protected static final int ITEM_FILTER_LABEL = 3;
+    protected static final int ITEM_MANAGE_LABELS = 4;
+    protected static final int ITEM_MANAGE_MILESTONES = 5;
 
     private static final int[] TITLES = new int[] {
         R.string.open, R.string.closed
@@ -155,8 +167,7 @@ public class IssueListActivity extends IssueListBaseActivity {
             if (mIsCollaborator == null) {
                 mIsCollaborator = result.getData();
                 if (mIsCollaborator) {
-                    mDrawerItems.addAll(COLLAB_DRAWER_ITEMS);
-                    mDrawerAdapter.notifyDataSetChanged();
+                    mDrawerAdapter.addItems(COLLAB_DRAWER_ITEMS);
                 }
             }
         }
@@ -172,9 +183,6 @@ public class IssueListActivity extends IssueListBaseActivity {
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.OWNER);
         mRepoName = data.getString(Constants.Repository.NAME);
-        mSortMode = SORT_MODE_CREATED;
-        mSortAscending = false;
-        updateSortDrawerItemState(ITEM_SORT_CREATED_DESC);
 
         if (TextUtils.equals(data.getString(Constants.Issue.STATE), Constants.Issue.STATE_CLOSED)) {
             getPager().setCurrentItem(1);
@@ -210,8 +218,8 @@ public class IssueListActivity extends IssueListBaseActivity {
     @Override
     protected Fragment getFragment(int position) {
         Map<String, String> filterData = new HashMap<>();
-        filterData.put("sort", mSortMode);
-        filterData.put("direction", mSortAscending ? "asc" : "desc");
+        filterData.put("sort", mDrawerAdapter.getSortMode());
+        filterData.put("direction", mDrawerAdapter.getSortDirection());
         if (mSelectedLabels != null) {
             filterData.put("labels", TextUtils.join(",", mSelectedLabels));
         }
@@ -244,14 +252,30 @@ public class IssueListActivity extends IssueListBaseActivity {
     }
 
     @Override
-    protected ListAdapter getNavigationDrawerAdapter() {
-        mDrawerItems = new ArrayList<>(DRAWER_ITEMS);
-        mDrawerItems.addAll(FILTER_DRAWER_ITEMS);
+    protected ListAdapter getRightNavigationDrawerAdapter() {
+        mDrawerAdapter = IssueListFragment.SortDrawerAdapter.create(this);
+        mDrawerAdapter.addItems(FILTER_DRAWER_ITEMS);
         if (mIsCollaborator != null && mIsCollaborator) {
-            mDrawerItems.addAll(COLLAB_DRAWER_ITEMS);
+            mDrawerAdapter.addItems(COLLAB_DRAWER_ITEMS);
         }
-        mDrawerAdapter = new DrawerAdapter(this, mDrawerItems);
         return mDrawerAdapter;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuItem item = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.actions)
+                .setIcon(R.drawable.abc_ic_menu_moreoverflow_mtrl_alpha);
+        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == Menu.FIRST) {
+            toggleRightSideDrawer();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -260,7 +284,38 @@ public class IssueListActivity extends IssueListBaseActivity {
     }
 
     @Override
-    public void reloadIssueList() {
+    protected boolean onDrawerItemSelected(boolean left, int position) {
+        if (mDrawerAdapter.handleSortModeChange(position)) {
+            reloadIssueList();
+            return true;
+        }
+
+        if (left) {
+            return super.onDrawerItemSelected(left, position);
+        }
+
+        int id = (int) mDrawerAdapter.getItemId(position);
+        switch (id) {
+            case ITEM_FILTER_ASSIGNEE:
+                filterAssignee();
+                return true;
+            case ITEM_FILTER_LABEL:
+                filterLabel();
+                return true;
+            case ITEM_FILTER_MILESTONE:
+                filterMilestone();
+                return true;
+            case ITEM_MANAGE_LABELS:
+                manageLabels();
+                return true;
+            case ITEM_MANAGE_MILESTONES:
+                manageMilestones();
+                return true;
+        }
+        return false;
+    }
+
+    private void reloadIssueList() {
         mOpenFragment = null;
         mClosedFragment = null;
         invalidateFragments();
@@ -377,29 +432,6 @@ public class IssueListActivity extends IssueListBaseActivity {
             return true;
         }
         return false;
-    }
-
-    @Override
-    protected boolean onDrawerItemSelected(int position) {
-        int id = mDrawerItems.get(position).getId();
-        switch (id) {
-            case ITEM_FILTER_ASSIGNEE:
-                filterAssignee();
-                return true;
-            case ITEM_FILTER_LABEL:
-                filterLabel();
-                return true;
-            case ITEM_FILTER_MILESTONE:
-                filterMilestone();
-                return true;
-            case ITEM_MANAGE_LABELS:
-                manageLabels();
-                return true;
-            case ITEM_MANAGE_MILESTONES:
-                manageMilestones();
-                return true;
-        }
-        return super.onDrawerItemSelected(position);
     }
 
     private void filterAssignee() {

@@ -47,9 +47,8 @@ import android.widget.TextView;
 
 import com.gh4a.activities.Github4AndroidActivity;
 import com.gh4a.activities.SearchActivity;
-import com.gh4a.activities.UserActivity;
+import com.gh4a.activities.home.HomeActivity;
 import com.gh4a.db.BookmarksProvider;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ColorDrawable;
@@ -62,7 +61,8 @@ import com.shamanland.fab.FloatingActionButton;
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 public abstract class BaseActivity extends AppCompatActivity implements
-        SwipeRefreshLayout.OnRefreshListener {
+        SwipeRefreshLayout.OnRefreshListener, DrawerLayout.DrawerListener,
+        ListView.OnItemClickListener {
     private ViewGroup mContentContainer;
     private TextView mEmptyView;
     private boolean mContentShown;
@@ -76,9 +76,11 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private boolean mHasErrorView = false;
+    private View mLeftDrawer;
 
     private ColorDrawable mHeaderBackground;
-    private ColorDrawable mDrawerTitleBackground;
+    private ColorDrawable mLeftDrawerTitleBackground;
+    private ColorDrawable mRightDrawerTitleBackground;
 
     private ViewTreeObserver.OnGlobalLayoutListener mOverlayLayoutListener =
             new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -105,24 +107,40 @@ public abstract class BaseActivity extends AppCompatActivity implements
         }
     }
 
-    protected ListAdapter getNavigationDrawerAdapter() {
+    protected ListAdapter getLeftNavigationDrawerAdapter() {
         return null;
     }
 
-    protected boolean isRightSideDrawer() {
-        return false;
+    protected ListAdapter getRightNavigationDrawerAdapter() {
+        return null;
     }
 
-    protected void toggleDrawer() {
-        int gravity = isRightSideDrawer() ? Gravity.RIGHT : Gravity.LEFT;
-        if (mDrawerLayout.isDrawerOpen(gravity)) {
-            mDrawerLayout.closeDrawer(gravity);
+    protected boolean closeDrawers() {
+        boolean result = false;
+        if (mDrawerLayout.isDrawerOpen(Gravity.LEFT)) {
+            mDrawerLayout.closeDrawer(Gravity.LEFT);
+            result = true;
+        }
+        if (mDrawerLayout.isDrawerOpen(Gravity.RIGHT)) {
+            mDrawerLayout.closeDrawer(Gravity.RIGHT);
+            result = true;
+        }
+        return result;
+    }
+
+    protected void toggleRightSideDrawer() {
+        if (mDrawerLayout.isDrawerOpen(Gravity.RIGHT)) {
+            mDrawerLayout.closeDrawer(Gravity.RIGHT);
         } else {
-            mDrawerLayout.openDrawer(gravity);
+            mDrawerLayout.openDrawer(Gravity.RIGHT);
         }
     }
 
-    protected boolean onDrawerItemSelected(int position) {
+    protected View getLeftDrawerTitle(ViewGroup container) {
+        return getLayoutInflater().inflate(R.layout.drawer_title_main, container, false);
+    }
+
+    protected boolean onDrawerItemSelected(boolean left, int position) {
         return false;
     }
 
@@ -187,13 +205,14 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     protected void setHeaderColor(int color, int statusBarColor) {
         mHeaderBackground.setColor(color);
-        mDrawerTitleBackground.setColor(color);
+        mLeftDrawerTitleBackground.setColor(color);
+        mRightDrawerTitleBackground.setColor(color);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(statusBarColor);
         }
     }
 
-    protected void transitionHeaderToColor(int colorAttrId, int statusBarColorAttrId) {
+    public void transitionHeaderToColor(int colorAttrId, int statusBarColorAttrId) {
         final AnimatorSet animation = new AnimatorSet();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -204,15 +223,29 @@ public abstract class BaseActivity extends AppCompatActivity implements
             statusBarAnimation.setEvaluator(new ArgbEvaluator());
 
             animation.playTogether(createColorTransition(mHeaderBackground, colorAttrId),
-                    createColorTransition(mDrawerTitleBackground, colorAttrId),
+                    createColorTransition(mLeftDrawerTitleBackground, colorAttrId),
+                    createColorTransition(mRightDrawerTitleBackground, colorAttrId),
                     statusBarAnimation);
         } else {
             animation.playTogether(createColorTransition(mHeaderBackground, colorAttrId),
-                    createColorTransition(mDrawerTitleBackground, colorAttrId));
+                    createColorTransition(mLeftDrawerTitleBackground, colorAttrId),
+                    createColorTransition(mRightDrawerTitleBackground, colorAttrId));
         }
 
         animation.setDuration(200);
         animation.start();
+    }
+
+    protected void updateRightNavigationDrawer() {
+        ListAdapter rightAdapter = getRightNavigationDrawerAdapter();
+        if (rightAdapter != null) {
+            ListView list = (ListView) findViewById(R.id.right_drawer_list);
+            list.setAdapter(rightAdapter);
+            list.setOnItemClickListener(this);
+            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.RIGHT);
+        } else {
+            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.RIGHT);
+        }
     }
 
     protected boolean isOnline() {
@@ -233,9 +266,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     protected Intent getToplevelActivityIntent() {
         Gh4Application app = Gh4Application.get();
         if (app.isAuthorized()) {
-            Intent intent = IntentUtils.getUserActivityIntent(this, app.getAuthLogin(), null);
-            intent.putExtra(UserActivity.EXTRA_TOPLEVEL_MODE, true);
-            return intent;
+            return new Intent(this, HomeActivity.class);
         } else {
             return new Intent(this, Github4AndroidActivity.class);
         }
@@ -334,6 +365,42 @@ public abstract class BaseActivity extends AppCompatActivity implements
         mSwipeLayout.setRefreshing(true);
     }
 
+    @Override
+    public void onDrawerOpened(View drawerView) {
+        if (mDrawerToggle != null && drawerView == mLeftDrawer) {
+            mDrawerToggle.onDrawerOpened(drawerView);
+        }
+    }
+
+    @Override
+    public void onDrawerClosed(View drawerView) {
+        if (mDrawerToggle != null && drawerView == mLeftDrawer) {
+            mDrawerToggle.onDrawerClosed(drawerView);
+        }
+    }
+
+    @Override
+    public void onDrawerSlide(View drawerView, float slideOffset) {
+        if (mDrawerToggle != null && drawerView == mLeftDrawer) {
+            mDrawerToggle.onDrawerSlide(drawerView, slideOffset);
+        }
+    }
+
+    @Override
+    public void onDrawerStateChanged(int newState) {
+        if (mDrawerToggle != null) {
+            mDrawerToggle.onDrawerStateChanged(newState);
+        }
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+        boolean isLeft = adapterView.getId() == R.id.left_drawer_list;
+        if (onDrawerItemSelected(isLeft, position)) {
+            mDrawerLayout.closeDrawer(isLeft ? Gravity.LEFT : Gravity.RIGHT);
+        }
+    }
+
     private void setErrorView() {
         mHasErrorView = true;
         super.setContentView(R.layout.error);
@@ -349,10 +416,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private void setupHeaderDrawable() {
         int primaryColor = UiUtils.resolveColor(this, R.attr.colorPrimary);
         mHeaderBackground = ColorDrawable.create(primaryColor);
-        mDrawerTitleBackground = ColorDrawable.create(primaryColor);
+        mLeftDrawerTitleBackground = ColorDrawable.create(primaryColor);
+        mRightDrawerTitleBackground = ColorDrawable.create(primaryColor);
 
-        assignBackground(R.id.drawer_title, mHeaderBackground);
-        assignBackground(R.id.header, mDrawerTitleBackground);
+        assignBackground(R.id.left_drawer_title, mLeftDrawerTitleBackground);
+        assignBackground(R.id.right_drawer_title, mRightDrawerTitleBackground);
+        assignBackground(R.id.header, mHeaderBackground);
     }
 
     private ObjectAnimator createColorTransition(ColorDrawable drawable, int colorAttrId) {
@@ -386,43 +455,35 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     private void setupNavigationDrawer() {
-        ListAdapter adapter = getNavigationDrawerAdapter();
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_container);
+        mLeftDrawer = findViewById(R.id.left_drawer);
 
         Toolbar toolBar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolBar);
 
-        if (adapter != null) {
-            ListView drawerList = (ListView) findViewById(R.id.drawer_list);
-            drawerList.setAdapter(adapter);
-            drawerList.setOnItemClickListener(new ListView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    if (onDrawerItemSelected(position)) {
-                        mDrawerLayout.closeDrawers();
-                    }
-                }
-            });
+        ListAdapter leftAdapter = getLeftNavigationDrawerAdapter();
+        if (leftAdapter != null) {
+            ListView list = (ListView) findViewById(R.id.left_drawer_list);
+            list.setAdapter(leftAdapter);
+            list.setOnItemClickListener(this);
 
-            if (isRightSideDrawer()) {
-                View drawer = findViewById(R.id.drawer);
-                DrawerLayout.LayoutParams lp = (DrawerLayout.LayoutParams) drawer.getLayoutParams();
-                lp.gravity = Gravity.RIGHT;
-                drawer.setLayoutParams(lp);
-            } else {
-                mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolBar, 0, 0);
-                mDrawerLayout.setDrawerListener(mDrawerToggle);
+            mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolBar, 0, 0);
+            mDrawerLayout.setDrawerListener(this);
 
-                ViewGroup title = (ViewGroup) findViewById(R.id.drawer_title);
-                LayoutInflater.from(this).inflate(R.layout.drawer_title_main, title);
+            ViewGroup title = (ViewGroup) findViewById(R.id.left_drawer_title);
+            View view = getLeftDrawerTitle(title);
+            if (view != null) {
+                title.addView(view);
             }
-
-            mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow_left, Gravity.LEFT);
-            mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow_right, Gravity.RIGHT);
-            mDrawerLayout.setScrimColor(getResources().getColor(R.color.drawer_scrim));
         } else {
-            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.LEFT);
         }
+
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow_left, Gravity.LEFT);
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow_right, Gravity.RIGHT);
+        mDrawerLayout.setScrimColor(getResources().getColor(R.color.drawer_scrim));
+
+        updateRightNavigationDrawer();
     }
 
     private void setContentShown(boolean shown, boolean animate) {

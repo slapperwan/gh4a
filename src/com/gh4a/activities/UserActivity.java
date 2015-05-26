@@ -33,48 +33,16 @@ import java.util.Arrays;
 import java.util.List;
 
 public class UserActivity extends BasePagerActivity {
-    private static final int REQUEST_SETTINGS = 10000;
-    public static final String EXTRA_TOPLEVEL_MODE = "toplevel_mode";
-
     private String mUserLogin;
     private String mUserName;
-    private boolean mIsTopLevelMode;
     private boolean mIsSelf;
     private UserFragment mUserFragment;
-    private PrivateEventListFragment mPrivateEventListFragment;
     private PublicEventListFragment mPublicEventListFragment;
     private Boolean mIsFollowing;
 
-    private static final int[] TITLES_SELF = new int[] {
-        R.string.about, R.string.user_news_feed,
-        R.string.user_your_actions
-    };
-    private static final int[] TITLES_OTHER = new int[] {
+    private static final int[] TAB_TITLES = new int[] {
         R.string.about, R.string.user_public_activity
     };
-
-    private static final int ITEM_ISSUES = 1;
-    private static final int ITEM_PULLREQUESTS = 2;
-    private static final int ITEM_SEARCH = 3;
-    private static final int ITEM_BOOKMARKS = 4;
-    private static final int ITEM_SETTINGS = 5;
-    private static final int ITEM_TIMELINE = 6;
-    private static final int ITEM_TRENDING = 7;
-    private static final int ITEM_BLOG = 8;
-    private static final List<DrawerAdapter.Item> DRAWER_ITEMS = Arrays.asList(
-        new DrawerAdapter.SectionHeaderItem(R.string.navigation),
-        new DrawerAdapter.EntryItem(R.string.my_issues, 0, ITEM_ISSUES),
-        new DrawerAdapter.EntryItem(R.string.my_pull_requests, 0, ITEM_PULLREQUESTS),
-        new DrawerAdapter.EntryItem(R.string.search, 0, ITEM_SEARCH),
-        new DrawerAdapter.EntryItem(R.string.bookmarks, 0, ITEM_BOOKMARKS),
-        new DrawerAdapter.DividerItem(),
-        new DrawerAdapter.SectionHeaderItem(R.string.explore),
-        new DrawerAdapter.EntryItem(R.string.pub_timeline, 0, ITEM_TIMELINE),
-        new DrawerAdapter.EntryItem(R.string.trend, 0, ITEM_TRENDING),
-        new DrawerAdapter.EntryItem(R.string.blog, 0, ITEM_BLOG),
-        new DrawerAdapter.DividerItem(),
-        new DrawerAdapter.EntryItem(R.string.settings, 0, ITEM_SETTINGS)
-    );
 
     private LoaderCallbacks<Boolean> mIsFollowingCallback = new LoaderCallbacks<Boolean>() {
         @Override
@@ -94,7 +62,6 @@ public class UserActivity extends BasePagerActivity {
         mUserLogin = data.getString(Constants.User.LOGIN);
         mUserName = data.getString(Constants.User.NAME);
         mIsSelf = mUserLogin.equals(Gh4Application.get().getAuthLogin());
-        mIsTopLevelMode = mIsSelf && data.getBoolean(EXTRA_TOPLEVEL_MODE, false);
 
         super.onCreate(savedInstanceState);
         if (hasErrorView()) {
@@ -102,65 +69,16 @@ public class UserActivity extends BasePagerActivity {
         }
 
         ActionBar actionBar = getSupportActionBar();
-        if (mIsTopLevelMode) {
-            actionBar.setDisplayShowHomeEnabled(true);
-            actionBar.setHomeButtonEnabled(true);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        } else {
-            actionBar.setTitle(mUserLogin);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            if (Gh4Application.get().isAuthorized()) {
-                getSupportLoaderManager().initLoader(4, null, mIsFollowingCallback);
-            }
+        actionBar.setTitle(mUserLogin);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        if (!mIsSelf && Gh4Application.get().isAuthorized()) {
+            getSupportLoaderManager().initLoader(4, null, mIsFollowingCallback);
         }
-    }
-
-    @Override
-    protected ListAdapter getNavigationDrawerAdapter() {
-        if (mIsTopLevelMode) {
-            return new DrawerAdapter(this, DRAWER_ITEMS);
-        }
-        return super.getNavigationDrawerAdapter();
-    }
-
-    @Override
-    protected boolean onDrawerItemSelected(int position) {
-        switch (DRAWER_ITEMS.get(position).getId()) {
-            case ITEM_SETTINGS:
-                startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
-                return true;
-            case ITEM_SEARCH:
-                startActivity(new Intent(this, SearchActivity.class));
-                return true;
-            case ITEM_BOOKMARKS:
-                startActivity(new Intent(this, BookmarkListActivity.class));
-                return true;
-            case ITEM_TIMELINE:
-                startActivity(new Intent(this, TimelineActivity.class));
-                return true;
-            case ITEM_BLOG:
-                startActivity(new Intent(this, BlogListActivity.class));
-                return true;
-            case ITEM_TRENDING:
-                startActivity(new Intent(this, TrendingActivity.class));
-                return true;
-            case ITEM_ISSUES:
-                Intent intent = new Intent(this, IssueListMineActivity.class);
-                intent.putExtra("type", "issue");
-                startActivity(intent);
-                return true;
-            case ITEM_PULLREQUESTS:
-                intent = new Intent(this, IssueListMineActivity.class);
-                intent.putExtra("type", "pr");
-                startActivity(intent);
-                return true;
-        }
-        return super.onDrawerItemSelected(position);
     }
 
     @Override
     protected int[] getTabTitleResIds() {
-        return mIsTopLevelMode ? TITLES_SELF : TITLES_OTHER;
+        return TAB_TITLES;
     }
 
     @Override
@@ -170,14 +88,6 @@ public class UserActivity extends BasePagerActivity {
                 mUserFragment = UserFragment.newInstance(mUserLogin, mUserName);
                 return mUserFragment;
             case 1:
-                if (mIsTopLevelMode) {
-                    mPrivateEventListFragment =
-                            PrivateEventListFragment.newInstance(mUserLogin);
-                    return mPrivateEventListFragment;
-                }
-                // else fall through: in non-toplevel mode, the public
-                // action fragment is at index 1
-            case 2:
                 mPublicEventListFragment =
                         PublicEventListFragment.newInstance(mUserLogin);
                 return mPublicEventListFragment;
@@ -187,9 +97,6 @@ public class UserActivity extends BasePagerActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (mIsTopLevelMode) {
-            return false;
-        }
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.user_menu, menu);
         return true;
@@ -199,8 +106,8 @@ public class UserActivity extends BasePagerActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem followAction = menu.findItem(R.id.follow);
         if (followAction != null) {
-            followAction.setVisible(!mIsSelf && Gh4Application.get().isAuthorized());
-            if (followAction.isVisible()) {
+            if (!mIsSelf && Gh4Application.get().isAuthorized()) {
+                followAction.setVisible(true);
                 if (mIsFollowing == null) {
                     MenuItemCompat.setActionView(followAction, R.layout.ab_loading);
                     MenuItemCompat.expandActionView(followAction);
@@ -209,23 +116,12 @@ public class UserActivity extends BasePagerActivity {
                 } else {
                     followAction.setTitle(R.string.user_follow_action);
                 }
+            } else {
+                followAction.setVisible(false);
             }
         }
 
         return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_SETTINGS) {
-            if (data.getBooleanExtra(SettingsActivity.RESULT_EXTRA_THEME_CHANGED, false)
-                    || data.getBooleanExtra(SettingsActivity.RESULT_EXTRA_AUTH_CHANGED, false)) {
-                goToToplevelActivity(false);
-                finish();
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
     }
 
     @Override
@@ -270,9 +166,6 @@ public class UserActivity extends BasePagerActivity {
     public void onRefresh() {
         if (mUserFragment != null) {
             mUserFragment.refresh();
-        }
-        if (mPrivateEventListFragment != null) {
-            mPrivateEventListFragment.refresh();
         }
         if (mPublicEventListFragment != null) {
             mPublicEventListFragment.refresh();

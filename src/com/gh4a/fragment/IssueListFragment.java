@@ -15,7 +15,10 @@
  */
 package com.gh4a.fragment;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.egit.github.core.Issue;
@@ -24,6 +27,7 @@ import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.IssueService;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -37,6 +41,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.IssueActivity;
 import com.gh4a.activities.IssueEditActivity;
+import com.gh4a.adapter.DrawerAdapter;
 import com.gh4a.adapter.IssueAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.shamanland.fab.FloatingActionButton;
@@ -153,5 +158,100 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> implements
         intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.NAME, mRepoName);
         startActivityForResult(intent, REQUEST_ISSUE_CREATE);
+    }
+
+    public static class SortDrawerAdapter extends DrawerAdapter {
+        private String mSortMode;
+        private boolean mSortAscending;
+        private List<Item> mItems;
+
+        private static final String SORT_MODE_CREATED = "created";
+        private static final String SORT_MODE_UPDATED = "updated";
+        private static final String SORT_MODE_COMMENTS = "comments";
+
+        private static final int ITEM_SORT_FIRST = 1000;
+        private static final int ITEM_SORT_CREATED_DESC = ITEM_SORT_FIRST;
+        private static final int ITEM_SORT_CREATED_ASC = ITEM_SORT_FIRST + 1;
+        private static final int ITEM_SORT_UPDATED_DESC = ITEM_SORT_FIRST + 2;
+        private static final int ITEM_SORT_UPDATED_ASC = ITEM_SORT_FIRST + 3;
+        private static final int ITEM_SORT_COMMENTS_DESC = ITEM_SORT_FIRST + 4;
+        private static final int ITEM_SORT_COMMENTS_ASC = ITEM_SORT_FIRST + 5;
+
+        private static final List<DrawerAdapter.Item> DRAWER_ITEMS = Arrays.asList(
+            new DrawerAdapter.SectionHeaderItem(R.string.issue_sort_order),
+            new DrawerAdapter.RadioItem(R.string.issue_sort_created_desc, ITEM_SORT_CREATED_DESC),
+            new DrawerAdapter.RadioItem(R.string.issue_sort_created_asc, ITEM_SORT_CREATED_ASC),
+            new DrawerAdapter.RadioItem(R.string.issue_sort_updated_desc, ITEM_SORT_UPDATED_DESC),
+            new DrawerAdapter.RadioItem(R.string.issue_sort_updated_asc, ITEM_SORT_UPDATED_ASC),
+            new DrawerAdapter.RadioItem(R.string.issue_sort_comments_desc, ITEM_SORT_COMMENTS_DESC),
+            new DrawerAdapter.RadioItem(R.string.issue_sort_comments_asc, ITEM_SORT_COMMENTS_ASC)
+        );
+
+
+        public static SortDrawerAdapter create(Context context) {
+            return new SortDrawerAdapter(context, new ArrayList<>(DRAWER_ITEMS));
+        }
+
+        private SortDrawerAdapter(Context context, List<Item> items) {
+            super(context, items);
+            mSortMode = SORT_MODE_CREATED;
+            mSortAscending = false;
+            mItems = items;
+            updateItemState(ITEM_SORT_CREATED_DESC);
+        }
+
+        public String getSortMode() {
+            return mSortMode;
+        }
+
+        public String getSortDirection() {
+            return mSortAscending ? "asc" : "desc";
+        }
+
+        public void addItems(List<Item> items) {
+            mItems.addAll(items);
+            notifyDataSetChanged();
+        }
+
+        public boolean handleSortModeChange(int position) {
+            int id = (int) getItemId(position);
+            switch (id) {
+                case ITEM_SORT_CREATED_ASC:
+                    updateSortMode(SORT_MODE_CREATED, true, id);
+                    return true;
+                case ITEM_SORT_CREATED_DESC:
+                    updateSortMode(SORT_MODE_CREATED, false, id);
+                    return true;
+                case ITEM_SORT_UPDATED_ASC:
+                    updateSortMode(SORT_MODE_UPDATED, true, id);
+                    return true;
+                case ITEM_SORT_UPDATED_DESC:
+                    updateSortMode(SORT_MODE_UPDATED, false, id);
+                    return true;
+                case ITEM_SORT_COMMENTS_ASC:
+                    updateSortMode(SORT_MODE_COMMENTS, true, id);
+                    return true;
+                case ITEM_SORT_COMMENTS_DESC:
+                    updateSortMode(SORT_MODE_COMMENTS, false, id);
+                    return true;
+            }
+
+            return false;
+        }
+
+        protected void updateSortMode(String sortMode, boolean ascending, int itemId) {
+            updateItemState(itemId);
+            mSortAscending = ascending;
+            mSortMode = sortMode;
+        }
+
+        private void updateItemState(int activeItemId) {
+            for (DrawerAdapter.Item item : mItems) {
+                if (item.getId() >= ITEM_SORT_FIRST) {
+                    ((DrawerAdapter.RadioItem) item).setChecked(item.getId() == activeItemId);
+                }
+            }
+            notifyDataSetChanged();
+        }
     }
 }

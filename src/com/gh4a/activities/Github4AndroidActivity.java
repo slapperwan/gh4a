@@ -98,12 +98,12 @@ public class Github4AndroidActivity extends BaseActivity {
     }
 
     @Override
-    protected ListAdapter getNavigationDrawerAdapter() {
+    protected ListAdapter getLeftNavigationDrawerAdapter() {
         return new DrawerAdapter(this, DRAWER_ITEMS);
     }
 
     @Override
-    protected boolean onDrawerItemSelected(int position) {
+    protected boolean onDrawerItemSelected(boolean left, int position) {
         switch (DRAWER_ITEMS.get(position).getId()) {
             case ITEM_SETTINGS:
                 startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
@@ -124,7 +124,7 @@ public class Github4AndroidActivity extends BaseActivity {
                 startActivity(new Intent(this, TrendingActivity.class));
                 return true;
         }
-        return super.onDrawerItemSelected(position);
+        return super.onDrawerItemSelected(left, position);
     }
 
     @Override

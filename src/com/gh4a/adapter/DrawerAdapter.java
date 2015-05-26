@@ -44,10 +44,15 @@ public class DrawerAdapter extends BaseAdapter {
 
     public static class EntryItem extends Item {
         private final int mIconResId;
+        private boolean mSelected = false;
 
         public EntryItem(int titleResId, int iconResId, int id) {
             super(titleResId, id);
             mIconResId = iconResId;
+        }
+
+        public void setSelected(boolean selected) {
+            mSelected = selected;
         }
 
         @Override
@@ -104,7 +109,7 @@ public class DrawerAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return position;
+        return mItems.get(position).getId();
     }
 
     @Override
@@ -140,6 +145,11 @@ public class DrawerAdapter extends BaseAdapter {
         TextView title = (TextView) convertView.findViewById(R.id.title);
         if (title != null) {
             title.setText(item.mTitleResId);
+        }
+
+        if (item instanceof EntryItem) {
+            boolean selected = ((EntryItem) item).mSelected;
+            convertView.setSelected(selected);
         }
 
         if (item instanceof RadioItem) {

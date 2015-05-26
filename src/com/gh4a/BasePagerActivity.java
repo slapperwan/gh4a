@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
@@ -16,6 +17,7 @@ import com.gh4a.widget.SwipeRefreshLayout;
 public abstract class BasePagerActivity extends BaseActivity implements
         SwipeRefreshLayout.ChildScrollDelegate, ViewPager.OnPageChangeListener {
     private FragmentAdapter mAdapter;
+    private SlidingTabLayout mTabs;
     private ViewPager mPager;
     private int[][] mTabHeaderColors;
     private boolean mScrolling;
@@ -34,12 +36,25 @@ public abstract class BasePagerActivity extends BaseActivity implements
         updateHeaderColor(0, 0);
 
         mPager = setupPager();
+        updateTabVisibility();
 
         setChildScrollDelegate(this);
     }
 
     protected void invalidateFragments() {
         mAdapter.notifyDataSetChanged();
+    }
+
+    protected void invalidateTabs() {
+        invalidateFragments();
+        mTabHeaderColors = getTabHeaderColors();
+        if (mTabHeaderColors != null) {
+            updateHeaderColor(0, 0);
+        } else {
+            transitionHeaderToColor(R.attr.colorPrimary, R.attr.colorPrimaryDark);
+        }
+        mTabs.setViewPager(mPager);
+        updateTabVisibility();
     }
 
     protected ViewPager getPager() {
@@ -60,35 +75,38 @@ public abstract class BasePagerActivity extends BaseActivity implements
     }
 
     private ViewPager setupPager() {
-        int[] titleResIds = getTabTitleResIds();
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(mAdapter);
 
-        // We never have many pages, make sure to keep them all alive
-        pager.setOffscreenPageLimit(titleResIds.length - 1);
+        mTabs = new SlidingTabLayout(this);
+        mTabs.setSelectedIndicatorColors(getResources().getColor(R.color.tab_indicator_color));
+        mTabs.setCustomTabView(R.layout.tab_indicator, R.id.tab_title);
+        mTabs.setFillContainer(true);
+        mTabs.setViewPager(pager);
+        mTabs.setOnPageChangeListener(this);
 
-        if (titleResIds.length > 1) {
-            SlidingTabLayout tabs = new SlidingTabLayout(this);
-            tabs.setSelectedIndicatorColors(getResources().getColor(R.color.tab_indicator_color));
-            tabs.setCustomTabView(R.layout.tab_indicator, R.id.tab_title);
-            tabs.setFillContainer(true);
-            tabs.setViewPager(pager);
-            tabs.setOnPageChangeListener(this);
-
-            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                Toolbar toolBar = (Toolbar) findViewById(R.id.toolbar);
-                toolBar.addView(tabs, new Toolbar.LayoutParams(
-                        Toolbar.LayoutParams.WRAP_CONTENT,
-                        Toolbar.LayoutParams.MATCH_PARENT));
-            } else {
-                LinearLayout header = (LinearLayout) findViewById(R.id.header);
-                header.addView(tabs, new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT));
-            }
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            Toolbar toolBar = (Toolbar) findViewById(R.id.toolbar);
+            toolBar.addView(mTabs, new Toolbar.LayoutParams(
+                    Toolbar.LayoutParams.WRAP_CONTENT,
+                    Toolbar.LayoutParams.MATCH_PARENT));
+        } else {
+            LinearLayout header = (LinearLayout) findViewById(R.id.header);
+            header.addView(mTabs, new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT));
         }
 
         return pager;
+    }
+
+    private void updateTabVisibility() {
+        int[] titleResIds = getTabTitleResIds();
+
+        // We never have many pages, make sure to keep them all alive
+        mPager.setOffscreenPageLimit(titleResIds.length - 1);
+
+        mTabs.setVisibility(titleResIds.length > 1 ? View.VISIBLE : View.GONE);
     }
 
     protected abstract int[] getTabTitleResIds();

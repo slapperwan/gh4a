@@ -77,7 +77,7 @@
         android:layout_height="match_parent" />
 
     <LinearLayout
-        android:id="@+id/drawer"
+        android:id="@+id/left_drawer"
         android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="left"
@@ -85,7 +85,7 @@
         android:background="?attr/drawerBackground">
 
         <FrameLayout
-            android:id="@+id/drawer_title"
+            android:id="@+id/left_drawer_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="?attr/actionBarSize"
@@ -98,7 +98,39 @@
             android:background="?android:attr/listDivider" />
 
         <ListView
-            android:id="@+id/drawer_list"
+            android:id="@+id/left_drawer_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:choiceMode="singleChoice"
+            android:overScrollMode="never"
+            android:divider="@null"
+            android:dividerHeight="0dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/right_drawer"
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="right"
+        android:orientation="vertical"
+        android:background="?attr/drawerBackground">
+
+        <FrameLayout
+            android:id="@+id/right_drawer_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize"
+            android:background="?attr/colorPrimary" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="7dp"
+            android:background="?android:attr/listDivider" />
+
+        <ListView
+            android:id="@+id/right_drawer_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:choiceMode="singleChoice"

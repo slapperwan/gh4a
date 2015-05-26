@@ -1,0 +1,142 @@
+package com.gh4a.activities.home;
+
+import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.ListAdapter;
+
+import com.gh4a.Constants;
+import com.gh4a.R;
+import com.gh4a.fragment.IssueListFragment;
+import com.gh4a.fragment.RepositoryIssueListFragment;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class IssueListFactory extends FragmentFactory {
+    private static final String QUERY = "is:%s is:%s %s:%s";
+
+    private static final int[] TAB_TITLES = new int[] {
+            R.string.created, R.string.assigned, R.string.mentioned
+    };
+
+    protected static final String SORT_MODE_CREATED = "created";
+    protected static final String SORT_MODE_UPDATED = "updated";
+    protected static final String SORT_MODE_COMMENTS = "comments";
+
+    private String mState;
+    private String mLogin;
+    private boolean mIsPullRequest;
+    private IssueListFragment.SortDrawerAdapter mDrawerAdapter;
+
+    public IssueListFactory(HomeActivity activity, String userLogin, boolean pr) {
+        super(activity);
+        mLogin = userLogin;
+        mState = Constants.Issue.STATE_OPEN;
+        mIsPullRequest = pr;
+    }
+
+    @Override
+    protected int getTitleResId() {
+        if (Constants.Issue.STATE_OPEN.equals(mState)) {
+            return mIsPullRequest ? R.string.pull_requests_open : R.string.issues_open;
+        } else {
+            return mIsPullRequest ? R.string.pull_requests_closed : R.string.issues_closed;
+        }
+    }
+
+    @Override
+    protected int[] getTabTitleResIds() {
+        return TAB_TITLES;
+    }
+
+    @Override
+    protected Fragment getFragment(int position) {
+        Map<String, String> filterData = new HashMap<>();
+        filterData.put("sort", mDrawerAdapter.getSortMode());
+        filterData.put("order", mDrawerAdapter.getSortDirection());
+
+        final String action;
+        if (position == 1) {
+            action = "assignee";
+        } else if (position == 2) {
+            action = "mentions";
+        } else {
+            action = "author";
+        }
+
+        filterData.put("q", String.format(QUERY, mIsPullRequest ? "pr" : "issue",
+                mState, action, mLogin));
+
+        return RepositoryIssueListFragment.newInstance(filterData);
+    }
+
+    @Override
+    protected void onRefreshFragment(Fragment fragment) {
+        ((RepositoryIssueListFragment) fragment).refresh();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        int resIdState = Constants.Issue.STATE_OPEN.equals(mState) ?
+                R.string.issues_menu_show_closed : R.string.issues_menu_show_open;
+        MenuItem item = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, resIdState);
+        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+
+        item = menu.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, R.string.actions)
+                .setIcon(R.drawable.abc_ic_menu_moreoverflow_mtrl_alpha);
+        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case Menu.FIRST:
+                toggleStateFilter();
+                return true;
+            case Menu.FIRST + 1:
+                mActivity.toggleToolDrawer();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected ListAdapter getToolDrawerAdapter() {
+        mDrawerAdapter = IssueListFragment.SortDrawerAdapter.create(mActivity);
+        return mDrawerAdapter;
+    }
+
+    @Override
+    protected boolean onDrawerItemSelected(int position) {
+        if (mDrawerAdapter.handleSortModeChange(position)) {
+            reloadIssueList();
+            return true;
+        }
+        return false;
+    }
+
+    private void reloadIssueList() {
+        mActivity.invalidateFragments();
+    }
+
+    private void toggleStateFilter() {
+        mState = Constants.Issue.STATE_CLOSED.equals(mState)
+                ? Constants.Issue.STATE_OPEN : Constants.Issue.STATE_CLOSED;
+        reloadIssueList();
+        updateHeaderColor();
+        mActivity.invalidateTitle();
+    }
+
+    private void updateHeaderColor() {
+        boolean showingClosed = Constants.Issue.STATE_CLOSED.equals(mState);
+        int headerColorAttrId = showingClosed
+                ? R.attr.colorIssueClosed : R.attr.colorIssueOpen;
+        int statusBarColorAttrId = showingClosed
+                ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark;
+        mActivity.transitionHeaderToColor(headerColorAttrId, statusBarColorAttrId);
+    }
+}

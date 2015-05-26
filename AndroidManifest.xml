@@ -54,7 +54,6 @@
         <activity android:name=".activities.IssueEditActivity" android:exported="false" />
         <activity android:name=".activities.IssueLabelListActivity" android:exported="false" />
         <activity android:name=".activities.IssueListActivity" android:exported="false" />
-        <activity android:name=".activities.IssueListMineActivity" android:exported="false" />
         <activity android:name=".activities.IssueMilestoneEditActivity" android:exported="false" />
         <activity android:name=".activities.IssueMilestoneListActivity" android:exported="false" />
         <activity android:name=".activities.OrganizationMemberListActivity" android:exported="false" />
@@ -72,6 +71,7 @@
         <activity android:name=".activities.WatcherListActivity" android:exported="false" />
         <activity android:name=".activities.WikiActivity" android:exported="false" />
         <activity android:name=".activities.WikiListActivity" android:exported="false" />
+        <activity android:name=".activities.home.HomeActivity" android:exported="false" />
 
         <activity
             android:name=".activities.SettingsActivity"
