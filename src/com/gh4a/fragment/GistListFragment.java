@@ -58,7 +58,6 @@ public class GistListFragment extends ListDataBaseFragment<Gist> {
 
     @Override
     protected void onItemClick(Gist gist) {
-        startActivity(IntentUtils.getGistActivityIntent(getActivity(),
-                gist.getUser().getLogin(), gist.getId()));
+        startActivity(IntentUtils.getGistActivityIntent(getActivity(), mUserLogin, gist.getId()));
     }
 }
