@@ -5,6 +5,8 @@
     <attr name="cardViewTheme" format="reference" />
     <attr name="listBackground" format="reference" />
     <attr name="drawerBackground" format="reference" />
+    <attr name="drawerEntryBackground" format="reference" />
+    <attr name="drawerEntryTextColor" format="color" />
     <attr name="colorIssueOpen" format="color" />
     <attr name="colorIssueClosed" format="color" />
     <attr name="colorPullRequestMerged" format="color" />

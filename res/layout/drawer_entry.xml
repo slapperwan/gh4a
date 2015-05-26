@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.gh4a.widget.StyleableTextView
+<com.gh4a.widget.ActivatableStyledTextView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/title"
@@ -7,7 +7,8 @@
     android:layout_height="48dp"
     android:gravity="center_vertical"
     android:paddingLeft="16dp"
+    android:background="?attr/drawerEntryBackground"
     android:textAppearance="?android:attr/textAppearanceMedium"
-    android:textColor="?android:attr/textColorPrimary"
+    android:textColor="?attr/drawerEntryTextColor"
     android:textSize="14sp"
     app:font="medium" />

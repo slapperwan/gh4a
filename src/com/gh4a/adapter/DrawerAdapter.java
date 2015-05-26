@@ -1,10 +1,12 @@
 package com.gh4a.adapter;
 
 import android.content.Context;
+import android.support.v4.view.ViewCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Checkable;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
@@ -147,9 +149,9 @@ public class DrawerAdapter extends BaseAdapter {
             title.setText(item.mTitleResId);
         }
 
-        if (item instanceof EntryItem) {
+        if (item instanceof EntryItem && convertView instanceof Checkable) {
             boolean selected = ((EntryItem) item).mSelected;
-            convertView.setSelected(selected);
+            ((Checkable) convertView).setChecked(selected);
         }
 
         if (item instanceof RadioItem) {

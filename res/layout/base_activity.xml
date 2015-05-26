@@ -101,7 +101,7 @@
             android:id="@+id/left_drawer_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:choiceMode="singleChoice"
+            android:choiceMode="none"
             android:overScrollMode="never"
             android:divider="@null"
             android:dividerHeight="0dp" />

@@ -40,6 +40,7 @@ public class HomeActivity extends BasePagerActivity implements
 
     private FragmentFactory mFactory;
     private SparseArray<Fragment> mFragments;
+    private DrawerAdapter mDrawerAdapter;
     private ImageView mAvatarView;
     private String mUserLogin;
     private int mSelectedFactoryId;
@@ -130,7 +131,8 @@ public class HomeActivity extends BasePagerActivity implements
 
     @Override
     protected ListAdapter getLeftNavigationDrawerAdapter() {
-        return new DrawerAdapter(this, DRAWER_ITEMS);
+        mDrawerAdapter = new DrawerAdapter(this, DRAWER_ITEMS);
+        return mDrawerAdapter;
     }
 
     @Override
@@ -218,6 +220,7 @@ public class HomeActivity extends BasePagerActivity implements
     @Override
     protected void onStart() {
         super.onStart();
+        updateDrawerSelectionState();
         mStarted = true;
         mFactory.onStart();
     }
@@ -325,7 +328,9 @@ public class HomeActivity extends BasePagerActivity implements
     private void switchTo(int itemId, FragmentFactory factory) {
         mFactory = factory;
         mSelectedFactoryId = itemId;
+
         updateRightNavigationDrawer();
+        updateDrawerSelectionState();
         super.supportInvalidateOptionsMenu();
         getSupportFragmentManager().popBackStackImmediate(null,
                 FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -334,5 +339,16 @@ public class HomeActivity extends BasePagerActivity implements
         if (mStarted) {
             mFactory.onStart();
         }
+    }
+
+    private void updateDrawerSelectionState() {
+        for (int i = 0; i < mDrawerAdapter.getCount(); i++) {
+            Object item = mDrawerAdapter.getItem(i);
+            if (item instanceof DrawerAdapter.EntryItem) {
+                DrawerAdapter.EntryItem dei = (DrawerAdapter.EntryItem) item;
+                dei.setSelected(dei.getId() == mSelectedFactoryId);
+            }
+        }
+        mDrawerAdapter.notifyDataSetChanged();
     }
 }
