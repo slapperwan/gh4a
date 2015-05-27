@@ -32,11 +32,18 @@ import com.gh4a.R;
  * (status and navigation bars, overlay action bars).
  */
 public class ScrimInsetsFrameLayout extends FrameLayout {
-    private Drawable mInsetForeground;
+    private static final int EDGE_MASK_TOP = 1 << 0;
+    private static final int EDGE_MASK_BOTTOM = 1 << 1;
+    private static final int EDGE_MASK_LEFT = 1 << 2;
+    private static final int EDGE_MASK_RIGHT = 1 << 3;
+    private static final int ALL_EDGE_MASK =
+            EDGE_MASK_TOP | EDGE_MASK_BOTTOM | EDGE_MASK_LEFT | EDGE_MASK_RIGHT;
 
+    private Drawable mInsetForeground;
     private Rect mInsets;
     private Rect mTempRect = new Rect();
     private OnInsetsCallback mOnInsetsCallback;
+    private int mEdgeMask = ALL_EDGE_MASK;
 
     public ScrimInsetsFrameLayout(Context context) {
         super(context);
@@ -59,6 +66,7 @@ public class ScrimInsetsFrameLayout extends FrameLayout {
         if (a == null) {
             return;
         }
+        mEdgeMask = a.getInt(R.styleable.ScrimInsetsView_consumedEdges, ALL_EDGE_MASK);
         setInsetForeground(a.getDrawable(R.styleable.ScrimInsetsView_insetForeground));
         a.recycle();
 
@@ -89,7 +97,25 @@ public class ScrimInsetsFrameLayout extends FrameLayout {
         if (mOnInsetsCallback != null) {
             mOnInsetsCallback.onInsetsChanged(this, insets);
         }
-        return true; // consume insets
+        if (mEdgeMask == ALL_EDGE_MASK) {
+            return true; // consume all insets
+        }
+
+        // consume insets selectively
+        if ((mEdgeMask & EDGE_MASK_TOP) != 0) {
+            insets.top = 0;
+        }
+        if ((mEdgeMask & EDGE_MASK_BOTTOM) != 0) {
+            insets.bottom = 0;
+        }
+        if ((mEdgeMask & EDGE_MASK_LEFT) != 0) {
+            insets.left = 0;
+        }
+        if ((mEdgeMask & EDGE_MASK_RIGHT) != 0) {
+            insets.right = 0;
+        }
+
+        return super.fitSystemWindows(insets);
     }
 
     @Override
