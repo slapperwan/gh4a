@@ -4,140 +4,166 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawer_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
-    <LinearLayout
+    <com.gh4a.widget.ScrimInsetsFrameLayout
+        android:id="@+id/inset_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:fitsSystemWindows="true">
 
         <LinearLayout
-            android:id="@+id/header"
+            android:id="@+id/content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="?attr/colorPrimary"
-            android:animateLayoutChanges="true"
-            android:elevation="2dp">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
+            <LinearLayout
+                android:id="@+id/header"
                 android:layout_width="match_parent"
-                android:layout_height="?actionBarSize"
-                android:theme="?attr/actionBarTheme"
-                app:popupTheme="?attr/actionBarPopupTheme" />
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="?attr/colorPrimary"
+                android:animateLayoutChanges="true"
+                android:elevation="2dp">
+
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?actionBarSize"
+                    android:theme="?attr/actionBarTheme"
+                    app:popupTheme="?attr/actionBarPopupTheme" />
+
+            </LinearLayout>
+
+            <com.gh4a.widget.SwipeRefreshLayout
+                android:id="@+id/swipe_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:foreground="@drawable/header_shadow">
+
+                    <fr.castorflex.android.smoothprogressbar.SmoothProgressBar
+                        android:id="@+id/progress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:indeterminate="true"
+                        android:visibility="gone"
+                        app:spb_sections_count="6"
+                        app:spb_speed="1.0"
+                        app:spb_progressiveStart_activated="true"
+                        app:spb_progressiveStart_speed="1.5"
+                        app:spb_progressiveStop_speed="3.4"
+                        app:spb_interpolator="spb_interpolator_acceleratedecelerate" />
+
+                    <com.gh4a.widget.StyleableTextView
+                        android:id="@android:id/empty"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:visibility="gone"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                    <FrameLayout
+                        android:id="@+id/content_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                </FrameLayout>
+
+            </com.gh4a.widget.SwipeRefreshLayout>
 
         </LinearLayout>
 
-        <com.gh4a.widget.SwipeRefreshLayout
-            android:id="@+id/swipe_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:foreground="@drawable/header_shadow">
-
-                <fr.castorflex.android.smoothprogressbar.SmoothProgressBar
-                    android:id="@+id/progress"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:indeterminate="true"
-                    android:visibility="gone"
-                    app:spb_sections_count="6"
-                    app:spb_speed="1.0"
-                    app:spb_progressiveStart_activated="true"
-                    app:spb_progressiveStart_speed="1.5"
-                    app:spb_progressiveStop_speed="3.4"
-                    app:spb_interpolator="spb_interpolator_acceleratedecelerate" />
-
-                <com.gh4a.widget.StyleableTextView
-                    android:id="@android:id/empty"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:visibility="gone"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                <FrameLayout
-                    android:id="@+id/content_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-            </FrameLayout>
-
-        </com.gh4a.widget.SwipeRefreshLayout>
-
-    </LinearLayout>
+    </com.gh4a.widget.ScrimInsetsFrameLayout>
 
     <FrameLayout
         android:id="@+id/overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <LinearLayout
-        android:id="@+id/left_drawer"
-        android:layout_width="300dp"
+    <com.gh4a.widget.ScrimInsetsFrameLayout
+        android:id="@+id/left_drawer_container"
+        android:layout_width="@dimen/nav_drawer_width"
         android:layout_height="match_parent"
         android:layout_gravity="left"
-        android:orientation="vertical"
-        android:background="?attr/drawerBackground">
+        android:background="?attr/drawerBackground"
+        android:fitsSystemWindows="true">
 
-        <FrameLayout
-            android:id="@+id/left_drawer_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="?attr/actionBarSize"
-            android:background="?attr/colorPrimary" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="7dp"
-            android:background="?android:attr/listDivider" />
-
-        <ListView
-            android:id="@+id/left_drawer_list"
+        <LinearLayout
+            android:id="@+id/left_drawer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:choiceMode="none"
-            android:overScrollMode="never"
-            android:divider="@null"
-            android:dividerHeight="0dp" />
+            android:orientation="vertical">
 
-    </LinearLayout>
+            <FrameLayout
+                android:id="@+id/left_drawer_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/actionBarSize"
+                android:background="?attr/colorPrimary" />
 
-    <LinearLayout
-        android:id="@+id/right_drawer"
-        android:layout_width="300dp"
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="7dp"
+                android:background="?android:attr/listDivider" />
+
+            <ListView
+                android:id="@+id/left_drawer_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:choiceMode="none"
+                android:overScrollMode="never"
+                android:divider="@null"
+                android:dividerHeight="0dp" />
+
+        </LinearLayout>
+
+    </com.gh4a.widget.ScrimInsetsFrameLayout>
+
+    <com.gh4a.widget.ScrimInsetsFrameLayout
+        android:id="@+id/right_drawer_container"
+        android:layout_width="@dimen/nav_drawer_width"
         android:layout_height="match_parent"
         android:layout_gravity="right"
-        android:orientation="vertical"
-        android:background="?attr/drawerBackground">
+        android:background="?attr/drawerBackground"
+        android:fitsSystemWindows="true">
 
-        <FrameLayout
-            android:id="@+id/right_drawer_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="?attr/actionBarSize"
-            android:background="?attr/colorPrimary" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="7dp"
-            android:background="?android:attr/listDivider" />
-
-        <ListView
-            android:id="@+id/right_drawer_list"
+        <LinearLayout
+            android:id="@+id/right_drawer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:choiceMode="singleChoice"
-            android:overScrollMode="never"
-            android:divider="@null"
-            android:dividerHeight="0dp" />
+            android:orientation="vertical">
 
-    </LinearLayout>
+            <FrameLayout
+                android:id="@+id/right_drawer_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/actionBarSize"
+                android:background="?attr/colorPrimary" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="7dp"
+                android:background="?android:attr/listDivider" />
+
+            <ListView
+                android:id="@+id/right_drawer_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:choiceMode="singleChoice"
+                android:overScrollMode="never"
+                android:divider="@null"
+                android:dividerHeight="0dp" />
+
+        </LinearLayout>
+
+    </com.gh4a.widget.ScrimInsetsFrameLayout>
 
 </android.support.v4.widget.DrawerLayout>

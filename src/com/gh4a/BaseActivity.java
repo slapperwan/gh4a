@@ -20,7 +20,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.drawable.Drawable;
+import android.graphics.Rect;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -36,7 +36,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
@@ -52,17 +51,22 @@ import com.gh4a.db.BookmarksProvider;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ColorDrawable;
+import com.gh4a.widget.ScrimInsetsFrameLayout;
 import com.gh4a.widget.SwipeRefreshLayout;
+import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ArgbEvaluator;
 import com.nineoldandroids.animation.ObjectAnimator;
 import com.shamanland.fab.FloatingActionButton;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 public abstract class BaseActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener, DrawerLayout.DrawerListener,
-        ListView.OnItemClickListener {
+        ListView.OnItemClickListener, ScrimInsetsFrameLayout.OnInsetsCallback {
     private ViewGroup mContentContainer;
     private TextView mEmptyView;
     private boolean mContentShown;
@@ -74,13 +78,13 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private SmoothProgressBar mProgress;
     private SwipeRefreshLayout mSwipeLayout;
     private DrawerLayout mDrawerLayout;
+    private ScrimInsetsFrameLayout mInsetsLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private boolean mHasErrorView = false;
     private View mLeftDrawer;
 
-    private ColorDrawable mHeaderBackground;
-    private ColorDrawable mLeftDrawerTitleBackground;
-    private ColorDrawable mRightDrawerTitleBackground;
+    private final List<ColorDrawable> mHeaderDrawables = new ArrayList<>();
+    private final List<ColorDrawable> mStatusBarDrawables = new ArrayList<>();
 
     private ViewTreeObserver.OnGlobalLayoutListener mOverlayLayoutListener =
             new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -99,9 +103,16 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
         if (isOnline()) {
             super.setContentView(R.layout.base_activity);
-            setupHeaderDrawable();
+
+            mInsetsLayout = (ScrimInsetsFrameLayout) findViewById(R.id.inset_layout);
+            mInsetsLayout.setOnInsetsCallback(this);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().setStatusBarColor(0);
+            }
+
             setupSwipeToRefresh();
             setupNavigationDrawer();
+            setupHeaderDrawable();
         } else {
             setErrorView();
         }
@@ -204,34 +215,26 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     protected void setHeaderColor(int color, int statusBarColor) {
-        mHeaderBackground.setColor(color);
-        mLeftDrawerTitleBackground.setColor(color);
-        mRightDrawerTitleBackground.setColor(color);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(statusBarColor);
+        for (ColorDrawable d : mHeaderDrawables) {
+            d.setColor(color);
+        }
+        for (ColorDrawable d : mStatusBarDrawables) {
+            d.setColor(statusBarColor);
         }
     }
 
     public void transitionHeaderToColor(int colorAttrId, int statusBarColorAttrId) {
         final AnimatorSet animation = new AnimatorSet();
+        List<Animator> animators = new ArrayList<>();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            final Window window = getWindow();
-            final ObjectAnimator statusBarAnimation = ObjectAnimator.ofInt(window,
-                    "statusBarColor", window.getStatusBarColor(),
-                    UiUtils.resolveColor(this, statusBarColorAttrId));
-            statusBarAnimation.setEvaluator(new ArgbEvaluator());
-
-            animation.playTogether(createColorTransition(mHeaderBackground, colorAttrId),
-                    createColorTransition(mLeftDrawerTitleBackground, colorAttrId),
-                    createColorTransition(mRightDrawerTitleBackground, colorAttrId),
-                    statusBarAnimation);
-        } else {
-            animation.playTogether(createColorTransition(mHeaderBackground, colorAttrId),
-                    createColorTransition(mLeftDrawerTitleBackground, colorAttrId),
-                    createColorTransition(mRightDrawerTitleBackground, colorAttrId));
+        for (ColorDrawable d : mHeaderDrawables) {
+            animators.add(createColorTransition(d, colorAttrId));
+        }
+        for (ColorDrawable d : mStatusBarDrawables) {
+            animators.add(createColorTransition(d, statusBarColorAttrId));
         }
 
+        animation.playTogether(animators);
         animation.setDuration(200);
         animation.start();
     }
@@ -242,6 +245,11 @@ public abstract class BaseActivity extends AppCompatActivity implements
             ListView list = (ListView) findViewById(R.id.right_drawer_list);
             list.setAdapter(rightAdapter);
             list.setOnItemClickListener(this);
+
+            ScrimInsetsFrameLayout insetsLayout =
+                    (ScrimInsetsFrameLayout) findViewById(R.id.right_drawer_container);
+            insetsLayout.setOnInsetsCallback(this);
+
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.RIGHT);
         } else {
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.RIGHT);
@@ -401,6 +409,25 @@ public abstract class BaseActivity extends AppCompatActivity implements
         }
     }
 
+    @Override
+    public void onInsetsChanged(ScrimInsetsFrameLayout layout, Rect insets) {
+        final int childId, id = layout.getId();
+        if (id == R.id.inset_layout) {
+            childId = R.id.content;
+        } else if (id == R.id.left_drawer_container) {
+            childId = R.id.left_drawer;
+        } else if (id == R.id.right_drawer_container) {
+            childId = R.id.right_drawer;
+        } else {
+            return;
+        }
+
+        View child = findViewById(childId);
+        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) child.getLayoutParams();
+        lp.topMargin = insets.top;
+        child.setLayoutParams(lp);
+    }
+
     private void setErrorView() {
         mHasErrorView = true;
         super.setContentView(R.layout.error);
@@ -415,13 +442,16 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     private void setupHeaderDrawable() {
         int primaryColor = UiUtils.resolveColor(this, R.attr.colorPrimary);
-        mHeaderBackground = ColorDrawable.create(primaryColor);
-        mLeftDrawerTitleBackground = ColorDrawable.create(primaryColor);
-        mRightDrawerTitleBackground = ColorDrawable.create(primaryColor);
+        assignBackground(R.id.left_drawer_title, primaryColor);
+        assignBackground(R.id.right_drawer_title, primaryColor);
+        assignBackground(R.id.header, primaryColor);
 
-        assignBackground(R.id.left_drawer_title, mLeftDrawerTitleBackground);
-        assignBackground(R.id.right_drawer_title, mRightDrawerTitleBackground);
-        assignBackground(R.id.header, mHeaderBackground);
+        if (mInsetsLayout != null) {
+            int primaryDarkColor = UiUtils.resolveColor(this, R.attr.colorPrimaryDark);
+            assignInsetDrawable(R.id.inset_layout, primaryDarkColor);
+            assignInsetDrawable(R.id.left_drawer_container, primaryDarkColor);
+            assignInsetDrawable(R.id.right_drawer_container, primaryDarkColor);
+        }
     }
 
     private ObjectAnimator createColorTransition(ColorDrawable drawable, int colorAttrId) {
@@ -432,13 +462,22 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     @SuppressWarnings("deprecation")
-    private void assignBackground(int viewId, Drawable background) {
+    private void assignBackground(int viewId, int color) {
         View view = findViewById(viewId);
+        ColorDrawable background = ColorDrawable.create(color);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             view.setBackground(background);
         } else {
             view.setBackgroundDrawable(background);
         }
+        mHeaderDrawables.add(background);
+    }
+
+    private void assignInsetDrawable(int viewId, int color) {
+        ColorDrawable d = ColorDrawable.create(color);
+        ScrimInsetsFrameLayout view = (ScrimInsetsFrameLayout) findViewById(viewId);
+        view.setInsetForeground(d);
+        mStatusBarDrawables.add(d);
     }
 
     private void setupSwipeToRefresh() {
@@ -469,6 +508,10 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
             mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolBar, 0, 0);
             mDrawerLayout.setDrawerListener(this);
+
+            ScrimInsetsFrameLayout insetsLayout =
+                    (ScrimInsetsFrameLayout) findViewById(R.id.left_drawer_container);
+            insetsLayout.setOnInsetsCallback(this);
 
             ViewGroup title = (ViewGroup) findViewById(R.id.left_drawer_title);
             View view = getLeftDrawerTitle(title);
