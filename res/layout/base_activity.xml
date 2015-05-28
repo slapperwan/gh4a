@@ -94,12 +94,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="?attr/actionBarSize"
+            android:clickable="true"
             android:background="?attr/colorPrimary" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginBottom="7dp"
+            android:clickable="true"
             android:background="?android:attr/listDivider" />
 
         <ListView
@@ -127,12 +129,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="?attr/actionBarSize"
+            android:clickable="true"
             android:background="?attr/colorPrimary" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginBottom="7dp"
+            android:clickable="true"
             android:background="?android:attr/listDivider" />
 
         <ListView
