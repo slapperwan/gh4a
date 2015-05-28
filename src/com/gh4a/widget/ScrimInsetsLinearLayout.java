@@ -16,6 +16,7 @@
 
 package com.gh4a.widget;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -24,6 +25,7 @@ import android.graphics.drawable.Drawable;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import com.gh4a.R;
 
@@ -31,7 +33,7 @@ import com.gh4a.R;
  * A layout that draws something in the insets passed to {@link #fitSystemWindows(Rect)}, i.e. the area above UI chrome
  * (status and navigation bars, overlay action bars).
  */
-public class ScrimInsetsFrameLayout extends FrameLayout {
+public class ScrimInsetsLinearLayout extends LinearLayout {
     private static final int EDGE_MASK_TOP = 1 << 0;
     private static final int EDGE_MASK_BOTTOM = 1 << 1;
     private static final int EDGE_MASK_LEFT = 1 << 2;
@@ -45,17 +47,18 @@ public class ScrimInsetsFrameLayout extends FrameLayout {
     private OnInsetsCallback mOnInsetsCallback;
     private int mEdgeMask = ALL_EDGE_MASK;
 
-    public ScrimInsetsFrameLayout(Context context) {
+    public ScrimInsetsLinearLayout(Context context) {
         super(context);
         init(context, null, 0);
     }
 
-    public ScrimInsetsFrameLayout(Context context, AttributeSet attrs) {
+    public ScrimInsetsLinearLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs, 0);
     }
 
-    public ScrimInsetsFrameLayout(Context context, AttributeSet attrs, int defStyle) {
+    @TargetApi(11)
+    public ScrimInsetsLinearLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init(context, attrs, defStyle);
     }
@@ -179,6 +182,6 @@ public class ScrimInsetsFrameLayout extends FrameLayout {
     }
 
     public interface OnInsetsCallback {
-        void onInsetsChanged(ScrimInsetsFrameLayout layout, Rect insets);
+        void onInsetsChanged(ScrimInsetsLinearLayout layout, Rect insets);
     }
 }

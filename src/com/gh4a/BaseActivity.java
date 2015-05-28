@@ -51,7 +51,7 @@ import com.gh4a.db.BookmarksProvider;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ColorDrawable;
-import com.gh4a.widget.ScrimInsetsFrameLayout;
+import com.gh4a.widget.ScrimInsetsLinearLayout;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorSet;
@@ -66,7 +66,7 @@ import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 public abstract class BaseActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener, DrawerLayout.DrawerListener,
-        ListView.OnItemClickListener, ScrimInsetsFrameLayout.OnInsetsCallback {
+        ListView.OnItemClickListener, ScrimInsetsLinearLayout.OnInsetsCallback {
     private ViewGroup mContentContainer;
     private TextView mEmptyView;
     private boolean mContentShown;
@@ -78,7 +78,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private SmoothProgressBar mProgress;
     private SwipeRefreshLayout mSwipeLayout;
     private DrawerLayout mDrawerLayout;
-    private ScrimInsetsFrameLayout mInsetsLayout;
+    private ScrimInsetsLinearLayout mInsetsLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private boolean mHasErrorView = false;
     private View mLeftDrawer;
@@ -104,7 +104,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         if (isOnline()) {
             super.setContentView(R.layout.base_activity);
 
-            mInsetsLayout = (ScrimInsetsFrameLayout) findViewById(R.id.inset_layout);
+            mInsetsLayout = (ScrimInsetsLinearLayout) findViewById(R.id.inset_layout);
             mInsetsLayout.setOnInsetsCallback(this);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 getWindow().setStatusBarColor(0);
@@ -246,8 +246,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
             list.setAdapter(rightAdapter);
             list.setOnItemClickListener(this);
 
-            ScrimInsetsFrameLayout insetsLayout =
-                    (ScrimInsetsFrameLayout) findViewById(R.id.right_drawer_container);
+            ScrimInsetsLinearLayout insetsLayout =
+                    (ScrimInsetsLinearLayout) findViewById(R.id.right_drawer);
             insetsLayout.setOnInsetsCallback(this);
 
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.RIGHT);
@@ -410,19 +410,11 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onInsetsChanged(ScrimInsetsFrameLayout layout, Rect insets) {
+    public void onInsetsChanged(ScrimInsetsLinearLayout layout, Rect insets) {
         final int childId, id = layout.getId();
-        if (id == R.id.inset_layout) {
-            childId = R.id.content;
-        } else if (id == R.id.left_drawer_container) {
-            childId = R.id.left_drawer;
-        } else if (id == R.id.right_drawer_container) {
-            childId = R.id.right_drawer;
-        } else {
-            return;
-        }
 
-        View child = findViewById(childId);
+        // assumes vertical orientation, but that's true for all of our views
+        View child = layout.getChildAt(0);
         ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) child.getLayoutParams();
         lp.topMargin = insets.top;
         child.setLayoutParams(lp);
@@ -449,8 +441,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
         if (mInsetsLayout != null) {
             int primaryDarkColor = UiUtils.resolveColor(this, R.attr.colorPrimaryDark);
             assignInsetDrawable(R.id.inset_layout, primaryDarkColor);
-            assignInsetDrawable(R.id.left_drawer_container, primaryDarkColor);
-            assignInsetDrawable(R.id.right_drawer_container, primaryDarkColor);
+            assignInsetDrawable(R.id.left_drawer, primaryDarkColor);
+            assignInsetDrawable(R.id.right_drawer, primaryDarkColor);
         }
     }
 
@@ -475,7 +467,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     private void assignInsetDrawable(int viewId, int color) {
         ColorDrawable d = ColorDrawable.create(color);
-        ScrimInsetsFrameLayout view = (ScrimInsetsFrameLayout) findViewById(viewId);
+        ScrimInsetsLinearLayout view = (ScrimInsetsLinearLayout) findViewById(viewId);
         view.setInsetForeground(d);
         mStatusBarDrawables.add(d);
     }
@@ -509,8 +501,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
             mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolBar, 0, 0);
             mDrawerLayout.setDrawerListener(this);
 
-            ScrimInsetsFrameLayout insetsLayout =
-                    (ScrimInsetsFrameLayout) findViewById(R.id.left_drawer_container);
+            ScrimInsetsLinearLayout insetsLayout =
+                    (ScrimInsetsLinearLayout) findViewById(R.id.left_drawer);
             insetsLayout.setOnInsetsCallback(this);
 
             ViewGroup title = (ViewGroup) findViewById(R.id.left_drawer_title);
