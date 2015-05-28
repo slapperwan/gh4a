@@ -411,8 +411,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     @Override
     public void onInsetsChanged(ScrimInsetsLinearLayout layout, Rect insets) {
-        final int childId, id = layout.getId();
-
         // assumes vertical orientation, but that's true for all of our views
         View child = layout.getChildAt(0);
         ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) child.getLayoutParams();
