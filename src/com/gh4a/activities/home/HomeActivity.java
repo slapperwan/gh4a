@@ -220,7 +220,9 @@ public class HomeActivity extends BasePagerActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        updateDrawerSelectionState();
+        if (mDrawerAdapter != null) {
+            updateDrawerSelectionState();
+        }
         mStarted = true;
         mFactory.onStart();
     }
