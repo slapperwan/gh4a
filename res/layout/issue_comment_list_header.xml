@@ -45,6 +45,7 @@
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/content_padding"
         android:paddingBottom="@dimen/content_padding"
+        android:textIsSelectable="true"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="?android:attr/textColorPrimary" />
 
