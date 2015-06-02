@@ -59,6 +59,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="?android:attr/textColorPrimary"
+        android:textIsSelectable="true"
         android:layout_marginTop="2dp"
         android:layout_below="@id/tv_file"
         android:layout_toLeftOf="@id/iv_edit"

@@ -29,6 +29,7 @@
         android:paddingRight="42dp"
         android:maxLines="2"
         android:ellipsize="end"
+        android:textIsSelectable="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         app:font="condensed"
         android:textColor="@color/primary_text_default_material_dark" />

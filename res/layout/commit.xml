@@ -78,6 +78,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:textIsSelectable="true"
                     android:textAppearance="@style/TextAppearance.ItemTitle" />
 
                 <com.gh4a.widget.StyleableTextView
@@ -85,6 +86,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:textIsSelectable="true"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
                 <com.gh4a.widget.StyleableTextView
