@@ -83,9 +83,13 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
 
     private void fillData(PageIteratorLoader<T> loader, Collection<T> data) {
         ListView listView = getListView();
+        int footerViewCount = listView.getFooterViewsCount();
+
         if (!loader.hasMoreData()) {
-            listView.removeFooterView(mLoadingView);
-        } else if (getListView().getFooterViewsCount() == 0) {
+            if (footerViewCount != 0) {
+                listView.removeFooterView(mLoadingView);
+            }
+        } else if (footerViewCount == 0) {
             listView.addFooterView(mLoadingView);
         }
 
