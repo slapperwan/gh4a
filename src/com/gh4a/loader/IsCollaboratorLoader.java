@@ -24,11 +24,16 @@ public class IsCollaboratorLoader extends BaseLoader<Boolean> {
     @Override
     public Boolean doLoadInBackground() throws IOException {
         Gh4Application app = Gh4Application.get();
+        String login = app.getAuthLogin();
+        if (login == null) {
+            return false;
+        }
+
         CollaboratorService collabService =
                 (CollaboratorService) app.getService(Gh4Application.COLLAB_SERVICE);
         try {
             RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
-            return collabService.isCollaborator(repoId, app.getAuthLogin());
+            return collabService.isCollaborator(repoId, login);
         } catch (RequestException e) {
             if (e.getStatus() == 403) {
                 // the API returns 403 if the user doesn't have push access,
