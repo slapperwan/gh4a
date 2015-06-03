@@ -120,33 +120,34 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.pullrequest_menu, menu);
+
         Gh4Application app = Gh4Application.get();
-        if (app.isAuthorized()) {
-            inflater.inflate(R.menu.pullrequest_menu, menu);
+        boolean authorized = app.isAuthorized();
 
-            boolean isCreator = mPullRequest.getUser().getLogin().equals(app.getAuthLogin());
+        boolean isCreator = mPullRequest.getUser().getLogin().equals(app.getAuthLogin());
+        boolean canOpenOrClose = authorized && (isCreator || mIsCollaborator);
+        boolean canMerge = authorized && mIsCollaborator;
 
-            if (!mIsCollaborator && !isCreator) {
-                menu.removeItem(R.id.pull_close);
-                menu.removeItem(R.id.pull_reopen);
-            } else if (Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState())) {
-                menu.removeItem(R.id.pull_close);
-                if (mPullRequest.isMerged()) {
-                    menu.findItem(R.id.pull_reopen).setEnabled(false);
-                }
-            } else {
-                menu.removeItem(R.id.pull_reopen);
+        if (!canOpenOrClose) {
+            menu.removeItem(R.id.pull_close);
+            menu.removeItem(R.id.pull_reopen);
+        } else if (Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState())) {
+            menu.removeItem(R.id.pull_close);
+            if (mPullRequest.isMerged()) {
+                menu.findItem(R.id.pull_reopen).setEnabled(false);
             }
-
-            if (!mIsCollaborator) {
-                menu.removeItem(R.id.pull_merge);
-            } else if (mPullRequest.isMerged()) {
-                MenuItem mergeItem = menu.findItem(R.id.pull_merge);
-                mergeItem.setEnabled(false);
-            } else if (!mPullRequest.isMergeable()) {
-                menu.findItem(R.id.pull_merge).setEnabled(false);
-            }
+        } else {
+            menu.removeItem(R.id.pull_reopen);
         }
+
+        if (!canMerge) {
+            menu.removeItem(R.id.pull_merge);
+        } else if (mPullRequest.isMerged() || !mPullRequest.isMergeable()) {
+            MenuItem mergeItem = menu.findItem(R.id.pull_merge);
+            mergeItem.setEnabled(false);
+        }
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 

@@ -323,30 +323,28 @@ public class IssueActivity extends BaseActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (Gh4Application.get().isAuthorized()) {
-            MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.issue_menu, menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.issue_menu, menu);
 
-            if (mIssue == null) {
-                menu.removeItem(R.id.issue_close);
-                menu.removeItem(R.id.issue_reopen);
-            } else if (Constants.Issue.STATE_CLOSED.equals(mIssue.getState())) {
-                menu.removeItem(R.id.issue_close);
-            } else {
-                menu.removeItem(R.id.issue_reopen);
-            }
+        boolean authorized = Gh4Application.get().isAuthorized();
+        boolean isCreator = mIssue != null && authorized &&
+                mIssue.getUser().getLogin().equals(Gh4Application.get().getAuthLogin());
+        boolean canOpenOrClose = mIssue != null && authorized &&
+                (isCreator || mIsCollaborator);
 
-            boolean isCreator = mIssue != null &&
-                    mIssue.getUser().getLogin().equals(Gh4Application.get().getAuthLogin());
-
-            if (!mIsCollaborator && !isCreator) {
-                menu.removeItem(R.id.issue_close);
-                menu.removeItem(R.id.issue_reopen);
-            }
-            if (mIssue == null) {
-                menu.removeItem(R.id.share);
-            }
+        if (!canOpenOrClose) {
+            menu.removeItem(R.id.issue_close);
+            menu.removeItem(R.id.issue_reopen);
+        } else if (Constants.Issue.STATE_CLOSED.equals(mIssue.getState())) {
+            menu.removeItem(R.id.issue_close);
+        } else {
+            menu.removeItem(R.id.issue_reopen);
         }
+
+        if (mIssue == null) {
+            menu.removeItem(R.id.share);
+        }
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -392,6 +390,7 @@ public class IssueActivity extends BaseActivity implements
         getSupportLoaderManager().restartLoader(0, null, mIssueCallback);
         getSupportLoaderManager().restartLoader(1, null, mCollaboratorCallback);
         getSupportLoaderManager().restartLoader(2, null, mEventCallback);
+        supportInvalidateOptionsMenu();
     }
 
     private boolean checkForAuthOrExit() {
