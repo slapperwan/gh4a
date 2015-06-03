@@ -91,7 +91,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         @Override
         public void onGlobalLayout() {
             FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mHeaderFab.getLayoutParams();
-            params.topMargin = mHeader.getBottom() - mHeaderFab.getHeight() / 2;
+            params.topMargin = mHeader.getHeight() - mHeaderFab.getHeight() / 2;
             mHeaderFab.setLayoutParams(params);
         }
     };
