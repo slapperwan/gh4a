@@ -102,6 +102,7 @@ public class StringUtils {
 
         StringBuilder content = new StringBuilder();
         content.append("<html><head><title></title>");
+        writeScriptInclude(content, "wraphandler");
 
         if (Constants.MARKDOWN_EXT.contains(ext)) {
             writeScriptInclude(content, "showdown");
