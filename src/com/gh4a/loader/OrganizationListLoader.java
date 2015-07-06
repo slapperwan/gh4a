@@ -20,8 +20,13 @@ public class OrganizationListLoader extends BaseLoader<List<User>> {
 
     @Override
     public List<User> doLoadInBackground() throws IOException {
+        Gh4Application app = Gh4Application.get();
         OrganizationService orgService = (OrganizationService)
-                Gh4Application.get().getService(Gh4Application.ORG_SERVICE);
-        return orgService.getOrganizations(mUserLogin);
+                app.getService(Gh4Application.ORG_SERVICE);
+        if (mUserLogin.equals(app.getAuthLogin())) {
+            return orgService.getOrganizations();
+        } else {
+            return orgService.getOrganizations(mUserLogin);
+        }
     }
 }
