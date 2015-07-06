@@ -112,7 +112,7 @@ public class FileViewerActivity extends WebViewerActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.download_menu, menu);
 
-        if (FileUtils.isImage(mPath)) {
+        if (FileUtils.isImage(mPath) || FileUtils.isMarkdown(mPath)) {
             menu.removeItem(R.id.wrap);
         }
 
