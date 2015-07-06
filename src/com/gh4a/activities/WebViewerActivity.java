@@ -27,6 +27,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -42,10 +43,18 @@ import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.SettingsFragment;
+import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.ThemeUtils;
+
+import java.util.Arrays;
+import java.util.List;
 
 public abstract class WebViewerActivity extends BaseActivity {
     protected WebView mWebView;
+
+    private static final List<String> SKIP_PRETTIFY_EXT = Arrays.asList(
+        "txt", "rdoc", "texttile", "org", "creole", "rst", "asciidoc", "pod", "");
+
 
     private int[] ZOOM_SIZES = new int[] {
         50, 75, 100, 150, 200
@@ -235,5 +244,82 @@ public abstract class WebViewerActivity extends BaseActivity {
 
     protected boolean handleUrlLoad(String url) {
         return false;
+    }
+
+    protected void loadCode(String data, String fileName) {
+        loadCode(data, fileName, null, null, null);
+    }
+
+    protected void loadCode(String data, String fileName,
+            String repoOwner, String repoName, String ref) {
+        String ext = FileUtils.getFileExtension(fileName);
+        boolean isMarkdown = FileUtils.isMarkdown(fileName);
+
+        StringBuilder content = new StringBuilder();
+        content.append("<html><head><title></title>");
+        writeScriptInclude(content, "wraphandler");
+
+        if (isMarkdown) {
+            writeScriptInclude(content, "showdown");
+            writeCssInclude(content, "markdown");
+            content.append("</head>");
+            content.append("<body>");
+            content.append("<div id='content'>");
+        } else if (!SKIP_PRETTIFY_EXT.contains(ext)) {
+            writeCssInclude(content, "prettify");
+            writeScriptInclude(content, "prettify");
+            // Try to load the language extension file.
+            // If there's none, this will fail silently
+            writeScriptInclude(content, "lang-" + ext);
+            content.append("</head>");
+            content.append("<body onload='prettyPrint()'>");
+            content.append("<pre class='prettyprint linenums lang-").append(ext).append("'>");
+        } else{
+            writeCssInclude(content, "text");
+            content.append("</head>");
+            content.append("<body>");
+            content.append("<pre>");
+        }
+
+        content.append(TextUtils.htmlEncode(data));
+
+        if (isMarkdown) {
+            content.append("</div>");
+
+            content.append("<script>");
+            if (repoOwner != null && repoName != null) {
+                content.append("var GitHub = new Object();");
+                content.append("GitHub.nameWithOwner = \"");
+                content.append(repoOwner).append("/").append(repoName).append("\";");
+                if (ref != null) {
+                    content.append("GitHub.branch = \"").append(ref).append("\";");
+                }
+            }
+            content.append("var text = document.getElementById('content').innerHTML;");
+            content.append("var converter = new Showdown.converter();");
+            content.append("var html = converter.makeHtml(text);");
+            content.append("document.getElementById('content').innerHTML = html;");
+            content.append("</script>");
+        } else {
+            content.append("</pre>");
+        }
+
+        content.append("</body></html>");
+
+        loadThemedHtml(content.toString());
+    }
+
+    protected static void writeScriptInclude(StringBuilder builder, String scriptName) {
+        builder.append("<script src='file:///android_asset/");
+        builder.append(scriptName);
+        builder.append(".js' type='text/javascript'></script>");
+    }
+
+    protected static void writeCssInclude(StringBuilder builder, String cssType) {
+        builder.append("<link href='file:///android_asset/");
+        builder.append(cssType);
+        builder.append("-");
+        builder.append(ThemeUtils.getCssTheme(Gh4Application.THEME));
+        builder.append(".css' rel='stylesheet' type='text/css'/>");
     }
 }

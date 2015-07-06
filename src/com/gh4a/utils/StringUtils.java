@@ -18,10 +18,8 @@ package com.gh4a.utils;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
 import android.text.format.DateUtils;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.widget.CustomTypefaceSpan;
 import com.gh4a.widget.StyleableTextView;
@@ -94,88 +92,6 @@ public class StringUtils {
         }
 
         return userLogin + (!StringUtils.isBlank(name) ? " - " + name : "");
-    }
-
-    public static String highlightSyntax(String data, String fileName,
-            String repoOwner, String repoName, String ref) {
-        String ext = FileUtils.getFileExtension(fileName);
-
-        StringBuilder content = new StringBuilder();
-        content.append("<html><head><title></title>");
-        writeScriptInclude(content, "wraphandler");
-
-        if (Constants.MARKDOWN_EXT.contains(ext)) {
-            writeScriptInclude(content, "showdown");
-            writeCssInclude(content, "markdown");
-            content.append("</head>");
-            content.append("<body>");
-            content.append("<div id='content'>");
-        } else if (!Constants.SKIP_PRETTIFY_EXT.contains(ext)) {
-            writeCssInclude(content, "prettify");
-            writeScriptInclude(content, "prettify");
-            // Try to load the language extension file.
-            // If there's none, this will fail silently
-            writeScriptInclude(content, "lang-" + ext);
-            content.append("</head>");
-            content.append("<body onload='prettyPrint()'>");
-            content.append("<pre class='prettyprint linenums lang-").append(ext).append("'>");
-        } else{
-            writeCssInclude(content, "text");
-            content.append("</head>");
-            content.append("<body>");
-            content.append("<pre>");
-        }
-
-        content.append(TextUtils.htmlEncode(data));
-
-        if (Constants.MARKDOWN_EXT.contains(ext)) {
-            content.append("</div>");
-
-            content.append("<script>");
-            if (repoOwner != null && repoName != null) {
-                content.append("var GitHub = new Object();");
-                content.append("GitHub.nameWithOwner = \"");
-                content.append(repoOwner).append("/").append(repoName).append("\";");
-                if (ref != null) {
-                    content.append("GitHub.branch = \"").append(ref).append("\";");
-                }
-            }
-            content.append("var text = document.getElementById('content').innerHTML;");
-            content.append("var converter = new Showdown.converter();");
-            content.append("var html = converter.makeHtml(text);");
-            content.append("document.getElementById('content').innerHTML = html;");
-            content.append("</script>");
-        } else {
-            content.append("</pre>");
-        }
-
-        content.append("</body></html>");
-
-        return content.toString();
-    }
-
-    private static void writeScriptInclude(StringBuilder builder, String scriptName) {
-        builder.append("<script src='file:///android_asset/");
-        builder.append(scriptName);
-        builder.append(".js' type='text/javascript'></script>");
-    }
-
-    private static void writeCssInclude(StringBuilder builder, String cssType) {
-        builder.append("<link href='file:///android_asset/");
-        builder.append(cssType);
-        builder.append("-");
-        builder.append(ThemeUtils.getCssTheme(Gh4Application.THEME));
-        builder.append(".css' rel='stylesheet' type='text/css'/>");
-    }
-
-    public static String highlightImage(String imageUrl) {
-        StringBuilder content = new StringBuilder();
-        content.append("<html><head>");
-        writeCssInclude(content, "text");
-        content.append("</head><body><div class='image'>");
-        content.append("<img src='").append(imageUrl).append("' />");
-        content.append("</div></body></html>");
-        return content.toString();
     }
 
     public static boolean checkEmail(String email) {
