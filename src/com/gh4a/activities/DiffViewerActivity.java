@@ -196,6 +196,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         content.append("<link href='file:///android_asset/text-");
         content.append(ThemeUtils.getCssTheme(Gh4Application.THEME));
         content.append(".css' rel='stylesheet' type='text/css'/>");
+        content.append("<script src='file:///android_asset/wraphandler.js' type='text/javascript'></script>");
         content.append("</head><body><pre>");
 
         String encoded = TextUtils.htmlEncode(mDiff);

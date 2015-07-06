@@ -17,4 +17,8 @@
         android:icon="@drawable/social_share"
         android:title="@string/share"
         app:showAsAction="ifRoom" />
+    <item android:id="@+id/wrap"
+        android:title="@string/wrap_lines"
+        android:checkable="true"
+        app:showAsAction="never" />
 </menu>

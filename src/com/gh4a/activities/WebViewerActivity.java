@@ -60,6 +60,7 @@ public abstract class WebViewerActivity extends BaseActivity {
     private WebViewClient mWebViewClient = new WebViewClient() {
         @Override
         public void onPageFinished(WebView webView, String url) {
+            applyLineWrapping(shouldWrapLines());
             setContentShown(true);
         }
 
@@ -153,11 +154,26 @@ public abstract class WebViewerActivity extends BaseActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem wrapItem = menu.findItem(R.id.wrap);
+        if (wrapItem != null) {
+            wrapItem.setChecked(shouldWrapLines());
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
 
         if (itemId == R.id.search) {
             doSearch();
+            return true;
+        } else if (itemId == R.id.wrap) {
+            boolean newState = !shouldWrapLines();
+            item.setChecked(newState);
+            setLineWrapping(newState);
+            applyLineWrapping(newState);
             return true;
         }
 
@@ -199,6 +215,22 @@ public abstract class WebViewerActivity extends BaseActivity {
 
     protected void loadThemedHtml(String html) {
         mWebView.loadDataWithBaseURL("file:///android_asset/", html, null, "utf-8", null);
+    }
+
+    private boolean shouldWrapLines() {
+        return getPrefs().getBoolean("line_wrapping", false);
+    }
+
+    private void setLineWrapping(boolean enabled) {
+        getPrefs().edit().putBoolean("line_wrapping", enabled).apply();
+    }
+
+    private SharedPreferences getPrefs() {
+        return getSharedPreferences(SettingsFragment.PREF_NAME, MODE_PRIVATE);
+    }
+
+    private void applyLineWrapping(boolean enabled) {
+        mWebView.loadUrl("javascript:applyLineWrapping(" + enabled + ")");
     }
 
     protected boolean handleUrlLoad(String url) {
