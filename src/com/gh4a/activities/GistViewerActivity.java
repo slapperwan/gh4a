@@ -30,7 +30,6 @@ import com.gh4a.loader.GistLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.StringUtils;
 
 import org.eclipse.egit.github.core.Gist;
 import org.eclipse.egit.github.core.GistFile;
@@ -51,8 +50,7 @@ public class GistViewerActivity extends WebViewerActivity {
             boolean success = !result.handleError(GistViewerActivity.this);
             if (success) {
                 mGistFile = result.getData().getFiles().get(mFileName);
-                loadThemedHtml(StringUtils.highlightSyntax(mGistFile.getContent(),
-                        mFileName, null, null, null));
+                loadCode(mGistFile.getContent(), mFileName);
             } else {
                 setContentEmpty(true);
                 setContentShown(true);

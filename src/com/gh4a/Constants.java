@@ -93,11 +93,4 @@ public interface Constants {
         public static final String RELEASE = "Release.release";
         public static final String RELEASER = "Release.releaser";
     }
-
-    public static final List<String> SKIP_PRETTIFY_EXT = Arrays.asList(
-        "txt", "rdoc", "texttile", "org", "creole", "rst",
-        "asciidoc", "pod", "");
-
-    public static final List<String> MARKDOWN_EXT = Arrays.asList(
-        "markdown", "md", "mdown", "mkdn", "mkd");
 }

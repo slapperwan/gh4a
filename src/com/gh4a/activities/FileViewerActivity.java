@@ -100,10 +100,10 @@ public class FileViewerActivity extends WebViewerActivity {
         if (base64Data != null && FileUtils.isImage(mPath)) {
             String imageUrl = "data:image/" + FileUtils.getFileExtension(mPath) +
                     ";base64," + base64Data;
-            loadThemedHtml(StringUtils.highlightImage(imageUrl));
+            loadThemedHtml(highlightImage(imageUrl));
         } else {
             String data = base64Data != null ? new String(EncodingUtils.fromBase64(base64Data)) : "";
-            loadThemedHtml(StringUtils.highlightSyntax(data, mPath, mRepoOwner, mRepoName, mRef));
+            loadCode(data, mPath, mRepoOwner, mRepoName, mRef);
         }
     }
 
@@ -156,5 +156,15 @@ public class FileViewerActivity extends WebViewerActivity {
     @Override
     protected Intent navigateUp() {
         return IntentUtils.getRepoActivityIntent(this, mRepoOwner, mRepoName, null);
+    }
+
+    private static String highlightImage(String imageUrl) {
+        StringBuilder content = new StringBuilder();
+        content.append("<html><head>");
+        writeCssInclude(content, "text");
+        content.append("</head><body><div class='image'>");
+        content.append("<img src='").append(imageUrl).append("' />");
+        content.append("</div></body></html>");
+        return content.toString();
     }
 }

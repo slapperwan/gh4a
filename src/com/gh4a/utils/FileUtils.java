@@ -14,8 +14,12 @@ import java.util.List;
 import java.util.Locale;
 
 public class FileUtils {
-    private static List<String> imageExts = Arrays.asList(
+    private static final List<String> IMAGE_EXTS = Arrays.asList(
         "png", "gif", "jpeg", "jpg", "bmp", "ico"
+    );
+
+    private static final List<String> MARKDOWN_EXTS = Arrays.asList(
+        "markdown", "md", "mdown", "mkdn", "mkd"
     );
 
     public static boolean save(File file, InputStream inputStream) {
@@ -68,14 +72,18 @@ public class FileUtils {
     }
 
     public static boolean isImage(String filename) {
-        if (StringUtils.isBlank(filename)) {
-            return false;
-        }
-        String ext = getFileExtension(filename);
-        if (StringUtils.isBlank(ext)) {
-            return false;
-        }
+        return isExtensionIn(filename, IMAGE_EXTS);
+    }
 
-        return imageExts.contains(ext.toLowerCase(Locale.US));
+    public static boolean isMarkdown(String filename) {
+        return isExtensionIn(filename, MARKDOWN_EXTS);
+    }
+
+    private static boolean isExtensionIn(String filename, List<String> extensions) {
+        String extension = filename == null ? null : getFileExtension(filename);
+        if (StringUtils.isBlank(extension)) {
+            return false;
+        }
+        return extensions.contains(extension.toLowerCase(Locale.US));
     }
 }
