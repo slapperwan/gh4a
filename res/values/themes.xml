@@ -27,6 +27,7 @@
         <item name="milestoneSmallIcon">@drawable/milestone_small_dark</item>
         <item name="downloadSmallIcon">@drawable/download_small_dark</item>
         <item name="filesSmallIcon">@drawable/files_small_dark</item>
+        <item name="privateSmallIcon">@drawable/private_small_dark</item>
         <item name="dueIcon">@drawable/due_dark</item>
         <item name="milestoneIcon">@drawable/milestone_dark</item>
         <item name="assigneeIcon">@drawable/assignee_dark</item>
@@ -53,6 +54,7 @@
         <item name="colorCommitAddition">#79d242</item>
         <item name="colorCommitDeletion">#d25151</item>
         <item name="colorFab">@color/default_fab_dark</item>
+        <item name="colorPrimaryTextEmphasized">@android:color/white</item>
     </style>
 
     <style name="DarkTheme" parent="DarkThemeBase" />
@@ -89,6 +91,7 @@
         <item name="milestoneSmallIcon">@drawable/milestone_small</item>
         <item name="downloadSmallIcon">@drawable/download_small</item>
         <item name="filesSmallIcon">@drawable/files_small</item>
+        <item name="privateSmallIcon">@drawable/private_small</item>
         <item name="dueIcon">@drawable/due</item>
         <item name="milestoneIcon">@drawable/milestone</item>
         <item name="assigneeIcon">@drawable/assignee</item>
@@ -116,6 +119,7 @@
         <item name="colorCommitAddition">#65b345</item>
         <item name="colorCommitDeletion">#b34545</item>
         <item name="colorFab">@color/default_fab_light</item>
+        <item name="colorPrimaryTextEmphasized">@android:color/black</item>
     </style>
 
     <style name="LightTheme" parent="LightThemeBase" />

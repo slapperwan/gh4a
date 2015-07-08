@@ -31,6 +31,17 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.ItemTitle" />
 
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/tv_private"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:drawableLeft="?attr/privateSmallIcon"
+                android:drawablePadding="4dp"
+                android:text="@string/repo_type_private"
+                android:textAppearance="@style/TextAppearance.VerySmall.Bold"
+                android:visibility="gone" />
+
             </LinearLayout>
 
         </android.support.v7.widget.CardView>

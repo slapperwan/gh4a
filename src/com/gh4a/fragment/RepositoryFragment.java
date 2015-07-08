@@ -231,6 +231,10 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
             tvIssues.setVisibility(View.GONE);
             tvIssuesCount.setVisibility(View.GONE);
         }
+
+        mContentView.findViewById(R.id.tv_private).setVisibility(
+                mRepository.isPrivate() ? View.VISIBLE : View.GONE);
+
     }
 
     private void updateClickableLabel(int id, boolean enable) {

@@ -46,6 +46,7 @@ public class RepositoryAdapter extends RootAdapter<Repository> implements Filter
         viewHolder.tvForks = (TextView) v.findViewById(R.id.tv_forks);
         viewHolder.tvStars = (TextView) v.findViewById(R.id.tv_stars);
         viewHolder.tvSize = (TextView) v.findViewById(R.id.tv_size);
+        viewHolder.tvPrivate = (TextView) v.findViewById(R.id.tv_private);
 
         v.setTag(viewHolder);
         return v;
@@ -69,6 +70,7 @@ public class RepositoryAdapter extends RootAdapter<Repository> implements Filter
         viewHolder.tvForks.setText(String.valueOf(repository.getForks()));
         viewHolder.tvStars.setText(String.valueOf(repository.getWatchers()));
         viewHolder.tvSize.setText(Formatter.formatFileSize(mContext, 1024L * repository.getSize()));
+        viewHolder.tvPrivate.setVisibility(repository.isPrivate() ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -85,5 +87,6 @@ public class RepositoryAdapter extends RootAdapter<Repository> implements Filter
         public TextView tvForks;
         public TextView tvStars;
         public TextView tvSize;
+        public TextView tvPrivate;
     }
 }

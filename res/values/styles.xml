@@ -4,6 +4,11 @@
         <item name="android:textSize">12sp</item>
     </style>
 
+    <style name="TextAppearance.VerySmall.Bold">
+        <item name="font">bold</item>
+        <item name="android:textColor">?attr/colorPrimaryTextEmphasized</item>
+    </style>
+
     <style name="TextAppearance.ItemTitle" parent="TextAppearance.AppCompat.Medium">
         <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="font">condensed</item>

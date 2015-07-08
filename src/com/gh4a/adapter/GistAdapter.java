@@ -47,6 +47,7 @@ public class GistAdapter extends RootAdapter<Gist> {
         viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
         viewHolder.tvSha = (TextView) v.findViewById(R.id.tv_sha);
         viewHolder.tvFiles = (TextView) v.findViewById(R.id.tv_files);
+        viewHolder.tvPrivate = (TextView) v.findViewById(R.id.tv_private);
 
         v.setTag(viewHolder);
         return v;
@@ -72,6 +73,7 @@ public class GistAdapter extends RootAdapter<Gist> {
                 ? mContext.getString(R.string.gist_no_description) : gist.getDescription());
         viewHolder.tvSha.setText(gist.getId());
         viewHolder.tvFiles.setText(String.valueOf(gist.getFiles().size()));
+        viewHolder.tvPrivate.setVisibility(gist.isPublic() ? View.GONE : View.VISIBLE);
     }
 
     private static class ViewHolder {
@@ -80,5 +82,6 @@ public class GistAdapter extends RootAdapter<Gist> {
         public TextView tvTitle;
         public TextView tvSha;
         public TextView tvFiles;
+        public TextView tvPrivate;
     }
 }

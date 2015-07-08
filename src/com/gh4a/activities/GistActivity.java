@@ -136,6 +136,8 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
         } else {
             findViewById(R.id.file_card).setVisibility(View.GONE);
         }
+
+        findViewById(R.id.tv_private).setVisibility(gist.isPublic() ? View.GONE : View.VISIBLE);
     }
 
     @Override
