@@ -1,12 +1,12 @@
 buildscript {
     repositories {
         mavenCentral()
-        maven { url 'http://download.crashlytics.com/maven' }
+        maven { url 'https://maven.fabric.io/public' }
     }
 
     dependencies {
         classpath 'com.android.tools.build:gradle:1.0.0'
-        classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
+        classpath 'io.fabric.tools:gradle:1.+'
     }
 }
 
@@ -14,12 +14,12 @@ repositories {
     maven { url 'http://dl.bintray.com/populov/maven' }
     maven { url 'https://github.com/kageiit/maven-repo/raw/master' }
     maven { url "https://github.com/kolavar/android-support-v4-preferencefragment/raw/master/maven-repository/" }
-    maven { url 'http://download.crashlytics.com/maven' }
     mavenCentral()
+    maven { url 'https://maven.fabric.io/public' }
 }
 
 apply plugin: 'com.android.application'
-apply plugin: 'crashlytics'
+apply plugin: 'io.fabric'
 
 android {
     signingConfigs {
@@ -70,7 +70,9 @@ dependencies {
     compile 'com.shamanland:fab:0.0.6'
     compile 'com.github.castorflex.smoothprogressbar:library:1.0.0'
     compile 'com.nineoldandroids:library:2.4.0+'
-    compile 'com.crashlytics.android:crashlytics:1.+'
+    compile('com.crashlytics.sdk.android:crashlytics:2.4.0@aar') {
+        transitive = true;
+    }
 }
 
 def Properties props = new Properties()
