@@ -50,6 +50,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
 
         LayoutInflater vi = getActivity().getLayoutInflater();
         mLoadingView = (TextView) vi.inflate(R.layout.list_loading_view, null);
+        mLoadingView.setVisibility(View.GONE);
 
         ListView listView = getListView();
         mAdapter = onCreateAdapter();
@@ -65,8 +66,9 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
                     UiUtils.resolveDrawable(getActivity(), R.attr.listBackground));
         }
 
-        getListView().setOnScrollListener(this);
-        getListView().setTextFilterEnabled(true);
+        listView.setOnScrollListener(this);
+        listView.setTextFilterEnabled(true);
+        listView.addFooterView(mLoadingView);
         setEmptyText(getString(getEmptyTextResId()));
         setListAdapter(mAdapter);
         setListShown(false);
@@ -82,18 +84,9 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     }
 
     private void fillData(PageIteratorLoader<T> loader, Collection<T> data) {
-        ListView listView = getListView();
-        int footerViewCount = listView.getFooterViewsCount();
+        mLoadingView.setVisibility(loader.hasMoreData() ? View.VISIBLE : View.GONE);
 
-        if (!loader.hasMoreData()) {
-            if (footerViewCount != 0) {
-                listView.removeFooterView(mLoadingView);
-            }
-        } else if (footerViewCount == 0) {
-            listView.addFooterView(mLoadingView);
-        }
-
-        if (mAdapter.getCount() > 0 && data.iterator().next() == mAdapter.getItem(0)) {
+        if (mAdapter.getCount() > 0 && !data.isEmpty() && data.iterator().next() == mAdapter.getItem(0)) {
             // there are common items, preserve them in order to keep the scroll position
             ArrayList<T> newData = new ArrayList<>();
             int index = 0, count = mAdapter.getCount();
