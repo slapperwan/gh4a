@@ -154,9 +154,10 @@ public class HtmlUtils {
         }
     }
 
-    private static final TagHandler TAG_HANDLER = new TagHandler() {
+    private static class MyTagHandler implements TagHandler {
         private LinkedList<ListSeparator> listElements = new LinkedList<>();
 
+        @Override
         public void handleTag(final boolean opening, final String tag,
                 final Editable output, final XMLReader xmlReader) {
             if (TAG_DEL.equalsIgnoreCase(tag)) {
@@ -289,7 +290,7 @@ public class HtmlUtils {
         if (TextUtils.isEmpty(html))
             return "";
 
-        return android.text.Html.fromHtml(html, imageGetter, TAG_HANDLER);
+        return android.text.Html.fromHtml(html, imageGetter, new MyTagHandler());
     }
 
     /**
