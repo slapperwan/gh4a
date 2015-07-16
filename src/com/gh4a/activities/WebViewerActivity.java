@@ -51,6 +51,7 @@ import java.util.List;
 
 public abstract class WebViewerActivity extends BaseActivity {
     protected WebView mWebView;
+    private boolean mStarted;
 
     private static final List<String> SKIP_PRETTIFY_EXT = Arrays.asList(
         "txt", "rdoc", "texttile", "org", "creole", "rst", "asciidoc", "pod", "");
@@ -75,12 +76,16 @@ public abstract class WebViewerActivity extends BaseActivity {
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            if (!handleUrlLoad(url)) {
+            if (mStarted && !handleUrlLoad(url)) {
                 try {
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                     startActivity(intent);
                 } catch (ActivityNotFoundException e) {
                     // ignore
+                } catch (SecurityException e) {
+                    // some apps (namely the Wikipedia one) have intent filters set
+                    // for the VIEW action for internal, non-exported activities
+                    // -> ignore
                 }
             }
             return true;
@@ -120,6 +125,18 @@ public abstract class WebViewerActivity extends BaseActivity {
             applyDefaultDarkColors((EditText) view);
         }
         return view;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mStarted = true;
+    }
+
+    @Override
+    protected void onStop() {
+        mStarted = false;
+        super.onStop();
     }
 
     private void applyDefaultDarkColors(EditText view) {
