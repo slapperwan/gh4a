@@ -41,7 +41,10 @@ import org.ocpsoft.prettytime.PrettyTime;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.pm.ApplicationInfo;
 import android.content.res.Configuration;
+import android.os.Build;
+import android.text.TextUtils;
 
 import com.crashlytics.android.Crashlytics;
 import com.gh4a.fragment.SettingsFragment;
@@ -77,6 +80,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
 
     private static final int MAX_TRACKED_URLS = 5;
     private static int sNextUrlTrackingPosition = 0;
+    private static boolean sHasCrashlytics;
 
     /*
      * (non-Javadoc)
@@ -92,7 +96,11 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         selectTheme(prefs.getInt(SettingsFragment.KEY_THEME, Constants.Theme.LIGHT));
         prefs.registerOnSharedPreferenceChangeListener(this);
 
-        Fabric.with(this, new Crashlytics());
+        boolean isDebuggable = (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+        sHasCrashlytics = !isDebuggable && !TextUtils.equals(Build.DEVICE, "sdk");
+        if (sHasCrashlytics) {
+            Fabric.with(this, new Crashlytics());
+        }
 
         mPt = new PrettyTime();
 
@@ -142,10 +150,12 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
 
     /* package */ static void trackVisitedUrl(String url) {
         synchronized (Gh4Application.class) {
-            Crashlytics.setString("github-url-" + sNextUrlTrackingPosition, url);
-            Crashlytics.setInt("last-url-position", sNextUrlTrackingPosition);
-            if (++sNextUrlTrackingPosition >= MAX_TRACKED_URLS) {
-                sNextUrlTrackingPosition = 0;
+            if (sHasCrashlytics) {
+                Crashlytics.setString("github-url-" + sNextUrlTrackingPosition, url);
+                Crashlytics.setInt("last-url-position", sNextUrlTrackingPosition);
+                if (++sNextUrlTrackingPosition >= MAX_TRACKED_URLS) {
+                    sNextUrlTrackingPosition = 0;
+                }
             }
         }
     }
