@@ -45,6 +45,7 @@ import android.content.res.Configuration;
 
 import com.crashlytics.android.Crashlytics;
 import com.gh4a.fragment.SettingsFragment;
+import io.fabric.sdk.android.Fabric;
 
 /**
  * The Class Gh4Application.
@@ -91,7 +92,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         selectTheme(prefs.getInt(SettingsFragment.KEY_THEME, Constants.Theme.LIGHT));
         prefs.registerOnSharedPreferenceChangeListener(this);
 
-        Crashlytics.start(this);
+        Fabric.with(this, new Crashlytics());
 
         mPt = new PrettyTime();
 
