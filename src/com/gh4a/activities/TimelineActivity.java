@@ -36,7 +36,7 @@ public class TimelineActivity extends BaseActivity {
             mFragment = PublicTimelineFragment.newInstance();
             fm.beginTransaction().add(R.id.content_container, mFragment).commit();
         } else {
-            mFragment = (PublicTimelineFragment) fm.findFragmentById(R.id.details);
+            mFragment = (PublicTimelineFragment) fm.findFragmentById(R.id.content_container);
         }
 
         ActionBar actionBar = getSupportActionBar();
