@@ -35,6 +35,7 @@ import android.content.SharedPreferences.Editor;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
@@ -197,8 +198,8 @@ public class Github4AndroidActivity extends BaseActivity {
             mOtpCode = otpCode;
         }
 
-        public LoginTask(Context context, int resWaitId, int resWaitMsg) {
-            super(context, resWaitId, resWaitMsg);
+        public LoginTask(FragmentActivity activity, int resWaitId, int resWaitMsg) {
+            super(activity, resWaitId, resWaitMsg);
         }
 
         @Override
