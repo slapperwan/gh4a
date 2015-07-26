@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.gh4a.activities.BlogListActivity;
+import com.gh4a.activities.DownloadsActivity;
+import com.gh4a.activities.ReleaseListActivity;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.activities.TrendingActivity;
 import com.gh4a.activities.WikiListActivity;
@@ -66,6 +68,14 @@ public class BrowseFilter extends Activity {
                 intent = IntentUtils.getUserActivityIntent(this, user);
             } else if (action == null) {
                 intent = IntentUtils.getRepoActivityIntent(this, user, repo, null);
+            } else if ("downloads".equals(action)) {
+                intent = new Intent(this, DownloadsActivity.class);
+                intent.putExtra(Constants.Repository.OWNER, user);
+                intent.putExtra(Constants.Repository.NAME, repo);
+            } else if ("releases".equals(action)) {
+                intent = new Intent(this, ReleaseListActivity.class);
+                intent.putExtra(Constants.Repository.OWNER, user);
+                intent.putExtra(Constants.Repository.NAME, repo);
             } else if ("tree".equals(action)) {
                 String ref = TextUtils.join("/", parts.subList(3, parts.size()));
                 intent = IntentUtils.getRepoActivityIntent(this, user, repo,
