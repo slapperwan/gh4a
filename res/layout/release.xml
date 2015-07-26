@@ -107,10 +107,11 @@
                     style="@style/HeaderLabel"
                     android:text="@string/downloads" />
 
-                <ListView
-                    android:id="@+id/download_list"
+                <LinearLayout
+                    android:id="@+id/downloads_container"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:orientation="vertical" />
 
             </LinearLayout>
 

@@ -24,9 +24,8 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.view.View;
-import android.widget.AdapterView;
+import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.gh4a.BaseActivity;
@@ -44,8 +43,7 @@ import com.gh4a.widget.StyleableTextView;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
-public class ReleaseInfoActivity extends BaseActivity implements
-        View.OnClickListener, AdapterView.OnItemClickListener {
+public class ReleaseInfoActivity extends BaseActivity implements View.OnClickListener {
     private String mRepoOwner;
     private String mRepoName;
     private Release mRelease;
@@ -128,11 +126,15 @@ public class ReleaseInfoActivity extends BaseActivity implements
         tag.setOnClickListener(this);
 
         if (mRelease.getAssets() != null && !mRelease.getAssets().isEmpty()) {
-            ListView downloadsList = (ListView) findViewById(R.id.download_list);
+            ViewGroup downloadContainer = (ViewGroup) findViewById(R.id.downloads_container);
             DownloadAdapter adapter = new DownloadAdapter(this);
             adapter.addAll(mRelease.getAssets());
-            downloadsList.setAdapter(adapter);
-            downloadsList.setOnItemClickListener(this);
+            for (int i = 0; i < adapter.getCount(); i++) {
+                View item = adapter.getView(i, null, downloadContainer);
+                item.setTag(adapter.getItem(i));
+                item.setOnClickListener(this);
+                downloadContainer.addView(item);
+            }
         } else {
             findViewById(R.id.downloads).setVisibility(View.GONE);
         }
@@ -154,21 +156,18 @@ public class ReleaseInfoActivity extends BaseActivity implements
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        DownloadAdapter adapter = (DownloadAdapter) parent.getAdapter();
-        final Download download = adapter.getItem(position);
-
-        UiUtils.enqueueDownload(this, download.getUrl(), download.getContentType(),
-                download.getName(), download.getDescription(), "application/octet-stream");
-    }
-
-    @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.tv_releasetag:
-                startActivity(IntentUtils.getRepoActivityIntent(this,
-                        mRepoOwner, mRepoName, mRelease.getTagName()));
-                break;
+        if (v.getTag() instanceof Download) {
+            Download download = (Download) v.getTag();
+            UiUtils.enqueueDownload(this, download.getUrl(), download.getContentType(),
+                    download.getName(), download.getDescription(), "application/octet-stream");
+        } else {
+            switch (v.getId()) {
+                case R.id.tv_releasetag:
+                    startActivity(IntentUtils.getRepoActivityIntent(this,
+                            mRepoOwner, mRepoName, mRelease.getTagName()));
+                    break;
+            }
         }
     }
 }
