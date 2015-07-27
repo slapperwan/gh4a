@@ -80,6 +80,7 @@ public class CommitActivity extends BasePagerActivity {
 
         menu.removeItem(R.id.download);
         menu.removeItem(R.id.search);
+        menu.removeItem(R.id.wrap);
 
         return super.onCreateOptionsMenu(menu);
     }
