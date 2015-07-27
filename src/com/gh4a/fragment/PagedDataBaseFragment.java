@@ -41,7 +41,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         LoaderManager.LoaderCallbacks<Collection<T>>, OnScrollListener {
     private RootAdapter<T> mAdapter;
     private boolean mIsLoadCompleted;
-    private TextView mLoadingView;
+    private View mLoadingView;
     private String mCurrentFilter;
 
     @Override
@@ -50,7 +50,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
 
         LayoutInflater vi = getActivity().getLayoutInflater();
         View loadingContainer = vi.inflate(R.layout.list_loading_view, null);
-        mLoadingView = (TextView) loadingContainer.findViewById(R.id.tv_title);
+        mLoadingView = loadingContainer.findViewById(R.id.loading);
         mLoadingView.setVisibility(View.GONE);
 
         ListView listView = getListView();
