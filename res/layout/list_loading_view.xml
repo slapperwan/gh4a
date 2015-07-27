@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.gh4a.widget.StyleableTextView
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/tv_title"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceSmall"
-    android:textColor="?attr/colorPrimaryDark"
-    android:gravity="center_horizontal"
-    android:text="@string/loading_msg"
-    android:paddingLeft="@dimen/content_padding"
-    android:paddingRight="@dimen/content_padding"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp" />
+    android:layout_height="wrap_content">
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="?attr/colorPrimaryDark"
+        android:gravity="center_horizontal"
+        android:text="@string/loading_msg"
+        android:paddingLeft="@dimen/content_padding"
+        android:paddingRight="@dimen/content_padding"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp" />
+
+</FrameLayout>
