@@ -11,6 +11,7 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.widget.ActivatableStyledTextView;
 
 import java.util.List;
 
@@ -47,10 +48,17 @@ public class DrawerAdapter extends BaseAdapter {
     public static class EntryItem extends Item {
         private final int mIconResId;
         private boolean mSelected = false;
+        private boolean mActivatable = true;
 
         public EntryItem(int titleResId, int iconResId, int id) {
             super(titleResId, id);
             mIconResId = iconResId;
+        }
+
+        public EntryItem(int titleResId, int iconResId, int id, boolean activatable) {
+            super(titleResId, id);
+            mIconResId = iconResId;
+            mActivatable = activatable;
         }
 
         public void setSelected(boolean selected) {
@@ -149,9 +157,14 @@ public class DrawerAdapter extends BaseAdapter {
             title.setText(item.mTitleResId);
         }
 
-        if (item instanceof EntryItem && convertView instanceof Checkable) {
-            boolean selected = ((EntryItem) item).mSelected;
-            ((Checkable) convertView).setChecked(selected);
+        if (item instanceof EntryItem) {
+            EntryItem ei = (EntryItem) item;
+            if (convertView instanceof ActivatableStyledTextView) {
+                ((ActivatableStyledTextView) convertView).setActivatable(ei.mActivatable);
+            }
+            if (convertView instanceof Checkable) {
+                ((Checkable) convertView).setChecked(ei.mSelected);
+            }
         }
 
         if (item instanceof RadioItem) {

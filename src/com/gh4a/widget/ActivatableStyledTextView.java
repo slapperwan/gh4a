@@ -11,6 +11,7 @@ public class ActivatableStyledTextView extends StyleableTextView implements Chec
     };
 
     private boolean mChecked;
+    private boolean mActivatable;
 
     public ActivatableStyledTextView(Context context) {
         super(context);
@@ -24,9 +25,14 @@ public class ActivatableStyledTextView extends StyleableTextView implements Chec
         super(context, attrs, defStyle);
     }
 
+    public void setActivatable(boolean activatable) {
+        mActivatable = activatable;
+        refreshDrawableState();
+    }
+
     @Override
     public boolean isChecked() {
-        return mChecked;
+        return mChecked && mActivatable;
     }
 
     @Override
