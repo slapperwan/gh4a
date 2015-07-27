@@ -49,7 +49,8 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         super.onActivityCreated(savedInstanceState);
 
         LayoutInflater vi = getActivity().getLayoutInflater();
-        mLoadingView = (TextView) vi.inflate(R.layout.list_loading_view, null);
+        View loadingContainer = vi.inflate(R.layout.list_loading_view, null);
+        mLoadingView = (TextView) loadingContainer.findViewById(R.id.tv_title);
         mLoadingView.setVisibility(View.GONE);
 
         ListView listView = getListView();
@@ -57,7 +58,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         if (mAdapter.isCardStyle()) {
             listView.setDivider(null);
             listView.setDividerHeight(0);
-            listView.setSelector(new ColorDrawable(android.R.color.transparent));
+            listView.setSelector(new ColorDrawable(0));
 
             int cardMargin = getResources().getDimensionPixelSize(R.dimen.card_margin);
             listView.setPadding(cardMargin, 0, cardMargin, 0);
@@ -68,7 +69,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
 
         listView.setOnScrollListener(this);
         listView.setTextFilterEnabled(true);
-        listView.addFooterView(mLoadingView);
+        listView.addFooterView(loadingContainer);
         setEmptyText(getString(getEmptyTextResId()));
         setListAdapter(mAdapter);
         setListShown(false);
