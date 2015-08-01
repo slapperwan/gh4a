@@ -264,17 +264,18 @@ public abstract class WebViewerActivity extends BaseActivity {
     }
 
     protected void loadCode(String data, String fileName) {
-        loadCode(data, fileName, null, null, null);
+        loadCode(data, fileName, null, null, null, -1, -1);
     }
 
     protected void loadCode(String data, String fileName,
-            String repoOwner, String repoName, String ref) {
+            String repoOwner, String repoName, String ref,
+            int highlightStart, int highlightEnd) {
         String ext = FileUtils.getFileExtension(fileName);
         boolean isMarkdown = FileUtils.isMarkdown(fileName);
 
         StringBuilder content = new StringBuilder();
         content.append("<html><head><title></title>");
-        writeScriptInclude(content, "wraphandler");
+        writeScriptInclude(content, "codeutils");
 
         if (isMarkdown) {
             writeScriptInclude(content, "showdown");
@@ -289,8 +290,11 @@ public abstract class WebViewerActivity extends BaseActivity {
             // If there's none, this will fail silently
             writeScriptInclude(content, "lang-" + ext);
             content.append("</head>");
-            content.append("<body onload='prettyPrint()'>");
-            content.append("<pre class='prettyprint linenums lang-").append(ext).append("'>");
+            content.append("<body onload='prettyPrint(function() { highlightLines(");
+            content.append(highlightStart).append(",").append(highlightEnd).append("); })'");
+            content.append(" onresize='scrollToHighlight();'>");
+            content.append("<pre id='content' class='prettyprint linenums lang-");
+            content.append(ext).append("'>");
         } else{
             writeCssInclude(content, "text");
             content.append("</head>");
