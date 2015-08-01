@@ -112,9 +112,11 @@ public class BrowseFilter extends Activity {
                 }
             } else if ("commit".equals(action) && !StringUtils.isBlank(id)) {
                 intent = IntentUtils.getCommitInfoActivityIntent(this, user, repo, id);
+                addLineNumbersToIntentIfPresent(intent, uri.getFragment());
             } else if ("blob".equals(action) && !StringUtils.isBlank(id) && parts.size() >= 5) {
                 String fullPath = TextUtils.join("/", parts.subList(4, parts.size()));
                 intent = IntentUtils.getFileViewerActivityIntent(this, user, repo, id, fullPath);
+                addLineNumbersToIntentIfPresent(intent, uri.getFragment());
             } else {
                 IntentUtils.launchBrowser(this, uri);
             }
@@ -123,5 +125,30 @@ public class BrowseFilter extends Activity {
             startActivity(intent);
         }
         finish();
+    }
+
+    private void addLineNumbersToIntentIfPresent(Intent intent, String fragment) {
+        if (intent == null || TextUtils.isEmpty(fragment)) {
+            return;
+        }
+
+        // Line numbers are encoded either in the form #L12 or #L12-14
+        if (!fragment.startsWith("L")) {
+            return;
+        }
+        try {
+            int dashPos = fragment.indexOf("-");
+            if (dashPos > 0) {
+                intent.putExtra(Constants.Object.HIGHLIGHT_START,
+                        Integer.valueOf(fragment.substring(1, dashPos)));
+                intent.putExtra(Constants.Object.HIGHLIGHT_END,
+                        Integer.valueOf(fragment.substring(dashPos + 1)));
+            } else {
+                intent.putExtra(Constants.Object.HIGHLIGHT_START,
+                        Integer.valueOf(fragment.substring(1)));
+            }
+        } catch (NumberFormatException e) {
+            // ignore
+        }
     }
 }

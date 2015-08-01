@@ -71,6 +71,8 @@ public interface Constants {
         public static final String PATH = "Object.PATH";
         public static final String OBJECT_SHA = "Object.SHA"; // SHA of the commit object
         public static final String REF = "Object.REF"; // SHA or branch/tag name of tree
+        public static final String HIGHLIGHT_START = "Object.HIGHLIGHT_START";
+        public static final String HIGHLIGHT_END = "Object.HIGHLIGHT_END";
     }
 
     public interface Gist {

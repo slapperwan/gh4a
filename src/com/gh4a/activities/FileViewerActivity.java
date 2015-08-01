@@ -45,6 +45,8 @@ public class FileViewerActivity extends WebViewerActivity {
     private String mRepoOwner;
     private String mPath;
     private String mRef;
+    private int mHighlightStart;
+    private int mHighlightEnd;
 
     private static final int MENU_ITEM_HISTORY = 10;
 
@@ -86,6 +88,8 @@ public class FileViewerActivity extends WebViewerActivity {
         mRepoName = data.getString(Constants.Repository.NAME);
         mPath = data.getString(Constants.Object.PATH);
         mRef = data.getString(Constants.Object.REF);
+        mHighlightStart = data.getInt(Constants.Object.HIGHLIGHT_START, -1);
+        mHighlightEnd = data.getInt(Constants.Object.HIGHLIGHT_END, -1);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(FileUtils.getFileName(mPath));
@@ -103,7 +107,7 @@ public class FileViewerActivity extends WebViewerActivity {
             loadThemedHtml(highlightImage(imageUrl));
         } else {
             String data = base64Data != null ? new String(EncodingUtils.fromBase64(base64Data)) : "";
-            loadCode(data, mPath, mRepoOwner, mRepoName, mRef);
+            loadCode(data, mPath, mRepoOwner, mRepoName, mRef, mHighlightStart, mHighlightEnd);
         }
     }
 
