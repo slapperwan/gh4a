@@ -72,6 +72,7 @@ public class AppCompatListPreference extends ListPreference {
             if (callChangeListener(value)) {
                 setValue(value);
             }
+            dialog.dismiss();
         }
     }
 
