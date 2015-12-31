@@ -97,6 +97,8 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
         Map<String, String> filterData = new HashMap<>();
         if (!mIsOrg && ("sources".equals(mRepoType) || "forks".equals(mRepoType))) {
             filterData.put("type", "all");
+        } else if (isSelf && "all".equals(mRepoType)) {
+            filterData.put("affiliation", "owner,collaborator");
         } else {
             filterData.put("type", mRepoType);
         }
