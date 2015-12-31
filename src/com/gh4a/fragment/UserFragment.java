@@ -80,6 +80,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         public Loader<LoaderResult<Collection<Repository>>> onCreateLoader(int id, Bundle args) {
             Map<String, String> filterData = new HashMap<>();
             filterData.put("sort", "pushed");
+            filterData.put("affiliation", "owner,collaborator");
             return new RepositoryListLoader(getActivity(), mUserLogin,
                     mUser.getType(), filterData, 5);
         }
