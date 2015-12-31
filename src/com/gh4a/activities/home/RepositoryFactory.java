@@ -2,6 +2,7 @@ package com.gh4a.activities.home;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.widget.ListAdapter;
 
 import com.gh4a.Constants;
@@ -15,6 +16,7 @@ public class RepositoryFactory extends FragmentFactory {
 
     private String mUserLogin;
     private int mSelectedIndex;
+    private String mSelectedType;
     private RepositoryListContainerFragment.FilterDrawerAdapter mDrawerAdapter;
     private RepositoryListContainerFragment mFragment;
 
@@ -47,9 +49,10 @@ public class RepositoryFactory extends FragmentFactory {
     @Override
     protected boolean onDrawerItemSelected(int position) {
         String type = mDrawerAdapter.handleSelectionAndGetFilterType(position);
-        if (type != null) {
+        if (type != null && !TextUtils.equals(type, mSelectedType)) {
             mFragment.setFilterType(type);
             mSelectedIndex = position;
+            mSelectedType = type;
             mDrawerAdapter.notifyDataSetChanged();
             mActivity.doInvalidateOptionsMenu();
             return true;
