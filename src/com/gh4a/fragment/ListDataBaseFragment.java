@@ -27,7 +27,7 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase im
         if (mAdapter.isCardStyle()) {
             listView.setDivider(null);
             listView.setDividerHeight(0);
-            listView.setSelector(new ColorDrawable(android.R.color.transparent));
+            listView.setSelector(new ColorDrawable(0));
         } else {
             listView.setBackgroundResource(
                     UiUtils.resolveDrawable(getActivity(), R.attr.listBackground));
