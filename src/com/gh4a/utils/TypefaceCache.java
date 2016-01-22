@@ -3,6 +3,7 @@ package com.gh4a.utils;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.util.SparseArray;
 
 public class TypefaceCache {
@@ -20,6 +21,23 @@ public class TypefaceCache {
         "fonts/Roboto-Italic.ttf",
         "fonts/Roboto-Condensed.ttf",
         "fonts/Roboto-BoldCondensed.ttf"
+    };
+
+    private static final String[] FONT_FAMILIES = new String[] {
+        "sans-serif",
+        "sans-serif-medium",
+        "sans-serif",
+        "sans-serif",
+        "sans-serif-condensed",
+        "sans-serif-condensed"
+    };
+    private static final int[] FONT_STYLES = new int[] {
+        Typeface.NORMAL,
+        Typeface.NORMAL,
+        Typeface.BOLD,
+        Typeface.ITALIC,
+        Typeface.NORMAL,
+        Typeface.BOLD
     };
 
     private static SparseArray<Typeface> sTypefaces = new SparseArray<>();
@@ -48,8 +66,14 @@ public class TypefaceCache {
 
         Typeface tf = sTypefaces.get(typeface);
         if (tf == null) {
-            AssetManager assets = context.getApplicationContext().getAssets();
-            tf = Typeface.createFromAsset(assets, FONT_FILENAMES[typeface]);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                // L has all typefaces we need, use system fonts
+                tf = Typeface.create(FONT_FAMILIES[typeface], FONT_STYLES[typeface]);
+            } else {
+                // use our fonts
+                AssetManager assets = context.getApplicationContext().getAssets();
+                tf = Typeface.createFromAsset(assets, FONT_FILENAMES[typeface]);
+            }
             sTypefaces.put(typeface, tf);
         }
 
