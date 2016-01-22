@@ -59,9 +59,6 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
             listView.setDivider(null);
             listView.setDividerHeight(0);
             listView.setSelector(new ColorDrawable(0));
-
-            int cardMargin = getResources().getDimensionPixelSize(R.dimen.card_margin);
-            listView.setPadding(cardMargin, 0, cardMargin, 0);
         } else {
             listView.setBackgroundResource(
                     UiUtils.resolveDrawable(getActivity(), R.attr.listBackground));

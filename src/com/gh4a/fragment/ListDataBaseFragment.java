@@ -28,9 +28,6 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase im
             listView.setDivider(null);
             listView.setDividerHeight(0);
             listView.setSelector(new ColorDrawable(android.R.color.transparent));
-
-            int cardMargin = getResources().getDimensionPixelSize(R.dimen.card_margin);
-            listView.setPadding(cardMargin, 0, cardMargin, 0);
         } else {
             listView.setBackgroundResource(
                     UiUtils.resolveDrawable(getActivity(), R.attr.listBackground));
