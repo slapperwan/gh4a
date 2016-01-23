@@ -35,6 +35,7 @@
         <item name="branchIcon">@drawable/branch_dark</item>
         <item name="tagIcon">@drawable/label_dark</item>
         <item name="cardViewTheme">@style/Theme.CardView.Dark</item>
+        <item name="preferenceTheme">@style/PreferenceTheme</item>
         <item name="colorAccent">@color/dark_accent</item>
         <item name="colorPrimary">@color/dark_accent</item>
         <item name="colorPrimaryDark">@color/dark_accent_dark</item>
@@ -100,6 +101,7 @@
         <item name="tagIcon">@drawable/label</item>
         <item name="listPopupWindowStyle">@style/Widget.AppCompat.Light.ListPopupWindow</item>
         <item name="cardViewTheme">@style/Theme.CardView.Light</item>
+        <item name="preferenceTheme">@style/PreferenceTheme</item>
         <item name="colorAccent">@color/light_accent</item>
         <item name="colorPrimary">@color/light_accent</item>
         <item name="colorPrimaryDark">@color/light_accent_dark</item>
@@ -138,5 +140,9 @@
         <item name="android:spinnerStyle">@style/Widget.Spinner.ActionBar.Light</item>
         <!-- used by appcompat to tint the spinner background drawable -->
         <item name="android:colorBackground">#ffffff</item>
+    </style>
+
+    <style name="PreferenceTheme" parent="PreferenceThemeOverlay">
+        <item name="android:textAppearanceLarge">@style/TextAppearance.AppCompat.Subhead</item>
     </style>
 </resources>
