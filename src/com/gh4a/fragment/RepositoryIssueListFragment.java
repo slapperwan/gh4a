@@ -16,6 +16,7 @@
 package com.gh4a.fragment;
 
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -76,7 +77,7 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Issue> {
     }
 
     @Override
-    protected RootAdapter<Issue> onCreateAdapter() {
+    protected RootAdapter<Issue, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         return new RepositoryIssueAdapter(getActivity());
     }
 

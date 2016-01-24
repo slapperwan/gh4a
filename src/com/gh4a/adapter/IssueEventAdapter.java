@@ -22,6 +22,7 @@ import org.eclipse.egit.github.core.IssueEvent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.TextUtils;
@@ -46,8 +47,8 @@ import com.gh4a.widget.StyleableTextView;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
-public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
-        View.OnClickListener {
+public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventAdapter.ViewHolder>
+        implements View.OnClickListener {
     public interface OnEditComment {
         void editComment(Comment comment);
     }
@@ -71,37 +72,25 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_gravatar_comment, parent, false);
-        ViewHolder viewHolder = new ViewHolder();
-
-        viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-        viewHolder.ivGravatar.setOnClickListener(this);
-
-        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
-        viewHolder.tvExtra = (StyleableTextView) v.findViewById(R.id.tv_extra);
-        viewHolder.tvFile = (StyleableTextView) v.findViewById(R.id.tv_file);
-        viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
-        viewHolder.ivEdit = (ImageView) v.findViewById(R.id.iv_edit);
-
-        v.setTag(viewHolder);
-        return v;
+        ViewHolder holder = new ViewHolder(v);
+        holder.ivGravatar.setOnClickListener(this);
+        return holder;
     }
 
     @Override
-    protected void bindView(View view, IssueEventHolder event) {
-        ViewHolder viewHolder = (ViewHolder) view.getTag();
+    public void onBindViewHolder(ViewHolder holder, IssueEventHolder event) {
         String ourLogin = Gh4Application.get().getAuthLogin();
         String login = event.getUser() != null ? event.getUser().getLogin() : null;
 
-        AvatarHandler.assignAvatar(viewHolder.ivGravatar, event.getUser());
-        viewHolder.ivGravatar.setTag(event);
+        AvatarHandler.assignAvatar(holder.ivGravatar, event.getUser());
+        holder.ivGravatar.setTag(event);
 
-        StringUtils.applyBoldTagsAndSetText(viewHolder.tvExtra,
+        StringUtils.applyBoldTagsAndSetText(holder.tvExtra,
                 mContext.getString(R.string.issue_comment_header,
                         CommitUtils.getUserLogin(mContext, event.getUser())));
-        viewHolder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
+        holder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
                 event.getCreatedAt(), true));
 
         if (event.comment instanceof CommitComment) {
@@ -109,27 +98,27 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
             String text = mContext.getString(R.string.issue_commit_comment_file,
                     FileUtils.getFileName(commitComment.getPath()));
 
-            viewHolder.tvFile.setVisibility(View.VISIBLE);
-            StringUtils.applyBoldTagsAndSetText(viewHolder.tvFile, text);
+            holder.tvFile.setVisibility(View.VISIBLE);
+            StringUtils.applyBoldTagsAndSetText(holder.tvFile, text);
         } else {
-            viewHolder.tvFile.setVisibility(View.GONE);
+            holder.tvFile.setVisibility(View.GONE);
         }
 
         if (event.comment != null) {
             String body = HtmlUtils.format(event.comment.getBodyHtml()).toString();
-            mImageGetter.bind(viewHolder.tvDesc, body, event.comment.getId());
+            mImageGetter.bind(holder.tvDesc, body, event.comment.getId());
         } else {
-            viewHolder.tvDesc.setText(formatEvent(event.event,
-                    viewHolder.tvExtra.getTypefaceValue()));
+            holder.tvDesc.setText(formatEvent(event.event,
+                    holder.tvExtra.getTypefaceValue()));
         }
 
         boolean canEdit = (login != null && login.equals(ourLogin)) || mRepoOwner.equals(ourLogin);
         if (event.comment != null && canEdit && mEditCallback != null) {
-            viewHolder.ivEdit.setVisibility(View.VISIBLE);
-            viewHolder.ivEdit.setTag(event.comment);
-            viewHolder.ivEdit.setOnClickListener(this);
+            holder.ivEdit.setVisibility(View.VISIBLE);
+            holder.ivEdit.setTag(event.comment);
+            holder.ivEdit.setOnClickListener(this);
         } else {
-            viewHolder.ivEdit.setVisibility(View.GONE);
+            holder.ivEdit.setVisibility(View.GONE);
         }
     }
 
@@ -213,15 +202,28 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
         } else if (v.getId() == R.id.iv_edit) {
             Comment comment = (Comment) v.getTag();
             mEditCallback.editComment(comment);
+        } else {
+            super.onClick(v);
         }
     }
 
-    private static class ViewHolder {
-        public ImageView ivGravatar;
-        public TextView tvDesc;
-        public StyleableTextView tvExtra;
-        public StyleableTextView tvFile;
-        public TextView tvTimestamp;
-        public ImageView ivEdit;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private ViewHolder(View view) {
+            super(view);
+            ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
+            tvDesc = (TextView) view.findViewById(R.id.tv_desc);
+            tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
+            tvExtra = (StyleableTextView) view.findViewById(R.id.tv_extra);
+            tvFile = (StyleableTextView) view.findViewById(R.id.tv_file);
+            tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
+            ivEdit = (ImageView) view.findViewById(R.id.iv_edit);
+        }
+
+        private ImageView ivGravatar;
+        private TextView tvDesc;
+        private StyleableTextView tvExtra;
+        private StyleableTextView tvFile;
+        private TextView tvTimestamp;
+        private ImageView ivEdit;
     }
 }

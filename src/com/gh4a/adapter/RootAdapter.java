@@ -20,11 +20,11 @@ import java.util.Collection;
 import java.util.List;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 
@@ -33,13 +33,36 @@ import android.widget.Filterable;
  *
  * @param <T> the generic type
  */
-public abstract class RootAdapter<T> extends BaseAdapter implements Filterable {
-    /** The objects. */
+public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
+        extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+        implements Filterable, View.OnClickListener {
+    public interface OnItemClickListener<T> {
+        void onItemClick(T item);
+    }
+    public interface OnScrolledToFooterListener {
+        void onScrolledToFooter();
+    }
+
+    /**
+     * The objects.
+     */
     private List<T> mObjects;
     private List<T> mUnfilteredObjects;
 
-    /** The context. */
-    protected Context mContext;
+    /**
+     * The context.
+     */
+    protected final Context mContext;
+    private final LayoutInflater mInflater;
+    private OnItemClickListener<T> mItemClickListener;
+
+    private View mHeaderView;
+    private View mFooterView;
+    private OnScrolledToFooterListener mFooterListener;
+
+    private static final int VIEW_TYPE_ITEM = 0;
+    private static final int VIEW_TYPE_HEADER = 1;
+    private static final int VIEW_TYPE_FOOTER = 2;
 
     private Filter mFilter = new Filter() {
         @Override
@@ -78,49 +101,53 @@ public abstract class RootAdapter<T> extends BaseAdapter implements Filterable {
         mObjects = new ArrayList<>();
         mUnfilteredObjects = new ArrayList<>();
         mContext = context;
+        mInflater = LayoutInflater.from(mContext);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see android.widget.Adapter#getCount()
-     */
+    public void setHeaderView(View headerView) {
+        mHeaderView = headerView;
+        notifyDataSetChanged();
+    }
+
+    public void setFooterView(View footerView, OnScrolledToFooterListener footerListener) {
+        mFooterView = footerView;
+        mFooterListener = footerListener;
+        notifyDataSetChanged();
+    }
+
+    public void setOnItemClickListener(OnItemClickListener<T> listener) {
+        mItemClickListener = listener;
+    }
+
     @Override
+    public int getItemCount() {
+        return mObjects.size()
+                + (mHeaderView != null ? 1 : 0)
+                + (mFooterView != null ? 1 : 0);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        int itemStart = mHeaderView != null ? 1 : 0;
+        if (mHeaderView != null && position == 0) {
+            return VIEW_TYPE_HEADER;
+        } else if (mFooterView != null && position == itemStart + mObjects.size()) {
+            return VIEW_TYPE_FOOTER;
+        } else {
+            return VIEW_TYPE_ITEM;
+        }
+    }
+
     public int getCount() {
         return mObjects.size();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see android.widget.Adapter#getItem(int)
-     */
-    @Override
     public T getItem(int position) {
         return mObjects.get(position);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see android.widget.Adapter#getItemId(int)
-     */
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see android.widget.Adapter#getView(int, android.view.View,
-     * android.view.ViewGroup)
-     */
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null) {
-            convertView = createView(LayoutInflater.from(mContext), parent,
-                    getItemViewType(position));
-        }
-        bindView(convertView, getItem(position));
-
-        return convertView;
+    public T getItemFromAdapterPosition(int position) {
+        return mObjects.get(position - (mHeaderView != null ? 1 : 0));
     }
 
     /**
@@ -153,6 +180,43 @@ public abstract class RootAdapter<T> extends BaseAdapter implements Filterable {
         notifyDataSetChanged();
     }
 
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        switch (viewType) {
+            case VIEW_TYPE_HEADER:
+                return new HeaderViewHolder(mHeaderView);
+            case VIEW_TYPE_FOOTER:
+                return new FooterViewHolder(mFooterView);
+            default:
+                RecyclerView.ViewHolder holder = onCreateViewHolder(mInflater, parent);
+                holder.itemView.setOnClickListener(this);
+                holder.itemView.setTag(holder);
+                return holder;
+        }
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        if (holder instanceof FooterViewHolder) {
+            if (mFooterListener != null) {
+                mFooterListener.onScrolledToFooter();
+            }
+        } else if (!(holder instanceof HeaderViewHolder)) {
+            onBindViewHolder((VH) holder, getItemFromAdapterPosition(position));
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (mItemClickListener != null) {
+            VH holder = (VH) view.getTag();
+            int position = holder.getAdapterPosition();
+            mItemClickListener.onItemClick(getItemFromAdapterPosition(position));
+        }
+    }
+
+    protected abstract VH onCreateViewHolder(LayoutInflater inflater, ViewGroup parent);
+    protected abstract void onBindViewHolder(VH holder, T item);
     protected boolean isFiltered(CharSequence filter, T object) {
         return true;
     }
@@ -166,6 +230,14 @@ public abstract class RootAdapter<T> extends BaseAdapter implements Filterable {
         return false;
     }
 
-    protected abstract View createView(LayoutInflater inflater, ViewGroup parent, int viewType);
-    protected abstract void bindView(View view, T object);
+    private static class HeaderViewHolder extends RecyclerView.ViewHolder {
+        public HeaderViewHolder(View v) {
+            super(v);
+        }
+    }
+    private static class FooterViewHolder extends RecyclerView.ViewHolder {
+        public FooterViewHolder(View v) {
+            super(v);
+        }
+    }
 }

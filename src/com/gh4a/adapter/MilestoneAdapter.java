@@ -18,6 +18,7 @@ package com.gh4a.adapter;
 import org.eclipse.egit.github.core.Milestone;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +30,7 @@ import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
-public class MilestoneAdapter extends RootAdapter<Milestone> {
+public class MilestoneAdapter extends RootAdapter<Milestone, MilestoneAdapter.ViewHolder> {
     private int mTextColorPrimary, mTextColorSecondary;
 
     public MilestoneAdapter(Context context) {
@@ -39,54 +40,52 @@ public class MilestoneAdapter extends RootAdapter<Milestone> {
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_milestone, null);
-        ViewHolder viewHolder = new ViewHolder();
-
-        viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvOpen = (TextView) v.findViewById(R.id.tv_open);
-        viewHolder.tvClosed = (TextView) v.findViewById(R.id.tv_closed);
-        viewHolder.tvDue = (TextView) v.findViewById(R.id.tv_due);
-
-        v.setTag(viewHolder);
-        return v;
+        return new ViewHolder(v);
     }
 
     @Override
-    protected void bindView(View v, Milestone milestone) {
-        ViewHolder viewHolder = (ViewHolder) v.getTag();
-
-        viewHolder.tvTitle.setText(milestone.getTitle());
-        viewHolder.tvTitle.setTextColor(Constants.Issue.STATE_CLOSED.equals(milestone.getState())
+    public void onBindViewHolder(ViewHolder holder, Milestone milestone) {
+        holder.tvTitle.setText(milestone.getTitle());
+        holder.tvTitle.setTextColor(Constants.Issue.STATE_CLOSED.equals(milestone.getState())
                 ? mTextColorSecondary : mTextColorPrimary);
 
         if (!StringUtils.isBlank(milestone.getDescription())) {
-            viewHolder.tvDesc.setVisibility(View.VISIBLE);
-            viewHolder.tvDesc.setText(milestone.getDescription());
+            holder.tvDesc.setVisibility(View.VISIBLE);
+            holder.tvDesc.setText(milestone.getDescription());
         } else {
-            viewHolder.tvDesc.setVisibility(View.GONE);
+            holder.tvDesc.setVisibility(View.GONE);
         }
 
-        viewHolder.tvOpen.setText(mContext.getString(R.string.issue_milestone_open_issues,
+        holder.tvOpen.setText(mContext.getString(R.string.issue_milestone_open_issues,
                 milestone.getOpenIssues()));
-        viewHolder.tvClosed.setText(mContext.getString(R.string.issue_milestone_closed_issues,
+        holder.tvClosed.setText(mContext.getString(R.string.issue_milestone_closed_issues,
                 milestone.getClosedIssues()));
 
         if (milestone.getDueOn() != null) {
-            viewHolder.tvDue.setText(
+            holder.tvDue.setText(
                     DateFormat.getMediumDateFormat(mContext).format(milestone.getDueOn()));
-            viewHolder.tvDue.setVisibility(View.VISIBLE);
+            holder.tvDue.setVisibility(View.VISIBLE);
         } else {
-            viewHolder.tvDue.setVisibility(View.GONE);
+            holder.tvDue.setVisibility(View.GONE);
         }
     }
 
-    private static class ViewHolder {
-        public TextView tvTitle;
-        public TextView tvDesc;
-        public TextView tvOpen;
-        public TextView tvClosed;
-        public TextView tvDue;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private ViewHolder(View view) {
+            super(view);
+            tvTitle = (TextView) view.findViewById(R.id.tv_title);
+            tvDesc = (TextView) view.findViewById(R.id.tv_desc);
+            tvOpen = (TextView) view.findViewById(R.id.tv_open);
+            tvClosed = (TextView) view.findViewById(R.id.tv_closed);
+            tvDue = (TextView) view.findViewById(R.id.tv_due);
+        }
+
+        private TextView tvTitle;
+        private TextView tvDesc;
+        private TextView tvOpen;
+        private TextView tvClosed;
+        private TextView tvDue;
     }
 }

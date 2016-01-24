@@ -16,6 +16,7 @@
 package com.gh4a.adapter;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,35 +30,26 @@ import com.gh4a.utils.StringUtils;
 
 import org.eclipse.egit.github.core.SearchUser;
 
-public class SearchUserAdapter extends RootAdapter<SearchUser> implements View.OnClickListener {
+public class SearchUserAdapter extends RootAdapter<SearchUser, SearchUserAdapter.ViewHolder> {
     public SearchUserAdapter(Context context) {
         super(context);
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_gravatar_2, parent, false);
-
-        ViewHolder viewHolder = new ViewHolder();
-        viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-        viewHolder.ivGravatar.setOnClickListener(this);
-
-        viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-
-        v.setTag(viewHolder);
-        return v;
+        ViewHolder holder = new ViewHolder(v);
+        holder.ivGravatar.setOnClickListener(this);
+        return holder;
     }
 
     @Override
-    protected void bindView(View v, SearchUser user) {
-        ViewHolder viewHolder = (ViewHolder) v.getTag();
+    public void onBindViewHolder(ViewHolder holder, SearchUser user) {
+        AvatarHandler.assignAvatar(holder.ivGravatar, determineUserId(user.getId()), null);
+        holder.ivGravatar.setTag(user);
 
-        AvatarHandler.assignAvatar(viewHolder.ivGravatar, determineUserId(user.getId()), null);
-        viewHolder.ivGravatar.setTag(user);
-
-        viewHolder.tvTitle.setText(StringUtils.formatName(user.getLogin(), user.getName()));
-        viewHolder.tvExtra.setText(mContext.getString(R.string.user_extra_data,
+        holder.tvTitle.setText(StringUtils.formatName(user.getLogin(), user.getName()));
+        holder.tvExtra.setText(mContext.getString(R.string.user_extra_data,
                 user.getFollowers(), user.getPublicRepos()));
     }
 
@@ -67,6 +59,8 @@ public class SearchUserAdapter extends RootAdapter<SearchUser> implements View.O
             SearchUser user = (SearchUser) v.getTag();
             mContext.startActivity(IntentUtils.getUserActivityIntent(mContext,
                     user.getLogin(), user.getName()));
+        } else {
+            super.onClick(v);
         }
     }
 
@@ -85,9 +79,16 @@ public class SearchUserAdapter extends RootAdapter<SearchUser> implements View.O
         return -1;
     }
 
-    private static class ViewHolder {
-        public TextView tvTitle;
-        public ImageView ivGravatar;
-        public TextView tvExtra;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private ViewHolder(View view) {
+            super(view);
+            ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
+            tvTitle = (TextView) view.findViewById(R.id.tv_title);
+            tvExtra = (TextView) view.findViewById(R.id.tv_extra);
+        }
+
+        private TextView tvTitle;
+        private ImageView ivGravatar;
+        private TextView tvExtra;
     }
 }

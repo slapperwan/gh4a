@@ -6,6 +6,7 @@ import org.eclipse.egit.github.core.Download;
 
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.Constants;
 import com.gh4a.R;
@@ -36,7 +37,7 @@ public class DownloadsFragment extends ListDataBaseFragment<Download> {
     }
 
     @Override
-    protected RootAdapter<Download> onCreateAdapter() {
+    protected RootAdapter<Download, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         return new DownloadAdapter(getActivity());
     }
 

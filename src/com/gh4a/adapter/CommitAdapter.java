@@ -20,6 +20,7 @@ import org.eclipse.egit.github.core.RepositoryCommit;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,37 +33,23 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
-public class CommitAdapter extends RootAdapter<RepositoryCommit> implements View.OnClickListener {
+public class CommitAdapter extends RootAdapter<RepositoryCommit, CommitAdapter.ViewHolder> {
     public CommitAdapter(Context context) {
         super(context);
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_commit, parent, false);
-        ViewHolder viewHolder = new ViewHolder();
-
-        viewHolder.tvSha = (TextView) v.findViewById(R.id.tv_sha);
-        viewHolder.tvSha.setTypeface(Typeface.MONOSPACE);
-
-        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-        viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
-        viewHolder.tvComments = (TextView) v.findViewById(R.id.tv_comments);
-
-        viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-        viewHolder.ivGravatar.setOnClickListener(this);
-
-        v.setTag(viewHolder);
-        return v;
+        ViewHolder holder = new ViewHolder(v);
+        holder.ivGravatar.setOnClickListener(this);
+        return holder;
     }
 
     @Override
-    protected void bindView(View v, RepositoryCommit commit) {
-        ViewHolder viewHolder = (ViewHolder) v.getTag();
-
-        AvatarHandler.assignAvatar(viewHolder.ivGravatar, commit.getAuthor());
-        viewHolder.ivGravatar.setTag(commit);
+    public void onBindViewHolder(ViewHolder holder, RepositoryCommit commit) {
+        AvatarHandler.assignAvatar(holder.ivGravatar, commit.getAuthor());
+        holder.ivGravatar.setTag(commit);
 
         String message = commit.getCommit().getMessage();
         int pos = message.indexOf('\n');
@@ -70,19 +57,19 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> implements View
             message = message.substring(0, pos);
         }
 
-        viewHolder.tvDesc.setText(message);
-        viewHolder.tvSha.setText(commit.getSha().substring(0, 10));
+        holder.tvDesc.setText(message);
+        holder.tvSha.setText(commit.getSha().substring(0, 10));
 
         int comments = commit.getCommit().getCommentCount();
         if (comments > 0) {
-            viewHolder.tvComments.setText(String.valueOf(comments));
-            viewHolder.tvComments.setVisibility(View.VISIBLE);
+            holder.tvComments.setText(String.valueOf(comments));
+            holder.tvComments.setVisibility(View.VISIBLE);
         } else {
-            viewHolder.tvComments.setVisibility(View.GONE);
+            holder.tvComments.setVisibility(View.GONE);
         }
 
-        viewHolder.tvExtra.setText(CommitUtils.getAuthorName(mContext, commit));
-        viewHolder.tvTimestamp.setText(
+        holder.tvExtra.setText(CommitUtils.getAuthorName(mContext, commit));
+        holder.tvTimestamp.setText(
                 StringUtils.formatRelativeTime(mContext, commit.getCommit().getAuthor().getDate(), false));
     }
 
@@ -95,15 +82,30 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit> implements View
             if (intent != null) {
                 mContext.startActivity(intent);
             }
+        } else {
+            super.onClick(v);
         }
     }
 
-    private static class ViewHolder {
-        public ImageView ivGravatar;
-        public TextView tvDesc;
-        public TextView tvExtra;
-        public TextView tvTimestamp;
-        public TextView tvSha;
-        public TextView tvComments;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private ViewHolder(View view) {
+            super(view);
+            tvSha = (TextView) view.findViewById(R.id.tv_sha);
+            tvSha.setTypeface(Typeface.MONOSPACE);
+
+            tvDesc = (TextView) view.findViewById(R.id.tv_desc);
+            tvExtra = (TextView) view.findViewById(R.id.tv_extra);
+            tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
+            tvComments = (TextView) view.findViewById(R.id.tv_comments);
+
+            ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
+        }
+
+        private ImageView ivGravatar;
+        private TextView tvDesc;
+        private TextView tvExtra;
+        private TextView tvTimestamp;
+        private TextView tvSha;
+        private TextView tvComments;
     }
 }

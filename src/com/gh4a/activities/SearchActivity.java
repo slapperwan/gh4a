@@ -30,6 +30,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -51,6 +53,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.adapter.RepositoryAdapter;
+import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.SearchUserAdapter;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
@@ -58,11 +61,11 @@ import com.gh4a.utils.UiUtils;
 
 public class SearchActivity extends BaseActivity implements
         SearchView.OnQueryTextListener, SearchView.OnCloseListener,
-        AdapterView.OnItemSelectedListener, AdapterView.OnItemClickListener {
+        AdapterView.OnItemSelectedListener, RootAdapter.OnItemClickListener {
 
     private SearchUserAdapter mUserAdapter;
     private RepositoryAdapter mRepoAdapter;
-    private ListView mListViewResults;
+    private RecyclerView mResultsView;
 
     private Spinner mSearchType;
     private SearchView mSearch;
@@ -104,20 +107,22 @@ public class SearchActivity extends BaseActivity implements
 
         updateSearchTypeHint();
 
-        mListViewResults = (ListView) findViewById(android.R.id.list);
-        mListViewResults.setOnItemClickListener(this);
-        registerForContextMenu(mListViewResults);
+        mResultsView = (RecyclerView) findViewById(R.id.list);
+        mResultsView.setLayoutManager(new LinearLayoutManager(this));
+        registerForContextMenu(mResultsView);
 
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(STATE_KEY_REPO_RESULTS)) {
                 mRepoAdapter = new RepositoryAdapter(this);
-                mListViewResults.setAdapter(mRepoAdapter);
+                mRepoAdapter.setOnItemClickListener(this);
+                mResultsView.setAdapter(mRepoAdapter);
                 ArrayList<Repository> data =(ArrayList<Repository>)
                         savedInstanceState.getSerializable(STATE_KEY_REPO_RESULTS);
                 fillRepositoriesData(data);
             } else if (savedInstanceState.containsKey(STATE_KEY_USER_RESULTS)) {
                 mUserAdapter = new SearchUserAdapter(this);
-                mListViewResults.setAdapter(mUserAdapter);
+                mUserAdapter.setOnItemClickListener(this);
+                mResultsView.setAdapter(mUserAdapter);
                 ArrayList<SearchUser> data =(ArrayList<SearchUser>)
                         savedInstanceState.getSerializable(STATE_KEY_USER_RESULTS);
                 fillUsersData(data);
@@ -147,13 +152,15 @@ public class SearchActivity extends BaseActivity implements
 
     protected void searchRepository(final String searchKey) {
         mRepoAdapter = new RepositoryAdapter(this);
-        mListViewResults.setAdapter(mRepoAdapter);
+        mRepoAdapter.setOnItemClickListener(this);
+        mResultsView.setAdapter(mRepoAdapter);
         AsyncTaskCompat.executeParallel(new LoadRepositoryTask(searchKey));
     }
 
     protected void searchUser(final String searchKey) {
         mUserAdapter = new SearchUserAdapter(this);
-        mListViewResults.setAdapter(mUserAdapter);
+        mUserAdapter.setOnItemClickListener(this);
+        mResultsView.setAdapter(mUserAdapter);
         AsyncTaskCompat.executeParallel(new LoadUserTask(searchKey));
     }
 
@@ -300,8 +307,8 @@ public class SearchActivity extends BaseActivity implements
 
         if (v.getId() == android.R.id.list) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-            ListAdapter listAdapter = mListViewResults.getAdapter();
-            Object object = listAdapter.getItem(info.position);
+            RootAdapter<?, ?> adapter = (RootAdapter<?, ?>) mResultsView.getAdapter();
+            Object object = adapter.getItem(info.position);
             menu.setHeaderTitle(R.string.go_to);
 
             if (object instanceof SearchUser) {
@@ -379,16 +386,14 @@ public class SearchActivity extends BaseActivity implements
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Object object = parent.getAdapter().getItem(position);
-
-        if (object instanceof SearchUser) {
-            SearchUser user = (SearchUser) object;
-            startActivity(IntentUtils.getUserActivityIntent(this, user.getLogin(), user.getName()));
-        } else if (object instanceof Repository) {
-            Repository repository = (Repository) object;
+    public void onItemClick(Object item) {
+        if (item instanceof Repository) {
+            Repository repository = (Repository) item;
             startActivity(IntentUtils.getRepoActivityIntent(this,
                     repository.getOwner().getLogin(), repository.getName(), null));
+        } else {
+            SearchUser user = (SearchUser) item;
+            startActivity(IntentUtils.getUserActivityIntent(this, user.getLogin(), user.getName()));
         }
     }
 }

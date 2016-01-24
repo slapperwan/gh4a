@@ -33,6 +33,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -61,6 +63,7 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.DividerItemDecoration;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
@@ -80,7 +83,7 @@ public class IssueActivity extends BaseActivity implements
     private View mListHeaderView;
     private boolean mEventsLoaded;
     private IssueEventAdapter mEventAdapter;
-    private ListView mListView;
+    private RecyclerView mRecyclerView;
     private boolean mIsCollaborator;
     private FloatingActionButton mEditFab;
     private CommentBoxFragment mCommentFragment;
@@ -166,7 +169,9 @@ public class IssueActivity extends BaseActivity implements
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        mListView = (ListView) findViewById(android.R.id.list);
+        mRecyclerView = (RecyclerView) findViewById(R.id.list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(this));
         mImageGetter = new HttpImageGetter(this);
 
         ViewGroup header = (ViewGroup) findViewById(R.id.header);
@@ -177,11 +182,11 @@ public class IssueActivity extends BaseActivity implements
         mHeader.setVisibility(View.GONE);
         header.addView(mHeader);
 
-        mListHeaderView = inflater.inflate(R.layout.issue_comment_list_header, mListView, false);
-        mListView.addHeaderView(mListHeaderView);
+        mListHeaderView = inflater.inflate(R.layout.issue_comment_list_header, mRecyclerView, false);
 
         mEventAdapter = new IssueEventAdapter(this, mRepoOwner, mRepoName, this);
-        mListView.setAdapter(mEventAdapter);
+        mEventAdapter.setHeaderView(mListHeaderView);
+        mRecyclerView.setAdapter(mEventAdapter);
 
         setChildScrollDelegate(this);
 
@@ -218,7 +223,7 @@ public class IssueActivity extends BaseActivity implements
         if (mCommentFragment != null && mCommentFragment.canChildScrollUp()) {
             return true;
         }
-        return UiUtils.canViewScrollUp(mListView);
+        return UiUtils.canViewScrollUp(mRecyclerView);
     }
 
     private void fillDataIfDone() {
@@ -243,7 +248,7 @@ public class IssueActivity extends BaseActivity implements
         tvState.setText(getString(stateTextResId).toUpperCase(Locale.getDefault()));
         transitionHeaderToColor(stateColorAttributeId,
                 closed ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark);
-        UiUtils.trySetListOverscrollColor(mListView,
+        UiUtils.trySetListOverscrollColor(mRecyclerView,
                 UiUtils.resolveColor(this, stateColorAttributeId));
         mEditFab.setSelected(closed);
 

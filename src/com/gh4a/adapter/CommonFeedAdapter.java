@@ -17,6 +17,7 @@ package com.gh4a.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -30,7 +31,7 @@ import com.gh4a.holder.Feed;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 
-public class CommonFeedAdapter extends RootAdapter<Feed> implements View.OnClickListener {
+public class CommonFeedAdapter extends RootAdapter<Feed, CommonFeedAdapter.ViewHolder> {
     private boolean mShowExtra;
 
     public CommonFeedAdapter(Context context, boolean showExtra) {
@@ -39,52 +40,41 @@ public class CommonFeedAdapter extends RootAdapter<Feed> implements View.OnClick
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_gravatar_3, parent, false);
-        ViewHolder viewHolder = new ViewHolder();
-
-        viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-        viewHolder.ivGravatar.setOnClickListener(this);
-
-        viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-        viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
-
-        v.setTag(viewHolder);
-        return v;
+        ViewHolder holder = new ViewHolder(v);
+        holder.ivGravatar.setOnClickListener(this);
+        return holder;
     }
 
     @Override
-    protected void bindView(View v, Feed feed) {
-        ViewHolder viewHolder = (ViewHolder) v.getTag();
-
+    public void onBindViewHolder(ViewHolder holder, Feed feed) {
         String title = feed.getTitle();
-        viewHolder.tvTitle.setText(title);
-        viewHolder.tvTitle.setVisibility(title != null ? View.VISIBLE : View.GONE);
+        holder.tvTitle.setText(title);
+        holder.tvTitle.setVisibility(title != null ? View.VISIBLE : View.GONE);
 
-        viewHolder.tvDesc.setText(feed.getPreview());
-        viewHolder.tvDesc.setGravity(mShowExtra ? Gravity.TOP : Gravity.CENTER_VERTICAL);
+        holder.tvDesc.setText(feed.getPreview());
+        holder.tvDesc.setGravity(mShowExtra ? Gravity.TOP : Gravity.CENTER_VERTICAL);
 
         if (mShowExtra && feed.getUserId() > 0) {
-            AvatarHandler.assignAvatar(viewHolder.ivGravatar,
+            AvatarHandler.assignAvatar(holder.ivGravatar,
                     feed.getUserId(), feed.getAvatarUrl());
-            viewHolder.ivGravatar.setTag(feed);
-            viewHolder.ivGravatar.setVisibility(View.VISIBLE);
+            holder.ivGravatar.setTag(feed);
+            holder.ivGravatar.setVisibility(View.VISIBLE);
         } else {
-            viewHolder.ivGravatar.setVisibility(View.GONE);
+            holder.ivGravatar.setVisibility(View.GONE);
         }
 
         if (mShowExtra) {
             String published = feed.getPublished() != null
                     ? DateFormat.getMediumDateFormat(mContext).format(feed.getPublished()) : "";
-            viewHolder.tvExtra.setText(feed.getAuthor());
-            viewHolder.tvTimestamp.setText(published);
-            viewHolder.tvExtra.setVisibility(View.VISIBLE);
-            viewHolder.tvTimestamp.setVisibility(View.VISIBLE);
+            holder.tvExtra.setText(feed.getAuthor());
+            holder.tvTimestamp.setText(published);
+            holder.tvExtra.setVisibility(View.VISIBLE);
+            holder.tvTimestamp.setVisibility(View.VISIBLE);
         } else {
-            viewHolder.tvExtra.setVisibility(View.GONE);
-            viewHolder.tvTimestamp.setVisibility(View.GONE);
+            holder.tvExtra.setVisibility(View.GONE);
+            holder.tvTimestamp.setVisibility(View.GONE);
         }
     }
 
@@ -96,14 +86,25 @@ public class CommonFeedAdapter extends RootAdapter<Feed> implements View.OnClick
             if (intent != null) {
                 mContext.startActivity(intent);
             }
+        } else {
+            super.onClick(v);
         }
     }
 
-    private static class ViewHolder {
-        public ImageView ivGravatar;
-        public TextView tvTitle;
-        public TextView tvDesc;
-        public TextView tvExtra;
-        public TextView tvTimestamp;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private ViewHolder(View view) {
+            super(view);
+            ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
+            tvTitle = (TextView) view.findViewById(R.id.tv_title);
+            tvDesc = (TextView) view.findViewById(R.id.tv_desc);
+            tvExtra = (TextView) view.findViewById(R.id.tv_extra);
+            tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
+        }
+
+        private ImageView ivGravatar;
+        private TextView tvTitle;
+        private TextView tvDesc;
+        private TextView tvExtra;
+        private TextView tvTimestamp;
     }
 }

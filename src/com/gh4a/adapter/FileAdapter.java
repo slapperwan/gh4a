@@ -16,6 +16,7 @@
 package com.gh4a.adapter;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,7 +32,7 @@ import org.eclipse.egit.github.core.RepositoryContents;
 
 import java.util.Set;
 
-public class FileAdapter extends RootAdapter<RepositoryContents> {
+public class FileAdapter extends RootAdapter<RepositoryContents, FileAdapter.ViewHolder> {
     private Set<String> mSubModuleNames;
 
     public FileAdapter(Context context) {
@@ -44,21 +45,13 @@ public class FileAdapter extends RootAdapter<RepositoryContents> {
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_file_manager, parent, false);
-        ViewHolder holder = new ViewHolder();
-
-        holder.icon = (ImageView) v.findViewById(R.id.iv_icon);
-        holder.fileName = (TextView) v.findViewById(R.id.tv_text);
-        holder.fileSize = (TextView) v.findViewById(R.id.tv_size);
-
-        v.setTag(holder);
-        return v;
+        return new ViewHolder(v);
     }
 
     @Override
-    protected void bindView(View v, RepositoryContents content) {
-        ViewHolder holder = (ViewHolder) v.getTag();
+    public void onBindViewHolder(ViewHolder holder, RepositoryContents content) {
         String name = content.getName();
         boolean isSubModule = mSubModuleNames != null && mSubModuleNames.contains(name);
 
@@ -88,9 +81,16 @@ public class FileAdapter extends RootAdapter<RepositoryContents> {
         return UiUtils.resolveDrawable(mContext, iconId);
     }
 
-    private static class ViewHolder {
-        ImageView icon;
-        TextView fileName;
-        TextView fileSize;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private ViewHolder(View view) {
+            super(view);
+            icon = (ImageView) view.findViewById(R.id.iv_icon);
+            fileName = (TextView) view.findViewById(R.id.tv_text);
+            fileSize = (TextView) view.findViewById(R.id.tv_size);
+        }
+
+        private ImageView icon;
+        private TextView fileName;
+        private TextView fileSize;
     }
 }

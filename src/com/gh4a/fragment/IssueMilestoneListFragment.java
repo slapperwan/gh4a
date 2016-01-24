@@ -22,6 +22,7 @@ import org.eclipse.egit.github.core.Milestone;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,7 +82,7 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
     }
 
     @Override
-    protected RootAdapter<Milestone> onCreateAdapter() {
+    protected RootAdapter<Milestone, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         return new MilestoneAdapter(getActivity());
     }
 
@@ -91,7 +92,7 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
     }
 
     @Override
-    protected void onItemClick(Milestone milestone) {
+    public void onItemClick(Milestone milestone) {
         Intent intent = new Intent(getActivity(), IssueMilestoneEditActivity.class);
         intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.NAME, mRepoName);

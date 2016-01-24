@@ -50,6 +50,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Typeface;
+import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.TextAppearanceSpan;
@@ -68,42 +69,33 @@ import com.gh4a.widget.CustomTypefaceSpan;
 import com.gh4a.widget.EllipsizeLineSpan;
 import com.gh4a.widget.StyleableTextView;
 
-public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListener {
+public class FeedAdapter extends RootAdapter<Event, FeedAdapter.EventViewHolder> {
     public FeedAdapter(Context context) {
         super(context);
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+    public EventViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.feed_row, parent, false);
-        ViewHolder viewHolder = new ViewHolder();
-
-        viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-        viewHolder.ivGravatar.setOnClickListener(this);
-
-        viewHolder.tvTitle = (StyleableTextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvDesc = (StyleableTextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvCreatedAt = (TextView) v.findViewById(R.id.tv_created_at);
-
-        v.setTag(viewHolder);
-        return v;
+        EventViewHolder holder = new EventViewHolder(v);
+        holder.ivGravatar.setOnClickListener(this);
+        return holder;
     }
 
     @Override
-    protected void bindView(View v, Event event) {
-        ViewHolder viewHolder = (ViewHolder) v.getTag();
+    public void onBindViewHolder(EventViewHolder holder, Event event) {
         User actor = event.getActor();
 
-        AvatarHandler.assignAvatar(viewHolder.ivGravatar, actor);
-        viewHolder.ivGravatar.setTag(actor);
+        AvatarHandler.assignAvatar(holder.ivGravatar, actor);
+        holder.ivGravatar.setTag(actor);
 
-        StringUtils.applyBoldTagsAndSetText(viewHolder.tvTitle, formatTitle(event));
-        viewHolder.tvCreatedAt.setText(StringUtils.formatRelativeTime(
+        StringUtils.applyBoldTagsAndSetText(holder.tvTitle, formatTitle(event));
+        holder.tvCreatedAt.setText(StringUtils.formatRelativeTime(
                 mContext, event.getCreatedAt(), false));
 
-        CharSequence content = formatDescription(event, viewHolder.tvDesc.getTypefaceValue());
-        viewHolder.tvDesc.setText(content);
-        viewHolder.tvDesc.setVisibility(content != null ? View.VISIBLE : View.GONE);
+        CharSequence content = formatDescription(event, holder.tvDesc.getTypefaceValue());
+        holder.tvDesc.setText(content);
+        holder.tvDesc.setVisibility(content != null ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -114,6 +106,8 @@ public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListe
             if (intent != null) {
                 mContext.startActivity(intent);
             }
+        } else {
+            super.onClick(v);
         }
     }
 
@@ -449,10 +443,18 @@ public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListe
     /**
      * The Class ViewHolder.
      */
-    private static class ViewHolder {
-        public ImageView ivGravatar;
-        public StyleableTextView tvTitle;
-        public StyleableTextView tvDesc;
-        public TextView tvCreatedAt;
+    public static class EventViewHolder extends RecyclerView.ViewHolder {
+        private EventViewHolder(View view) {
+            super(view);
+            ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
+            tvTitle = (StyleableTextView) view.findViewById(R.id.tv_title);
+            tvDesc = (StyleableTextView) view.findViewById(R.id.tv_desc);
+            tvCreatedAt = (TextView) view.findViewById(R.id.tv_created_at);
+        }
+
+        private ImageView ivGravatar;
+        private StyleableTextView tvTitle;
+        private StyleableTextView tvDesc;
+        private TextView tvCreatedAt;
     }
 }

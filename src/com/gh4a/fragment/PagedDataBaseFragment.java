@@ -19,6 +19,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,8 +39,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase implements
-        LoaderManager.LoaderCallbacks<Collection<T>>, OnScrollListener {
-    private RootAdapter<T> mAdapter;
+        LoaderManager.LoaderCallbacks<Collection<T>>,
+        RootAdapter.OnItemClickListener<T>, RootAdapter.OnScrolledToFooterListener {
+    private RootAdapter<T, ? extends RecyclerView.ViewHolder> mAdapter;
     private boolean mIsLoadCompleted;
     private View mLoadingView;
     private String mCurrentFilter;
@@ -48,37 +50,43 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        LayoutInflater vi = getActivity().getLayoutInflater();
-        View loadingContainer = vi.inflate(R.layout.list_loading_view, null);
-        mLoadingView = loadingContainer.findViewById(R.id.loading);
-        mLoadingView.setVisibility(View.GONE);
-
-        ListView listView = getListView();
-        mAdapter = onCreateAdapter();
-        if (mAdapter.isCardStyle()) {
-            listView.setDivider(null);
-            listView.setDividerHeight(0);
-            listView.setSelector(new ColorDrawable(0));
-        } else {
-            listView.setBackgroundResource(
-                    UiUtils.resolveDrawable(getActivity(), R.attr.listBackground));
-        }
-
-        listView.setOnScrollListener(this);
-        listView.setTextFilterEnabled(true);
-        listView.addFooterView(loadingContainer);
         setEmptyText(getString(getEmptyTextResId()));
-        setListAdapter(mAdapter);
-        setListShown(false);
+        setContentShown(false);
 
         getLoaderManager().initLoader(0, null, this);
     }
 
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        mAdapter = onCreateAdapter();
+
+        super.onViewCreated(view, savedInstanceState);
+
+        RecyclerView recyclerView = getRecyclerView();
+        LayoutInflater inflater = getLayoutInflater(savedInstanceState);
+        View loadingContainer = inflater.inflate(R.layout.list_loading_view, recyclerView, false);
+        mLoadingView = loadingContainer.findViewById(R.id.loading);
+        mLoadingView.setVisibility(View.GONE);
+
+        mAdapter.setFooterView(loadingContainer, this);
+        mAdapter.setOnItemClickListener(this);
+        if (!mAdapter.isCardStyle()) {
+            recyclerView.setBackgroundResource(
+                    UiUtils.resolveDrawable(getActivity(), R.attr.listBackground));
+        }
+        recyclerView.setAdapter(mAdapter);
+    }
+
     public void refresh() {
-        if (getListView() != null) {
-            setListShown(false);
+        if (getRecyclerView() != null) {
+            setContentShown(false);
             getLoaderManager().getLoader(0).onContentChanged();
         }
+    }
+
+    @Override
+    protected boolean hasDividers() {
+        return !mAdapter.isCardStyle();
     }
 
     private void fillData(PageIteratorLoader<T> loader, Collection<T> data) {
@@ -102,7 +110,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         }
     }
 
-    protected void onAddData(RootAdapter<T> adapter, Collection<T> data) {
+    protected void onAddData(RootAdapter<T, ? extends RecyclerView.ViewHolder> adapter, Collection<T> data) {
         adapter.addAll(data);
     }
 
@@ -115,7 +123,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     public void onLoadFinished(Loader<Collection<T>> loader, Collection<T> events) {
         fillData((PageIteratorLoader<T>) loader, events);
         mIsLoadCompleted = true;
-        setListShown(true);
+        setContentShown(true);
         getActivity().supportInvalidateOptionsMenu();
         mAdapter.notifyDataSetChanged();
         if (!TextUtils.isEmpty(mCurrentFilter)) {
@@ -128,30 +136,15 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     }
 
     @Override
-    public void onScroll(AbsListView view, int firstVisible, int visibleCount, int totalCount) {
-        boolean loadMore = firstVisible > 0 && visibleCount > 0 &&
-                getListView().getFooterViewsCount() != 0 &&
-                firstVisible + visibleCount >= totalCount;
-
-        if (loadMore && mIsLoadCompleted) {
+    public void onScrolledToFooter() {
+        if (mIsLoadCompleted && mLoadingView.getVisibility() == View.VISIBLE) {
             mIsLoadCompleted = false;
             getLoaderManager().getLoader(0).forceLoad();
         }
     }
 
-    @Override
-    public void onScrollStateChanged(AbsListView view, int scrollState) {
-    }
-
-    @Override
-    public void onListItemClick(ListView listView, View view, int position, long id) {
-        if (position < mAdapter.getCount()) {
-            onItemClick(mAdapter.getItem(position));
-        }
-    }
-
     protected abstract int getEmptyTextResId();
-    protected abstract RootAdapter<T> onCreateAdapter();
+    protected abstract RootAdapter<T, ? extends RecyclerView.ViewHolder> onCreateAdapter();
     protected abstract PageIterator<T> onCreateIterator();
-    protected abstract void onItemClick(T item);
+    public abstract void onItemClick(T item);
 }

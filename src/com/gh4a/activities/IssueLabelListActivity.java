@@ -24,6 +24,8 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ActionMode;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,12 +39,14 @@ import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.adapter.IssueLabelAdapter;
+import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.DividerItemDecoration;
 import com.shamanland.fab.FloatingActionButton;
 import com.shamanland.fab.ShowHideOnScroll;
 
@@ -55,7 +59,7 @@ import java.net.URLEncoder;
 import java.util.List;
 
 public class IssueLabelListActivity extends BaseActivity implements
-        OnItemClickListener, View.OnClickListener {
+        RootAdapter.OnItemClickListener<IssueLabelAdapter.EditableLabel>, View.OnClickListener {
     private String mRepoOwner;
     private String mRepoName;
     private EditActionMode mActionMode;
@@ -63,7 +67,7 @@ public class IssueLabelListActivity extends BaseActivity implements
 
     private FloatingActionButton mFab;
     private ShowHideOnScroll mFabListener;
-    private ListView mListView;
+    private RecyclerView mRecyclerView;
     private IssueLabelAdapter mAdapter;
 
     private static final String STATE_KEY_ADDED_LABEL = "added_label";
@@ -110,9 +114,11 @@ public class IssueLabelListActivity extends BaseActivity implements
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         mAdapter = new IssueLabelAdapter(this);
-        mListView = (ListView) findViewById(android.R.id.list);
-        mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener(this);
+        mAdapter.setOnItemClickListener(this);
+        mRecyclerView = (RecyclerView) findViewById(R.id.list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(this));
+        mRecyclerView.setAdapter(mAdapter);
 
         mFab = (FloatingActionButton) findViewById(R.id.fab_add);
         mFab.setOnClickListener(this);
@@ -157,9 +163,9 @@ public class IssueLabelListActivity extends BaseActivity implements
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    public void onItemClick(IssueLabelAdapter.EditableLabel item) {
         if (mActionMode == null) {
-            startEditing(mAdapter.getItem(position));
+            startEditing(item);
         }
     }
 
@@ -188,10 +194,10 @@ public class IssueLabelListActivity extends BaseActivity implements
 
     private void updateFabVisibility() {
         if (Gh4Application.get().isAuthorized() && mActionMode == null) {
-            mListView.setOnTouchListener(mFabListener);
+            mRecyclerView.setOnTouchListener(mFabListener);
             mFab.setVisibility(View.VISIBLE);
         } else {
-            mListView.setOnTouchListener(null);
+            mRecyclerView.setOnTouchListener(null);
             mFab.setVisibility(View.GONE);
         }
     }

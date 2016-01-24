@@ -23,20 +23,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.adapter.ReleaseAdapter;
+import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.ReleaseLoader;
 import com.gh4a.utils.IntentUtils;
 
-public class ReleaseListActivity extends BaseActivity implements AdapterView.OnItemClickListener {
+public class ReleaseListActivity extends BaseActivity implements
+        RootAdapter.OnItemClickListener<Release> {
     private String mUserLogin;
     private String mRepoName;
     private ReleaseAdapter mAdapter;
@@ -78,10 +79,11 @@ public class ReleaseListActivity extends BaseActivity implements AdapterView.OnI
         actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        ListView listView = (ListView) findViewById(android.R.id.list);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list);
         mAdapter = new ReleaseAdapter(this);
-        listView.setAdapter(mAdapter);
-        listView.setOnItemClickListener(this);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(mAdapter);
+        mAdapter.setOnItemClickListener(this);
 
         getSupportLoaderManager().initLoader(0, null, mReleaseCallback);
     }
@@ -100,8 +102,7 @@ public class ReleaseListActivity extends BaseActivity implements AdapterView.OnI
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Release release = mAdapter.getItem(position);
+    public void onItemClick(Release release) {
         Intent intent = new Intent(this, ReleaseInfoActivity.class);
         intent.putExtra(Constants.Repository.OWNER, mUserLogin);
         intent.putExtra(Constants.Repository.NAME, mRepoName);

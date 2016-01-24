@@ -23,16 +23,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.adapter.DownloadAdapter;
+import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MarkdownLoader;
@@ -45,7 +46,7 @@ import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 public class ReleaseInfoActivity extends BaseActivity implements
-        View.OnClickListener, AdapterView.OnItemClickListener {
+        View.OnClickListener, RootAdapter.OnItemClickListener<Download> {
     private String mRepoOwner;
     private String mRepoName;
     private Release mRelease;
@@ -128,14 +129,21 @@ public class ReleaseInfoActivity extends BaseActivity implements
         tag.setOnClickListener(this);
 
         if (mRelease.getAssets() != null && !mRelease.getAssets().isEmpty()) {
-            ListView downloadsList = (ListView) findViewById(R.id.download_list);
+            RecyclerView downloadsList = (RecyclerView) findViewById(R.id.download_list);
+            downloadsList.setLayoutManager(new LinearLayoutManager(this));
             DownloadAdapter adapter = new DownloadAdapter(this);
             adapter.addAll(mRelease.getAssets());
             downloadsList.setAdapter(adapter);
-            downloadsList.setOnItemClickListener(this);
+            adapter.setOnItemClickListener(this);
         } else {
             findViewById(R.id.downloads).setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void onItemClick(Download download) {
+        UiUtils.enqueueDownload(this, download.getUrl(), download.getContentType(),
+                download.getName(), download.getDescription(), "application/octet-stream");
     }
 
     private void fillNotes(String bodyHtml) {
@@ -151,15 +159,6 @@ public class ReleaseInfoActivity extends BaseActivity implements
 
         body.setVisibility(View.VISIBLE);
         findViewById(R.id.pb_releasenotes).setVisibility(View.GONE);
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        DownloadAdapter adapter = (DownloadAdapter) parent.getAdapter();
-        final Download download = adapter.getItem(position);
-
-        UiUtils.enqueueDownload(this, download.getUrl(), download.getContentType(),
-                download.getName(), download.getDescription(), "application/octet-stream");
     }
 
     @Override

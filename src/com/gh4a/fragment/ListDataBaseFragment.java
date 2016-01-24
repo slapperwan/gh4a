@@ -5,6 +5,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ListView;
 
@@ -14,51 +15,55 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.UiUtils;
 
 public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase implements
-        LoaderCallbacks<LoaderResult<List<T>>> {
-    private RootAdapter<T> mAdapter;
+        LoaderCallbacks<LoaderResult<List<T>>>, RootAdapter.OnItemClickListener<T> {
+    private RootAdapter<T, ? extends RecyclerView.ViewHolder> mAdapter;
     private boolean mViewCreated;
+
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        ListView listView = getListView();
-        mAdapter = onCreateAdapter();
-        if (mAdapter.isCardStyle()) {
-            listView.setDivider(null);
-            listView.setDividerHeight(0);
-            listView.setSelector(new ColorDrawable(0));
-        } else {
-            listView.setBackgroundResource(
-                    UiUtils.resolveDrawable(getActivity(), R.attr.listBackground));
-        }
-
-        int emptyResId = getEmptyTextResId();
-        if (emptyResId != 0) {
-            setEmptyText(getString(emptyResId));
-        }
-
-        setListAdapter(mAdapter);
-        setListShown(false);
-
+        setContentShown(false);
         getLoaderManager().initLoader(0, null, this);
     }
 
     public void refresh() {
-        setListShown(false);
+        setContentShown(false);
         mAdapter.clear();
         getLoaderManager().getLoader(0).onContentChanged();
-        setListAdapter(mAdapter);
+        getRecyclerView().setAdapter(mAdapter);
     }
 
-    protected void onAddData(RootAdapter<T> adapter, List<T> data) {
+    @Override
+    protected boolean hasDividers() {
+        return !mAdapter.isCardStyle();
+    }
+
+    protected void onAddData(RootAdapter<T, ?> adapter, List<T> data) {
         adapter.addAll(data);
         adapter.notifyDataSetChanged();
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        mAdapter = onCreateAdapter();
+        mAdapter.setOnItemClickListener(this);
+
         super.onViewCreated(view, savedInstanceState);
+
+        RecyclerView recyclerView = getRecyclerView();
+        if (!mAdapter.isCardStyle()) {
+            recyclerView.setBackgroundResource(
+                    UiUtils.resolveDrawable(getActivity(), R.attr.listBackground));
+        }
+        recyclerView.setAdapter(mAdapter);
+
+        int emptyResId = getEmptyTextResId();
+        if (emptyResId != 0) {
+            setEmptyText(getString(emptyResId));
+        }
+
         mViewCreated = true;
     }
 
@@ -69,24 +74,15 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase im
     }
 
     @Override
-    public void onListItemClick(ListView listView, View view, final int position, long id) {
-        // When the fragment is torn down, it can happen we get a click event after our
-        // view is already destroyed. Catch that by checking whether our views are still valid.
-        if (mViewCreated) {
-            onItemClick(mAdapter.getItem(position));
-        }
-    }
-
-    @Override
     public void onLoadFinished(Loader<LoaderResult<List<T>>> loader, LoaderResult<List<T>> result) {
         if (!result.handleError(getActivity())) {
             mAdapter.clear();
             onAddData(mAdapter, result.getData());
         }
         if (isResumed()) {
-            setListShown(true);
+            setContentShown(true);
         } else {
-            setListShownNoAnimation(true);
+            setContentShownNoAnimation(true);
         }
         getActivity().supportInvalidateOptionsMenu();
     }
@@ -96,6 +92,6 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase im
     }
 
     protected abstract int getEmptyTextResId();
-    protected abstract RootAdapter<T> onCreateAdapter();
-    protected abstract void onItemClick(T item);
+    protected abstract RootAdapter<T, ? extends RecyclerView.ViewHolder> onCreateAdapter();
+    public abstract void onItemClick(T item);
 }

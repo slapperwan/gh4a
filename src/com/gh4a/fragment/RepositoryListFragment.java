@@ -24,6 +24,7 @@ import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -58,7 +59,7 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     }
 
     @Override
-    protected RootAdapter<Repository> onCreateAdapter() {
+    protected RootAdapter<Repository, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         return new RepositoryAdapter(getActivity());
     }
 
@@ -68,7 +69,8 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     }
 
     @Override
-    protected void onAddData(RootAdapter<Repository> adapter, Collection<Repository> repositories) {
+    protected void onAddData(RootAdapter<Repository, ? extends RecyclerView.ViewHolder> adapter,
+            Collection<Repository> repositories) {
         if (!mIsOrg && ("sources".equals(mRepoType) || "forks".equals(mRepoType))) {
             for (Repository repository : repositories) {
                 if ("sources".equals(mRepoType) && !repository.isFork()) {
@@ -84,7 +86,7 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     }
 
     @Override
-    protected void onItemClick(Repository repository) {
+    public void onItemClick(Repository repository) {
         IntentUtils.openRepositoryInfoActivity(getActivity(), repository);
     }
 

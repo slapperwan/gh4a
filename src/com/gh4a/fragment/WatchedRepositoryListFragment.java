@@ -20,6 +20,7 @@ import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.WatcherService;
 
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -48,7 +49,7 @@ public class WatchedRepositoryListFragment extends PagedDataBaseFragment<Reposit
     }
 
     @Override
-    protected RootAdapter<Repository> onCreateAdapter() {
+    protected RootAdapter<Repository, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         return new RepositoryAdapter(getActivity());
     }
 
@@ -58,7 +59,7 @@ public class WatchedRepositoryListFragment extends PagedDataBaseFragment<Reposit
     }
 
     @Override
-    protected void onItemClick(Repository repository) {
+    public void onItemClick(Repository repository) {
         IntentUtils.openRepositoryInfoActivity(getActivity(), repository);
     }
 

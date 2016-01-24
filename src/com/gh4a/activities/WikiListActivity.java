@@ -23,6 +23,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -32,6 +34,7 @@ import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.adapter.CommonFeedAdapter;
+import com.gh4a.adapter.RootAdapter;
 import com.gh4a.holder.Feed;
 import com.gh4a.loader.FeedLoader;
 import com.gh4a.loader.LoaderCallbacks;
@@ -39,11 +42,13 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.DividerItemDecoration;
 
-public class WikiListActivity extends BaseActivity {
+public class WikiListActivity extends BaseActivity
+        implements RootAdapter.OnItemClickListener<Feed> {
     private String mUserLogin;
     private String mRepoName;
-    private ListView mListView;
+    private RecyclerView mRecyclerView;
 
     private LoaderCallbacks<List<Feed>> mFeedCallback = new LoaderCallbacks<List<Feed>>() {
         @Override
@@ -51,6 +56,7 @@ public class WikiListActivity extends BaseActivity {
             String url = "https://github.com/" + mUserLogin + "/" + mRepoName + "/wiki.atom";
             return new FeedLoader(WikiListActivity.this, url);
         }
+
         @Override
         public void onResultReady(LoaderResult<List<Feed>> result) {
             setContentEmpty(true);
@@ -84,26 +90,27 @@ public class WikiListActivity extends BaseActivity {
         actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        mListView = (ListView) findViewById(android.R.id.list);
-        //mListView.setOnScrollListener(new WikiScrollListener(this));
         CommonFeedAdapter adapter = new CommonFeedAdapter(this, false);
-        mListView.setAdapter(adapter);
-        mListView.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Feed feed = (Feed) adapterView.getAdapter().getItem(position);
-                openViewer(feed);
-            }
-        });
-        mListView.setBackgroundResource(
+        adapter.setOnItemClickListener(this);
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(this));
+        mRecyclerView.setAdapter(adapter);
+        mRecyclerView.setBackgroundResource(
                 UiUtils.resolveDrawable(this, R.attr.listBackground));
 
         getSupportLoaderManager().initLoader(0, null, mFeedCallback);
     }
 
+    @Override
+    public void onItemClick(Feed feed) {
+        openViewer(feed);
+    }
+
     private void fillData(List<Feed> result) {
         if (result != null) {
-            CommonFeedAdapter adapter = (CommonFeedAdapter) mListView.getAdapter();
+            CommonFeedAdapter adapter = (CommonFeedAdapter) mRecyclerView.getAdapter();
             adapter.addAll(result);
             adapter.notifyDataSetChanged();
 
@@ -118,7 +125,7 @@ public class WikiListActivity extends BaseActivity {
             }
         }
     }
-    
+
     private void openViewer(Feed feed) {
         Intent intent = new Intent(this, WikiActivity.class);
         intent.putExtra(Constants.Blog.TITLE, feed.getTitle());

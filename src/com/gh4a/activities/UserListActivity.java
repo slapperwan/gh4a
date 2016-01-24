@@ -19,12 +19,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.R;
+import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.UserAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
@@ -36,7 +39,7 @@ import org.eclipse.egit.github.core.User;
 import java.util.List;
 
 public abstract class UserListActivity extends BaseActivity implements
-        AdapterView.OnItemClickListener {
+        RootAdapter.OnItemClickListener<User> {
     private UserAdapter mUserAdapter;
 
     private LoaderCallbacks<List<User>> mUserListCallback = new LoaderCallbacks<List<User>>() {
@@ -74,11 +77,12 @@ public abstract class UserListActivity extends BaseActivity implements
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         mUserAdapter = new UserAdapter(this);
+        mUserAdapter.setOnItemClickListener(this);
 
-        ListView listView = (ListView) findViewById(android.R.id.list);
-        listView.setOnItemClickListener(this);
-        listView.setAdapter(mUserAdapter);
-        listView.setBackgroundResource(
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(mUserAdapter);
+        recyclerView.setBackgroundResource(
                 UiUtils.resolveDrawable(this, R.attr.listBackground));
 
         getSupportLoaderManager().initLoader(0, null, mUserListCallback);
@@ -99,8 +103,7 @@ public abstract class UserListActivity extends BaseActivity implements
     protected abstract String getSubTitle();
 
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        User user = (User) adapterView.getAdapter().getItem(position);
+    public void onItemClick(User user) {
         Intent intent = IntentUtils.getUserActivityIntent(this, user);
         if (intent != null) {
             startActivity(intent);

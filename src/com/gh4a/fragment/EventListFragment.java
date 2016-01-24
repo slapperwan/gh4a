@@ -18,6 +18,7 @@ package com.gh4a.fragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -96,11 +97,11 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        registerForContextMenu(getListView());
+        registerForContextMenu(getRecyclerView());
     }
 
     @Override
-    protected RootAdapter<Event> onCreateAdapter() {
+    protected RootAdapter<Event, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         mAdapter = new FeedAdapter(getActivity());
         return mAdapter;
     }
@@ -118,7 +119,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
     }
 
     @Override
-    protected void onItemClick(Event event) {
+    public void onItemClick(Event event) {
         Gh4Application context = Gh4Application.get();
 
         if (FeedAdapter.hasInvalidPayload(event)) {
@@ -407,12 +408,12 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info =
                 (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        if (info.position >= mAdapter.getCount()) {
+        if (info.position >= mAdapter.getItemCount()) {
             return false;
         }
 
         int id = item.getItemId();
-        Event event = mAdapter.getItem(info.position);
+        Event event = mAdapter.getItemFromAdapterPosition(info.position);
 
         if (id >= MENU_DOWNLOAD_START && id <= MENU_DOWNLOAD_END) {
             final Download download;

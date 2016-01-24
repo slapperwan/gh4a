@@ -2,6 +2,8 @@ package com.gh4a.utils;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -22,12 +24,15 @@ import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.EdgeEffectCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.method.LinkMovementMethod;
 import android.view.ContextThemeWrapper;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.EdgeEffect;
@@ -69,26 +74,98 @@ public class UiUtils {
         return context.getResources().getColor(R.color.label_fg_light);
     }
 
-    public static void trySetListOverscrollColor(ListView view, int color) {
+    public static void trySetListOverscrollColor(RecyclerView view, int color) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            trySetEdgeEffectColor(view, "mEdgeGlowTop", color);
-            trySetEdgeEffectColor(view, "mEdgeGlowBottom", color);
+            RecyclerViewEdgeColorHelper helper =
+                    (RecyclerViewEdgeColorHelper) view.getTag(R.id.RecyclerViewEdgeColorHelper);
+            if (helper == null) {
+                helper = new RecyclerViewEdgeColorHelper(view);
+                view.setTag(R.id.RecyclerViewEdgeColorHelper, helper);
+            }
+            helper.setColor(color);
         }
     }
 
     @TargetApi(21)
-    private static void trySetEdgeEffectColor(ListView view, String fieldName, int color) {
-        try {
-            Field effectField = AbsListView.class.getDeclaredField(fieldName);
-            effectField.setAccessible(true);
-            EdgeEffect effect = (EdgeEffect) effectField.get(view);
-            final int alpha = Color.alpha(effect.getColor());
-            effect.setColor(Color.argb(alpha, Color.red(color),
-                    Color.green(color), Color.blue(color)));
-        } catch (NoSuchFieldException e) {
-            // ignored
-        } catch (IllegalAccessException e) {
-            // ignored
+    private static class RecyclerViewEdgeColorHelper implements ViewTreeObserver.OnGlobalLayoutListener {
+        private RecyclerView mView;
+        private int mColor;
+        private EdgeEffect mTopEffect, mBottomEffect;
+        private Object mLastTopEffect, mLastBottomEffect;
+
+        private static Method sTopEnsureMethod, sBottomEnsureMethod;
+        private static Field sTopEffectField, sBottomEffectField;
+
+        public RecyclerViewEdgeColorHelper(RecyclerView view) {
+            mView = view;
+            mColor = 0;
+            mView.getViewTreeObserver().addOnGlobalLayoutListener(this);
+        }
+        public void setColor(int color) {
+            mColor = color;
+            applyIfPossible();
+        }
+        @Override
+        public void onGlobalLayout() {
+            applyIfPossible();
+        }
+
+        private void applyIfPossible() {
+            if (!ensureStaticMethodsAndFields()) {
+                return;
+            }
+            try {
+                Object topEffect = sTopEffectField.get(mView);
+                Object bottomEffect = sBottomEffectField.get(mView);
+                if (topEffect == null || bottomEffect == null
+                        || topEffect != mLastTopEffect || bottomEffect != mLastBottomEffect) {
+                    sTopEnsureMethod.invoke(mView);
+                    sBottomEnsureMethod.invoke(mView);
+                    mLastTopEffect = sTopEffectField.get(mView);
+                    mLastBottomEffect = sBottomEffectField.get(mView);
+
+                    final Field edgeField = mLastTopEffect.getClass().getDeclaredField("mEdgeEffect");
+                    edgeField.setAccessible(true);
+                    mTopEffect = (EdgeEffect) edgeField.get(mLastTopEffect);
+                    mBottomEffect = (EdgeEffect) edgeField.get(mLastBottomEffect);
+                }
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                mTopEffect = mBottomEffect = null;
+            } catch (NoSuchFieldException e) {
+                mTopEffect = mBottomEffect = null;
+            }
+            applyColor(mTopEffect);
+            applyColor(mBottomEffect);
+        }
+
+        private void applyColor(EdgeEffect effect) {
+            if (effect != null) {
+                final int alpha = Color.alpha(effect.getColor());
+                effect.setColor(Color.argb(alpha, Color.red(mColor),
+                        Color.green(mColor), Color.blue(mColor)));
+            }
+        }
+
+        private boolean ensureStaticMethodsAndFields() {
+            if (sTopEnsureMethod != null && sBottomEnsureMethod != null) {
+                return true;
+            }
+            try {
+                sTopEnsureMethod = RecyclerView.class.getDeclaredMethod("ensureTopGlow");
+                sTopEnsureMethod.setAccessible(true);
+                sBottomEnsureMethod = RecyclerView.class.getDeclaredMethod("ensureBottomGlow");
+                sBottomEnsureMethod.setAccessible(true);
+                sTopEffectField = RecyclerView.class.getDeclaredField("mTopGlow");
+                sTopEffectField.setAccessible(true);
+                sBottomEffectField = RecyclerView.class.getDeclaredField("mBottomGlow");
+                sBottomEffectField.setAccessible(true);
+                return true;
+            } catch (NoSuchMethodException e) {
+                // ignored
+            } catch (NoSuchFieldException e) {
+                // ignored
+            }
+            return false;
         }
     }
 

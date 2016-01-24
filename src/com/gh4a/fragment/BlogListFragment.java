@@ -20,6 +20,7 @@ import java.util.List;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.Constants;
 import com.gh4a.R;
@@ -38,7 +39,7 @@ public class BlogListFragment extends ListDataBaseFragment<Feed> {
     }
 
     @Override
-    protected RootAdapter<Feed> onCreateAdapter() {
+    protected RootAdapter<Feed, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         return new CommonFeedAdapter(getActivity(), true);
     }
 

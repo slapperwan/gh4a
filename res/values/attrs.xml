@@ -74,4 +74,5 @@
         </attr>
     </declare-styleable>
 
+    <item name="RecyclerViewEdgeColorHelper" type="id" />
 </resources>

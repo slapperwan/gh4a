@@ -30,6 +30,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,6 +45,7 @@ import com.gh4a.activities.IssueEditActivity;
 import com.gh4a.adapter.DrawerAdapter;
 import com.gh4a.adapter.IssueAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.utils.UiUtils;
 import com.shamanland.fab.FloatingActionButton;
 import com.shamanland.fab.ShowHideOnScroll;
 
@@ -81,11 +83,11 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> implements
 
             View content = super.onCreateView(inflater, listContainer, savedInstanceState);
             FloatingActionButton fab = (FloatingActionButton) wrapper.findViewById(R.id.fab_add);
-            ListView list = (ListView) content.findViewById(android.R.id.list);
+            RecyclerView recyclerView = (RecyclerView) content.findViewById(R.id.list);
 
             if (Gh4Application.get().isAuthorized()) {
                 fab.setOnClickListener(this);
-                list.setOnTouchListener(new ShowHideOnScroll(fab));
+                recyclerView.setOnTouchListener(new ShowHideOnScroll(fab));
             } else {
                 fab.setVisibility(View.GONE);
             }
@@ -93,6 +95,20 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> implements
             return wrapper;
         } else {
             return super.onCreateView(inflater, container, savedInstanceState);
+        }
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        String stateFilter = mFilterData.get(Constants.Issue.STATE);
+        int stateColorAttr = TextUtils.equals(stateFilter, Constants.Issue.STATE_OPEN)
+                ? R.attr.colorIssueOpen : TextUtils.equals(stateFilter, Constants.Issue.STATE_CLOSED)
+                ? R.attr.colorIssueClosed : 0;
+
+        if (stateColorAttr != 0) {
+            UiUtils.trySetListOverscrollColor(getRecyclerView(),
+                    UiUtils.resolveColor(getActivity(), stateColorAttr));
         }
     }
 
@@ -115,7 +131,7 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> implements
     }
 
     @Override
-    protected RootAdapter<Issue> onCreateAdapter() {
+    protected RootAdapter<Issue, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         return new IssueAdapter(getActivity());
     }
 
@@ -125,7 +141,7 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> implements
     }
 
     @Override
-    protected void onItemClick(Issue issue) {
+    public void onItemClick(Issue issue) {
         Intent intent = new Intent(getActivity(), IssueActivity.class);
         intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.NAME, mRepoName);

@@ -17,6 +17,7 @@ package com.gh4a.adapter;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
@@ -27,42 +28,40 @@ import android.widget.TextView;
 import com.gh4a.R;
 import com.gh4a.holder.Trend;
 
-public class TrendAdapter extends RootAdapter<Trend> {
+public class TrendAdapter extends RootAdapter<Trend, TrendAdapter.ViewHolder> {
     public TrendAdapter(Context context) {
         super(context);
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_trend, null);
-        ViewHolder viewHolder = new ViewHolder();
-
-        viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-
-        v.setTag(viewHolder);
-        return v;
+        return new ViewHolder(v);
     }
 
     @Override
-    protected void bindView(View v, Trend trend) {
-        ViewHolder viewHolder = (ViewHolder) v.getTag();
-
+    public void onBindViewHolder(ViewHolder holder, Trend trend) {
         String owner = trend.getRepoOwner();
         String name = trend.getRepoName();
         if (owner != null && name != null) {
             SpannableStringBuilder title = new SpannableStringBuilder();
             title.append(owner).append("/").append(name);
             title.setSpan(new StyleSpan(Typeface.BOLD), 0, owner.length(), 0);
-            viewHolder.tvTitle.setText(title);
+            holder.tvTitle.setText(title);
         } else {
-            viewHolder.tvTitle.setText(trend.getTitle());
+            holder.tvTitle.setText(trend.getTitle());
         }
-        viewHolder.tvDesc.setText(trend.getDescription());
+        holder.tvDesc.setText(trend.getDescription());
     }
 
-    private static class ViewHolder {
-        public TextView tvTitle;
-        public TextView tvDesc;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private ViewHolder(View view) {
+            super(view);
+            tvTitle = (TextView) view.findViewById(R.id.tv_title);
+            tvDesc = (TextView) view.findViewById(R.id.tv_desc);
+        }
+
+        private TextView tvTitle;
+        private TextView tvDesc;
     }
 }

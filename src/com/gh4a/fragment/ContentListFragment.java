@@ -84,7 +84,7 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        registerForContextMenu(getListView());
+        registerForContextMenu(getRecyclerView());
     }
 
     @Override
@@ -116,8 +116,9 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
         }
     }
 
+
     @Override
-    protected RootAdapter<RepositoryContents> onCreateAdapter() {
+    protected RootAdapter<RepositoryContents, ?> onCreateAdapter() {
         mAdapter = new FileAdapter(getActivity());
         mAdapter.setSubModuleNames(mCallback.getSubModuleNames(this));
         return mAdapter;
@@ -139,13 +140,13 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
     }
 
     @Override
-    protected void onAddData(RootAdapter<RepositoryContents> adapter, List<RepositoryContents> data) {
+    protected void onAddData(RootAdapter<RepositoryContents, ?> adapter, List<RepositoryContents> data) {
         super.onAddData(adapter, data);
         mCallback.onContentsLoaded(this, data);
     }
 
     @Override
-    protected void onItemClick(RepositoryContents content) {
+    public void onItemClick(RepositoryContents content) {
         mCallback.onTreeSelected(content);
     }
 

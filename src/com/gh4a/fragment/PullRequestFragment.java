@@ -36,6 +36,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -178,11 +179,17 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        LayoutInflater inflater = getLayoutInflater(savedInstanceState);
-        mListHeaderView = inflater.inflate(R.layout.issue_comment_list_header, getListView(), false);
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        getListView().addHeaderView(mListHeaderView, null, true);
+        LayoutInflater inflater = getLayoutInflater(savedInstanceState);
+        mListHeaderView = inflater.inflate(R.layout.issue_comment_list_header,
+                getRecyclerView(), false);
+        mAdapter.setHeaderView(mListHeaderView);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
 
         FragmentManager fm = getChildFragmentManager();
         mCommentFragment = (CommentBoxFragment) fm.findFragmentById(R.id.comment_box);
@@ -196,7 +203,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
             stateColor = R.attr.colorIssueOpen;
         }
 
-        UiUtils.trySetListOverscrollColor(getListView(), stateColor);
+        UiUtils.trySetListOverscrollColor(getRecyclerView(), stateColor);
 
         super.onActivityCreated(savedInstanceState);
 
@@ -219,7 +226,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     }
 
     @Override
-    protected RootAdapter<IssueEventHolder> onCreateAdapter() {
+    protected RootAdapter<IssueEventHolder, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         mAdapter = new IssueEventAdapter(getActivity(), mRepoOwner, mRepoName, this);
         return mAdapter;
     }
@@ -255,15 +262,15 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     }
 
     @Override
-    public void setListShown(boolean shown) {
-        super.setListShown(shown);
+    public void setContentShown(boolean shown) {
+        super.setContentShown(shown);
         mListShown = shown;
         updateCommentSectionVisibility(getView());
     }
 
     @Override
-    public void setListShownNoAnimation(boolean shown) {
-        super.setListShownNoAnimation(shown);
+    public void setContentShownNoAnimation(boolean shown) {
+        super.setContentShownNoAnimation(shown);
         mListShown = shown;
         updateCommentSectionVisibility(getView());
     }
@@ -371,7 +378,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     }
 
     @Override
-    protected void onItemClick(IssueEventHolder event) {
+    public void onItemClick(IssueEventHolder event) {
     }
 
     @Override
@@ -469,7 +476,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         @Override
         protected void onSuccess(MergeStatus result) {
             if (result.isMerged()) {
-                setListShown(false);
+                setContentShown(false);
                 getLoaderManager().getLoader(1).onContentChanged();
             } else {
                 ToastUtils.showMessage(mContext, R.string.pull_error_merge);

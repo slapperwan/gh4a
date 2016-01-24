@@ -2,6 +2,7 @@ package com.gh4a.fragment;
 
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.Constants;
 import com.gh4a.R;
@@ -47,7 +48,7 @@ public class GistListFragment extends ListDataBaseFragment<Gist> {
     }
 
     @Override
-    protected RootAdapter<Gist> onCreateAdapter() {
+    protected RootAdapter<Gist, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         return new GistAdapter(getActivity(), mUserLogin);
     }
 
@@ -57,7 +58,7 @@ public class GistListFragment extends ListDataBaseFragment<Gist> {
     }
 
     @Override
-    protected void onItemClick(Gist gist) {
+    public void onItemClick(Gist gist) {
         startActivity(IntentUtils.getGistActivityIntent(getActivity(), mUserLogin, gist.getId()));
     }
 }

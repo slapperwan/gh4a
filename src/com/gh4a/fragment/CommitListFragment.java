@@ -24,6 +24,7 @@ import org.eclipse.egit.github.core.service.CommitService;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -70,7 +71,7 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
     }
 
     @Override
-    protected RootAdapter<RepositoryCommit> onCreateAdapter() {
+    protected RootAdapter<RepositoryCommit, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         return new CommitAdapter(getActivity());
     }
 
@@ -80,7 +81,7 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
     }
 
     @Override
-    protected void onItemClick(RepositoryCommit commit) {
+    public void onItemClick(RepositoryCommit commit) {
         String[] urlPart = commit.getUrl().split("/");
         Intent intent = IntentUtils.getCommitInfoActivityIntent(getActivity(),
                 urlPart[4], urlPart[5], commit.getSha());

@@ -6,6 +6,7 @@ import org.eclipse.egit.github.core.Repository;
 
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.Constants;
 import com.gh4a.R;
@@ -48,12 +49,12 @@ public class RepositorySearchFragment extends ListDataBaseFragment<Repository> {
     }
 
     @Override
-    protected RootAdapter<Repository> onCreateAdapter() {
+    protected RootAdapter<Repository, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         return new RepositoryAdapter(getActivity());
     }
 
     @Override
-    protected void onItemClick(Repository item) {
+    public void onItemClick(Repository item) {
         startActivity(IntentUtils.getRepoActivityIntent(getActivity(),
                 item.getOwner().getLogin(), item.getName(), null));
     }
