@@ -160,8 +160,12 @@ public class IntentUtils {
     // the browser's intent filters. We therefore resolve the intent by ourselves,
     // strip our own entry from the list and pass the result to the system's
     // activity chooser.
+    // When doing that, pass a dummy URI to the resolver and swap in our real URI
+    // later, as otherwise the system might return our package only if it's set
+    // to handle the Github URIs by default
+    private static final Uri DUMMY_URI = Uri.parse("http://www.somedummy.com");
     private static Intent createBrowserIntent(Context context, Uri uri) {
-        final Intent browserIntent = new Intent(Intent.ACTION_VIEW, uri)
+        final Intent browserIntent = new Intent(Intent.ACTION_VIEW, DUMMY_URI)
                 .addCategory(Intent.CATEGORY_BROWSABLE);
         final PackageManager pm = context.getPackageManager();
         final List<ResolveInfo> activities = pm.queryIntentActivities(browserIntent,
@@ -182,6 +186,7 @@ public class IntentUtils {
 
             Intent targetIntent = new Intent(browserIntent);
             targetIntent.setPackage(info.packageName);
+            targetIntent.setData(uri);
             chooserIntents.add(targetIntent);
         }
 
