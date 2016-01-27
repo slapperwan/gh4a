@@ -25,6 +25,9 @@ public class EllipsizeLineSpan extends ReplacementSpan implements
     @Override
     public int getSize(Paint paint, CharSequence text,
             int start, int end, Paint.FontMetricsInt fm) {
+        if (fm != null) {
+            paint.getFontMetricsInt(fm);
+        }
         int textWidth = (int) Math.ceil(paint.measureText(text, start, end));
         return Math.min(textWidth, mClipRect.width());
     }
