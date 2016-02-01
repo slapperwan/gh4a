@@ -58,6 +58,7 @@ import com.gh4a.adapter.SearchUserAdapter;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.DividerItemDecoration;
 
 public class SearchActivity extends BaseActivity implements
         SearchView.OnQueryTextListener, SearchView.OnCloseListener,
@@ -109,6 +110,7 @@ public class SearchActivity extends BaseActivity implements
 
         mResultsView = (RecyclerView) findViewById(R.id.list);
         mResultsView.setLayoutManager(new LinearLayoutManager(this));
+        mResultsView.addItemDecoration(new DividerItemDecoration(this));
         registerForContextMenu(mResultsView);
 
         if (savedInstanceState != null) {

@@ -35,6 +35,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.ReleaseLoader;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.widget.DividerItemDecoration;
 
 public class ReleaseListActivity extends BaseActivity implements
         RootAdapter.OnItemClickListener<Release> {
@@ -82,6 +83,7 @@ public class ReleaseListActivity extends BaseActivity implements
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list);
         mAdapter = new ReleaseAdapter(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this));
         recyclerView.setAdapter(mAdapter);
         mAdapter.setOnItemClickListener(this);
 

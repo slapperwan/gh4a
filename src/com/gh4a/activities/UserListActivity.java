@@ -33,6 +33,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.DividerItemDecoration;
 
 import org.eclipse.egit.github.core.User;
 
@@ -81,6 +82,7 @@ public abstract class UserListActivity extends BaseActivity implements
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this));
         recyclerView.setAdapter(mUserAdapter);
         recyclerView.setBackgroundResource(
                 UiUtils.resolveDrawable(this, R.attr.listBackground));
