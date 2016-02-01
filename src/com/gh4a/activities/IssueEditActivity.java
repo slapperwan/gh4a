@@ -184,13 +184,6 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         fab.setOnClickListener(this);
         setHeaderAlignedActionButton(fab);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(isInEditMode()
-                ? getString(R.string.issue_edit_title, mEditIssue.getNumber())
-                : getString(R.string.issue_create));
-        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
         mTvSelectedMilestone = (TextView) findViewById(R.id.tv_milestone);
         mTvSelectedAssignee = (TextView) findViewById(R.id.tv_assignee);
         mTvLabels = (TextView) findViewById(R.id.tv_labels);
@@ -210,6 +203,13 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
         mTitleView.setText(mEditIssue.getTitle());
         mDescView.setText(mEditIssue.getBody());
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(isInEditMode()
+                ? getString(R.string.issue_edit_title, mEditIssue.getNumber())
+                : getString(R.string.issue_create));
+        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         updateLabels();
         updateLabelStates();
