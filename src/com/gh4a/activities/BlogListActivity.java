@@ -38,7 +38,7 @@ public class BlogListActivity extends BaseActivity {
                     .add(R.id.content_container, mFragment)
                     .commit();
         } else {
-            mFragment = (BlogListFragment) fm.findFragmentById(R.id.details);
+            mFragment = (BlogListFragment) fm.findFragmentById(R.id.content_container);
         }
 
         ActionBar actionBar = getSupportActionBar();

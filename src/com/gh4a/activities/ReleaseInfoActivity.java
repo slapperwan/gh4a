@@ -37,6 +37,7 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MarkdownLoader;
 import com.gh4a.loader.ReleaseLoader;
 import com.gh4a.utils.AvatarHandler;
+import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
@@ -138,7 +139,8 @@ public class ReleaseInfoActivity extends BaseActivity implements View.OnClickLis
         AvatarHandler.assignAvatar(gravatar, mRelease.getAuthor());
 
         StyleableTextView details = (StyleableTextView) findViewById(R.id.tv_releaseinfo);
-        String detailsText = getString(R.string.release_details, mRelease.getAuthor().getLogin(),
+        String detailsText = getString(R.string.release_details,
+                CommitUtils.getUserLogin(this, mRelease.getAuthor()),
                 StringUtils.formatRelativeTime(this, mRelease.getCreatedAt(), true));
         StringUtils.applyBoldTagsAndSetText(details, detailsText);
 

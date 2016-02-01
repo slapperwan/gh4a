@@ -154,8 +154,9 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
             if (assigneeLogin != null && assigneeLogin.equals(actorLogin)) {
                 textResId = R.string.issue_event_assigned_self;
             } else {
-                textBase = mContext.getString(R.string.issue_event_assigned, actorLogin,
-                        assigneeLogin != null ? assigneeLogin : mContext.getString(R.string.unknown));
+                textBase = mContext.getString(R.string.issue_event_assigned,
+                        CommitUtils.getUserLogin(mContext, event.getActor()),
+                        CommitUtils.getUserLogin(mContext, event.getAssignee()));
             }
         } else if (TextUtils.equals(type, "unassigned")) {
             textBase = mContext.getString(R.string.issue_event_unassigned,

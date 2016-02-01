@@ -112,13 +112,15 @@ public class HttpImageGetter implements ImageGetter {
     }
 
     public void destroy() {
-        for (WeakReference<Bitmap> ref : loadedBitmaps) {
-            Bitmap bitmap = ref.get();
-            if (bitmap != null) {
-                bitmap.recycle();
+        synchronized (this) {
+            for (WeakReference<Bitmap> ref : loadedBitmaps) {
+                Bitmap bitmap = ref.get();
+                if (bitmap != null) {
+                    bitmap.recycle();
+                }
             }
+            destroyed = true;
         }
-        destroyed = true;
     }
 
     @SuppressWarnings("deprecation")
@@ -241,38 +243,51 @@ public class HttpImageGetter implements ImageGetter {
     }
 
     public Drawable getDrawable(String source) {
-        File output = null;
-        if (destroyed) {
-            return loading.getDrawable(source);
-        }
-        try {
-            output = File.createTempFile("image", ".jpg", dir);
-            InputStream is = fetch(source);
-            if (is != null) {
-                boolean success = FileUtils.save(output, is);
-                if (success) {
-                    Bitmap bitmap = ImageUtils.getBitmap(output, width, Integer.MAX_VALUE);
-                    if (bitmap == null) {
-                        return loading.getDrawable(source);
+        Bitmap bitmap = null;
+
+        if (!destroyed) {
+            File output = null;
+            InputStream is = null;
+            try {
+                output = File.createTempFile("image", ".jpg", dir);
+                is = fetch(source);
+                if (is != null) {
+                    boolean success = FileUtils.save(output, is);
+                    if (success) {
+                        bitmap = ImageUtils.getBitmap(output, width, Integer.MAX_VALUE);
                     }
-                    loadedBitmaps.add(new WeakReference<Bitmap>(bitmap));
-                    BitmapDrawable drawable = new BitmapDrawable(
-                            context.getResources(), bitmap);
-                    drawable.setBounds(0, 0, bitmap.getWidth(), bitmap.getHeight());
-                    return drawable;
                 }
-                else {
-                    return loading.getDrawable(source);
+            } catch (IOException e) {
+                // fall through to showing the loading bitmap
+            } finally {
+                if (output != null) {
+                    output.delete();
+                }
+                if (is != null) {
+                    try {
+                        is.close();
+                    } catch (IOException e) {
+                        // ignored
+                    }
                 }
             }
-            else {
-                return loading.getDrawable(source);
-            }
-        } catch (IOException e) {
-            return loading.getDrawable(source);
-        } finally {
-            if (output != null)
-                output.delete();
         }
+
+        synchronized (this) {
+            if (destroyed) {
+                bitmap.recycle();
+                bitmap = null;
+            } else {
+                loadedBitmaps.add(new WeakReference<Bitmap>(bitmap));
+            }
+        }
+
+        if (bitmap == null) {
+            return loading.getDrawable(source);
+        }
+
+        BitmapDrawable drawable = new BitmapDrawable(context.getResources(), bitmap);
+        drawable.setBounds(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        return drawable;
     }
 }

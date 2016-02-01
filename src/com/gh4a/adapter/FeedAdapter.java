@@ -273,7 +273,7 @@ public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListe
     private String formatTitle(Event event) {
         String eventType = event.getType();
         EventRepository eventRepo = event.getRepo();
-        User actor = event.getActor();
+        String actorLogin = CommitUtils.getUserLogin(mContext, event.getActor());
         Resources res = mContext.getResources();
 
         if (hasInvalidPayload(event)) {
@@ -282,55 +282,55 @@ public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListe
 
         if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
             CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
-            return res.getString(R.string.event_commit_comment_title,
-                    actor.getLogin(), payload.getComment().getCommitId().substring(0, 7),
+            return res.getString(R.string.event_commit_comment_title, actorLogin,
+                    payload.getComment().getCommitId().substring(0, 7),
                     formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_CREATE.equals(eventType)) {
             CreatePayload payload = (CreatePayload) event.getPayload();
             String type = payload.getRefType();
             if ("repository".equals(type)) {
-                return res.getString(R.string.event_create_repo_title,
-                        actor.getLogin(), formatFromRepoName(eventRepo));
+                return res.getString(R.string.event_create_repo_title, actorLogin,
+                        formatFromRepoName(eventRepo));
             } else if ("branch".equals(type) || "tag".equals(type)) {
                 return res.getString(R.string.event_create_branch_title,
-                        actor.getLogin(), type, payload.getRef(), formatFromRepoName(eventRepo));
+                        actorLogin, type, payload.getRef(), formatFromRepoName(eventRepo));
             }
 
         } else if (Event.TYPE_DELETE.equals(eventType)) {
             DeletePayload payload = (DeletePayload) event.getPayload();
             if ("repository".equals(payload.getRefType())) {
                 return res.getString(R.string.event_delete_repo_title,
-                        actor.getLogin(), payload.getRef());
+                        actorLogin, payload.getRef());
             } else {
                 return res.getString(R.string.event_delete_branch_title,
-                        actor.getLogin(), payload.getRefType(), payload.getRef(),
+                        actorLogin, payload.getRefType(), payload.getRef(),
                         formatFromRepoName(eventRepo));
             }
 
         } else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
             return res.getString(R.string.event_download_title,
-                    actor.getLogin(), formatFromRepoName(eventRepo));
+                    actorLogin, formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_FOLLOW.equals(eventType)) {
             FollowPayload payload = (FollowPayload) event.getPayload();
             return res.getString(R.string.event_follow_title,
-                    actor.getLogin(), payload.getTarget().getLogin());
+                    actorLogin, payload.getTarget().getLogin());
 
         } else if (Event.TYPE_FORK.equals(event.getType())) {
             return res.getString(R.string.event_fork_title,
-                    actor.getLogin(), formatFromRepoName(eventRepo));
+                    actorLogin, formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_FORK_APPLY.equals(eventType)) {
             return res.getString(R.string.event_fork_apply_title,
-                    actor.getLogin(), formatFromRepoName(eventRepo));
+                    actorLogin, formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_GIST.equals(eventType)) {
             GistPayload payload = (GistPayload) event.getPayload();
             Gist gist = payload.getGist();
-            String login = actor.getLogin();
+            String login = event.getActor().getLogin();
             if (TextUtils.isEmpty(login)) {
-                login = CommitUtils.getUserLogin(mContext, gist.getUser());
+                login = CommitUtils.getUserLogin(mContext, gist.getOwner());
             }
 
             String id = gist != null ? gist.getId() : mContext.getString(R.string.deleted);
@@ -342,7 +342,7 @@ public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListe
             GollumPayload payload = (GollumPayload) event.getPayload();
             List<GollumPage> pages = payload.getPages();
             int count = pages == null ? 0 : pages.size();
-            return res.getString(R.string.event_gollum_title, actor.getLogin(),
+            return res.getString(R.string.event_gollum_title, actorLogin,
                     res.getQuantityString(R.plurals.page, count, count),
                     formatFromRepoName(eventRepo));
 
@@ -352,30 +352,30 @@ public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListe
             if (issue != null) {
                 int formatResId = issue.getPullRequest() != null
                         ? R.string.event_pull_request_comment : R.string.event_issue_comment;
-                return res.getString(formatResId, actor.getLogin(),
+                return res.getString(formatResId, actorLogin,
                         issue.getNumber(), formatFromRepoName(eventRepo));
             }
 
         } else if (Event.TYPE_ISSUES.equals(eventType)) {
             IssuesPayload eventPayload = (IssuesPayload) event.getPayload();
             return res.getString(R.string.event_issues_title,
-                    actor.getLogin(), eventPayload.getAction(),
+                    actorLogin, eventPayload.getAction(),
                     eventPayload.getIssue().getNumber(), formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_MEMBER.equals(eventType)) {
             MemberPayload payload = (MemberPayload) event.getPayload();
             return res.getString(R.string.event_member_title,
-                    actor.getLogin(), payload.getMember() != null ? payload.getMember().getLogin() : "",
+                    actorLogin, payload.getMember() != null ? payload.getMember().getLogin() : "",
                             formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_PUBLIC.equals(eventType)) {
             return res.getString(R.string.event_public_title,
-                    actor.getLogin(), formatFromRepoName(eventRepo));
+                    actorLogin, formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_PULL_REQUEST.equals(eventType)) {
             PullRequestPayload payload = (PullRequestPayload) event.getPayload();
             return res.getString(R.string.event_pull_request_title,
-                    actor.getLogin(), payload.getAction(),
+                    actorLogin, payload.getAction(),
                     payload.getNumber(), formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
@@ -383,13 +383,13 @@ public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListe
                     (PullRequestReviewCommentPayload) event.getPayload();
             if (payload.getPullRequest() != null) {
                 return res.getString(R.string.event_pull_request_review_comment_title,
-                        actor.getLogin(), payload.getPullRequest().getNumber(),
+                        actorLogin, payload.getPullRequest().getNumber(),
                         formatFromRepoName(eventRepo));
             } else {
                 CommitComment comment = payload.getComment();
                 if (comment != null) {
                     return res.getString(R.string.event_commit_comment_title,
-                            actor.getLogin(), payload.getComment().getCommitId().substring(0, 7),
+                            actorLogin, payload.getComment().getCommitId().substring(0, 7),
                             formatFromRepoName(eventRepo));
                 }
             }
@@ -398,11 +398,11 @@ public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListe
             PushPayload payload = (PushPayload) event.getPayload();
             String[] refPart = payload.getRef().split("/");
             return res.getString(R.string.event_push_title,
-                    actor.getLogin(), refPart.length == 3 ? refPart[2] : payload.getRef(),
+                    actorLogin, refPart.length == 3 ? refPart[2] : payload.getRef(),
                             formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_RELEASE.equals(eventType)) {
-            return res.getString(R.string.event_release_title, actor.getLogin(),
+            return res.getString(R.string.event_release_title, actorLogin,
                     formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_TEAM_ADD.equals(eventType)) {
@@ -412,16 +412,16 @@ public class FeedAdapter extends RootAdapter<Event> implements View.OnClickListe
                 Repository repo = payload.getRepo();
                 if (repo != null) {
                     return res.getString(R.string.event_team_repo_add,
-                            actor.getLogin(), formatToRepoName(repo), team.getName());
+                            actorLogin, formatToRepoName(repo), team.getName());
                 } else if (payload.getUser() != null) {
                     return res.getString(R.string.event_team_user_add,
-                            actor.getLogin(), payload.getUser().getLogin(), team.getName());
+                            actorLogin, payload.getUser().getLogin(), team.getName());
                 }
             }
 
         } else if (Event.TYPE_WATCH.equals(eventType)) {
             return res.getString(R.string.event_watch_title,
-                    actor.getLogin(), formatFromRepoName(eventRepo));
+                    actorLogin, formatFromRepoName(eventRepo));
         }
 
         return "";
