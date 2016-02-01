@@ -118,7 +118,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
         TextView releaseType = (TextView) findViewById(R.id.tv_releasetype);
         if (mRelease.isDraft()) {
             releaseType.setText(R.string.release_type_draft);
-        } else if (mRelease.isPreRelease()) {
+        } else if (mRelease.isPrerelease()) {
             releaseType.setText(R.string.release_type_prerelease);
         } else {
             releaseType.setText(R.string.release_type_final);
