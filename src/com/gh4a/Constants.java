@@ -92,7 +92,7 @@ public interface Constants {
     }
 
     public interface Release {
+        public static final String ID = "Release.id";
         public static final String RELEASE = "Release.release";
-        public static final String RELEASER = "Release.releaser";
     }
 }

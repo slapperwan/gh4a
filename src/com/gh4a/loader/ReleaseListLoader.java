@@ -13,23 +13,28 @@ import android.content.Context;
 
 import com.gh4a.Gh4Application;
 
-public class ReleaseLoader extends BaseLoader<Release> {
+public class ReleaseListLoader extends BaseLoader<List<Release>> {
 
     private String mRepoOwner;
     private String mRepoName;
-    private long mReleaseId;
 
-    public ReleaseLoader(Context context, String repoOwner, String repoName, long id) {
+    public ReleaseListLoader(Context context, String repoOwner, String repoName) {
         super(context);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
-        mReleaseId = id;
     }
 
     @Override
-    public Release doLoadInBackground() throws IOException {
+    public List<Release> doLoadInBackground() throws IOException {
         RepositoryService repoService = (RepositoryService)
                 Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
-        return repoService.getRelease(new RepositoryId(mRepoOwner, mRepoName), mReleaseId);
+        List<Release> releases = repoService.getReleases(new RepositoryId(mRepoOwner, mRepoName));
+        Collections.sort(releases, new Comparator<Release>() {
+            @Override
+            public int compare(Release lhs, Release rhs) {
+                return rhs.getCreatedAt().compareTo(lhs.getCreatedAt());
+            }
+        });
+        return releases;
     }
 }

@@ -23,6 +23,7 @@ import org.eclipse.egit.github.core.Gist;
 import org.eclipse.egit.github.core.GollumPage;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.PullRequest;
+import org.eclipse.egit.github.core.Release;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.Team;
 import org.eclipse.egit.github.core.User;
@@ -240,8 +241,12 @@ public class FeedAdapter extends RootAdapter<Event, FeedAdapter.EventViewHolder>
 
         } else if (Event.TYPE_RELEASE.equals(eventType)) {
             ReleasePayload payload = (ReleasePayload) event.getPayload();
-            if (payload.getRelease() != null) {
-                return payload.getRelease().getName();
+            Release release = payload.getRelease();
+            if (release != null) {
+                if (!TextUtils.isEmpty(release.getName())) {
+                    return release.getName();
+                }
+                return release.getTagName();
             }
         }
 

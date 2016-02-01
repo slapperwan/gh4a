@@ -4,6 +4,7 @@ import org.eclipse.egit.github.core.Release;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +26,11 @@ public class ReleaseAdapter extends RootAdapter<Release, ReleaseAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ViewHolder holder, Release release) {
-        holder.tvTitle.setText(release.getName());
+        String name = release.getName();
+        if (TextUtils.isEmpty(name)) {
+            name = release.getTagName();
+        }
+        holder.tvTitle.setText(name);
         holder.tvType.setText(formatReleaseType(release));
         holder.tvCreatedAt.setText(mContext.getString(R.string.download_created,
                 StringUtils.formatRelativeTime(mContext, release.getCreatedAt(), true)));
