@@ -43,7 +43,7 @@ public class ReleaseAdapter extends RootAdapter<Release> {
         if (release.isDraft()) {
             return mContext.getString(R.string.release_type_draft);
         }
-        if (release.isPreRelease()) {
+        if (release.isPrerelease()) {
             return mContext.getString(R.string.release_type_prerelease);
         }
         return mContext.getString(R.string.release_type_final);

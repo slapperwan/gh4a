@@ -6,21 +6,20 @@ import java.net.HttpURLConnection;
 
 public class DefaultClient extends GitHubClient {
     private static final String DEFAULT_HEADER_ACCEPT = "application/vnd.github.beta.full+json";
-    private String mHeaderAccept;
 
     public DefaultClient() {
         this(DEFAULT_HEADER_ACCEPT);
     }
 
     public DefaultClient(String headerAccept) {
-        mHeaderAccept = headerAccept;
+        super();
+        setHeaderAccept(headerAccept);
     }
 
     @Override
     protected HttpURLConnection configureRequest(HttpURLConnection request) {
         super.configureRequest(request);
         Gh4Application.trackVisitedUrl(request.getURL().toExternalForm());
-        request.setRequestProperty(HEADER_ACCEPT, mHeaderAccept);
         return request;
     }
 
