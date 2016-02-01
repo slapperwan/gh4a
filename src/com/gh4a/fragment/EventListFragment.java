@@ -272,8 +272,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             Release release = payload.getRelease();
             if (release != null) {
                 intent = new Intent(getActivity(), ReleaseInfoActivity.class);
-                intent.putExtra(Constants.Release.RELEASE, release);
-                intent.putExtra(Constants.Release.RELEASER, event.getActor());
+                intent.putExtra(Constants.Release.ID, release.getId());
                 intent.putExtra(Constants.Repository.OWNER, repoOwner);
                 intent.putExtra(Constants.Repository.NAME, repoName);
                 startActivity(intent);

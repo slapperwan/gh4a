@@ -17,12 +17,12 @@ package com.gh4a.activities;
 
 import org.eclipse.egit.github.core.Download;
 import org.eclipse.egit.github.core.Release;
-import org.eclipse.egit.github.core.User;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -35,6 +35,7 @@ import com.gh4a.adapter.DownloadAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MarkdownLoader;
+import com.gh4a.loader.ReleaseLoader;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
@@ -47,10 +48,28 @@ public class ReleaseInfoActivity extends BaseActivity implements View.OnClickLis
     private String mRepoOwner;
     private String mRepoName;
     private Release mRelease;
-    private User mReleaser;
+    private long mReleaseId;
 
     private HttpImageGetter mImageGetter;
 
+    private LoaderCallbacks<Release> mReleaseCallback = new LoaderCallbacks<Release>() {
+        @Override
+        public Loader<LoaderResult<Release>> onCreateLoader(int id, Bundle args) {
+            return new ReleaseLoader(ReleaseInfoActivity.this, mRepoOwner, mRepoName, mReleaseId);
+        }
+
+        @Override
+        public void onResultReady(LoaderResult<Release> result) {
+            if (!result.handleError(ReleaseInfoActivity.this)) {
+                mRelease = result.getData();
+                handleReleaseReady();
+                setContentShown(true);
+            } else {
+                setContentEmpty(true);
+                setContentShown(true);
+            }
+        }
+    };
     private LoaderCallbacks<String> mBodyCallback = new LoaderCallbacks<String>() {
         @Override
         public Loader<LoaderResult<String>> onCreateLoader(int id, Bundle args) {
@@ -76,20 +95,21 @@ public class ReleaseInfoActivity extends BaseActivity implements View.OnClickLis
         mRepoOwner = extras.getString(Constants.Repository.OWNER);
         mRepoName = extras.getString(Constants.Repository.NAME);
         mRelease = (Release) extras.getSerializable(Constants.Release.RELEASE);
-        mReleaser = mRelease.getAuthor();
-        if (mReleaser == null) {
-            mReleaser = (User) extras.getSerializable(Constants.Release.RELEASER);
-        }
+        mReleaseId = extras.getLong(Constants.Release.ID);
 
         mImageGetter = new HttpImageGetter(this);
-        fillData();
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(mRelease.getName());
+        actionBar.setTitle(R.string.release_title);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        getSupportLoaderManager().initLoader(0, null, mBodyCallback);
+        if (mRelease != null) {
+            handleReleaseReady();
+        } else {
+            setContentShown(false);
+            getSupportLoaderManager().initLoader(0, null, mReleaseCallback);
+        }
     }
 
     @Override
@@ -103,12 +123,22 @@ public class ReleaseInfoActivity extends BaseActivity implements View.OnClickLis
         return IntentUtils.getRepoActivityIntent(this, mRepoOwner, mRepoName, null);
     }
 
+    private void handleReleaseReady() {
+        String name = mRelease.getName();
+        if (TextUtils.isEmpty(name)) {
+            name = mRelease.getTagName();
+        }
+        getSupportActionBar().setTitle(name);
+        getSupportLoaderManager().initLoader(1, null, mBodyCallback);
+        fillData();
+    }
+
     private void fillData() {
         ImageView gravatar = (ImageView) findViewById(R.id.iv_gravatar);
         AvatarHandler.assignAvatar(gravatar, mRelease.getAuthor());
 
         StyleableTextView details = (StyleableTextView) findViewById(R.id.tv_releaseinfo);
-        String detailsText = getString(R.string.release_details, mReleaser.getLogin(),
+        String detailsText = getString(R.string.release_details, mRelease.getAuthor().getLogin(),
                 StringUtils.formatRelativeTime(this, mRelease.getCreatedAt(), true));
         StringUtils.applyBoldTagsAndSetText(details, detailsText);
 

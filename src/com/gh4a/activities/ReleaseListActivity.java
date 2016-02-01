@@ -33,7 +33,7 @@ import com.gh4a.R;
 import com.gh4a.adapter.ReleaseAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.ReleaseLoader;
+import com.gh4a.loader.ReleaseListLoader;
 import com.gh4a.utils.IntentUtils;
 
 public class ReleaseListActivity extends BaseActivity implements AdapterView.OnItemClickListener {
@@ -44,7 +44,7 @@ public class ReleaseListActivity extends BaseActivity implements AdapterView.OnI
     private LoaderCallbacks<List<Release>> mReleaseCallback = new LoaderCallbacks<List<Release>>() {
         @Override
         public Loader<LoaderResult<List<Release>>> onCreateLoader(int id, Bundle args) {
-            return new ReleaseLoader(ReleaseListActivity.this, mUserLogin, mRepoName);
+            return new ReleaseListLoader(ReleaseListActivity.this, mUserLogin, mRepoName);
         }
 
         @Override

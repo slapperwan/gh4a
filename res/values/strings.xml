@@ -244,6 +244,7 @@
     <string name="commit_comment_error_body">Please enter your comment.</string>
 
     <!-- Release -->
+    <string name="release_title">Release</string>
     <string name="release_details">Released by [b]%1$s[/b] %2$s</string>
     <string name="release_tag">On tag %1$s</string>
     <string name="release_notes">Release notes</string>

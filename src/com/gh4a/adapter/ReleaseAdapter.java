@@ -3,6 +3,7 @@ package com.gh4a.adapter;
 import org.eclipse.egit.github.core.Release;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,8 +33,12 @@ public class ReleaseAdapter extends RootAdapter<Release> {
     @Override
     protected void bindView(View v, Release release) {
         ViewHolder viewHolder = (ViewHolder) v.getTag();
+        String name = release.getName();
+        if (TextUtils.isEmpty(name)) {
+            name = release.getTagName();
+        }
 
-        viewHolder.tvTitle.setText(release.getName());
+        viewHolder.tvTitle.setText(name);
         viewHolder.tvType.setText(formatReleaseType(release));
         viewHolder.tvCreatedAt.setText(mContext.getString(R.string.download_created,
                 StringUtils.formatRelativeTime(mContext, release.getCreatedAt(), true)));
