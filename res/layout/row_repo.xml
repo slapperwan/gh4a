@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:minHeight="72dp"
     android:padding="@dimen/content_padding"
+    android:background="?attr/selectableItemBackground"
     android:orientation="vertical">
 
     <com.gh4a.widget.StyleableTextView

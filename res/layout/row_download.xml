@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:minHeight="72dp"
     android:orientation="horizontal"
+    android:background="?attr/selectableItemBackground"
     android:padding="@dimen/content_padding">
 
     <LinearLayout

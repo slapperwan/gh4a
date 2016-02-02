@@ -6,6 +6,7 @@
     android:minHeight="?attr/listPreferredItemHeight"
     android:padding="@dimen/content_padding"
     android:gravity="center_vertical"
+    android:background="?attr/selectableItemBackground"
     android:orientation="horizontal">
 
     <LinearLayout

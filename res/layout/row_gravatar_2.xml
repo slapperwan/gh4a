@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="?android:attr/listPreferredItemHeight"
+    android:background="?attr/selectableItemBackground"
     android:padding="@dimen/content_padding">
 
     <com.gh4a.widget.FixedSizeImageView
