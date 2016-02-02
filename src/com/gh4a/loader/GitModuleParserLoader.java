@@ -11,6 +11,8 @@ import org.eclipse.egit.github.core.service.ContentsService;
 import org.eclipse.egit.github.core.util.EncodingUtils;
 
 import android.content.Context;
+import android.net.Uri;
+import android.text.TextUtils;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.StringUtils;
@@ -52,17 +54,29 @@ public class GitModuleParserLoader extends BaseLoader<Map<String, String>> {
             if (line.startsWith("path = ")) {
                 String[] pathPart = line.split("=");
                 path = pathPart[1].trim();
-            }
-
-            if (line.startsWith("url = ")) {
+            } else if (line.startsWith("url = ")) {
                 String[] urlPart = line.split("=");
-                String url = urlPart[1].trim();
-                String[] userRepoPart = url.split("/");
-                String user = userRepoPart[3];
-                String repo = userRepoPart[4];
 
-                if (repo.lastIndexOf(".") != -1) {
-                    repo = repo.substring(0, repo.lastIndexOf("."));
+                String url = urlPart[1].trim().replace("github.com:", "github.com/");
+                int pos = url.indexOf("git@");
+                if (pos == 0) {
+                    url = "ssh://" + url.substring(4);
+                }
+
+                Uri uri = Uri.parse(url);
+                if (!TextUtils.equals(uri.getHost(), "github.com")) {
+                    continue;
+                }
+                List<String> pathSegments = uri.getPathSegments();
+                if (pathSegments == null || pathSegments.size() < 2) {
+                    continue;
+                }
+                String user = pathSegments.get(pathSegments.size() - 2);
+                String repo = pathSegments.get(pathSegments.size() - 1);
+
+                pos = repo.lastIndexOf(".");
+                if (pos != -1) {
+                    repo = repo.substring(0, pos);
                 }
                 gitModuleMap.put(path, user + "/" + repo);
             }
