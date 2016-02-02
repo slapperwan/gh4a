@@ -2,6 +2,7 @@ package com.gh4a.activities;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -368,10 +369,20 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
 
     @Override
     public Set<String> getSubModuleNames(ContentListFragment fragment) {
-        if (mGitModuleMap != null && fragment.getPath() == null) {
-            return mGitModuleMap.keySet();
+        if (mGitModuleMap == null) {
+            return null;
         }
-        return null;
+
+        String prefix = fragment.getPath() == null ? null : (fragment.getPath() + "/");
+        Set<String> names = new HashSet<>();
+        for (String name : mGitModuleMap.keySet()) {
+            if (prefix == null && !name.contains("/")) {
+                names.add(name);
+            } else if (prefix != null && name.startsWith(prefix)) {
+                names.add(name.substring(prefix.length()));
+            }
+        }
+        return names;
     }
 
     @Override
