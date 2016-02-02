@@ -65,6 +65,7 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase im
         }
 
         mViewCreated = true;
+        updateEmptyState();
     }
 
     @Override
@@ -84,6 +85,7 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase im
         } else {
             setContentShownNoAnimation(true);
         }
+        updateEmptyState();
         getActivity().supportInvalidateOptionsMenu();
     }
 

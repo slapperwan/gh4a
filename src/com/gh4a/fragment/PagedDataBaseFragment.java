@@ -75,6 +75,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
                     UiUtils.resolveDrawable(getActivity(), R.attr.listBackground));
         }
         recyclerView.setAdapter(mAdapter);
+        updateEmptyState();
     }
 
     public void refresh() {
@@ -129,6 +130,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         if (!TextUtils.isEmpty(mCurrentFilter)) {
             mAdapter.getFilter().filter(mCurrentFilter);
         }
+        updateEmptyState();
     }
 
     @Override
