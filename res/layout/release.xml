@@ -107,10 +107,14 @@
                     style="@style/HeaderLabel"
                     android:text="@string/downloads" />
 
-                <android.support.v7.widget.RecyclerView
+                <!-- FIXME: Replace by RecyclerView again once RecyclerView
+                            gets wrap_content support
+                            https://code.google.com/p/android/issues/detail?id=74772 -->
+                <LinearLayout
                     android:id="@+id/download_list"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
 
             </LinearLayout>
 

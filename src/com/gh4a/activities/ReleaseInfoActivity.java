@@ -26,6 +26,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -161,12 +162,18 @@ public class ReleaseInfoActivity extends BaseActivity implements
         tag.setOnClickListener(this);
 
         if (mRelease.getAssets() != null && !mRelease.getAssets().isEmpty()) {
-            RecyclerView downloadsList = (RecyclerView) findViewById(R.id.download_list);
-            downloadsList.setLayoutManager(new LinearLayoutManager(this));
+            // FIXME: Replace by RecyclerView again once RecyclerView gets wrap_content support
+            // https://code.google.com/p/android/issues/detail?id=74772
+            ViewGroup downloadsList = (ViewGroup) findViewById(R.id.download_list);
             DownloadAdapter adapter = new DownloadAdapter(this);
             adapter.addAll(mRelease.getAssets());
-            downloadsList.setAdapter(adapter);
             adapter.setOnItemClickListener(this);
+            for (int i = 0; i < adapter.getCount(); i++) {
+                int type = adapter.getItemViewType(i);
+                RecyclerView.ViewHolder vh = adapter.onCreateViewHolder(downloadsList, type);
+                adapter.onBindViewHolder(vh, i);
+                downloadsList.addView(vh.itemView);
+            }
         } else {
             findViewById(R.id.downloads).setVisibility(View.GONE);
         }

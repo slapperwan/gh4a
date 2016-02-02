@@ -41,7 +41,7 @@ public class MilestoneAdapter extends RootAdapter<Milestone, MilestoneAdapter.Vi
 
     @Override
     public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
-        View v = inflater.inflate(R.layout.row_milestone, null);
+        View v = inflater.inflate(R.layout.row_milestone, parent, false);
         return new ViewHolder(v);
     }
 

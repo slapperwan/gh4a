@@ -20,7 +20,7 @@ public class DownloadAdapter extends RootAdapter<Download, DownloadAdapter.ViewH
 
     @Override
     public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
-        View v = inflater.inflate(R.layout.row_download, null);
+        View v = inflater.inflate(R.layout.row_download, parent, false);
         return new ViewHolder(v);
     }
 
