@@ -119,6 +119,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
             String body = HtmlUtils.format(event.comment.getBodyHtml()).toString();
             mImageGetter.bind(viewHolder.tvDesc, body, event.comment.getId());
         } else {
+            viewHolder.tvDesc.setTag(null);
             viewHolder.tvDesc.setText(formatEvent(event.event,
                     viewHolder.tvExtra.getTypefaceValue()));
         }
