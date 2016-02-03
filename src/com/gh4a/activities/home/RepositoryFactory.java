@@ -21,7 +21,7 @@ public class RepositoryFactory extends FragmentFactory {
 
     private static final String STATE_KEY_FRAGMENT = "repoFactoryFragment";
 
-    public RepositoryFactory(HomeActivity activity, String userLogin, Bundle savedInstanceState) {
+    public RepositoryFactory(HomeActivity activity, String userLogin) {
         super(activity);
         mUserLogin = userLogin;
     }

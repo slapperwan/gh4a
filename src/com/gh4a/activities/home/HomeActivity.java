@@ -63,7 +63,7 @@ public class HomeActivity extends BasePagerActivity implements
         } else {
             mSelectedFactoryId = R.id.news_feed;
         }
-        mFactory = getFactoryForItem(mSelectedFactoryId, savedInstanceState);
+        mFactory = getFactoryForItem(mSelectedFactoryId);
         mFragments = new SparseArray<>();
 
         super.onCreate(savedInstanceState);
@@ -136,7 +136,7 @@ public class HomeActivity extends BasePagerActivity implements
         }
 
         int id = item.getItemId();
-        FragmentFactory factory = getFactoryForItem(id, null);
+        FragmentFactory factory = getFactoryForItem(id);
 
         if (factory != null) {
             switchTo(id, factory);
@@ -158,12 +158,12 @@ public class HomeActivity extends BasePagerActivity implements
         return false;
     }
 
-    private FragmentFactory getFactoryForItem(int id, Bundle savedInstanceState) {
+    private FragmentFactory getFactoryForItem(int id) {
         switch (id) {
             case R.id.news_feed:
                 return new NewsFeedFactory(this, mUserLogin);
             case R.id.my_repos:
-                return new RepositoryFactory(this, mUserLogin, savedInstanceState);
+                return new RepositoryFactory(this, mUserLogin);
             case R.id.my_issues:
                 return new IssueListFactory(this, mUserLogin, false);
             case R.id.my_prs:
