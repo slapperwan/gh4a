@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.view.MenuItem;
-import android.widget.ListAdapter;
 
 import com.gh4a.Constants;
 import com.gh4a.R;

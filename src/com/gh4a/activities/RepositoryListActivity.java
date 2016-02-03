@@ -15,18 +15,14 @@
  */
 package com.gh4a.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
-import android.widget.ListAdapter;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.R;
-import com.gh4a.fragment.PublicTimelineFragment;
-import com.gh4a.fragment.RepositoryIssueListFragment;
 import com.gh4a.fragment.RepositoryListContainerFragment;
 
 public class RepositoryListActivity extends BaseActivity implements

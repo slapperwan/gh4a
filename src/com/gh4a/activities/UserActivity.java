@@ -10,7 +10,6 @@ import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.ListAdapter;
 
 import com.gh4a.BackgroundTask;
 import com.gh4a.BasePagerActivity;
@@ -18,7 +17,6 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.db.BookmarksProvider;
-import com.gh4a.fragment.PrivateEventListFragment;
 import com.gh4a.fragment.PublicEventListFragment;
 import com.gh4a.fragment.UserFragment;
 import com.gh4a.loader.IsFollowingUserLoader;
@@ -27,9 +25,6 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
 
 import org.eclipse.egit.github.core.service.UserService;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class UserActivity extends BasePagerActivity {
     private String mUserLogin;

@@ -27,7 +27,6 @@ import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ListAdapter;
 
 import com.gh4a.BasePagerActivity;
 import com.gh4a.Constants;
@@ -47,7 +46,6 @@ import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

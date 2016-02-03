@@ -4,7 +4,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ListAdapter;
 
 import com.gh4a.Constants;
 import com.gh4a.R;

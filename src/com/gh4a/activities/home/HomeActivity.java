@@ -12,7 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import com.gh4a.BasePagerActivity;
@@ -29,9 +28,6 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.User;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class HomeActivity extends BasePagerActivity implements
         View.OnClickListener, RepositoryListContainerFragment.Callback {

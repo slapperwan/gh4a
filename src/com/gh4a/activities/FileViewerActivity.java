@@ -32,7 +32,6 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.StringUtils;
 
 import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.util.EncodingUtils;

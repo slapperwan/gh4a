@@ -54,7 +54,6 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.ThemeUtils;
 import com.gh4a.utils.ToastUtils;
 
 import org.eclipse.egit.github.core.CommitComment;

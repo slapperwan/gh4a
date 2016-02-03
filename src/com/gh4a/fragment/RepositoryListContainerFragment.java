@@ -1,7 +1,6 @@
 package com.gh4a.fragment;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -25,9 +24,6 @@ import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
 
 import org.eclipse.egit.github.core.Repository;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class RepositoryListContainerFragment extends Fragment implements
         SearchView.OnCloseListener, SearchView.OnQueryTextListener,
