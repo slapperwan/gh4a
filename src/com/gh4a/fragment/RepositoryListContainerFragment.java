@@ -31,17 +31,21 @@ public class RepositoryListContainerFragment extends Fragment implements
     private String mUserLogin;
     private String mUserType;
     private String mFilterType;
+    private boolean mSearchVisible;
 
     private MenuInflater mMenuInflater;
     private PagedDataBaseFragment<Repository> mMainFragment;
     private RepositorySearchFragment mSearchFragment;
     private MenuItem mFilterItem;
+    private String mSearchQuery;
 
     public interface Callback {
         void initiateFilter();
     }
 
     private static final String STATE_KEY_FILTER_TYPE = "filter_type";
+    private static final String STATE_KEY_SEARCH_VISIBLE = "search_visible";
+    private static final String STATE_KEY_QUERY = "search_query";
 
     public static RepositoryListContainerFragment newInstance(String userLogin, String userType) {
         RepositoryListContainerFragment f = new RepositoryListContainerFragment();
@@ -62,10 +66,19 @@ public class RepositoryListContainerFragment extends Fragment implements
 
         if (savedInstanceState != null) {
             mFilterType = savedInstanceState.getString(STATE_KEY_FILTER_TYPE);
+            mSearchVisible = savedInstanceState.getBoolean(STATE_KEY_SEARCH_VISIBLE);
+            mSearchQuery = savedInstanceState.getString(STATE_KEY_QUERY);
         }
 
         setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
+    }
+
+    public void destroyChildren() {
+        getChildFragmentManager().beginTransaction()
+                .remove(mMainFragment)
+                .remove(mSearchFragment)
+                .commit();
     }
 
     @Nullable
@@ -86,6 +99,8 @@ public class RepositoryListContainerFragment extends Fragment implements
         if (mMainFragment == null) {
             setFilterType("all");
             addSearchFragment();
+        } else {
+            setSearchVisibility(mSearchVisible);
         }
     }
 
@@ -102,6 +117,8 @@ public class RepositoryListContainerFragment extends Fragment implements
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(STATE_KEY_FILTER_TYPE, mFilterType);
+        outState.putBoolean(STATE_KEY_SEARCH_VISIBLE, mSearchVisible);
+        outState.putString(STATE_KEY_QUERY, mSearchQuery);
     }
 
     public void refresh() {
@@ -153,7 +170,11 @@ public class RepositoryListContainerFragment extends Fragment implements
             MenuItem searchItem = menu.findItem(R.id.search);
             MenuItemCompat.setOnActionExpandListener(searchItem, this);
 
-            SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+            final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+            if (mSearchQuery != null) {
+                MenuItemCompat.expandActionView(searchItem);
+                searchView.setQuery(mSearchQuery, false);
+            }
             searchView.setOnCloseListener(this);
             searchView.setOnQueryTextListener(this);
         } else {
@@ -161,6 +182,7 @@ public class RepositoryListContainerFragment extends Fragment implements
         }
 
         mFilterItem = menu.findItem(R.id.filter);
+        mFilterItem.setVisible(!mSearchVisible);
 
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -187,7 +209,10 @@ public class RepositoryListContainerFragment extends Fragment implements
         FragmentManager fm = getChildFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
 
-        mFilterItem.setVisible(!visible);
+        mSearchVisible = visible;
+        if (mFilterItem != null) {
+            mFilterItem.setVisible(!visible);
+        }
 
         mSearchFragment.setQuery(null);
         mSearchFragment.setUserVisibleHint(visible);
@@ -206,11 +231,13 @@ public class RepositoryListContainerFragment extends Fragment implements
 
     @Override
     public boolean onQueryTextChange(String newText) {
+        mSearchQuery = newText;
         return false;
     }
 
     @Override
     public boolean onClose() {
+        mSearchQuery = null;
         setSearchVisibility(false);
         return false;
     }
@@ -222,6 +249,7 @@ public class RepositoryListContainerFragment extends Fragment implements
 
     @Override
     public boolean onMenuItemActionCollapse(MenuItem item) {
+        mSearchQuery = null;
         setSearchVisibility(false);
         return true;
     }

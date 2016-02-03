@@ -19,6 +19,8 @@ public class RepositoryFactory extends FragmentFactory {
     private RepositoryListContainerFragment.FilterDrawerHelper mDrawerHelper;
     private RepositoryListContainerFragment mFragment;
 
+    private static final String STATE_KEY_FRAGMENT = "repoFactoryFragment";
+
     public RepositoryFactory(HomeActivity activity, String userLogin, Bundle savedInstanceState) {
         super(activity);
         mUserLogin = userLogin;
@@ -56,6 +58,22 @@ public class RepositoryFactory extends FragmentFactory {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        if (mFragment != null) {
+            mActivity.getSupportFragmentManager().putFragment(outState, STATE_KEY_FRAGMENT, mFragment);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mFragment.destroyChildren();
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle state) {
+        super.onRestoreInstanceState(state);
+        mFragment = (RepositoryListContainerFragment)
+                mActivity.getSupportFragmentManager().getFragment(state, STATE_KEY_FRAGMENT);
     }
 
     @Override

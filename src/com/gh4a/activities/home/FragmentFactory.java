@@ -40,5 +40,9 @@ public abstract class FragmentFactory {
 
     protected void onSaveInstanceState(Bundle outState) {}
 
+    protected void onRestoreInstanceState(Bundle state) {}
+
+    protected void onDestroy() {}
+
     protected void onStart() {}
 }

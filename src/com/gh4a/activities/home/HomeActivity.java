@@ -86,6 +86,14 @@ public class HomeActivity extends BasePagerActivity implements
     }
 
     @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null) {
+            mFactory.onRestoreInstanceState(savedInstanceState);
+        }
+    }
+
+    @Override
     public void onClick(View view) {
         User user = (User) view.getTag();
         Intent intent = IntentUtils.getUserActivityIntent(this, user);
@@ -292,6 +300,9 @@ public class HomeActivity extends BasePagerActivity implements
     }
 
     private void switchTo(int itemId, FragmentFactory factory) {
+        if (mFactory != null) {
+            mFactory.onDestroy();
+        }
         mFactory = factory;
         mSelectedFactoryId = itemId;
 

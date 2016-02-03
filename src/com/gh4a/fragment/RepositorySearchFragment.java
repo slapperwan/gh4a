@@ -30,7 +30,9 @@ public class RepositorySearchFragment extends ListDataBaseFragment<Repository> {
     }
 
     public void setQuery(String query) {
-        mLoader.setQuery(query);
+        if (mLoader != null) {
+            mLoader.setQuery(query);
+        }
         getArguments().putString("query", query);
         refresh();
     }

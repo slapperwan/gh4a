@@ -27,10 +27,11 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase im
     }
 
     public void refresh() {
-        setContentShown(false);
-        mAdapter.clear();
-        getLoaderManager().getLoader(0).onContentChanged();
-        getRecyclerView().setAdapter(mAdapter);
+        if (mViewCreated) {
+            mAdapter.clear();
+            setContentShown(false);
+            getLoaderManager().getLoader(0).onContentChanged();
+        }
     }
 
     @Override
