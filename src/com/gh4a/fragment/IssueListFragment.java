@@ -80,18 +80,7 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> implements
         if (TextUtils.equals(mFilterData.get(Constants.Issue.STATE), Constants.Issue.STATE_OPEN)) {
             View wrapper = inflater.inflate(R.layout.fab_list_wrapper, container, false);
             ViewGroup listContainer = (ViewGroup) wrapper.findViewById(R.id.container);
-
-            View content = super.onCreateView(inflater, listContainer, savedInstanceState);
-            FloatingActionButton fab = (FloatingActionButton) wrapper.findViewById(R.id.fab_add);
-            RecyclerView recyclerView = (RecyclerView) content.findViewById(R.id.list);
-
-            if (Gh4Application.get().isAuthorized()) {
-                fab.setOnClickListener(this);
-                recyclerView.setOnTouchListener(new ShowHideOnScroll(fab));
-            } else {
-                fab.setVisibility(View.GONE);
-            }
-            listContainer.addView(content);
+            listContainer.addView(super.onCreateView(inflater, listContainer, savedInstanceState));
             return wrapper;
         } else {
             return super.onCreateView(inflater, container, savedInstanceState);
@@ -105,6 +94,17 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> implements
         int stateColorAttr = TextUtils.equals(stateFilter, Constants.Issue.STATE_OPEN)
                 ? R.attr.colorIssueOpen : TextUtils.equals(stateFilter, Constants.Issue.STATE_CLOSED)
                 ? R.attr.colorIssueClosed : 0;
+
+        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab_add);
+        if (fab != null) {
+            if (Gh4Application.get().isAuthorized()) {
+                RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.list);
+                recyclerView.setOnTouchListener(new ShowHideOnScroll(fab));
+                fab.setOnClickListener(this);
+            } else {
+                fab.setVisibility(View.GONE);
+            }
+        }
 
         if (stateColorAttr != 0) {
             UiUtils.trySetListOverscrollColor(getRecyclerView(),

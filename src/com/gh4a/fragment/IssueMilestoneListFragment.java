@@ -66,19 +66,22 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View wrapper = inflater.inflate(R.layout.fab_list_wrapper, container, false);
         ViewGroup listContainer = (ViewGroup) wrapper.findViewById(R.id.container);
+        listContainer.addView(super.onCreateView(inflater, listContainer, savedInstanceState));
+        return wrapper;
+    }
 
-        View content = super.onCreateView(inflater, listContainer, savedInstanceState);
-        FloatingActionButton fab = (FloatingActionButton) wrapper.findViewById(R.id.fab_add);
-        RecyclerView recyclerView = (RecyclerView) content.findViewById(R.id.list);
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
+        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab_add);
         if (Gh4Application.get().isAuthorized()) {
-            fab.setOnClickListener(this);
+            RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.list);
             recyclerView.setOnTouchListener(new ShowHideOnScroll(fab));
+            fab.setOnClickListener(this);
         } else {
             fab.setVisibility(View.GONE);
         }
-        listContainer.addView(content);
-        return wrapper;
     }
 
     @Override
