@@ -273,6 +273,10 @@ public class HttpImageGetter implements ImageGetter {
             }
         }
 
+        if (bitmap == null) {
+            return loading.getDrawable(source);
+        }
+
         synchronized (this) {
             if (destroyed) {
                 bitmap.recycle();
@@ -280,10 +284,6 @@ public class HttpImageGetter implements ImageGetter {
             } else {
                 loadedBitmaps.add(new WeakReference<Bitmap>(bitmap));
             }
-        }
-
-        if (bitmap == null) {
-            return loading.getDrawable(source);
         }
 
         BitmapDrawable drawable = new BitmapDrawable(context.getResources(), bitmap);
