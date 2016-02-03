@@ -21,7 +21,6 @@ import com.gh4a.R;
 import com.gh4a.activities.BookmarkListActivity;
 import com.gh4a.activities.SearchActivity;
 import com.gh4a.activities.SettingsActivity;
-import com.gh4a.adapter.DrawerAdapter;
 import com.gh4a.fragment.RepositoryListContainerFragment;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
@@ -106,8 +105,8 @@ public class HomeActivity extends BasePagerActivity implements
     }
 
     @Override
-    protected ListAdapter getRightNavigationDrawerAdapter() {
-        return mFactory.getToolDrawerAdapter();
+    protected int[] getRightNavigationDrawerMenuResources() {
+        return mFactory.getToolDrawerMenuResIds();
     }
 
     @Override
@@ -127,6 +126,10 @@ public class HomeActivity extends BasePagerActivity implements
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         super.onNavigationItemSelected(item);
+
+        if (mFactory != null && mFactory.onDrawerItemSelected(item)) {
+            return true;
+        }
 
         int id = item.getItemId();
         FragmentFactory factory = getFactoryForItem(id, null);

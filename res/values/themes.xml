@@ -43,8 +43,6 @@
         <item name="actionBarTabStyle">@style/Widget.ActionBar.TabView</item>
         <item name="listBackground">@android:color/transparent</item>
         <item name="drawerBackground">@color/background_floating_material_dark</item>
-        <item name="drawerEntryBackground">@drawable/drawer_entry_bg_dark</item>
-        <item name="drawerEntryTextColor">@color/drawer_entry_text_color_dark</item>
         <item name="colorIssueOpen">@color/issue_open_dark</item>
         <item name="colorIssueClosed">@color/issue_closed_dark</item>
         <item name="colorPullRequestMerged">@color/pr_merged_dark</item>
@@ -109,8 +107,6 @@
         <item name="actionBarTabStyle">@style/Widget.ActionBar.TabView</item>
         <item name="listBackground">@android:color/white</item>
         <item name="drawerBackground">@color/background_floating_material_light</item>
-        <item name="drawerEntryBackground">@drawable/drawer_entry_bg_light</item>
-        <item name="drawerEntryTextColor">@color/drawer_entry_text_color_light</item>
         <item name="colorIssueOpen">@color/issue_open_light</item>
         <item name="colorIssueClosed">@color/issue_closed_light</item>
         <item name="colorPullRequestMerged">@color/pr_merged_light</item>

@@ -28,7 +28,8 @@ public class IssueListFactory extends FragmentFactory {
     private String mState;
     private String mLogin;
     private boolean mIsPullRequest;
-    private IssueListFragment.SortDrawerAdapter mDrawerAdapter;
+    private IssueListFragment.SortDrawerHelper mDrawerHelper =
+            new IssueListFragment.SortDrawerHelper();
 
     public IssueListFactory(HomeActivity activity, String userLogin, boolean pr) {
         super(activity);
@@ -54,8 +55,8 @@ public class IssueListFactory extends FragmentFactory {
     @Override
     protected Fragment getFragment(int position) {
         Map<String, String> filterData = new HashMap<>();
-        filterData.put("sort", mDrawerAdapter.getSortMode());
-        filterData.put("order", mDrawerAdapter.getSortDirection());
+        filterData.put("sort", mDrawerHelper.getSortMode());
+        filterData.put("order", mDrawerHelper.getSortDirection());
 
         final String action;
         if (position == 1) {
@@ -105,14 +106,13 @@ public class IssueListFactory extends FragmentFactory {
     }
 
     @Override
-    protected ListAdapter getToolDrawerAdapter() {
-        mDrawerAdapter = IssueListFragment.SortDrawerAdapter.create(mActivity);
-        return mDrawerAdapter;
+    protected int[] getToolDrawerMenuResIds() {
+        return new int[] { IssueListFragment.SortDrawerHelper.getMenuResId() };
     }
 
     @Override
-    protected boolean onDrawerItemSelected(int position) {
-        if (mDrawerAdapter.handleSortModeChange(position)) {
+    protected boolean onDrawerItemSelected(MenuItem item) {
+        if (mDrawerHelper.handleItemSelection(item)) {
             reloadIssueList();
             return true;
         }

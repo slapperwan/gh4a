@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
+import android.view.MenuItem;
 import android.widget.ListAdapter;
 
 import com.gh4a.BaseActivity;
@@ -33,8 +34,7 @@ public class RepositoryListActivity extends BaseActivity implements
     private String mUserLogin;
     private String mUserType;
     private RepositoryListContainerFragment mFragment;
-    private int mSelectedIndex = 0;
-    private RepositoryListContainerFragment.FilterDrawerAdapter mDrawerAdapter;
+    private RepositoryListContainerFragment.FilterDrawerHelper mDrawerHelper;
 
     private static final String STATE_KEY_INDEX = "selectedIndex";
 
@@ -56,7 +56,6 @@ public class RepositoryListActivity extends BaseActivity implements
             fm.beginTransaction().add(R.id.content_container, mFragment).commit();
         } else {
             mFragment = (RepositoryListContainerFragment) fm.findFragmentById(R.id.details);
-            mSelectedIndex = savedInstanceState.getInt(STATE_KEY_INDEX);
         }
 
         ActionBar actionBar = getSupportActionBar();
@@ -68,37 +67,22 @@ public class RepositoryListActivity extends BaseActivity implements
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt(STATE_KEY_INDEX, mSelectedIndex);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        onDrawerItemSelected(false, mSelectedIndex);
-    }
-
-    @Override
-    protected ListAdapter getRightNavigationDrawerAdapter() {
-        mDrawerAdapter = RepositoryListContainerFragment.FilterDrawerAdapter.create(this,
+    protected int[] getRightNavigationDrawerMenuResources() {
+        mDrawerHelper = RepositoryListContainerFragment.FilterDrawerHelper.create(this,
                 mUserLogin, mUserType);
-        return mDrawerAdapter;
+        return mDrawerHelper.getMenuResIds();
     }
 
     @Override
-    protected boolean onDrawerItemSelected(boolean left, int position) {
-        if (!left) {
-            String type = mDrawerAdapter.handleSelectionAndGetFilterType(position);
-            if (type != null) {
-                mFragment.setFilterType(type);
-                mSelectedIndex = position;
-                mDrawerAdapter.notifyDataSetChanged();
-                super.supportInvalidateOptionsMenu();
-                return true;
-            }
+    public boolean onNavigationItemSelected(MenuItem item) {
+        super.onNavigationItemSelected(item);
+        String type = mDrawerHelper.handleSelectionAndGetFilterType(item);
+        if (type != null) {
+            mFragment.setFilterType(type);
+            super.supportInvalidateOptionsMenu();
+            return true;
         }
-        return super.onDrawerItemSelected(left, position);
+        return false;
     }
 
     @Override

@@ -33,6 +33,7 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -42,7 +43,6 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.IssueActivity;
 import com.gh4a.activities.IssueEditActivity;
-import com.gh4a.adapter.DrawerAdapter;
 import com.gh4a.adapter.IssueAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.UiUtils;
@@ -176,44 +176,21 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> implements
         startActivityForResult(intent, REQUEST_ISSUE_CREATE);
     }
 
-    public static class SortDrawerAdapter extends DrawerAdapter {
+    public static class SortDrawerHelper {
         private String mSortMode;
         private boolean mSortAscending;
-        private List<Item> mItems;
 
         private static final String SORT_MODE_CREATED = "created";
         private static final String SORT_MODE_UPDATED = "updated";
         private static final String SORT_MODE_COMMENTS = "comments";
 
-        private static final int ITEM_SORT_FIRST = 1000;
-        private static final int ITEM_SORT_CREATED_DESC = ITEM_SORT_FIRST;
-        private static final int ITEM_SORT_CREATED_ASC = ITEM_SORT_FIRST + 1;
-        private static final int ITEM_SORT_UPDATED_DESC = ITEM_SORT_FIRST + 2;
-        private static final int ITEM_SORT_UPDATED_ASC = ITEM_SORT_FIRST + 3;
-        private static final int ITEM_SORT_COMMENTS_DESC = ITEM_SORT_FIRST + 4;
-        private static final int ITEM_SORT_COMMENTS_ASC = ITEM_SORT_FIRST + 5;
-
-        private static final List<DrawerAdapter.Item> DRAWER_ITEMS = Arrays.asList(
-            new DrawerAdapter.SectionHeaderItem(R.string.issue_sort_order),
-            new DrawerAdapter.RadioItem(R.string.issue_sort_created_desc, ITEM_SORT_CREATED_DESC),
-            new DrawerAdapter.RadioItem(R.string.issue_sort_created_asc, ITEM_SORT_CREATED_ASC),
-            new DrawerAdapter.RadioItem(R.string.issue_sort_updated_desc, ITEM_SORT_UPDATED_DESC),
-            new DrawerAdapter.RadioItem(R.string.issue_sort_updated_asc, ITEM_SORT_UPDATED_ASC),
-            new DrawerAdapter.RadioItem(R.string.issue_sort_comments_desc, ITEM_SORT_COMMENTS_DESC),
-            new DrawerAdapter.RadioItem(R.string.issue_sort_comments_asc, ITEM_SORT_COMMENTS_ASC)
-        );
-
-
-        public static SortDrawerAdapter create(Context context) {
-            return new SortDrawerAdapter(context, new ArrayList<>(DRAWER_ITEMS));
-        }
-
-        private SortDrawerAdapter(Context context, List<Item> items) {
-            super(context, items);
+        public SortDrawerHelper() {
             mSortMode = SORT_MODE_CREATED;
             mSortAscending = false;
-            mItems = items;
-            updateItemState(ITEM_SORT_CREATED_DESC);
+        }
+
+        public static int getMenuResId() {
+            return R.menu.issue_list_sort;
         }
 
         public String getSortMode() {
@@ -224,50 +201,34 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> implements
             return mSortAscending ? "asc" : "desc";
         }
 
-        public void addItems(List<Item> items) {
-            mItems.addAll(items);
-            notifyDataSetChanged();
-        }
-
-        public boolean handleSortModeChange(int position) {
-            int id = (int) getItemId(position);
-            switch (id) {
-                case ITEM_SORT_CREATED_ASC:
-                    updateSortMode(SORT_MODE_CREATED, true, id);
+        public boolean handleItemSelection(MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.sort_created_asc:
+                    updateSortMode(SORT_MODE_CREATED, true);
                     return true;
-                case ITEM_SORT_CREATED_DESC:
-                    updateSortMode(SORT_MODE_CREATED, false, id);
+                case R.id.sort_created_desc:
+                    updateSortMode(SORT_MODE_CREATED, false);
                     return true;
-                case ITEM_SORT_UPDATED_ASC:
-                    updateSortMode(SORT_MODE_UPDATED, true, id);
+                case R.id.sort_updated_asc:
+                    updateSortMode(SORT_MODE_UPDATED, true);
                     return true;
-                case ITEM_SORT_UPDATED_DESC:
-                    updateSortMode(SORT_MODE_UPDATED, false, id);
+                case R.id.sort_updated_desc:
+                    updateSortMode(SORT_MODE_UPDATED, false);
                     return true;
-                case ITEM_SORT_COMMENTS_ASC:
-                    updateSortMode(SORT_MODE_COMMENTS, true, id);
+                case R.id.sort_comments_asc:
+                    updateSortMode(SORT_MODE_COMMENTS, true);
                     return true;
-                case ITEM_SORT_COMMENTS_DESC:
-                    updateSortMode(SORT_MODE_COMMENTS, false, id);
+                case R.id.sort_comments_desc:
+                    updateSortMode(SORT_MODE_COMMENTS, false);
                     return true;
             }
 
             return false;
         }
 
-        protected void updateSortMode(String sortMode, boolean ascending, int itemId) {
-            updateItemState(itemId);
+        protected void updateSortMode(String sortMode, boolean ascending) {
             mSortAscending = ascending;
             mSortMode = sortMode;
-        }
-
-        private void updateItemState(int activeItemId) {
-            for (DrawerAdapter.Item item : mItems) {
-                if (item.getId() >= ITEM_SORT_FIRST) {
-                    ((DrawerAdapter.RadioItem) item).setChecked(item.getId() == activeItemId);
-                }
-            }
-            notifyDataSetChanged();
         }
     }
 }

@@ -32,7 +32,6 @@ import android.widget.ListAdapter;
 import com.gh4a.BasePagerActivity;
 import com.gh4a.Constants;
 import com.gh4a.R;
-import com.gh4a.adapter.DrawerAdapter;
 import com.gh4a.fragment.IssueListFragment;
 import com.gh4a.loader.CollaboratorListLoader;
 import com.gh4a.loader.IsCollaboratorLoader;
@@ -69,31 +68,12 @@ public class IssueListActivity extends BasePagerActivity {
     private List<Milestone> mMilestones;
     private List<User> mAssignees;
 
-    protected IssueListFragment.SortDrawerAdapter mDrawerAdapter;
-
-    protected static final int ITEM_FILTER_MILESTONE = 1;
-    protected static final int ITEM_FILTER_ASSIGNEE = 2;
-    protected static final int ITEM_FILTER_LABEL = 3;
-    protected static final int ITEM_MANAGE_LABELS = 4;
-    protected static final int ITEM_MANAGE_MILESTONES = 5;
+    protected IssueListFragment.SortDrawerHelper mSortHelper =
+            new IssueListFragment.SortDrawerHelper();
 
     private static final int[] TITLES = new int[] {
         R.string.open, R.string.closed
     };
-
-    private static final List<DrawerAdapter.Item> FILTER_DRAWER_ITEMS = Arrays.asList(
-        new DrawerAdapter.DividerItem(),
-        new DrawerAdapter.SectionHeaderItem(R.string.issue_filter),
-        new DrawerAdapter.EntryItem(R.string.issue_filter_by_milestone, 0, ITEM_FILTER_MILESTONE, false),
-        new DrawerAdapter.EntryItem(R.string.issue_filter_by_labels, 0, ITEM_FILTER_LABEL, false)
-    );
-
-    private static final List<DrawerAdapter.Item> COLLAB_DRAWER_ITEMS = Arrays.asList(
-        new DrawerAdapter.EntryItem(R.string.issue_filter_by_assignee, 0, ITEM_FILTER_ASSIGNEE, false),
-        new DrawerAdapter.DividerItem(),
-        new DrawerAdapter.EntryItem(R.string.issue_manage_labels, 0, ITEM_MANAGE_LABELS, false),
-        new DrawerAdapter.EntryItem(R.string.issue_manage_milestones, 0, ITEM_MANAGE_MILESTONES, false)
-    );
 
     private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
         @Override
@@ -167,7 +147,7 @@ public class IssueListActivity extends BasePagerActivity {
             if (mIsCollaborator == null) {
                 mIsCollaborator = result.getData();
                 if (mIsCollaborator) {
-                    mDrawerAdapter.addItems(COLLAB_DRAWER_ITEMS);
+                    updateRightNavigationDrawer();
                 }
             }
         }
@@ -218,8 +198,8 @@ public class IssueListActivity extends BasePagerActivity {
     @Override
     protected Fragment getFragment(int position) {
         Map<String, String> filterData = new HashMap<>();
-        filterData.put("sort", mDrawerAdapter.getSortMode());
-        filterData.put("direction", mDrawerAdapter.getSortDirection());
+        filterData.put("sort", mSortHelper.getSortMode());
+        filterData.put("direction", mSortHelper.getSortDirection());
         if (mSelectedLabels != null) {
             filterData.put("labels", TextUtils.join(",", mSelectedLabels));
         }
@@ -252,13 +232,42 @@ public class IssueListActivity extends BasePagerActivity {
     }
 
     @Override
-    protected ListAdapter getRightNavigationDrawerAdapter() {
-        mDrawerAdapter = IssueListFragment.SortDrawerAdapter.create(this);
-        mDrawerAdapter.addItems(FILTER_DRAWER_ITEMS);
-        if (mIsCollaborator != null && mIsCollaborator) {
-            mDrawerAdapter.addItems(COLLAB_DRAWER_ITEMS);
+    protected int[] getRightNavigationDrawerMenuResources() {
+        int[] menuResIds = new int[2];
+        menuResIds[0] = IssueListFragment.SortDrawerHelper.getMenuResId();
+        menuResIds[1] = mIsCollaborator != null && mIsCollaborator
+                ? R.menu.issue_list_filter_collab : R.menu.issue_list_filter;
+        return menuResIds;
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        super.onNavigationItemSelected(item);
+
+        if (mSortHelper.handleItemSelection(item)) {
+            reloadIssueList();
+            return true;
         }
-        return mDrawerAdapter;
+
+        switch (item.getItemId()) {
+            case R.id.filter_by_assignee:
+                filterAssignee();
+                return true;
+            case R.id.filter_by_label:
+                filterLabel();
+                return true;
+            case R.id.filter_by_milestone:
+                filterMilestone();
+                return true;
+            case R.id.manage_labels:
+                manageLabels();
+                return true;
+            case R.id.manage_milestones:
+                manageMilestones();
+                return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -281,38 +290,6 @@ public class IssueListActivity extends BasePagerActivity {
     @Override
     protected Intent navigateUp() {
         return IntentUtils.getRepoActivityIntent(this, mRepoOwner, mRepoName, null);
-    }
-
-    @Override
-    protected boolean onDrawerItemSelected(boolean left, int position) {
-        if (mDrawerAdapter.handleSortModeChange(position)) {
-            reloadIssueList();
-            return true;
-        }
-
-        if (left) {
-            return super.onDrawerItemSelected(left, position);
-        }
-
-        int id = (int) mDrawerAdapter.getItemId(position);
-        switch (id) {
-            case ITEM_FILTER_ASSIGNEE:
-                filterAssignee();
-                return true;
-            case ITEM_FILTER_LABEL:
-                filterLabel();
-                return true;
-            case ITEM_FILTER_MILESTONE:
-                filterMilestone();
-                return true;
-            case ITEM_MANAGE_LABELS:
-                manageLabels();
-                return true;
-            case ITEM_MANAGE_MILESTONES:
-                manageMilestones();
-                return true;
-        }
-        return false;
     }
 
     private void reloadIssueList() {

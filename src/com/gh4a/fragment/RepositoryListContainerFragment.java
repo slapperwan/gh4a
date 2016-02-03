@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.view.SupportMenuInflater;
 import android.support.v7.widget.SearchView;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,7 +21,6 @@ import android.view.ViewGroup;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.adapter.DrawerAdapter;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
 
@@ -230,55 +230,45 @@ public class RepositoryListContainerFragment extends Fragment implements
         return true;
     }
 
-    public static class FilterDrawerAdapter extends DrawerAdapter {
-        private String[] mTypes;
-        private List<Item> mItems;
-        private int mSelectedIndex = 0;
+    public static class FilterDrawerHelper {
+        private int mMenuResId;
 
-        public static FilterDrawerAdapter create(Context context, String userLogin, String userType) {
-            final int itemResId, valueResId;
+        private static SparseArray<String> FILTER_LOOKUP = new SparseArray<>();
+        static {
+            FILTER_LOOKUP.put(R.id.filter_type_all, "all");
+            FILTER_LOOKUP.put(R.id.filter_type_owner, "owner");
+            FILTER_LOOKUP.put(R.id.filter_type_member, "member");
+            FILTER_LOOKUP.put(R.id.filter_type_public, "public");
+            FILTER_LOOKUP.put(R.id.filter_type_private, "private");
+            FILTER_LOOKUP.put(R.id.filter_type_sources, "sources");
+            FILTER_LOOKUP.put(R.id.filter_type_forks, "forks");
+            FILTER_LOOKUP.put(R.id.filter_type_watched, "watched");
+            FILTER_LOOKUP.put(R.id.filter_type_starred, "starred");
+        }
 
+        public static FilterDrawerHelper create(Context context, String userLogin, String userType) {
+            int menuResId;
             if (userLogin.equals(Gh4Application.get().getAuthLogin())) {
-                itemResId = R.array.repo_list_login_items;
-                valueResId = R.array.repo_list_login_values;
+                menuResId = R.menu.repo_filter_logged_in;
             } else if (Constants.User.TYPE_ORG.equals(userType)) {
-                itemResId = R.array.repo_list_org_items;
-                valueResId = R.array.repo_list_org_values;
+                menuResId = R.menu.repo_filter_org;
             } else {
-                itemResId = R.array.repo_list_user_items;
-                valueResId = R.array.repo_list_user_values;
+                menuResId = R.menu.repo_filter_user;
             }
 
-            String[] types = context.getResources().getStringArray(valueResId);
-            List<Item> items = new ArrayList<>();
-
-            TypedArray itemResIds = context.getResources().obtainTypedArray(itemResId);
-            for (int i = 0; i < itemResIds.length(); i++) {
-                items.add(new DrawerAdapter.RadioItem(itemResIds.getResourceId(i, 0), i + 1));
-            }
-
-            itemResIds.recycle();
-
-            return new FilterDrawerAdapter(context, items, types);
+            return new FilterDrawerHelper(menuResId);
         }
 
-        private FilterDrawerAdapter(Context context, List<Item> items, String[] types) {
-            super(context, items);
-            mTypes = types;
-            mItems = items;
+        private FilterDrawerHelper(int menuResId) {
+            mMenuResId = menuResId;
         }
 
-        public String handleSelectionAndGetFilterType(int position) {
-            if (position >= mTypes.length) {
-                return null;
-            }
+        public int[] getMenuResIds() {
+            return new int[] { mMenuResId };
+        }
 
-            for (int i = 0; i < mItems.size(); i++) {
-                DrawerAdapter.RadioItem item = (DrawerAdapter.RadioItem) mItems.get(i);
-                item.setChecked(position == i);
-            }
-
-            return mTypes[position];
+        public String handleSelectionAndGetFilterType(MenuItem item) {
+            return FILTER_LOOKUP.get(item.getItemId());
         }
     }
 }

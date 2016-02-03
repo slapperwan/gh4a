@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="@string/issue_filter">
+        <menu>
+            <item
+                android:id="@+id/filter_by_milestone"
+                android:title="@string/issue_filter_by_milestone" />
+            <item
+                android:id="@+id/filter_by_label"
+                android:title="@string/issue_filter_by_labels" />
+            <item
+                android:id="@+id/filter_by_assignee"
+                android:title="@string/issue_filter_by_assignee" />
+        </menu>
+    </item>
+    <group>
+        <item
+            android:id="@+id/manage_labels"
+            android:title="@string/issue_manage_labels" />
+        <item
+            android:id="@+id/manage_milestones"
+            android:title="@string/issue_manage_milestones" />
+    </group>
+</menu>

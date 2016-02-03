@@ -17,7 +17,6 @@ import com.gh4a.BasePagerActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.adapter.DrawerAdapter;
 import com.gh4a.db.BookmarksProvider;
 import com.gh4a.fragment.PrivateEventListFragment;
 import com.gh4a.fragment.PublicEventListFragment;

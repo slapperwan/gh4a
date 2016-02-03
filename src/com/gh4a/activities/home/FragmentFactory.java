@@ -23,11 +23,11 @@ public abstract class FragmentFactory {
         return null;
     }
 
-    protected ListAdapter getToolDrawerAdapter() {
+    protected int[] getToolDrawerMenuResIds() {
         return null;
     }
 
-    protected boolean onDrawerItemSelected(int position) {
+    protected boolean onDrawerItemSelected(MenuItem item) {
         return false;
     }
 
