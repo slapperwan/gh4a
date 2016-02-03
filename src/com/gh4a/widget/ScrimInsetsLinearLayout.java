@@ -69,7 +69,7 @@ public class ScrimInsetsLinearLayout extends LinearLayout {
             return;
         }
         mEdgeMask = a.getInt(R.styleable.ScrimInsetsView_consumedEdges, ALL_EDGE_MASK);
-        setInsetForeground(a.getDrawable(R.styleable.ScrimInsetsView_insetForeground));
+        setInsetForeground(a.getDrawable(R.styleable.ScrimInsetsView_insetsForeground));
         a.recycle();
 
         setWillNotDraw(true);

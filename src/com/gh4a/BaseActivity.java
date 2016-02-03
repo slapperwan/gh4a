@@ -25,12 +25,14 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -66,6 +68,7 @@ import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 public abstract class BaseActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener, DrawerLayout.DrawerListener,
+        NavigationView.OnNavigationItemSelectedListener,
         ListView.OnItemClickListener, ScrimInsetsLinearLayout.OnInsetsCallback {
     private ViewGroup mContentContainer;
     private TextView mEmptyView;
@@ -81,7 +84,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private ScrimInsetsLinearLayout mInsetsLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private boolean mHasErrorView = false;
-    private View mLeftDrawer;
+    private NavigationView mLeftDrawer;
+    private View mLeftDrawerTitle;
 
     private final List<ColorDrawable> mHeaderDrawables = new ArrayList<>();
     private final List<ColorDrawable> mStatusBarDrawables = new ArrayList<>();
@@ -118,8 +122,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
         }
     }
 
-    protected ListAdapter getLeftNavigationDrawerAdapter() {
-        return null;
+    protected int getLeftNavigationDrawerMenuResource() {
+        return 0;
     }
 
     protected ListAdapter getRightNavigationDrawerAdapter() {
@@ -403,10 +407,15 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        boolean isLeft = adapterView.getId() == R.id.left_drawer_list;
-        if (onDrawerItemSelected(isLeft, position)) {
-            mDrawerLayout.closeDrawer(isLeft ? Gravity.LEFT : Gravity.RIGHT);
+        if (onDrawerItemSelected(false, position)) {
+            mDrawerLayout.closeDrawer(Gravity.RIGHT);
         }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        mDrawerLayout.closeDrawer(Gravity.LEFT);
+        return false;
     }
 
     @Override
@@ -432,14 +441,14 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     private void setupHeaderDrawable() {
         int primaryColor = UiUtils.resolveColor(this, R.attr.colorPrimary);
-        assignBackground(R.id.left_drawer_title, primaryColor);
-        assignBackground(R.id.right_drawer_title, primaryColor);
-        assignBackground(R.id.header, primaryColor);
+        assignBackground(mLeftDrawerTitle, primaryColor);
+        assignBackground(findViewById(R.id.right_drawer_title), primaryColor);
+        assignBackground(findViewById(R.id.header), primaryColor);
 
         if (mInsetsLayout != null) {
             int primaryDarkColor = UiUtils.resolveColor(this, R.attr.colorPrimaryDark);
             assignInsetDrawable(R.id.inset_layout, primaryDarkColor);
-            assignInsetDrawable(R.id.left_drawer, primaryDarkColor);
+            //assignInsetDrawable(R.id.left_drawer, primaryDarkColor);
             assignInsetDrawable(R.id.right_drawer, primaryDarkColor);
         }
     }
@@ -452,8 +461,10 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     @SuppressWarnings("deprecation")
-    private void assignBackground(int viewId, int color) {
-        View view = findViewById(viewId);
+    private void assignBackground(View view, int color) {
+        if (view == null) {
+            return;
+        }
         ColorDrawable background = ColorDrawable.create(color);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             view.setBackground(background);
@@ -485,28 +496,22 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     private void setupNavigationDrawer() {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_container);
-        mLeftDrawer = findViewById(R.id.left_drawer);
+        mLeftDrawer = (NavigationView) findViewById(R.id.left_drawer);
 
         Toolbar toolBar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolBar);
 
-        ListAdapter leftAdapter = getLeftNavigationDrawerAdapter();
-        if (leftAdapter != null) {
-            ListView list = (ListView) findViewById(R.id.left_drawer_list);
-            list.setAdapter(leftAdapter);
-            list.setOnItemClickListener(this);
+        int drawerMenuResId = getLeftNavigationDrawerMenuResource();
+        if (drawerMenuResId != 0) {
+            mLeftDrawer.inflateMenu(drawerMenuResId);
+            mLeftDrawer.setNavigationItemSelectedListener(this);
 
             mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolBar, 0, 0);
             mDrawerLayout.setDrawerListener(this);
 
-            ScrimInsetsLinearLayout insetsLayout =
-                    (ScrimInsetsLinearLayout) findViewById(R.id.left_drawer);
-            insetsLayout.setOnInsetsCallback(this);
-
-            ViewGroup title = (ViewGroup) findViewById(R.id.left_drawer_title);
-            View view = getLeftDrawerTitle(title);
-            if (view != null) {
-                title.addView(view);
+            mLeftDrawerTitle = getLeftDrawerTitle(mLeftDrawer);
+            if (mLeftDrawerTitle!= null) {
+                mLeftDrawer.addHeaderView(mLeftDrawerTitle);
             }
         } else {
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.LEFT);

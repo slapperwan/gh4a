@@ -40,41 +40,12 @@ public class HomeActivity extends BasePagerActivity implements
 
     private FragmentFactory mFactory;
     private SparseArray<Fragment> mFragments;
-    private DrawerAdapter mDrawerAdapter;
     private ImageView mAvatarView;
     private String mUserLogin;
     private int mSelectedFactoryId;
     private boolean mStarted;
 
     private static final String STATE_KEY_FACTORY_ITEM = "factoryItem";
-
-    private static final int ITEM_NEWS_FEED = 1;
-    private static final int ITEM_REPOSITORIES = 2;
-    private static final int ITEM_ISSUES = 3;
-    private static final int ITEM_PULLREQUESTS = 4;
-    private static final int ITEM_GISTS = 5;
-    private static final int ITEM_TIMELINE = 6;
-    private static final int ITEM_TRENDING = 7;
-    private static final int ITEM_BLOG = 8;
-    private static final int ITEM_SEARCH = 9;
-    private static final int ITEM_BOOKMARKS = 10;
-    private static final int ITEM_SETTINGS = 11;
-
-    private static final List<DrawerAdapter.Item> DRAWER_ITEMS = Arrays.asList(
-        new DrawerAdapter.EntryItem(R.string.user_news_feed, 0, ITEM_NEWS_FEED),
-        new DrawerAdapter.EntryItem(R.string.my_repositories, 0, ITEM_REPOSITORIES),
-        new DrawerAdapter.EntryItem(R.string.my_issues, 0, ITEM_ISSUES),
-        new DrawerAdapter.EntryItem(R.string.my_pull_requests, 0, ITEM_PULLREQUESTS),
-        new DrawerAdapter.EntryItem(R.string.my_gists, 0, ITEM_GISTS),
-        new DrawerAdapter.DividerItem(),
-        new DrawerAdapter.EntryItem(R.string.pub_timeline, 0, ITEM_TIMELINE),
-        new DrawerAdapter.EntryItem(R.string.trend, 0, ITEM_TRENDING),
-        new DrawerAdapter.EntryItem(R.string.blog, 0, ITEM_BLOG),
-        new DrawerAdapter.DividerItem(),
-        new DrawerAdapter.EntryItem(R.string.search, 0, ITEM_SEARCH),
-        new DrawerAdapter.EntryItem(R.string.bookmarks, 0, ITEM_BOOKMARKS),
-        new DrawerAdapter.EntryItem(R.string.settings, 0, ITEM_SETTINGS)
-    );
 
     private LoaderCallbacks<User> mUserCallback = new LoaderCallbacks<User>() {
         @Override
@@ -95,7 +66,7 @@ public class HomeActivity extends BasePagerActivity implements
         if (savedInstanceState != null) {
             mSelectedFactoryId = savedInstanceState.getInt(STATE_KEY_FACTORY_ITEM);
         } else {
-            mSelectedFactoryId = ITEM_NEWS_FEED;
+            mSelectedFactoryId = R.id.news_feed;
         }
         mFactory = getFactoryForItem(mSelectedFactoryId, savedInstanceState);
         mFragments = new SparseArray<>();
@@ -130,9 +101,8 @@ public class HomeActivity extends BasePagerActivity implements
     }
 
     @Override
-    protected ListAdapter getLeftNavigationDrawerAdapter() {
-        mDrawerAdapter = new DrawerAdapter(this, DRAWER_ITEMS);
-        return mDrawerAdapter;
+    protected int getLeftNavigationDrawerMenuResource() {
+        return R.menu.home_nav_drawer;
     }
 
     @Override
@@ -155,12 +125,10 @@ public class HomeActivity extends BasePagerActivity implements
     }
 
     @Override
-    protected boolean onDrawerItemSelected(boolean left, int position) {
-        if (!left) {
-            return mFactory.onDrawerItemSelected(position);
-        }
+    public boolean onNavigationItemSelected(MenuItem item) {
+        super.onNavigationItemSelected(item);
 
-        int id = DRAWER_ITEMS.get(position).getId();
+        int id = item.getItemId();
         FragmentFactory factory = getFactoryForItem(id, null);
 
         if (factory != null) {
@@ -169,37 +137,37 @@ public class HomeActivity extends BasePagerActivity implements
         }
 
         switch (id) {
-            case ITEM_SEARCH:
+            case R.id.search:
                 startActivity(new Intent(this, SearchActivity.class));
                 return true;
-            case ITEM_BOOKMARKS:
+            case R.id.bookmarks:
                 startActivity(new Intent(this, BookmarkListActivity.class));
                 return true;
-            case ITEM_SETTINGS:
+            case R.id.settings:
                 startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
                 return true;
         }
 
-        return super.onDrawerItemSelected(left, position);
+        return false;
     }
 
     private FragmentFactory getFactoryForItem(int id, Bundle savedInstanceState) {
         switch (id) {
-            case ITEM_NEWS_FEED:
+            case R.id.news_feed:
                 return new NewsFeedFactory(this, mUserLogin);
-            case ITEM_REPOSITORIES:
+            case R.id.my_repos:
                 return new RepositoryFactory(this, mUserLogin, savedInstanceState);
-            case ITEM_ISSUES:
+            case R.id.my_issues:
                 return new IssueListFactory(this, mUserLogin, false);
-            case ITEM_PULLREQUESTS:
+            case R.id.my_prs:
                 return new IssueListFactory(this, mUserLogin, true);
-            case ITEM_GISTS:
+            case R.id.my_gists:
                 return new GistFactory(this, mUserLogin);
-            case ITEM_TIMELINE:
+            case R.id.pub_timeline:
                 return new TimelineFactory(this);
-            case ITEM_BLOG:
+            case R.id.blog:
                 return new BlogFactory(this);
-            case ITEM_TRENDING:
+            case R.id.trend:
                 return new TrendingFactory(this);
         }
         return null;
@@ -220,9 +188,6 @@ public class HomeActivity extends BasePagerActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        if (mDrawerAdapter != null) {
-            updateDrawerSelectionState();
-        }
         mStarted = true;
         mFactory.onStart();
     }
@@ -332,7 +297,6 @@ public class HomeActivity extends BasePagerActivity implements
         mSelectedFactoryId = itemId;
 
         updateRightNavigationDrawer();
-        updateDrawerSelectionState();
         super.supportInvalidateOptionsMenu();
         getSupportFragmentManager().popBackStackImmediate(null,
                 FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -341,16 +305,5 @@ public class HomeActivity extends BasePagerActivity implements
         if (mStarted) {
             mFactory.onStart();
         }
-    }
-
-    private void updateDrawerSelectionState() {
-        for (int i = 0; i < mDrawerAdapter.getCount(); i++) {
-            Object item = mDrawerAdapter.getItem(i);
-            if (item instanceof DrawerAdapter.EntryItem) {
-                DrawerAdapter.EntryItem dei = (DrawerAdapter.EntryItem) item;
-                dei.setSelected(dei.getId() == mSelectedFactoryId);
-            }
-        }
-        mDrawerAdapter.notifyDataSetChanged();
     }
 }

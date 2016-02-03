@@ -65,7 +65,7 @@
     </declare-styleable>
 
     <declare-styleable name="ScrimInsetsView">
-        <attr name="insetForeground" format="reference|color" />
+        <attr name="insetsForeground" format="reference|color" />
         <attr name="consumedEdges" format="enum">
             <enum name="top" value="1" />
             <enum name="bottom" value="2" />

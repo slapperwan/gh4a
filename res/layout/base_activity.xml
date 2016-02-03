@@ -80,40 +80,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <com.gh4a.widget.ScrimInsetsLinearLayout
+    <android.support.design.widget.NavigationView
         android:id="@+id/left_drawer"
-        android:layout_width="@dimen/nav_drawer_width"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_gravity="left"
-        android:background="?attr/drawerBackground"
-        android:orientation="vertical"
-        android:fitsSystemWindows="true">
-
-        <FrameLayout
-            android:id="@+id/left_drawer_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="?attr/actionBarSize"
-            android:clickable="true"
-            android:background="?attr/colorPrimary" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="7dp"
-            android:clickable="true"
-            android:background="?android:attr/listDivider" />
-
-        <ListView
-            android:id="@+id/left_drawer_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:choiceMode="none"
-            android:overScrollMode="never"
-            android:divider="@null"
-            android:dividerHeight="0dp" />
-
-    </com.gh4a.widget.ScrimInsetsLinearLayout>
+        android:layout_gravity="left" />
 
     <com.gh4a.widget.ScrimInsetsLinearLayout
         android:id="@+id/right_drawer"

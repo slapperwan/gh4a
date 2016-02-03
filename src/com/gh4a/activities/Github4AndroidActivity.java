@@ -65,26 +65,6 @@ import com.gh4a.utils.UiUtils;
 public class Github4AndroidActivity extends BaseActivity {
     private static final int REQUEST_SETTINGS = 10000;
 
-    private static final int ITEM_SEARCH = 1;
-    private static final int ITEM_BOOKMARKS = 2;
-    private static final int ITEM_SETTINGS = 3;
-    private static final int ITEM_TIMELINE = 4;
-    private static final int ITEM_TRENDING = 5;
-    private static final int ITEM_BLOG = 6;
-
-    private static final List<DrawerAdapter.Item> DRAWER_ITEMS = Arrays.asList(
-        new DrawerAdapter.SectionHeaderItem(R.string.navigation),
-        new DrawerAdapter.EntryItem(R.string.search, 0, ITEM_SEARCH),
-        new DrawerAdapter.EntryItem(R.string.bookmarks, 0, ITEM_BOOKMARKS),
-        new DrawerAdapter.DividerItem(),
-        new DrawerAdapter.SectionHeaderItem(R.string.explore),
-        new DrawerAdapter.EntryItem(R.string.pub_timeline, 0, ITEM_TIMELINE),
-        new DrawerAdapter.EntryItem(R.string.trend, 0, ITEM_TRENDING),
-        new DrawerAdapter.EntryItem(R.string.blog, 0, ITEM_BLOG),
-        new DrawerAdapter.DividerItem(),
-        new DrawerAdapter.EntryItem(R.string.settings, 0, ITEM_SETTINGS)
-    );
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,33 +79,34 @@ public class Github4AndroidActivity extends BaseActivity {
     }
 
     @Override
-    protected ListAdapter getLeftNavigationDrawerAdapter() {
-        return new DrawerAdapter(this, DRAWER_ITEMS);
+    protected int getLeftNavigationDrawerMenuResource() {
+        return R.menu.anon_nav_drawer;
     }
 
     @Override
-    protected boolean onDrawerItemSelected(boolean left, int position) {
-        switch (DRAWER_ITEMS.get(position).getId()) {
-            case ITEM_SETTINGS:
+    public boolean onNavigationItemSelected(MenuItem item) {
+        super.onNavigationItemSelected(item);
+        switch (item.getItemId()) {
+            case R.id.settings:
                 startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
                 return true;
-            case ITEM_SEARCH:
+            case R.id.search:
                 startActivity(new Intent(this, SearchActivity.class));
                 return true;
-            case ITEM_BOOKMARKS:
+            case R.id.bookmarks:
                 startActivity(new Intent(this, BookmarkListActivity.class));
                 return true;
-            case ITEM_TIMELINE:
+            case R.id.pub_timeline:
                 startActivity(new Intent(this, TimelineActivity.class));
                 return true;
-            case ITEM_BLOG:
+            case R.id.blog:
                 startActivity(new Intent(this, BlogListActivity.class));
                 return true;
-            case ITEM_TRENDING:
+            case R.id.trend:
                 startActivity(new Intent(this, TrendingActivity.class));
                 return true;
         }
-        return super.onDrawerItemSelected(left, position);
+        return false;
     }
 
     @Override
