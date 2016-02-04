@@ -194,7 +194,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
 
         content.append("<html><head><title></title>");
         writeCssInclude(content, "text");
-        writeScriptInclude(content, "wraphandler");
+        writeScriptInclude(content, "codeutils");
         content.append("</head><body><pre>");
 
         String encoded = TextUtils.htmlEncode(mDiff);
