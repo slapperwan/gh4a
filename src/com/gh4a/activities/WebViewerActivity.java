@@ -22,22 +22,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
-import android.content.res.TypedArray;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.util.AttributeSet;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.EditText;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
@@ -116,18 +111,6 @@ public abstract class WebViewerActivity extends BaseActivity {
     }
 
     @Override
-    public View onCreateView(String name, @NonNull Context context, @NonNull AttributeSet attrs) {
-        View view = super.onCreateView(name, context, attrs);
-        // When tinting the views, the support library discards the passed context,
-        // thus the search view input box is black-on-black when using the light
-        // theme. Fix that by post-processing the EditText instance
-        if (view instanceof EditText) {
-            applyDefaultDarkColors((EditText) view);
-        }
-        return view;
-    }
-
-    @Override
     protected void onStart() {
         super.onStart();
         mStarted = true;
@@ -137,15 +120,6 @@ public abstract class WebViewerActivity extends BaseActivity {
     protected void onStop() {
         mStarted = false;
         super.onStop();
-    }
-
-    private void applyDefaultDarkColors(EditText view) {
-        TypedArray a = getTheme().obtainStyledAttributes(R.style.DarkTheme, new int[] {
-            android.R.attr.textColorPrimary, android.R.attr.textColorHint
-        });
-        view.setTextColor(a.getColor(0, 0));
-        view.setHintTextColor(a.getColor(1, 0));
-        a.recycle();
     }
 
     @SuppressWarnings("deprecation")
