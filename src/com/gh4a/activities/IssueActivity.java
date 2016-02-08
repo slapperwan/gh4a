@@ -65,6 +65,7 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
+import com.gh4a.widget.FloatingActionButtonWithVisibilityControl;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
@@ -85,7 +86,7 @@ public class IssueActivity extends BaseActivity implements
     private IssueEventAdapter mEventAdapter;
     private RecyclerView mRecyclerView;
     private boolean mIsCollaborator;
-    private FloatingActionButton mEditFab;
+    private FloatingActionButtonWithVisibilityControl mEditFab;
     private CommentBoxFragment mCommentFragment;
     private HttpImageGetter mImageGetter;
 
@@ -140,9 +141,7 @@ public class IssueActivity extends BaseActivity implements
         public void onResultReady(LoaderResult<Boolean> result) {
             if (!result.handleError(IssueActivity.this)) {
                 mIsCollaborator = result.getData();
-                if (mIsCollaborator && mIssue != null && mEventsLoaded) {
-                    mEditFab.setVisibility(View.VISIBLE);
-                }
+                updateFabVisibility();
                 supportInvalidateOptionsMenu();
             }
         }
@@ -197,8 +196,10 @@ public class IssueActivity extends BaseActivity implements
         mCommentFragment = (CommentBoxFragment) fm.findFragmentById(R.id.comment_box);
 
         CoordinatorLayout rootLayout = getRootLayout();
-        mEditFab = (FloatingActionButton) inflater.inflate(R.layout.issue_edit_fab, rootLayout, false);
+        mEditFab = (FloatingActionButtonWithVisibilityControl)
+                inflater.inflate(R.layout.issue_edit_fab, rootLayout, false);
         mEditFab.setOnClickListener(this);
+        mEditFab.setCanShow(false);
         rootLayout.addView(mEditFab);
 
         setToolbarScrollable(true);
@@ -323,11 +324,8 @@ public class IssueActivity extends BaseActivity implements
             tvPull.setVisibility(View.GONE);
         }
 
-        if (mHeader.getVisibility() == View.GONE) {
-            mHeader.setVisibility(View.VISIBLE);
-            mEditFab.setVisibility(mIsCollaborator ? View.VISIBLE : View.GONE);
-        }
-
+        mHeader.setVisibility(View.VISIBLE);
+        updateFabVisibility();
         refreshDone();
     }
 
@@ -401,6 +399,13 @@ public class IssueActivity extends BaseActivity implements
         getSupportLoaderManager().restartLoader(1, null, mCollaboratorCallback);
         getSupportLoaderManager().restartLoader(2, null, mEventCallback);
         supportInvalidateOptionsMenu();
+    }
+
+    private void updateFabVisibility() {
+        if (mIsCollaborator && mIssue != null && mEventsLoaded) {
+            mEditFab.setCanShow(true);
+            mEditFab.show();
+        }
     }
 
     private boolean checkForAuthOrExit() {
