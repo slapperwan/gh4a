@@ -416,7 +416,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
         int primaryDarkColor = UiUtils.resolveColor(this, R.attr.colorPrimaryDark);
         ColorDrawable d = ColorDrawable.create(primaryDarkColor);
-        mCoordinatorLayout.setStatusBarBackground(d);
+        mDrawerLayout.setStatusBarBackground(d);
         mStatusBarDrawables.add(d);
     }
 

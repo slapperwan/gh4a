@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.DrawerLayout
+<com.gh4a.widget.InvalidatingDrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawer_container"
@@ -85,4 +85,4 @@
         android:layout_gravity="right"
         android:background="?attr/drawerBackground" />
 
-</android.support.v4.widget.DrawerLayout>
+</com.gh4a.widget.InvalidatingDrawerLayout>
