@@ -29,6 +29,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
@@ -202,6 +203,8 @@ public class IssueActivity extends BaseActivity implements
         mEditFab.setCanShow(false);
         rootLayout.addView(mEditFab);
 
+        AppBarLayout abl = (AppBarLayout) findViewById(R.id.header);
+        abl.addOnOffsetChangedListener(mCommentFragment);
         setToolbarScrollable(true);
 
         getSupportLoaderManager().initLoader(0, null, mIssueCallback);

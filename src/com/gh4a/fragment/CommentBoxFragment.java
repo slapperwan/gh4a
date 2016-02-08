@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.os.AsyncTaskCompat;
 import android.text.Editable;
@@ -23,7 +24,8 @@ import com.gh4a.widget.SwipeRefreshLayout;
 import java.io.IOException;
 
 public class CommentBoxFragment extends Fragment implements
-        View.OnClickListener, TextWatcher, SwipeRefreshLayout.ChildScrollDelegate {
+        View.OnClickListener, TextWatcher, SwipeRefreshLayout.ChildScrollDelegate,
+        AppBarLayout.OnOffsetChangedListener {
     public interface Callback {
         @StringRes int getCommentEditorHintResId();
         void onSendCommentInBackground(String comment) throws IOException;
@@ -70,6 +72,18 @@ public class CommentBoxFragment extends Fragment implements
         Editable comment = mCommentEditor.getText();
         AsyncTaskCompat.executeParallel(new CommentTask(comment.toString()));
         UiUtils.hideImeForView(getActivity().getCurrentFocus());
+    }
+
+    @Override
+    public void onOffsetChanged(AppBarLayout abl, int verticalOffset) {
+        View v = getView();
+        if (v != null) {
+            int offset = abl.getTotalScrollRange() + verticalOffset;
+            if (offset >= 0) {
+                v.setPadding(v.getPaddingLeft(), v.getPaddingTop(),
+                        v.getPaddingRight(), offset);
+            }
+        }
     }
 
     @Override

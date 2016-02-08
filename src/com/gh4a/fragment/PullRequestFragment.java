@@ -32,6 +32,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
 import android.support.v4.os.AsyncTaskCompat;
@@ -176,6 +177,9 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
             mAdapter.destroy();
             mAdapter = null;
         }
+
+        AppBarLayout abl = (AppBarLayout) getActivity().findViewById(R.id.header);
+        abl.removeOnOffsetChangedListener(mCommentFragment);
     }
 
     @Override
@@ -193,6 +197,9 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
         FragmentManager fm = getChildFragmentManager();
         mCommentFragment = (CommentBoxFragment) fm.findFragmentById(R.id.comment_box);
+
+        AppBarLayout abl = (AppBarLayout) getActivity().findViewById(R.id.header);
+        abl.addOnOffsetChangedListener(mCommentFragment);
 
         final int stateColor;
         if (mPullRequest.isMerged()) {
