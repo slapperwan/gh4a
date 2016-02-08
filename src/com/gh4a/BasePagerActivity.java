@@ -2,6 +2,7 @@ package com.gh4a;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -11,13 +12,12 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.gh4a.utils.UiUtils;
-import com.gh4a.widget.SlidingTabLayout;
 import com.gh4a.widget.SwipeRefreshLayout;
 
 public abstract class BasePagerActivity extends BaseActivity implements
         SwipeRefreshLayout.ChildScrollDelegate, ViewPager.OnPageChangeListener {
     private FragmentAdapter mAdapter;
-    private SlidingTabLayout mTabs;
+    private TabLayout mTabs;
     private ViewPager mPager;
     private int[][] mTabHeaderColors;
     private boolean mScrolling;
@@ -53,7 +53,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
         } else {
             transitionHeaderToColor(R.attr.colorPrimary, R.attr.colorPrimaryDark);
         }
-        mTabs.setViewPager(mPager);
+        mTabs.setupWithViewPager(mPager);
         updateTabVisibility();
     }
 
@@ -77,13 +77,10 @@ public abstract class BasePagerActivity extends BaseActivity implements
     private ViewPager setupPager() {
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(mAdapter);
+        pager.addOnPageChangeListener(this);
 
-        mTabs = new SlidingTabLayout(this);
-        mTabs.setSelectedIndicatorColors(getResources().getColor(R.color.tab_indicator_color));
-        mTabs.setCustomTabView(R.layout.tab_indicator, R.id.tab_title);
-        mTabs.setFillContainer(true);
-        mTabs.setViewPager(pager);
-        mTabs.setOnPageChangeListener(this);
+        mTabs = (TabLayout) getLayoutInflater().inflate(R.layout.tab_bar, null);
+        mTabs.setupWithViewPager(pager);
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             Toolbar toolBar = (Toolbar) findViewById(R.id.toolbar);
