@@ -67,7 +67,6 @@ dependencies {
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.squareup.okhttp:okhttp:1.5.4'
     compile 'org.ocpsoft.prettytime:prettytime:3.2.4.Final'
-    compile 'com.shamanland:fab:0.0.6'
     compile 'com.github.castorflex.smoothprogressbar:library:1.0.0'
     compile 'com.nineoldandroids:library:2.4.0+'
     compile('com.crashlytics.sdk.android:crashlytics:2.4.0@aar') {

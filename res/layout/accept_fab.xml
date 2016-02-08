@@ -2,13 +2,11 @@
 <android.support.design.widget.FloatingActionButton
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/edit_fab"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginRight="16dp"
-    android:src="@drawable/content_edit_white"
-    android:visibility="gone"
-    app:backgroundTint="?attr/colorIssueEditFab"
-    app:layout_anchor="@id/header"
+    android:src="@drawable/navigation_accept"
+    app:backgroundTint="?attr/colorFab"
+    app:layout_anchor="@+id/header"
     app:layout_anchorGravity="right|bottom"
     app:fabSize="mini" />

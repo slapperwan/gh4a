@@ -20,11 +20,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Rect;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -36,10 +37,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.gh4a.activities.Github4AndroidActivity;
@@ -49,13 +48,11 @@ import com.gh4a.db.BookmarksProvider;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ColorDrawable;
-import com.gh4a.widget.ScrimInsetsLinearLayout;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ArgbEvaluator;
 import com.nineoldandroids.animation.ObjectAnimator;
-import com.shamanland.fab.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,20 +61,18 @@ import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 public abstract class BaseActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener, DrawerLayout.DrawerListener,
-        NavigationView.OnNavigationItemSelectedListener,
-        ScrimInsetsLinearLayout.OnInsetsCallback {
+        NavigationView.OnNavigationItemSelectedListener {
     private ViewGroup mContentContainer;
     private TextView mEmptyView;
     private boolean mContentShown;
     private boolean mContentEmpty;
 
-    private View mHeader;
-    private FrameLayout mOverlay;
-    private FloatingActionButton mHeaderFab;
+    private AppBarLayout mHeader;
     private SmoothProgressBar mProgress;
     private SwipeRefreshLayout mSwipeLayout;
     private DrawerLayout mDrawerLayout;
-    private ScrimInsetsLinearLayout mInsetsLayout;
+    private CoordinatorLayout mCoordinatorLayout;
+    private Toolbar mToolbar;
     private ActionBarDrawerToggle mDrawerToggle;
     private boolean mHasErrorView = false;
     private NavigationView mLeftDrawer;
@@ -88,16 +83,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private final List<ColorDrawable> mHeaderDrawables = new ArrayList<>();
     private final List<ColorDrawable> mStatusBarDrawables = new ArrayList<>();
 
-    private ViewTreeObserver.OnGlobalLayoutListener mOverlayLayoutListener =
-            new ViewTreeObserver.OnGlobalLayoutListener() {
-        @Override
-        public void onGlobalLayout() {
-            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mHeaderFab.getLayoutParams();
-            params.topMargin = mHeader.getHeight() - mHeaderFab.getHeight() / 2;
-            mHeaderFab.setLayoutParams(params);
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
@@ -105,12 +90,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
         if (isOnline()) {
             super.setContentView(R.layout.base_activity);
-
-            mInsetsLayout = (ScrimInsetsLinearLayout) findViewById(R.id.inset_layout);
-            mInsetsLayout.setOnInsetsCallback(this);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setStatusBarColor(0);
-            }
 
             setupSwipeToRefresh();
             setupNavigationDrawer();
@@ -197,19 +176,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
         }
     }
 
-    protected void setHeaderAlignedActionButton(FloatingActionButton fab) {
-        mHeaderFab = fab;
-
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT
-        );
-        params.gravity = Gravity.RIGHT;
-        params.rightMargin = getResources().getDimensionPixelSize(R.dimen.content_padding);
-
+    protected CoordinatorLayout getRootLayout() {
         ensureContent();
-        mOverlay.getViewTreeObserver().addOnGlobalLayoutListener(mOverlayLayoutListener);
-        mOverlay.addView(fab, params);
+        return mCoordinatorLayout;
     }
 
     protected void setHeaderColor(int color, int statusBarColor) {
@@ -278,6 +247,28 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     protected boolean hasErrorView() {
         return mHasErrorView;
+    }
+
+    protected void addHeaderView(View view, boolean scrollable) {
+        mHeader.addView(view, 1, new AppBarLayout.LayoutParams(
+                AppBarLayout.LayoutParams.MATCH_PARENT,
+                AppBarLayout.LayoutParams.WRAP_CONTENT));
+        setAppBarChildScrollable(view, scrollable);
+    }
+
+    protected void setToolbarScrollable(boolean scrollable) {
+        setAppBarChildScrollable(mToolbar, scrollable);
+    }
+
+    private void setAppBarChildScrollable(View view, boolean scrollable) {
+        AppBarLayout.LayoutParams lp = (AppBarLayout.LayoutParams) view.getLayoutParams();
+        if (scrollable) {
+            lp.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS
+                    | AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL);
+        } else {
+            lp.setScrollFlags(0);
+        }
+        view.setLayoutParams(lp);
     }
 
     protected void saveBookmark(String name, int type, Intent intent, String extraData) {
@@ -403,15 +394,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
         return false;
     }
 
-    @Override
-    public void onInsetsChanged(ScrimInsetsLinearLayout layout, Rect insets) {
-        // assumes vertical orientation, but that's true for all of our views
-        View child = layout.getChildAt(0);
-        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) child.getLayoutParams();
-        lp.topMargin = insets.top;
-        child.setLayoutParams(lp);
-    }
-
     private void setErrorView() {
         mHasErrorView = true;
         super.setContentView(R.layout.error);
@@ -425,17 +407,17 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     private void setupHeaderDrawable() {
+        ensureContent();
+
         int primaryColor = UiUtils.resolveColor(this, R.attr.colorPrimary);
         assignBackground(mLeftDrawerTitle, primaryColor);
         assignBackground(mRightDrawerTitle, primaryColor);
-        assignBackground(findViewById(R.id.header), primaryColor);
+        assignBackground(mHeader, primaryColor);
 
-        if (mInsetsLayout != null) {
-            int primaryDarkColor = UiUtils.resolveColor(this, R.attr.colorPrimaryDark);
-            ColorDrawable d = ColorDrawable.create(primaryDarkColor);
-            mInsetsLayout.setInsetForeground(d);
-            mStatusBarDrawables.add(d);
-        }
+        int primaryDarkColor = UiUtils.resolveColor(this, R.attr.colorPrimaryDark);
+        ColorDrawable d = ColorDrawable.create(primaryDarkColor);
+        mCoordinatorLayout.setStatusBarBackground(d);
+        mStatusBarDrawables.add(d);
     }
 
     private ObjectAnimator createColorTransition(ColorDrawable drawable, int colorAttrId) {
@@ -543,11 +525,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
                 UiUtils.resolveColor(this, R.attr.colorPrimaryDark)
         });
 
+        mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
         mContentContainer = (ViewGroup) findViewById(R.id.content_container);
         mEmptyView = (TextView) findViewById(android.R.id.empty);
 
-        mOverlay = (FrameLayout) findViewById(R.id.overlay);
-        mHeader = findViewById(R.id.header);
+        mHeader = (AppBarLayout) findViewById(R.id.header);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
 
         mContentShown = true;
     }

@@ -23,7 +23,6 @@ import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gh4a.BasePagerActivity;
@@ -89,13 +88,12 @@ public class PullRequestActivity extends BasePagerActivity implements
         mRepoName = data.getString(Constants.Repository.NAME);
         mPullRequestNumber = data.getInt(Constants.PullRequest.NUMBER);
 
-        LinearLayout header = (LinearLayout) findViewById(R.id.header);
         LayoutInflater inflater = getLayoutInflater();
 
-        mHeader = (ViewGroup) inflater.inflate(R.layout.issue_header, header, false);
+        mHeader = (ViewGroup) inflater.inflate(R.layout.issue_header, null);
         mHeader.setClickable(false);
         mHeader.setVisibility(View.GONE);
-        header.addView(mHeader, 1);
+        addHeaderView(mHeader, true);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getResources().getString(R.string.pull_request_title) + " #" + mPullRequestNumber);

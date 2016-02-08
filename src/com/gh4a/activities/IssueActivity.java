@@ -29,6 +29,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
 import android.support.v4.os.AsyncTaskCompat;
@@ -66,7 +68,6 @@ import com.gh4a.widget.DividerItemDecoration;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
-import com.shamanland.fab.FloatingActionButton;
 
 public class IssueActivity extends BaseActivity implements
         View.OnClickListener, IssueEventAdapter.OnEditComment,
@@ -173,13 +174,12 @@ public class IssueActivity extends BaseActivity implements
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this));
         mImageGetter = new HttpImageGetter(this);
 
-        ViewGroup header = (ViewGroup) findViewById(R.id.header);
         LayoutInflater inflater = getLayoutInflater();
 
-        mHeader = (ViewGroup) inflater.inflate(R.layout.issue_header, header, false);
+        mHeader = (ViewGroup) inflater.inflate(R.layout.issue_header, null);
         mHeader.setClickable(false);
         mHeader.setVisibility(View.GONE);
-        header.addView(mHeader);
+        addHeaderView(mHeader, false);
 
         mListHeaderView = inflater.inflate(R.layout.issue_comment_list_header, mRecyclerView, false);
 
@@ -196,10 +196,12 @@ public class IssueActivity extends BaseActivity implements
         FragmentManager fm = getSupportFragmentManager();
         mCommentFragment = (CommentBoxFragment) fm.findFragmentById(R.id.comment_box);
 
-        mEditFab = (FloatingActionButton) inflater.inflate(R.layout.issue_edit_fab, null);
+        CoordinatorLayout rootLayout = getRootLayout();
+        mEditFab = (FloatingActionButton) inflater.inflate(R.layout.issue_edit_fab, rootLayout, false);
         mEditFab.setOnClickListener(this);
-        mEditFab.setVisibility(View.GONE);
-        setHeaderAlignedActionButton(mEditFab);
+        rootLayout.addView(mEditFab);
+
+        setToolbarScrollable(true);
 
         getSupportLoaderManager().initLoader(0, null, mIssueCallback);
         getSupportLoaderManager().initLoader(1, null, mCollaboratorCallback);

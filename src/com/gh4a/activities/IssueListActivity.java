@@ -15,21 +15,27 @@
  */
 package com.gh4a.activities;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.gh4a.BasePagerActivity;
 import com.gh4a.Constants;
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueListFragment;
 import com.gh4a.loader.CollaboratorListLoader;
@@ -50,7 +56,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class IssueListActivity extends BasePagerActivity {
+public class IssueListActivity extends BasePagerActivity implements View.OnClickListener {
+    private static final int REQUEST_ISSUE_CREATE = 1001;
+
     private String mRepoOwner;
     private String mRepoName;
 
@@ -58,6 +66,7 @@ public class IssueListActivity extends BasePagerActivity {
     private int mSelectedMilestone;
     private String mSelectedAssignee;
 
+    private FloatingActionButton mCreateFab;
     private IssueListFragment mOpenFragment;
     private IssueListFragment mClosedFragment;
     private Boolean mIsCollaborator;
@@ -166,6 +175,14 @@ public class IssueListActivity extends BasePagerActivity {
             getPager().setCurrentItem(1);
         }
 
+        if (Gh4Application.get().isAuthorized()) {
+            CoordinatorLayout rootLayout = getRootLayout();
+            mCreateFab = (FloatingActionButton) getLayoutInflater().inflate(
+                    R.layout.add_fab, rootLayout, false);
+            mCreateFab.setOnClickListener(this);
+            rootLayout.addView(mCreateFab);
+        }
+
         getSupportLoaderManager().initLoader(3, null, mIsCollaboratorCallback);
 
         ActionBar actionBar = getSupportActionBar();
@@ -177,6 +194,16 @@ public class IssueListActivity extends BasePagerActivity {
     @Override
     protected int[] getTabTitleResIds() {
         return TITLES;
+    }
+
+    @Override
+    protected void onPageMoved(int position, float fraction) {
+        super.onPageMoved(position, fraction);
+        float openFraction = 1 - position - fraction;
+        ViewCompat.setScaleX(mCreateFab, openFraction);
+        ViewCompat.setScaleY(mCreateFab, openFraction);
+        mCreateFab.setVisibility(openFraction == 0 ? View.INVISIBLE : View.VISIBLE);
+
     }
 
     @Override
@@ -227,6 +254,17 @@ public class IssueListActivity extends BasePagerActivity {
             }
         }
         return false;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_ISSUE_CREATE) {
+            if (resultCode == Activity.RESULT_OK) {
+                mOpenFragment.refresh();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override
@@ -283,6 +321,14 @@ public class IssueListActivity extends BasePagerActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View view) {
+        Intent intent = new Intent(this, IssueEditActivity.class);
+        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+        intent.putExtra(Constants.Repository.NAME, mRepoName);
+        startActivityForResult(intent, REQUEST_ISSUE_CREATE);
     }
 
     @Override

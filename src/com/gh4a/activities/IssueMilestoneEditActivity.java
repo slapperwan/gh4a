@@ -21,6 +21,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
@@ -33,7 +35,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gh4a.BaseActivity;
@@ -45,7 +46,6 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
-import com.shamanland.fab.FloatingActionButton;
 
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -89,19 +89,19 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
 
         setContentView(R.layout.issue_create_milestone);
 
-        LinearLayout headerContainer = (LinearLayout) findViewById(R.id.header);
         LayoutInflater headerInflater = LayoutInflater.from(UiUtils.makeHeaderThemedContext(this));
-        View header = headerInflater.inflate(R.layout.issue_create_header, headerContainer);
+        View header = headerInflater.inflate(R.layout.issue_create_header, null);
+        addHeaderView(header, false);
 
         mTitleView = (EditText) header.findViewById(R.id.et_title);
         mDescriptionView = (EditText) header.findViewById(R.id.et_desc);
         mDueView = (TextView) findViewById(R.id.tv_due);
 
-        FloatingActionButton fab =
-                (FloatingActionButton) getLayoutInflater().inflate(R.layout.default_fab, null);
-        fab.setImageResource(R.drawable.navigation_accept);
+        CoordinatorLayout rootLayout = getRootLayout();
+        FloatingActionButton fab = (FloatingActionButton)
+                getLayoutInflater().inflate(R.layout.accept_fab, rootLayout, false);
         fab.setOnClickListener(this);
-        setHeaderAlignedActionButton(fab);
+        rootLayout.addView(fab);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(isInEditMode()

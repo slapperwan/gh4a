@@ -9,7 +9,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
@@ -33,12 +32,16 @@ public abstract class BasePagerActivity extends BaseActivity implements
         setContentView(R.layout.view_pager);
 
         mTabHeaderColors = getTabHeaderColors();
-        updateHeaderColor(0, 0);
-
         mPager = setupPager();
         updateTabVisibility();
 
         setChildScrollDelegate(this);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        onPageMoved(0, 0);
     }
 
     protected void invalidateFragments() {
@@ -49,7 +52,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
         invalidateFragments();
         mTabHeaderColors = getTabHeaderColors();
         if (mTabHeaderColors != null) {
-            updateHeaderColor(0, 0);
+            onPageMoved(0, 0);
         } else {
             transitionHeaderToColor(R.attr.colorPrimary, R.attr.colorPrimaryDark);
         }
@@ -83,15 +86,12 @@ public abstract class BasePagerActivity extends BaseActivity implements
         mTabs.setupWithViewPager(pager);
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            Toolbar toolBar = (Toolbar) findViewById(R.id.toolbar);
-            toolBar.addView(mTabs, new Toolbar.LayoutParams(
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            toolbar.addView(mTabs, new Toolbar.LayoutParams(
                     Toolbar.LayoutParams.WRAP_CONTENT,
                     Toolbar.LayoutParams.MATCH_PARENT));
         } else {
-            LinearLayout header = (LinearLayout) findViewById(R.id.header);
-            header.addView(mTabs, new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT));
+            addHeaderView(mTabs, false);
         }
 
         return pager;
@@ -104,6 +104,8 @@ public abstract class BasePagerActivity extends BaseActivity implements
         mPager.setOffscreenPageLimit(titleResIds.length - 1);
 
         mTabs.setVisibility(titleResIds.length > 1 ? View.VISIBLE : View.GONE);
+        setToolbarScrollable(titleResIds.length > 1
+                && getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE);
     }
 
     protected abstract int[] getTabTitleResIds();
@@ -119,13 +121,13 @@ public abstract class BasePagerActivity extends BaseActivity implements
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        updateHeaderColor(position, positionOffset);
+        onPageMoved(position, positionOffset);
     }
 
     @Override
     public void onPageSelected(int position) {
         if (!mScrolling) {
-            updateHeaderColor(position, 0);
+            onPageMoved(position, 0);
         }
     }
 
@@ -134,17 +136,15 @@ public abstract class BasePagerActivity extends BaseActivity implements
         mScrolling = state != ViewPager.SCROLL_STATE_IDLE;
     }
 
-    private void updateHeaderColor(int position, float fraction) {
-        if (mTabHeaderColors == null) {
-            return;
+    protected void onPageMoved(int position, float fraction) {
+        if (mTabHeaderColors != null) {
+            int nextIndex = Math.max(position, mTabHeaderColors.length - 1);
+            int headerColor = UiUtils.mixColors(mTabHeaderColors[position][0],
+                    mTabHeaderColors[nextIndex][0], fraction);
+            int statusBarColor = UiUtils.mixColors(mTabHeaderColors[position][1],
+                    mTabHeaderColors[nextIndex][1], fraction);
+            setHeaderColor(headerColor, statusBarColor);
         }
-
-        int nextIndex = Math.max(position, mTabHeaderColors.length - 1);
-        int headerColor = UiUtils.mixColors(mTabHeaderColors[position][0],
-                mTabHeaderColors[nextIndex][0], fraction);
-        int statusBarColor = UiUtils.mixColors(mTabHeaderColors[position][1],
-                mTabHeaderColors[nextIndex][1], fraction);
-        setHeaderColor(headerColor, statusBarColor);
     }
 
     private class FragmentAdapter extends FragmentStatePagerAdapter {

@@ -23,23 +23,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.gh4a.Constants;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.IssueMilestoneEditActivity;
 import com.gh4a.adapter.MilestoneAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
-import com.shamanland.fab.FloatingActionButton;
-import com.shamanland.fab.ShowHideOnScroll;
 
-public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> implements
-        View.OnClickListener {
+public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> {
     private String mRepoOwner;
     private String mRepoName;
 
@@ -59,28 +52,6 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
         super.onCreate(savedInstanceState);
         mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
         mRepoName = getArguments().getString(Constants.Repository.NAME);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View wrapper = inflater.inflate(R.layout.fab_list_wrapper, container, false);
-        ViewGroup listContainer = (ViewGroup) wrapper.findViewById(R.id.container);
-        listContainer.addView(super.onCreateView(inflater, listContainer, savedInstanceState));
-        return wrapper;
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab_add);
-        if (Gh4Application.get().isAuthorized()) {
-            RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.list);
-            recyclerView.setOnTouchListener(new ShowHideOnScroll(fab));
-            fab.setOnClickListener(this);
-        } else {
-            fab.setVisibility(View.GONE);
-        }
     }
 
     @Override
@@ -105,13 +76,5 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
     @Override
     public Loader<LoaderResult<List<Milestone>>> onCreateLoader(int id, Bundle args) {
         return new MilestoneListLoader(getActivity(), mRepoOwner, mRepoName);
-    }
-
-    @Override
-    public void onClick(View view) {
-        Intent intent = new Intent(getActivity(), IssueMilestoneEditActivity.class);
-        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.NAME, mRepoName);
-        startActivity(intent);
     }
 }

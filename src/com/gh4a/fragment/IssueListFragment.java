@@ -28,26 +28,19 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.IssueActivity;
-import com.gh4a.activities.IssueEditActivity;
 import com.gh4a.adapter.IssueAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.UiUtils;
-import com.shamanland.fab.FloatingActionButton;
-import com.shamanland.fab.ShowHideOnScroll;
 
-public class IssueListFragment extends PagedDataBaseFragment<Issue> implements
-        View.OnClickListener {
+public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     private static final int REQUEST_ISSUE = 1000;
-    private static final int REQUEST_ISSUE_CREATE = 1001;
 
     private String mRepoOwner;
     private String mRepoName;
@@ -71,36 +64,12 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> implements
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if (TextUtils.equals(mFilterData.get(Constants.Issue.STATE), Constants.Issue.STATE_OPEN)) {
-            View wrapper = inflater.inflate(R.layout.fab_list_wrapper, container, false);
-            ViewGroup listContainer = (ViewGroup) wrapper.findViewById(R.id.container);
-            listContainer.addView(super.onCreateView(inflater, listContainer, savedInstanceState));
-            return wrapper;
-        } else {
-            return super.onCreateView(inflater, container, savedInstanceState);
-        }
-    }
-
-    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         String stateFilter = mFilterData.get(Constants.Issue.STATE);
         int stateColorAttr = TextUtils.equals(stateFilter, Constants.Issue.STATE_OPEN)
                 ? R.attr.colorIssueOpen : TextUtils.equals(stateFilter, Constants.Issue.STATE_CLOSED)
                 ? R.attr.colorIssueClosed : 0;
-
-        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab_add);
-        if (fab != null) {
-            if (Gh4Application.get().isAuthorized()) {
-                RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.list);
-                recyclerView.setOnTouchListener(new ShowHideOnScroll(fab));
-                fab.setOnClickListener(this);
-            } else {
-                fab.setVisibility(View.GONE);
-            }
-        }
-
         if (stateColorAttr != 0) {
             UiUtils.trySetListOverscrollColor(getRecyclerView(),
                     UiUtils.resolveColor(getActivity(), stateColorAttr));
@@ -147,7 +116,7 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> implements
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_ISSUE || requestCode == REQUEST_ISSUE_CREATE) {
+        if (requestCode == REQUEST_ISSUE) {
             if (resultCode == Activity.RESULT_OK) {
                 super.refresh();
             }
@@ -161,14 +130,6 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> implements
         IssueService issueService = (IssueService)
                 Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
         return issueService.pageIssues(new RepositoryId(mRepoOwner, mRepoName), mFilterData);
-    }
-
-    @Override
-    public void onClick(View view) {
-        Intent intent = new Intent(getActivity(), IssueEditActivity.class);
-        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.NAME, mRepoName);
-        startActivityForResult(intent, REQUEST_ISSUE_CREATE);
     }
 
     public static class SortDrawerHelper {

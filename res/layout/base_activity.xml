@@ -7,19 +7,15 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <com.gh4a.widget.ScrimInsetsLinearLayout
-        android:id="@+id/inset_layout"
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/coordinator_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true"
-        android:orientation="vertical"
-        app:consumedEdges="top">
+        android:layout_height="match_parent">
 
-        <LinearLayout
+        <android.support.design.widget.AppBarLayout
             android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:background="?attr/colorPrimary"
             android:animateLayoutChanges="true"
             android:elevation="2dp">
@@ -31,12 +27,13 @@
                 android:theme="?attr/actionBarTheme"
                 app:popupTheme="?attr/actionBarPopupTheme" />
 
-        </LinearLayout>
+        </android.support.design.widget.AppBarLayout>
 
         <com.gh4a.widget.SwipeRefreshLayout
             android:id="@+id/swipe_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -73,12 +70,7 @@
 
         </com.gh4a.widget.SwipeRefreshLayout>
 
-    </com.gh4a.widget.ScrimInsetsLinearLayout>
-
-    <FrameLayout
-        android:id="@+id/overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.NavigationView
         android:id="@+id/left_drawer"

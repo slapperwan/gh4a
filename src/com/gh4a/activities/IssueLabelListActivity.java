@@ -18,6 +18,8 @@ package com.gh4a.activities;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.Loader;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -44,8 +46,6 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
-import com.shamanland.fab.FloatingActionButton;
-import com.shamanland.fab.ShowHideOnScroll;
 
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -63,7 +63,6 @@ public class IssueLabelListActivity extends BaseActivity implements
     private IssueLabelAdapter.EditableLabel mAddedLabel;
 
     private FloatingActionButton mFab;
-    private ShowHideOnScroll mFabListener;
     private RecyclerView mRecyclerView;
     private IssueLabelAdapter mAdapter;
 
@@ -102,7 +101,7 @@ public class IssueLabelListActivity extends BaseActivity implements
             return;
         }
 
-        setContentView(R.layout.issue_label_list);
+        setContentView(R.layout.generic_list);
         setContentShown(false);
 
         ActionBar actionBar = getSupportActionBar();
@@ -117,9 +116,11 @@ public class IssueLabelListActivity extends BaseActivity implements
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this));
         mRecyclerView.setAdapter(mAdapter);
 
-        mFab = (FloatingActionButton) findViewById(R.id.fab_add);
+        CoordinatorLayout rootLayout = getRootLayout();
+        mFab = (FloatingActionButton) getLayoutInflater().inflate(
+                R.layout.add_fab, rootLayout, false);
         mFab.setOnClickListener(this);
-        mFabListener = new ShowHideOnScroll(mFab);
+        rootLayout.addView(mFab);
         updateFabVisibility();
 
         getSupportLoaderManager().initLoader(0, null, mLabelCallback);
@@ -190,13 +191,8 @@ public class IssueLabelListActivity extends BaseActivity implements
     }
 
     private void updateFabVisibility() {
-        if (Gh4Application.get().isAuthorized() && mActionMode == null) {
-            mRecyclerView.setOnTouchListener(mFabListener);
-            mFab.setVisibility(View.VISIBLE);
-        } else {
-            mRecyclerView.setOnTouchListener(null);
-            mFab.setVisibility(View.GONE);
-        }
+        boolean visible = Gh4Application.get().isAuthorized() && mActionMode == null;
+        mFab.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     private final class EditActionMode implements ActionMode.Callback {
