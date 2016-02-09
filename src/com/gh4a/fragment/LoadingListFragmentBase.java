@@ -1,6 +1,7 @@
 package com.gh4a.fragment;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,6 +20,10 @@ import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 public class LoadingListFragmentBase extends ProgressFragment implements
         SwipeRefreshLayout.ChildScrollDelegate {
     private RecyclerView mRecyclerView;
+
+    public interface OnRecyclerViewCreatedListener {
+        void onRecyclerViewCreated(Fragment fragment, RecyclerView recyclerView);
+    }
 
     public LoadingListFragmentBase() {
 
@@ -39,6 +44,10 @@ public class LoadingListFragmentBase extends ProgressFragment implements
         mRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
         if (hasDividers()) {
             mRecyclerView.addItemDecoration(new DividerItemDecoration(view.getContext()));
+        }
+
+        if (getActivity() instanceof OnRecyclerViewCreatedListener) {
+            ((OnRecyclerViewCreatedListener) getActivity()).onRecyclerViewCreated(this, mRecyclerView);
         }
 
         SmoothProgressBar progress = (SmoothProgressBar) view.findViewById(R.id.progress);

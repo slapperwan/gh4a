@@ -114,6 +114,7 @@ public class IssueLabelListActivity extends BaseActivity implements
         mRecyclerView = (RecyclerView) findViewById(R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this));
+        mRecyclerView.setTag(R.id.FloatingActionButtonScrollEnabled, new Object());
         mRecyclerView.setAdapter(mAdapter);
 
         CoordinatorLayout rootLayout = getRootLayout();

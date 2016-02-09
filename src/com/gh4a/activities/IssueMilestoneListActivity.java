@@ -21,6 +21,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.gh4a.BaseActivity;
@@ -28,9 +29,11 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueMilestoneListFragment;
+import com.gh4a.fragment.LoadingListFragmentBase;
 import com.gh4a.utils.IntentUtils;
 
-public class IssueMilestoneListActivity extends BaseActivity implements View.OnClickListener {
+public class IssueMilestoneListActivity extends BaseActivity implements
+        View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener {
     private String mRepoOwner;
     private String mRepoName;
 
@@ -62,6 +65,11 @@ public class IssueMilestoneListActivity extends BaseActivity implements View.OnC
         actionBar.setTitle(R.string.issue_milestones);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public void onRecyclerViewCreated(Fragment fragment, RecyclerView recyclerView) {
+        recyclerView.setTag(R.id.FloatingActionButtonScrollEnabled, new Object());
     }
 
     @Override

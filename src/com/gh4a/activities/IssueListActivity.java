@@ -28,6 +28,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,6 +39,7 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueListFragment;
+import com.gh4a.fragment.LoadingListFragmentBase;
 import com.gh4a.loader.CollaboratorListLoader;
 import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.LabelListLoader;
@@ -56,7 +58,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class IssueListActivity extends BasePagerActivity implements View.OnClickListener {
+public class IssueListActivity extends BasePagerActivity implements
+        View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener {
     private static final int REQUEST_ISSUE_CREATE = 1001;
 
     private String mRepoOwner;
@@ -194,6 +197,13 @@ public class IssueListActivity extends BasePagerActivity implements View.OnClick
     @Override
     protected int[] getTabTitleResIds() {
         return TITLES;
+    }
+
+    @Override
+    public void onRecyclerViewCreated(Fragment fragment, RecyclerView recyclerView) {
+        if (fragment == mOpenFragment) {
+            recyclerView.setTag(R.id.FloatingActionButtonScrollEnabled, new Object());
+        }
     }
 
     @Override
