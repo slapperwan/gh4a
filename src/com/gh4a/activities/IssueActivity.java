@@ -29,7 +29,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
@@ -66,7 +65,6 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
-import com.gh4a.widget.FloatingActionButtonWithVisibilityControl;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
@@ -87,7 +85,7 @@ public class IssueActivity extends BaseActivity implements
     private IssueEventAdapter mEventAdapter;
     private RecyclerView mRecyclerView;
     private boolean mIsCollaborator;
-    private FloatingActionButtonWithVisibilityControl mEditFab;
+    private FloatingActionButton mEditFab;
     private CommentBoxFragment mCommentFragment;
     private HttpImageGetter mImageGetter;
 
@@ -196,15 +194,6 @@ public class IssueActivity extends BaseActivity implements
         FragmentManager fm = getSupportFragmentManager();
         mCommentFragment = (CommentBoxFragment) fm.findFragmentById(R.id.comment_box);
 
-        CoordinatorLayout rootLayout = getRootLayout();
-        mEditFab = (FloatingActionButtonWithVisibilityControl)
-                inflater.inflate(R.layout.issue_edit_fab, rootLayout, false);
-        mEditFab.setOnClickListener(this);
-        mEditFab.setCanShow(false);
-        rootLayout.addView(mEditFab);
-
-        AppBarLayout abl = (AppBarLayout) findViewById(R.id.header);
-        abl.addOnOffsetChangedListener(mCommentFragment);
         setToolbarScrollable(true);
 
         getSupportLoaderManager().initLoader(0, null, mIssueCallback);
@@ -255,7 +244,6 @@ public class IssueActivity extends BaseActivity implements
                 closed ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark);
         UiUtils.trySetListOverscrollColor(mRecyclerView,
                 UiUtils.resolveColor(this, stateColorAttributeId));
-        mEditFab.setSelected(closed);
 
         TextView tvExtra = (TextView) mListHeaderView.findViewById(R.id.tv_extra);
         tvExtra.setText(mIssue.getUser().getLogin());
@@ -405,9 +393,21 @@ public class IssueActivity extends BaseActivity implements
     }
 
     private void updateFabVisibility() {
-        if (mIsCollaborator && mIssue != null && mEventsLoaded) {
-            mEditFab.setCanShow(true);
-            mEditFab.show();
+        boolean shouldHaveFab = mIsCollaborator && mIssue != null && mEventsLoaded;
+        CoordinatorLayout rootLayout = getRootLayout();
+
+        if (shouldHaveFab && mEditFab == null) {
+            mEditFab = (FloatingActionButton)
+                    getLayoutInflater().inflate(R.layout.issue_edit_fab, rootLayout, false);
+            mEditFab.setOnClickListener(this);
+            rootLayout.addView(mEditFab);
+        } else if (!shouldHaveFab && mEditFab != null) {
+            rootLayout.removeView(mEditFab);
+            mEditFab = null;
+        }
+        if (mEditFab != null) {
+            boolean closed = Constants.Issue.STATE_CLOSED.equals(mIssue.getState());
+            mEditFab.setSelected(closed);
         }
     }
 

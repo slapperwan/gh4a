@@ -10,7 +10,6 @@ import org.eclipse.egit.github.core.service.CommitService;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
@@ -80,9 +79,6 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
             mAdapter.destroy();
             mAdapter = null;
         }
-
-        AppBarLayout abl = (AppBarLayout) getActivity().findViewById(R.id.header);
-        abl.removeOnOffsetChangedListener(mCommentFragment);
     }
 
     @Override
@@ -91,9 +87,6 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
         FragmentManager fm = getChildFragmentManager();
         mCommentFragment = (CommentBoxFragment) fm.findFragmentById(R.id.comment_box);
-
-        AppBarLayout abl = (AppBarLayout) getActivity().findViewById(R.id.header);
-        abl.addOnOffsetChangedListener(mCommentFragment);
     }
 
     @Override

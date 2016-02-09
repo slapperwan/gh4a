@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
@@ -65,6 +66,21 @@ public class CommentBoxFragment extends Fragment implements
         mCommentEditor = (EditText) view.findViewById(R.id.et_comment);
         mCommentEditor.setHint(mCallback.getCommentEditorHintResId());
         mCommentEditor.addTextChangedListener(this);
+
+        Activity activity = getActivity();
+        if (activity instanceof BaseActivity) {
+            ((BaseActivity) activity).addAppBarOffsetListener(this);
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        Activity activity = getActivity();
+        if (activity instanceof BaseActivity) {
+            ((BaseActivity) activity).removeAppBarOffsetListener(this);
+        }
     }
 
     @Override

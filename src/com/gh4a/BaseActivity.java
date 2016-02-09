@@ -249,6 +249,14 @@ public abstract class BaseActivity extends AppCompatActivity implements
         return mHasErrorView;
     }
 
+    public void addAppBarOffsetListener(AppBarLayout.OnOffsetChangedListener l) {
+        mHeader.addOnOffsetChangedListener(l);
+    }
+
+    public void removeAppBarOffsetListener(AppBarLayout.OnOffsetChangedListener l) {
+        mHeader.removeOnOffsetChangedListener(l);
+    }
+
     protected void addHeaderView(View view, boolean scrollable) {
         mHeader.addView(view, 1, new AppBarLayout.LayoutParams(
                 AppBarLayout.LayoutParams.MATCH_PARENT,
