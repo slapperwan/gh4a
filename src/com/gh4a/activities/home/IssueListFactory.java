@@ -69,7 +69,8 @@ public class IssueListFactory extends FragmentFactory {
         filterData.put("q", String.format(QUERY, mIsPullRequest ? "pr" : "issue",
                 mState, action, mLogin));
 
-        return RepositoryIssueListFragment.newInstance(filterData);
+        return RepositoryIssueListFragment.newInstance(filterData,
+                mIsPullRequest ? R.string.no_pull_requests_found : R.string.no_issues_found);
     }
 
     @Override

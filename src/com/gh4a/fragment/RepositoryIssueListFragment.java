@@ -34,8 +34,14 @@ import java.util.Map;
 
 public class RepositoryIssueListFragment extends PagedDataBaseFragment<Issue> {
     private Map<String, String> mFilterData;
+    private int mEmptyTextResId;
 
     public static RepositoryIssueListFragment newInstance(Map<String, String> filterData) {
+        return newInstance(filterData, R.string.no_issues_found);
+    }
+
+    public static RepositoryIssueListFragment newInstance(Map<String, String> filterData,
+            int emptyTextResId) {
         RepositoryIssueListFragment f = new RepositoryIssueListFragment();
 
         Bundle args = new Bundle();
@@ -44,6 +50,7 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Issue> {
                 args.putString(key, filterData.get(key));
             }
         }
+        args.putInt("emptytext", emptyTextResId);
         f.setArguments(args);
         return f;
     }
@@ -61,6 +68,7 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Issue> {
                 mFilterData.put(key, args.getString(key));
             }
         }
+        mEmptyTextResId = args.getInt("emptytext");
     }
 
     @Override
@@ -83,7 +91,7 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Issue> {
 
     @Override
     protected int getEmptyTextResId() {
-        return R.string.no_issues_found;
+        return mEmptyTextResId;
     }
 
     @Override
