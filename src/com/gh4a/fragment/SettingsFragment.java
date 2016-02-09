@@ -201,7 +201,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
     private static class OpenSourceComponentAdapter extends BaseAdapter {
         private static final String[][] COMPONENTS = new String[][] {
             { "Android-ProgressFragment", "https://github.com/johnkil/Android-ProgressFragment" },
-            { "Floating Action Button", "https://github.com/shamanland/floating-action-button" },
             { "Github Java bindings", "https://github.com/maniac103/egit-github" },
             { "HoloColorPicker", "https://github.com/LarsWerkman/HoloColorPicker" },
             { "Material Design Icons", "https://github.com/google/material-design-icons" },
