@@ -18,6 +18,7 @@ package com.gh4a.activities;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import com.gh4a.BaseActivity;
@@ -30,15 +31,18 @@ public class RepositoryListActivity extends BaseActivity implements
     private String mUserLogin;
     private String mUserType;
     private RepositoryListContainerFragment mFragment;
-    private RepositoryListContainerFragment.FilterDrawerHelper mDrawerHelper;
-
-    private static final String STATE_KEY_INDEX = "selectedIndex";
+    private RepositoryListContainerFragment.FilterDrawerHelper mFilterDrawerHelper;
+    private RepositoryListContainerFragment.SortDrawerHelper mSortDrawerHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Bundle data = getIntent().getExtras();
         mUserLogin = data.getString(Constants.User.LOGIN);
         mUserType = data.getString(Constants.User.TYPE);
+
+        mFilterDrawerHelper = RepositoryListContainerFragment.FilterDrawerHelper.create(
+                mUserLogin, mUserType);
+        mSortDrawerHelper = new RepositoryListContainerFragment.SortDrawerHelper();
 
         super.onCreate(savedInstanceState);
 
@@ -54,6 +58,9 @@ public class RepositoryListActivity extends BaseActivity implements
             mFragment = (RepositoryListContainerFragment) fm.findFragmentById(R.id.details);
         }
 
+        mSortDrawerHelper.setFilterType(mFragment.getFilterType());
+        updateRightNavigationDrawer();
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.user_pub_repos);
         actionBar.setSubtitle(mUserLogin);
@@ -64,18 +71,38 @@ public class RepositoryListActivity extends BaseActivity implements
 
     @Override
     protected int[] getRightNavigationDrawerMenuResources() {
-        mDrawerHelper = RepositoryListContainerFragment.FilterDrawerHelper.create(this,
-                mUserLogin, mUserType);
-        return mDrawerHelper.getMenuResIds();
+        int sortMenuResId = mSortDrawerHelper.getMenuResId();
+        int filterMenuResId = mFilterDrawerHelper.getMenuResId();
+        if (sortMenuResId == 0) {
+            return new int[] { filterMenuResId };
+        } else {
+            return new int[] { sortMenuResId, filterMenuResId };
+        }
+    }
+
+    @Override
+    protected void onPrepareRightNavigationDrawerMenu(Menu menu) {
+        if (mFragment != null) {
+            mFilterDrawerHelper.selectFilterType(menu, mFragment.getFilterType());
+            mSortDrawerHelper.selectSortType(menu,
+                    mFragment.getSortOrder(), mFragment.getSortDirection());
+        }
     }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         super.onNavigationItemSelected(item);
-        String type = mDrawerHelper.handleSelectionAndGetFilterType(item);
+        String type = mFilterDrawerHelper.handleSelectionAndGetFilterType(item);
         if (type != null) {
             mFragment.setFilterType(type);
             super.supportInvalidateOptionsMenu();
+            updateRightNavigationDrawer();
+            return true;
+        }
+        String[] sortOrderAndDirection = mSortDrawerHelper.handleSelectionAndGetSortOrder(item);
+        if (sortOrderAndDirection != null) {
+            mFragment.setSortOrder(sortOrderAndDirection[0], sortOrderAndDirection[1]);
+            updateRightNavigationDrawer();
             return true;
         }
         return false;

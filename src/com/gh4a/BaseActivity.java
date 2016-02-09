@@ -33,6 +33,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -214,11 +215,16 @@ public abstract class BaseActivity extends AppCompatActivity implements
                 mRightDrawer.inflateMenu(id);
             }
             mRightDrawer.setNavigationItemSelectedListener(this);
+            onPrepareRightNavigationDrawerMenu(mRightDrawer.getMenu());
 
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.RIGHT);
         } else {
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.RIGHT);
         }
+    }
+
+    protected void onPrepareRightNavigationDrawerMenu(Menu menu) {
+
     }
 
     protected boolean isOnline() {

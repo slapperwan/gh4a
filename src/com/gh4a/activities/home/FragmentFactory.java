@@ -26,6 +26,10 @@ public abstract class FragmentFactory {
         return null;
     }
 
+    protected void prepareToolDrawerMenu(Menu menu) {
+
+    }
+
     protected boolean onDrawerItemSelected(MenuItem item) {
         return false;
     }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="@string/repo_sort">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/sort_name_asc"
+                    android:title="@string/repo_sort_order_name_asc" />
+                <item
+                    android:id="@+id/sort_name_desc"
+                    android:title="@string/repo_sort_order_name_desc" />
+                <item
+                    android:id="@+id/sort_created_asc"
+                    android:title="@string/repo_sort_order_creation_asc" />
+                <item
+                    android:id="@+id/sort_created_desc"
+                    android:title="@string/repo_sort_order_creation_desc" />
+                <item
+                    android:id="@+id/sort_pushed_asc"
+                    android:title="@string/repo_sort_order_pushed_asc" />
+                <item
+                    android:id="@+id/sort_pushed_desc"
+                    android:title="@string/repo_sort_order_pushed_desc" />
+            </group>
+        </menu>
+    </item>
+</menu>

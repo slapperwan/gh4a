@@ -2,6 +2,7 @@ package com.gh4a.activities.home;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
@@ -111,6 +112,12 @@ public class HomeActivity extends BasePagerActivity implements
     @Override
     protected int[] getRightNavigationDrawerMenuResources() {
         return mFactory.getToolDrawerMenuResIds();
+    }
+
+    @Override
+    protected void onPrepareRightNavigationDrawerMenu(Menu menu) {
+        super.onPrepareRightNavigationDrawerMenu(menu);
+        mFactory.prepareToolDrawerMenu(menu);
     }
 
     @Override
@@ -282,8 +289,9 @@ public class HomeActivity extends BasePagerActivity implements
         return true;
     }
 
-    public void doInvalidateOptionsMenu() {
+    public void doInvalidateOptionsMenuAndToolDrawer() {
         super.supportInvalidateOptionsMenu();
+        updateRightNavigationDrawer();
     }
 
     public void invalidateFragments() {

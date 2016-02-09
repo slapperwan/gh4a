@@ -115,6 +115,14 @@
     <string name="repo_type_forks">Forks</string>
     <string name="repo_type_watched">Watched</string>
     <string name="repo_type_starred">Starred</string>
+    <string name="repo_filter">Filter</string>
+    <string name="repo_sort">Sort order</string>
+    <string name="repo_sort_order_name_asc">By name (A-Z)</string>
+    <string name="repo_sort_order_name_desc">By name (Z-A)</string>
+    <string name="repo_sort_order_creation_desc">Newest</string>
+    <string name="repo_sort_order_creation_asc">Oldest</string>
+    <string name="repo_sort_order_pushed_desc">Most recently pushed</string>
+    <string name="repo_sort_order_pushed_asc">Least recently pushed</string>
 
     <string name="no_blogs_found">No blogs found.</string>
     <string name="no_comments_found">Nobody has commented so far.</string>

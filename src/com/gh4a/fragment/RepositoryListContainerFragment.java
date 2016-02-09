@@ -9,11 +9,13 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.view.SupportMenuInflater;
 import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -30,7 +32,9 @@ public class RepositoryListContainerFragment extends Fragment implements
         MenuItemCompat.OnActionExpandListener, SwipeRefreshLayout.ChildScrollDelegate {
     private String mUserLogin;
     private String mUserType;
-    private String mFilterType;
+    private String mFilterType = "all";
+    private String mSortOrder = "full_name";
+    private String mSortDirection = "asc";
     private boolean mSearchVisible;
 
     private MenuInflater mMenuInflater;
@@ -38,12 +42,15 @@ public class RepositoryListContainerFragment extends Fragment implements
     private RepositorySearchFragment mSearchFragment;
     private MenuItem mFilterItem;
     private String mSearchQuery;
+    private boolean mActivityCreated;
 
     public interface Callback {
         void initiateFilter();
     }
 
     private static final String STATE_KEY_FILTER_TYPE = "filter_type";
+    private static final String STATE_KEY_SORT_ORDER = "sort_order";
+    private static final String STATE_KEY_SORT_DIRECTION = "sort_direction";
     private static final String STATE_KEY_SEARCH_VISIBLE = "search_visible";
     private static final String STATE_KEY_QUERY = "search_query";
 
@@ -64,8 +71,10 @@ public class RepositoryListContainerFragment extends Fragment implements
         mUserLogin = data.getString(Constants.User.LOGIN);
         mUserType = data.getString(Constants.User.TYPE);
 
-        if (savedInstanceState != null) {
+        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_KEY_FILTER_TYPE)) {
             mFilterType = savedInstanceState.getString(STATE_KEY_FILTER_TYPE);
+            mSortOrder = savedInstanceState.getString(STATE_KEY_SORT_ORDER);
+            mSortDirection = savedInstanceState.getString(STATE_KEY_SORT_DIRECTION);
             mSearchVisible = savedInstanceState.getBoolean(STATE_KEY_SEARCH_VISIBLE);
             mSearchQuery = savedInstanceState.getString(STATE_KEY_QUERY);
         }
@@ -91,13 +100,14 @@ public class RepositoryListContainerFragment extends Fragment implements
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mMenuInflater = new SupportMenuInflater(UiUtils.makeHeaderThemedContext(getActivity()));
+        mActivityCreated = true;
 
         FragmentManager fm = getChildFragmentManager();
         mMainFragment = (PagedDataBaseFragment<Repository>) fm.findFragmentByTag("main");
         mSearchFragment = (RepositorySearchFragment) fm.findFragmentByTag("search");
 
         if (mMainFragment == null) {
-            setFilterType("all");
+            applyFilterTypeAndSortOrder();
             addSearchFragment();
         } else {
             setSearchVisibility(mSearchVisible);
@@ -117,6 +127,8 @@ public class RepositoryListContainerFragment extends Fragment implements
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(STATE_KEY_FILTER_TYPE, mFilterType);
+        outState.putString(STATE_KEY_SORT_ORDER, mSortOrder);
+        outState.putString(STATE_KEY_SORT_DIRECTION, mSortDirection);
         outState.putBoolean(STATE_KEY_SEARCH_VISIBLE, mSearchVisible);
         outState.putString(STATE_KEY_QUERY, mSearchQuery);
     }
@@ -127,7 +139,22 @@ public class RepositoryListContainerFragment extends Fragment implements
     }
 
     public void setFilterType(String type) {
-        switch (type) {
+        if (type != mFilterType) {
+            mFilterType = type;
+            applyFilterTypeAndSortOrder();
+        }
+    }
+
+    public void setSortOrder(String sortOrder, String direction) {
+        if (!TextUtils.equals(sortOrder, mSortOrder) || !TextUtils.equals(mSortDirection, direction)) {
+            mSortOrder = sortOrder;
+            mSortDirection = direction;
+            applyFilterTypeAndSortOrder();
+        }
+    }
+
+    private void applyFilterTypeAndSortOrder() {
+        switch (mFilterType) {
             case "starred":
                 mMainFragment = StarredRepositoryListFragment.newInstance(mUserLogin);
                 break;
@@ -135,7 +162,8 @@ public class RepositoryListContainerFragment extends Fragment implements
                 mMainFragment = WatchedRepositoryListFragment.newInstance(mUserLogin);
                 break;
             default:
-                mMainFragment = RepositoryListFragment.newInstance(mUserLogin, mUserType, type);
+                mMainFragment = RepositoryListFragment.newInstance(mUserLogin, mUserType,
+                        mFilterType, mSortOrder, mSortDirection);
                 break;
         }
 
@@ -148,7 +176,18 @@ public class RepositoryListContainerFragment extends Fragment implements
         }
         ft.add(R.id.details, mMainFragment, "main");
         ft.commitAllowingStateLoss();
-        mFilterType = type;
+    }
+
+    public String getFilterType() {
+        return mFilterType;
+    }
+
+    public String getSortOrder() {
+        return mSortOrder;
+    }
+
+    public String getSortDirection() {
+        return mSortDirection;
     }
 
     private void addSearchFragment() {
@@ -254,6 +293,26 @@ public class RepositoryListContainerFragment extends Fragment implements
         return true;
     }
 
+    private static void setMenuItemChecked(MenuItem item, int selected, SparseArray<?> relevant) {
+        if (relevant.indexOfKey(item.getItemId()) >= 0) {
+            item.setChecked(item.getItemId() == selected);
+        }
+    }
+
+    private static void setMenuItemChecked(Menu menu, int selected, SparseArray<?> relevant) {
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            if (item.hasSubMenu()) {
+                SubMenu sm = item.getSubMenu();
+                for (int j = 0; j < sm.size(); j++) {
+                    setMenuItemChecked(sm.getItem(j), selected, relevant);
+                }
+            } else {
+                setMenuItemChecked(item, selected, relevant);
+            }
+        }
+    }
+
     public static class FilterDrawerHelper {
         private int mMenuResId;
 
@@ -270,7 +329,7 @@ public class RepositoryListContainerFragment extends Fragment implements
             FILTER_LOOKUP.put(R.id.filter_type_starred, "starred");
         }
 
-        public static FilterDrawerHelper create(Context context, String userLogin, String userType) {
+        public static FilterDrawerHelper create(String userLogin, String userType) {
             int menuResId;
             if (userLogin.equals(Gh4Application.get().getAuthLogin())) {
                 menuResId = R.menu.repo_filter_logged_in;
@@ -287,12 +346,65 @@ public class RepositoryListContainerFragment extends Fragment implements
             mMenuResId = menuResId;
         }
 
-        public int[] getMenuResIds() {
-            return new int[] { mMenuResId };
+        public int getMenuResId() {
+            return mMenuResId;
+        }
+
+        public void selectFilterType(Menu menu, String filterType) {
+            int selectedId = 0;
+            for (int i = 0; i < FILTER_LOOKUP.size(); i++) {
+                if (FILTER_LOOKUP.valueAt(i).equals(filterType)) {
+                    selectedId = FILTER_LOOKUP.keyAt(i);
+                    break;
+                }
+            }
+            setMenuItemChecked(menu, selectedId, FILTER_LOOKUP);
         }
 
         public String handleSelectionAndGetFilterType(MenuItem item) {
             return FILTER_LOOKUP.get(item.getItemId());
+        }
+    }
+
+    public static class SortDrawerHelper {
+        private String mFilterType = "all";
+
+        private static SparseArray<String[]> SORT_LOOKUP = new SparseArray<>();
+        static {
+            SORT_LOOKUP.put(R.id.sort_name_asc, new String[] { "full_name", "asc" });
+            SORT_LOOKUP.put(R.id.sort_name_desc, new String[] { "full_name", "desc" });
+            SORT_LOOKUP.put(R.id.sort_created_asc, new String[] { "created", "asc" });
+            SORT_LOOKUP.put(R.id.sort_created_desc, new String[] { "created", "desc" });
+            SORT_LOOKUP.put(R.id.sort_pushed_asc, new String[] { "pushed", "asc" });
+            SORT_LOOKUP.put(R.id.sort_pushed_desc, new String[] { "pushed", "desc" });
+        }
+
+        public SortDrawerHelper() {
+        }
+
+        public void setFilterType(String type) {
+            mFilterType = type;
+        }
+
+        public int getMenuResId() {
+            return TextUtils.equals(mFilterType, "starred") || TextUtils.equals(mFilterType, "watched")
+                    ? 0 : R.menu.repo_sort;
+        }
+
+        public void selectSortType(Menu menu, String order, String direction) {
+            int selectedId = 0;
+            for (int i = 0; i < SORT_LOOKUP.size(); i++) {
+                String[] value = SORT_LOOKUP.valueAt(i);
+                if (value[0].equals(order) && value[1].equals(direction)) {
+                    selectedId = SORT_LOOKUP.keyAt(i);
+                    break;
+                }
+            }
+            setMenuItemChecked(menu, selectedId, SORT_LOOKUP);
+        }
+
+        public String[] handleSelectionAndGetSortOrder(MenuItem item) {
+            return SORT_LOOKUP.get(item.getItemId());
         }
     }
 }

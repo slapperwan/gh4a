@@ -2,7 +2,7 @@ package com.gh4a.activities.home;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import com.gh4a.Constants;
@@ -15,8 +15,8 @@ public class RepositoryFactory extends FragmentFactory {
     };
 
     private String mUserLogin;
-    private String mSelectedType;
-    private RepositoryListContainerFragment.FilterDrawerHelper mDrawerHelper;
+    private RepositoryListContainerFragment.FilterDrawerHelper mFilterDrawerHelper;
+    private RepositoryListContainerFragment.SortDrawerHelper mSortDrawerHelper;
     private RepositoryListContainerFragment mFragment;
 
     private static final String STATE_KEY_FRAGMENT = "repoFactoryFragment";
@@ -24,6 +24,10 @@ public class RepositoryFactory extends FragmentFactory {
     public RepositoryFactory(HomeActivity activity, String userLogin) {
         super(activity);
         mUserLogin = userLogin;
+
+        mFilterDrawerHelper = RepositoryListContainerFragment.FilterDrawerHelper.create(mUserLogin,
+                Constants.User.TYPE_USER);
+        mSortDrawerHelper = new RepositoryListContainerFragment.SortDrawerHelper();
     }
 
     @Override
@@ -38,18 +42,38 @@ public class RepositoryFactory extends FragmentFactory {
 
     @Override
     protected int[] getToolDrawerMenuResIds() {
-        mDrawerHelper = RepositoryListContainerFragment.FilterDrawerHelper.create(mActivity,
-                mUserLogin, Constants.User.TYPE_USER);
-        return mDrawerHelper.getMenuResIds();
+        int sortMenuResId = mSortDrawerHelper.getMenuResId();
+        int filterMenuResId = mFilterDrawerHelper.getMenuResId();
+        if (sortMenuResId == 0) {
+            return new int[] { filterMenuResId };
+        } else {
+            return new int[] { sortMenuResId, filterMenuResId };
+        }
+    }
+
+    @Override
+    protected void prepareToolDrawerMenu(Menu menu) {
+        super.prepareToolDrawerMenu(menu);
+        if (mFragment != null) {
+            mFilterDrawerHelper.selectFilterType(menu, mFragment.getFilterType());
+            mSortDrawerHelper.selectSortType(menu,
+                    mFragment.getSortOrder(), mFragment.getSortDirection());
+        }
     }
 
     @Override
     protected boolean onDrawerItemSelected(MenuItem item) {
-        String type = mDrawerHelper.handleSelectionAndGetFilterType(item);
-        if (type != null && !TextUtils.equals(type, mSelectedType)) {
+        String type = mFilterDrawerHelper.handleSelectionAndGetFilterType(item);
+        if (type != null) {
             mFragment.setFilterType(type);
-            mSelectedType = type;
-            mActivity.doInvalidateOptionsMenu();
+            mSortDrawerHelper.setFilterType(type);
+            mActivity.doInvalidateOptionsMenuAndToolDrawer();
+            return true;
+        }
+        String[] sortOrderAndDirection = mSortDrawerHelper.handleSelectionAndGetSortOrder(item);
+        if (sortOrderAndDirection != null) {
+            mFragment.setSortOrder(sortOrderAndDirection[0], sortOrderAndDirection[1]);
+            mActivity.doInvalidateOptionsMenuAndToolDrawer();
             return true;
         }
         return super.onDrawerItemSelected(item);
@@ -74,12 +98,17 @@ public class RepositoryFactory extends FragmentFactory {
         super.onRestoreInstanceState(state);
         mFragment = (RepositoryListContainerFragment)
                 mActivity.getSupportFragmentManager().getFragment(state, STATE_KEY_FRAGMENT);
+        if (mFragment != null) {
+            mSortDrawerHelper.setFilterType(mFragment.getFilterType());
+            mActivity.doInvalidateOptionsMenuAndToolDrawer();
+        }
     }
 
     @Override
     protected Fragment getFragment(int position) {
         mFragment = RepositoryListContainerFragment.newInstance(mUserLogin,
                 Constants.User.TYPE_USER);
+        mActivity.doInvalidateOptionsMenuAndToolDrawer();
         return mFragment;
     }
 

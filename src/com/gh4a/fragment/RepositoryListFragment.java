@@ -37,14 +37,19 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     private String mLogin;
     private String mRepoType;
     private boolean mIsOrg;
+    private String mSortOrder;
+    private String mSortDirection;
 
-    public static RepositoryListFragment newInstance(String login, String userType, String repoType) {
+    public static RepositoryListFragment newInstance(String login, String userType,
+            String repoType, String sortOrder, String sortDirection) {
         RepositoryListFragment f = new RepositoryListFragment();
 
         Bundle args = new Bundle();
         args.putString(Constants.User.LOGIN, login);
         args.putString(Constants.User.TYPE, userType);
         args.putString(Constants.Repository.TYPE, repoType);
+        args.putString("sortOrder", sortOrder);
+        args.putString("sortDirection", sortDirection);
         f.setArguments(args);
 
         return f;
@@ -56,6 +61,8 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
         mLogin = getArguments().getString(Constants.User.LOGIN);
         mRepoType = getArguments().getString(Constants.Repository.TYPE);
         mIsOrg = Constants.User.TYPE_ORG.equals(getArguments().getString(Constants.User.TYPE));
+        mSortOrder = getArguments().getString("sortOrder");
+        mSortDirection = getArguments().getString("sortDirection");
     }
 
     @Override
@@ -103,6 +110,10 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
             filterData.put("affiliation", "owner,collaborator");
         } else {
             filterData.put("type", mRepoType);
+        }
+        if (mSortOrder != null) {
+            filterData.put("sort", mSortOrder);
+            filterData.put("direction", mSortDirection);
         }
 
         if (isSelf) {
