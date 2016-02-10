@@ -322,11 +322,16 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
 
         for (int i = 0; i < count; i++) {
             User org = organizations.get(i);
-            TextView rowView = (TextView) inflater.inflate(R.layout.selectable_label, llOrg, false);
+            View rowView = inflater.inflate(R.layout.selectable_label_with_avatar, llOrg, false);
 
             rowView.setOnClickListener(this);
-            rowView.setText(org.getLogin());
             rowView.setTag(org);
+
+            ImageView avatar = (ImageView) rowView.findViewById(R.id.iv_gravatar);
+            AvatarHandler.assignAvatar(avatar, org);
+
+            TextView nameView = (TextView) rowView.findViewById(R.id.tv_title);
+            nameView.setText(org.getLogin());
 
             llOrg.addView(rowView);
         }
