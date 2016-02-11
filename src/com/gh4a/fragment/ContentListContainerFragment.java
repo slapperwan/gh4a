@@ -105,20 +105,22 @@ public class ContentListContainerFragment extends Fragment implements
                 }
             }
         } else {
-            mDirStack.push(null);
+            mDirStack.push("");
         }
     }
 
     public void setRef(String ref) {
+        getArguments().putString("ref", ref);
         mSelectedRef = ref;
         mGitModuleMap = null;
         mDirStack.clear();
-        mDirStack.push(null);
+        mDirStack.push("");
         mContentCache.clear();
         mContentListFragment = null;
         getChildFragmentManager().popBackStackImmediate(null,
                 FragmentManager.POP_BACK_STACK_INCLUSIVE);
         addFragmentForTopOfStack();
+        updateBreadcrumbs();
     }
 
     public boolean handleBackPress() {
@@ -154,9 +156,6 @@ public class ContentListContainerFragment extends Fragment implements
         outState.putStringArrayList(STATE_KEY_DIR_STACK, new ArrayList<>(mDirStack));
         for (Map.Entry<String, ArrayList<RepositoryContents>> entry : mContentCache.entrySet()) {
             String key = entry.getKey();
-            if (key == null) {
-                key = "/";
-            }
             outState.putSerializable(STATE_KEY_CONTENT_CACHE_PREFIX + key, entry.getValue());
         }
     }
@@ -236,7 +235,8 @@ public class ContentListContainerFragment extends Fragment implements
 
     private void addFragmentForTopOfStack() {
         String path = mDirStack.peek();
-        mContentListFragment = ContentListFragment.newInstance(mRepository, path,
+        mContentListFragment = ContentListFragment.newInstance(mRepository,
+                TextUtils.isEmpty(path) ? null : path,
                 mContentCache.get(path), mSelectedRef);
 
         FragmentTransaction ft = getChildFragmentManager().beginTransaction();
@@ -249,7 +249,7 @@ public class ContentListContainerFragment extends Fragment implements
 
     private void updateBreadcrumbs() {
         String path = mDirStack.peek();
-        mBreadcrumbs.setPath(path == null ? "" : path);
+        mBreadcrumbs.setPath(path);
     }
 
     private String getCurrentRef() {
