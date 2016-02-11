@@ -98,6 +98,8 @@ public class StyleableTextView extends TextView {
     public void setTypeface(Typeface tf, int style) {
         if (tf == getTypeface()) {
             setTypeface(TypefaceCache.getTypeface(getContext(), mTypefaceValue, style));
+        } else {
+            super.setTypeface(tf, style);
         }
     }
 
