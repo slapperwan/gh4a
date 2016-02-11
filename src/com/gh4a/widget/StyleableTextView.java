@@ -3,6 +3,7 @@ package com.gh4a.widget;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.graphics.Typeface;
 import android.support.v7.text.AllCapsTransformationMethod;
 import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
@@ -90,6 +91,13 @@ public class StyleableTextView extends TextView {
         }
         if (allCaps) {
             setTransformationMethod(new AllCapsTransformationMethod(getContext()));
+        }
+    }
+
+    @Override
+    public void setTypeface(Typeface tf, int style) {
+        if (tf == getTypeface()) {
+            setTypeface(TypefaceCache.getTypeface(getContext(), mTypefaceValue, style));
         }
     }
 
