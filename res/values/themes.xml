@@ -39,6 +39,7 @@
         <item name="colorAccent">@color/dark_accent</item>
         <item name="colorPrimary">@color/dark_accent</item>
         <item name="colorPrimaryDark">@color/dark_accent_dark</item>
+        <item name="colorBreadcrumbBackground">#587849</item>
         <item name="android:textColorLink">@color/dark_link_color</item>
         <item name="actionBarTabStyle">@style/Widget.ActionBar.TabView</item>
         <item name="listBackground">@android:color/transparent</item>
@@ -103,6 +104,7 @@
         <item name="colorAccent">@color/light_accent</item>
         <item name="colorPrimary">@color/light_accent</item>
         <item name="colorPrimaryDark">@color/light_accent_dark</item>
+        <item name="colorBreadcrumbBackground">#7baa67</item>
         <item name="android:textColorLink">@color/light_link_color</item>
         <item name="actionBarTabStyle">@style/Widget.ActionBar.TabView</item>
         <item name="listBackground">@android:color/white</item>

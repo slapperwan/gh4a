@@ -18,6 +18,7 @@ package com.gh4a.fragment;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.view.View;
 
 import com.gh4a.Constants;
 import com.gh4a.R;
@@ -76,10 +77,12 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        try {
+        if (getParentFragment() instanceof ParentCallback) {
+            mCallback = (ParentCallback) getParentFragment();
+        } else if (activity instanceof ParentCallback) {
             mCallback = (ParentCallback) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity + " must implement OnTreeSelectedListener");
+        } else {
+            throw new ClassCastException("No callback provided");
         }
     }
 

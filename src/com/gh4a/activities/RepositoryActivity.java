@@ -2,16 +2,11 @@ package com.gh4a.activities;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
 
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryBranch;
-import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.RepositoryTag;
 import org.eclipse.egit.github.core.service.StarService;
@@ -22,7 +17,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.util.Pair;
@@ -47,12 +41,10 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.db.BookmarksProvider;
 import com.gh4a.fragment.CommitListFragment;
-import com.gh4a.fragment.ContentListFragment;
-import com.gh4a.fragment.ContentListFragment.ParentCallback;
+import com.gh4a.fragment.ContentListContainerFragment;
 import com.gh4a.fragment.RepositoryFragment;
 import com.gh4a.loader.BaseLoader;
 import com.gh4a.loader.BranchListLoader;
-import com.gh4a.loader.GitModuleParserLoader;
 import com.gh4a.loader.IsStarringLoader;
 import com.gh4a.loader.IsWatchingLoader;
 import com.gh4a.loader.LoaderCallbacks;
@@ -62,12 +54,11 @@ import com.gh4a.loader.TagListLoader;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 
-public class RepositoryActivity extends BasePagerActivity implements ParentCallback {
+public class RepositoryActivity extends BasePagerActivity {
     private static final int LOADER_REPO = 0;
     private static final int LOADER_BRANCHES_AND_TAGS = 1;
     private static final int LOADER_WATCHING = 2;
     private static final int LOADER_STARRING = 3;
-    private static final int LOADER_MODULEMAP = 4;
 
     public static final String EXTRA_INITIAL_PAGE = "initial_page";
     public static final int PAGE_REPO_OVERVIEW = 0;
@@ -101,22 +92,6 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
             setContentShown(true);
             refreshDone();
             supportInvalidateOptionsMenu();
-        }
-    };
-
-    private LoaderCallbacks<Map<String, String>> mGitModuleCallback =
-            new LoaderCallbacks<Map<String, String>>() {
-        @Override
-        public Loader<LoaderResult<Map<String, String>>> onCreateLoader(int id, Bundle args) {
-            return new GitModuleParserLoader(RepositoryActivity.this, mRepoOwner,
-                    mRepoName, ".gitmodules", mSelectedRef);
-        }
-        @Override
-        public void onResultReady(LoaderResult<Map<String, String>> result) {
-            mGitModuleMap = result.getData();
-            if (mContentListFragment != null) {
-                mContentListFragment.onSubModuleNamesChanged(getSubModuleNames(mContentListFragment));
-            }
         }
     };
 
@@ -179,7 +154,6 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
     private ProgressDialog mProgressDialog;
     private int mInitialPage;
 
-    private Stack<String> mDirStack = new Stack<>();
     private Repository mRepository;
     private List<RepositoryBranch> mBranches;
     private List<RepositoryTag> mTags;
@@ -189,48 +163,14 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
     private Boolean mIsStarring;
 
     private RepositoryFragment mRepositoryFragment;
-    private ContentListFragment mContentListFragment;
+    private ContentListContainerFragment mContentListFragment;
     private CommitListFragment mCommitListFragment;
-
-    private Map<String, String> mGitModuleMap;
-    private Map<String, ArrayList<RepositoryContents>> mContentCache =
-            new LinkedHashMap<String, ArrayList<RepositoryContents>>() {
-        private static final long serialVersionUID = -2379579224736389357L;
-
-        @Override
-        protected boolean removeEldestEntry(Entry<String, ArrayList<RepositoryContents>> eldest) {
-            return size() > MAX_CACHE_ENTRIES;
-        }
-    };
-
-    private static final int MAX_CACHE_ENTRIES = 100;
-
-    private static final String STATE_KEY_DIR_STACK = "dir_stack";
-    private static final String STATE_KEY_CONTENT_CACHE_PREFIX = "content_cache_";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (hasErrorView()) {
             return;
-        }
-
-        if (savedInstanceState != null) {
-            for (String entry : savedInstanceState.getStringArrayList(STATE_KEY_DIR_STACK)) {
-                mDirStack.add(entry);
-            }
-
-            int prefixLen = STATE_KEY_CONTENT_CACHE_PREFIX.length();
-            for (String key : savedInstanceState.keySet()) {
-                if (key.startsWith(STATE_KEY_CONTENT_CACHE_PREFIX)) {
-                    String cacheKey = key.substring(prefixLen);
-                    if (cacheKey.equals("/")) {
-                        cacheKey = null;
-                    }
-                    mContentCache.put(cacheKey,
-                            (ArrayList<RepositoryContents>) savedInstanceState.getSerializable(key));
-                }
-            }
         }
 
         Bundle bundle = getIntent().getExtras();
@@ -267,19 +207,6 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putStringArrayList(STATE_KEY_DIR_STACK, new ArrayList<>(mDirStack));
-        for (Map.Entry<String, ArrayList<RepositoryContents>> entry : mContentCache.entrySet()) {
-            String key = entry.getKey();
-            if (key == null) {
-                key = "/";
-            }
-            outState.putSerializable(STATE_KEY_CONTENT_CACHE_PREFIX + key, entry.getValue());
-        }
-    }
-
-    @Override
     protected int[] getTabTitleResIds() {
         return TITLES;
     }
@@ -291,12 +218,8 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
                 mRepositoryFragment = RepositoryFragment.newInstance(mRepository, mSelectedRef);
                 return mRepositoryFragment;
             case 1:
-                if (mDirStack.isEmpty()) {
-                    mDirStack.push(null);
-                }
-                String path = mDirStack.peek();
-                mContentListFragment = ContentListFragment.newInstance(mRepository, path,
-                        mContentCache.get(path), mSelectedRef);
+                mContentListFragment = ContentListContainerFragment.newInstance(mRepository,
+                        mSelectedRef);
                 return mContentListFragment;
             case 2:
                 mCommitListFragment = CommitListFragment.newInstance(mRepository, mSelectedRef);
@@ -307,15 +230,7 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
 
     @Override
     protected boolean fragmentNeedsRefresh(Fragment fragment) {
-        if (fragment instanceof ContentListFragment) {
-            if (mContentListFragment == null) {
-                return true;
-            }
-            ContentListFragment clf = (ContentListFragment) fragment;
-            if (mDirStack.isEmpty() || !TextUtils.equals(mDirStack.peek(), clf.getPath())) {
-                return true;
-            }
-        } else if (fragment instanceof CommitListFragment && mCommitListFragment == null) {
+        if (fragment instanceof CommitListFragment && mCommitListFragment == null) {
             return true;
         } else if (fragment instanceof RepositoryFragment && mRepositoryFragment == null) {
             return true;
@@ -334,65 +249,13 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
     }
 
     @Override
-    public void onContentsLoaded(ContentListFragment fragment, List<RepositoryContents> contents) {
-        if (contents == null) {
-            return;
-        }
-        mContentCache.put(fragment.getPath(), new ArrayList<>(contents));
-        if (fragment.getPath() == null) {
-            for (RepositoryContents content : contents) {
-                if (RepositoryContents.TYPE_FILE.equals(content.getType())) {
-                    if (content.getName().equals(".gitmodules")) {
-                        LoaderManager lm = getSupportLoaderManager();
-                        lm.restartLoader(LOADER_MODULEMAP, null, mGitModuleCallback);
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
-    public void onTreeSelected(RepositoryContents content) {
-        String path = content.getPath();
-        if (RepositoryContents.TYPE_DIR.equals(content.getType())) {
-            mDirStack.push(path);
-            invalidateFragments();
-        } else if (mGitModuleMap != null && mGitModuleMap.get(path) != null) {
-            String[] userRepo = mGitModuleMap.get(path).split("/");
-            startActivity(IntentUtils.getRepoActivityIntent(this, userRepo[0], userRepo[1], null));
-        } else {
-            startActivity(IntentUtils.getFileViewerActivityIntent(this, mRepoOwner, mRepoName,
-                    getCurrentRef(), content.getPath()));
-        }
-    }
-
-    @Override
-    public Set<String> getSubModuleNames(ContentListFragment fragment) {
-        if (mGitModuleMap == null) {
-            return null;
-        }
-
-        String prefix = fragment.getPath() == null ? null : (fragment.getPath() + "/");
-        Set<String> names = new HashSet<>();
-        for (String name : mGitModuleMap.keySet()) {
-            if (prefix == null && !name.contains("/")) {
-                names.add(name);
-            } else if (prefix != null && name.startsWith(prefix)) {
-                names.add(name.substring(prefix.length()));
-            }
-        }
-        return names;
-    }
-
-    @Override
     public void onBackPressed() {
-        if (mDirStack.size() > 1 && getPager().getCurrentItem() == 1) {
-            mDirStack.pop();
-            invalidateFragments();
-        } else {
-            super.onBackPressed();
+        if (mContentListFragment != null) {
+            if (getPager().getCurrentItem() == 1 && mContentListFragment.handleBackPress()) {
+                return;
+            }
         }
+        super.onBackPressed();
     }
 
     @Override
@@ -535,11 +398,10 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
         if (mRepositoryFragment != null) {
             mRepositoryFragment.setRef(mSelectedRef);
         }
-        mContentListFragment = null;
+        if (mContentListFragment != null) {
+            mContentListFragment.setRef(mSelectedRef);
+        }
         mCommitListFragment = null;
-        mGitModuleMap = null;
-        mDirStack.clear();
-        mContentCache.clear();
     }
 
     private void refreshFragments() {
