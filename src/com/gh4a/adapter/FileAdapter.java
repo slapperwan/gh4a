@@ -16,27 +16,41 @@
 package com.gh4a.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.Formatter;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gh4a.Constants;
 import com.gh4a.R;
+import com.gh4a.activities.CommitHistoryActivity;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.UiUtils;
 
+import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryContents;
 
 import java.util.Set;
 
-public class FileAdapter extends RootAdapter<RepositoryContents, FileAdapter.ViewHolder> {
+public class FileAdapter extends RootAdapter<RepositoryContents, FileAdapter.ViewHolder>
+        implements View.OnCreateContextMenuListener {
+    private static final int MENU_HISTORY = 1;
+
+    private Repository mRepository;
+    private String mRef;
     private Set<String> mSubModuleNames;
 
-    public FileAdapter(Context context) {
+    public FileAdapter(Context context, Repository repository, String ref) {
         super(context);
+        mRepository = repository;
+        mRef = ref;
     }
 
     public void setSubModuleNames(Set<String> subModules) {
@@ -47,7 +61,23 @@ public class FileAdapter extends RootAdapter<RepositoryContents, FileAdapter.Vie
     @Override
     public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_file_manager, parent, false);
+        v.setOnCreateContextMenuListener(this);
         return new ViewHolder(v);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        ViewHolder holder = (ViewHolder) v.getTag();
+
+        if (mSubModuleNames == null || !mSubModuleNames.contains(holder.contents.getName())) {
+            Intent historyIntent = new Intent(mContext, CommitHistoryActivity.class);
+            historyIntent.putExtra(Constants.Repository.OWNER, mRepository.getOwner().getLogin());
+            historyIntent.putExtra(Constants.Repository.NAME, mRepository.getName());
+            historyIntent.putExtra(Constants.Object.PATH, holder.contents.getPath());
+            historyIntent.putExtra(Constants.Object.REF, mRef);
+
+            menu.add(Menu.NONE, MENU_HISTORY, Menu.NONE, R.string.history).setIntent(historyIntent);
+        }
     }
 
     @Override
@@ -55,6 +85,7 @@ public class FileAdapter extends RootAdapter<RepositoryContents, FileAdapter.Vie
         String name = content.getName();
         boolean isSubModule = mSubModuleNames != null && mSubModuleNames.contains(name);
 
+        holder.contents = content;
         holder.icon.setBackgroundResource(getIconId(content.getType(), name));
         holder.fileName.setText(name);
 
@@ -88,6 +119,8 @@ public class FileAdapter extends RootAdapter<RepositoryContents, FileAdapter.Vie
             fileName = (TextView) view.findViewById(R.id.tv_text);
             fileSize = (TextView) view.findViewById(R.id.tv_size);
         }
+
+        private RepositoryContents contents;
 
         private ImageView icon;
         private TextView fileName;

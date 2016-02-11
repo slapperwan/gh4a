@@ -23,8 +23,6 @@ public class CommitHistoryActivity extends BaseActivity {
             return;
         }
 
-        setContentView(R.layout.generic_list);
-
         Bundle extras = getIntent().getExtras();
         String filePath = extras.getString(Constants.Object.PATH);
         mRepoOwner = extras.getString(Constants.Repository.OWNER);
