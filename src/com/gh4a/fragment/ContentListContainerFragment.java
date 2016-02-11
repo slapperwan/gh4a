@@ -219,9 +219,6 @@ public class ContentListContainerFragment extends Fragment implements
     public void onCrumbSelection(String absolutePath, int index, int count) {
         FragmentManager fm = getChildFragmentManager();
         boolean poppedAny = false;
-        if (TextUtils.isEmpty(absolutePath)) {
-            absolutePath = null;
-        }
         while (!TextUtils.equals(absolutePath, mDirStack.peek())) {
             mDirStack.pop();
             fm.popBackStack();
