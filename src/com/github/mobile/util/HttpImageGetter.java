@@ -273,17 +273,17 @@ public class HttpImageGetter implements ImageGetter {
             }
         }
 
-        if (bitmap == null) {
-            return loading.getDrawable(source);
-        }
-
         synchronized (this) {
             if (destroyed) {
                 bitmap.recycle();
                 bitmap = null;
-            } else {
-                loadedBitmaps.add(new WeakReference<Bitmap>(bitmap));
+            } else if (bitmap != null) {
+                loadedBitmaps.add(new WeakReference<>(bitmap));
             }
+        }
+
+        if (bitmap == null) {
+            return loading.getDrawable(source);
         }
 
         BitmapDrawable drawable = new BitmapDrawable(context.getResources(), bitmap);
