@@ -96,11 +96,23 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
         }
     }
 
+    public void resume() {
+        mImageGetter.resume();
+    }
+
+    public void pause() {
+        mImageGetter.pause();
+    }
+
     @Override
     public void clear() {
         super.clear();
+        boolean resumed = mImageGetter.isResumed();
         mImageGetter.destroy();
         mImageGetter = new HttpImageGetter(mContext);
+        if (resumed) {
+            mImageGetter.resume();
+        }
     }
 
     @Override

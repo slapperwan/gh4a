@@ -204,12 +204,24 @@ public class IssueActivity extends BaseActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mImageGetter != null) {
-            mImageGetter.destroy();
-        }
+        mImageGetter.destroy();
         if (mEventAdapter != null) {
             mEventAdapter.destroy();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mEventAdapter.resume();
+        mImageGetter.resume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mEventAdapter.pause();
+        mImageGetter.pause();
     }
 
     @Override

@@ -178,6 +178,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         }
     }
 
+
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -209,6 +210,20 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
         fillData();
         getLoaderManager().initLoader(1, null, mCollaboratorCallback);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mImageGetter.resume();
+        mAdapter.resume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mImageGetter.pause();
+        mAdapter.pause();
     }
 
     @Override

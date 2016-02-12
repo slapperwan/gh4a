@@ -157,6 +157,18 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         getLoaderManager().initLoader(1, null, mPullRequestsCallback);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mImageGetter.resume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mImageGetter.pause();
+    }
+
     public void setRef(String ref) {
         mRef = ref;
         getArguments().putString(Constants.Object.REF, ref);

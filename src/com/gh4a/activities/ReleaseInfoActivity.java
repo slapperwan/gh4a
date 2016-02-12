@@ -117,6 +117,18 @@ public class ReleaseInfoActivity extends BaseActivity implements
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        mImageGetter.resume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mImageGetter.pause();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         mImageGetter.destroy();

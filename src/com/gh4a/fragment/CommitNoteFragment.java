@@ -90,6 +90,18 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        mAdapter.resume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mAdapter.pause();
+    }
+
+    @Override
     public boolean canChildScrollUp() {
         if (mCommentFragment != null && mCommentFragment.canChildScrollUp()) {
             return true;

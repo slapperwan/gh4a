@@ -67,6 +67,14 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         mEditCallback = editCallback;
     }
 
+    public void resume() {
+        mImageGetter.resume();
+    }
+
+    public void pause() {
+        mImageGetter.pause();
+    }
+
     public void destroy() {
         mImageGetter.destroy();
     }
@@ -189,8 +197,12 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
     @Override
     public void clear() {
         super.clear();
+        boolean resumed = mImageGetter.isResumed();
         mImageGetter.destroy();
         mImageGetter = new HttpImageGetter(mContext);
+        if (resumed) {
+            mImageGetter.resume();
+        }
     }
 
     @Override

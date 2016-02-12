@@ -133,6 +133,16 @@ public class HttpImageGetter implements ImageGetter {
         }
     }
 
+    private static class GifInfo {
+        WeakReference<GifDrawable> mDrawable;
+        GifCallback mCallback;
+        public GifInfo(GifDrawable d) {
+            mCallback = new GifCallback();
+            mDrawable = new WeakReference<>(d);
+            d.setCallback(mCallback);
+        }
+    }
+
     private static boolean containsImages(final String html) {
         return html.contains("<img");
     }
@@ -149,11 +159,12 @@ public class HttpImageGetter implements ImageGetter {
 
     private final Map<Object, CharSequence> fullHtmlCache = new HashMap<>();
 
-    private final Map<Object, WeakReference<GifCallback>> knownGifCbs = new HashMap<>();
+    private final Map<Object, GifInfo> knownGifs = new HashMap<>();
 
     private ArrayList<WeakReference<Bitmap>> loadedBitmaps;
 
     private boolean destroyed;
+    private boolean resumed;
 
     /**
      * Create image getter for context
@@ -175,6 +186,20 @@ public class HttpImageGetter implements ImageGetter {
         loading = new LoadingImageGetter(context, 24);
     }
 
+    public void pause() {
+        resumed = false;
+        updateGifPlayState();
+    }
+
+    public void resume() {
+        resumed = true;
+        updateGifPlayState();
+    }
+
+    public boolean isResumed() {
+        return resumed;
+    }
+
     public void destroy() {
         synchronized (this) {
             for (WeakReference<Bitmap> ref : loadedBitmaps) {
@@ -183,7 +208,31 @@ public class HttpImageGetter implements ImageGetter {
                     bitmap.recycle();
                 }
             }
+            loadedBitmaps.clear();
+            for (GifInfo info : knownGifs.values()) {
+                GifDrawable drawable = info.mDrawable.get();
+                if (drawable != null) {
+                    drawable.setCallback(null);
+                    drawable.stop();
+                    drawable.recycle();
+                }
+            }
+            knownGifs.clear();
             destroyed = true;
+        }
+    }
+
+    private synchronized void updateGifPlayState() {
+        for (GifInfo info : knownGifs.values()) {
+            GifDrawable drawable = info.mDrawable.get();
+            if (drawable == null) {
+                continue;
+            }
+            if (resumed) {
+                drawable.start();
+            } else {
+                drawable.stop();
+            }
         }
     }
 
@@ -199,22 +248,9 @@ public class HttpImageGetter implements ImageGetter {
         return size.x;
     }
 
-    private GifCallback getGifCallback(Object id) {
-        WeakReference<GifCallback> cbRef = knownGifCbs.get(id);
-        if (cbRef == null) {
-            return null;
-        }
-        return cbRef.get();
-    }
-
     private HttpImageGetter show(final TextView view, final CharSequence html, final Object id) {
         if (TextUtils.isEmpty(html))
             return hide(view, id);
-
-        GifCallback cb = getGifCallback(id);
-        if (cb != null) {
-            cb.addView(view);
-        }
 
         view.setText(html);
         view.setVisibility(VISIBLE);
@@ -223,11 +259,6 @@ public class HttpImageGetter implements ImageGetter {
     }
 
     private HttpImageGetter hide(final TextView view, final Object id) {
-        GifCallback cb = getGifCallback(id);
-        if (cb != null) {
-            cb.removeView(view);
-        }
-
         view.setText(null);
         view.setVisibility(GONE);
         view.setTag(null);
@@ -251,7 +282,6 @@ public class HttpImageGetter implements ImageGetter {
             rawHtmlCache.put(id, encoded);
         else {
             rawHtmlCache.remove(id);
-            knownGifCbs.remove(id);
             fullHtmlCache.put(id, encoded);
         }
     }
@@ -266,12 +296,15 @@ public class HttpImageGetter implements ImageGetter {
      */
     public HttpImageGetter bind(final TextView view, final String html,
             final Object id) {
+        unbindViewFromGifs(view);
         if (TextUtils.isEmpty(html))
             return hide(view, id);
 
         CharSequence encoded = fullHtmlCache.get(id);
-        if (encoded != null)
+        if (encoded != null) {
+            addViewToGifCb(view, id);
             return show(view, encoded, id);
+        }
 
         encoded = rawHtmlCache.get(id);
         if (encoded == null) {
@@ -280,7 +313,6 @@ public class HttpImageGetter implements ImageGetter {
                 rawHtmlCache.put(id, encoded);
             else {
                 rawHtmlCache.remove(id);
-                knownGifCbs.remove(id);
                 fullHtmlCache.put(id, encoded);
                 return show(view, encoded, id);
             }
@@ -296,11 +328,24 @@ public class HttpImageGetter implements ImageGetter {
         return this;
     }
 
-    public class ImageGetterAsyncTask extends AsyncTask<Object, Void, CharSequence> {
+    private synchronized void unbindViewFromGifs(TextView view) {
+        for (GifInfo info : knownGifs.values()) {
+            info.mCallback.removeView(view);
+        }
+    }
 
+    private synchronized void addViewToGifCb(TextView view, Object id) {
+        GifInfo info = knownGifs.get(id);
+        if (info != null) {
+            info.mCallback.addView(view);
+        }
+    }
+
+    public class ImageGetterAsyncTask extends AsyncTask<Object, Void, CharSequence> {
         String html;
         Object id;
         TextView view;
+
         @Override
         protected CharSequence doInBackground(Object... params) {
             html = (String) params[0];
@@ -319,14 +364,19 @@ public class HttpImageGetter implements ImageGetter {
                 for (ImageSpan span : spans) {
                     Drawable d = span.getDrawable();
                     if (d instanceof GifDrawable) {
-                        GifCallback cb = new GifCallback();
-                        d.setCallback(cb);
-                        ((GifDrawable) d).start();
-                        knownGifCbs.put(id, new WeakReference<>(cb));
+                        GifDrawable gd = (GifDrawable) d;
+                        synchronized (this) {
+                            if (resumed) {
+                                gd.start();
+                            }
+                            knownGifs.put(id, new GifInfo(gd));
+                        }
                     }
                 }
 
+
                 if (id.equals(view.getTag())) {
+                    addViewToGifCb(view, id);
                     show(view, result, id);
                 }
             }
