@@ -339,7 +339,7 @@ public class UiUtils {
     }
 
     @SuppressLint("NewApi")
-    private static boolean downloadNeedsWarning(Context context) {
+    public static boolean downloadNeedsWarning(Context context) {
         ConnectivityManager cm =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 

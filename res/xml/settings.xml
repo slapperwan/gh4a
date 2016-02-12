@@ -17,6 +17,14 @@
         android:entryValues="@array/text_size_values"
         android:defaultValue="2" />
 
+    <com.gh4a.widget.IntegerListPreference
+        android:key="http_gif_load_mode"
+        android:title="@string/menu_gif_load_mode"
+        android:summary="%s"
+        android:entries="@array/load_gif_mode_items"
+        android:entryValues="@array/load_gif_mode_values"
+        android:defaultValue="1" />
+
     <Preference
         android:key="logout"
         android:title="@string/logout" />

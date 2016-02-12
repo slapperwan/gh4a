@@ -396,4 +396,5 @@
 
     <!-- Webview text size -->
     <string name="menu_text_size">Text size</string>
+    <string name="menu_gif_load_mode">Animated GIF loading</string>
 </resources>

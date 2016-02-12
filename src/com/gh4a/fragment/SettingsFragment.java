@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialog;
@@ -35,6 +36,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
 
     public static final String KEY_THEME = "theme";
     public static final String KEY_TEXT_SIZE = "webview_initial_zoom";
+    public static final String KEY_GIF_LOADING = "http_gif_load_mode";
     private static final String KEY_LOGOUT = "logout";
     private static final String KEY_ABOUT = "about";
     private static final String KEY_OPEN_SOURCE_COMPONENTS = "open_source_components";
@@ -76,6 +78,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
 
         mOpenSourcePref = findPreference(KEY_OPEN_SOURCE_COMPONENTS);
         mOpenSourcePref.setOnPreferenceClickListener(this);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+            getPreferenceScreen().removePreference(findPreference(KEY_GIF_LOADING));
+        }
 
         updateLogoutPrefState();
     }

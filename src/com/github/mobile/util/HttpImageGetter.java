@@ -17,6 +17,7 @@ package com.github.mobile.util;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
@@ -34,6 +35,7 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.UiUtils;
 
@@ -354,14 +356,17 @@ public class HttpImageGetter implements ImageGetter {
                         bitmap = ImageUtils.renderSvgToBitmap(context.getResources(),
                                 is, width, Integer.MAX_VALUE);
                     } else {
-                        output = File.createTempFile("image", ".tmp", dir);
-                        if (FileUtils.save(output, is)) {
-                            if (mime != null && mime.startsWith("image/gif")) {
-                                GifDrawable d = new GifDrawable(output);
-                                d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
-                                return d;
-                            } else {
-                                bitmap = ImageUtils.getBitmap(output, width, Integer.MAX_VALUE);
+                        boolean isGif = mime != null && mime.startsWith("image/gif");
+                        if (!isGif || canLoadGif()) {
+                            output = File.createTempFile("image", ".tmp", dir);
+                            if (FileUtils.save(output, is)) {
+                                if (isGif) {
+                                    GifDrawable d = new GifDrawable(output);
+                                    d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
+                                    return d;
+                                } else {
+                                    bitmap = ImageUtils.getBitmap(output, width, Integer.MAX_VALUE);
+                                }
                             }
                         }
                     }
@@ -401,5 +406,24 @@ public class HttpImageGetter implements ImageGetter {
         BitmapDrawable drawable = new BitmapDrawable(context.getResources(), bitmap);
         drawable.setBounds(0, 0, bitmap.getWidth(), bitmap.getHeight());
         return drawable;
+    }
+
+    private boolean canLoadGif() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+            // animated GIFs cause more memory pressure than GB can handle
+            return false;
+        }
+
+        SharedPreferences prefs = context.getSharedPreferences(SettingsFragment.PREF_NAME,
+                Context.MODE_PRIVATE);
+        int mode = prefs.getInt(SettingsFragment.KEY_GIF_LOADING, 1);
+        switch (mode) {
+            case 1: // load via Wifi
+                return !UiUtils.downloadNeedsWarning(context);
+            case 2: // always load
+                return true;
+            default:
+                return false;
+        }
     }
 }
