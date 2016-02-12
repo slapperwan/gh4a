@@ -15,14 +15,20 @@
  */
 package com.github.mobile.util;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
+import android.graphics.Canvas;
 import android.graphics.Point;
 import android.util.Log;
 
+import com.caverock.androidsvg.SVG;
+import com.caverock.androidsvg.SVGParseException;
+
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 
 /**
@@ -127,5 +133,28 @@ public class ImageUtils {
      */
     public static Bitmap getBitmap(final File image, int width, int height) {
         return getBitmap(image.getAbsolutePath(), width, height);
+    }
+
+    public static Bitmap renderSvgToBitmap(Resources res, InputStream is, int width, int height) {
+        try {
+            SVG svg = SVG.getFromInputStream(is);
+            if (svg != null) {
+                svg.setRenderDPI(res.getDisplayMetrics().densityDpi);
+                int docWidth = (int) svg.getDocumentWidth();
+                int docHeight = (int) svg.getDocumentHeight();
+                while (docWidth >= width || docHeight >= height) {
+                    docWidth /= 2;
+                    docHeight /= 2;
+                }
+
+                Bitmap bitmap = Bitmap.createBitmap(docWidth, docHeight, Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(bitmap);
+                svg.renderToCanvas(canvas);
+                return bitmap;
+            }
+        } catch (SVGParseException e) {
+            // fall through
+        }
+        return null;
     }
 }

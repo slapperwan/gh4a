@@ -28,6 +28,7 @@ import android.support.v4.os.AsyncTaskCompat;
 import android.text.Html.ImageGetter;
 import android.text.TextUtils;
 import android.view.WindowManager;
+import android.webkit.MimeTypeMap;
 import android.widget.TextView;
 
 import com.gh4a.R;
@@ -38,7 +39,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -242,19 +245,34 @@ public class HttpImageGetter implements ImageGetter {
         return url.openStream();
     }
 
+    @Override
     public Drawable getDrawable(String source) {
         Bitmap bitmap = null;
 
         if (!destroyed) {
             File output = null;
             InputStream is = null;
+            HttpURLConnection connection = null;
             try {
-                output = File.createTempFile("image", ".jpg", dir);
-                is = fetch(source);
+                connection = (HttpURLConnection) new URL(source).openConnection();
+                is = connection.getInputStream();
                 if (is != null) {
-                    boolean success = FileUtils.save(output, is);
-                    if (success) {
-                        bitmap = ImageUtils.getBitmap(output, width, Integer.MAX_VALUE);
+                    String mime = connection.getContentType();
+                    if (mime == null) {
+                        mime = URLConnection.guessContentTypeFromName(source);
+                    }
+                    if (mime == null) {
+                        mime = URLConnection.guessContentTypeFromStream(is);
+                    }
+                    if (mime != null && mime.startsWith("image/svg")) {
+                        bitmap = ImageUtils.renderSvgToBitmap(context.getResources(),
+                                is, width, Integer.MAX_VALUE);
+                    } else {
+                        String extension = MimeTypeMap.getFileExtensionFromUrl(source);
+                        output = File.createTempFile("image", "." + extension, dir);
+                        if (FileUtils.save(output, is)) {
+                            bitmap = ImageUtils.getBitmap(output, width, Integer.MAX_VALUE);
+                        }
                     }
                 }
             } catch (IOException e) {
@@ -269,6 +287,9 @@ public class HttpImageGetter implements ImageGetter {
                     } catch (IOException e) {
                         // ignored
                     }
+                }
+                if (connection != null) {
+                    connection.disconnect();
                 }
             }
         }
