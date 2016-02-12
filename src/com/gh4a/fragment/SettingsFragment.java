@@ -200,6 +200,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
 
     private static class OpenSourceComponentAdapter extends BaseAdapter {
         private static final String[][] COMPONENTS = new String[][] {
+            { "android-gif-drawable", "https://github.com/koral--/android-gif-drawable" },
             { "AndroidSVG", "https://github.com/BigBadaboom/androidsvg" },
             { "Android-ProgressFragment", "https://github.com/johnkil/Android-ProgressFragment" },
             { "Github Java bindings", "https://github.com/maniac103/egit-github" },

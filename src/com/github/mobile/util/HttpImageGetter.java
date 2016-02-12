@@ -23,12 +23,14 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.os.AsyncTaskCompat;
 import android.text.Html.ImageGetter;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.ImageSpan;
 import android.view.WindowManager;
-import android.webkit.MimeTypeMap;
 import android.widget.TextView;
 
 import com.gh4a.R;
@@ -45,6 +47,8 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import pl.droidsonroids.gif.GifDrawable;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -74,6 +78,59 @@ public class HttpImageGetter implements ImageGetter {
         }
     }
 
+    private static class GifCallback implements Drawable.Callback {
+        private ArrayList<WeakReference<TextView>> mViewRefs = new ArrayList<>();
+        private Handler mHandler = new Handler();
+
+        public void addView(TextView view) {
+            boolean alreadyPresent = false;
+            for (int i = 0; i < mViewRefs.size(); i++) {
+                TextView existing = mViewRefs.get(i).get();
+                if (existing == null) {
+                    mViewRefs.remove(i);
+                } else if (existing == view) {
+                    alreadyPresent = true;
+                }
+            }
+            if (!alreadyPresent) {
+                mViewRefs.add(new WeakReference<>(view));
+            }
+        }
+
+        public void removeView(TextView view) {
+            for (int i = 0; i < mViewRefs.size(); i++) {
+                TextView existing = mViewRefs.get(i).get();
+                if (existing == null || existing == view) {
+                    mViewRefs.remove(i);
+                }
+            }
+        }
+
+        @Override
+        public void invalidateDrawable(Drawable drawable) {
+            for (WeakReference<TextView> ref : mViewRefs) {
+                TextView view = ref.get();
+                if (view != null) {
+                    view.invalidate();
+                    // make sure the TextView's display list is regenerated
+                    boolean enabled = view.isEnabled();
+                    view.setEnabled(!enabled);
+                    view.setEnabled(enabled);
+                }
+            }
+        }
+
+        @Override
+        public void scheduleDrawable(Drawable drawable, Runnable runnable, long when) {
+            mHandler.postAtTime(runnable, when);
+        }
+
+        @Override
+        public void unscheduleDrawable(Drawable drawable, Runnable runnable) {
+            mHandler.removeCallbacks(runnable);
+        }
+    }
+
     private static boolean containsImages(final String html) {
         return html.contains("<img");
     }
@@ -89,6 +146,8 @@ public class HttpImageGetter implements ImageGetter {
     private final Map<Object, CharSequence> rawHtmlCache = new HashMap<>();
 
     private final Map<Object, CharSequence> fullHtmlCache = new HashMap<>();
+
+    private final Map<Object, WeakReference<GifCallback>> knownGifCbs = new HashMap<>();
 
     private ArrayList<WeakReference<Bitmap>> loadedBitmaps;
 
@@ -138,9 +197,22 @@ public class HttpImageGetter implements ImageGetter {
         return size.x;
     }
 
-    private HttpImageGetter show(final TextView view, final CharSequence html) {
+    private GifCallback getGifCallback(Object id) {
+        WeakReference<GifCallback> cbRef = knownGifCbs.get(id);
+        if (cbRef == null) {
+            return null;
+        }
+        return cbRef.get();
+    }
+
+    private HttpImageGetter show(final TextView view, final CharSequence html, final Object id) {
         if (TextUtils.isEmpty(html))
-            return hide(view);
+            return hide(view, id);
+
+        GifCallback cb = getGifCallback(id);
+        if (cb != null) {
+            cb.addView(view);
+        }
 
         view.setText(html);
         view.setVisibility(VISIBLE);
@@ -148,7 +220,12 @@ public class HttpImageGetter implements ImageGetter {
         return this;
     }
 
-    private HttpImageGetter hide(final TextView view) {
+    private HttpImageGetter hide(final TextView view, final Object id) {
+        GifCallback cb = getGifCallback(id);
+        if (cb != null) {
+            cb.removeView(view);
+        }
+
         view.setText(null);
         view.setVisibility(GONE);
         view.setTag(null);
@@ -172,6 +249,7 @@ public class HttpImageGetter implements ImageGetter {
             rawHtmlCache.put(id, encoded);
         else {
             rawHtmlCache.remove(id);
+            knownGifCbs.remove(id);
             fullHtmlCache.put(id, encoded);
         }
     }
@@ -187,11 +265,11 @@ public class HttpImageGetter implements ImageGetter {
     public HttpImageGetter bind(final TextView view, final String html,
             final Object id) {
         if (TextUtils.isEmpty(html))
-            return hide(view);
+            return hide(view, id);
 
         CharSequence encoded = fullHtmlCache.get(id);
         if (encoded != null)
-            return show(view, encoded);
+            return show(view, encoded, id);
 
         encoded = rawHtmlCache.get(id);
         if (encoded == null) {
@@ -200,15 +278,16 @@ public class HttpImageGetter implements ImageGetter {
                 rawHtmlCache.put(id, encoded);
             else {
                 rawHtmlCache.remove(id);
+                knownGifCbs.remove(id);
                 fullHtmlCache.put(id, encoded);
-                return show(view, encoded);
+                return show(view, encoded, id);
             }
         }
 
         if (TextUtils.isEmpty(encoded))
-            return hide(view);
+            return hide(view, id);
 
-        show(view, encoded);
+        show(view, encoded, id);
         view.setTag(id);
         ImageGetterAsyncTask asyncTask = new ImageGetterAsyncTask();
         AsyncTaskCompat.executeParallel(asyncTask, html, id, view);
@@ -233,16 +312,23 @@ public class HttpImageGetter implements ImageGetter {
                 rawHtmlCache.remove(id);
                 fullHtmlCache.put(id, result);
 
+                Spanned spanned = (Spanned) result;
+                ImageSpan[] spans = spanned.getSpans(0, result.length(), ImageSpan.class);
+                for (ImageSpan span : spans) {
+                    Drawable d = span.getDrawable();
+                    if (d instanceof GifDrawable) {
+                        GifCallback cb = new GifCallback();
+                        d.setCallback(cb);
+                        ((GifDrawable) d).start();
+                        knownGifCbs.put(id, new WeakReference<>(cb));
+                    }
+                }
+
                 if (id.equals(view.getTag())) {
-                    show(view, result);
+                    show(view, result, id);
                 }
             }
         }
-    }
-
-    private InputStream fetch(String urlString) throws IOException {
-        URL url = new URL(urlString);
-        return url.openStream();
     }
 
     @Override
@@ -268,10 +354,15 @@ public class HttpImageGetter implements ImageGetter {
                         bitmap = ImageUtils.renderSvgToBitmap(context.getResources(),
                                 is, width, Integer.MAX_VALUE);
                     } else {
-                        String extension = MimeTypeMap.getFileExtensionFromUrl(source);
-                        output = File.createTempFile("image", "." + extension, dir);
+                        output = File.createTempFile("image", ".tmp", dir);
                         if (FileUtils.save(output, is)) {
-                            bitmap = ImageUtils.getBitmap(output, width, Integer.MAX_VALUE);
+                            if (mime != null && mime.startsWith("image/gif")) {
+                                GifDrawable d = new GifDrawable(output);
+                                d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
+                                return d;
+                            } else {
+                                bitmap = ImageUtils.getBitmap(output, width, Integer.MAX_VALUE);
+                            }
                         }
                     }
                 }

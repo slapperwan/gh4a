@@ -64,6 +64,7 @@ dependencies {
     compile 'com.larswerkman:HoloColorPicker:1.4@aar'
     compile 'com.github.johnkil.android-progressfragment:progressfragment:1.4.0@aar'
     compile 'com.caverock:androidsvg:1.2.2-beta-1@aar'
+    compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.+'
     compile 'org.apmem.tools:layouts:1.9@aar'
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.squareup.okhttp:okhttp:1.5.4'
