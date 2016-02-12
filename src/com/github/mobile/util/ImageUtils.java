@@ -21,6 +21,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
 import android.graphics.Canvas;
 import android.graphics.Point;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.caverock.androidsvg.SVG;
@@ -139,16 +140,19 @@ public class ImageUtils {
         try {
             SVG svg = SVG.getFromInputStream(is);
             if (svg != null) {
-                svg.setRenderDPI(res.getDisplayMetrics().densityDpi);
-                int docWidth = (int) svg.getDocumentWidth();
-                int docHeight = (int) svg.getDocumentHeight();
+                svg.setRenderDPI(DisplayMetrics.DENSITY_DEFAULT);
+                float density = res.getDisplayMetrics().density;
+                int docWidth = (int) (svg.getDocumentWidth() * density);
+                int docHeight = (int) (svg.getDocumentHeight() * density);
                 while (docWidth >= width || docHeight >= height) {
                     docWidth /= 2;
                     docHeight /= 2;
+                    density /= 2;
                 }
 
                 Bitmap bitmap = Bitmap.createBitmap(docWidth, docHeight, Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(bitmap);
+                canvas.scale(density, density);
                 svg.renderToCanvas(canvas);
                 return bitmap;
             }
