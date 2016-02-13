@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -41,6 +42,8 @@ import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.ThemeUtils;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -51,6 +54,7 @@ public abstract class WebViewerActivity extends BaseActivity {
     private static final List<String> SKIP_PRETTIFY_EXT = Arrays.asList(
         "txt", "rdoc", "texttile", "org", "creole", "rst", "asciidoc", "pod", "");
 
+    private static ArrayList<String> sLanguagePlugins = new ArrayList<>();
 
     private int[] ZOOM_SIZES = new int[] {
         50, 75, 100, 150, 200
@@ -241,6 +245,28 @@ public abstract class WebViewerActivity extends BaseActivity {
         loadCode(data, fileName, null, null, null, -1, -1);
     }
 
+    private void loadLanguagePluginListIfNeeded() {
+        if (!sLanguagePlugins.isEmpty()) {
+            return;
+        }
+
+        AssetManager am = getAssets();
+        try {
+            String[] files = am.list("");
+            for (String f : files) {
+                if (f.startsWith("lang-")) {
+                    int pos = f.lastIndexOf('.');
+                    if (pos > 0 && TextUtils.equals(f.substring(pos + 1), "js")) {
+                        sLanguagePlugins.add(f.substring(0, pos));
+                    }
+                }
+            }
+        } catch (IOException e) {
+            // retry next time
+            sLanguagePlugins.clear();
+        }
+    }
+
     protected void loadCode(String data, String fileName,
             String repoOwner, String repoName, String ref,
             int highlightStart, int highlightEnd) {
@@ -260,9 +286,10 @@ public abstract class WebViewerActivity extends BaseActivity {
         } else if (!SKIP_PRETTIFY_EXT.contains(ext)) {
             writeCssInclude(content, "prettify");
             writeScriptInclude(content, "prettify");
-            // Try to load the language extension file.
-            // If there's none, this will fail silently
-            writeScriptInclude(content, "lang-" + ext);
+            loadLanguagePluginListIfNeeded();
+            for (String plugin : sLanguagePlugins) {
+                writeScriptInclude(content, plugin);
+            }
             content.append("</head>");
             content.append("<body onload='prettyPrint(function() { highlightLines(");
             content.append(highlightStart).append(",").append(highlightEnd).append("); })'");
