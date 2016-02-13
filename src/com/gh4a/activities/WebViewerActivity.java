@@ -44,15 +44,10 @@ import com.gh4a.utils.ThemeUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public abstract class WebViewerActivity extends BaseActivity {
     protected WebView mWebView;
     private boolean mStarted;
-
-    private static final List<String> SKIP_PRETTIFY_EXT = Arrays.asList(
-        "txt", "rdoc", "texttile", "org", "creole", "rst", "asciidoc", "pod", "");
 
     private static ArrayList<String> sLanguagePlugins = new ArrayList<>();
 
@@ -283,7 +278,7 @@ public abstract class WebViewerActivity extends BaseActivity {
             content.append("</head>");
             content.append("<body>");
             content.append("<div id='content'>");
-        } else if (!SKIP_PRETTIFY_EXT.contains(ext)) {
+        } else {
             writeCssInclude(content, "prettify");
             writeScriptInclude(content, "prettify");
             loadLanguagePluginListIfNeeded();
@@ -296,11 +291,6 @@ public abstract class WebViewerActivity extends BaseActivity {
             content.append(" onresize='scrollToHighlight();'>");
             content.append("<pre id='content' class='prettyprint linenums lang-");
             content.append(ext).append("'>");
-        } else{
-            writeCssInclude(content, "text");
-            content.append("</head>");
-            content.append("<body>");
-            content.append("<pre>");
         }
 
         content.append(TextUtils.htmlEncode(data));
