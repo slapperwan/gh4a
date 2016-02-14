@@ -164,6 +164,37 @@
 
     </RelativeLayout>
 
+    <RelativeLayout
+        android:id="@+id/merge_status_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/overview_item_spacing"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/iv_merge_status_icon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginRight="10dp" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/merge_status_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/iv_merge_status_icon"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+
+        <LinearLayout
+            android:id="@+id/merge_commit_status_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/merge_status_label"
+            android:layout_toRightOf="@id/iv_merge_status_icon"
+            android:layout_marginTop="2dp"
+            android:orientation="vertical" />
+
+    </RelativeLayout>
+
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_pull"
         android:layout_width="wrap_content"
@@ -174,6 +205,5 @@
         android:textColor="?android:attr/textColorLink"
         android:text="@string/view_pull_request"
         android:visibility="gone" />
-
 
 </LinearLayout>

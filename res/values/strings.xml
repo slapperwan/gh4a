@@ -344,6 +344,10 @@
     <string name="pull_error_merge">Pull request could not be merged</string>
     <string name="pull_message_dialog_title">Merge pull request #%1$d</string>
     <string name="pull_merge_message_description">If you want to add additional details to the merge commit message, please enter them below.</string>
+    <string name="pull_merge_status_clean">Pull request can be merged.</string>
+    <string name="pull_merge_status_unstable">Pull request didn\'t pass all checks.</string>
+    <string name="pull_merge_status_dirty">Pull request has conflicts that need to be resolved manually.</string>
+    <string name="pull_merge_status_unknown">The status of the pull request could not be determined.</string>
 
     <!-- Object -->
     <string name="object_view_file_at">View file @ %1$s</string>

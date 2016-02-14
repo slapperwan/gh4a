@@ -34,6 +34,13 @@
         <item name="labelsIcon">@drawable/labels_dark</item>
         <item name="branchIcon">@drawable/branch_dark</item>
         <item name="tagIcon">@drawable/label_dark</item>
+        <item name="commitStatusOkIcon">@drawable/commit_status_ok_dark</item>
+        <item name="commitStatusUnknownIcon">@drawable/commit_status_unknown_dark</item>
+        <item name="commitStatusFailIcon">@drawable/commit_status_fail_dark</item>
+        <item name="pullRequestMergeOkIcon">@drawable/pull_request_merge_ok_dark</item>
+        <item name="pullRequestMergeDirtyIcon">@drawable/pull_request_merge_dirty_dark</item>
+        <item name="pullRequestMergeUnstableIcon">@drawable/pull_request_merge_unstable_dark</item>
+        <item name="pullRequestMergeUnknownIcon">@drawable/pull_request_merge_unknown_dark</item>
         <item name="cardViewTheme">@style/Theme.CardView.Dark</item>
         <item name="preferenceTheme">@style/PreferenceTheme</item>
         <item name="colorAccent">@color/dark_accent</item>
@@ -98,6 +105,13 @@
         <item name="labelsIcon">@drawable/labels</item>
         <item name="branchIcon">@drawable/branch</item>
         <item name="tagIcon">@drawable/label</item>
+        <item name="commitStatusOkIcon">@drawable/commit_status_ok</item>
+        <item name="commitStatusUnknownIcon">@drawable/commit_status_unknown</item>
+        <item name="commitStatusFailIcon">@drawable/commit_status_fail</item>
+        <item name="pullRequestMergeOkIcon">@drawable/pull_request_merge_ok</item>
+        <item name="pullRequestMergeDirtyIcon">@drawable/pull_request_merge_dirty</item>
+        <item name="pullRequestMergeUnstableIcon">@drawable/pull_request_merge_unstable</item>
+        <item name="pullRequestMergeUnknownIcon">@drawable/pull_request_merge_unknown</item>
         <item name="listPopupWindowStyle">@style/Widget.AppCompat.Light.ListPopupWindow</item>
         <item name="cardViewTheme">@style/Theme.CardView.Light</item>
         <item name="preferenceTheme">@style/PreferenceTheme</item>

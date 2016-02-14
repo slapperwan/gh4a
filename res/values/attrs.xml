@@ -45,6 +45,13 @@
     <attr name="labelsIcon" format="reference" />
     <attr name="branchIcon" format="reference" />
     <attr name="tagIcon" format="reference" />
+    <attr name="pullRequestMergeOkIcon" format="reference" />
+    <attr name="pullRequestMergeUnstableIcon" format="reference" />
+    <attr name="pullRequestMergeDirtyIcon" format="reference" />
+    <attr name="pullRequestMergeUnknownIcon" format="reference" />
+    <attr name="commitStatusOkIcon" format="reference" />
+    <attr name="commitStatusUnknownIcon" format="reference" />
+    <attr name="commitStatusFailIcon" format="reference" />
 
     <declare-styleable name="LabelBadgeView">
         <attr name="badgeSize" format="dimension"/>

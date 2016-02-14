@@ -16,10 +16,13 @@
 package com.gh4a.fragment;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.CommitStatus;
 import org.eclipse.egit.github.core.MergeStatus;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.Repository;
@@ -56,6 +59,7 @@ import com.gh4a.activities.EditIssueCommentActivity;
 import com.gh4a.activities.EditPullRequestCommentActivity;
 import com.gh4a.adapter.IssueEventAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.loader.CommitStatusLoader;
 import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.PullRequestCommentListLoader;
 import com.gh4a.loader.IssueEventHolder;
@@ -82,6 +86,22 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     private CommentBoxFragment mCommentFragment;
     private IssueEventAdapter mAdapter;
     private HttpImageGetter mImageGetter;
+
+    private LoaderCallbacks<List<CommitStatus>> mStatusCallback =
+            new LoaderCallbacks<List<CommitStatus>>() {
+        @Override
+        public Loader<LoaderResult<List<CommitStatus>>> onCreateLoader(int id, Bundle args) {
+            return new CommitStatusLoader(getActivity(), mRepoOwner, mRepoName,
+                    mPullRequest.getHead().getSha());
+        }
+
+        @Override
+        public void onResultReady(LoaderResult<List<CommitStatus>> result) {
+            if (!result.handleError(getActivity())) {
+                fillStatus(result.getData());
+            }
+        }
+    };
 
     private LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>() {
         @Override
@@ -178,7 +198,6 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         }
     }
 
-
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -210,6 +229,9 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
         fillData();
         getLoaderManager().initLoader(1, null, mCollaboratorCallback);
+        if (!mPullRequest.isMerged()) {
+            getLoaderManager().initLoader(2, null, mStatusCallback);
+        }
     }
 
     @Override
@@ -343,6 +365,67 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         } else {
             assigneeGroup.setVisibility(View.GONE);
         }
+    }
+
+    private void fillStatus(List<CommitStatus> statuses) {
+        Map<String, CommitStatus> statusByContext = new HashMap<>();
+        for (CommitStatus status : statuses) {
+            if (!statusByContext.containsKey(status.getContext())) {
+                statusByContext.put(status.getContext(), status);
+            }
+        }
+
+        final int statusIconDrawableAttrId, statusLabelResId;
+        if (PullRequest.MERGEABLE_STATE_CLEAN.equals(mPullRequest.getMergeableState())) {
+            statusIconDrawableAttrId = R.attr.pullRequestMergeOkIcon;
+            statusLabelResId = R.string.pull_merge_status_clean;
+        } else if (PullRequest.MERGEABLE_STATE_UNSTABLE.equals(mPullRequest.getMergeableState())) {
+            statusIconDrawableAttrId = R.attr.pullRequestMergeUnstableIcon;
+            statusLabelResId = R.string.pull_merge_status_unstable;
+        } else if (PullRequest.MERGEABLE_STATE_DIRTY.equals(mPullRequest.getMergeableState())) {
+            statusIconDrawableAttrId = R.attr.pullRequestMergeDirtyIcon;
+            statusLabelResId = R.string.pull_merge_status_dirty;
+        } else if (statusByContext.isEmpty()) {
+            // unknwon status, no commit statuses -> nothing to display
+            return;
+        } else {
+            statusIconDrawableAttrId = R.attr.pullRequestMergeUnknownIcon;
+            statusLabelResId = R.string.pull_merge_status_unknown;
+        }
+
+        ImageView statusIcon = (ImageView) mListHeaderView.findViewById(R.id.iv_merge_status_icon);
+        statusIcon.setImageResource(UiUtils.resolveDrawable(getActivity(),
+                statusIconDrawableAttrId));
+
+        TextView statusLabel = (TextView) mListHeaderView.findViewById(R.id.merge_status_label);
+        statusLabel.setText(statusLabelResId);
+
+        ViewGroup statusContainer = (ViewGroup)
+                mListHeaderView.findViewById(R.id.merge_commit_status_container);
+        LayoutInflater inflater = getLayoutInflater(null);
+        for (CommitStatus status : statusByContext.values()) {
+            View statusRow = inflater.inflate(R.layout.row_commit_status, statusContainer);
+
+            String state = status.getState();
+            final int iconDrawableAttrId;
+            if (CommitStatus.STATE_ERROR.equals(state) || CommitStatus.STATE_FAILURE.equals(state)) {
+                iconDrawableAttrId = R.attr.commitStatusFailIcon;
+            } else if (CommitStatus.STATE_SUCCESS.equals(state)) {
+                iconDrawableAttrId = R.attr.commitStatusOkIcon;
+            } else {
+                iconDrawableAttrId = R.attr.commitStatusUnknownIcon;
+            }
+            ImageView icon = (ImageView) statusRow.findViewById(R.id.iv_status_icon);
+            icon.setImageResource(UiUtils.resolveDrawable(getActivity(), iconDrawableAttrId));
+
+            TextView context = (TextView) statusRow.findViewById(R.id.tv_context);
+            context.setText(status.getContext());
+
+            TextView description = (TextView) statusRow.findViewById(R.id.tv_desc);
+            description.setText(status.getDescription());
+        }
+
+        mListHeaderView.findViewById(R.id.merge_status_container).setVisibility(View.VISIBLE);
     }
 
     private void showMergeDialog() {
