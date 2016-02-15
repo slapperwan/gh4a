@@ -47,11 +47,17 @@ import com.gh4a.widget.StyleableTextView;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventAdapter.ViewHolder>
         implements View.OnClickListener {
     public interface OnEditComment {
         void editComment(Comment comment);
     }
+
+    private static final Pattern COMMIT_URL_REPO_NAME_AND_OWNER_PATTERN =
+            Pattern.compile(".*github.com\\/repos\\/([^\\/]+)\\/([^\\/]+)\\/commits");
 
     private HttpImageGetter mImageGetter;
     private OnEditComment mEditCallback;
@@ -182,8 +188,20 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         text.setSpan(new ClickableSpan() {
             @Override
             public void onClick(View view) {
+                // The commit might be in a different repo. The API doesn't provide
+                // that information directly, so get it indirectly by parsing the URL
+                String repoOwner = mRepoOwner, repoName = mRepoName;
+                String url = event.getCommitUrl();
+                if (url != null) {
+                    Matcher matcher = COMMIT_URL_REPO_NAME_AND_OWNER_PATTERN.matcher(url);
+                    if (matcher.find()) {
+                        repoOwner = matcher.group(1);
+                        repoName = matcher.group(2);
+                    }
+                }
+
                 mContext.startActivity(IntentUtils.getCommitInfoActivityIntent(mContext,
-                        mRepoOwner, mRepoName, event.getCommitId()));
+                        repoOwner, repoName, event.getCommitId()));
             }
             @Override
             public void updateDrawState(@NonNull TextPaint ds) {
