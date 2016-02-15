@@ -9,6 +9,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
@@ -106,6 +107,15 @@ public abstract class BasePagerActivity extends BaseActivity implements
         mTabs.setVisibility(titleResIds.length > 1 ? View.VISIBLE : View.GONE);
         setToolbarScrollable(titleResIds.length > 1
                 && getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE);
+
+        LinearLayout tabStrip = (LinearLayout) mTabs.getChildAt(0);
+        for (int i = 0; i < tabStrip.getChildCount(); i++) {
+            View tab = tabStrip.getChildAt(i);
+            LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) tab.getLayoutParams();
+            lp.width = LinearLayout.LayoutParams.WRAP_CONTENT;
+            lp.weight = 1;
+            tab.setLayoutParams(lp);
+        }
     }
 
     protected abstract int[] getTabTitleResIds();
