@@ -229,7 +229,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
         fillData();
         getLoaderManager().initLoader(1, null, mCollaboratorCallback);
-        if (!mPullRequest.isMerged()) {
+        if (Constants.Issue.STATE_OPEN.equals(mPullRequest.getState())) {
             getLoaderManager().initLoader(2, null, mStatusCallback);
         }
     }
@@ -408,8 +408,9 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         ViewGroup statusContainer = (ViewGroup)
                 mListHeaderView.findViewById(R.id.merge_commit_status_container);
         LayoutInflater inflater = getLayoutInflater(null);
+        statusContainer.removeAllViews();
         for (CommitStatus status : statusByContext.values()) {
-            View statusRow = inflater.inflate(R.layout.row_commit_status, statusContainer);
+            View statusRow = inflater.inflate(R.layout.row_commit_status, statusContainer, false);
 
             String state = status.getState();
             final int iconDrawableAttrId;
@@ -428,7 +429,11 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
             TextView description = (TextView) statusRow.findViewById(R.id.tv_desc);
             description.setText(status.getDescription());
+
+            statusContainer.addView(statusRow);
         }
+        mListHeaderView.findViewById(R.id.merge_commit_no_status).setVisibility(
+                statusByContext.isEmpty() ? View.VISIBLE : View.GONE);
 
         mListHeaderView.findViewById(R.id.merge_status_container).setVisibility(View.VISIBLE);
     }

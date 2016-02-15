@@ -182,7 +182,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/iv_merge_status_icon"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
         <LinearLayout
             android:id="@+id/merge_commit_status_container"
@@ -190,8 +190,16 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/merge_status_label"
             android:layout_toRightOf="@id/iv_merge_status_icon"
-            android:layout_marginTop="2dp"
             android:orientation="vertical" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/merge_commit_no_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/merge_status_label"
+            android:layout_toRightOf="@id/iv_merge_status_icon"
+            android:text="@string/pull_no_commit_status"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
 
     </RelativeLayout>
 
