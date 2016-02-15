@@ -23,6 +23,8 @@ import java.util.Map;
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitStatus;
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.MergeStatus;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.Repository;
@@ -34,6 +36,7 @@ import org.eclipse.egit.github.core.service.PullRequestService;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
@@ -61,6 +64,7 @@ import com.gh4a.adapter.IssueEventAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.CommitStatusLoader;
 import com.gh4a.loader.IsCollaboratorLoader;
+import com.gh4a.loader.IssueLoader;
 import com.gh4a.loader.PullRequestCommentListLoader;
 import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.loader.LoaderCallbacks;
@@ -99,6 +103,20 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         public void onResultReady(LoaderResult<List<CommitStatus>> result) {
             if (!result.handleError(getActivity())) {
                 fillStatus(result.getData());
+            }
+        }
+    };
+
+    private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>() {
+        @Override
+        public Loader<LoaderResult<Issue>> onCreateLoader(int id, Bundle args) {
+            return new IssueLoader(getActivity(), mRepoOwner, mRepoName, mPullRequest.getNumber());
+        }
+
+        @Override
+        public void onResultReady(LoaderResult<Issue> result) {
+            if (!result.handleError(getActivity())) {
+                fillLabels(result.getData().getLabels());
             }
         }
     };
@@ -229,8 +247,9 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
         fillData();
         getLoaderManager().initLoader(1, null, mCollaboratorCallback);
+        getLoaderManager().initLoader(2, null, mIssueCallback);
         if (Constants.Issue.STATE_OPEN.equals(mPullRequest.getState())) {
-            getLoaderManager().initLoader(2, null, mStatusCallback);
+            getLoaderManager().initLoader(3, null, mStatusCallback);
         }
     }
 
@@ -369,6 +388,31 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
             assigneeGroup.setVisibility(View.VISIBLE);
         } else {
             assigneeGroup.setVisibility(View.GONE);
+        }
+    }
+
+    private void fillLabels(List<Label> labels) {
+        View labelGroup = mListHeaderView.findViewById(R.id.label_container);
+        if (labels != null && !labels.isEmpty()) {
+            ViewGroup labelContainer = (ViewGroup) mListHeaderView.findViewById(R.id.labels);
+            LayoutInflater inflater = getLayoutInflater(null);
+            labelContainer.removeAllViews();
+
+            for (Label label : labels) {
+                TextView tvLabel = (TextView) inflater.inflate(R.layout.issue_label,
+                        labelContainer, false);
+                int color = Color.parseColor("#" + label.getColor());
+
+                tvLabel.setText(label.getName());
+                tvLabel.setBackgroundColor(color);
+                tvLabel.setTextColor(UiUtils.textColorForBackground(getActivity(), color));
+
+                labelContainer.addView(tvLabel);
+            }
+            labelGroup.setVisibility(View.VISIBLE);
+            labelContainer.setVisibility(View.VISIBLE);
+        } else {
+            labelGroup.setVisibility(View.GONE);
         }
     }
 
