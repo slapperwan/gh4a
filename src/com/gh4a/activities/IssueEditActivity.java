@@ -23,6 +23,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.Loader;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
@@ -71,6 +72,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
     private List<Label> mAllLabels;
     private Issue mEditIssue;
 
+    private TextInputLayout mTitleWrapper;
     private EditText mTitleView;
     private EditText mDescView;
     private TextView mTvSelectedMilestone;
@@ -175,6 +177,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         View header = headerInflater.inflate(R.layout.issue_create_header, null);
         addHeaderView(header, false);
 
+        mTitleWrapper = (TextInputLayout) header.findViewById(R.id.title_wrapper);
         mTitleView = (EditText) header.findViewById(R.id.et_title);
         mDescView = (EditText) header.findViewById(R.id.et_desc);
 
@@ -223,8 +226,9 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
     public void onClick(View view) {
         String title = mTitleView.getText() == null ? null : mTitleView.getText().toString();
         if (StringUtils.isBlank(title)) {
-            mTitleView.setError(getString(R.string.issue_error_title));
+            mTitleWrapper.setError(getString(R.string.issue_error_title));
         } else {
+            mTitleWrapper.setErrorEnabled(false);
             mEditIssue.setTitle(title);
             mEditIssue.setBody(mDescView.getText().toString());
             AsyncTaskCompat.executeParallel(new SaveIssueTask(mEditIssue));

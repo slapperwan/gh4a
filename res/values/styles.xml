@@ -26,11 +26,6 @@
         <item name="android:textColor">@color/abc_primary_text_material_dark</item>
     </style>
 
-    <style name="TextAppearance.Header.Caption" parent="TextAppearance.AppCompat.Caption">
-        <item name="android:textColor">@color/abc_secondary_text_material_dark</item>
-        <item name="allCaps">true</item>
-    </style>
-
     <style name="TextAppearance.Caption" parent="TextAppearance.AppCompat.Caption">
         <item name="allCaps">true</item>
     </style>
