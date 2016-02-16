@@ -9,6 +9,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.CharArrayWriter;
+import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -18,10 +19,12 @@ import java.util.List;
 
 public class TrendLoader extends BaseLoader<List<Trend>> {
     private String mUrl;
+    private String mQueryTarget;
 
-    public TrendLoader(Context context, String url) {
+    public TrendLoader(Context context, String url, String queryTarget) {
         super(context);
         mUrl = url;
+        mQueryTarget = queryTarget;
     }
 
     @Override
@@ -32,8 +35,24 @@ public class TrendLoader extends BaseLoader<List<Trend>> {
         HttpURLConnection connection = null;
         CharArrayWriter writer = null;
 
+        JSONObject input = new JSONObject().put("input",
+                new JSONObject().put("webpage/url", mQueryTarget));
+
         try {
             connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+
+            DataOutputStream dos = new DataOutputStream(connection.getOutputStream());
+            try {
+                dos.write(input.toString().getBytes());
+                dos.flush();
+            } finally {
+                dos.close();
+            }
+
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 return trends;
             }
@@ -45,7 +64,7 @@ public class TrendLoader extends BaseLoader<List<Trend>> {
             char[] tmp = new char[1024];
 
             int l;
-            while((l = reader.read(tmp)) != -1) {
+            while ((l = reader.read(tmp)) != -1) {
                 writer.write(tmp, 0, l);
             }
         } finally {
@@ -58,16 +77,12 @@ public class TrendLoader extends BaseLoader<List<Trend>> {
         }
 
         JSONObject jsonObject = new JSONObject(writer.toString());
-        JSONObject resultObject = jsonObject.getJSONObject("results");
-        JSONArray repositoryArray = resultObject.getJSONArray("repositories");
-        for (int i = 0; i < repositoryArray.length(); i++) {
-            JSONObject repoObject = repositoryArray.getJSONObject(i);
-            JSONObject titleObject = repoObject.getJSONObject("title");
+        JSONArray resultArray = jsonObject.getJSONArray("results");
+        for (int i = 0; i < resultArray.length(); i++) {
+            JSONObject repoObject = resultArray.getJSONObject(i);
 
             Trend trend = new Trend();
-            trend.setTitle(titleObject.getString("text"));
-            trend.setRepo(repoObject.optString("owner"), repoObject.optString("repo"));
-            trend.setLink(titleObject.optString("href"));
+            trend.setRepo(repoObject.getString("owner"), repoObject.getString("repo"));
             trend.setDescription(repoObject.optString("description"));
 
             trends.add(trend);

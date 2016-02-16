@@ -16,19 +16,10 @@
 package com.gh4a.holder;
 
 public class Trend {
-
-    private String title;
     private String repoOwner;
     private String repoName;
-    private String link;
     private String description;
 
-    public String getTitle() {
-        return title;
-    }
-    public void setTitle(String title) {
-        this.title = title;
-    }
     public void setRepo(String owner, String repo) {
         this.repoOwner = owner;
         this.repoName = repo;
@@ -38,9 +29,6 @@ public class Trend {
     }
     public String getRepoName() {
         return repoName;
-    }
-    public void setLink(String link) {
-        this.link = link;
     }
     public String getDescription() {
         return description;
