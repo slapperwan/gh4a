@@ -50,14 +50,11 @@ public class TrendAdapter extends RootAdapter<Trend> {
 
         String owner = trend.getRepoOwner();
         String name = trend.getRepoName();
-        if (owner != null && name != null) {
-            SpannableStringBuilder title = new SpannableStringBuilder();
-            title.append(owner).append("/").append(name);
-            title.setSpan(new StyleSpan(Typeface.BOLD), 0, owner.length(), 0);
-            viewHolder.tvTitle.setText(title);
-        } else {
-            viewHolder.tvTitle.setText(trend.getTitle());
-        }
+
+        SpannableStringBuilder title = new SpannableStringBuilder();
+        title.append(owner).append("/").append(name);
+        title.setSpan(new StyleSpan(Typeface.BOLD), 0, owner.length(), 0);
+        viewHolder.tvTitle.setText(title);
         viewHolder.tvDesc.setText(trend.getDescription());
     }
 
