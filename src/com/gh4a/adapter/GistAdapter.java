@@ -46,7 +46,7 @@ public class GistAdapter extends RootAdapter<Gist, GistAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, Gist gist) {
-        User user = gist.getUser();
+        User user = gist.getOwner();
         boolean isSelf = user != null && TextUtils.equals(user.getLogin(), mOwnerLogin);
 
         if (isSelf) {
