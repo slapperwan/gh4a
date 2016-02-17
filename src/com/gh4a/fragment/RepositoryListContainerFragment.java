@@ -42,7 +42,6 @@ public class RepositoryListContainerFragment extends Fragment implements
     private RepositorySearchFragment mSearchFragment;
     private MenuItem mFilterItem;
     private String mSearchQuery;
-    private boolean mActivityCreated;
 
     public interface Callback {
         void initiateFilter();
@@ -100,7 +99,6 @@ public class RepositoryListContainerFragment extends Fragment implements
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mMenuInflater = new SupportMenuInflater(UiUtils.makeHeaderThemedContext(getActivity()));
-        mActivityCreated = true;
 
         FragmentManager fm = getChildFragmentManager();
         mMainFragment = (PagedDataBaseFragment<Repository>) fm.findFragmentByTag("main");
