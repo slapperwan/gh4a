@@ -294,9 +294,10 @@ public class HomeActivity extends BasePagerActivity implements
         updateRightNavigationDrawer();
     }
 
+    @Override
     public void invalidateFragments() {
-        super.invalidateFragments();
         mFragments.clear();
+        super.invalidateFragments();
     }
 
     public void toggleToolDrawer() {
