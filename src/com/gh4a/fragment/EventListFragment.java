@@ -189,8 +189,8 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             GistPayload payload = (GistPayload) event.getPayload();
             String login = event.getActor().getLogin();
             if (StringUtils.isBlank(login) && payload.getGist() != null
-                    && payload.getGist().getUser() != null) {
-                login = payload.getGist().getUser().getLogin();
+                    && payload.getGist().getOwner() != null) {
+                login = payload.getGist().getOwner().getLogin();
             }
             if (!StringUtils.isBlank(login)) {
                 intent = IntentUtils.getGistActivityIntent(getActivity(),
@@ -343,9 +343,12 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         } else if (Event.TYPE_GIST.equals(eventType)) {
             GistPayload payload = (GistPayload) event.getPayload();
             String gistId = payload.getGist().getId();
-            String user = payload.getGist().getUser().getLogin();
-            menu.add(getString(R.string.menu_gist, gistId))
-                    .setIntent(IntentUtils.getGistActivityIntent(getActivity(), user, gistId));
+            User owner  = payload.getGist().getOwner();
+            if (owner != null) {
+                String login = owner.getLogin();
+                menu.add(getString(R.string.menu_gist, gistId))
+                        .setIntent(IntentUtils.getGistActivityIntent(getActivity(), login, gistId));
+            }
 
         } else if (Event.TYPE_GOLLUM.equals(eventType)) {
             GollumPayload payload = (GollumPayload) event.getPayload();
