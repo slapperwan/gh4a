@@ -188,15 +188,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
 
         } else if (Event.TYPE_GIST.equals(eventType)) {
             GistPayload payload = (GistPayload) event.getPayload();
-            String login = event.getActor().getLogin();
-            if (StringUtils.isBlank(login) && payload.getGist() != null
-                    && payload.getGist().getOwner() != null) {
-                login = payload.getGist().getOwner().getLogin();
-            }
-            if (!StringUtils.isBlank(login)) {
-                intent = IntentUtils.getGistActivityIntent(getActivity(),
-                        login, payload.getGist().getId());
-            }
+            intent = IntentUtils.getGistActivityIntent(getActivity(), payload.getGist().getId());
 
         } else if (Event.TYPE_GOLLUM.equals(eventType)) {
             intent = new Intent(getActivity(), WikiListActivity.class);
@@ -344,12 +336,8 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         } else if (Event.TYPE_GIST.equals(eventType)) {
             GistPayload payload = (GistPayload) event.getPayload();
             String gistId = payload.getGist().getId();
-            User owner  = payload.getGist().getOwner();
-            if (owner != null) {
-                String login = owner.getLogin();
-                menu.add(getString(R.string.menu_gist, gistId))
-                        .setIntent(IntentUtils.getGistActivityIntent(getActivity(), login, gistId));
-            }
+            menu.add(getString(R.string.menu_gist, gistId))
+                    .setIntent(IntentUtils.getGistActivityIntent(getActivity(), gistId));
 
         } else if (Event.TYPE_GOLLUM.equals(eventType)) {
             GollumPayload payload = (GollumPayload) event.getPayload();

@@ -140,9 +140,8 @@ public class IntentUtils {
         return intent;
     }
 
-    public static Intent getGistActivityIntent(Context context, String userLogin, String gistId) {
+    public static Intent getGistActivityIntent(Context context, String gistId) {
         Intent intent = new Intent(context, GistActivity.class);
-        intent.putExtra(Constants.User.LOGIN, userLogin);
         intent.putExtra(Constants.Gist.ID, gistId);
         return intent;
     }

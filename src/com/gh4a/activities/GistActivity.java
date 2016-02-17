@@ -45,12 +45,12 @@ import com.gh4a.loader.GistLoader;
 import com.gh4a.loader.GistStarLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
 public class GistActivity extends BaseActivity implements View.OnClickListener {
     private String mGistId;
-    private String mUserLogin;
     private Gist mGist;
     private Boolean mIsStarred;
 
@@ -90,7 +90,6 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
 
         mGistId = getIntent().getExtras().getString(Constants.Gist.ID);
-        mUserLogin = getIntent().getExtras().getString(Constants.User.LOGIN);
 
         if (hasErrorView()) {
             return;
@@ -99,10 +98,9 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
         setContentView(R.layout.gist);
         setContentShown(false);
 
-        ActionBar mActionBar = getSupportActionBar();
-        mActionBar.setTitle(getString(R.string.gist_title, mGistId));
-        mActionBar.setSubtitle(mUserLogin);
-        mActionBar.setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(getString(R.string.gist_title, mGistId));
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         getSupportLoaderManager().initLoader(0, null, mGistCallback);
         getSupportLoaderManager().initLoader(1, null, mStarCallback);
@@ -110,6 +108,10 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
 
     private void fillData(final Gist gist) {
         mGist = gist;
+
+        if (gist.getOwner() != null) {
+            getSupportActionBar().setSubtitle(gist.getOwner().getLogin());
+        }
 
         TextView tvDesc = (TextView) findViewById(R.id.tv_desc);
         tvDesc.setText(TextUtils.isEmpty(gist.getDescription())
@@ -144,7 +146,6 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
     public void onClick(View view) {
         Intent intent = new Intent(this, GistViewerActivity.class);
         GistFile gist = (GistFile) view.getTag();
-        intent.putExtra(Constants.User.LOGIN, mUserLogin);
         intent.putExtra(Constants.Gist.FILENAME, gist.getFilename());
         intent.putExtra(Constants.Gist.ID, mGistId);
         startActivity(intent);
@@ -190,10 +191,11 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.share:
+                String login = CommitUtils.getUserLogin(this, mGist.getOwner());
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
                 shareIntent.setType("text/plain");
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT,
-                        getString(R.string.share_gist_subject, mGistId, mUserLogin));
+                        getString(R.string.share_gist_subject, mGistId, login));
                 shareIntent.putExtra(Intent.EXTRA_TEXT,  mGist.getHtmlUrl());
                 shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
@@ -209,9 +211,14 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     protected Intent navigateUp() {
-        Intent intent = new Intent(this, GistListActivity.class);
-        intent.putExtra(Constants.User.LOGIN, mUserLogin);
-        return intent;
+        String login = mGist != null && mGist.getOwner() != null
+                ? mGist.getOwner().getLogin() : null;
+        if (login != null) {
+            Intent intent = new Intent(this, GistListActivity.class);
+            intent.putExtra(Constants.User.LOGIN, login);
+            return intent;
+        }
+        return null;
     }
 
     private class UpdateStarTask extends BackgroundTask<Void> {

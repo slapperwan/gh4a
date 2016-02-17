@@ -35,7 +35,6 @@ import org.eclipse.egit.github.core.Gist;
 import org.eclipse.egit.github.core.GistFile;
 
 public class GistViewerActivity extends WebViewerActivity {
-    private String mUserLogin;
     private String mFileName;
     private String mGistId;
     private GistFile mGistFile;
@@ -67,7 +66,6 @@ public class GistViewerActivity extends WebViewerActivity {
             return;
         }
 
-        mUserLogin = getIntent().getExtras().getString(Constants.User.LOGIN);
         mFileName = getIntent().getExtras().getString(Constants.Gist.FILENAME);
         mGistId = getIntent().getExtras().getString(Constants.Gist.ID);
 
@@ -94,7 +92,7 @@ public class GistViewerActivity extends WebViewerActivity {
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getGistActivityIntent(this, mUserLogin, mGistId);
+        return IntentUtils.getGistActivityIntent(this, mGistId);
     }
 
     @Override

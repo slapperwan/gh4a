@@ -33,8 +33,8 @@ public class BrowseFilter extends Activity {
 
         String first = parts.isEmpty() ? null : parts.get(0);
         if (IGitHubConstants.HOST_GISTS.equals(uri.getHost())) {
-            if (parts.size() >= 2) {
-                intent = IntentUtils.getGistActivityIntent(this, parts.get(0), parts.get(1));
+            if (!parts.isEmpty()) {
+                intent = IntentUtils.getGistActivityIntent(this, parts.get(parts.size() - 1));
             } else {
                 IntentUtils.launchBrowser(this, uri);
             }
