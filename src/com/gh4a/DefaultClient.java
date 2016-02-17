@@ -5,7 +5,7 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import java.net.HttpURLConnection;
 
 public class DefaultClient extends GitHubClient {
-    private static final String DEFAULT_HEADER_ACCEPT = "application/vnd.github.beta.full+json";
+    private static final String DEFAULT_HEADER_ACCEPT = "application/vnd.github.v3.full+json";
 
     public DefaultClient() {
         this(DEFAULT_HEADER_ACCEPT);
