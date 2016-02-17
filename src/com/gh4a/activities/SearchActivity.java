@@ -20,13 +20,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.egit.github.core.CodeSearchResult;
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.RequestError;
 import org.eclipse.egit.github.core.SearchUser;
 import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.client.RequestException;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.egit.github.core.service.UserService;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
@@ -45,11 +49,13 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
+import com.gh4a.adapter.CodeSearchAdapter;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.SearchUserAdapter;
@@ -64,6 +70,7 @@ public class SearchActivity extends BaseActivity implements
 
     private SearchUserAdapter mUserAdapter;
     private RepositoryAdapter mRepoAdapter;
+    private CodeSearchAdapter mCodeAdapter;
     private RecyclerView mResultsView;
 
     private Spinner mSearchType;
@@ -73,6 +80,7 @@ public class SearchActivity extends BaseActivity implements
 
     private static final String STATE_KEY_REPO_RESULTS = "repo_results";
     private static final String STATE_KEY_USER_RESULTS = "user_results";
+    private static final String STATE_KEY_CODE_RESULTS = "code_results";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -126,6 +134,13 @@ public class SearchActivity extends BaseActivity implements
                 ArrayList<SearchUser> data =(ArrayList<SearchUser>)
                         savedInstanceState.getSerializable(STATE_KEY_USER_RESULTS);
                 fillUsersData(data);
+            } else if (savedInstanceState.containsKey(STATE_KEY_CODE_RESULTS)) {
+                mCodeAdapter = new CodeSearchAdapter(this);
+                mCodeAdapter.setOnItemClickListener(this);
+                mResultsView.setAdapter(mCodeAdapter);
+                ArrayList<CodeSearchResult> data =(ArrayList<CodeSearchResult>)
+                        savedInstanceState.getSerializable(STATE_KEY_CODE_RESULTS);
+                fillCodeData(data);
             }
         }
     }
@@ -147,6 +162,13 @@ public class SearchActivity extends BaseActivity implements
                 users.add(mUserAdapter.getItem(i));
             }
             outState.putSerializable(STATE_KEY_USER_RESULTS, users);
+        } else if (mCodeAdapter != null) {
+            int count = mCodeAdapter.getCount();
+            ArrayList<CodeSearchResult> users = new ArrayList<>(count);
+            for (int i = 0; i < count; i++) {
+                users.add(mCodeAdapter.getItem(i));
+            }
+            outState.putSerializable(STATE_KEY_CODE_RESULTS, users);
         }
     }
 
@@ -164,6 +186,14 @@ public class SearchActivity extends BaseActivity implements
         AsyncTaskCompat.executeParallel(new LoadUserTask(searchKey));
     }
 
+    protected void searchCode(final String searchKey) {
+        mCodeAdapter = new CodeSearchAdapter(this);
+        mCodeAdapter.setOnItemClickListener(this);
+        mResultsView.setAdapter(mCodeAdapter);
+        AsyncTaskCompat.executeParallel(new SearchCodeTask(searchKey));
+
+    }
+
     private static class SearchTypeAdapter extends BaseAdapter implements SpinnerAdapter {
         private Context mContext;
         private LayoutInflater mInflater;
@@ -171,7 +201,8 @@ public class SearchActivity extends BaseActivity implements
 
         private final int[][] mResources = new int[][] {
             { R.string.search_type_repo, R.drawable.search_repos_dark, R.attr.searchRepoIcon, 0 },
-            { R.string.search_type_user, R.drawable.search_users_dark, R.attr.searchUserIcon, 0 }
+            { R.string.search_type_user, R.drawable.search_users_dark, R.attr.searchUserIcon, 0 },
+            { R.string.search_type_code, R.drawable.search_code_dark, R.attr.searchCodeIcon, 0 }
         };
 
         SearchTypeAdapter(Context context, Context popupContext) {
@@ -246,6 +277,16 @@ public class SearchActivity extends BaseActivity implements
         }
     }
 
+    protected void fillCodeData(List<CodeSearchResult> results) {
+        if (mCodeAdapter != null) {
+            mCodeAdapter.clear();
+            if (results != null) {
+                mCodeAdapter.addAll(results);
+            }
+            mCodeAdapter.notifyDataSetChanged();
+        }
+    }
+
     // TODO: replace this by using loaders (would avoid the need for manually
     //       saving the results into the saved instance state)
     private class LoadRepositoryTask extends ProgressDialogTask<List<Repository>> {
@@ -301,6 +342,45 @@ public class SearchActivity extends BaseActivity implements
         }
     }
 
+    private class SearchCodeTask extends ProgressDialogTask<List<CodeSearchResult>> {
+        private String mQuery;
+
+        public SearchCodeTask(String query) {
+            super(SearchActivity.this, 0, R.string.loading_msg);
+            mQuery = query;
+        }
+
+        @Override
+        protected List<CodeSearchResult> run() throws IOException {
+            if (StringUtils.isBlank(mQuery)) {
+                return null;
+            }
+
+            RepositoryService repoService = (RepositoryService)
+                    Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
+            return repoService.searchCode(mQuery);
+        }
+
+        @Override
+        protected void onSuccess(List<CodeSearchResult> result) {
+            fillCodeData(result);
+        }
+
+        @Override
+        protected void onError(Exception e) {
+            if (e instanceof RequestException) {
+                RequestError error = ((RequestException) e).getError();
+                if (error != null && error.getErrors() != null && !error.getErrors().isEmpty()) {
+                    Toast.makeText(SearchActivity.this,
+                            R.string.code_search_too_broad_toast, Toast.LENGTH_LONG).show();
+                    return;
+                }
+            }
+            super.onError(e);
+        }
+    }
+
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         menu.clear();// clear items
@@ -333,17 +413,17 @@ public class SearchActivity extends BaseActivity implements
         switch (mSearchType.getSelectedItemPosition()) {
             case 0: mSearch.setQueryHint(getString(R.string.search_hint_repo)); break;
             case 1: mSearch.setQueryHint(getString(R.string.search_hint_user)); break;
+            case 2: mSearch.setQueryHint(getString(R.string.search_hint_code)); break;
             default: mSearch.setQueryHint(null); break;
         }
     }
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        boolean searchUser = mSearchType.getSelectedItemPosition() == 1;
-        if (searchUser) {
-            searchUser(query);
-        } else {
-            searchRepository(query);
+        switch (mSearchType.getSelectedItemPosition()) {
+            case 1: searchUser(query); break;
+            case 2: searchCode(query); break;
+            default: searchRepository(query); break;
         }
         mSubmitted = true;
         mSearch.clearFocus();
@@ -380,6 +460,10 @@ public class SearchActivity extends BaseActivity implements
             mRepoAdapter.clear();
             mRepoAdapter.notifyDataSetChanged();
         }
+        if (mCodeAdapter != null) {
+            mCodeAdapter.clear();
+            mCodeAdapter.notifyDataSetChanged();
+        }
         mQuery = null;
         mSubmitted = false;
         return true;
@@ -391,6 +475,13 @@ public class SearchActivity extends BaseActivity implements
             Repository repository = (Repository) item;
             startActivity(IntentUtils.getRepoActivityIntent(this,
                     repository.getOwner().getLogin(), repository.getName(), null));
+        } else if (item instanceof CodeSearchResult) {
+            CodeSearchResult result = (CodeSearchResult) item;
+            Repository repo = result.getRepository();
+            Uri uri = Uri.parse(result.getUrl());
+            String ref = uri.getQueryParameter("ref");
+            startActivity(IntentUtils.getFileViewerActivityIntent(this,
+                    repo.getOwner().getLogin(), repo.getName(), ref, result.getPath()));
         } else {
             SearchUser user = (SearchUser) item;
             startActivity(IntentUtils.getUserActivityIntent(this, user.getLogin(), user.getName()));

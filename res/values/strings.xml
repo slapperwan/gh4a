@@ -385,8 +385,12 @@
     <!-- Search -->
     <string name="search_type_repo">Repository</string>
     <string name="search_type_user">User</string>
+    <string name="search_type_code">Code</string>
     <string name="search_hint_repo">Search for repositories</string>
     <string name="search_hint_user">Search for users</string>
+    <string name="search_hint_code">Search for code</string>
+    <string name="code_search_result_in">In repo %1$s/%2$s</string>
+    <string name="code_search_too_broad_toast">Your search was too broad. You need to specify both at least one search term as well as either a user or a repo.</string>
 
     <!-- Sharing -->
     <string name="send_email_title">Select email application</string>
