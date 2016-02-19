@@ -43,6 +43,7 @@ public class ContentListContainerFragment extends Fragment implements
     private String mSelectedRef;
     private Map<String, String> mGitModuleMap;
     private Stack<String> mDirStack = new Stack<>();
+    private ArrayList<String> mInitialPathToLoad;
     private Map<String, ArrayList<RepositoryContents>> mContentCache =
             new LinkedHashMap<String, ArrayList<RepositoryContents>>() {
         private static final long serialVersionUID = -2379579224736389357L;
@@ -113,6 +114,12 @@ public class ContentListContainerFragment extends Fragment implements
         getArguments().putString("ref", ref);
         mSelectedRef = ref;
         mGitModuleMap = null;
+
+        mInitialPathToLoad = new ArrayList<>();
+        for (int i = 1; i < mDirStack.size(); i++) {
+            mInitialPathToLoad.add(mDirStack.get(i));
+        }
+
         mDirStack.clear();
         mDirStack.push("");
         mContentCache.clear();
@@ -175,6 +182,24 @@ public class ContentListContainerFragment extends Fragment implements
                         break;
                     }
                 }
+            }
+        }
+        if (mInitialPathToLoad != null && !mInitialPathToLoad.isEmpty()) {
+            String itemToLoad = mInitialPathToLoad.get(0);
+            boolean found = false;
+            for (RepositoryContents content : contents) {
+                if (RepositoryContents.TYPE_DIR.equals(content.getType())) {
+                    if (content.getPath().equals(itemToLoad)) {
+                        onTreeSelected(content);
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if (found) {
+                mInitialPathToLoad.remove(0);
+            } else {
+                mInitialPathToLoad = null;
             }
         }
     }
