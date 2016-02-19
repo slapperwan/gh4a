@@ -546,6 +546,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
         mHeader = (AppBarLayout) findViewById(R.id.header);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
 
+        mSwipeLayout.setAppBarLayout(mHeader);
+
         mContentShown = true;
     }
 }
