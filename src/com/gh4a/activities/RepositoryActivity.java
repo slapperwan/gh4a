@@ -75,7 +75,7 @@ public class RepositoryActivity extends BasePagerActivity implements ParentCallb
     public static final int PAGE_COMMITS = 2;
 
     private static final int[] TITLES = new int[] {
-        R.string.about, R.string.repo_files, R.string.commits
+        R.string.repo_about, R.string.repo_files, R.string.commits
     };
 
     private LoaderCallbacks<Repository> mRepoCallback = new LoaderCallbacks<Repository>() {

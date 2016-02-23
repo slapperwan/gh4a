@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="theme_items">
+        <item>Dunkel</item>
+        <item>Hell</item>
+    </string-array>
+    <string-array name="text_size_items">
+        <item>Winzig</item>
+        <item>Klein</item>
+        <item>Normal</item>
+        <item>Groß</item>
+        <item>Riesig</item>
+    </string-array>
+</resources>
