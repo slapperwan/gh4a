@@ -288,6 +288,8 @@ public class UiUtils {
         }
     }
 
+    // FIXME: Remove this and use setDestinationInExternalPublicDir() when removing GB compatibility
+    //        (and re-check whether WRITE_EXTERNAL_STORAGE permission can be dropped when doing that)
     private static Uri buildDownloadDestinationUri(String fileName) {
         final File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         if (file.exists()) {
