@@ -24,6 +24,9 @@ public class IssueEventHolder {
     }
 
     public User getUser() {
-        return comment != null ? comment.getUser() : event.getActor();
+        if (comment != null) {
+            return comment.getUser();
+        }
+        return event.getAssigner() != null ? event.getAssigner() : event.getActor();
     }
 }

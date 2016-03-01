@@ -18,6 +18,7 @@ package com.gh4a.adapter;
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.IssueEvent;
+import org.eclipse.egit.github.core.User;
 
 import android.content.Context;
 import android.content.Intent;
@@ -123,7 +124,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
             mImageGetter.bind(holder.tvDesc, body, event.comment.getId());
         } else {
             holder.tvDesc.setTag(null);
-            holder.tvDesc.setText(formatEvent(event.event,
+            holder.tvDesc.setText(formatEvent(event.event, event.getUser(),
                     holder.tvExtra.getTypefaceValue()));
         }
 
@@ -137,7 +138,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         }
     }
 
-    private CharSequence formatEvent(final IssueEvent event, int typefaceValue) {
+    private CharSequence formatEvent(final IssueEvent event, final User user, int typefaceValue) {
         String type = event.getEvent();
         String textBase = null;
         int textResId = 0;
@@ -152,26 +153,30 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         } else if (TextUtils.equals(type, "referenced")) {
             textResId = event.getCommitId() != null
                     ? R.string.issue_event_referenced_with_commit : R.string.issue_event_referenced;
-        } else if (TextUtils.equals(type, "assigned")) {
-            String actorLogin = event.getActor() != null ? event.getActor().getLogin() : null;
+        } else if (TextUtils.equals(type, "assigned") || TextUtils.equals(type, "unassigned")) {
+            boolean isAssign = TextUtils.equals(type, "assigned");
+            String actorLogin = user != null ? user.getLogin() : null;
             String assigneeLogin = event.getAssignee() != null ? event.getAssignee().getLogin() : null;
             if (assigneeLogin != null && assigneeLogin.equals(actorLogin)) {
-                textResId = R.string.issue_event_assigned_self;
+                textResId = isAssign
+                        ? R.string.issue_event_assigned_self : R.string.issue_event_unassigned_self;
             } else {
-                textBase = mContext.getString(R.string.issue_event_assigned,
-                        CommitUtils.getUserLogin(mContext, event.getActor()),
+                textResId = isAssign
+                        ? R.string.issue_event_assigned : R.string.issue_event_unassigned;
+                textBase = mContext.getString(textResId,
+                        CommitUtils.getUserLogin(mContext, user),
                         CommitUtils.getUserLogin(mContext, event.getAssignee()));
             }
         } else if (TextUtils.equals(type, "unassigned")) {
             textBase = mContext.getString(R.string.issue_event_unassigned,
-                    event.getActor().getLogin(), event.getAssignee().getLogin());
+                    CommitUtils.getUserLogin(mContext, user),
+                    CommitUtils.getUserLogin(mContext, event.getAssignee()));
         } else {
             return null;
         }
 
         if (textBase == null) {
-            textBase = mContext.getString(textResId,
-                    CommitUtils.getUserLogin(mContext, event.getActor()));
+            textBase = mContext.getString(textResId, CommitUtils.getUserLogin(mContext, user));
         }
         SpannableStringBuilder text = StringUtils.applyBoldTags(mContext, textBase, typefaceValue);
         if (event.getCommitId() == null) {
