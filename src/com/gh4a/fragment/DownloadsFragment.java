@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.adapter.DownloadAdapter;
@@ -48,7 +49,8 @@ public class DownloadsFragment extends ListDataBaseFragment<Download> {
 
     @Override
     public void onItemClick(final Download download) {
-        UiUtils.enqueueDownload(getActivity(), download.getHtmlUrl(), download.getContentType(),
+        UiUtils.enqueueDownloadWithPermissionCheck((BaseActivity) getActivity(),
+                download.getHtmlUrl(), download.getContentType(),
                 download.getName(), download.getDescription(), null);
     }
 

@@ -350,7 +350,7 @@ public class RepositoryActivity extends BasePagerActivity {
             case R.id.zip_download:
                 String zipUrl = "https://github.com/" + mRepoOwner + "/" + mRepoName
                         + "/archive/" + getCurrentRef() + ".zip";
-                UiUtils.enqueueDownload(this, zipUrl, "application/zip",
+                UiUtils.enqueueDownloadWithPermissionCheck(this, zipUrl, "application/zip",
                         mRepoName + "-" + getCurrentRef() + ".zip", null, null);
                 return true;
         }

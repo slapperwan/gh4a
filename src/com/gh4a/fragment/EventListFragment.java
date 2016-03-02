@@ -26,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -167,7 +168,8 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         } else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
             DownloadPayload payload = (DownloadPayload) event.getPayload();
             Download download = payload.getDownload();
-            UiUtils.enqueueDownload(getActivity(), download.getHtmlUrl(), download.getContentType(),
+            UiUtils.enqueueDownloadWithPermissionCheck((BaseActivity) getActivity(),
+                    download.getHtmlUrl(), download.getContentType(),
                     download.getName(), download.getDescription(), null);
 
         } else if (Event.TYPE_FOLLOW.equals(eventType)) {
@@ -418,7 +420,8 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             }
 
             if (download != null) {
-                UiUtils.enqueueDownload(getActivity(), download.getHtmlUrl(), download.getContentType(),
+                UiUtils.enqueueDownloadWithPermissionCheck((BaseActivity) getActivity(),
+                        download.getHtmlUrl(), download.getContentType(),
                         download.getName(), download.getDescription(), null);
             }
             return true;

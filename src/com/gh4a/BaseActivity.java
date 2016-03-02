@@ -19,6 +19,7 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -27,6 +28,8 @@ import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -62,6 +65,7 @@ import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 public abstract class BaseActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener, DrawerLayout.DrawerListener,
+        ActivityCompat.OnRequestPermissionsResultCallback,
         NavigationView.OnNavigationItemSelectedListener {
     private ViewGroup mContentContainer;
     private TextView mEmptyView;
@@ -80,6 +84,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private NavigationView mRightDrawer;
     private View mLeftDrawerTitle;
     private View mRightDrawerTitle;
+
+    private ActivityCompat.OnRequestPermissionsResultCallback mPendingPermissionCb;
 
     private final List<ColorDrawable> mHeaderDrawables = new ArrayList<>();
     private final List<ColorDrawable> mStatusBarDrawables = new ArrayList<>();
@@ -406,6 +412,42 @@ public abstract class BaseActivity extends AppCompatActivity implements
     public boolean onNavigationItemSelected(MenuItem item) {
         mDrawerLayout.closeDrawers();
         return false;
+    }
+
+    public void requestPermission(final String permission,
+            ActivityCompat.OnRequestPermissionsResultCallback cb,
+            int rationaleTextResId) {
+        if (mPendingPermissionCb != null) {
+            throw new IllegalStateException();
+        }
+        int grantResult = ActivityCompat.checkSelfPermission(this, permission);
+        if (grantResult == PackageManager.PERMISSION_GRANTED) {
+            cb.onRequestPermissionsResult(0, new String[] { permission }, new int[] { grantResult });
+        } else {
+            mPendingPermissionCb = cb;
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
+                Snackbar.make(getRootLayout(), rationaleTextResId, Snackbar.LENGTH_INDEFINITE)
+                        .setAction(R.string.ok, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                ActivityCompat.requestPermissions(BaseActivity.this,
+                                        new String[] { permission }, 0);
+
+                            }
+                        })
+                        .show();
+            } else {
+                ActivityCompat.requestPermissions(this, new String[] { permission }, 0);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (mPendingPermissionCb != null) {
+            mPendingPermissionCb.onRequestPermissionsResult(0, permissions, grantResults);
+            mPendingPermissionCb = null;
+        }
     }
 
     private void setErrorView() {

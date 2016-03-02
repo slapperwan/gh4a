@@ -192,8 +192,9 @@ public class ReleaseInfoActivity extends BaseActivity implements
 
     @Override
     public void onItemClick(Download download) {
-        UiUtils.enqueueDownload(this, download.getUrl(), download.getContentType(),
-                download.getName(), download.getDescription(), "application/octet-stream");
+        UiUtils.enqueueDownloadWithPermissionCheck(this, download.getUrl(),
+                download.getContentType(), download.getName(),
+                download.getDescription(), "application/octet-stream");
     }
 
     private void fillNotes(String bodyHtml) {

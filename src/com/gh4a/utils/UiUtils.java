@@ -5,9 +5,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.DownloadManager;
@@ -15,6 +17,7 @@ import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -23,6 +26,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -302,7 +306,24 @@ public class UiUtils {
         return Uri.withAppendedPath(Uri.fromFile(file), fileName);
     }
 
-    public static void enqueueDownload(final Context context, String url, final String mimeType,
+    public static void enqueueDownloadWithPermissionCheck(final BaseActivity activity,
+            final String url, final String mimeType, final String fileName,
+            final String description, final String mediaType) {
+        final ActivityCompat.OnRequestPermissionsResultCallback cb =
+                new ActivityCompat.OnRequestPermissionsResultCallback() {
+            @Override
+            public void onRequestPermissionsResult(int requestCode,
+                    @NonNull String[] permissions, @NonNull int[] grantResults) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    enqueueDownload(activity, url, mimeType, fileName, description, mediaType);
+                }
+            }
+        };
+        activity.requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, cb,
+                R.string.download_permission_rationale);
+    }
+
+    private static void enqueueDownload(final Context context, String url, final String mimeType,
             final String fileName, final String description, final String mediaType) {
         if (url == null) {
             return;

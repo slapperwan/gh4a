@@ -84,6 +84,7 @@
     <string name="download_now_button">Download now</string>
     <string name="download_wifi_button">Download over Wi-Fi</string>
     <string name="download_fail_no_storage_toast">The file could not be downloaded - the storage or SD card isn\'t available.</string>
+    <string name="download_permission_rationale">Permission to write to USB storage or SD card is required in order to download files.</string>
 	<string name="auth_code">Authentication Code</string>
 	<string name="two_factor_auth">Two-factor Authentication</string>
 	<string name="verify">Verify</string>
