@@ -73,20 +73,11 @@
 
                 </FrameLayout>
 
-                <FrameLayout
-                    android:id="@+id/error"
+                <ViewStub
+                    android:id="@+id/error_stub"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:visibility="gone">
-
-                    <!-- FIXME -->
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:text="@string/error_connection" />
-
-                </FrameLayout>
+                    android:layout="@layout/error" />
 
             </FrameLayout>
 

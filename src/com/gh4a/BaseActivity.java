@@ -37,6 +37,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
@@ -129,15 +130,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     public void handleLoadFailure(Exception e) {
         setErrorViewVisibility(true);
-        Snackbar.make(mCoordinatorLayout, R.string.error_toast, Snackbar.LENGTH_INDEFINITE)
-                .setAction(R.string.retry, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        setErrorViewVisibility(false);
-                        restartKnownLoaders();
-                    }
-                })
-                .show();
     }
 
     protected int getLeftNavigationDrawerMenuResource() {
@@ -479,7 +471,27 @@ public abstract class BaseActivity extends AppCompatActivity implements
     protected void setErrorViewVisibility(boolean visible) {
         View content = findViewById(R.id.content);
         View error = findViewById(R.id.error);
+
         content.setVisibility(visible ? View.GONE : View.VISIBLE);
+        mSwipeLayout.setEnabled(visible ? false : canSwipeToRefresh());
+
+        if (error == null) {
+            if (!visible) {
+                // It's not inflated yet and we don't want it
+                // to be visible, so there's nothing to do
+                return;
+            }
+            ViewStub errorStub = (ViewStub) findViewById(R.id.error_stub);
+            error = errorStub.inflate();
+
+            error.findViewById(R.id.retry_button).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setErrorViewVisibility(false);
+                    restartKnownLoaders();
+                }
+            });
+        }
         error.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 

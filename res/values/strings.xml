@@ -14,7 +14,7 @@
     <string name="search">Search</string>
     <string name="logout">Logout</string>
     <string name="login">Login</string>
-    <string name="retry">Retry</string>
+    <string name="try_again">Try again</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="settings">Settings</string>
@@ -43,6 +43,7 @@
     <string name="theme">Theme</string>
     <string name="pub_timeline">Public Timeline</string>
     <string name="error_connection">Connection error</string>
+    <string name="load_failure_explanation">Loading the data from Github failed. Please verify you have a working network connection and try again.</string>
     <string name="home">Home</string>
     <string name="share">Share</string>
     <string name="download">Download</string>
