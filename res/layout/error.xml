@@ -1,53 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/error"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="vertical">
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/load_failed_bg" />
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:src="@drawable/load_failed_bg" />
+    <com.gh4a.widget.StyleableTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal|top"
+        android:text="@string/load_failure_explanation"
+        android:textSize="16sp"
+        android:textColor="?android:attr/textColorSecondary"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp" />
 
-        <com.gh4a.widget.StyleableTextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal|top"
-            android:text="@string/load_failure_explanation"
-            android:textSize="16sp"
-            android:textColor="?android:attr/textColorSecondary"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp" />
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/retry_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/try_again"
+        android:textColor="?attr/colorPrimary"
+        app:allCaps="true"
+        app:font="medium"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp" />
 
-        <com.gh4a.widget.StyleableTextView
-            android:id="@+id/retry_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="@string/try_again"
-            android:textColor="?attr/colorPrimary"
-            app:allCaps="true"
-            app:font="medium"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="40dp" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="40dp" />
-
-    </LinearLayout>
-
-</FrameLayout>
+</LinearLayout>
