@@ -252,6 +252,7 @@ public class HomeActivity extends BasePagerActivity implements
             int position = mFragments.keyAt(i);
             mFactory.onRefreshFragment(mFragments.get(position));
         }
+        getSupportLoaderManager().restartLoader(0, null, mUserCallback);
         refreshDone();
     }
 
