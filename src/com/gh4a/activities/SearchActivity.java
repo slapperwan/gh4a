@@ -15,24 +15,18 @@
  */
 package com.gh4a.activities;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.CodeSearchResult;
 import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.RequestError;
 import org.eclipse.egit.github.core.SearchUser;
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.RequestException;
-import org.eclipse.egit.github.core.service.RepositoryService;
-import org.eclipse.egit.github.core.service.UserService;
 
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.os.AsyncTaskCompat;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -49,16 +43,18 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.gh4a.BaseActivity;
-import com.gh4a.Gh4Application;
-import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.adapter.CodeSearchAdapter;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.SearchUserAdapter;
+import com.gh4a.loader.CodeSearchLoader;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
+import com.gh4a.loader.RepositorySearchLoader;
+import com.gh4a.loader.UserSearchLoader;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
@@ -68,19 +64,57 @@ public class SearchActivity extends BaseActivity implements
         SearchView.OnQueryTextListener, SearchView.OnCloseListener,
         AdapterView.OnItemSelectedListener, RootAdapter.OnItemClickListener {
 
-    private SearchUserAdapter mUserAdapter;
-    private RepositoryAdapter mRepoAdapter;
-    private CodeSearchAdapter mCodeAdapter;
+    private RootAdapter<?, ?> mAdapter;
     private RecyclerView mResultsView;
 
     private Spinner mSearchType;
     private SearchView mSearch;
     private String mQuery;
-    private boolean mSubmitted;
 
-    private static final String STATE_KEY_REPO_RESULTS = "repo_results";
-    private static final String STATE_KEY_USER_RESULTS = "user_results";
-    private static final String STATE_KEY_CODE_RESULTS = "code_results";
+    private static final String STATE_KEY_QUERY = "query";
+    private static final String STATE_KEY_SEARCH_MODE = "search_mode";
+    private static final int SEARCH_MODE_NONE = 0;
+    private static final int SEARCH_MODE_REPO = 1;
+    private static final int SEARCH_MODE_USER = 2;
+    private static final int SEARCH_MODE_CODE = 3;
+
+    private LoaderCallbacks<List<Repository>> mRepoCallback = new LoaderCallbacks<List<Repository>>(this) {
+        @Override
+        protected Loader<LoaderResult<List<Repository>>> onCreateLoader() {
+            RepositorySearchLoader loader = new RepositorySearchLoader(SearchActivity.this, null);
+            loader.setQuery(mQuery);
+            return loader;
+        }
+
+        @Override
+        protected void onResultReady(List<Repository> result) {
+            fillRepositoriesData(result);
+        }
+    };
+
+    private LoaderCallbacks<List<SearchUser>> mUserCallback = new LoaderCallbacks<List<SearchUser>>(this) {
+        @Override
+        protected Loader<LoaderResult<List<SearchUser>>> onCreateLoader() {
+            return new UserSearchLoader(SearchActivity.this, mQuery);
+        }
+
+        @Override
+        protected void onResultReady(List<SearchUser> result) {
+            fillUsersData(result);
+        }
+    };
+
+    private LoaderCallbacks<List<CodeSearchResult>> mCodeCallback = new LoaderCallbacks<List<CodeSearchResult>>(this) {
+        @Override
+        protected Loader<LoaderResult<List<CodeSearchResult>>> onCreateLoader() {
+            return new CodeSearchLoader(SearchActivity.this, mQuery);
+        }
+
+        @Override
+        protected void onResultReady(List<CodeSearchResult> result) {
+            fillCodeData(result);
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -117,78 +151,30 @@ public class SearchActivity extends BaseActivity implements
         registerForContextMenu(mResultsView);
 
         if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey(STATE_KEY_REPO_RESULTS)) {
-                mRepoAdapter = new RepositoryAdapter(this);
-                mRepoAdapter.setOnItemClickListener(this);
-                mResultsView.setAdapter(mRepoAdapter);
-                ArrayList<Repository> data =(ArrayList<Repository>)
-                        savedInstanceState.getSerializable(STATE_KEY_REPO_RESULTS);
-                fillRepositoriesData(data);
-            } else if (savedInstanceState.containsKey(STATE_KEY_USER_RESULTS)) {
-                mUserAdapter = new SearchUserAdapter(this);
-                mUserAdapter.setOnItemClickListener(this);
-                mResultsView.setAdapter(mUserAdapter);
-                ArrayList<SearchUser> data =(ArrayList<SearchUser>)
-                        savedInstanceState.getSerializable(STATE_KEY_USER_RESULTS);
-                fillUsersData(data);
-            } else if (savedInstanceState.containsKey(STATE_KEY_CODE_RESULTS)) {
-                mCodeAdapter = new CodeSearchAdapter(this);
-                mCodeAdapter.setOnItemClickListener(this);
-                mResultsView.setAdapter(mCodeAdapter);
-                ArrayList<CodeSearchResult> data =(ArrayList<CodeSearchResult>)
-                        savedInstanceState.getSerializable(STATE_KEY_CODE_RESULTS);
-                fillCodeData(data);
+            mQuery = savedInstanceState.getString(STATE_KEY_QUERY);
+            mSearch.setQuery(mQuery, false);
+
+            LoaderManager lm = getSupportLoaderManager();
+            int previousMode = savedInstanceState.getInt(STATE_KEY_SEARCH_MODE, SEARCH_MODE_NONE);
+            switch (previousMode) {
+                case SEARCH_MODE_REPO: lm.initLoader(0, null, mRepoCallback); break;
+                case SEARCH_MODE_USER: lm.initLoader(0, null, mUserCallback); break;
+                case SEARCH_MODE_CODE: lm.initLoader(0, null, mCodeCallback); break;
             }
         }
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (mRepoAdapter != null) {
-            int count = mRepoAdapter.getCount();
-            ArrayList<Repository> repos = new ArrayList<>(count);
-            for (int i = 0; i < count; i++) {
-                repos.add(mRepoAdapter.getItem(i));
-            }
-            outState.putSerializable(STATE_KEY_REPO_RESULTS, repos);
-        } else if (mUserAdapter != null) {
-            int count = mUserAdapter.getCount();
-            ArrayList<SearchUser> users = new ArrayList<>(count);
-            for (int i = 0; i < count; i++) {
-                users.add(mUserAdapter.getItem(i));
-            }
-            outState.putSerializable(STATE_KEY_USER_RESULTS, users);
-        } else if (mCodeAdapter != null) {
-            int count = mCodeAdapter.getCount();
-            ArrayList<CodeSearchResult> users = new ArrayList<>(count);
-            for (int i = 0; i < count; i++) {
-                users.add(mCodeAdapter.getItem(i));
-            }
-            outState.putSerializable(STATE_KEY_CODE_RESULTS, users);
+        if (mAdapter instanceof RepositoryAdapter) {
+            outState.putInt(STATE_KEY_SEARCH_MODE, SEARCH_MODE_REPO);
+        } else if (mAdapter instanceof SearchUserAdapter) {
+            outState.putInt(STATE_KEY_SEARCH_MODE, SEARCH_MODE_USER);
+        } else if (mAdapter instanceof CodeSearchAdapter) {
+            outState.putInt(STATE_KEY_SEARCH_MODE, SEARCH_MODE_CODE);
         }
-    }
-
-    protected void searchRepository(final String searchKey) {
-        mRepoAdapter = new RepositoryAdapter(this);
-        mRepoAdapter.setOnItemClickListener(this);
-        mResultsView.setAdapter(mRepoAdapter);
-        AsyncTaskCompat.executeParallel(new LoadRepositoryTask(searchKey));
-    }
-
-    protected void searchUser(final String searchKey) {
-        mUserAdapter = new SearchUserAdapter(this);
-        mUserAdapter.setOnItemClickListener(this);
-        mResultsView.setAdapter(mUserAdapter);
-        AsyncTaskCompat.executeParallel(new LoadUserTask(searchKey));
-    }
-
-    protected void searchCode(final String searchKey) {
-        mCodeAdapter = new CodeSearchAdapter(this);
-        mCodeAdapter.setOnItemClickListener(this);
-        mResultsView.setAdapter(mCodeAdapter);
-        AsyncTaskCompat.executeParallel(new SearchCodeTask(searchKey));
-
+        outState.putString(STATE_KEY_QUERY, mQuery);
+        super.onSaveInstanceState(outState);
     }
 
     private static class SearchTypeAdapter extends BaseAdapter implements SpinnerAdapter {
@@ -255,141 +241,29 @@ public class SearchActivity extends BaseActivity implements
     }
 
     protected void fillRepositoriesData(List<Repository> repos) {
-        if (mRepoAdapter != null) {
-            mRepoAdapter.clear();
-            if (repos != null) {
-                mRepoAdapter.addAll(repos);
-            }
-            mRepoAdapter.notifyDataSetChanged();
-        }
+        RepositoryAdapter adapter = new RepositoryAdapter(this);
+        adapter.addAll(repos);
+        setAdapter(adapter);
     }
 
     protected void fillUsersData(List<SearchUser> users) {
-        if (mUserAdapter != null) {
-            mUserAdapter.clear();
-            if (users != null) {
-                mUserAdapter.addAll(users);
-            }
-            mUserAdapter.notifyDataSetChanged();
-        }
+        SearchUserAdapter adapter = new SearchUserAdapter(this);
+        adapter.addAll(users);
+        setAdapter(adapter);
     }
 
     protected void fillCodeData(List<CodeSearchResult> results) {
-        if (mCodeAdapter != null) {
-            mCodeAdapter.clear();
-            if (results != null) {
-                mCodeAdapter.addAll(results);
-            }
-            mCodeAdapter.notifyDataSetChanged();
-        }
+        CodeSearchAdapter adapter = new CodeSearchAdapter(this);
+        adapter.addAll(results);
+        setAdapter(adapter);
     }
 
-    // TODO: replace this by using loaders (would avoid the need for manually
-    //       saving the results into the saved instance state)
-    private class LoadRepositoryTask extends ProgressDialogTask<List<Repository>> {
-        private String mQuery;
-
-        public LoadRepositoryTask(String query) {
-            super(SearchActivity.this, 0, R.string.loading_msg);
-            mQuery = query;
-        }
-
-        @Override
-        protected List<Repository> run() throws IOException {
-            if (StringUtils.isBlank(mQuery)) {
-                return null;
-            }
-
-            RepositoryService repoService = (RepositoryService)
-                    Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
-            HashMap<String, String> params = new HashMap<>();
-            params.put("fork", "true");
-
-            return repoService.searchRepositories(mQuery, params);
-        }
-
-        @Override
-        protected void onSuccess(List<Repository> result) {
-            fillRepositoriesData(result);
-        }
-
-        @Override
-        protected void onError(Exception e) {
-            super.onError(e);
-            // TODO: handle
-        }
+    private void setAdapter(RootAdapter<?, ?> adapter) {
+        adapter.setOnItemClickListener(this);
+        mResultsView.setAdapter(adapter);
+        mAdapter = adapter;
+        setContentShown(true);
     }
-
-    private class LoadUserTask extends ProgressDialogTask<List<SearchUser>> {
-        private String mQuery;
-
-        public LoadUserTask(String query) {
-            super(SearchActivity.this, 0, R.string.loading_msg);
-            mQuery = query;
-        }
-
-        @Override
-        protected List<SearchUser> run() throws IOException {
-            if (StringUtils.isBlank(mQuery)) {
-                return null;
-            }
-
-            UserService userService = (UserService)
-                    Gh4Application.get().getService(Gh4Application.USER_SERVICE);
-            return userService.searchUsers(mQuery);
-        }
-
-        @Override
-        protected void onSuccess(List<SearchUser> result) {
-            fillUsersData(result);
-        }
-
-        @Override
-        protected void onError(Exception e) {
-            super.onError(e);
-            // TODO: handle
-        }
-    }
-
-    private class SearchCodeTask extends ProgressDialogTask<List<CodeSearchResult>> {
-        private String mQuery;
-
-        public SearchCodeTask(String query) {
-            super(SearchActivity.this, 0, R.string.loading_msg);
-            mQuery = query;
-        }
-
-        @Override
-        protected List<CodeSearchResult> run() throws IOException {
-            if (StringUtils.isBlank(mQuery)) {
-                return null;
-            }
-
-            RepositoryService repoService = (RepositoryService)
-                    Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
-            return repoService.searchCode(mQuery);
-        }
-
-        @Override
-        protected void onSuccess(List<CodeSearchResult> result) {
-            fillCodeData(result);
-        }
-
-        @Override
-        protected void onError(Exception e) {
-            if (e instanceof RequestException) {
-                RequestError error = ((RequestException) e).getError();
-                if (error != null && error.getErrors() != null && !error.getErrors().isEmpty()) {
-                    Toast.makeText(SearchActivity.this,
-                            R.string.code_search_too_broad_toast, Toast.LENGTH_LONG).show();
-                    return;
-                }
-            }
-            super.onError(e);
-            // TODO: handle
-        }
-    }
-
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
@@ -430,12 +304,13 @@ public class SearchActivity extends BaseActivity implements
 
     @Override
     public boolean onQueryTextSubmit(String query) {
+        LoaderManager lm = getSupportLoaderManager();
         switch (mSearchType.getSelectedItemPosition()) {
-            case 1: searchUser(query); break;
-            case 2: searchCode(query); break;
-            default: searchRepository(query); break;
+            case 1: lm.restartLoader(0, null, mUserCallback); break;
+            case 2: lm.restartLoader(0, null, mCodeCallback); break;
+            default: lm.restartLoader(0, null, mRepoCallback); break;
         }
-        mSubmitted = true;
+        setContentShown(false);
         mSearch.clearFocus();
         return true;
     }
@@ -443,14 +318,13 @@ public class SearchActivity extends BaseActivity implements
     @Override
     public boolean onQueryTextChange(String newText) {
         mQuery = newText;
-        mSubmitted = false;
         return false;
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         updateSearchTypeHint();
-        if (mSubmitted) {
+        if (getSupportLoaderManager().getLoader(0) != null) {
             onQueryTextSubmit(mQuery);
         }
     }
@@ -462,20 +336,10 @@ public class SearchActivity extends BaseActivity implements
 
     @Override
     public boolean onClose() {
-        if (mUserAdapter != null) {
-            mUserAdapter.clear();
-            mUserAdapter.notifyDataSetChanged();
-        }
-        if (mRepoAdapter != null) {
-            mRepoAdapter.clear();
-            mRepoAdapter.notifyDataSetChanged();
-        }
-        if (mCodeAdapter != null) {
-            mCodeAdapter.clear();
-            mCodeAdapter.notifyDataSetChanged();
+        if (mAdapter != null) {
+            mAdapter.clear();
         }
         mQuery = null;
-        mSubmitted = false;
         return true;
     }
 
