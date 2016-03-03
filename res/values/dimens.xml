@@ -5,7 +5,6 @@
     <dimen name="overview_header_spacing">4dp</dimen>
     <dimen name="default_label_badge_size">6dp</dimen>
     <dimen name="default_label_badge_spacing">2dp</dimen>
-    <dimen name="label_spacing">5dp</dimen>
     <dimen name="card_margin">8dp</dimen>
     <dimen name="card_top_bottom_margin">0dp</dimen>
     <dimen name="floating_action_button_margin_mini">26dp</dimen>
