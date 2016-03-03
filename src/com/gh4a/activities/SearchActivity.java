@@ -20,7 +20,6 @@ import java.util.List;
 import org.eclipse.egit.github.core.CodeSearchResult;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.SearchUser;
-import org.eclipse.egit.github.core.User;
 
 import android.content.Context;
 import android.net.Uri;
@@ -31,8 +30,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,7 +53,6 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.RepositorySearchLoader;
 import com.gh4a.loader.UserSearchLoader;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
 
@@ -148,7 +144,6 @@ public class SearchActivity extends BaseActivity implements
         mResultsView = (RecyclerView) findViewById(R.id.list);
         mResultsView.setLayoutManager(new LinearLayoutManager(this));
         mResultsView.addItemDecoration(new DividerItemDecoration(this));
-        registerForContextMenu(mResultsView);
 
         if (savedInstanceState != null) {
             mQuery = savedInstanceState.getString(STATE_KEY_QUERY);
@@ -263,34 +258,6 @@ public class SearchActivity extends BaseActivity implements
         mResultsView.setAdapter(adapter);
         mAdapter = adapter;
         setContentShown(true);
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-        menu.clear();// clear items
-
-        if (v.getId() == android.R.id.list) {
-            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-            RootAdapter<?, ?> adapter = (RootAdapter<?, ?>) mResultsView.getAdapter();
-            Object object = adapter.getItem(info.position);
-            menu.setHeaderTitle(R.string.go_to);
-
-            if (object instanceof SearchUser) {
-                /** Menu for user */
-                SearchUser user = (SearchUser) object;
-                menu.add(getString(R.string.menu_user, StringUtils.formatName(user.getLogin(), user.getName())))
-                        .setIntent(IntentUtils.getUserActivityIntent(this, user.getLogin(), user.getName()));
-            } else {
-                /** Menu for repository */
-                Repository repository = (Repository) object;
-                User owner = repository.getOwner();
-                menu.add(getString(R.string.menu_user, StringUtils.formatName(owner.getLogin(), owner.getName())))
-                        .setIntent(IntentUtils.getUserActivityIntent(this, owner.getLogin(), owner.getName()));
-                menu.add(getString(R.string.menu_repo, repository.getName()))
-                        .setIntent(IntentUtils.getRepoActivityIntent(this, owner.getLogin(), repository.getName(), null));
-            }
-        }
-        super.onCreateContextMenu(menu, v, menuInfo);
     }
 
     private void updateSearchTypeHint() {
