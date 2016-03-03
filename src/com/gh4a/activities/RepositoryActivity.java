@@ -193,7 +193,7 @@ public class RepositoryActivity extends BasePagerActivity {
         if (!TextUtils.isEmpty(mSelectedRef)) {
             return mSelectedRef;
         }
-        return mRepository.getMasterBranch();
+        return mRepository.getDefaultBranch();
     }
 
     @Override
@@ -356,7 +356,7 @@ public class RepositoryActivity extends BasePagerActivity {
             if (name.equals(mSelectedRef) || adapter.getSha(i).equals(mSelectedRef)) {
                 current = i;
             }
-            if (name.equals(mRepository.getMasterBranch())) {
+            if (name.equals(mRepository.getDefaultBranch())) {
                 master = i;
             }
         }

@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
@@ -399,7 +400,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         } else {
             view.setTypeface(view.getTypeface(), 0);
             view.setBackgroundColor(0);
-            view.setTextColor(getResources().getColor(Gh4Application.THEME != R.style.LightTheme
+            view.setTextColor(ContextCompat.getColor(this, Gh4Application.THEME != R.style.LightTheme
                     ? R.color.label_fg_light : R.color.label_fg_dark));
         }
     }

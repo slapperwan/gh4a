@@ -27,6 +27,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -552,7 +553,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow_left, Gravity.LEFT);
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow_right, Gravity.RIGHT);
-        mDrawerLayout.setScrimColor(getResources().getColor(R.color.drawer_scrim));
+        mDrawerLayout.setScrimColor(ContextCompat.getColor(this, R.color.drawer_scrim));
 
         mRightDrawerTitle = mRightDrawer.inflateHeaderView(R.layout.drawer_title_right);
 

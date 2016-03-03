@@ -16,6 +16,7 @@
 package com.gh4a.fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 
@@ -69,17 +70,17 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
         mPath = getArguments().getString(Constants.Object.PATH);
         mRef = getArguments().getString(Constants.Object.REF);
         if (StringUtils.isBlank(mRef)) {
-            mRef = mRepository.getMasterBranch();
+            mRef = mRepository.getDefaultBranch();
         }
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         if (getParentFragment() instanceof ParentCallback) {
             mCallback = (ParentCallback) getParentFragment();
-        } else if (activity instanceof ParentCallback) {
-            mCallback = (ParentCallback) activity;
+        } else if (context instanceof ParentCallback) {
+            mCallback = (ParentCallback) context;
         } else {
             throw new ClassCastException("No callback provided");
         }

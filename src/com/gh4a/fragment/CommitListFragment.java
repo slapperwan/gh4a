@@ -44,7 +44,7 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
 
     public static CommitListFragment newInstance(Repository repo, String ref) {
         return newInstance(repo.getOwner().getLogin(), repo.getName(),
-                StringUtils.isBlank(ref) ? repo.getMasterBranch() : ref, null);
+                StringUtils.isBlank(ref) ? repo.getDefaultBranch() : ref, null);
     }
 
     public static CommitListFragment newInstance(String repoOwner, String repoName,

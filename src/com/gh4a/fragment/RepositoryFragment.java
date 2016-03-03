@@ -65,7 +65,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         @Override
         protected Loader<LoaderResult<String>> onCreateLoader() {
             return new ReadmeLoader(getActivity(), mRepository.getOwner().getLogin(),
-                    mRepository.getName(), StringUtils.isBlank(mRef) ? mRepository.getMasterBranch() : mRef);
+                    mRepository.getName(), StringUtils.isBlank(mRef) ? mRepository.getDefaultBranch() : mRef);
         }
         @Override
         protected void onResultReady(String result) {

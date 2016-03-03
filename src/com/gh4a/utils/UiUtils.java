@@ -27,6 +27,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -71,9 +72,9 @@ public class UiUtils {
         int luminance = Math.round(0.213F * red + 0.715F * green + 0.072F * blue);
 
         if (luminance >= 128) {
-            return context.getResources().getColor(R.color.label_fg_dark);
+            return ContextCompat.getColor(context, R.color.label_fg_dark);
         }
-        return context.getResources().getColor(R.color.label_fg_light);
+        return ContextCompat.getColor(context, R.color.label_fg_light);
     }
 
     public static void trySetListOverscrollColor(RecyclerView view, int color) {

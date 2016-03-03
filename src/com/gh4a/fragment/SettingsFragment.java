@@ -48,12 +48,12 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
     private Preference mOpenSourcePref;
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (!(activity instanceof OnStateChangeListener)) {
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (!(context instanceof OnStateChangeListener)) {
             throw new IllegalArgumentException("Activity must implement OnStateChangeListener");
         }
-        mListener = (OnStateChangeListener) activity;
+        mListener = (OnStateChangeListener) context;
     }
 
     @Override

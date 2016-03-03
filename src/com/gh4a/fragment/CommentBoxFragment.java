@@ -1,6 +1,7 @@
 package com.gh4a.fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -38,12 +39,12 @@ public class CommentBoxFragment extends Fragment implements
     private Callback mCallback;
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         if (getParentFragment() instanceof Callback) {
             mCallback = (Callback) getParentFragment();
-        } else if (activity instanceof Callback) {
-            mCallback = (Callback) activity;
+        } else if (context instanceof Callback) {
+            mCallback = (Callback) context;
         } else {
             throw new IllegalStateException("No callback provided");
         }
