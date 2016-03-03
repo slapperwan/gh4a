@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
@@ -63,6 +64,7 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
 
     private Milestone mMilestone;
 
+    private TextInputLayout mTitleWrapper;
     private EditText mTitleView;
     private EditText mDescriptionView;
     private TextView mDueView;
@@ -89,6 +91,7 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         View header = headerInflater.inflate(R.layout.issue_create_header, null);
         addHeaderView(header, false);
 
+        mTitleWrapper = (TextInputLayout) header.findViewById(R.id.title_wrapper);
         mTitleView = (EditText) header.findViewById(R.id.et_title);
         mDescriptionView = (EditText) header.findViewById(R.id.et_desc);
         mDueView = (TextView) findViewById(R.id.tv_due);
@@ -151,16 +154,14 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
             DialogFragment newFragment = new DatePickerFragment();
             newFragment.show(getSupportFragmentManager(), "datePicker");
         } else if (view instanceof FloatingActionButton) {
-            String title = mTitleView.getText() == null
-                    ? null : mTitleView.getText().toString();
+            String title = mTitleView.getText() == null ? null : mTitleView.getText().toString();
             if (StringUtils.isBlank(title)) {
-                ToastUtils.showMessage(this, R.string.issue_error_milestone_title);
+                mTitleWrapper.setError(getString(R.string.issue_error_milestone_title));
             } else {
-                String desc = null;
-                if (mDescriptionView.getText() != null) {
-                    desc = mDescriptionView.getText().toString();
-                }
+                String desc = mDescriptionView.getText() != null ?
+                    mDescriptionView.getText().toString() : null;
 
+                mTitleWrapper.setErrorEnabled(false);
                 mMilestone.setTitle(title);
                 mMilestone.setDescription(desc);
                 AsyncTaskCompat.executeParallel(new SaveIssueMilestoneTask(mMilestone));
