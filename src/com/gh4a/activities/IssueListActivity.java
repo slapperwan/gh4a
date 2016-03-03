@@ -327,7 +327,7 @@ public class IssueListActivity extends BasePagerActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuItem item = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.actions)
-                .setIcon(R.drawable.abc_ic_menu_moreoverflow_mtrl_alpha);
+                .setIcon(R.drawable.overflow);
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
         return super.onCreateOptionsMenu(menu);
     }

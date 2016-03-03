@@ -45,6 +45,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
 
     protected void invalidateFragments() {
         mAdapter.notifyDataSetChanged();
+        updateTabVisibility();
     }
 
     protected void invalidateTabs() {
@@ -55,8 +56,6 @@ public abstract class BasePagerActivity extends BaseActivity implements
         } else {
             transitionHeaderToColor(R.attr.colorPrimary, R.attr.colorPrimaryDark);
         }
-        mTabs.setupWithViewPager(mPager);
-        updateTabVisibility();
     }
 
     protected ViewPager getPager() {
