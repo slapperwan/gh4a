@@ -1,7 +1,6 @@
 package com.gh4a.fragment;
 
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

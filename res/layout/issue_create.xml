@@ -18,8 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="72dp"
             android:gravity="center_vertical"
-            android:clickable="true"
-            android:onClick="showMilestonesDialog">
+            android:clickable="true">
 
             <ImageView
                 android:id="@+id/iv_milestone"
@@ -52,8 +51,7 @@
             android:layout_width="match_parent"
             android:layout_height="72dp"
             android:gravity="center_vertical"
-            android:clickable="true"
-            android:onClick="showAssigneesDialog">
+            android:clickable="true">
 
             <ImageView
                 android:id="@+id/iv_assignee"
@@ -86,8 +84,7 @@
             android:layout_width="match_parent"
             android:layout_height="72dp"
             android:gravity="center_vertical"
-            android:clickable="true"
-            android:onClick="showLabelDialog">
+            android:clickable="true">
 
             <ImageView
                 android:id="@+id/iv_labels"

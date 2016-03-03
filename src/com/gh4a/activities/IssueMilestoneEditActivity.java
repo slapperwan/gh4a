@@ -99,6 +99,8 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         fab.setOnClickListener(this);
         rootLayout.addView(fab);
 
+        findViewById(R.id.due_container).setOnClickListener(this);
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(isInEditMode()
                 ? R.string.issue_milestone_edit : R.string.issue_milestone_new);
@@ -145,19 +147,24 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
 
     @Override
     public void onClick(View view) {
-        String title = mTitleView.getText() == null
-                ? null : mTitleView.getText().toString();
-        if (StringUtils.isBlank(title)) {
-            ToastUtils.showMessage(this, R.string.issue_error_milestone_title);
-        } else {
-            String desc = null;
-            if (mDescriptionView.getText() != null) {
-                desc = mDescriptionView.getText().toString();
-            }
+        if (view.getId() == R.id.due_container) {
+            DialogFragment newFragment = new DatePickerFragment();
+            newFragment.show(getSupportFragmentManager(), "datePicker");
+        } else if (view instanceof FloatingActionButton) {
+            String title = mTitleView.getText() == null
+                    ? null : mTitleView.getText().toString();
+            if (StringUtils.isBlank(title)) {
+                ToastUtils.showMessage(this, R.string.issue_error_milestone_title);
+            } else {
+                String desc = null;
+                if (mDescriptionView.getText() != null) {
+                    desc = mDescriptionView.getText().toString();
+                }
 
-            mMilestone.setTitle(title);
-            mMilestone.setDescription(desc);
-            AsyncTaskCompat.executeParallel(new SaveIssueMilestoneTask(mMilestone));
+                mMilestone.setTitle(title);
+                mMilestone.setDescription(desc);
+                AsyncTaskCompat.executeParallel(new SaveIssueMilestoneTask(mMilestone));
+            }
         }
     }
 
@@ -182,11 +189,6 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void showDatePickerDialog(View view) {
-        DialogFragment newFragment = new DatePickerFragment();
-        newFragment.show(getSupportFragmentManager(), "datePicker");
     }
 
     private void setDueOn(int year, int month, int day) {

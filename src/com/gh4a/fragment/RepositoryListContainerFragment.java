@@ -136,7 +136,7 @@ public class RepositoryListContainerFragment extends Fragment implements
     }
 
     public void setFilterType(String type) {
-        if (type != mFilterType) {
+        if (!TextUtils.equals(type, mFilterType)) {
             mFilterType = type;
             applyFilterTypeAndSortOrder();
         }

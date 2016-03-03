@@ -20,10 +20,6 @@ public class IssueListFactory extends FragmentFactory {
             R.string.created, R.string.assigned, R.string.mentioned
     };
 
-    protected static final String SORT_MODE_CREATED = "created";
-    protected static final String SORT_MODE_UPDATED = "updated";
-    protected static final String SORT_MODE_COMMENTS = "comments";
-
     private String mState;
     private String mLogin;
     private boolean mIsPullRequest;

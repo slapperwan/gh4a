@@ -97,7 +97,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         protected void onResultReady(List<Label> result) {
             stopProgressDialog(mProgressDialog);
             mAllLabels = result;
-            showLabelDialog(null);
+            showLabelDialog();
             getSupportLoaderManager().destroyLoader(0);
         }
         @Override
@@ -117,7 +117,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         protected void onResultReady(List<Milestone> result) {
             stopProgressDialog(mProgressDialog);
             mAllMilestone = result;
-            showMilestonesDialog(null);
+            showMilestonesDialog();
             getSupportLoaderManager().destroyLoader(1);
         }
         @Override
@@ -136,7 +136,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         protected void onResultReady(List<User> result) {
             stopProgressDialog(mProgressDialog);
             mAllAssignee = result;
-            showAssigneesDialog(null);
+            showAssigneesDialog();
             getSupportLoaderManager().destroyLoader(2);
         }
         @Override
@@ -191,6 +191,10 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         fab.setOnClickListener(this);
         rootLayout.addView(fab);
 
+        findViewById(R.id.milestone_container).setOnClickListener(this);
+        findViewById(R.id.assignee_container).setOnClickListener(this);
+        findViewById(R.id.label_container).setOnClickListener(this);
+
         mTvSelectedMilestone = (TextView) findViewById(R.id.tv_milestone);
         mTvSelectedAssignee = (TextView) findViewById(R.id.tv_assignee);
         mTvLabels = (TextView) findViewById(R.id.tv_labels);
@@ -228,14 +232,23 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        String title = mTitleView.getText() == null ? null : mTitleView.getText().toString();
-        if (StringUtils.isBlank(title)) {
-            mTitleWrapper.setError(getString(R.string.issue_error_title));
-        } else {
-            mTitleWrapper.setErrorEnabled(false);
-            mEditIssue.setTitle(title);
-            mEditIssue.setBody(mDescView.getText().toString());
-            AsyncTaskCompat.executeParallel(new SaveIssueTask(mEditIssue));
+        int id = view.getId();
+        if (id == R.id.milestone_container) {
+            showMilestonesDialog();
+        } else if (id == R.id.assignee_container) {
+            showAssigneesDialog();
+        } else if (id == R.id.label_container) {
+            showLabelDialog();
+        } else if (view instanceof FloatingActionButton) {
+            String title = mTitleView.getText() == null ? null : mTitleView.getText().toString();
+            if (StringUtils.isBlank(title)) {
+                mTitleWrapper.setError(getString(R.string.issue_error_title));
+            } else {
+                mTitleWrapper.setErrorEnabled(false);
+                mEditIssue.setTitle(title);
+                mEditIssue.setBody(mDescView.getText().toString());
+                AsyncTaskCompat.executeParallel(new SaveIssueTask(mEditIssue));
+            }
         }
     }
 
@@ -253,7 +266,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
                 mRepoOwner, mRepoName, Constants.Issue.STATE_OPEN);
     }
 
-    public void showMilestonesDialog(View view) {
+    private void showMilestonesDialog() {
         if (mAllMilestone == null) {
             mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
             getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
@@ -293,7 +306,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
-    public void showAssigneesDialog(View view) {
+    private void showAssigneesDialog() {
         if (mAllAssignee == null) {
             mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
             getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
@@ -335,7 +348,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
-    public void showLabelDialog(View view) {
+    private void showLabelDialog() {
         if (mAllLabels == null) {
             mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
             getSupportLoaderManager().initLoader(0, null, mLabelCallback);

@@ -36,10 +36,6 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Issue> {
     private Map<String, String> mFilterData;
     private int mEmptyTextResId;
 
-    public static RepositoryIssueListFragment newInstance(Map<String, String> filterData) {
-        return newInstance(filterData, R.string.no_issues_found);
-    }
-
     public static RepositoryIssueListFragment newInstance(Map<String, String> filterData,
             int emptyTextResId) {
         RepositoryIssueListFragment f = new RepositoryIssueListFragment();

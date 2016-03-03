@@ -41,7 +41,6 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     private RootAdapter<T, ? extends RecyclerView.ViewHolder> mAdapter;
     private boolean mIsLoadCompleted;
     private View mLoadingView;
-    private String mCurrentFilter;
 
     private LoaderCallbacks<PageIteratorLoader<T>.LoadedPage<T>> mLoaderCallback =
             new LoaderCallbacks<PageIteratorLoader<T>.LoadedPage<T>>(this) {
@@ -57,9 +56,6 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
             setContentShown(true);
             getActivity().supportInvalidateOptionsMenu();
             mAdapter.notifyDataSetChanged();
-            if (!TextUtils.isEmpty(mCurrentFilter)) {
-                mAdapter.getFilter().filter(mCurrentFilter);
-            }
             updateEmptyState();
         }
     };

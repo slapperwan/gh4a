@@ -188,6 +188,11 @@ public class HomeActivity extends BasePagerActivity implements
     }
 
     @Override
+    protected int[][] getTabHeaderColors() {
+        return mFactory.getTabHeaderColors();
+    }
+
+    @Override
     protected Fragment getFragment(int position) {
         Fragment fragment = mFactory.getFragment(position);
         mFragments.put(position, fragment);

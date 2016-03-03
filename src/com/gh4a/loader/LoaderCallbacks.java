@@ -1,7 +1,6 @@
 package com.gh4a.loader;
 
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.gh4a.BaseActivity;

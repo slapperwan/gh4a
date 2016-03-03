@@ -70,13 +70,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
-    private static final int MENU_OPEN_ISSUES = 4;
-    private static final int MENU_ISSUE = 5;
-    private static final int MENU_GIST = 6;
-    private static final int MENU_COMMENT_COMMIT = 11;
     private static final int MENU_DOWNLOAD_START = 100;
     private static final int MENU_DOWNLOAD_END = 199;
-    private static final int MENU_PUSH_COMMIT_START = 200;
 
     protected String mLogin;
     private FeedAdapter mAdapter;

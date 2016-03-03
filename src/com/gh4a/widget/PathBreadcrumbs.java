@@ -51,15 +51,6 @@ public class PathBreadcrumbs extends HorizontalScrollView implements View.OnClic
                 ViewGroup.LayoutParams.WRAP_CONTENT));
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    private void setAlpha(View view, int alpha) {
-        if (view instanceof ImageView && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            ((ImageView) view).setImageAlpha(alpha);
-        } else {
-            ViewCompat.setAlpha(view, alpha);
-        }
-    }
-
     public void setPath(@NonNull String path) {
         initRootCrumb();
 
@@ -110,10 +101,10 @@ public class PathBreadcrumbs extends HorizontalScrollView implements View.OnClic
         mCallback = callback;
     }
 
-    public boolean setActive(String path) {
+    public void setActive(String path) {
         int active = mItems.indexOf(path);
         if (active < 0) {
-            return false;
+            return;
         }
 
         mActive = active;
@@ -122,7 +113,6 @@ public class PathBreadcrumbs extends HorizontalScrollView implements View.OnClic
             ActivatableStyledTextView tv = (ActivatableStyledTextView) child.getChildAt(0);
             tv.setChecked(i == mActive);
         }
-        return true;
     }
 
     public int size() {
