@@ -117,11 +117,6 @@ public class ContentListContainerFragment extends Fragment implements
         return (BaseActivity) getActivity();
     }
 
-    @Override
-    public LoaderManager getSupportLoaderManager() {
-        return getLoaderManager();
-    }
-
     public void setRef(String ref) {
         getArguments().putString("ref", ref);
         mSelectedRef = ref;

@@ -57,9 +57,7 @@ import com.nineoldandroids.animation.ArgbEvaluator;
 import com.nineoldandroids.animation.ObjectAnimator;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
@@ -85,7 +83,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private View mLeftDrawerTitle;
     private View mRightDrawerTitle;
 
-    private Set<LoaderCallbacks<?>> mLoaderCallbacks = new HashSet<>();
     private ActivityCompat.OnRequestPermissionsResultCallback mPendingPermissionCb;
 
     private final List<ColorDrawable> mHeaderDrawables = new ArrayList<>();
@@ -106,14 +103,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
     @Override
     public BaseActivity getBaseActivity() {
         return this;
-    }
-
-    public void registerLoader(LoaderCallbacks<?> loaderCallback) {
-        mLoaderCallbacks.add(loaderCallback);
-    }
-
-    public void unregisterLoader(LoaderCallbacks<?> loaderCallback) {
-        mLoaderCallbacks.remove(loaderCallback);
     }
 
     public void handleAuthFailureDuringLoad() {
@@ -462,12 +451,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
         }
     }
 
-    private void restartKnownLoaders() {
-        for (LoaderCallbacks<?> loader : mLoaderCallbacks) {
-            loader.restartLoading();
-        }
-    }
-
     protected void setErrorViewVisibility(boolean visible) {
         View content = findViewById(R.id.content);
         View error = findViewById(R.id.error);
@@ -488,7 +471,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
                 @Override
                 public void onClick(View v) {
                     setErrorViewVisibility(false);
-                    restartKnownLoaders();
+                    onRefresh();
                 }
             });
         }

@@ -10,27 +10,16 @@ public abstract class LoaderCallbacks<T> implements
         android.support.v4.app.LoaderManager.LoaderCallbacks<LoaderResult<T>> {
     public interface ParentCallback {
         BaseActivity getBaseActivity();
-        LoaderManager getSupportLoaderManager();
     }
 
     private ParentCallback mCb;
-    private int mId = -1;
 
     public LoaderCallbacks(ParentCallback cb) {
         mCb = cb;
     }
 
-    public void restartLoading() {
-        if (mId >= 0) {
-            LoaderManager lm = mCb.getSupportLoaderManager();
-            lm.restartLoader(mId, null, this);
-        }
-    }
-
     @Override
     public Loader<LoaderResult<T>> onCreateLoader(int id, Bundle args) {
-        mId = id;
-        mCb.getBaseActivity().registerLoader(this);
         return onCreateLoader();
     }
 
@@ -48,8 +37,6 @@ public abstract class LoaderCallbacks<T> implements
 
     @Override
     public void onLoaderReset(Loader<LoaderResult<T>> loader) {
-        mId = -1;
-        mCb.getBaseActivity().unregisterLoader(this);
     }
 
     protected abstract Loader<LoaderResult<T>> onCreateLoader();
