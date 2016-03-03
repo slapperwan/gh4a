@@ -301,6 +301,9 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
             hintView.setText(R.string.user_no_repos);
             ll.addView(hintView);
         }
+
+        getView().findViewById(R.id.pb_top_repos).setVisibility(View.GONE);
+        getView().findViewById(R.id.ll_top_repos).setVisibility(View.VISIBLE);
     }
 
     public void fillOrganizations(List<User> organizations) {
