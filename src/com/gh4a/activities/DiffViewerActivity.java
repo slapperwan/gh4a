@@ -80,21 +80,15 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     private static final int MENU_ITEM_VIEW = 10;
 
     private LoaderCallbacks<List<CommitComment>> mCommentCallback =
-            new LoaderCallbacks<List<CommitComment>>() {
+            new LoaderCallbacks<List<CommitComment>>(this) {
         @Override
-        public Loader<LoaderResult<List<CommitComment>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<CommitComment>>> onCreateLoader() {
             return createCommentLoader();
         }
 
         @Override
-        public void onResultReady(LoaderResult<List<CommitComment>> result) {
-            if (result.handleError(DiffViewerActivity.this)) {
-                setContentEmpty(true);
-                setContentShown(true);
-                return;
-            }
-
-            addCommentsToMap(result.getData());
+        protected void onResultReady(List<CommitComment> result) {
+            addCommentsToMap(result);
             showDiff();
         }
     };
@@ -110,10 +104,6 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         mPath = data.getString(Constants.Object.PATH);
         mSha = data.getString(Constants.Object.OBJECT_SHA);
         mDiff = data.getString(Constants.Commit.DIFF);
-
-        if (hasErrorView()) {
-            return;
-        }
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(FileUtils.getFileName(mPath));

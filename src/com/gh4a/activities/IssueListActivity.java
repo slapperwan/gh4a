@@ -85,90 +85,98 @@ public class IssueListActivity extends BasePagerActivity implements
         R.string.open, R.string.closed
     };
 
-    private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
+    private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>(this) {
         @Override
-        public Loader<LoaderResult<List<Label>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<Label>>> onCreateLoader() {
             return new LabelListLoader(IssueListActivity.this, mRepoOwner, mRepoName);
         }
 
         @Override
-        public void onResultReady(LoaderResult<List<Label>> result) {
-            if (checkForError(result)) {
-                return;
-            }
+        protected void onResultReady(List<Label> result) {
             stopProgressDialog(mProgressDialog);
-            mLabels = result.getData();
+            mLabels = result;
             showLabelsDialog();
             getSupportLoaderManager().destroyLoader(0);
+        }
+
+        @Override
+        protected boolean onError(Exception e) {
+            stopProgressDialog(mProgressDialog);
+            return false;
         }
     };
 
     private LoaderCallbacks<List<Milestone>> mMilestoneCallback =
-            new LoaderCallbacks<List<Milestone>>() {
+            new LoaderCallbacks<List<Milestone>>(this) {
         @Override
-        public Loader<LoaderResult<List<Milestone>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<Milestone>>> onCreateLoader() {
             return new MilestoneListLoader(IssueListActivity.this, mRepoOwner, mRepoName,
                     Constants.Issue.STATE_OPEN);
         }
 
         @Override
-        public void onResultReady(LoaderResult<List<Milestone>> result) {
-            if (checkForError(result)) {
-                return;
-            }
+        protected void onResultReady(List<Milestone> result) {
             stopProgressDialog(mProgressDialog);
-            mMilestones = result.getData();
+            mMilestones = result;
             showMilestonesDialog();
             getSupportLoaderManager().destroyLoader(1);
+        }
 
+        @Override
+        protected boolean onError(Exception e) {
+            stopProgressDialog(mProgressDialog);
+            return false;
         }
     };
 
     private LoaderCallbacks<List<User>> mCollaboratorListCallback =
-            new LoaderCallbacks<List<User>>() {
+            new LoaderCallbacks<List<User>>(this) {
         @Override
-        public Loader<LoaderResult<List<User>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<User>>> onCreateLoader() {
             return new CollaboratorListLoader(IssueListActivity.this, mRepoOwner, mRepoName);
         }
 
         @Override
-        public void onResultReady(LoaderResult<List<User>> result) {
-            if (checkForError(result)) {
-                return;
-            }
+        protected void onResultReady(List<User> result) {
             stopProgressDialog(mProgressDialog);
-            mAssignees = result.getData();
+            mAssignees = result;
             showAssigneesDialog();
             getSupportLoaderManager().destroyLoader(2);
         }
+
+        @Override
+        protected boolean onError(Exception e) {
+            stopProgressDialog(mProgressDialog);
+            return false;
+        }
     };
 
-    private LoaderCallbacks<Boolean> mIsCollaboratorCallback = new LoaderCallbacks<Boolean>() {
+    private LoaderCallbacks<Boolean> mIsCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
-        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsCollaboratorLoader(IssueListActivity.this, mRepoOwner, mRepoName);
         }
 
         @Override
-        public void onResultReady(LoaderResult<Boolean> result) {
-            if (checkForError(result)) {
-                return;
-            }
+        protected void onResultReady(Boolean result) {
             if (mIsCollaborator == null) {
-                mIsCollaborator = result.getData();
+                mIsCollaborator = result;
                 if (mIsCollaborator) {
                     updateRightNavigationDrawer();
                 }
             }
+        }
+
+        @Override
+        protected boolean onError(Exception e) {
+            stopProgressDialog(mProgressDialog);
+            return false;
         }
     };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (hasErrorView()) {
-            return;
-        }
 
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.OWNER);
@@ -454,15 +462,6 @@ public class IssueListActivity extends BasePagerActivity implements
                 .setSingleChoiceItems(assignees, selected, selectCb)
                 .setNegativeButton(R.string.cancel, null)
                 .show();
-    }
-
-    private boolean checkForError(LoaderResult<?> result) {
-        if (result.handleError(IssueListActivity.this)) {
-            stopProgressDialog(mProgressDialog);
-            supportInvalidateOptionsMenu();
-            return true;
-        }
-        return false;
     }
 
     private void filterAssignee() {

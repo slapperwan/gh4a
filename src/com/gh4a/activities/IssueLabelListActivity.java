@@ -69,23 +69,19 @@ public class IssueLabelListActivity extends BaseActivity implements
     private static final String STATE_KEY_ADDED_LABEL = "added_label";
     private static final String STATE_KEY_EDITING_LABEL = "editing_label";
 
-    private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
+    private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>(this) {
         @Override
-        public Loader<LoaderResult<List<Label>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<Label>>> onCreateLoader() {
             return new LabelListLoader(IssueLabelListActivity.this, mRepoOwner, mRepoName);
         }
         @Override
-        public void onResultReady(LoaderResult<List<Label>> result) {
-            boolean success = !result.handleError(IssueLabelListActivity.this);
+        protected void onResultReady(List<Label> result) {
             UiUtils.hideImeForView(getCurrentFocus());
-            if (success) {
-                mAdapter.clear();
-                for (Label label : result.getData()) {
-                    mAdapter.add(new IssueLabelAdapter.EditableLabel(label));
-                }
-                mAdapter.notifyDataSetChanged();
+            mAdapter.clear();
+            for (Label label : result) {
+                mAdapter.add(new IssueLabelAdapter.EditableLabel(label));
             }
-            setContentEmpty(!success);
+            mAdapter.notifyDataSetChanged();
             setContentShown(true);
         }
     };
@@ -96,10 +92,6 @@ public class IssueLabelListActivity extends BaseActivity implements
 
         mRepoOwner = getIntent().getExtras().getString(Constants.Repository.OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);
-
-        if (hasErrorView()) {
-            return;
-        }
 
         setContentView(R.layout.generic_list);
         setContentShown(false);

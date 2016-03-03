@@ -1,22 +1,35 @@
 package com.gh4a.fragment;
 
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.devspark.progressfragment.ProgressFragment;
+import com.gh4a.BaseActivity;
 import com.gh4a.R;
+import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
 
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 public class LoadingFragmentBase extends ProgressFragment implements
-        SwipeRefreshLayout.ChildScrollDelegate {
+        LoaderCallbacks.ParentCallback, SwipeRefreshLayout.ChildScrollDelegate {
     private SmoothProgressBar mProgress;
 
     public LoadingFragmentBase() {
+    }
+
+    @Override
+    public BaseActivity getBaseActivity() {
+        return (BaseActivity) getActivity();
+    }
+
+    @Override
+    public LoaderManager getSupportLoaderManager() {
+        return getLoaderManager();
     }
 
     @Override

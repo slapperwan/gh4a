@@ -2,28 +2,47 @@ package com.gh4a.fragment;
 
 import java.util.List;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.UiUtils;
 
 public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase implements
-        LoaderCallbacks<LoaderResult<List<T>>>, RootAdapter.OnItemClickListener<T> {
+        RootAdapter.OnItemClickListener<T> {
     private RootAdapter<T, ? extends RecyclerView.ViewHolder> mAdapter;
     private boolean mViewCreated;
 
+    private LoaderCallbacks<List<T>> mLoaderCallback = new LoaderCallbacks<List<T>>(this) {
+        @Override
+        protected Loader<LoaderResult<List<T>>> onCreateLoader() {
+            return ListDataBaseFragment.this.onCreateLoader();
+        }
+
+        @Override
+        protected void onResultReady(List<T> result) {
+            mAdapter.clear();
+            onAddData(mAdapter, result);
+            if (isResumed()) {
+                setContentShown(true);
+            } else {
+                setContentShownNoAnimation(true);
+            }
+            updateEmptyState();
+            getActivity().supportInvalidateOptionsMenu();
+        }
+    };
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         setContentShown(false);
-        getLoaderManager().initLoader(0, null, this);
+        getLoaderManager().initLoader(0, null, mLoaderCallback);
     }
 
     public void refresh() {
@@ -73,25 +92,7 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase im
         super.onDestroyView();
     }
 
-    @Override
-    public void onLoadFinished(Loader<LoaderResult<List<T>>> loader, LoaderResult<List<T>> result) {
-        if (!result.handleError(getActivity())) {
-            mAdapter.clear();
-            onAddData(mAdapter, result.getData());
-        }
-        if (isResumed()) {
-            setContentShown(true);
-        } else {
-            setContentShownNoAnimation(true);
-        }
-        updateEmptyState();
-        getActivity().supportInvalidateOptionsMenu();
-    }
-
-    @Override
-    public void onLoaderReset(Loader<LoaderResult<List<T>>> loader) {
-    }
-
+    protected abstract Loader<LoaderResult<List<T>>> onCreateLoader();
     protected abstract int getEmptyTextResId();
     protected abstract RootAdapter<T, ? extends RecyclerView.ViewHolder> onCreateAdapter();
     public abstract void onItemClick(T item);

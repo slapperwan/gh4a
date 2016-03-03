@@ -76,10 +76,6 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         mRepoName = data.getString(Constants.Repository.NAME);
         mMilestone = (Milestone) data.getSerializable(EXTRA_MILESTONE);
 
-        if (hasErrorView()) {
-            return;
-        }
-
         if (!Gh4Application.get().isAuthorized()) {
             Intent intent = new Intent(this, Github4AndroidActivity.class);
             startActivity(intent);

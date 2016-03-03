@@ -56,42 +56,34 @@ public class ReleaseInfoActivity extends BaseActivity implements
 
     private HttpImageGetter mImageGetter;
 
-    private LoaderCallbacks<Release> mReleaseCallback = new LoaderCallbacks<Release>() {
+    private LoaderCallbacks<Release> mReleaseCallback = new LoaderCallbacks<Release>(this) {
         @Override
-        public Loader<LoaderResult<Release>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Release>> onCreateLoader() {
             return new ReleaseLoader(ReleaseInfoActivity.this, mRepoOwner, mRepoName, mReleaseId);
         }
 
         @Override
-        public void onResultReady(LoaderResult<Release> result) {
-            if (!result.handleError(ReleaseInfoActivity.this)) {
-                mRelease = result.getData();
-                handleReleaseReady();
-                setContentShown(true);
-            } else {
-                setContentEmpty(true);
-                setContentShown(true);
-            }
+        protected void onResultReady(Release result) {
+            mRelease = result;
+            handleReleaseReady();
+            setContentShown(true);
         }
     };
-    private LoaderCallbacks<String> mBodyCallback = new LoaderCallbacks<String>() {
+    private LoaderCallbacks<String> mBodyCallback = new LoaderCallbacks<String>(this) {
         @Override
-        public Loader<LoaderResult<String>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<String>> onCreateLoader() {
             return new MarkdownLoader(ReleaseInfoActivity.this, mRelease.getBody(), null);
         }
 
         @Override
-        public void onResultReady(LoaderResult<String> result) {
-            fillNotes(result.getData());
+        protected void onResultReady(String result) {
+            fillNotes(result);
         }
     };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (hasErrorView()) {
-            return;
-        }
 
         setContentView(R.layout.release);
 

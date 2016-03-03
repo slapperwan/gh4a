@@ -17,9 +17,6 @@ public class TrendingActivity extends BasePagerActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (hasErrorView()) {
-            return;
-        }
 
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.trend);

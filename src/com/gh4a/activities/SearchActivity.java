@@ -85,9 +85,6 @@ public class SearchActivity extends BaseActivity implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (hasErrorView()) {
-            return;
-        }
 
         setContentView(R.layout.generic_list);
 
@@ -315,6 +312,12 @@ public class SearchActivity extends BaseActivity implements
         protected void onSuccess(List<Repository> result) {
             fillRepositoriesData(result);
         }
+
+        @Override
+        protected void onError(Exception e) {
+            super.onError(e);
+            // TODO: handle
+        }
     }
 
     private class LoadUserTask extends ProgressDialogTask<List<SearchUser>> {
@@ -339,6 +342,12 @@ public class SearchActivity extends BaseActivity implements
         @Override
         protected void onSuccess(List<SearchUser> result) {
             fillUsersData(result);
+        }
+
+        @Override
+        protected void onError(Exception e) {
+            super.onError(e);
+            // TODO: handle
         }
     }
 
@@ -377,6 +386,7 @@ public class SearchActivity extends BaseActivity implements
                 }
             }
             super.onError(e);
+            // TODO: handle
         }
     }
 

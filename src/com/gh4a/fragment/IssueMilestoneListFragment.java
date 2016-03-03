@@ -74,7 +74,7 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
     }
 
     @Override
-    public Loader<LoaderResult<List<Milestone>>> onCreateLoader(int id, Bundle args) {
+    public Loader<LoaderResult<List<Milestone>>> onCreateLoader() {
         return new MilestoneListLoader(getActivity(), mRepoOwner, mRepoName);
     }
 }

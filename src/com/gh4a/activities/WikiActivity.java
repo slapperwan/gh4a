@@ -29,10 +29,6 @@ public class WikiActivity extends WebViewerActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (hasErrorView()) {
-            return;
-        }
-
         mUserLogin = getIntent().getStringExtra(Constants.Repository.OWNER);
         mRepoName = getIntent().getStringExtra(Constants.Repository.NAME);
         String title = getIntent().getStringExtra(Constants.Blog.TITLE);

@@ -87,67 +87,74 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
     private static final String STATE_KEY_ISSUE = "issue";
 
-    private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
+    private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>(this) {
         @Override
-        public Loader<LoaderResult<List<Label>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<Label>>> onCreateLoader() {
             return new LabelListLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
         }
         @Override
-        public void onResultReady(LoaderResult<List<Label>> result) {
+        protected void onResultReady(List<Label> result) {
             stopProgressDialog(mProgressDialog);
-            if (!result.handleError(IssueEditActivity.this)) {
-                mAllLabels = result.getData();
-                showLabelDialog(null);
-                getSupportLoaderManager().destroyLoader(0);
-            }
+            mAllLabels = result;
+            showLabelDialog(null);
+            getSupportLoaderManager().destroyLoader(0);
+        }
+        @Override
+        protected boolean onError(Exception e) {
+            stopProgressDialog(mProgressDialog);
+            return false;
         }
     };
 
-    private LoaderCallbacks<List<Milestone>> mMilestoneCallback = new LoaderCallbacks<List<Milestone>>() {
+    private LoaderCallbacks<List<Milestone>> mMilestoneCallback = new LoaderCallbacks<List<Milestone>>(this) {
         @Override
-        public Loader<LoaderResult<List<Milestone>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<Milestone>>> onCreateLoader() {
             return new MilestoneListLoader(IssueEditActivity.this,
                     mRepoOwner, mRepoName, Constants.Issue.STATE_OPEN);
         }
         @Override
-        public void onResultReady(LoaderResult<List<Milestone>> result) {
+        protected void onResultReady(List<Milestone> result) {
             stopProgressDialog(mProgressDialog);
-            if (!result.handleError(IssueEditActivity.this)) {
-                mAllMilestone = result.getData();
-                showMilestonesDialog(null);
-                getSupportLoaderManager().destroyLoader(1);
-            }
+            mAllMilestone = result;
+            showMilestonesDialog(null);
+            getSupportLoaderManager().destroyLoader(1);
+        }
+        @Override
+        protected boolean onError(Exception e) {
+            stopProgressDialog(mProgressDialog);
+            return false;
         }
     };
 
-    private LoaderCallbacks<List<User>> mCollaboratorListCallback = new LoaderCallbacks<List<User>>() {
+    private LoaderCallbacks<List<User>> mCollaboratorListCallback = new LoaderCallbacks<List<User>>(this) {
         @Override
-        public Loader<LoaderResult<List<User>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<User>>> onCreateLoader() {
             return new CollaboratorListLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
         }
         @Override
-        public void onResultReady(LoaderResult<List<User>> result) {
+        protected void onResultReady(List<User> result) {
             stopProgressDialog(mProgressDialog);
-            if (!result.handleError(IssueEditActivity.this)) {
-                mAllAssignee = result.getData();
-                showAssigneesDialog(null);
-                getSupportLoaderManager().destroyLoader(2);
-            }
+            mAllAssignee = result;
+            showAssigneesDialog(null);
+            getSupportLoaderManager().destroyLoader(2);
+        }
+        @Override
+        protected boolean onError(Exception e) {
+            stopProgressDialog(mProgressDialog);
+            return false;
         }
     };
 
-    private LoaderCallbacks<Boolean> mIsCollaboratorCallback = new LoaderCallbacks<Boolean>() {
+    private LoaderCallbacks<Boolean> mIsCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
-        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsCollaboratorLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
         }
         @Override
-        public void onResultReady(LoaderResult<Boolean> result) {
-            if (!result.handleError(IssueEditActivity.this)) {
-                mIsCollaborator = result.getData();
-                updateLabels();
-                updateLabelStates();
-            }
+        protected void onResultReady(Boolean result) {
+            mIsCollaborator = result;
+            updateLabels();
+            updateLabelStates();
         }
     };
 
@@ -160,10 +167,6 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         mRepoOwner = data.getString(Constants.Repository.OWNER);
         mRepoName = data.getString(Constants.Repository.NAME);
         mEditIssue = (Issue) data.getSerializable(EXTRA_ISSUE);
-
-        if (hasErrorView()) {
-            return;
-        }
 
         if (!Gh4Application.get().isAuthorized()) {
             Intent intent = new Intent(this, Github4AndroidActivity.class);

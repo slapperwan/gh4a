@@ -30,7 +30,7 @@ public class ContributorListFragment extends ListDataBaseFragment<Contributor> {
     }
 
     @Override
-    public Loader<LoaderResult<List<Contributor>>> onCreateLoader(int id, Bundle args) {
+    public Loader<LoaderResult<List<Contributor>>> onCreateLoader() {
         String repoOwner = getArguments().getString(Constants.Repository.OWNER);
         String repoName = getArguments().getString(Constants.Repository.NAME);
         return new ContributorListLoader(getActivity(), repoOwner, repoName);

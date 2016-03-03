@@ -38,7 +38,7 @@ public class RepositorySearchFragment extends ListDataBaseFragment<Repository> {
     }
 
     @Override
-    public Loader<LoaderResult<List<Repository>>> onCreateLoader(int id, Bundle args) {
+    public Loader<LoaderResult<List<Repository>>> onCreateLoader() {
         String login = getArguments().getString(Constants.User.LOGIN);
         mLoader = new RepositorySearchLoader(getActivity(), login);
         mLoader.setQuery(getArguments().getString("query"));

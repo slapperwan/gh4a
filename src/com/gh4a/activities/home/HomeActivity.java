@@ -2,7 +2,6 @@ package com.gh4a.activities.home;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
@@ -43,16 +42,15 @@ public class HomeActivity extends BasePagerActivity implements
 
     private static final String STATE_KEY_FACTORY_ITEM = "factoryItem";
 
-    private LoaderCallbacks<User> mUserCallback = new LoaderCallbacks<User>() {
+    private LoaderCallbacks<User> mUserCallback = new LoaderCallbacks<User>(this) {
         @Override
-        public Loader<LoaderResult<User>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<User>> onCreateLoader() {
             return new UserLoader(HomeActivity.this, mUserLogin);
         }
         @Override
-        public void onResultReady(LoaderResult<User> result) {
-            User user = result.getData();
-            mAvatarView.setTag(user);
-            AvatarHandler.assignAvatar(mAvatarView, user);
+        protected void onResultReady(User result) {
+            mAvatarView.setTag(result);
+            AvatarHandler.assignAvatar(mAvatarView, result);
         }
     };
 
@@ -68,9 +66,6 @@ public class HomeActivity extends BasePagerActivity implements
         mFragments = new SparseArray<>();
 
         super.onCreate(savedInstanceState);
-        if (hasErrorView()) {
-            return;
-        }
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
@@ -233,7 +228,7 @@ public class HomeActivity extends BasePagerActivity implements
         if (requestCode == REQUEST_SETTINGS) {
             if (data.getBooleanExtra(SettingsActivity.RESULT_EXTRA_THEME_CHANGED, false)
                     || data.getBooleanExtra(SettingsActivity.RESULT_EXTRA_AUTH_CHANGED, false)) {
-                goToToplevelActivity(false);
+                goToToplevelActivity();
                 finish();
             }
         } else {

@@ -14,6 +14,7 @@
     <string name="search">Search</string>
     <string name="logout">Logout</string>
     <string name="login">Login</string>
+    <string name="retry">Retry</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="settings">Settings</string>
@@ -85,6 +86,7 @@
     <string name="download_wifi_button">Download over Wi-Fi</string>
     <string name="download_fail_no_storage_toast">The file could not be downloaded - the storage or SD card isn\'t available.</string>
     <string name="download_permission_rationale">Permission to write to USB storage or SD card is required in order to download files.</string>
+    <string name="load_auth_failure_notice">Your authentication credentials aren\'t valid anymore, please log in again.</string>
 	<string name="auth_code">Authentication Code</string>
 	<string name="two_factor_auth">Two-factor Authentication</string>
 	<string name="verify">Verify</string>

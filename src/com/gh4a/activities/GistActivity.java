@@ -54,34 +54,28 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
     private Gist mGist;
     private Boolean mIsStarred;
 
-    private LoaderCallbacks<Gist> mGistCallback = new LoaderCallbacks<Gist>() {
+    private LoaderCallbacks<Gist> mGistCallback = new LoaderCallbacks<Gist>(this) {
         @Override
-        public Loader<LoaderResult<Gist>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Gist>> onCreateLoader() {
             return new GistLoader(GistActivity.this, mGistId);
         }
         @Override
-        public void onResultReady(LoaderResult<Gist> result) {
-            boolean success = !result.handleError(GistActivity.this);
-            if (success) {
-                fillData(result.getData());
-            }
-            setContentEmpty(!success);
+        protected void onResultReady(Gist result) {
+            fillData(result);
             setContentShown(true);
             supportInvalidateOptionsMenu();
         }
     };
 
-    private LoaderCallbacks<Boolean> mStarCallback = new LoaderCallbacks<Boolean>() {
+    private LoaderCallbacks<Boolean> mStarCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
-        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new GistStarLoader(GistActivity.this, mGistId);
         }
         @Override
-        public void onResultReady(LoaderResult<Boolean> result) {
-            if (!result.handleError(GistActivity.this)) {
-                mIsStarred = result.getData();
-                supportInvalidateOptionsMenu();
-            }
+        protected void onResultReady(Boolean result) {
+            mIsStarred = result;
+            supportInvalidateOptionsMenu();
         }
     };
 
@@ -90,10 +84,6 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
 
         mGistId = getIntent().getExtras().getString(Constants.Gist.ID);
-
-        if (hasErrorView()) {
-            return;
-        }
 
         setContentView(R.layout.gist);
         setContentShown(false);

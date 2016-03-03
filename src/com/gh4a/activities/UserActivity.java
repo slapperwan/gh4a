@@ -38,14 +38,14 @@ public class UserActivity extends BasePagerActivity {
         R.string.about, R.string.user_public_activity
     };
 
-    private LoaderCallbacks<Boolean> mIsFollowingCallback = new LoaderCallbacks<Boolean>() {
+    private LoaderCallbacks<Boolean> mIsFollowingCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
-        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsFollowingUserLoader(UserActivity.this, mUserLogin);
         }
         @Override
-        public void onResultReady(LoaderResult<Boolean> result) {
-            mIsFollowing = result.getData();
+        protected void onResultReady(Boolean result) {
+            mIsFollowing = result;
             supportInvalidateOptionsMenu();
         }
     };
@@ -58,9 +58,6 @@ public class UserActivity extends BasePagerActivity {
         mIsSelf = mUserLogin.equals(Gh4Application.get().getAuthLogin());
 
         super.onCreate(savedInstanceState);
-        if (hasErrorView()) {
-            return;
-        }
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(mUserLogin);

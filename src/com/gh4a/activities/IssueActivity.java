@@ -89,60 +89,47 @@ public class IssueActivity extends BaseActivity implements
     private CommentBoxFragment mCommentFragment;
     private HttpImageGetter mImageGetter;
 
-    private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>() {
+    private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>(this) {
         @Override
-        public Loader<LoaderResult<Issue>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Issue>> onCreateLoader() {
             return new IssueLoader(IssueActivity.this, mRepoOwner, mRepoName, mIssueNumber);
         }
         @Override
-        public void onResultReady(LoaderResult<Issue> result) {
-            if (!result.handleError(IssueActivity.this)) {
-                mIssue = result.getData();
-                fillDataIfDone();
-                supportInvalidateOptionsMenu();
-            } else {
-                setContentEmpty(true);
-                setContentShown(true);
-            }
+        protected void onResultReady(Issue result) {
+            mIssue = result;
+            fillDataIfDone();
+            supportInvalidateOptionsMenu();
         }
     };
 
     private LoaderCallbacks<List<IssueEventHolder>> mEventCallback =
-            new LoaderCallbacks<List<IssueEventHolder>>() {
+            new LoaderCallbacks<List<IssueEventHolder>>(this) {
         @Override
-        public Loader<LoaderResult<List<IssueEventHolder>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<IssueEventHolder>>> onCreateLoader() {
             return new IssueCommentListLoader(IssueActivity.this, mRepoOwner, mRepoName, mIssueNumber);
         }
         @Override
-        public void onResultReady(LoaderResult<List<IssueEventHolder>> result) {
-            if (!result.handleError(IssueActivity.this)) {
-                List<IssueEventHolder> events = result.getData();
-                mEventAdapter.clear();
-                if (events != null) {
-                    mEventAdapter.addAll(events);
-                }
-                mEventAdapter.notifyDataSetChanged();
-                mEventsLoaded = true;
-                fillDataIfDone();
-            } else {
-                setContentEmpty(true);
-                setContentShown(true);
+        protected void onResultReady(List<IssueEventHolder> result) {
+            mEventAdapter.clear();
+            if (result != null) {
+                mEventAdapter.addAll(result);
             }
+            mEventAdapter.notifyDataSetChanged();
+            mEventsLoaded = true;
+            fillDataIfDone();
         }
     };
 
-    private LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>() {
+    private LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
-        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsCollaboratorLoader(IssueActivity.this, mRepoOwner, mRepoName);
         }
         @Override
-        public void onResultReady(LoaderResult<Boolean> result) {
-            if (!result.handleError(IssueActivity.this)) {
-                mIsCollaborator = result.getData();
-                updateFabVisibility();
-                supportInvalidateOptionsMenu();
-            }
+        protected void onResultReady(Boolean result) {
+            mIsCollaborator = result;
+            updateFabVisibility();
+            supportInvalidateOptionsMenu();
         }
     };
 
@@ -154,10 +141,6 @@ public class IssueActivity extends BaseActivity implements
         mRepoOwner = data.getString(Constants.Repository.OWNER);
         mRepoName = data.getString(Constants.Repository.NAME);
         mIssueNumber = data.getInt(Constants.Issue.NUMBER);
-
-        if (hasErrorView()) {
-            return;
-        }
 
         setContentView(R.layout.issue);
         setContentShown(false);

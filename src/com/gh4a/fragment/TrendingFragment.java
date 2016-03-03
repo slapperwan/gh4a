@@ -88,7 +88,7 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
     }
 
     @Override
-    public Loader<LoaderResult<List<Trend>>> onCreateLoader(int id, Bundle args) {
+    public Loader<LoaderResult<List<Trend>>> onCreateLoader() {
         return new TrendLoader(getActivity(), API_URL, mUrl);
     }
 }

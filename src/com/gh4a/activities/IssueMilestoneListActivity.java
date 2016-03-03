@@ -39,9 +39,6 @@ public class IssueMilestoneListActivity extends BaseActivity implements
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (hasErrorView()) {
-            return;
-        }
 
         mRepoOwner = getIntent().getExtras().getString(Constants.Repository.OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);

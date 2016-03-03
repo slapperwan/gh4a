@@ -27,10 +27,6 @@ public class BlogActivity extends WebViewerActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (hasErrorView()) {
-            return;
-        }
-
         String title = getIntent().getStringExtra(Constants.Blog.TITLE);
         String content = getIntent().getStringExtra(Constants.Blog.CONTENT);
 

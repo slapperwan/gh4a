@@ -21,13 +21,11 @@ public abstract class BasePagerActivity extends BaseActivity implements
     private ViewPager mPager;
     private int[][] mTabHeaderColors;
     private boolean mScrolling;
+    private boolean mErrorViewVisible;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (hasErrorView()) {
-            return;
-        }
 
         mAdapter = new FragmentAdapter();
         setContentView(R.layout.view_pager);
@@ -70,6 +68,13 @@ public abstract class BasePagerActivity extends BaseActivity implements
     }
 
     @Override
+    protected void setErrorViewVisibility(boolean visible) {
+        mErrorViewVisible = visible;
+        updateTabVisibility();
+        super.setErrorViewVisibility(visible);
+    }
+
+    @Override
     public boolean canChildScrollUp() {
         Fragment item = mAdapter.getCurrentFragment();
         if (item != null && item instanceof SwipeRefreshLayout.ChildScrollDelegate) {
@@ -104,7 +109,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
         // We never have many pages, make sure to keep them all alive
         mPager.setOffscreenPageLimit(titleResIds.length - 1);
 
-        mTabs.setVisibility(titleResIds.length > 1 ? View.VISIBLE : View.GONE);
+        mTabs.setVisibility(titleResIds.length > 1 && !mErrorViewVisible ? View.VISIBLE : View.GONE);
         setToolbarScrollable(titleResIds.length > 1
                 && getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE);
 

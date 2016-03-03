@@ -18,7 +18,6 @@ package com.gh4a.fragment;
 import java.util.List;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 
@@ -58,7 +57,7 @@ public class BlogListFragment extends ListDataBaseFragment<Feed> {
     }
 
     @Override
-    public Loader<LoaderResult<List<Feed>>> onCreateLoader(int id, Bundle args) {
+    public Loader<LoaderResult<List<Feed>>> onCreateLoader() {
         return new FeedLoader(getActivity(), BLOG);
     }
 }

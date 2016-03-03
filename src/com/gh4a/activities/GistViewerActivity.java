@@ -39,21 +39,15 @@ public class GistViewerActivity extends WebViewerActivity {
     private String mGistId;
     private GistFile mGistFile;
 
-    private LoaderCallbacks<Gist> mGistCallback = new LoaderCallbacks<Gist>() {
+    private LoaderCallbacks<Gist> mGistCallback = new LoaderCallbacks<Gist>(this) {
         @Override
-        public Loader<LoaderResult<Gist>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Gist>> onCreateLoader() {
             return new GistLoader(GistViewerActivity.this, mGistId);
         }
         @Override
-        public void onResultReady(LoaderResult<Gist> result) {
-            boolean success = !result.handleError(GistViewerActivity.this);
-            if (success) {
-                mGistFile = result.getData().getFiles().get(mFileName);
-                loadCode(mGistFile.getContent(), mFileName);
-            } else {
-                setContentEmpty(true);
-                setContentShown(true);
-            }
+        protected void onResultReady(Gist result) {
+            mGistFile = result.getFiles().get(mFileName);
+            loadCode(mGistFile.getContent(), mFileName);
             supportInvalidateOptionsMenu();
         }
     };
@@ -61,10 +55,6 @@ public class GistViewerActivity extends WebViewerActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (hasErrorView()) {
-            return;
-        }
 
         mFileName = getIntent().getExtras().getString(Constants.Gist.FILENAME);
         mGistId = getIntent().getExtras().getString(Constants.Gist.ID);

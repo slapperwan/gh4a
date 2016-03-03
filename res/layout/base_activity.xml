@@ -40,31 +40,53 @@
                 android:layout_height="match_parent"
                 android:foreground="@drawable/header_shadow">
 
-                <fr.castorflex.android.smoothprogressbar.SmoothProgressBar
-                    android:id="@+id/progress"
+                <FrameLayout
+                    android:id="@+id/content"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:indeterminate="true"
-                    android:visibility="gone"
-                    app:spb_sections_count="6"
-                    app:spb_speed="1.0"
-                    app:spb_progressiveStart_activated="true"
-                    app:spb_progressiveStart_speed="1.5"
-                    app:spb_progressiveStop_speed="3.4"
-                    app:spb_interpolator="spb_interpolator_acceleratedecelerate" />
+                    android:layout_height="match_parent">
 
-                <com.gh4a.widget.StyleableTextView
-                    android:id="@android:id/empty"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:visibility="gone"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                    <fr.castorflex.android.smoothprogressbar.SmoothProgressBar
+                        android:id="@+id/progress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:indeterminate="true"
+                        android:visibility="gone"
+                        app:spb_sections_count="6"
+                        app:spb_speed="1.0"
+                        app:spb_progressiveStart_activated="true"
+                        app:spb_progressiveStart_speed="1.5"
+                        app:spb_progressiveStop_speed="3.4"
+                        app:spb_interpolator="spb_interpolator_acceleratedecelerate" />
+
+                    <com.gh4a.widget.StyleableTextView
+                        android:id="@android:id/empty"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:visibility="gone"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                    <FrameLayout
+                        android:id="@+id/content_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                </FrameLayout>
 
                 <FrameLayout
-                    android:id="@+id/content_container"
+                    android:id="@+id/error"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:visibility="gone">
+
+                    <!-- FIXME -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="@string/error_connection" />
+
+                </FrameLayout>
 
             </FrameLayout>
 

@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.gh4a.loader.GitModuleParserLoader;
 import com.gh4a.loader.LoaderCallbacks;
@@ -31,7 +32,8 @@ import java.util.Set;
 import java.util.Stack;
 
 public class ContentListContainerFragment extends Fragment implements
-        ContentListFragment.ParentCallback, PathBreadcrumbs.SelectionCallback {
+        ContentListFragment.ParentCallback, PathBreadcrumbs.SelectionCallback,
+        LoaderCallbacks.ParentCallback {
     private static final int LOADER_MODULEMAP = 100;
 
     private static final String STATE_KEY_DIR_STACK = "dir_stack";
@@ -56,15 +58,15 @@ public class ContentListContainerFragment extends Fragment implements
     };
 
     private LoaderCallbacks<Map<String, String>> mGitModuleCallback =
-            new LoaderCallbacks<Map<String, String>>() {
+            new LoaderCallbacks<Map<String, String>>(this) {
         @Override
-        public Loader<LoaderResult<Map<String, String>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Map<String, String>>> onCreateLoader() {
             return new GitModuleParserLoader(getActivity(), mRepository.getOwner().getLogin(),
                     mRepository.getName(), ".gitmodules", mSelectedRef);
         }
         @Override
-        public void onResultReady(LoaderResult<Map<String, String>> result) {
-            mGitModuleMap = result.getData();
+        protected void onResultReady(Map<String, String> result) {
+            mGitModuleMap = result;
             if (mContentListFragment != null) {
                 mContentListFragment.onSubModuleNamesChanged(getSubModuleNames(mContentListFragment));
             }
@@ -108,6 +110,16 @@ public class ContentListContainerFragment extends Fragment implements
         } else {
             mDirStack.push("");
         }
+    }
+
+    @Override
+    public BaseActivity getBaseActivity() {
+        return (BaseActivity) getActivity();
+    }
+
+    @Override
+    public LoaderManager getSupportLoaderManager() {
+        return getLoaderManager();
     }
 
     public void setRef(String ref) {

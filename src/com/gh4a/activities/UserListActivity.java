@@ -40,19 +40,15 @@ public abstract class UserListActivity extends BaseActivity implements
         RootAdapter.OnItemClickListener<User> {
     private UserAdapter mUserAdapter;
 
-    private LoaderCallbacks<List<User>> mUserListCallback = new LoaderCallbacks<List<User>>() {
+    private LoaderCallbacks<List<User>> mUserListCallback = new LoaderCallbacks<List<User>>(this) {
         @Override
-        public Loader<LoaderResult<List<User>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<User>>> onCreateLoader() {
             return getUserListLoader();
         }
 
         @Override
-        public void onResultReady(LoaderResult<List<User>> result) {
-            boolean success = !result.handleError(UserListActivity.this);
-            if (success) {
-                fillData(result.getData());
-            }
-            setContentEmpty(!success);
+        protected void onResultReady(List<User> result) {
+            fillData(result);
             setContentShown(true);
         }
     };
@@ -60,10 +56,6 @@ public abstract class UserListActivity extends BaseActivity implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (hasErrorView()) {
-            return;
-        }
 
         setContentView(R.layout.generic_list);
         setContentShown(false);

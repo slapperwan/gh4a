@@ -95,7 +95,7 @@ public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit
     }
 
     @Override
-    public Loader<LoaderResult<List<RepositoryCommit>>> onCreateLoader(int id, Bundle args) {
+    public Loader<LoaderResult<List<RepositoryCommit>>> onCreateLoader() {
         return new CommitCompareLoader(getActivity(), mRepoOwner, mRepoName, mBase, mHead);
     }
 }

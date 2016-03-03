@@ -17,12 +17,9 @@ package com.gh4a;
 
 import android.app.ProgressDialog;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -39,7 +36,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -49,6 +45,7 @@ import com.gh4a.activities.Github4AndroidActivity;
 import com.gh4a.activities.SearchActivity;
 import com.gh4a.activities.home.HomeActivity;
 import com.gh4a.db.BookmarksProvider;
+import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ColorDrawable;
@@ -59,13 +56,16 @@ import com.nineoldandroids.animation.ArgbEvaluator;
 import com.nineoldandroids.animation.ObjectAnimator;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 public abstract class BaseActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener, DrawerLayout.DrawerListener,
         ActivityCompat.OnRequestPermissionsResultCallback,
+        LoaderCallbacks.ParentCallback,
         NavigationView.OnNavigationItemSelectedListener {
     private ViewGroup mContentContainer;
     private TextView mEmptyView;
@@ -79,12 +79,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private CoordinatorLayout mCoordinatorLayout;
     private Toolbar mToolbar;
     private ActionBarDrawerToggle mDrawerToggle;
-    private boolean mHasErrorView = false;
     private NavigationView mLeftDrawer;
     private NavigationView mRightDrawer;
     private View mLeftDrawerTitle;
     private View mRightDrawerTitle;
 
+    private Set<LoaderCallbacks<?>> mLoaderCallbacks = new HashSet<>();
     private ActivityCompat.OnRequestPermissionsResultCallback mPendingPermissionCb;
 
     private final List<ColorDrawable> mHeaderDrawables = new ArrayList<>();
@@ -95,15 +95,49 @@ public abstract class BaseActivity extends AppCompatActivity implements
         setTheme(Gh4Application.THEME);
         super.onCreate(savedInstanceState);
 
-        if (isOnline()) {
-            super.setContentView(R.layout.base_activity);
+        super.setContentView(R.layout.base_activity);
 
-            setupSwipeToRefresh();
-            setupNavigationDrawer();
-            setupHeaderDrawable();
-        } else {
-            setErrorView();
-        }
+        setupSwipeToRefresh();
+        setupNavigationDrawer();
+        setupHeaderDrawable();
+    }
+
+    @Override
+    public BaseActivity getBaseActivity() {
+        return this;
+    }
+
+    public void registerLoader(LoaderCallbacks<?> loaderCallback) {
+        mLoaderCallbacks.add(loaderCallback);
+    }
+
+    public void unregisterLoader(LoaderCallbacks<?> loaderCallback) {
+        mLoaderCallbacks.remove(loaderCallback);
+    }
+
+    public void handleAuthFailureDuringLoad() {
+        Gh4Application.get().logout();
+        Snackbar.make(mCoordinatorLayout, R.string.load_auth_failure_notice, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.login, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        goToToplevelActivity();
+                    }
+                })
+                .show();
+    }
+
+    public void handleLoadFailure(Exception e) {
+        setErrorViewVisibility(true);
+        Snackbar.make(mCoordinatorLayout, R.string.error_toast, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.retry, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        setErrorViewVisibility(false);
+                        restartKnownLoaders();
+                    }
+                })
+                .show();
     }
 
     protected int getLeftNavigationDrawerMenuResource() {
@@ -233,18 +267,10 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     }
 
-    protected boolean isOnline() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo info = cm.getActiveNetworkInfo();
-        return info != null && info.isAvailable() && info.isConnected();
-    }
 
-    protected void goToToplevelActivity(boolean newTask) {
+    protected void goToToplevelActivity() {
         Intent intent = getToplevelActivityIntent();
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        if (newTask) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        }
         startActivity(intent);
     }
 
@@ -255,10 +281,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
         } else {
             return new Intent(this, Github4AndroidActivity.class);
         }
-    }
-
-    protected boolean hasErrorView() {
-        return mHasErrorView;
     }
 
     public void addAppBarOffsetListener(AppBarLayout.OnOffsetChangedListener l) {
@@ -305,11 +327,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        if (!hasErrorView()) {
-            ensureContent();
-            if (mContentContainer.getChildCount() == 0) {
-                throw new IllegalStateException("Content view must be initialized before");
-            }
+        ensureContent();
+        if (mContentContainer.getChildCount() == 0) {
+            throw new IllegalStateException("Content view must be initialized before");
         }
     }
 
@@ -450,16 +470,17 @@ public abstract class BaseActivity extends AppCompatActivity implements
         }
     }
 
-    private void setErrorView() {
-        mHasErrorView = true;
-        super.setContentView(R.layout.error);
+    private void restartKnownLoaders() {
+        for (LoaderCallbacks<?> loader : mLoaderCallbacks) {
+            loader.restartLoading();
+        }
+    }
 
-        findViewById(R.id.btn_home).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToToplevelActivity(true);
-            }
-        });
+    protected void setErrorViewVisibility(boolean visible) {
+        View content = findViewById(R.id.content);
+        View error = findViewById(R.id.error);
+        content.setVisibility(visible ? View.GONE : View.VISIBLE);
+        error.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     private void setupHeaderDrawable() {

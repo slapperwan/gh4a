@@ -18,7 +18,6 @@ package com.gh4a.fragment;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.view.View;
 
 import com.gh4a.Constants;
 import com.gh4a.R;
@@ -120,7 +119,7 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
     }
 
     @Override
-    public Loader<LoaderResult<List<RepositoryContents>>> onCreateLoader(int id, Bundle args) {
+    public Loader<LoaderResult<List<RepositoryContents>>> onCreateLoader() {
         ContentListLoader loader = new ContentListLoader(getActivity(),
                 mRepository.getOwner().getLogin(), mRepository.getName(), mPath, mRef);
         @SuppressWarnings("unchecked")

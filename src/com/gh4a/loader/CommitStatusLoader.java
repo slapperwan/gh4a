@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.egit.github.core.CommitStatus;
-import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.CommitService;
-import org.eclipse.egit.github.core.service.PullRequestService;
 
 import android.content.Context;
 

@@ -92,46 +92,40 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     private HttpImageGetter mImageGetter;
 
     private LoaderCallbacks<List<CommitStatus>> mStatusCallback =
-            new LoaderCallbacks<List<CommitStatus>>() {
+            new LoaderCallbacks<List<CommitStatus>>(this) {
         @Override
-        public Loader<LoaderResult<List<CommitStatus>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<CommitStatus>>> onCreateLoader() {
             return new CommitStatusLoader(getActivity(), mRepoOwner, mRepoName,
                     mPullRequest.getHead().getSha());
         }
 
         @Override
-        public void onResultReady(LoaderResult<List<CommitStatus>> result) {
-            if (!result.handleError(getActivity())) {
-                fillStatus(result.getData());
-            }
+        protected void onResultReady(List<CommitStatus> result) {
+            fillStatus(result);
         }
     };
 
-    private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>() {
+    private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>(this) {
         @Override
-        public Loader<LoaderResult<Issue>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Issue>> onCreateLoader() {
             return new IssueLoader(getActivity(), mRepoOwner, mRepoName, mPullRequest.getNumber());
         }
 
         @Override
-        public void onResultReady(LoaderResult<Issue> result) {
-            if (!result.handleError(getActivity())) {
-                fillLabels(result.getData().getLabels());
-            }
+        protected void onResultReady(Issue result) {
+            fillLabels(result.getLabels());
         }
     };
 
-    private LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>() {
+    private LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
-        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsCollaboratorLoader(getActivity(), mRepoOwner, mRepoName);
         }
         @Override
-        public void onResultReady(LoaderResult<Boolean> result) {
-            if (!result.handleError(getActivity())) {
-                mIsCollaborator = result.getData();
-                getActivity().supportInvalidateOptionsMenu();
-            }
+        protected void onResultReady(Boolean result) {
+            mIsCollaborator = result;
+            getActivity().supportInvalidateOptionsMenu();
         }
     };
 
@@ -513,7 +507,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     }
 
     @Override
-    public Loader<LoaderResult<List<IssueEventHolder>>> onCreateLoader(int id, Bundle args) {
+    public Loader<LoaderResult<List<IssueEventHolder>>> onCreateLoader() {
         return new PullRequestCommentListLoader(getActivity(),
                 mRepoOwner, mRepoName, mPullRequest.getNumber());
     }

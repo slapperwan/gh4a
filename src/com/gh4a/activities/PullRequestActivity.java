@@ -56,21 +56,17 @@ public class PullRequestActivity extends BasePagerActivity implements
         R.string.pull_request_conversation, R.string.commits, R.string.pull_request_files
     };
 
-    private LoaderCallbacks<PullRequest> mPullRequestCallback = new LoaderCallbacks<PullRequest>() {
+    private LoaderCallbacks<PullRequest> mPullRequestCallback = new LoaderCallbacks<PullRequest>(this) {
         @Override
-        public Loader<LoaderResult<PullRequest>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<PullRequest>> onCreateLoader() {
             return new PullRequestLoader(PullRequestActivity.this,
                     mRepoOwner, mRepoName, mPullRequestNumber);
         }
         @Override
-        public void onResultReady(LoaderResult<PullRequest> result) {
-            boolean success = !result.handleError(PullRequestActivity.this);
-            if (success) {
-                mPullRequest = result.getData();
-                fillHeader();
-                setTabsEnabled(true);
-            }
-            setContentEmpty(!success);
+        protected void onResultReady(PullRequest result) {
+            mPullRequest = result;
+            fillHeader();
+            setTabsEnabled(true);
             setContentShown(true);
             supportInvalidateOptionsMenu();
         }
@@ -79,9 +75,6 @@ public class PullRequestActivity extends BasePagerActivity implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (hasErrorView()) {
-            return;
-        }
 
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.OWNER);

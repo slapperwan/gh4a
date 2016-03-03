@@ -3,7 +3,6 @@ package com.gh4a.activities;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryBranch;
@@ -69,26 +68,22 @@ public class RepositoryActivity extends BasePagerActivity {
         R.string.about, R.string.repo_files, R.string.commits
     };
 
-    private LoaderCallbacks<Repository> mRepoCallback = new LoaderCallbacks<Repository>() {
+    private LoaderCallbacks<Repository> mRepoCallback = new LoaderCallbacks<Repository>(this) {
         @Override
-        public Loader<LoaderResult<Repository>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Repository>> onCreateLoader() {
             return new RepositoryLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
         }
 
         @Override
-        public void onResultReady(LoaderResult<Repository> result) {
-            boolean success = !result.handleError(RepositoryActivity.this);
-            if (success) {
-                mRepository = result.getData();
-                updateTitle();
-                setTabsEnabled(true);
-                // Apply initial page selection first time the repo is loaded
-                if (mInitialPage >= PAGE_REPO_OVERVIEW && mInitialPage <= PAGE_COMMITS) {
-                    getPager().setCurrentItem(mInitialPage);
-                    mInitialPage = -1;
-                }
+        protected void onResultReady(Repository result) {
+            mRepository = result;
+            updateTitle();
+            setTabsEnabled(true);
+            // Apply initial page selection first time the repo is loaded
+            if (mInitialPage >= PAGE_REPO_OVERVIEW && mInitialPage <= PAGE_COMMITS) {
+                getPager().setCurrentItem(mInitialPage);
+                mInitialPage = -1;
             }
-            setContentEmpty(!success);
             setContentShown(true);
             refreshDone();
             supportInvalidateOptionsMenu();
@@ -96,10 +91,9 @@ public class RepositoryActivity extends BasePagerActivity {
     };
 
     private LoaderCallbacks<Pair<List<RepositoryBranch>, List<RepositoryTag>>> mBranchesAndTagsCallback =
-            new LoaderCallbacks<Pair<List<RepositoryBranch>, List<RepositoryTag>>>() {
+            new LoaderCallbacks<Pair<List<RepositoryBranch>, List<RepositoryTag>>>(this) {
         @Override
-        public Loader<LoaderResult<Pair<List<RepositoryBranch>, List<RepositoryTag>>>> onCreateLoader(
-                int id, Bundle args) {
+        protected Loader<LoaderResult<Pair<List<RepositoryBranch>, List<RepositoryTag>>>> onCreateLoader() {
             return new BaseLoader<Pair<List<RepositoryBranch>, List<RepositoryTag>>>(RepositoryActivity.this) {
                 @Override
                 protected Pair<List<RepositoryBranch>, List<RepositoryTag>> doLoadInBackground() throws Exception {
@@ -109,42 +103,41 @@ public class RepositoryActivity extends BasePagerActivity {
             };
         }
         @Override
-        public void onResultReady(LoaderResult<Pair<List<RepositoryBranch>, List<RepositoryTag>>> result) {
-            if (!result.handleError(RepositoryActivity.this)) {
-                stopProgressDialog(mProgressDialog);
-                mBranches = result.getData().first;
-                mTags = result.getData().second;
-                showRefSelectionDialog();
-                getSupportLoaderManager().destroyLoader(LOADER_BRANCHES_AND_TAGS);
-            }
+        protected void onResultReady(Pair<List<RepositoryBranch>, List<RepositoryTag>> result) {
+            stopProgressDialog(mProgressDialog);
+            mBranches = result.first;
+            mTags = result.second;
+            showRefSelectionDialog();
+            getSupportLoaderManager().destroyLoader(LOADER_BRANCHES_AND_TAGS);
+        }
+        @Override
+        protected boolean onError(Exception e) {
+            stopProgressDialog(mProgressDialog);
+            return false;
         }
     };
 
-    private LoaderCallbacks<Boolean> mWatchCallback = new LoaderCallbacks<Boolean>() {
+    private LoaderCallbacks<Boolean> mWatchCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
-        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsWatchingLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
         }
         @Override
-        public void onResultReady(LoaderResult<Boolean> result) {
-            if (!result.handleError(RepositoryActivity.this)) {
-                mIsWatching = result.getData();
-                supportInvalidateOptionsMenu();
-            }
+        protected void onResultReady(Boolean result) {
+            mIsWatching = result;
+            supportInvalidateOptionsMenu();
         }
     };
 
-    private LoaderCallbacks<Boolean> mStarCallback = new LoaderCallbacks<Boolean>() {
+    private LoaderCallbacks<Boolean> mStarCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
-        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsStarringLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
         }
         @Override
-        public void onResultReady(LoaderResult<Boolean> result) {
-            if (!result.handleError(RepositoryActivity.this)) {
-                mIsStarring = result.getData();
-                supportInvalidateOptionsMenu();
-            }
+        protected void onResultReady(Boolean result) {
+            mIsStarring = result;
+            supportInvalidateOptionsMenu();
         }
     };
 
@@ -169,9 +162,6 @@ public class RepositoryActivity extends BasePagerActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (hasErrorView()) {
-            return;
-        }
 
         Bundle bundle = getIntent().getExtras();
         mRepoOwner = bundle.getString(Constants.Repository.OWNER);

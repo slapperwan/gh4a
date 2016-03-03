@@ -67,9 +67,9 @@ public class Github4AndroidActivity extends BaseActivity {
 
         Gh4Application app = Gh4Application.get();
         if (app.isAuthorized()) {
-            goToToplevelActivity(false);
+            goToToplevelActivity();
             finish();
-        } else if (!hasErrorView()) {
+        } else {
             setContentView(R.layout.main);
         }
     }
@@ -238,7 +238,7 @@ public class Github4AndroidActivity extends BaseActivity {
             editor.putString(Constants.User.LOGIN, mUserName);
             editor.apply();
 
-            goToToplevelActivity(false);
+            goToToplevelActivity();
             finish();
         }
 

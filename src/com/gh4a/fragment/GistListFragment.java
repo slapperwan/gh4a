@@ -40,7 +40,7 @@ public class GistListFragment extends ListDataBaseFragment<Gist> {
     }
 
     @Override
-    public Loader<LoaderResult<List<Gist>>> onCreateLoader(int id, Bundle args) {
+    public Loader<LoaderResult<List<Gist>>> onCreateLoader() {
         if (mShowStarred) {
             return new StarredGistListLoader(getActivity());
         }

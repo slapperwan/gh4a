@@ -36,7 +36,6 @@ import com.gh4a.activities.WikiListActivity;
 import com.gh4a.adapter.FeedAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 

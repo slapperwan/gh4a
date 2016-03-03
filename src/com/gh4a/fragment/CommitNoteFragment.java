@@ -125,7 +125,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     }
 
     @Override
-    public Loader<LoaderResult<List<CommitComment>>> onCreateLoader(int id, Bundle args) {
+    public Loader<LoaderResult<List<CommitComment>>> onCreateLoader() {
         return new CommitCommentListLoader(getActivity(), mRepoOwner, mRepoName,
                 mObjectSha, true, false);
     }

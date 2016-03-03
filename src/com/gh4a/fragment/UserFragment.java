@@ -56,28 +56,24 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
     private User mUser;
     private View mContentView;
 
-    private LoaderCallbacks<User> mUserCallback = new LoaderCallbacks<User>() {
+    private LoaderCallbacks<User> mUserCallback = new LoaderCallbacks<User>(this) {
         @Override
-        public Loader<LoaderResult<User>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<User>> onCreateLoader() {
             return new UserLoader(getActivity(), mUserLogin);
         }
         @Override
-        public void onResultReady(LoaderResult<User> result) {
-            boolean success = !result.handleError(getActivity());
-            if (success) {
-                mUser = result.getData();
-                fillData();
-            }
+        protected void onResultReady(User result) {
+            mUser = result;
+            fillData();
             setContentShown(true);
-            setContentEmpty(!success);
             getActivity().supportInvalidateOptionsMenu();
         }
     };
 
     private LoaderCallbacks<Collection<Repository>> mRepoListCallback =
-            new LoaderCallbacks<Collection<Repository>>() {
+            new LoaderCallbacks<Collection<Repository>>(this) {
         @Override
-        public Loader<LoaderResult<Collection<Repository>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Collection<Repository>>> onCreateLoader() {
             Map<String, String> filterData = new HashMap<>();
             filterData.put("sort", "pushed");
             filterData.put("affiliation", "owner,collaborator");
@@ -85,23 +81,19 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
                     mUser.getType(), filterData, 5);
         }
         @Override
-        public void onResultReady(LoaderResult<Collection<Repository>> result) {
-            getView().findViewById(R.id.pb_top_repos).setVisibility(View.GONE);
-            if (!result.handleError(getActivity())) {
-                fillTopRepos(result.getData());
-                getView().findViewById(R.id.ll_top_repos).setVisibility(View.VISIBLE);
-            }
+        protected void onResultReady(Collection<Repository> result) {
+            fillTopRepos(result);
         }
     };
 
-    private LoaderCallbacks<List<User>> mOrganizationCallback = new LoaderCallbacks<List<User>>() {
+    private LoaderCallbacks<List<User>> mOrganizationCallback = new LoaderCallbacks<List<User>>(this) {
         @Override
-        public Loader<LoaderResult<List<User>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<User>>> onCreateLoader() {
             return new OrganizationListLoader(getActivity(), mUserLogin);
         }
         @Override
-        public void onResultReady(LoaderResult<List<User>> result) {
-            fillOrganizations(result.getData());
+        protected void onResultReady(List<User> result) {
+            fillOrganizations(result);
         }
     };
 

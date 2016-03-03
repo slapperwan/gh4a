@@ -43,19 +43,15 @@ public class ReleaseListActivity extends BaseActivity implements
     private String mRepoName;
     private ReleaseAdapter mAdapter;
 
-    private LoaderCallbacks<List<Release>> mReleaseCallback = new LoaderCallbacks<List<Release>>() {
+    private LoaderCallbacks<List<Release>> mReleaseCallback = new LoaderCallbacks<List<Release>>(this) {
         @Override
-        public Loader<LoaderResult<List<Release>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<Release>>> onCreateLoader() {
             return new ReleaseListLoader(ReleaseListActivity.this, mUserLogin, mRepoName);
         }
 
         @Override
-        public void onResultReady(LoaderResult<List<Release>> result) {
-            boolean success = !result.handleError(ReleaseListActivity.this);
-            setContentEmpty(true);
-            if (success) {
-                fillData(result.getData());
-            }
+        protected void onResultReady(List<Release> result) {
+            fillData(result);
             setContentShown(true);
         }
     };
@@ -66,10 +62,6 @@ public class ReleaseListActivity extends BaseActivity implements
 
         mUserLogin = getIntent().getStringExtra(Constants.Repository.OWNER);
         mRepoName = getIntent().getStringExtra(Constants.Repository.NAME);
-
-        if (hasErrorView()) {
-            return;
-        }
 
         setContentView(R.layout.generic_list);
         setContentShown(false);
@@ -91,11 +83,8 @@ public class ReleaseListActivity extends BaseActivity implements
     }
 
     private void fillData(List<Release> result) {
-        if (result != null && !result.isEmpty()) {
-            mAdapter.addAll(result);
-            mAdapter.notifyDataSetChanged();
-            setContentEmpty(false);
-        }
+        setContentEmpty(result == null || result.isEmpty());
+        mAdapter.addAll(result);
     }
 
     @Override

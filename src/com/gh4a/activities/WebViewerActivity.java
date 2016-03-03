@@ -90,10 +90,6 @@ public abstract class WebViewerActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (hasErrorView()) {
-            return;
-        }
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             if ((getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
                 WebView.setWebContentsDebuggingEnabled(true);

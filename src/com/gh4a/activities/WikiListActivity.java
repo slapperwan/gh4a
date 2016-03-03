@@ -46,24 +46,29 @@ public class WikiListActivity extends BaseActivity
     private String mRepoName;
     private RecyclerView mRecyclerView;
 
-    private LoaderCallbacks<List<Feed>> mFeedCallback = new LoaderCallbacks<List<Feed>>() {
+    private LoaderCallbacks<List<Feed>> mFeedCallback = new LoaderCallbacks<List<Feed>>(this) {
         @Override
-        public Loader<LoaderResult<List<Feed>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<Feed>>> onCreateLoader() {
             String url = "https://github.com/" + mUserLogin + "/" + mRepoName + "/wiki.atom";
             return new FeedLoader(WikiListActivity.this, url);
         }
 
         @Override
-        public void onResultReady(LoaderResult<List<Feed>> result) {
-            setContentEmpty(true);
-            //noinspection ThrowableResultOfMethodCallIgnored
-            if (result.getException() instanceof SAXException) {
-                ToastUtils.notFoundMessage(WikiListActivity.this, getString(R.string.recent_wiki));
-            } else if (!result.handleError(WikiListActivity.this)) {
-                fillData(result.getData());
-                setContentEmpty(false);
-            }
+        protected void onResultReady(List<Feed> result) {
+            fillData(result);
+            setContentEmpty(false);
             setContentShown(true);
+        }
+
+        @Override
+        protected boolean onError(Exception e) {
+            if (e instanceof SAXException) {
+                ToastUtils.notFoundMessage(WikiListActivity.this, getString(R.string.recent_wiki));
+                setContentEmpty(true);
+                setContentShown(true);
+                return true;
+            }
+            return false;
         }
     };
 
@@ -73,10 +78,6 @@ public class WikiListActivity extends BaseActivity
 
         mUserLogin = getIntent().getStringExtra(Constants.Repository.OWNER);
         mRepoName = getIntent().getStringExtra(Constants.Repository.NAME);
-
-        if (hasErrorView()) {
-            return;
-        }
 
         setContentView(R.layout.generic_list);
         setContentShown(false);

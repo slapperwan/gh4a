@@ -46,10 +46,6 @@ public class RepositoryListActivity extends BaseActivity implements
 
         super.onCreate(savedInstanceState);
 
-        if (hasErrorView()) {
-            return;
-        }
-
         FragmentManager fm = getSupportFragmentManager();
         if (savedInstanceState == null) {
             mFragment = RepositoryListContainerFragment.newInstance(mUserLogin, mUserType);

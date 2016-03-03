@@ -55,7 +55,7 @@ public class DownloadsFragment extends ListDataBaseFragment<Download> {
     }
 
     @Override
-    public Loader<LoaderResult<List<Download>>> onCreateLoader(int id, Bundle args) {
+    public Loader<LoaderResult<List<Download>>> onCreateLoader() {
         return new DownloadsLoader(getActivity(), mRepoOwner, mRepoName);
     }
 }

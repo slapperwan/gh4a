@@ -19,9 +19,6 @@ public class CommitHistoryActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (hasErrorView()) {
-            return;
-        }
 
         Bundle extras = getIntent().getExtras();
         String filePath = extras.getString(Constants.Object.PATH);

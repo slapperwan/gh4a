@@ -35,40 +35,30 @@ public class PullRequestFilesFragment extends CommitFragment {
     private List<CommitFile> mFiles;
     private List<CommitComment> mComments;
 
-    private LoaderCallbacks<List<CommitFile>> mPullRequestFilesCallback = new LoaderCallbacks<List<CommitFile>>() {
+    private LoaderCallbacks<List<CommitFile>> mPullRequestFilesCallback = new LoaderCallbacks<List<CommitFile>>(this) {
         @Override
-        public Loader<LoaderResult<List<CommitFile>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<CommitFile>>> onCreateLoader() {
             return new PullRequestFilesLoader(getActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
         }
 
         @Override
-        public void onResultReady(LoaderResult<List<CommitFile>> result) {
-            if (result.handleError(getActivity())) {
-                setContentShown(true);
-                setContentEmpty(true);
-                return;
-            }
-            mFiles = result.getData();
+        protected void onResultReady(List<CommitFile> result) {
+            mFiles = result;
             fillDataIfReady();
         }
     };
 
     private LoaderCallbacks<List<CommitComment>> mPullRequestCommentsCallback =
-            new LoaderCallbacks<List<CommitComment>>() {
+            new LoaderCallbacks<List<CommitComment>>(this) {
         @Override
-        public Loader<LoaderResult<List<CommitComment>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<CommitComment>>> onCreateLoader() {
             return new PullRequestCommentsLoader(getActivity(),
                     mRepoOwner, mRepoName, mPullRequestNumber);
         }
 
         @Override
-        public void onResultReady(LoaderResult<List<CommitComment>> result) {
-            if (result.handleError(getActivity())) {
-                setContentShown(true);
-                setContentEmpty(true);
-                return;
-            }
-            mComments = result.getData();
+        protected void onResultReady(List<CommitComment> result) {
+            mComments = result;
             fillDataIfReady();
         }
     };

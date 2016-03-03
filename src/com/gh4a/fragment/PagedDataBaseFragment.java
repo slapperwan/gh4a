@@ -16,7 +16,6 @@
 package com.gh4a.fragment;
 
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -25,6 +24,8 @@ import android.view.View;
 
 import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PageIteratorLoader;
 import com.gh4a.utils.UiUtils;
 
@@ -33,13 +34,35 @@ import org.eclipse.egit.github.core.client.PageIterator;
 import java.util.ArrayList;
 import java.util.Collection;
 
+// FIXME: save iterator state to saved instance state
+
 public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase implements
-        LoaderManager.LoaderCallbacks<Collection<T>>,
         RootAdapter.OnItemClickListener<T>, RootAdapter.OnScrolledToFooterListener {
     private RootAdapter<T, ? extends RecyclerView.ViewHolder> mAdapter;
     private boolean mIsLoadCompleted;
     private View mLoadingView;
     private String mCurrentFilter;
+
+    private LoaderCallbacks<PageIteratorLoader<T>.LoadedPage<T>> mLoaderCallback =
+            new LoaderCallbacks<PageIteratorLoader<T>.LoadedPage<T>>(this) {
+        @Override
+        protected Loader<LoaderResult<PageIteratorLoader<T>.LoadedPage<T>>> onCreateLoader() {
+            return new PageIteratorLoader<>(getActivity(), onCreateIterator());
+        }
+
+        @Override
+        protected void onResultReady(PageIteratorLoader<T>.LoadedPage<T> result) {
+            fillData(result.results, result.hasMoreData);
+            mIsLoadCompleted = true;
+            setContentShown(true);
+            getActivity().supportInvalidateOptionsMenu();
+            mAdapter.notifyDataSetChanged();
+            if (!TextUtils.isEmpty(mCurrentFilter)) {
+                mAdapter.getFilter().filter(mCurrentFilter);
+            }
+            updateEmptyState();
+        }
+    };
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -48,7 +71,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         setEmptyText(getString(getEmptyTextResId()));
         setContentShown(false);
 
-        getLoaderManager().initLoader(0, null, this);
+        getLoaderManager().initLoader(0, null, mLoaderCallback);
     }
 
     @Override
@@ -85,8 +108,8 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         return !mAdapter.isCardStyle();
     }
 
-    private void fillData(PageIteratorLoader<T> loader, Collection<T> data) {
-        mLoadingView.setVisibility(loader.hasMoreData() ? View.VISIBLE : View.GONE);
+    private void fillData(Collection<T> data, boolean hasMoreData) {
+        mLoadingView.setVisibility(hasMoreData ? View.VISIBLE : View.GONE);
 
         if (mAdapter.getCount() > 0 && !data.isEmpty() && data.iterator().next() == mAdapter.getItem(0)) {
             // there are common items, preserve them in order to keep the scroll position
@@ -108,28 +131,6 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
 
     protected void onAddData(RootAdapter<T, ? extends RecyclerView.ViewHolder> adapter, Collection<T> data) {
         adapter.addAll(data);
-    }
-
-    @Override
-    public Loader<Collection<T>> onCreateLoader(int id, Bundle args) {
-        return new PageIteratorLoader<>(getActivity(), onCreateIterator());
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Collection<T>> loader, Collection<T> events) {
-        fillData((PageIteratorLoader<T>) loader, events);
-        mIsLoadCompleted = true;
-        setContentShown(true);
-        getActivity().supportInvalidateOptionsMenu();
-        mAdapter.notifyDataSetChanged();
-        if (!TextUtils.isEmpty(mCurrentFilter)) {
-            mAdapter.getFilter().filter(mCurrentFilter);
-        }
-        updateEmptyState();
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Collection<T>> loader) {
     }
 
     @Override

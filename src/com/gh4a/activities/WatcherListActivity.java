@@ -36,9 +36,6 @@ public class WatcherListActivity extends BasePagerActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (hasErrorView()) {
-            return;
-        }
 
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.OWNER);
