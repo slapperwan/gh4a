@@ -19,7 +19,9 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.CodeSearchResult;
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.RequestError;
 import org.eclipse.egit.github.core.SearchUser;
+import org.eclipse.egit.github.core.client.RequestException;
 
 import android.content.Context;
 import android.net.Uri;
@@ -40,6 +42,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.R;
@@ -109,6 +112,19 @@ public class SearchActivity extends BaseActivity implements
         @Override
         protected void onResultReady(List<CodeSearchResult> result) {
             fillCodeData(result);
+        }
+
+        @Override
+        protected boolean onError(Exception e) {
+             if (e instanceof RequestException) {
+                RequestError error = ((RequestException) e).getError();
+                if (error != null && error.getErrors() != null && !error.getErrors().isEmpty()) {
+                    Toast.makeText(SearchActivity.this,
+                            R.string.code_search_too_broad_toast, Toast.LENGTH_LONG).show();
+                    return true;
+                }
+            }
+            return super.onError(e);
         }
     };
 
