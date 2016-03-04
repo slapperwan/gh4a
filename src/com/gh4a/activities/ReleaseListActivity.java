@@ -82,6 +82,14 @@ public class ReleaseListActivity extends BaseActivity implements
         getSupportLoaderManager().initLoader(0, null, mReleaseCallback);
     }
 
+    @Override
+    public void onRefresh() {
+        mAdapter.clear();
+        setContentShown(false);
+        getSupportLoaderManager().getLoader(0).onContentChanged();
+        super.onRefresh();
+    }
+
     private void fillData(List<Release> result) {
         setContentEmpty(result == null || result.isEmpty());
         mAdapter.addAll(result);

@@ -15,7 +15,6 @@ public abstract class FragmentFactory {
     protected abstract int getTitleResId();
     protected abstract int[] getTabTitleResIds();
     protected abstract Fragment getFragment(int position);
-    protected abstract void onRefreshFragment(Fragment fragment);
 
     /* expected format: int[tabCount][2] - 0 is header, 1 is status bar */
     protected int[][] getTabHeaderColors() {

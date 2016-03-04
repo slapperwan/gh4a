@@ -95,6 +95,17 @@ public class PullRequestFilesFragment extends CommitFragment {
     }
 
     @Override
+    public void onRefresh() {
+        mFiles = null;
+        mComments = null;
+        if (isAdded()) {
+            setContentShown(false);
+            getLoaderManager().getLoader(0).onContentChanged();
+            getLoaderManager().getLoader(1).onContentChanged();
+        }
+    }
+
+    @Override
     protected void initLoader() {
         getLoaderManager().initLoader(0, null, mPullRequestFilesCallback);
         getLoaderManager().initLoader(1, null, mPullRequestCommentsCallback);

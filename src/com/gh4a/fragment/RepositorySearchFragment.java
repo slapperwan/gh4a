@@ -34,7 +34,7 @@ public class RepositorySearchFragment extends ListDataBaseFragment<Repository> {
             mLoader.setQuery(query);
         }
         getArguments().putString("query", query);
-        refresh();
+        onRefresh();
     }
 
     @Override

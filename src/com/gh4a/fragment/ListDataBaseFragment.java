@@ -15,7 +15,6 @@ import com.gh4a.utils.UiUtils;
 public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase implements
         RootAdapter.OnItemClickListener<T> {
     private RootAdapter<T, ? extends RecyclerView.ViewHolder> mAdapter;
-    private boolean mViewCreated;
 
     private LoaderCallbacks<List<T>> mLoaderCallback = new LoaderCallbacks<List<T>>(this) {
         @Override
@@ -45,11 +44,14 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase im
         getLoaderManager().initLoader(0, null, mLoaderCallback);
     }
 
-    public void refresh() {
-        if (mViewCreated) {
-            mAdapter.clear();
+    @Override
+    public void onRefresh() {
+        if (isAdded()) {
             setContentShown(false);
             getLoaderManager().getLoader(0).onContentChanged();
+        }
+        if (mAdapter != null) {
+            mAdapter.clear();
         }
     }
 
@@ -82,14 +84,7 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase im
             setEmptyText(getString(emptyResId));
         }
 
-        mViewCreated = true;
         updateEmptyState();
-    }
-
-    @Override
-    public void onDestroyView() {
-        mViewCreated = false;
-        super.onDestroyView();
     }
 
     protected abstract Loader<LoaderResult<List<T>>> onCreateLoader();

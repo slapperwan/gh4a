@@ -28,9 +28,4 @@ public class BlogFactory extends FragmentFactory {
     protected Fragment getFragment(int position) {
         return BlogListFragment.newInstance();
     }
-
-    @Override
-    protected void onRefreshFragment(Fragment fragment) {
-        ((BlogListFragment) fragment).refresh();
-    }
 }

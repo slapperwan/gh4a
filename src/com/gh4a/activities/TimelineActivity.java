@@ -25,36 +25,29 @@ import com.gh4a.R;
 import com.gh4a.fragment.PublicTimelineFragment;
 
 public class TimelineActivity extends BaseActivity {
-    private PublicTimelineFragment mFragment;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         FragmentManager fm = getSupportFragmentManager();
+        final PublicTimelineFragment fragment;
         if (savedInstanceState == null) {
-            mFragment = PublicTimelineFragment.newInstance();
-            fm.beginTransaction().add(R.id.content_container, mFragment).commit();
+            fragment = PublicTimelineFragment.newInstance();
+            fm.beginTransaction().add(R.id.content_container, fragment).commit();
         } else {
-            mFragment = (PublicTimelineFragment) fm.findFragmentById(R.id.content_container);
+            fragment = (PublicTimelineFragment) fm.findFragmentById(R.id.content_container);
         }
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.pub_timeline);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        setChildScrollDelegate(mFragment);
+        setChildScrollDelegate(fragment);
     }
 
     @Override
     protected boolean canSwipeToRefresh() {
         return true;
-    }
-
-    @Override
-    public void onRefresh() {
-        mFragment.refresh();
-        refreshDone();
     }
 
     @Override

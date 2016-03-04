@@ -109,6 +109,17 @@ public class ReleaseInfoActivity extends BaseActivity implements
     }
 
     @Override
+    public void onRefresh() {
+        Loader loader = getSupportLoaderManager().getLoader(0);
+        if (loader != null) {
+            mRelease = null;
+            setContentShown(false);
+            loader.onContentChanged();
+        }
+        super.onRefresh();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         mImageGetter.resume();

@@ -79,11 +79,18 @@ public abstract class UserListActivity extends BaseActivity implements
         getSupportLoaderManager().initLoader(0, null, mUserListCallback);
     }
 
+    @Override
+    public void onRefresh() {
+        mUserAdapter.clear();
+        setContentShown(false);
+        getSupportLoaderManager().getLoader(0).onContentChanged();
+        super.onRefresh();
+    }
+
     protected void fillData(List<User> users) {
         if (users != null) {
             mUserAdapter.addAll(users);
         }
-        mUserAdapter.notifyDataSetChanged();
     }
 
     protected abstract Loader<LoaderResult<List<User>>> getUserListLoader();

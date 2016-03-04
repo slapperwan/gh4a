@@ -93,7 +93,7 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
         if (requestCode == REQUEST_COMMIT) {
             if (resultCode == Activity.RESULT_OK) {
                 // comments were updated
-                refresh();
+                onRefresh();
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);

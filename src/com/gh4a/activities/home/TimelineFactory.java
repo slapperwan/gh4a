@@ -28,9 +28,4 @@ public class TimelineFactory extends FragmentFactory {
     protected Fragment getFragment(int position) {
         return PublicTimelineFragment.newInstance();
     }
-
-    @Override
-    protected void onRefreshFragment(Fragment fragment) {
-        ((PublicTimelineFragment) fragment).refresh();
-    }
 }

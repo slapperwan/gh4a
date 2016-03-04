@@ -118,7 +118,7 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ISSUE) {
             if (resultCode == Activity.RESULT_OK) {
-                super.refresh();
+                super.onRefresh();
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);

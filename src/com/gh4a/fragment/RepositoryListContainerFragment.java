@@ -18,16 +18,18 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
 
 import org.eclipse.egit.github.core.Repository;
 
 public class RepositoryListContainerFragment extends Fragment implements
-        SearchView.OnCloseListener, SearchView.OnQueryTextListener,
+        LoaderCallbacks.ParentCallback, SearchView.OnCloseListener, SearchView.OnQueryTextListener,
         MenuItemCompat.OnActionExpandListener, SwipeRefreshLayout.ChildScrollDelegate {
     private String mUserLogin;
     private String mUserType;
@@ -81,6 +83,17 @@ public class RepositoryListContainerFragment extends Fragment implements
         super.onCreate(savedInstanceState);
     }
 
+    @Override
+    public BaseActivity getBaseActivity() {
+        return (BaseActivity) getActivity();
+    }
+
+    @Override
+    public void onRefresh() {
+        mMainFragment.onRefresh();
+        mSearchFragment.onRefresh();
+    }
+
     public void destroyChildren() {
         getChildFragmentManager().beginTransaction()
                 .remove(mMainFragment)
@@ -128,11 +141,6 @@ public class RepositoryListContainerFragment extends Fragment implements
         outState.putString(STATE_KEY_SORT_DIRECTION, mSortDirection);
         outState.putBoolean(STATE_KEY_SEARCH_VISIBLE, mSearchVisible);
         outState.putString(STATE_KEY_QUERY, mSearchQuery);
-    }
-
-    public void refresh() {
-        mSearchFragment.refresh();
-        mMainFragment.refresh();
     }
 
     public void setFilterType(String type) {

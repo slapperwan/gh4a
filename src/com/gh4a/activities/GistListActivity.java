@@ -28,7 +28,6 @@ import com.gh4a.utils.IntentUtils;
 
 public class GistListActivity extends BaseActivity {
     private String mUserLogin;
-    private GistListFragment mFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -37,11 +36,12 @@ public class GistListActivity extends BaseActivity {
         mUserLogin = getIntent().getExtras().getString(Constants.User.LOGIN);
 
         FragmentManager fm = getSupportFragmentManager();
+        final GistListFragment fragment;
         if (savedInstanceState == null) {
-            mFragment = GistListFragment.newInstance(mUserLogin, false);
-            fm.beginTransaction().add(R.id.content_container, mFragment).commit();
+            fragment = GistListFragment.newInstance(mUserLogin, false);
+            fm.beginTransaction().add(R.id.content_container, fragment).commit();
         } else {
-            mFragment = (GistListFragment) fm.findFragmentById(R.id.details);
+            fragment = (GistListFragment) fm.findFragmentById(R.id.content_container);
         }
 
         ActionBar actionBar = getSupportActionBar();
@@ -49,18 +49,12 @@ public class GistListActivity extends BaseActivity {
         actionBar.setSubtitle(mUserLogin);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        setChildScrollDelegate(mFragment);
+        setChildScrollDelegate(fragment);
     }
 
     @Override
     protected boolean canSwipeToRefresh() {
         return true;
-    }
-
-    @Override
-    public void onRefresh() {
-        mFragment.refresh();
-        refreshDone();
     }
 
     @Override

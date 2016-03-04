@@ -91,6 +91,14 @@ public class FileViewerActivity extends WebViewerActivity {
         getSupportLoaderManager().initLoader(0, null, mFileCallback);
     }
 
+    @Override
+    public void onRefresh() {
+        getSupportLoaderManager().getLoader(0).onContentChanged();
+        setContentShown(false);
+        setContentEmpty(false);
+        super.onRefresh();
+    }
+
     private void loadContent(RepositoryContents content) {
         String base64Data = content.getContent();
         if (base64Data != null && FileUtils.isImage(mPath)) {

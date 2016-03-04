@@ -14,7 +14,7 @@ import com.gh4a.widget.SwipeRefreshLayout;
 
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
-public class LoadingFragmentBase extends ProgressFragment implements
+public abstract class LoadingFragmentBase extends ProgressFragment implements
         LoaderCallbacks.ParentCallback, SwipeRefreshLayout.ChildScrollDelegate {
     private SmoothProgressBar mProgress;
 

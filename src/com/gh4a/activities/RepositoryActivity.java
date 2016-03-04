@@ -16,6 +16,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.util.Pair;
@@ -85,7 +86,6 @@ public class RepositoryActivity extends BasePagerActivity {
                 mInitialPage = -1;
             }
             setContentShown(true);
-            refreshDone();
             supportInvalidateOptionsMenu();
         }
     };
@@ -235,7 +235,24 @@ public class RepositoryActivity extends BasePagerActivity {
 
     @Override
     public void onRefresh() {
-        refreshFragments();
+        mRepositoryFragment = null;
+        mRepository = null;
+        mIsStarring = null;
+        mIsWatching = null;
+        mBranches = null;
+        mTags = null;
+        clearRefDependentFragments();
+        setContentShown(false);
+        setTabsEnabled(false);
+
+        LoaderManager lm = getSupportLoaderManager();
+        for (int i = 0; i < 4; i++) {
+            Loader loader = lm.getLoader(i);
+            if (loader != null) {
+                loader.onContentChanged();
+            }
+        }
+        super.onRefresh();
     }
 
     @Override
@@ -392,13 +409,6 @@ public class RepositoryActivity extends BasePagerActivity {
             mContentListFragment.setRef(mSelectedRef);
         }
         mCommitListFragment = null;
-    }
-
-    private void refreshFragments() {
-        mRepositoryFragment = null;
-        clearRefDependentFragments();
-        setContentShown(false);
-        getSupportLoaderManager().getLoader(LOADER_REPO).onContentChanged();
     }
 
     private class BranchAndTagAdapter extends BaseAdapter {

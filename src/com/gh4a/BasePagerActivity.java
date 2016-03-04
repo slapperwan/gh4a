@@ -7,10 +7,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
 
@@ -71,6 +73,17 @@ public abstract class BasePagerActivity extends BaseActivity implements
         mErrorViewVisible = visible;
         updateTabVisibility();
         super.setErrorViewVisibility(visible);
+    }
+
+    @Override
+    public void onRefresh() {
+        for (int i = 0; i < mAdapter.getCount(); i++) {
+            Fragment f = mAdapter.getExistingFragment(i);
+            if (f instanceof LoaderCallbacks.ParentCallback) {
+                ((LoaderCallbacks.ParentCallback) f).onRefresh();
+            }
+        }
+        super.onRefresh();
     }
 
     @Override
@@ -162,6 +175,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
     }
 
     private class FragmentAdapter extends FragmentStatePagerAdapter {
+        private SparseArray<Fragment> mFragments = new SparseArray<>();
         private Fragment mCurrentFragment;
 
         public FragmentAdapter() {
@@ -175,7 +189,13 @@ public abstract class BasePagerActivity extends BaseActivity implements
 
         @Override
         public Fragment getItem(int position) {
-            return getFragment(position);
+            Fragment f = getFragment(position);
+            mFragments.put(position, f);
+            return f;
+        }
+
+        private Fragment getExistingFragment(int position) {
+            return mFragments.get(position);
         }
 
         private Fragment getCurrentFragment() {
@@ -190,6 +210,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
             super.destroyItem(container, position, object);
+            mFragments.remove(position);
             if (object == mCurrentFragment) {
                 mCurrentFragment = null;
             }

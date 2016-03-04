@@ -124,6 +124,19 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
     }
 
     @Override
+    public void onRefresh() {
+        mUser = null;
+        if (mContentView != null) {
+            setContentShown(false);
+            fillOrganizations(null);
+            fillTopRepos(null);
+        }
+        if (isAdded()) {
+            getLoaderManager().getLoader(0).onContentChanged();
+        }
+    }
+
+    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
@@ -132,13 +145,6 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         setContentShown(false);
 
         getLoaderManager().initLoader(0, null, mUserCallback);
-    }
-
-    public void refresh() {
-        if (mContentView != null) {
-            setContentShown(false);
-            getLoaderManager().getLoader(0).onContentChanged();
-        }
     }
 
     private void fillData() {

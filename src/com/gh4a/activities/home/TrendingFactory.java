@@ -33,10 +33,4 @@ public class TrendingFactory extends FragmentFactory {
         }
         return null;
     }
-
-    @Override
-    protected void onRefreshFragment(Fragment fragment) {
-        ((TrendingFragment) fragment).refresh();
-
-    }
 }

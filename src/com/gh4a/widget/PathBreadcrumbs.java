@@ -1,16 +1,12 @@
 package com.gh4a.widget;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.gh4a.R;

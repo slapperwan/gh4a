@@ -9,6 +9,7 @@ public abstract class LoaderCallbacks<T> implements
         android.support.v4.app.LoaderManager.LoaderCallbacks<LoaderResult<T>> {
     public interface ParentCallback {
         BaseActivity getBaseActivity();
+        void onRefresh();
     }
 
     private ParentCallback mCb;

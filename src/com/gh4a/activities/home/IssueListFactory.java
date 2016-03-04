@@ -70,11 +70,6 @@ public class IssueListFactory extends FragmentFactory {
     }
 
     @Override
-    protected void onRefreshFragment(Fragment fragment) {
-        ((RepositoryIssueListFragment) fragment).refresh();
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         int resIdState = Constants.Issue.STATE_OPEN.equals(mState) ?
                 R.string.issues_menu_show_closed : R.string.issues_menu_show_open;

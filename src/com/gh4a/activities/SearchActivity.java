@@ -176,6 +176,18 @@ public class SearchActivity extends BaseActivity implements
     }
 
     @Override
+    public void onRefresh() {
+        Loader loader = getSupportLoaderManager().getLoader(0);
+        if (loader != null) {
+            if (mAdapter != null) {
+                mAdapter.clear();
+            }
+            loader.onContentChanged();
+        }
+        super.onRefresh();
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         if (mAdapter instanceof RepositoryAdapter) {
             outState.putInt(STATE_KEY_SEARCH_MODE, SEARCH_MODE_REPO);

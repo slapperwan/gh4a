@@ -16,6 +16,7 @@
 package com.gh4a.fragment;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -248,6 +249,25 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     }
 
     @Override
+    public void onRefresh() {
+        mIsCollaborator = false;
+        if (mListHeaderView != null) {
+            getActivity().supportInvalidateOptionsMenu();
+            fillLabels(new ArrayList<Label>());
+            fillStatus(new ArrayList<CommitStatus>());
+        }
+        if (isAdded()) {
+            for (int i = 1; i < 4; i++) {
+                Loader loader = getLoaderManager().getLoader(i);
+                if (loader != null) {
+                    loader.onContentChanged();
+                }
+            }
+        }
+        super.onRefresh();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         mImageGetter.resume();
@@ -267,12 +287,6 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
             return true;
         }
         return super.canChildScrollUp();
-    }
-
-    @Override
-    public void refresh() {
-        super.refresh();
-        getLoaderManager().getLoader(1).onContentChanged();
     }
 
     @Override
@@ -554,12 +568,12 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     @Override
     public void onCommentSent() {
         // reload comments
-        super.refresh();
+        super.onRefresh();
     }
 
     public void refreshComments() {
         // no need to refresh pull request and collaborator status in that case
-        super.refresh();
+        super.onRefresh();
     }
 
     private class PullRequestOpenCloseTask extends ProgressDialogTask<PullRequest> {
@@ -591,7 +605,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
             fillData();
             // reload events, the action will have triggered an additional one
-            PullRequestFragment.super.refresh();
+            PullRequestFragment.super.onRefresh();
             getActivity().supportInvalidateOptionsMenu();
         }
 

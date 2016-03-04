@@ -125,11 +125,6 @@ public class RepositoryFactory extends FragmentFactory {
         return mFragment;
     }
 
-    @Override
-    protected void onRefreshFragment(Fragment fragment) {
-        ((RepositoryListContainerFragment) fragment).refresh();
-    }
-
     private void restorePreviouslySelectedFilterAndSort() {
         String lastType = mPrefs.getString(PREF_KEY_FILTER, null);
         String lastOrder = mPrefs.getString(PREF_KEY_SORT_ORDER, null);

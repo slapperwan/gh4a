@@ -81,7 +81,6 @@ public class IssueLabelListActivity extends BaseActivity implements
             for (Label label : result) {
                 mAdapter.add(new IssueLabelAdapter.EditableLabel(label));
             }
-            mAdapter.notifyDataSetChanged();
             setContentShown(true);
         }
     };
@@ -139,6 +138,14 @@ public class IssueLabelListActivity extends BaseActivity implements
                 }
             }
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        setContentShown(false);
+        mAdapter.clear();
+        getSupportLoaderManager().getLoader(0).onContentChanged();
+        super.onRefresh();
     }
 
     @Override

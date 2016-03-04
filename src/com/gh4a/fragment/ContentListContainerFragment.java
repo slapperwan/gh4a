@@ -83,7 +83,6 @@ public class ContentListContainerFragment extends Fragment implements
         return f;
     }
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,6 +109,11 @@ public class ContentListContainerFragment extends Fragment implements
         } else {
             mDirStack.push("");
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        setRef(mSelectedRef);
     }
 
     @Override

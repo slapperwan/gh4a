@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v4.os.AsyncTaskCompat;
@@ -224,6 +225,25 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
         updateLabels();
         updateLabelStates();
+    }
+
+    @Override
+    public void onRefresh() {
+        mAllAssignee = null;
+        mAllMilestone = null;
+        mAllLabels = null;
+        mIsCollaborator = false;
+        updateLabels();
+        updateLabelStates();
+
+        LoaderManager lm = getSupportLoaderManager();
+        for (int i = 0; i < 4; i++) {
+            Loader loader = lm.getLoader(i);
+            if (loader != null) {
+                loader.onContentChanged();
+            }
+        }
+        super.onRefresh();
     }
 
     private boolean isInEditMode() {

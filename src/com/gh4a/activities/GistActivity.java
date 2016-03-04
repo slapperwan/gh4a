@@ -24,6 +24,7 @@ import org.eclipse.egit.github.core.service.GistService;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -94,6 +95,17 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
 
         getSupportLoaderManager().initLoader(0, null, mGistCallback);
         getSupportLoaderManager().initLoader(1, null, mStarCallback);
+    }
+
+    @Override
+    public void onRefresh() {
+        LoaderManager lm = getSupportLoaderManager();
+        lm.getLoader(0).onContentChanged();
+        lm.getLoader(1).onContentChanged();
+        mGist = null;
+        mIsStarred = null;
+        setContentShown(false);
+        super.onRefresh();
     }
 
     private void fillData(final Gist gist) {

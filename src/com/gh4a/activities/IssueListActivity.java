@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewCompat;
@@ -203,6 +204,24 @@ public class IssueListActivity extends BasePagerActivity implements
     }
 
     @Override
+    public void onRefresh() {
+        mAssignees = null;
+        mMilestones = null;
+        mLabels = null;
+        mIsCollaborator = null;
+        updateRightNavigationDrawer();
+
+        LoaderManager lm = getSupportLoaderManager();
+        for (int i = 0; i < 4; i++) {
+            Loader loader = lm.getLoader(i);
+            if (loader != null) {
+                loader.onContentChanged();
+            }
+        }
+        super.onRefresh();
+    }
+
+    @Override
     protected int[] getTabTitleResIds() {
         return TITLES;
     }
@@ -278,7 +297,7 @@ public class IssueListActivity extends BasePagerActivity implements
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ISSUE_CREATE) {
             if (resultCode == Activity.RESULT_OK) {
-                mOpenFragment.refresh();
+                mOpenFragment.onRefresh();
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);

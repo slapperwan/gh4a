@@ -20,7 +20,6 @@ import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
-import com.gh4a.R;
 import com.gh4a.adapter.RepositoryIssueAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.IntentUtils;

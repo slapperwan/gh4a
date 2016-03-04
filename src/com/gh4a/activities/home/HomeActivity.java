@@ -6,7 +6,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
-import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,7 +33,6 @@ public class HomeActivity extends BasePagerActivity implements
     private static final int REQUEST_SETTINGS = 10000;
 
     private FragmentFactory mFactory;
-    private SparseArray<Fragment> mFragments;
     private ImageView mAvatarView;
     private String mUserLogin;
     private int mSelectedFactoryId;
@@ -63,7 +61,6 @@ public class HomeActivity extends BasePagerActivity implements
             mSelectedFactoryId = R.id.news_feed;
         }
         mFactory = getFactoryForItem(mSelectedFactoryId);
-        mFragments = new SparseArray<>();
 
         super.onCreate(savedInstanceState);
 
@@ -194,9 +191,7 @@ public class HomeActivity extends BasePagerActivity implements
 
     @Override
     protected Fragment getFragment(int position) {
-        Fragment fragment = mFactory.getFragment(position);
-        mFragments.put(position, fragment);
-        return fragment;
+        return mFactory.getFragment(position);
     }
 
     @Override
@@ -253,12 +248,8 @@ public class HomeActivity extends BasePagerActivity implements
 
     @Override
     public void onRefresh() {
-        for (int i = 0; i < mFragments.size(); i++) {
-            int position = mFragments.keyAt(i);
-            mFactory.onRefreshFragment(mFragments.get(position));
-        }
-        getSupportLoaderManager().restartLoader(0, null, mUserCallback);
-        refreshDone();
+        getSupportLoaderManager().getLoader(0).onContentChanged();
+        super.onRefresh();
     }
 
     @Override
@@ -297,7 +288,6 @@ public class HomeActivity extends BasePagerActivity implements
 
     @Override
     public void invalidateFragments() {
-        mFragments.clear();
         super.invalidateFragments();
     }
 

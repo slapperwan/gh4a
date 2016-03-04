@@ -106,10 +106,11 @@ public class PullRequestActivity extends BasePagerActivity implements
 
     @Override
     public void onRefresh() {
-        if (mPullRequestFragment != null) {
-            mPullRequestFragment.refresh();
-        }
-        refreshDone();
+        mPullRequest = null;
+        setContentShown(false);
+        setTabsEnabled(false);
+        getSupportLoaderManager().getLoader(0).onContentChanged();
+        super.onRefresh();
     }
 
     @Override

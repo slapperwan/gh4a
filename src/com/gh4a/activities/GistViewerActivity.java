@@ -67,6 +67,14 @@ public class GistViewerActivity extends WebViewerActivity {
     }
 
     @Override
+    public void onRefresh() {
+        setContentShown(false);
+        getSupportLoaderManager().getLoader(0).onContentChanged();
+        mGistFile = null;
+        super.onRefresh();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.download_menu, menu);

@@ -146,6 +146,20 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     }
 
     @Override
+    public void onRefresh() {
+        if (mContentView != null) {
+            mContentView.findViewById(R.id.readme).setVisibility(View.GONE);
+            mContentView.findViewById(R.id.pb_readme).setVisibility(View.VISIBLE);
+            mContentView.findViewById(R.id.pull_requests_progress).setVisibility(View.VISIBLE);
+        }
+        if (isAdded()) {
+            setContentShown(false);
+            getLoaderManager().getLoader(0).onContentChanged();
+            getLoaderManager().getLoader(1).onContentChanged();
+        }
+    }
+
+    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 

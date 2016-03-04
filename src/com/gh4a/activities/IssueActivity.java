@@ -32,6 +32,7 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
@@ -312,7 +313,6 @@ public class IssueActivity extends BaseActivity implements
 
         mHeader.setVisibility(View.VISIBLE);
         updateFabVisibility();
-        refreshDone();
     }
 
     @Override
@@ -380,11 +380,15 @@ public class IssueActivity extends BaseActivity implements
     public void onRefresh() {
         mIssue = null;
         mEventsLoaded = false;
+        mIsCollaborator = false;
         setContentShown(false);
-        getSupportLoaderManager().restartLoader(0, null, mIssueCallback);
-        getSupportLoaderManager().restartLoader(1, null, mCollaboratorCallback);
-        getSupportLoaderManager().restartLoader(2, null, mEventCallback);
-        supportInvalidateOptionsMenu();
+        updateFabVisibility();
+
+        LoaderManager lm = getSupportLoaderManager();
+        for (int i = 0; i < 3; i++) {
+            lm.getLoader(i).onContentChanged();
+        }
+        super.onRefresh();
     }
 
     private void updateFabVisibility() {

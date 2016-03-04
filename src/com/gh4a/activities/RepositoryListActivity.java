@@ -51,7 +51,7 @@ public class RepositoryListActivity extends BaseActivity implements
             mFragment = RepositoryListContainerFragment.newInstance(mUserLogin, mUserType);
             fm.beginTransaction().add(R.id.content_container, mFragment).commit();
         } else {
-            mFragment = (RepositoryListContainerFragment) fm.findFragmentById(R.id.details);
+            mFragment = (RepositoryListContainerFragment) fm.findFragmentById(R.id.content_container);
         }
 
         mSortDrawerHelper.setFilterType(mFragment.getFilterType());
@@ -112,12 +112,6 @@ public class RepositoryListActivity extends BaseActivity implements
     @Override
     public void initiateFilter() {
         toggleRightSideDrawer();
-    }
-
-    @Override
-    public void onRefresh() {
-        mFragment.refresh();
-        refreshDone();
     }
 
     @Override

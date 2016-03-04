@@ -124,6 +124,17 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     }
 
     @Override
+    public void onRefresh() {
+        Loader loader = getSupportLoaderManager().getLoader(0);
+        if (loader != null) {
+            mCommitCommentsByPos.clear();
+            setContentShown(false);
+            loader.onContentChanged();
+        }
+        super.onRefresh();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.download_menu, menu);

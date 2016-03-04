@@ -31,9 +31,4 @@ public class NewsFeedFactory extends FragmentFactory {
     protected Fragment getFragment(int position) {
         return PrivateEventListFragment.newInstance(mUserLogin);
     }
-
-    @Override
-    protected void onRefreshFragment(Fragment fragment) {
-        ((PrivateEventListFragment) fragment).refresh();
-    }
 }

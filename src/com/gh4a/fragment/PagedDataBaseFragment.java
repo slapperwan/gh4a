@@ -18,7 +18,6 @@ package com.gh4a.fragment;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -71,6 +70,19 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     }
 
     @Override
+    public void onRefresh() {
+        if (mAdapter != null) {
+            mAdapter.clear();
+        }
+        mIsLoadCompleted = false;
+        if (isAdded()) {
+            setContentShown(false);
+            getLoaderManager().getLoader(0).onContentChanged();
+            getActivity().supportInvalidateOptionsMenu();
+        }
+    }
+
+    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         mAdapter = onCreateAdapter();
 
@@ -90,13 +102,6 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         }
         recyclerView.setAdapter(mAdapter);
         updateEmptyState();
-    }
-
-    public void refresh() {
-        if (getRecyclerView() != null) {
-            setContentShown(false);
-            getLoaderManager().getLoader(0).onContentChanged();
-        }
     }
 
     @Override

@@ -155,13 +155,13 @@ public class UserActivity extends BasePagerActivity {
 
     @Override
     public void onRefresh() {
-        if (mUserFragment != null) {
-            mUserFragment.refresh();
+        Loader loader = getSupportLoaderManager().getLoader(4);
+        if (loader != null) {
+            mIsFollowing = null;
+            supportInvalidateOptionsMenu();
+            loader.onContentChanged();
         }
-        if (mPublicEventListFragment != null) {
-            mPublicEventListFragment.refresh();
-        }
-        refreshDone();
+        super.onRefresh();
     }
 
     private class UpdateFollowTask extends BackgroundTask<Void> {

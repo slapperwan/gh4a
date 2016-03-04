@@ -28,6 +28,8 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -158,10 +160,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     protected boolean canSwipeToRefresh() {
         return false;
-    }
-
-    protected void refreshDone() {
-        mSwipeLayout.setRefreshing(false);
     }
 
     protected void setChildScrollDelegate(SwipeRefreshLayout.ChildScrollDelegate delegate) {
@@ -380,7 +378,13 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     @Override
     public void onRefresh() {
-        mSwipeLayout.setRefreshing(true);
+        FragmentManager fm = getSupportFragmentManager();
+        Fragment f = fm.findFragmentById(R.id.content_container);
+        if (f instanceof LoaderCallbacks.ParentCallback) {
+            ((LoaderCallbacks.ParentCallback) f).onRefresh();
+        }
+        supportInvalidateOptionsMenu();
+        mSwipeLayout.setRefreshing(false);
     }
 
     @Override

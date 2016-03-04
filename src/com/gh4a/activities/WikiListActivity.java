@@ -44,7 +44,7 @@ public class WikiListActivity extends BaseActivity
         implements RootAdapter.OnItemClickListener<Feed> {
     private String mUserLogin;
     private String mRepoName;
-    private RecyclerView mRecyclerView;
+    private CommonFeedAdapter mAdapter;
 
     private LoaderCallbacks<List<Feed>> mFeedCallback = new LoaderCallbacks<List<Feed>>(this) {
         @Override
@@ -87,17 +87,26 @@ public class WikiListActivity extends BaseActivity
         actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        CommonFeedAdapter adapter = new CommonFeedAdapter(this, false);
-        adapter.setOnItemClickListener(this);
+        mAdapter = new CommonFeedAdapter(this, false);
+        mAdapter.setOnItemClickListener(this);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.list);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(this));
-        mRecyclerView.setAdapter(adapter);
-        mRecyclerView.setBackgroundResource(
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this));
+        recyclerView.setAdapter(mAdapter);
+        recyclerView.setBackgroundResource(
                 UiUtils.resolveDrawable(this, R.attr.listBackground));
 
         getSupportLoaderManager().initLoader(0, null, mFeedCallback);
+    }
+
+    @Override
+    public void onRefresh() {
+        mAdapter.clear();
+        setContentShown(false);
+        setContentEmpty(false);
+        getSupportLoaderManager().getLoader(0).onContentChanged();
+        super.onRefresh();
     }
 
     @Override
@@ -106,18 +115,19 @@ public class WikiListActivity extends BaseActivity
     }
 
     private void fillData(List<Feed> result) {
-        if (result != null) {
-            CommonFeedAdapter adapter = (CommonFeedAdapter) mRecyclerView.getAdapter();
-            adapter.addAll(result);
-            adapter.notifyDataSetChanged();
+        mAdapter.clear();
+        if (result == null) {
+            return;
+        }
 
-            String initialPage = getIntent().getStringExtra(Constants.Object.OBJECT_SHA);
-            if (initialPage != null) {
-                for (Feed feed : result) {
-                    if (initialPage.equals(feed.getId())) {
-                        openViewer(feed);
-                        break;
-                    }
+        mAdapter.addAll(result);
+
+        String initialPage = getIntent().getStringExtra(Constants.Object.OBJECT_SHA);
+        if (initialPage != null) {
+            for (Feed feed : result) {
+                if (initialPage.equals(feed.getId())) {
+                    openViewer(feed);
+                    break;
                 }
             }
         }

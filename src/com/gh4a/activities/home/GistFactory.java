@@ -23,11 +23,6 @@ public class GistFactory extends FragmentFactory {
     }
 
     @Override
-    protected void onRefreshFragment(Fragment fragment) {
-        ((GistListFragment) fragment).refresh();
-    }
-
-    @Override
     protected int[] getTabTitleResIds() {
         return TAB_TITLES;
     }

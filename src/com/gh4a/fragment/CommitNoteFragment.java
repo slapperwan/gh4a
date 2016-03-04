@@ -134,7 +134,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_EDIT) {
             if (resultCode == Activity.RESULT_OK) {
-                refresh();
+                onRefresh();
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -168,6 +168,6 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
     @Override
     public void onCommentSent() {
-        refresh();
+        onRefresh();
     }
 }

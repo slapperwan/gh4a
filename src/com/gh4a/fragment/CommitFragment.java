@@ -97,6 +97,17 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
     }
 
     @Override
+    public void onRefresh() {
+        mCommit = null;
+        mComments = null;
+        if (isAdded()) {
+            setContentShown(false);
+            getLoaderManager().getLoader(0).onContentChanged();
+            getLoaderManager().getLoader(1).onContentChanged();
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         mContentView = inflater.inflate(R.layout.commit, null);
