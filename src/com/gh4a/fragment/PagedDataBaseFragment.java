@@ -21,6 +21,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import com.gh4a.PageIteratorWithSaveableState;
 import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderCallbacks;
@@ -33,19 +34,20 @@ import org.eclipse.egit.github.core.client.PageIterator;
 import java.util.ArrayList;
 import java.util.Collection;
 
-// FIXME: save iterator state to saved instance state
-
 public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase implements
         RootAdapter.OnItemClickListener<T>, RootAdapter.OnScrolledToFooterListener {
     private RootAdapter<T, ? extends RecyclerView.ViewHolder> mAdapter;
+    private PageIteratorWithSaveableState<T> mIterator;
     private boolean mIsLoadCompleted;
     private View mLoadingView;
+
+    private static final String STATE_KEY_ITERATOR_STATE = "iterator_state";
 
     private LoaderCallbacks<PageIteratorLoader<T>.LoadedPage<T>> mLoaderCallback =
             new LoaderCallbacks<PageIteratorLoader<T>.LoadedPage<T>>(this) {
         @Override
         protected Loader<LoaderResult<PageIteratorLoader<T>.LoadedPage<T>>> onCreateLoader() {
-            return new PageIteratorLoader<>(getActivity(), onCreateIterator());
+            return new PageIteratorLoader<>(getActivity(), mIterator);
         }
 
         @Override
@@ -66,7 +68,20 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         setEmptyText(getString(getEmptyTextResId()));
         setContentShown(false);
 
+        mIterator = (PageIteratorWithSaveableState<T>) onCreateIterator();
+        if (savedInstanceState != null) {
+            mIterator.restoreState(savedInstanceState.getBundle(STATE_KEY_ITERATOR_STATE));
+        }
+
         getLoaderManager().initLoader(0, null, mLoaderCallback);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mIterator != null) {
+            outState.putBundle(STATE_KEY_ITERATOR_STATE, mIterator.saveState());
+        }
     }
 
     @Override
