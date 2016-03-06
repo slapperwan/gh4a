@@ -441,7 +441,7 @@ public class HttpImageGetter implements ImageGetter {
         }
 
         synchronized (this) {
-            if (destroyed) {
+            if (destroyed && bitmap != null) {
                 bitmap.recycle();
                 bitmap = null;
             } else if (bitmap != null) {
