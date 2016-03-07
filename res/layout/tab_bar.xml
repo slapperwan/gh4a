@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     app:tabMode="scrollable"
     app:tabGravity="fill"
+    app:tabMaxWidth="-1dp"
     app:tabTextColor="@color/tab_text_color"
     app:tabSelectedTextColor="@color/tab_indicator_color"
     app:tabIndicatorColor="@color/tab_indicator_color" />
