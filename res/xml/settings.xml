@@ -9,6 +9,14 @@
         android:entryValues="@array/theme_values"
         android:defaultValue="1" />
 
+    <ListPreference
+        android:key="start_page"
+        android:title="@string/start_page"
+        android:summary="%s"
+        android:entries="@array/start_page_items"
+        android:entryValues="@array/start_page_values"
+        android:defaultValue="newsfeed" />
+
     <com.gh4a.widget.IntegerListPreference
         android:key="webview_initial_zoom"
         android:title="@string/menu_text_size"

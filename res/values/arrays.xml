@@ -8,6 +8,28 @@
         <item>0</item>
         <item>1</item>
     </string-array>
+    <string-array name="start_page_items" translatable="false">
+        <item>@string/start_page_last_selected</item>
+        <item>@string/user_news_feed</item>
+        <item>@string/my_repositories</item>
+        <item>@string/my_issues</item>
+        <item>@string/my_pull_requests</item>
+        <item>@string/my_gists</item>
+        <item>@string/pub_timeline</item>
+        <item>@string/trend</item>
+        <item>@string/blog</item>
+    </string-array>
+    <string-array name="start_page_values" translatable="false">
+        <item>last</item>
+        <item>newsfeed</item>
+        <item>repos</item>
+        <item>issues</item>
+        <item>prs</item>
+        <item>gists</item>
+        <item>timeline</item>
+        <item>trends</item>
+        <item>blog</item>
+    </string-array>
     <string-array name="text_size_items">
         <item>Smallest</item>
         <item>Smaller</item>

@@ -220,10 +220,6 @@ public abstract class WebViewerActivity extends BaseActivity {
         getPrefs().edit().putBoolean("line_wrapping", enabled).apply();
     }
 
-    private SharedPreferences getPrefs() {
-        return getSharedPreferences(SettingsFragment.PREF_NAME, MODE_PRIVATE);
-    }
-
     private void applyLineWrapping(boolean enabled) {
         mWebView.loadUrl("javascript:applyLineWrapping(" + enabled + ")");
     }

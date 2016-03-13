@@ -102,6 +102,8 @@
     <string name="my_issues">My issues</string>
     <string name="my_pull_requests">My pull requests</string>
     <string name="my_gists">My gists</string>
+    <string name="start_page">Start page</string>
+    <string name="start_page_last_selected">Last selected</string>
 
     <plurals name="contributor_extra_data">
         <item quantity="one">%1$d contribution</item>

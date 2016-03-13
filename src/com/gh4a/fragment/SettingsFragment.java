@@ -34,6 +34,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
     public static final String PREF_NAME = "Gh4a-pref";
 
     public static final String KEY_THEME = "theme";
+    public static final String KEY_START_PAGE = "start_page";
     public static final String KEY_TEXT_SIZE = "webview_initial_zoom";
     public static final String KEY_GIF_LOADING = "http_gif_load_mode";
     private static final String KEY_LOGOUT = "logout";

@@ -18,6 +18,7 @@ package com.gh4a;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
@@ -52,6 +53,7 @@ import com.gh4a.activities.Github4AndroidActivity;
 import com.gh4a.activities.SearchActivity;
 import com.gh4a.activities.home.HomeActivity;
 import com.gh4a.db.BookmarksProvider;
+import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
@@ -264,6 +266,10 @@ public abstract class BaseActivity extends AppCompatActivity implements
         } else {
             return new Intent(this, Github4AndroidActivity.class);
         }
+    }
+
+    protected SharedPreferences getPrefs() {
+        return getSharedPreferences(SettingsFragment.PREF_NAME, MODE_PRIVATE);
     }
 
     public void addAppBarOffsetListener(AppBarLayout.OnOffsetChangedListener l) {

@@ -1,6 +1,5 @@
 package com.gh4a.activities.home;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,7 +9,6 @@ import android.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.fragment.RepositoryListContainerFragment;
-import com.gh4a.fragment.SettingsFragment;
 
 public class RepositoryFactory extends FragmentFactory {
     private static final int[] TAB_TITLES = new int[] {
@@ -28,14 +26,14 @@ public class RepositoryFactory extends FragmentFactory {
     private static final String PREF_KEY_SORT_ORDER = "home_repo_list_sort_order";
     private static final String PREF_KEY_SORT_DIR = "home_repo_list_sort_dir";
 
-    public RepositoryFactory(HomeActivity activity, String userLogin) {
+    public RepositoryFactory(HomeActivity activity, String userLogin, SharedPreferences prefs) {
         super(activity);
         mUserLogin = userLogin;
 
         mFilterDrawerHelper = RepositoryListContainerFragment.FilterDrawerHelper.create(mUserLogin,
                 Constants.User.TYPE_USER);
         mSortDrawerHelper = new RepositoryListContainerFragment.SortDrawerHelper();
-        mPrefs = activity.getSharedPreferences(SettingsFragment.PREF_NAME, Context.MODE_PRIVATE);
+        mPrefs = prefs;
     }
 
     @Override

@@ -28,8 +28,6 @@ import org.eclipse.egit.github.core.service.OAuthService;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -231,12 +229,10 @@ public class Github4AndroidActivity extends BaseActivity {
 
         @Override
         protected void onSuccess(Authorization result) {
-            SharedPreferences sharedPreferences = getSharedPreferences(
-                    SettingsFragment.PREF_NAME, MODE_PRIVATE);
-            Editor editor = sharedPreferences.edit();
-            editor.putString(Constants.User.AUTH_TOKEN, result.getToken());
-            editor.putString(Constants.User.LOGIN, mUserName);
-            editor.apply();
+            getPrefs().edit()
+                    .putString(Constants.User.AUTH_TOKEN, result.getToken())
+                    .putString(Constants.User.LOGIN, mUserName)
+                    .apply();
 
             goToToplevelActivity();
             finish();

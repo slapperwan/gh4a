@@ -6,6 +6,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
+import android.text.TextUtils;
+import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +22,7 @@ import com.gh4a.activities.BookmarkListActivity;
 import com.gh4a.activities.SearchActivity;
 import com.gh4a.activities.SettingsActivity;
 import com.gh4a.fragment.RepositoryListContainerFragment;
+import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.UserLoader;
@@ -40,6 +43,18 @@ public class HomeActivity extends BasePagerActivity implements
 
     private static final String STATE_KEY_FACTORY_ITEM = "factoryItem";
 
+    private static final SparseArray<String> START_PAGE_MAPPING = new SparseArray<>();
+    static {
+        START_PAGE_MAPPING.put(R.id.news_feed, "newsfeed");
+        START_PAGE_MAPPING.put(R.id.my_repos, "repos");
+        START_PAGE_MAPPING.put(R.id.my_issues, "issues");
+        START_PAGE_MAPPING.put(R.id.my_prs, "prs");
+        START_PAGE_MAPPING.put(R.id.my_gists, "gists");
+        START_PAGE_MAPPING.put(R.id.pub_timeline, "timeline");
+        START_PAGE_MAPPING.put(R.id.trend, "trends");
+        START_PAGE_MAPPING.put(R.id.blog, "blog");
+    }
+
     private LoaderCallbacks<User> mUserCallback = new LoaderCallbacks<User>(this) {
         @Override
         protected Loader<LoaderResult<User>> onCreateLoader() {
@@ -58,7 +73,7 @@ public class HomeActivity extends BasePagerActivity implements
         if (savedInstanceState != null) {
             mSelectedFactoryId = savedInstanceState.getInt(STATE_KEY_FACTORY_ITEM);
         } else {
-            mSelectedFactoryId = R.id.news_feed;
+            mSelectedFactoryId = determineInitialPage();
         }
         mFactory = getFactoryForItem(mSelectedFactoryId);
 
@@ -162,7 +177,7 @@ public class HomeActivity extends BasePagerActivity implements
             case R.id.news_feed:
                 return new NewsFeedFactory(this, mUserLogin);
             case R.id.my_repos:
-                return new RepositoryFactory(this, mUserLogin);
+                return new RepositoryFactory(this, mUserLogin, getPrefs());
             case R.id.my_issues:
                 return new IssueListFactory(this, mUserLogin, false);
             case R.id.my_prs:
@@ -299,12 +314,29 @@ public class HomeActivity extends BasePagerActivity implements
         getSupportActionBar().setTitle(mFactory.getTitleResId());
     }
 
+    private int determineInitialPage() {
+        String initialPage = getPrefs().getString(SettingsFragment.KEY_START_PAGE, "newsfeed");
+        if (TextUtils.equals(initialPage, "last")) {
+            initialPage = getPrefs().getString("last_selected_home_page", "newsfeed");
+        }
+        for (int i = 0; i < START_PAGE_MAPPING.size(); i++) {
+            if (TextUtils.equals(initialPage, START_PAGE_MAPPING.valueAt(i))) {
+                return START_PAGE_MAPPING.keyAt(i);
+            }
+        }
+        return R.id.news_feed;
+    }
+
     private void switchTo(int itemId, FragmentFactory factory) {
         if (mFactory != null) {
             mFactory.onDestroy();
         }
         mFactory = factory;
         mSelectedFactoryId = itemId;
+
+        getPrefs().edit()
+                .putString("last_selected_home_page", START_PAGE_MAPPING.get(mSelectedFactoryId))
+                .apply();
 
         updateRightNavigationDrawer();
         super.supportInvalidateOptionsMenu();
