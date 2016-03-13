@@ -19,6 +19,7 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -35,6 +36,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -536,7 +538,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private void setupNavigationDrawer() {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_container);
         mLeftDrawer = (NavigationView) findViewById(R.id.left_drawer);
+        applyHighlightColor(mLeftDrawer);
         mRightDrawer = (NavigationView) findViewById(R.id.right_drawer);
+        applyHighlightColor(mRightDrawer);
 
         Toolbar toolBar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolBar);
@@ -569,6 +573,44 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private void setContentShown(boolean shown, boolean animate) {
         mContentShown = shown;
         updateViewVisibility(animate);
+    }
+
+    private void applyHighlightColor(NavigationView view) {
+        ColorStateList iconTint =
+                createDefaultNavigationColorStateList(android.R.attr.textColorSecondary);
+        if (iconTint != null) {
+            view.setItemIconTintList(iconTint);
+        }
+        ColorStateList textColor =
+                createDefaultNavigationColorStateList(android.R.attr.textColorPrimary);
+        if (textColor != null) {
+            view.setItemTextColor(textColor);
+        }
+    }
+
+    // similar to what NavigationView does by default,
+    // but uses accent color instead of primary color
+    private ColorStateList createDefaultNavigationColorStateList(int baseColorThemeAttr) {
+        TypedValue value = new TypedValue();
+        if (!getTheme().resolveAttribute(baseColorThemeAttr, value, true)) {
+            return null;
+        }
+        ColorStateList baseColor = ContextCompat.getColorStateList(this, value.resourceId);
+        if (!getTheme().resolveAttribute(android.support.design.R.attr.colorAccent, value, true)) {
+            return null;
+        }
+        int colorAccent = value.data;
+        int defaultColor = baseColor.getDefaultColor();
+        final int[] disabledStateSet = { -android.R.attr.state_enabled };
+        final int[] checkedStateSet = { android.R.attr.state_checked };
+        final int[][] states = { disabledStateSet, checkedStateSet, { 0 } };
+        final int[] colors = {
+            baseColor.getColorForState(disabledStateSet, defaultColor),
+            colorAccent,
+            defaultColor
+        };
+
+        return new ColorStateList(states, colors);
     }
 
     private void updateViewVisibility(boolean animate) {

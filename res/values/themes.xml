@@ -46,10 +46,10 @@
         <item name="cardViewTheme">@style/Theme.CardView.Dark</item>
         <item name="preferenceTheme">@style/PreferenceTheme</item>
         <item name="colorAccent">@color/dark_accent</item>
-        <item name="colorPrimary">@color/dark_accent</item>
-        <item name="colorPrimaryDark">@color/dark_accent_dark</item>
+        <item name="colorPrimary">@color/dark_primary</item>
+        <item name="colorPrimaryDark">@color/dark_primary_dark</item>
         <item name="colorBreadcrumbBackground">#587849</item>
-        <item name="android:textColorLink">@color/dark_link_color</item>
+        <item name="android:textColorLink">@color/dark_accent</item>
         <item name="actionBarTabStyle">@style/Widget.ActionBar.TabView</item>
         <item name="listBackground">@android:color/transparent</item>
         <item name="drawerBackground">@color/background_floating_material_dark</item>
@@ -69,7 +69,7 @@
     <style name="DarkTheme" parent="DarkThemeBase" />
 
     <style name="DarkAlertDialogTheme" parent="Theme.AppCompat.Dialog.Alert">
-        <item name="colorPrimary">@color/dark_accent</item>
+        <item name="colorPrimary">@color/dark_primary</item>
         <item name="colorAccent">@color/dark_accent</item>
     </style>
 
@@ -120,10 +120,10 @@
         <item name="cardViewTheme">@style/Theme.CardView.Light</item>
         <item name="preferenceTheme">@style/PreferenceTheme</item>
         <item name="colorAccent">@color/light_accent</item>
-        <item name="colorPrimary">@color/light_accent</item>
-        <item name="colorPrimaryDark">@color/light_accent_dark</item>
+        <item name="colorPrimary">@color/light_primary</item>
+        <item name="colorPrimaryDark">@color/light_primary_dark</item>
         <item name="colorBreadcrumbBackground">#7baa67</item>
-        <item name="android:textColorLink">@color/light_link_color</item>
+        <item name="android:textColorLink">@color/light_accent</item>
         <item name="actionBarTabStyle">@style/Widget.ActionBar.TabView</item>
         <item name="listBackground">@android:color/white</item>
         <item name="drawerBackground">@color/background_floating_material_light</item>
@@ -143,8 +143,8 @@
     <style name="LightTheme" parent="LightThemeBase" />
 
     <style name="LightAlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="colorPrimary">@color/light_accent</item>
-        <item name="colorAccent">@color/light_accent</item>
+        <item name="colorPrimary">@color/light_primary</item>
+        <item name="colorAccent">@color/light_primary</item>
     </style>
 
     <style name="Theme.Header" parent="Theme.AppCompat">
