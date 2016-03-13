@@ -141,6 +141,8 @@
     <string name="no_pull_requests_found">No pull requests were opened so far.</string>
     <string name="no_repos_found">No repositories found.</string>
     <string name="no_search_repos_found">No repositories found matching the criteria.</string>
+    <string name="no_search_users_found">No users found matching the criteria.</string>
+    <string name="no_search_code_found">No code occurences found matching the criteria.</string>
     <string name="no_starred_repos_found">No repositories were starred yet.</string>
     <string name="no_watched_repos_found">No repositories are being watched yet.</string>
     <string name="no_watchers_found">Nobody is watching this repository yet.</string>
@@ -388,7 +390,7 @@
     <string name="search_hint_user">Search for users</string>
     <string name="search_hint_code">Search for code</string>
     <string name="code_search_result_in">In repo %1$s/%2$s</string>
-    <string name="code_search_too_broad_toast">Your search was too broad. You need to specify both at least one search term as well as either a user or a repo.</string>
+    <string name="code_search_too_broad">Your search was too broad. You need to specify both at least one search term as well as either a user or a repo.</string>
 
     <!-- Sharing -->
     <string name="send_email_title">Select email application</string>

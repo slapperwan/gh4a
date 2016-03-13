@@ -42,7 +42,6 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.R;
@@ -119,8 +118,9 @@ public class SearchActivity extends BaseActivity implements
              if (e instanceof RequestException) {
                 RequestError error = ((RequestException) e).getError();
                 if (error != null && error.getErrors() != null && !error.getErrors().isEmpty()) {
-                    Toast.makeText(SearchActivity.this,
-                            R.string.code_search_too_broad_toast, Toast.LENGTH_LONG).show();
+                    setEmptyText(R.string.code_search_too_broad);
+                    setContentEmpty(true);
+                    setContentShown(false);
                     return true;
                 }
             }
@@ -155,7 +155,7 @@ public class SearchActivity extends BaseActivity implements
         mSearch.setOnCloseListener(this);
         mSearch.onActionViewExpanded();
 
-        updateSearchTypeHint();
+        updateSelectedSearchType();
 
         mResultsView = (RecyclerView) findViewById(R.id.list);
         mResultsView.setLayoutManager(new LinearLayoutManager(this));
@@ -286,14 +286,27 @@ public class SearchActivity extends BaseActivity implements
         mResultsView.setAdapter(adapter);
         mAdapter = adapter;
         setContentShown(true);
+        setContentEmpty(adapter.getCount() == 0);
     }
 
-    private void updateSearchTypeHint() {
+    private void updateSelectedSearchType() {
         switch (mSearchType.getSelectedItemPosition()) {
-            case 0: mSearch.setQueryHint(getString(R.string.search_hint_repo)); break;
-            case 1: mSearch.setQueryHint(getString(R.string.search_hint_user)); break;
-            case 2: mSearch.setQueryHint(getString(R.string.search_hint_code)); break;
-            default: mSearch.setQueryHint(null); break;
+            case 0:
+                mSearch.setQueryHint(getString(R.string.search_hint_repo));
+                setEmptyText(R.string.no_search_repos_found);
+                break;
+            case 1:
+                mSearch.setQueryHint(getString(R.string.search_hint_user));
+                setEmptyText(R.string.no_search_users_found);
+                break;
+            case 2:
+                mSearch.setQueryHint(getString(R.string.search_hint_code));
+                setEmptyText(R.string.no_search_code_found);
+                break;
+            default:
+                mSearch.setQueryHint(null);
+                setEmptyText(null);
+                break;
         }
     }
 
@@ -318,7 +331,7 @@ public class SearchActivity extends BaseActivity implements
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        updateSearchTypeHint();
+        updateSelectedSearchType();
         if (getSupportLoaderManager().getLoader(0) != null) {
             onQueryTextSubmit(mQuery);
         }
@@ -326,7 +339,7 @@ public class SearchActivity extends BaseActivity implements
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-        updateSearchTypeHint();
+        updateSelectedSearchType();
     }
 
     @Override
