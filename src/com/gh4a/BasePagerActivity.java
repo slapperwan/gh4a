@@ -64,10 +64,6 @@ public abstract class BasePagerActivity extends BaseActivity implements
         return mPager;
     }
 
-    protected void setTabsEnabled(boolean enabled) {
-        mPager.setEnabled(enabled);
-    }
-
     @Override
     protected void setErrorViewVisibility(boolean visible) {
         mErrorViewVisible = visible;

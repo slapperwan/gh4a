@@ -65,6 +65,9 @@ public class RepositoryActivity extends BasePagerActivity {
     public static final int PAGE_FILES = 1;
     public static final int PAGE_COMMITS = 2;
 
+    private static final int[] TITLES_LOADING = new int[] {
+        R.string.about
+    };
     private static final int[] TITLES = new int[] {
         R.string.about, R.string.repo_files, R.string.commits
     };
@@ -79,7 +82,7 @@ public class RepositoryActivity extends BasePagerActivity {
         protected void onResultReady(Repository result) {
             mRepository = result;
             updateTitle();
-            setTabsEnabled(true);
+            invalidateTabs();
             // Apply initial page selection first time the repo is loaded
             if (mInitialPage >= PAGE_REPO_OVERVIEW && mInitialPage <= PAGE_COMMITS) {
                 getPager().setCurrentItem(mInitialPage);
@@ -175,7 +178,6 @@ public class RepositoryActivity extends BasePagerActivity {
 
         setEmptyText(R.string.repo_no_data);
         setContentShown(false);
-        setTabsEnabled(false);
 
         getSupportLoaderManager().initLoader(LOADER_REPO, null, mRepoCallback);
         if (Gh4Application.get().isAuthorized()) {
@@ -198,7 +200,7 @@ public class RepositoryActivity extends BasePagerActivity {
 
     @Override
     protected int[] getTabTitleResIds() {
-        return TITLES;
+        return mRepository != null ? TITLES : TITLES_LOADING;
     }
 
     @Override
@@ -243,7 +245,7 @@ public class RepositoryActivity extends BasePagerActivity {
         mTags = null;
         clearRefDependentFragments();
         setContentShown(false);
-        setTabsEnabled(false);
+        invalidateTabs();
 
         LoaderManager lm = getSupportLoaderManager();
         for (int i = 0; i < 4; i++) {

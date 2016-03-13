@@ -52,6 +52,9 @@ public class PullRequestActivity extends BasePagerActivity implements
 
     private ViewGroup mHeader;
 
+    private static final int[] TITLES_LOADING = new int[] {
+        R.string.pull_request_conversation
+    };
     private static final int[] TITLES = new int[] {
         R.string.pull_request_conversation, R.string.commits, R.string.pull_request_files
     };
@@ -66,8 +69,8 @@ public class PullRequestActivity extends BasePagerActivity implements
         protected void onResultReady(PullRequest result) {
             mPullRequest = result;
             fillHeader();
-            setTabsEnabled(true);
             setContentShown(true);
+            invalidateTabs();
             supportInvalidateOptionsMenu();
         }
     };
@@ -94,7 +97,6 @@ public class PullRequestActivity extends BasePagerActivity implements
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         setContentShown(false);
-        setTabsEnabled(false);
 
         getSupportLoaderManager().initLoader(0, null, mPullRequestCallback);
     }
@@ -108,14 +110,14 @@ public class PullRequestActivity extends BasePagerActivity implements
     public void onRefresh() {
         mPullRequest = null;
         setContentShown(false);
-        setTabsEnabled(false);
         getSupportLoaderManager().getLoader(0).onContentChanged();
+        invalidateTabs();
         super.onRefresh();
     }
 
     @Override
     protected int[] getTabTitleResIds() {
-        return TITLES;
+        return mPullRequest != null ? TITLES : TITLES_LOADING;
     }
 
     @Override
