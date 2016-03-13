@@ -77,12 +77,14 @@ How to Build Octodroid
 
 Open Source Libraries
 ---------------------
+* [android-gif-drawable](https://github.com/koral--/android-gif-drawable)
+* [AndroidSVG](https://github.com/BigBadaboom/androidsvg)
 * [GitHub Java API](https://github.com/maniac103/egit-github/tree/master/org.eclipse.egit.github.core)
 * [HoloColorPicker](https://github.com/LarsWerkman/HoloColorPicker)
+* [Material Design Icons](https://github.com/google/material-design-icons)
+* [Nine Old Androids](https://github.com/JakeWharton/NineOldAndroids)
 * [ProgressFragment](https://github.com/johnkil/Android-ProgressFragment)
-* [PreferenceFragment](https://github.com/kolavar/android-support-v4-preferencefragment)
 * [SmoothProgressBar](https://github.com/castorflex/SmoothProgressBar)
-* [FloatingActionButton](https://github.com/shamanland/floating-action-button)
 
 Contributions
 -------------
