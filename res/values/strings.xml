@@ -404,6 +404,6 @@
     <string name="share_user_subject_loginonly">User %1$s</string>
 
     <!-- Webview text size -->
-    <string name="menu_text_size">Text size</string>
+    <string name="menu_text_size">Code view text size</string>
     <string name="menu_gif_load_mode">Animated GIF loading</string>
 </resources>
