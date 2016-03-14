@@ -61,34 +61,34 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     private String mRef;
     private HttpImageGetter mImageGetter;
 
-    private LoaderCallbacks<String> mReadmeCallback = new LoaderCallbacks<String>() {
+    private LoaderCallbacks<String> mReadmeCallback = new LoaderCallbacks<String>(this) {
         @Override
-        public Loader<LoaderResult<String>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<String>> onCreateLoader() {
             return new ReadmeLoader(getActivity(), mRepository.getOwner().getLogin(),
-                    mRepository.getName(), StringUtils.isBlank(mRef) ? mRepository.getMasterBranch() : mRef);
+                    mRepository.getName(), StringUtils.isBlank(mRef) ? mRepository.getDefaultBranch() : mRef);
         }
         @Override
-        public void onResultReady(LoaderResult<String> result) {
+        protected void onResultReady(String result) {
             TextView readmeView = (TextView) mContentView.findViewById(R.id.readme);
             View progress = mContentView.findViewById(R.id.pb_readme);
             AsyncTaskCompat.executeParallel(new FillReadmeTask(
-                    mRepository.getId(), readmeView, progress, mImageGetter), result.getData());
+                    mRepository.getId(), readmeView, progress, mImageGetter), result);
         }
     };
 
-    private LoaderCallbacks<Integer> mPullRequestsCallback = new LoaderCallbacks<Integer>() {
+    private LoaderCallbacks<Integer> mPullRequestsCallback = new LoaderCallbacks<Integer>(this) {
         @Override
-        public Loader<LoaderResult<Integer>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Integer>> onCreateLoader() {
             return new PullRequestCountLoader(getActivity(), mRepository, Constants.Issue.STATE_OPEN);
         }
 
         @Override
-        public void onResultReady(LoaderResult<Integer> result) {
+        protected void onResultReady(Integer result) {
             View v = getView();
             v.findViewById(R.id.pull_requests_progress).setVisibility(View.GONE);
 
             TextView tvPullRequestsCountView = (TextView) v.findViewById(R.id.tv_pull_requests_count);
-            tvPullRequestsCountView.setText(String.valueOf(result.getData()));
+            tvPullRequestsCountView.setText(String.valueOf(result));
         }
     };
 
@@ -146,6 +146,20 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     }
 
     @Override
+    public void onRefresh() {
+        if (mContentView != null) {
+            mContentView.findViewById(R.id.readme).setVisibility(View.GONE);
+            mContentView.findViewById(R.id.pb_readme).setVisibility(View.VISIBLE);
+            mContentView.findViewById(R.id.pull_requests_progress).setVisibility(View.VISIBLE);
+        }
+        if (isAdded()) {
+            setContentShown(false);
+            getLoaderManager().getLoader(0).onContentChanged();
+            getLoaderManager().getLoader(1).onContentChanged();
+        }
+    }
+
+    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
@@ -155,6 +169,18 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
 
         getLoaderManager().initLoader(0, null, mReadmeCallback);
         getLoaderManager().initLoader(1, null, mPullRequestsCallback);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mImageGetter.resume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mImageGetter.pause();
     }
 
     public void setRef(String ref) {
@@ -231,6 +257,10 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
             tvIssues.setVisibility(View.GONE);
             tvIssuesCount.setVisibility(View.GONE);
         }
+
+        mContentView.findViewById(R.id.tv_private).setVisibility(
+                mRepository.isPrivate() ? View.VISIBLE : View.GONE);
+
     }
 
     private void updateClickableLabel(int id, boolean enable) {

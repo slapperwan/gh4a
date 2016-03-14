@@ -13,7 +13,6 @@ buildscript {
 repositories {
     maven { url 'http://dl.bintray.com/populov/maven' }
     maven { url 'https://github.com/kageiit/maven-repo/raw/master' }
-    maven { url "https://github.com/kolavar/android-support-v4-preferencefragment/raw/master/maven-repository/" }
     mavenCentral()
     maven { url 'https://maven.fabric.io/public' }
 }
@@ -25,13 +24,13 @@ android {
     signingConfigs {
         playStore
     }
-    compileSdkVersion 22
-    buildToolsVersion '22.0.1'
+    compileSdkVersion 23
+    buildToolsVersion '23.0.2'
     defaultConfig {
         minSdkVersion 10
-        targetSdkVersion 22
-        versionCode 41
-        versionName "3.8.1"
+        targetSdkVersion 23
+        versionCode 42
+        versionName "3.9"
     }
 
     buildTypes {
@@ -57,18 +56,20 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
 
-    compile 'com.android.support:support-v4:22.1.1'
-    compile 'com.android.support:appcompat-v7:22.1.1'
-    compile 'com.android.support:cardview-v7:22.1.1'
-    compile 'com.larswerkman:HoloColorPicker:1.4@aar'
+    compile 'com.android.support:support-v4:23.2.1'
+    compile 'com.android.support:appcompat-v7:23.2.1'
+    compile 'com.android.support:cardview-v7:23.2.1'
+    compile 'com.android.support:preference-v7:23.2.1'
+    compile 'com.android.support:design:23.2.1'
+    compile 'com.larswerkman:HoloColorPicker:1.5@aar'
     compile 'com.github.johnkil.android-progressfragment:progressfragment:1.4.0@aar'
-    compile 'com.android.support:support-v4-preferencefragment:1.0.0@aar'
+    compile 'com.caverock:androidsvg:1.2.2-beta-1@aar'
+    compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.+'
     compile 'org.apmem.tools:layouts:1.9@aar'
-    compile 'com.google.code.gson:gson:2.2.4'
-    compile 'com.squareup.okhttp:okhttp:1.5.4'
-    compile 'org.ocpsoft.prettytime:prettytime:3.2.4.Final'
-    compile 'com.shamanland:fab:0.0.6'
-    compile 'com.github.castorflex.smoothprogressbar:library:1.0.0'
+    compile 'com.google.code.gson:gson:2.4'
+    compile 'com.squareup.okhttp:okhttp:1.6.0'
+    compile 'org.ocpsoft.prettytime:prettytime:3.0.0.Final'
+    compile 'com.github.castorflex.smoothprogressbar:library:1.1.0'
     compile 'com.nineoldandroids:library:2.4.0+'
     compile('com.crashlytics.sdk.android:crashlytics:2.4.0@aar') {
         transitive = true;

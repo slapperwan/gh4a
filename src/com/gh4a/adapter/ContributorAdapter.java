@@ -4,6 +4,7 @@ import org.eclipse.egit.github.core.Contributor;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,36 +16,27 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
-public class ContributorAdapter extends RootAdapter<Contributor> implements View.OnClickListener {
+public class ContributorAdapter extends RootAdapter<Contributor, ContributorAdapter.ViewHolder> {
     public ContributorAdapter(Context context) {
         super(context);
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_gravatar_2, parent, false);
-        ViewHolder viewHolder = new ViewHolder();
-
-        viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-        viewHolder.ivGravatar.setOnClickListener(this);
-
-        viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvExtra = (TextView) v.findViewById(R.id.tv_extra);
-
-        v.setTag(viewHolder);
-        return v;
+        ViewHolder holder = new ViewHolder(v);
+        holder.ivGravatar.setOnClickListener(this);
+        return holder;
     }
 
     @Override
-    protected void bindView(View v, Contributor contributor) {
-        ViewHolder viewHolder = (ViewHolder) v.getTag();
-
-        AvatarHandler.assignAvatar(viewHolder.ivGravatar,
+    public void onBindViewHolder(ViewHolder holder, Contributor contributor) {
+        AvatarHandler.assignAvatar(holder.ivGravatar,
                 contributor.getId(), contributor.getAvatarUrl());
-        viewHolder.ivGravatar.setTag(contributor);
+        holder.ivGravatar.setTag(contributor);
 
-        viewHolder.tvTitle.setText(StringUtils.formatName(contributor.getLogin(), contributor.getName()));
-        viewHolder.tvExtra.setText(mContext.getResources().getQuantityString(R.plurals.contributor_extra_data,
+        holder.tvTitle.setText(StringUtils.formatName(contributor.getLogin(), contributor.getName()));
+        holder.tvExtra.setText(mContext.getResources().getQuantityString(R.plurals.contributor_extra_data,
                 contributor.getContributions(), contributor.getContributions()));
     }
 
@@ -57,12 +49,21 @@ public class ContributorAdapter extends RootAdapter<Contributor> implements View
             if (intent != null) {
                 mContext.startActivity(intent);
             }
+        } else {
+            super.onClick(v);
         }
     }
 
-    private static class ViewHolder {
-        public TextView tvTitle;
-        public ImageView ivGravatar;
-        public TextView tvExtra;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private ViewHolder(View view) {
+            super(view);
+            ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
+            tvTitle = (TextView) view.findViewById(R.id.tv_title);
+            tvExtra = (TextView) view.findViewById(R.id.tv_extra);
+        }
+
+        private TextView tvTitle;
+        private ImageView ivGravatar;
+        private TextView tvExtra;
     }
 }

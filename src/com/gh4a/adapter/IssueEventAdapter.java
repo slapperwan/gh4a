@@ -18,10 +18,12 @@ package com.gh4a.adapter;
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.IssueEvent;
+import org.eclipse.egit.github.core.User;
 
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.TextUtils;
@@ -46,11 +48,17 @@ import com.gh4a.widget.StyleableTextView;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
-public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
-        View.OnClickListener {
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventAdapter.ViewHolder>
+        implements View.OnClickListener {
     public interface OnEditComment {
         void editComment(Comment comment);
     }
+
+    private static final Pattern COMMIT_URL_REPO_NAME_AND_OWNER_PATTERN =
+            Pattern.compile(".*github.com\\/repos\\/([^\\/]+)\\/([^\\/]+)\\/commits");
 
     private HttpImageGetter mImageGetter;
     private OnEditComment mEditCallback;
@@ -66,42 +74,38 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
         mEditCallback = editCallback;
     }
 
+    public void resume() {
+        mImageGetter.resume();
+    }
+
+    public void pause() {
+        mImageGetter.pause();
+    }
+
     public void destroy() {
         mImageGetter.destroy();
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_gravatar_comment, parent, false);
-        ViewHolder viewHolder = new ViewHolder();
-
-        viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-        viewHolder.ivGravatar.setOnClickListener(this);
-
-        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
-        viewHolder.tvExtra = (StyleableTextView) v.findViewById(R.id.tv_extra);
-        viewHolder.tvFile = (StyleableTextView) v.findViewById(R.id.tv_file);
-        viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
-        viewHolder.ivEdit = (ImageView) v.findViewById(R.id.iv_edit);
-
-        v.setTag(viewHolder);
-        return v;
+        ViewHolder holder = new ViewHolder(v);
+        holder.ivGravatar.setOnClickListener(this);
+        return holder;
     }
 
     @Override
-    protected void bindView(View view, IssueEventHolder event) {
-        ViewHolder viewHolder = (ViewHolder) view.getTag();
+    public void onBindViewHolder(ViewHolder holder, IssueEventHolder event) {
         String ourLogin = Gh4Application.get().getAuthLogin();
         String login = event.getUser() != null ? event.getUser().getLogin() : null;
 
-        AvatarHandler.assignAvatar(viewHolder.ivGravatar, event.getUser());
-        viewHolder.ivGravatar.setTag(event);
+        AvatarHandler.assignAvatar(holder.ivGravatar, event.getUser());
+        holder.ivGravatar.setTag(event);
 
-        StringUtils.applyBoldTagsAndSetText(viewHolder.tvExtra,
+        StringUtils.applyBoldTagsAndSetText(holder.tvExtra,
                 mContext.getString(R.string.issue_comment_header,
                         CommitUtils.getUserLogin(mContext, event.getUser())));
-        viewHolder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
+        holder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
                 event.getCreatedAt(), true));
 
         if (event.comment instanceof CommitComment) {
@@ -109,32 +113,32 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
             String text = mContext.getString(R.string.issue_commit_comment_file,
                     FileUtils.getFileName(commitComment.getPath()));
 
-            viewHolder.tvFile.setVisibility(View.VISIBLE);
-            StringUtils.applyBoldTagsAndSetText(viewHolder.tvFile, text);
+            holder.tvFile.setVisibility(View.VISIBLE);
+            StringUtils.applyBoldTagsAndSetText(holder.tvFile, text);
         } else {
-            viewHolder.tvFile.setVisibility(View.GONE);
+            holder.tvFile.setVisibility(View.GONE);
         }
 
         if (event.comment != null) {
             String body = HtmlUtils.format(event.comment.getBodyHtml()).toString();
-            mImageGetter.bind(viewHolder.tvDesc, body, event.comment.getId());
+            mImageGetter.bind(holder.tvDesc, body, event.comment.getId());
         } else {
-            viewHolder.tvDesc.setTag(null);
-            viewHolder.tvDesc.setText(formatEvent(event.event,
-                    viewHolder.tvExtra.getTypefaceValue()));
+            holder.tvDesc.setTag(null);
+            holder.tvDesc.setText(formatEvent(event.event, event.getUser(),
+                    holder.tvExtra.getTypefaceValue()));
         }
 
         boolean canEdit = (login != null && login.equals(ourLogin)) || mRepoOwner.equals(ourLogin);
         if (event.comment != null && canEdit && mEditCallback != null) {
-            viewHolder.ivEdit.setVisibility(View.VISIBLE);
-            viewHolder.ivEdit.setTag(event.comment);
-            viewHolder.ivEdit.setOnClickListener(this);
+            holder.ivEdit.setVisibility(View.VISIBLE);
+            holder.ivEdit.setTag(event.comment);
+            holder.ivEdit.setOnClickListener(this);
         } else {
-            viewHolder.ivEdit.setVisibility(View.GONE);
+            holder.ivEdit.setVisibility(View.GONE);
         }
     }
 
-    private CharSequence formatEvent(final IssueEvent event, int typefaceValue) {
+    private CharSequence formatEvent(final IssueEvent event, final User user, int typefaceValue) {
         String type = event.getEvent();
         String textBase = null;
         int textResId = 0;
@@ -149,26 +153,30 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
         } else if (TextUtils.equals(type, "referenced")) {
             textResId = event.getCommitId() != null
                     ? R.string.issue_event_referenced_with_commit : R.string.issue_event_referenced;
-        } else if (TextUtils.equals(type, "assigned")) {
-            String actorLogin = event.getActor() != null ? event.getActor().getLogin() : null;
+        } else if (TextUtils.equals(type, "assigned") || TextUtils.equals(type, "unassigned")) {
+            boolean isAssign = TextUtils.equals(type, "assigned");
+            String actorLogin = user != null ? user.getLogin() : null;
             String assigneeLogin = event.getAssignee() != null ? event.getAssignee().getLogin() : null;
             if (assigneeLogin != null && assigneeLogin.equals(actorLogin)) {
-                textResId = R.string.issue_event_assigned_self;
+                textResId = isAssign
+                        ? R.string.issue_event_assigned_self : R.string.issue_event_unassigned_self;
             } else {
-                textBase = mContext.getString(R.string.issue_event_assigned,
-                        CommitUtils.getUserLogin(mContext, event.getActor()),
+                textResId = isAssign
+                        ? R.string.issue_event_assigned : R.string.issue_event_unassigned;
+                textBase = mContext.getString(textResId,
+                        CommitUtils.getUserLogin(mContext, user),
                         CommitUtils.getUserLogin(mContext, event.getAssignee()));
             }
         } else if (TextUtils.equals(type, "unassigned")) {
             textBase = mContext.getString(R.string.issue_event_unassigned,
-                    event.getActor().getLogin(), event.getAssignee().getLogin());
+                    CommitUtils.getUserLogin(mContext, user),
+                    CommitUtils.getUserLogin(mContext, event.getAssignee()));
         } else {
             return null;
         }
 
         if (textBase == null) {
-            textBase = mContext.getString(textResId,
-                    CommitUtils.getUserLogin(mContext, event.getActor()));
+            textBase = mContext.getString(textResId, CommitUtils.getUserLogin(mContext, user));
         }
         SpannableStringBuilder text = StringUtils.applyBoldTags(mContext, textBase, typefaceValue);
         if (event.getCommitId() == null) {
@@ -185,8 +193,20 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
         text.setSpan(new ClickableSpan() {
             @Override
             public void onClick(View view) {
+                // The commit might be in a different repo. The API doesn't provide
+                // that information directly, so get it indirectly by parsing the URL
+                String repoOwner = mRepoOwner, repoName = mRepoName;
+                String url = event.getCommitUrl();
+                if (url != null) {
+                    Matcher matcher = COMMIT_URL_REPO_NAME_AND_OWNER_PATTERN.matcher(url);
+                    if (matcher.find()) {
+                        repoOwner = matcher.group(1);
+                        repoName = matcher.group(2);
+                    }
+                }
+
                 mContext.startActivity(IntentUtils.getCommitInfoActivityIntent(mContext,
-                        mRepoOwner, mRepoName, event.getCommitId()));
+                        repoOwner, repoName, event.getCommitId()));
             }
             @Override
             public void updateDrawState(@NonNull TextPaint ds) {
@@ -200,8 +220,12 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
     @Override
     public void clear() {
         super.clear();
+        boolean resumed = mImageGetter.isResumed();
         mImageGetter.destroy();
         mImageGetter = new HttpImageGetter(mContext);
+        if (resumed) {
+            mImageGetter.resume();
+        }
     }
 
     @Override
@@ -215,15 +239,28 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder> implements
         } else if (v.getId() == R.id.iv_edit) {
             Comment comment = (Comment) v.getTag();
             mEditCallback.editComment(comment);
+        } else {
+            super.onClick(v);
         }
     }
 
-    private static class ViewHolder {
-        public ImageView ivGravatar;
-        public TextView tvDesc;
-        public StyleableTextView tvExtra;
-        public StyleableTextView tvFile;
-        public TextView tvTimestamp;
-        public ImageView ivEdit;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private ViewHolder(View view) {
+            super(view);
+            ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
+            tvDesc = (TextView) view.findViewById(R.id.tv_desc);
+            tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
+            tvExtra = (StyleableTextView) view.findViewById(R.id.tv_extra);
+            tvFile = (StyleableTextView) view.findViewById(R.id.tv_file);
+            tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
+            ivEdit = (ImageView) view.findViewById(R.id.iv_edit);
+        }
+
+        private ImageView ivGravatar;
+        private TextView tvDesc;
+        private StyleableTextView tvExtra;
+        private StyleableTextView tvFile;
+        private TextView tvTimestamp;
+        private ImageView ivEdit;
     }
 }

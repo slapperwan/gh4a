@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="@string/issue_sort_order">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/sort_created_desc"
+                    android:title="@string/issue_sort_created_desc"
+                    android:checked="true" />
+                <item
+                    android:id="@+id/sort_created_asc"
+                    android:title="@string/issue_sort_created_asc" />
+                <item
+                    android:id="@+id/sort_updated_desc"
+                    android:title="@string/issue_sort_updated_desc" />
+                <item
+                    android:id="@+id/sort_updated_asc"
+                    android:title="@string/issue_sort_updated_asc" />
+                <item
+                    android:id="@+id/sort_comments_desc"
+                    android:title="@string/issue_sort_comments_desc" />
+                <item
+                    android:id="@+id/sort_comments_asc"
+                    android:title="@string/issue_sort_comments_asc" />
+            </group>
+        </menu>
+    </item>
+</menu>

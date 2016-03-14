@@ -9,34 +9,38 @@
     android:paddingBottom="@dimen/floating_action_button_margin_mini"
     android:orientation="vertical">
 
-    <com.gh4a.widget.StyleableTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/issue_title"
-        android:textAppearance="@style/TextAppearance.Header.Caption" />
-
-    <EditText
-        android:id="@+id/et_title"
-        android:layout_height="wrap_content"
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/title_wrapper"
         android:layout_width="match_parent"
-        android:layout_marginBottom="@dimen/overview_item_spacing"
-        style="@style/TextAppearance.Header"
-        android:maxLines="2" />
-
-    <com.gh4a.widget.StyleableTextView
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/issue_body"
-        android:textAppearance="@style/TextAppearance.Header.Caption" />
+        android:hint="@string/issue_title">
 
-    <EditText
-        android:id="@+id/et_desc"
-        android:layout_height="wrap_content"
+        <EditText
+            android:id="@+id/et_title"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_marginBottom="@dimen/overview_item_spacing"
+            style="@style/TextAppearance.Header"
+            android:maxLines="2" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/desc_wrapper"
         android:layout_width="match_parent"
-        style="@style/TextAppearance.Header"
-        android:gravity="top"
-        android:minLines="@integer/issue_edit_body_min_lines"
-        android:maxLines="@integer/issue_edit_body_max_lines"
-        android:inputType="textMultiLine|textCapSentences" />
+        android:layout_height="wrap_content"
+        android:hint="@string/issue_body">
+
+        <EditText
+            android:id="@+id/et_desc"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            style="@style/TextAppearance.Header"
+            android:gravity="top"
+            android:minLines="@integer/issue_edit_body_min_lines"
+            android:maxLines="@integer/issue_edit_body_max_lines"
+            android:inputType="textMultiLine|textCapSentences" />
+
+    </android.support.design.widget.TextInputLayout>
 
 </LinearLayout>

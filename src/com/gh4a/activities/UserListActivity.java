@@ -19,39 +19,36 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.R;
+import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.UserAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.DividerItemDecoration;
 
 import org.eclipse.egit.github.core.User;
 
 import java.util.List;
 
 public abstract class UserListActivity extends BaseActivity implements
-        AdapterView.OnItemClickListener {
+        RootAdapter.OnItemClickListener<User> {
     private UserAdapter mUserAdapter;
 
-    private LoaderCallbacks<List<User>> mUserListCallback = new LoaderCallbacks<List<User>>() {
+    private LoaderCallbacks<List<User>> mUserListCallback = new LoaderCallbacks<List<User>>(this) {
         @Override
-        public Loader<LoaderResult<List<User>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<User>>> onCreateLoader() {
             return getUserListLoader();
         }
 
         @Override
-        public void onResultReady(LoaderResult<List<User>> result) {
-            boolean success = !result.handleError(UserListActivity.this);
-            if (success) {
-                fillData(result.getData());
-            }
-            setContentEmpty(!success);
+        protected void onResultReady(List<User> result) {
+            fillData(result);
             setContentShown(true);
         }
     };
@@ -59,10 +56,6 @@ public abstract class UserListActivity extends BaseActivity implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (hasErrorView()) {
-            return;
-        }
 
         setContentView(R.layout.generic_list);
         setContentShown(false);
@@ -74,21 +67,30 @@ public abstract class UserListActivity extends BaseActivity implements
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         mUserAdapter = new UserAdapter(this);
+        mUserAdapter.setOnItemClickListener(this);
 
-        ListView listView = (ListView) findViewById(android.R.id.list);
-        listView.setOnItemClickListener(this);
-        listView.setAdapter(mUserAdapter);
-        listView.setBackgroundResource(
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this));
+        recyclerView.setAdapter(mUserAdapter);
+        recyclerView.setBackgroundResource(
                 UiUtils.resolveDrawable(this, R.attr.listBackground));
 
         getSupportLoaderManager().initLoader(0, null, mUserListCallback);
+    }
+
+    @Override
+    public void onRefresh() {
+        mUserAdapter.clear();
+        setContentShown(false);
+        getSupportLoaderManager().getLoader(0).onContentChanged();
+        super.onRefresh();
     }
 
     protected void fillData(List<User> users) {
         if (users != null) {
             mUserAdapter.addAll(users);
         }
-        mUserAdapter.notifyDataSetChanged();
     }
 
     protected abstract Loader<LoaderResult<List<User>>> getUserListLoader();
@@ -99,8 +101,7 @@ public abstract class UserListActivity extends BaseActivity implements
     protected abstract String getSubTitle();
 
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        User user = (User) adapterView.getAdapter().getItem(position);
+    public void onItemClick(User user) {
         Intent intent = IntentUtils.getUserActivityIntent(this, user);
         if (intent != null) {
             startActivity(intent);

@@ -17,6 +17,7 @@ package com.gh4a.fragment;
 
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
@@ -68,7 +69,7 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
     }
 
     @Override
-    protected RootAdapter<Trend> onCreateAdapter() {
+    protected RootAdapter<Trend, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         return new TrendAdapter(getActivity());
     }
 
@@ -78,7 +79,7 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
     }
 
     @Override
-    protected void onItemClick(Trend trend) {
+    public void onItemClick(Trend trend) {
         String owner = trend.getRepoOwner();
         String name = trend.getRepoName();
         if (owner != null && name != null) {
@@ -87,7 +88,7 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
     }
 
     @Override
-    public Loader<LoaderResult<List<Trend>>> onCreateLoader(int id, Bundle args) {
+    public Loader<LoaderResult<List<Trend>>> onCreateLoader() {
         return new TrendLoader(getActivity(), API_URL, mUrl);
     }
 }

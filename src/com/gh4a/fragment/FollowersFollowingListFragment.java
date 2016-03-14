@@ -21,6 +21,7 @@ import org.eclipse.egit.github.core.service.UserService;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -52,7 +53,7 @@ public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> 
     }
 
     @Override
-    protected RootAdapter<User> onCreateAdapter() {
+    protected RootAdapter<User, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         return new UserAdapter(getActivity());
     }
 
@@ -62,7 +63,7 @@ public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> 
     }
 
     @Override
-    protected void onItemClick(User user) {
+    public void onItemClick(User user) {
         Intent intent = IntentUtils.getUserActivityIntent(getActivity(), user);
         if (intent != null) {
             startActivity(intent);

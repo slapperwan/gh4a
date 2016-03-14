@@ -7,6 +7,7 @@ import org.eclipse.egit.github.core.Contributor;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.Constants;
 import com.gh4a.R;
@@ -29,7 +30,7 @@ public class ContributorListFragment extends ListDataBaseFragment<Contributor> {
     }
 
     @Override
-    public Loader<LoaderResult<List<Contributor>>> onCreateLoader(int id, Bundle args) {
+    public Loader<LoaderResult<List<Contributor>>> onCreateLoader() {
         String repoOwner = getArguments().getString(Constants.Repository.OWNER);
         String repoName = getArguments().getString(Constants.Repository.NAME);
         return new ContributorListLoader(getActivity(), repoOwner, repoName);
@@ -41,12 +42,12 @@ public class ContributorListFragment extends ListDataBaseFragment<Contributor> {
     }
 
     @Override
-    protected RootAdapter<Contributor> onCreateAdapter() {
+    protected RootAdapter<Contributor, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         return new ContributorAdapter(getActivity());
     }
 
     @Override
-    protected void onItemClick(Contributor item) {
+    public void onItemClick(Contributor item) {
         Intent intent = IntentUtils.getUserActivityIntent(getActivity(),
                 item.getLogin(), item.getName());
         if (intent != null) {

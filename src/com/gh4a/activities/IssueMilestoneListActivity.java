@@ -17,24 +17,28 @@ package com.gh4a.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueMilestoneListFragment;
+import com.gh4a.fragment.LoadingListFragmentBase;
 import com.gh4a.utils.IntentUtils;
 
-public class IssueMilestoneListActivity extends BaseActivity {
+public class IssueMilestoneListActivity extends BaseActivity implements
+        View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener {
     private String mRepoOwner;
     private String mRepoName;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (hasErrorView()) {
-            return;
-        }
 
         mRepoOwner = getIntent().getExtras().getString(Constants.Repository.OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);
@@ -46,6 +50,14 @@ public class IssueMilestoneListActivity extends BaseActivity {
                     .commit();
         }
 
+        if (Gh4Application.get().isAuthorized()) {
+            CoordinatorLayout rootLayout = getRootLayout();
+            FloatingActionButton fab = (FloatingActionButton)
+                    getLayoutInflater().inflate(R.layout.add_fab, rootLayout, false);
+            fab.setOnClickListener(this);
+            rootLayout.addView(fab);
+        }
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.issue_milestones);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
@@ -53,8 +65,21 @@ public class IssueMilestoneListActivity extends BaseActivity {
     }
 
     @Override
+    public void onRecyclerViewCreated(Fragment fragment, RecyclerView recyclerView) {
+        recyclerView.setTag(R.id.FloatingActionButtonScrollEnabled, new Object());
+    }
+
+    @Override
     protected Intent navigateUp() {
         return IntentUtils.getIssueListActivityIntent(this,
                 mRepoOwner, mRepoName, Constants.Issue.STATE_OPEN);
+    }
+
+    @Override
+    public void onClick(View view) {
+        Intent intent = new Intent(this, IssueMilestoneEditActivity.class);
+        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+        intent.putExtra(Constants.Repository.NAME, mRepoName);
+        startActivity(intent);
     }
 }

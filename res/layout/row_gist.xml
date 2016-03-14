@@ -2,20 +2,40 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:minHeight="72dp"
+    android:background="?attr/selectableItemBackground"
     android:padding="@dimen/content_padding">
 
-    <com.gh4a.widget.StyleableTextView
-        android:id="@+id/tv_files"
+    <LinearLayout
+        android:id="@+id/info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginLeft="8dp"
-        android:drawableLeft="?attr/filesSmallIcon"
-        android:drawablePadding="4dp"
-        android:textAppearance="@style/TextAppearance.VerySmall" />
+        android:orientation="vertical">
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_private"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:drawableLeft="?attr/privateSmallIcon"
+            android:drawablePadding="4dp"
+            android:text="@string/repo_type_private"
+            android:textAppearance="@style/TextAppearance.VerySmall.Bold"
+            android:visibility="gone" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_files"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="?attr/filesSmallIcon"
+            android:drawablePadding="4dp"
+            android:textAppearance="@style/TextAppearance.VerySmall" />
+
+    </LinearLayout>
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_creator"
@@ -31,7 +51,7 @@
         android:id="@+id/tv_timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@id/tv_files"
+        android:layout_toLeftOf="@id/info"
         android:layout_toRightOf="@id/tv_creator"
         android:layout_alignBaseline="@id/tv_creator"
         android:layout_alignWithParentIfMissing="true"
@@ -41,7 +61,7 @@
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@id/tv_files"
+        android:layout_toLeftOf="@id/info"
         android:layout_alignParentLeft="true"
         android:layout_below="@id/tv_timestamp"
         android:textAppearance="@style/TextAppearance.ItemTitle" />
@@ -50,7 +70,7 @@
         android:id="@+id/tv_sha"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@id/tv_files"
+        android:layout_toLeftOf="@id/info"
         android:layout_alignParentLeft="true"
         android:layout_below="@id/tv_title"
         android:textAppearance="?android:attr/textAppearanceSmall" />

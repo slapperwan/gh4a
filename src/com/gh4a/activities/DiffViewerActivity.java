@@ -54,7 +54,6 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.ThemeUtils;
 import com.gh4a.utils.ToastUtils;
 
 import org.eclipse.egit.github.core.CommitComment;
@@ -81,21 +80,15 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     private static final int MENU_ITEM_VIEW = 10;
 
     private LoaderCallbacks<List<CommitComment>> mCommentCallback =
-            new LoaderCallbacks<List<CommitComment>>() {
+            new LoaderCallbacks<List<CommitComment>>(this) {
         @Override
-        public Loader<LoaderResult<List<CommitComment>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<CommitComment>>> onCreateLoader() {
             return createCommentLoader();
         }
 
         @Override
-        public void onResultReady(LoaderResult<List<CommitComment>> result) {
-            if (result.handleError(DiffViewerActivity.this)) {
-                setContentEmpty(true);
-                setContentShown(true);
-                return;
-            }
-
-            addCommentsToMap(result.getData());
+        protected void onResultReady(List<CommitComment> result) {
+            addCommentsToMap(result);
             showDiff();
         }
     };
@@ -111,10 +104,6 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         mPath = data.getString(Constants.Object.PATH);
         mSha = data.getString(Constants.Object.OBJECT_SHA);
         mDiff = data.getString(Constants.Commit.DIFF);
-
-        if (hasErrorView()) {
-            return;
-        }
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(FileUtils.getFileName(mPath));
@@ -132,6 +121,17 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         } else {
             getSupportLoaderManager().initLoader(0, null, mCommentCallback);
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        Loader loader = getSupportLoaderManager().getLoader(0);
+        if (loader != null) {
+            mCommitCommentsByPos.clear();
+            setContentShown(false);
+            loader.onContentChanged();
+        }
+        super.onRefresh();
     }
 
     @Override

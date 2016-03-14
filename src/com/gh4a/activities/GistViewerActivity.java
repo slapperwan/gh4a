@@ -35,26 +35,19 @@ import org.eclipse.egit.github.core.Gist;
 import org.eclipse.egit.github.core.GistFile;
 
 public class GistViewerActivity extends WebViewerActivity {
-    private String mUserLogin;
     private String mFileName;
     private String mGistId;
     private GistFile mGistFile;
 
-    private LoaderCallbacks<Gist> mGistCallback = new LoaderCallbacks<Gist>() {
+    private LoaderCallbacks<Gist> mGistCallback = new LoaderCallbacks<Gist>(this) {
         @Override
-        public Loader<LoaderResult<Gist>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Gist>> onCreateLoader() {
             return new GistLoader(GistViewerActivity.this, mGistId);
         }
         @Override
-        public void onResultReady(LoaderResult<Gist> result) {
-            boolean success = !result.handleError(GistViewerActivity.this);
-            if (success) {
-                mGistFile = result.getData().getFiles().get(mFileName);
-                loadCode(mGistFile.getContent(), mFileName);
-            } else {
-                setContentEmpty(true);
-                setContentShown(true);
-            }
+        protected void onResultReady(Gist result) {
+            mGistFile = result.getFiles().get(mFileName);
+            loadCode(mGistFile.getContent(), mFileName);
             supportInvalidateOptionsMenu();
         }
     };
@@ -63,11 +56,6 @@ public class GistViewerActivity extends WebViewerActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (hasErrorView()) {
-            return;
-        }
-
-        mUserLogin = getIntent().getExtras().getString(Constants.User.LOGIN);
         mFileName = getIntent().getExtras().getString(Constants.Gist.FILENAME);
         mGistId = getIntent().getExtras().getString(Constants.Gist.ID);
 
@@ -76,6 +64,14 @@ public class GistViewerActivity extends WebViewerActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         getSupportLoaderManager().initLoader(0, null, mGistCallback);
+    }
+
+    @Override
+    public void onRefresh() {
+        setContentShown(false);
+        getSupportLoaderManager().getLoader(0).onContentChanged();
+        mGistFile = null;
+        super.onRefresh();
     }
 
     @Override
@@ -94,7 +90,7 @@ public class GistViewerActivity extends WebViewerActivity {
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getGistActivityIntent(this, mUserLogin, mGistId);
+        return IntentUtils.getGistActivityIntent(this, mGistId);
     }
 
     @Override

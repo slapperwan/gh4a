@@ -21,6 +21,7 @@ import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -55,13 +56,13 @@ public class PullRequestListFragment extends PagedDataBaseFragment<PullRequest> 
     }
 
     @Override
-    protected void onItemClick(PullRequest pullRequest) {
+    public void onItemClick(PullRequest pullRequest) {
         startActivity(IntentUtils.getPullRequestActivityIntent(getActivity(),
                 mRepoOwner, mRepoName, pullRequest.getNumber()));
     }
 
     @Override
-    protected RootAdapter<PullRequest> onCreateAdapter() {
+    protected RootAdapter<PullRequest, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         return new PullRequestAdapter(getActivity());
     }
 

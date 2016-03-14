@@ -35,40 +35,30 @@ public class PullRequestFilesFragment extends CommitFragment {
     private List<CommitFile> mFiles;
     private List<CommitComment> mComments;
 
-    private LoaderCallbacks<List<CommitFile>> mPullRequestFilesCallback = new LoaderCallbacks<List<CommitFile>>() {
+    private LoaderCallbacks<List<CommitFile>> mPullRequestFilesCallback = new LoaderCallbacks<List<CommitFile>>(this) {
         @Override
-        public Loader<LoaderResult<List<CommitFile>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<CommitFile>>> onCreateLoader() {
             return new PullRequestFilesLoader(getActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
         }
 
         @Override
-        public void onResultReady(LoaderResult<List<CommitFile>> result) {
-            if (result.handleError(getActivity())) {
-                setContentShown(true);
-                setContentEmpty(true);
-                return;
-            }
-            mFiles = result.getData();
+        protected void onResultReady(List<CommitFile> result) {
+            mFiles = result;
             fillDataIfReady();
         }
     };
 
     private LoaderCallbacks<List<CommitComment>> mPullRequestCommentsCallback =
-            new LoaderCallbacks<List<CommitComment>>() {
+            new LoaderCallbacks<List<CommitComment>>(this) {
         @Override
-        public Loader<LoaderResult<List<CommitComment>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<CommitComment>>> onCreateLoader() {
             return new PullRequestCommentsLoader(getActivity(),
                     mRepoOwner, mRepoName, mPullRequestNumber);
         }
 
         @Override
-        public void onResultReady(LoaderResult<List<CommitComment>> result) {
-            if (result.handleError(getActivity())) {
-                setContentShown(true);
-                setContentEmpty(true);
-                return;
-            }
-            mComments = result.getData();
+        protected void onResultReady(List<CommitComment> result) {
+            mComments = result;
             fillDataIfReady();
         }
     };
@@ -102,6 +92,17 @@ public class PullRequestFilesFragment extends CommitFragment {
         mContentView.findViewById(R.id.iv_commit_gravatar).setVisibility(View.GONE);
         mContentView.findViewById(R.id.tv_commit_extra).setVisibility(View.GONE);
         mContentView.findViewById(R.id.tv_message).setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onRefresh() {
+        mFiles = null;
+        mComments = null;
+        if (isAdded()) {
+            setContentShown(false);
+            getLoaderManager().getLoader(0).onContentChanged();
+            getLoaderManager().getLoader(1).onContentChanged();
+        }
     }
 
     @Override

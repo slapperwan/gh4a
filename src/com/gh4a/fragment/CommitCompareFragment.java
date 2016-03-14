@@ -23,6 +23,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.Constants;
 import com.gh4a.R;
@@ -70,12 +71,12 @@ public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit
     }
 
     @Override
-    protected RootAdapter<RepositoryCommit> onCreateAdapter() {
+    protected RootAdapter<RepositoryCommit, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         return new CommitAdapter(getActivity());
     }
 
     @Override
-    protected void onItemClick(RepositoryCommit commit) {
+    public void onItemClick(RepositoryCommit commit) {
         Intent intent = IntentUtils.getCommitInfoActivityIntent(getActivity(),
                 mRepoOwner, mRepoName, commit.getSha());
         startActivityForResult(intent, REQUEST_COMMIT);
@@ -86,7 +87,7 @@ public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit
         if (requestCode == REQUEST_COMMIT) {
             if (resultCode == Activity.RESULT_OK) {
                 // comments were updated
-                refresh();
+                onRefresh();
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -94,7 +95,7 @@ public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit
     }
 
     @Override
-    public Loader<LoaderResult<List<RepositoryCommit>>> onCreateLoader(int id, Bundle args) {
+    public Loader<LoaderResult<List<RepositoryCommit>>> onCreateLoader() {
         return new CommitCompareLoader(getActivity(), mRepoOwner, mRepoName, mBase, mHead);
     }
 }

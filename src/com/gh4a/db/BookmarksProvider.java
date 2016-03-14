@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 public class BookmarksProvider extends ContentProvider {
@@ -46,7 +47,7 @@ public class BookmarksProvider extends ContentProvider {
     }
 
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection,
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection,
             String[] selectionArgs, String sortOrder) {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         int match = sURIMatcher.match(uri);
@@ -77,12 +78,12 @@ public class BookmarksProvider extends ContentProvider {
     }
 
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
         return null;
     }
 
     @Override
-    public Uri insert(Uri uri, ContentValues values) {
+    public Uri insert(@NonNull Uri uri, ContentValues values) {
         if (sURIMatcher.match(uri) != MATCH_ALL) {
             return null;
         }
@@ -99,7 +100,7 @@ public class BookmarksProvider extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         int count;
         int match = sURIMatcher.match(uri);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
@@ -128,7 +129,7 @@ public class BookmarksProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         int match = sURIMatcher.match(uri);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 

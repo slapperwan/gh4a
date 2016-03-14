@@ -18,6 +18,7 @@ package com.gh4a.adapter;
 import org.eclipse.egit.github.core.User;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,33 +30,25 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
-public class UserAdapter extends RootAdapter<User> implements View.OnClickListener {
+public class UserAdapter extends RootAdapter<User, UserAdapter.ViewHolder> {
     public UserAdapter(Context context) {
         super(context);
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_gravatar_1, parent, false);
-        ViewHolder viewHolder = new ViewHolder();
-
-        viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-        viewHolder.ivGravatar.setOnClickListener(this);
-
-        viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-
-        v.setTag(viewHolder);
-        return v;
+        ViewHolder holder = new ViewHolder(v);
+        holder.ivGravatar.setOnClickListener(this);
+        return holder;
     }
 
     @Override
-    protected void bindView(View v, User user) {
-        ViewHolder viewHolder = (ViewHolder) v.getTag();
+    public void onBindViewHolder(ViewHolder holder, User user) {
+        AvatarHandler.assignAvatar(holder.ivGravatar, user);
+        holder.ivGravatar.setTag(user);
 
-        AvatarHandler.assignAvatar(viewHolder.ivGravatar, user);
-        viewHolder.ivGravatar.setTag(user);
-
-        viewHolder.tvTitle.setText(StringUtils.formatName(user.getLogin(), user.getName()));
+        holder.tvTitle.setText(StringUtils.formatName(user.getLogin(), user.getName()));
     }
 
     @Override
@@ -63,11 +56,19 @@ public class UserAdapter extends RootAdapter<User> implements View.OnClickListen
         if (v.getId() == R.id.iv_gravatar) {
             User user = (User) v.getTag();
             mContext.startActivity(IntentUtils.getUserActivityIntent(mContext, user));
+        } else {
+            super.onClick(v);
         }
     }
 
-    private static class ViewHolder {
-        public TextView tvTitle;
-        public ImageView ivGravatar;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private ViewHolder(View view) {
+            super(view);
+            ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
+            tvTitle = (TextView) view.findViewById(R.id.tv_title);
+        }
+
+        private TextView tvTitle;
+        private ImageView ivGravatar;
     }
 }

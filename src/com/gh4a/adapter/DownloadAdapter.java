@@ -3,6 +3,7 @@ package com.gh4a.adapter;
 import org.eclipse.egit.github.core.Download;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,49 +13,47 @@ import android.widget.TextView;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
-public class DownloadAdapter extends RootAdapter<Download> {
+public class DownloadAdapter extends RootAdapter<Download, DownloadAdapter.ViewHolder> {
     public DownloadAdapter(Context context) {
         super(context);
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
-        View v = inflater.inflate(R.layout.row_download, null);
-        ViewHolder viewHolder = new ViewHolder();
-
-        viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvCreatedAt = (TextView) v.findViewById(R.id.tv_created_at);
-        viewHolder.tvSize = (TextView) v.findViewById(R.id.tv_size);
-        viewHolder.tvDownloads = (TextView) v.findViewById(R.id.tv_downloads);
-
-        v.setTag(viewHolder);
-        return v;
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+        View v = inflater.inflate(R.layout.row_download, parent, false);
+        return new ViewHolder(v);
     }
 
     @Override
-    protected void bindView(View v, Download download) {
-        ViewHolder viewHolder = (ViewHolder) v.getTag();
-
-        viewHolder.tvTitle.setText(download.getName());
+    public void onBindViewHolder(ViewHolder holder, Download download) {
+        holder.tvTitle.setText(download.getName());
         if (!StringUtils.isBlank(download.getDescription())) {
-            viewHolder.tvDesc.setVisibility(View.VISIBLE);
-            viewHolder.tvDesc.setText(download.getDescription());
+            holder.tvDesc.setVisibility(View.VISIBLE);
+            holder.tvDesc.setText(download.getDescription());
         } else {
-            viewHolder.tvDesc.setVisibility(View.GONE);
+            holder.tvDesc.setVisibility(View.GONE);
         }
 
-        viewHolder.tvCreatedAt.setText(mContext.getString(R.string.download_created,
+        holder.tvCreatedAt.setText(mContext.getString(R.string.download_created,
                 StringUtils.formatRelativeTime(mContext, download.getCreatedAt(), true)));
-        viewHolder.tvSize.setText(Formatter.formatFileSize(mContext, download.getSize()));
-        viewHolder.tvDownloads.setText(String.valueOf(download.getDownloadCount()));
+        holder.tvSize.setText(Formatter.formatFileSize(mContext, download.getSize()));
+        holder.tvDownloads.setText(String.valueOf(download.getDownloadCount()));
     }
 
-    private static class ViewHolder {
-        public TextView tvTitle;
-        public TextView tvDesc;
-        public TextView tvSize;
-        public TextView tvDownloads;
-        public TextView tvCreatedAt;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private ViewHolder(View view) {
+            super(view);
+            tvTitle = (TextView) view.findViewById(R.id.tv_title);
+            tvDesc = (TextView) view.findViewById(R.id.tv_desc);
+            tvCreatedAt = (TextView) view.findViewById(R.id.tv_created_at);
+            tvSize = (TextView) view.findViewById(R.id.tv_size);
+            tvDownloads = (TextView) view.findViewById(R.id.tv_downloads);
+        }
+
+        private TextView tvTitle;
+        private TextView tvDesc;
+        private TextView tvSize;
+        private TextView tvDownloads;
+        private TextView tvCreatedAt;
     }
 }

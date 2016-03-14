@@ -7,6 +7,7 @@
     android:minHeight="?android:attr/listPreferredItemHeight"
     android:paddingLeft="@dimen/content_padding"
     android:paddingRight="@dimen/content_padding"
+    android:background="?attr/selectableItemBackground"
     android:orientation="horizontal">
 
     <com.gh4a.widget.FixedSizeImageView

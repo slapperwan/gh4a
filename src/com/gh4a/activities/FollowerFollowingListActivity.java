@@ -34,9 +34,6 @@ public class FollowerFollowingListActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (hasErrorView()) {
-            return;
-        }
 
         Bundle data = getIntent().getExtras();
         boolean showFollowers = data.getBoolean(EXTRA_SHOW_FOLLOWERS);

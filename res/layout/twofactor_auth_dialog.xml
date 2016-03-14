@@ -4,13 +4,19 @@
     android:orientation="vertical"
     android:padding="@dimen/content_padding" >
 
-    <EditText
-        android:id="@+id/auth_code"
+    <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/auth_code"
-        android:imeOptions="actionDone"
-        android:inputType="number"
-        android:maxLength="6" />
+        android:hint="@string/auth_code">
+
+        <EditText
+            android:id="@+id/auth_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionDone"
+            android:inputType="number"
+            android:maxLength="6" />
+
+    </android.support.design.widget.TextInputLayout>
 
 </LinearLayout>

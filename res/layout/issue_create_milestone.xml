@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<android.support.v4.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
     <RelativeLayout
-        android:id="@+id/label_container"
+        android:id="@+id/due_container"
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:paddingLeft="@dimen/content_padding"
@@ -13,8 +13,7 @@
         android:paddingTop="@dimen/floating_action_button_margin_mini"
         android:paddingBottom="@dimen/content_padding"
         android:gravity="center_vertical"
-        android:clickable="true"
-        android:onClick="showDatePickerDialog">
+        android:clickable="true">
 
         <ImageView
             android:id="@+id/iv_due"
@@ -42,4 +41,4 @@
 
     </RelativeLayout>
 
-</ScrollView>
+</android.support.v4.widget.NestedScrollView>

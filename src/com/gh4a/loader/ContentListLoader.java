@@ -40,7 +40,7 @@ public class ContentListLoader extends BaseLoader<List<RepositoryContents>> {
 
         if (mRef == null) {
             Repository repo = repoService.getRepository(mRepoOwner, mRepoName);
-            mRef = repo.getMasterBranch();
+            mRef = repo.getDefaultBranch();
         }
 
         List<RepositoryContents> contents;

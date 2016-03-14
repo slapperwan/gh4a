@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,6 +90,18 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        mAdapter.resume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mAdapter.pause();
+    }
+
+    @Override
     public boolean canChildScrollUp() {
         if (mCommentFragment != null && mCommentFragment.canChildScrollUp()) {
             return true;
@@ -97,7 +110,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     }
 
     @Override
-    protected RootAdapter<CommitComment> onCreateAdapter() {
+    protected RootAdapter<CommitComment, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         mAdapter = new CommitNoteAdapter(getActivity(), mRepoOwner, this);
         return mAdapter;
     }
@@ -108,11 +121,11 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     }
 
     @Override
-    protected void onItemClick(CommitComment comment) {
+    public void onItemClick(CommitComment comment) {
     }
 
     @Override
-    public Loader<LoaderResult<List<CommitComment>>> onCreateLoader(int id, Bundle args) {
+    public Loader<LoaderResult<List<CommitComment>>> onCreateLoader() {
         return new CommitCommentListLoader(getActivity(), mRepoOwner, mRepoName,
                 mObjectSha, true, false);
     }
@@ -121,7 +134,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_EDIT) {
             if (resultCode == Activity.RESULT_OK) {
-                refresh();
+                onRefresh();
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -155,6 +168,6 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
     @Override
     public void onCommentSent() {
-        refresh();
+        onRefresh();
     }
 }

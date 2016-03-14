@@ -25,38 +25,31 @@ import com.gh4a.R;
 import com.gh4a.fragment.BlogListFragment;
 
 public class BlogListActivity extends BaseActivity {
-    private BlogListFragment mFragment;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         FragmentManager fm = getSupportFragmentManager();
+        final BlogListFragment fragment;
         if (savedInstanceState == null) {
-            mFragment = BlogListFragment.newInstance();
+            fragment = BlogListFragment.newInstance();
             fm.beginTransaction()
-                    .add(R.id.content_container, mFragment)
+                    .add(R.id.content_container, fragment)
                     .commit();
         } else {
-            mFragment = (BlogListFragment) fm.findFragmentById(R.id.content_container);
+            fragment = (BlogListFragment) fm.findFragmentById(R.id.content_container);
         }
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.blog);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        setChildScrollDelegate(mFragment);
+        setChildScrollDelegate(fragment);
     }
 
     @Override
     protected boolean canSwipeToRefresh() {
         return true;
-    }
-
-    @Override
-    public void onRefresh() {
-        mFragment.refresh();
-        refreshDone();
     }
 
     @Override

@@ -24,6 +24,7 @@ import org.eclipse.egit.github.core.service.GistService;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -45,43 +46,37 @@ import com.gh4a.loader.GistLoader;
 import com.gh4a.loader.GistStarLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
 public class GistActivity extends BaseActivity implements View.OnClickListener {
     private String mGistId;
-    private String mUserLogin;
     private Gist mGist;
     private Boolean mIsStarred;
 
-    private LoaderCallbacks<Gist> mGistCallback = new LoaderCallbacks<Gist>() {
+    private LoaderCallbacks<Gist> mGistCallback = new LoaderCallbacks<Gist>(this) {
         @Override
-        public Loader<LoaderResult<Gist>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Gist>> onCreateLoader() {
             return new GistLoader(GistActivity.this, mGistId);
         }
         @Override
-        public void onResultReady(LoaderResult<Gist> result) {
-            boolean success = !result.handleError(GistActivity.this);
-            if (success) {
-                fillData(result.getData());
-            }
-            setContentEmpty(!success);
+        protected void onResultReady(Gist result) {
+            fillData(result);
             setContentShown(true);
             supportInvalidateOptionsMenu();
         }
     };
 
-    private LoaderCallbacks<Boolean> mStarCallback = new LoaderCallbacks<Boolean>() {
+    private LoaderCallbacks<Boolean> mStarCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
-        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new GistStarLoader(GistActivity.this, mGistId);
         }
         @Override
-        public void onResultReady(LoaderResult<Boolean> result) {
-            if (!result.handleError(GistActivity.this)) {
-                mIsStarred = result.getData();
-                supportInvalidateOptionsMenu();
-            }
+        protected void onResultReady(Boolean result) {
+            mIsStarred = result;
+            supportInvalidateOptionsMenu();
         }
     };
 
@@ -90,26 +85,35 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
 
         mGistId = getIntent().getExtras().getString(Constants.Gist.ID);
-        mUserLogin = getIntent().getExtras().getString(Constants.User.LOGIN);
-
-        if (hasErrorView()) {
-            return;
-        }
 
         setContentView(R.layout.gist);
         setContentShown(false);
 
-        ActionBar mActionBar = getSupportActionBar();
-        mActionBar.setTitle(getString(R.string.gist_title, mGistId));
-        mActionBar.setSubtitle(mUserLogin);
-        mActionBar.setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(getString(R.string.gist_title, mGistId));
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         getSupportLoaderManager().initLoader(0, null, mGistCallback);
         getSupportLoaderManager().initLoader(1, null, mStarCallback);
     }
 
+    @Override
+    public void onRefresh() {
+        LoaderManager lm = getSupportLoaderManager();
+        lm.getLoader(0).onContentChanged();
+        lm.getLoader(1).onContentChanged();
+        mGist = null;
+        mIsStarred = null;
+        setContentShown(false);
+        super.onRefresh();
+    }
+
     private void fillData(final Gist gist) {
         mGist = gist;
+
+        if (gist.getOwner() != null) {
+            getSupportActionBar().setSubtitle(gist.getOwner().getLogin());
+        }
 
         TextView tvDesc = (TextView) findViewById(R.id.tv_desc);
         tvDesc.setText(TextUtils.isEmpty(gist.getDescription())
@@ -136,13 +140,14 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
         } else {
             findViewById(R.id.file_card).setVisibility(View.GONE);
         }
+
+        findViewById(R.id.tv_private).setVisibility(gist.isPublic() ? View.GONE : View.VISIBLE);
     }
 
     @Override
     public void onClick(View view) {
         Intent intent = new Intent(this, GistViewerActivity.class);
         GistFile gist = (GistFile) view.getTag();
-        intent.putExtra(Constants.User.LOGIN, mUserLogin);
         intent.putExtra(Constants.Gist.FILENAME, gist.getFilename());
         intent.putExtra(Constants.Gist.ID, mGistId);
         startActivity(intent);
@@ -188,10 +193,11 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.share:
+                String login = CommitUtils.getUserLogin(this, mGist.getOwner());
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
                 shareIntent.setType("text/plain");
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT,
-                        getString(R.string.share_gist_subject, mGistId, mUserLogin));
+                        getString(R.string.share_gist_subject, mGistId, login));
                 shareIntent.putExtra(Intent.EXTRA_TEXT,  mGist.getHtmlUrl());
                 shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
@@ -207,9 +213,14 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     protected Intent navigateUp() {
-        Intent intent = new Intent(this, GistListActivity.class);
-        intent.putExtra(Constants.User.LOGIN, mUserLogin);
-        return intent;
+        String login = mGist != null && mGist.getOwner() != null
+                ? mGist.getOwner().getLogin() : null;
+        if (login != null) {
+            Intent intent = new Intent(this, GistListActivity.class);
+            intent.putExtra(Constants.User.LOGIN, login);
+            return intent;
+        }
+        return null;
     }
 
     private class UpdateStarTask extends BackgroundTask<Void> {

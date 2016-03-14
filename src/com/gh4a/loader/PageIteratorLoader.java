@@ -11,19 +11,24 @@ import android.util.Log;
 
 import com.gh4a.Constants;
 
-public class PageIteratorLoader<T> extends AsyncTaskLoader<Collection<T>> {
+public class PageIteratorLoader<T> extends AsyncTaskLoader<LoaderResult<PageIteratorLoader<T>.LoadedPage<T>>> {
     private PageIterator<T> mPageIterator;
     private ArrayList<T> mPreviouslyLoadedData;
+
+    public class LoadedPage<T> {
+        public final Collection<T> results;
+        public final boolean hasMoreData;
+        private LoadedPage(Collection<T> r, boolean hmd) {
+            results = r;
+            hasMoreData = hmd;
+        }
+    }
 
     public PageIteratorLoader(Context context, PageIterator<T> pageIterator) {
         super(context);
         mPageIterator = pageIterator;
         mPreviouslyLoadedData = new ArrayList<>();
         onContentChanged();
-    }
-
-    public boolean hasMoreData() {
-        return mPageIterator.hasNext();
     }
 
     @Override
@@ -41,7 +46,7 @@ public class PageIteratorLoader<T> extends AsyncTaskLoader<Collection<T>> {
     }
 
     @Override
-    public Collection<T> loadInBackground() {
+    public LoaderResult<LoadedPage<T>> loadInBackground() {
         if (mPageIterator.hasNext()) {
             try {
                 Collection<T> newData = mPageIterator.next();
@@ -49,10 +54,11 @@ public class PageIteratorLoader<T> extends AsyncTaskLoader<Collection<T>> {
                 mPreviouslyLoadedData.addAll(newData);
             } catch (Exception e) {
                 Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                return new LoaderResult<>(e);
             }
         }
 
-        return mPreviouslyLoadedData;
+        return new LoaderResult<>(new LoadedPage<>(mPreviouslyLoadedData, mPageIterator.hasNext()));
     }
 
     @Override

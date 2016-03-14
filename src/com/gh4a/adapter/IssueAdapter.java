@@ -17,6 +17,7 @@ package com.gh4a.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,57 +32,43 @@ import com.gh4a.widget.LabelBadgeView;
 
 import org.eclipse.egit.github.core.Issue;
 
-public class IssueAdapter extends RootAdapter<Issue> implements View.OnClickListener {
+public class IssueAdapter extends RootAdapter<Issue, IssueAdapter.ViewHolder> {
     public IssueAdapter(Context context) {
         super(context);
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_issue, parent, false);
-        ViewHolder viewHolder = new ViewHolder();
-
-        viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-        viewHolder.ivGravatar.setOnClickListener(this);
-
-        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvCreator = (TextView) v.findViewById(R.id.tv_creator);
-        viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
-        viewHolder.tvNumber = (TextView) v.findViewById(R.id.tv_number);
-        viewHolder.lvLabels = (LabelBadgeView) v.findViewById(R.id.labels);
-        viewHolder.tvComments = (TextView) v.findViewById(R.id.tv_comments);
-        viewHolder.tvMilestone = (TextView) v.findViewById(R.id.tv_milestone);
-
-        v.setTag(viewHolder);
-        return v;
+        ViewHolder holder = new ViewHolder(v);
+        holder.ivGravatar.setOnClickListener(this);
+        return holder;
     }
 
     @Override
-    protected void bindView(View v, Issue issue) {
-        ViewHolder viewHolder = (ViewHolder) v.getTag();
+    public void onBindViewHolder(ViewHolder holder, Issue issue) {
+        AvatarHandler.assignAvatar(holder.ivGravatar, issue.getUser());
+        holder.ivGravatar.setTag(issue);
 
-        AvatarHandler.assignAvatar(viewHolder.ivGravatar, issue.getUser());
-        viewHolder.ivGravatar.setTag(issue);
-
-        viewHolder.lvLabels.setLabels(issue.getLabels());
-        viewHolder.tvNumber.setText("#" + issue.getNumber());
-        viewHolder.tvDesc.setText(issue.getTitle());
-        viewHolder.tvCreator.setText(issue.getUser().getLogin());
-        viewHolder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
+        holder.lvLabels.setLabels(issue.getLabels());
+        holder.tvNumber.setText("#" + issue.getNumber());
+        holder.tvDesc.setText(issue.getTitle());
+        holder.tvCreator.setText(issue.getUser().getLogin());
+        holder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
                 issue.getCreatedAt(), true));
 
         if (issue.getComments() > 0) {
-            viewHolder.tvComments.setVisibility(View.VISIBLE);
-            viewHolder.tvComments.setText(String.valueOf(issue.getComments()));
+            holder.tvComments.setVisibility(View.VISIBLE);
+            holder.tvComments.setText(String.valueOf(issue.getComments()));
         } else {
-            viewHolder.tvComments.setVisibility(View.GONE);
+            holder.tvComments.setVisibility(View.GONE);
         }
 
         if (issue.getMilestone() != null) {
-            viewHolder.tvMilestone.setVisibility(View.VISIBLE);
-            viewHolder.tvMilestone.setText(issue.getMilestone().getTitle());
+            holder.tvMilestone.setVisibility(View.VISIBLE);
+            holder.tvMilestone.setText(issue.getMilestone().getTitle());
         } else {
-            viewHolder.tvMilestone.setVisibility(View.GONE);
+            holder.tvMilestone.setVisibility(View.GONE);
         }
     }
 
@@ -93,17 +80,31 @@ public class IssueAdapter extends RootAdapter<Issue> implements View.OnClickList
             if (intent != null) {
                 mContext.startActivity(intent);
             }
+        } else {
+            super.onClick(v);
         }
     }
 
-    private static class ViewHolder {
-        public ImageView ivGravatar;
-        public TextView tvNumber;
-        public TextView tvDesc;
-        public TextView tvCreator;
-        public TextView tvTimestamp;
-        public LabelBadgeView lvLabels;
-        public TextView tvComments;
-        public TextView tvMilestone;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private ViewHolder(View view) {
+            super(view);
+            ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
+            tvDesc = (TextView) view.findViewById(R.id.tv_desc);
+            tvCreator = (TextView) view.findViewById(R.id.tv_creator);
+            tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
+            tvNumber = (TextView) view.findViewById(R.id.tv_number);
+            lvLabels = (LabelBadgeView) view.findViewById(R.id.labels);
+            tvComments = (TextView) view.findViewById(R.id.tv_comments);
+            tvMilestone = (TextView) view.findViewById(R.id.tv_milestone);
+        }
+
+        private ImageView ivGravatar;
+        private TextView tvNumber;
+        private TextView tvDesc;
+        private TextView tvCreator;
+        private TextView tvTimestamp;
+        private LabelBadgeView lvLabels;
+        private TextView tvComments;
+        private TextView tvMilestone;
     }
 }

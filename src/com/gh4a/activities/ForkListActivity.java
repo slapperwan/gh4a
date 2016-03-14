@@ -28,9 +28,6 @@ public class ForkListActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (hasErrorView()) {
-            return;
-        }
 
         Bundle data = getIntent().getExtras();
         String repoOwner = data.getString(Constants.Repository.OWNER);

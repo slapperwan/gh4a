@@ -34,7 +34,8 @@ public class BookmarkListActivity extends BaseActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.generic_list);
+        ListView listView = new ListView(this);
+        setContentView(listView);
         setContentShown(false);
         setEmptyText(R.string.no_bookmarks);
 
@@ -42,7 +43,6 @@ public class BookmarkListActivity extends BaseActivity implements
         actionBar.setTitle(R.string.bookmarks);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        ListView listView = (ListView) findViewById(android.R.id.list);
         mAdapter = new BookmarkAdapter(this);
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
@@ -50,12 +50,6 @@ public class BookmarkListActivity extends BaseActivity implements
         listView.setBackgroundResource(UiUtils.resolveDrawable(this, R.attr.listBackground));
 
         getSupportLoaderManager().initLoader(0, null, this);
-    }
-
-    @Override
-    protected boolean isOnline() {
-        // we don't need a connection
-        return true;
     }
 
     @Override

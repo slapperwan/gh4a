@@ -20,18 +20,14 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.egit.github.core.Authorization;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.OAuthService;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -44,7 +40,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.Toast;
 
 import com.gh4a.BaseActivity;
@@ -54,7 +49,6 @@ import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.TwoFactorAuthException;
-import com.gh4a.adapter.DrawerAdapter;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
@@ -65,67 +59,48 @@ import com.gh4a.utils.UiUtils;
 public class Github4AndroidActivity extends BaseActivity {
     private static final int REQUEST_SETTINGS = 10000;
 
-    private static final int ITEM_SEARCH = 1;
-    private static final int ITEM_BOOKMARKS = 2;
-    private static final int ITEM_SETTINGS = 3;
-    private static final int ITEM_TIMELINE = 4;
-    private static final int ITEM_TRENDING = 5;
-    private static final int ITEM_BLOG = 6;
-
-    private static final List<DrawerAdapter.Item> DRAWER_ITEMS = Arrays.asList(
-        new DrawerAdapter.SectionHeaderItem(R.string.navigation),
-        new DrawerAdapter.EntryItem(R.string.search, 0, ITEM_SEARCH),
-        new DrawerAdapter.EntryItem(R.string.bookmarks, 0, ITEM_BOOKMARKS),
-        new DrawerAdapter.DividerItem(),
-        new DrawerAdapter.SectionHeaderItem(R.string.explore),
-        new DrawerAdapter.EntryItem(R.string.pub_timeline, 0, ITEM_TIMELINE),
-        new DrawerAdapter.EntryItem(R.string.trend, 0, ITEM_TRENDING),
-        new DrawerAdapter.EntryItem(R.string.blog, 0, ITEM_BLOG),
-        new DrawerAdapter.DividerItem(),
-        new DrawerAdapter.EntryItem(R.string.settings, 0, ITEM_SETTINGS)
-    );
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Gh4Application app = Gh4Application.get();
         if (app.isAuthorized()) {
-            goToToplevelActivity(false);
+            goToToplevelActivity();
             finish();
-        } else if (!hasErrorView()) {
+        } else {
             setContentView(R.layout.main);
         }
     }
 
     @Override
-    protected ListAdapter getNavigationDrawerAdapter() {
-        return new DrawerAdapter(this, DRAWER_ITEMS);
+    protected int getLeftNavigationDrawerMenuResource() {
+        return R.menu.anon_nav_drawer;
     }
 
     @Override
-    protected boolean onDrawerItemSelected(int position) {
-        switch (DRAWER_ITEMS.get(position).getId()) {
-            case ITEM_SETTINGS:
+    public boolean onNavigationItemSelected(MenuItem item) {
+        super.onNavigationItemSelected(item);
+        switch (item.getItemId()) {
+            case R.id.settings:
                 startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
                 return true;
-            case ITEM_SEARCH:
+            case R.id.search:
                 startActivity(new Intent(this, SearchActivity.class));
                 return true;
-            case ITEM_BOOKMARKS:
+            case R.id.bookmarks:
                 startActivity(new Intent(this, BookmarkListActivity.class));
                 return true;
-            case ITEM_TIMELINE:
+            case R.id.pub_timeline:
                 startActivity(new Intent(this, TimelineActivity.class));
                 return true;
-            case ITEM_BLOG:
+            case R.id.blog:
                 startActivity(new Intent(this, BlogListActivity.class));
                 return true;
-            case ITEM_TRENDING:
+            case R.id.trend:
                 startActivity(new Intent(this, TrendingActivity.class));
                 return true;
         }
-        return super.onDrawerItemSelected(position);
+        return false;
     }
 
     @Override
@@ -254,14 +229,12 @@ public class Github4AndroidActivity extends BaseActivity {
 
         @Override
         protected void onSuccess(Authorization result) {
-            SharedPreferences sharedPreferences = getSharedPreferences(
-                    SettingsFragment.PREF_NAME, MODE_PRIVATE);
-            Editor editor = sharedPreferences.edit();
-            editor.putString(Constants.User.AUTH_TOKEN, result.getToken());
-            editor.putString(Constants.User.LOGIN, mUserName);
-            editor.apply();
+            getPrefs().edit()
+                    .putString(Constants.User.AUTH_TOKEN, result.getToken())
+                    .putString(Constants.User.LOGIN, mUserName)
+                    .apply();
 
-            goToToplevelActivity(false);
+            goToToplevelActivity();
             finish();
         }
 

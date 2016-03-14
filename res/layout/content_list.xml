@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.gh4a.widget.PathBreadcrumbs
+        android:id="@+id/breadcrumbs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorBreadcrumbBackground"
+        android:scrollbarSize="2dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:elevation="2dp" />
+
+    <FrameLayout
+        android:id="@+id/content_list_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+</LinearLayout>

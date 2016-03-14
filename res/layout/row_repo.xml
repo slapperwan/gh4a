@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:minHeight="72dp"
     android:padding="@dimen/content_padding"
+    android:background="?attr/selectableItemBackground"
     android:orientation="vertical">
 
     <com.gh4a.widget.StyleableTextView
@@ -27,6 +28,17 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
         android:orientation="horizontal">
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_private"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
+            android:drawableLeft="?attr/privateSmallIcon"
+            android:drawablePadding="4dp"
+            android:text="@string/repo_type_private"
+            android:textAppearance="@style/TextAppearance.VerySmall.Bold"
+            android:visibility="gone" />
 
         <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_language"

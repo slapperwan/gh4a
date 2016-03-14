@@ -18,18 +18,19 @@ package com.gh4a.activities;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.Loader;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ActionMode;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
@@ -37,14 +38,14 @@ import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.adapter.IssueLabelAdapter;
+import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
-import com.shamanland.fab.FloatingActionButton;
-import com.shamanland.fab.ShowHideOnScroll;
+import com.gh4a.widget.DividerItemDecoration;
 
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -55,37 +56,31 @@ import java.net.URLEncoder;
 import java.util.List;
 
 public class IssueLabelListActivity extends BaseActivity implements
-        OnItemClickListener, View.OnClickListener {
+        RootAdapter.OnItemClickListener<IssueLabelAdapter.EditableLabel>, View.OnClickListener {
     private String mRepoOwner;
     private String mRepoName;
     private EditActionMode mActionMode;
     private IssueLabelAdapter.EditableLabel mAddedLabel;
 
     private FloatingActionButton mFab;
-    private ShowHideOnScroll mFabListener;
-    private ListView mListView;
+    private RecyclerView mRecyclerView;
     private IssueLabelAdapter mAdapter;
 
     private static final String STATE_KEY_ADDED_LABEL = "added_label";
     private static final String STATE_KEY_EDITING_LABEL = "editing_label";
 
-    private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
+    private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>(this) {
         @Override
-        public Loader<LoaderResult<List<Label>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<Label>>> onCreateLoader() {
             return new LabelListLoader(IssueLabelListActivity.this, mRepoOwner, mRepoName);
         }
         @Override
-        public void onResultReady(LoaderResult<List<Label>> result) {
-            boolean success = !result.handleError(IssueLabelListActivity.this);
+        protected void onResultReady(List<Label> result) {
             UiUtils.hideImeForView(getCurrentFocus());
-            if (success) {
-                mAdapter.clear();
-                for (Label label : result.getData()) {
-                    mAdapter.add(new IssueLabelAdapter.EditableLabel(label));
-                }
-                mAdapter.notifyDataSetChanged();
+            mAdapter.clear();
+            for (Label label : result) {
+                mAdapter.add(new IssueLabelAdapter.EditableLabel(label));
             }
-            setContentEmpty(!success);
             setContentShown(true);
         }
     };
@@ -97,11 +92,7 @@ public class IssueLabelListActivity extends BaseActivity implements
         mRepoOwner = getIntent().getExtras().getString(Constants.Repository.OWNER);
         mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);
 
-        if (hasErrorView()) {
-            return;
-        }
-
-        setContentView(R.layout.issue_label_list);
+        setContentView(R.layout.generic_list);
         setContentShown(false);
 
         ActionBar actionBar = getSupportActionBar();
@@ -110,13 +101,18 @@ public class IssueLabelListActivity extends BaseActivity implements
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         mAdapter = new IssueLabelAdapter(this);
-        mListView = (ListView) findViewById(android.R.id.list);
-        mListView.setAdapter(mAdapter);
-        mListView.setOnItemClickListener(this);
+        mAdapter.setOnItemClickListener(this);
+        mRecyclerView = (RecyclerView) findViewById(R.id.list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(this));
+        mRecyclerView.setTag(R.id.FloatingActionButtonScrollEnabled, new Object());
+        mRecyclerView.setAdapter(mAdapter);
 
-        mFab = (FloatingActionButton) findViewById(R.id.fab_add);
+        CoordinatorLayout rootLayout = getRootLayout();
+        mFab = (FloatingActionButton) getLayoutInflater().inflate(
+                R.layout.add_fab, rootLayout, false);
         mFab.setOnClickListener(this);
-        mFabListener = new ShowHideOnScroll(mFab);
+        rootLayout.addView(mFab);
         updateFabVisibility();
 
         getSupportLoaderManager().initLoader(0, null, mLabelCallback);
@@ -145,6 +141,14 @@ public class IssueLabelListActivity extends BaseActivity implements
     }
 
     @Override
+    public void onRefresh() {
+        setContentShown(false);
+        mAdapter.clear();
+        getSupportLoaderManager().getLoader(0).onContentChanged();
+        super.onRefresh();
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (mActionMode != null) {
@@ -157,9 +161,9 @@ public class IssueLabelListActivity extends BaseActivity implements
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    public void onItemClick(IssueLabelAdapter.EditableLabel item) {
         if (mActionMode == null) {
-            startEditing(mAdapter.getItem(position));
+            startEditing(item);
         }
     }
 
@@ -187,13 +191,8 @@ public class IssueLabelListActivity extends BaseActivity implements
     }
 
     private void updateFabVisibility() {
-        if (Gh4Application.get().isAuthorized() && mActionMode == null) {
-            mListView.setOnTouchListener(mFabListener);
-            mFab.setVisibility(View.VISIBLE);
-        } else {
-            mListView.setOnTouchListener(null);
-            mFab.setVisibility(View.GONE);
-        }
+        boolean visible = Gh4Application.get().isAuthorized() && mActionMode == null;
+        mFab.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     private final class EditActionMode implements ActionMode.Callback {

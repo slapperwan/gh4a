@@ -16,10 +16,10 @@
 package com.gh4a.fragment;
 
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
-import com.gh4a.R;
 import com.gh4a.adapter.RepositoryIssueAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.IntentUtils;
@@ -33,8 +33,10 @@ import java.util.Map;
 
 public class RepositoryIssueListFragment extends PagedDataBaseFragment<Issue> {
     private Map<String, String> mFilterData;
+    private int mEmptyTextResId;
 
-    public static RepositoryIssueListFragment newInstance(Map<String, String> filterData) {
+    public static RepositoryIssueListFragment newInstance(Map<String, String> filterData,
+            int emptyTextResId) {
         RepositoryIssueListFragment f = new RepositoryIssueListFragment();
 
         Bundle args = new Bundle();
@@ -43,6 +45,7 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Issue> {
                 args.putString(key, filterData.get(key));
             }
         }
+        args.putInt("emptytext", emptyTextResId);
         f.setArguments(args);
         return f;
     }
@@ -60,6 +63,7 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Issue> {
                 mFilterData.put(key, args.getString(key));
             }
         }
+        mEmptyTextResId = args.getInt("emptytext");
     }
 
     @Override
@@ -76,13 +80,13 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Issue> {
     }
 
     @Override
-    protected RootAdapter<Issue> onCreateAdapter() {
+    protected RootAdapter<Issue, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         return new RepositoryIssueAdapter(getActivity());
     }
 
     @Override
     protected int getEmptyTextResId() {
-        return R.string.no_issues_found;
+        return mEmptyTextResId;
     }
 
     @Override

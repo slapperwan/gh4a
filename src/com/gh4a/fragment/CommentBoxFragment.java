@@ -1,9 +1,11 @@
 package com.gh4a.fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.os.AsyncTaskCompat;
 import android.text.Editable;
@@ -13,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
@@ -23,7 +26,8 @@ import com.gh4a.widget.SwipeRefreshLayout;
 import java.io.IOException;
 
 public class CommentBoxFragment extends Fragment implements
-        View.OnClickListener, TextWatcher, SwipeRefreshLayout.ChildScrollDelegate {
+        View.OnClickListener, TextWatcher, SwipeRefreshLayout.ChildScrollDelegate,
+        AppBarLayout.OnOffsetChangedListener {
     public interface Callback {
         @StringRes int getCommentEditorHintResId();
         void onSendCommentInBackground(String comment) throws IOException;
@@ -35,12 +39,12 @@ public class CommentBoxFragment extends Fragment implements
     private Callback mCallback;
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         if (getParentFragment() instanceof Callback) {
             mCallback = (Callback) getParentFragment();
-        } else if (activity instanceof Callback) {
-            mCallback = (Callback) activity;
+        } else if (context instanceof Callback) {
+            mCallback = (Callback) context;
         } else {
             throw new IllegalStateException("No callback provided");
         }
@@ -63,6 +67,21 @@ public class CommentBoxFragment extends Fragment implements
         mCommentEditor = (EditText) view.findViewById(R.id.et_comment);
         mCommentEditor.setHint(mCallback.getCommentEditorHintResId());
         mCommentEditor.addTextChangedListener(this);
+
+        Activity activity = getActivity();
+        if (activity instanceof BaseActivity) {
+            ((BaseActivity) activity).addAppBarOffsetListener(this);
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        Activity activity = getActivity();
+        if (activity instanceof BaseActivity) {
+            ((BaseActivity) activity).removeAppBarOffsetListener(this);
+        }
     }
 
     @Override
@@ -70,6 +89,18 @@ public class CommentBoxFragment extends Fragment implements
         Editable comment = mCommentEditor.getText();
         AsyncTaskCompat.executeParallel(new CommentTask(comment.toString()));
         UiUtils.hideImeForView(getActivity().getCurrentFocus());
+    }
+
+    @Override
+    public void onOffsetChanged(AppBarLayout abl, int verticalOffset) {
+        View v = getView();
+        if (v != null) {
+            int offset = abl.getTotalScrollRange() + verticalOffset;
+            if (offset >= 0) {
+                v.setPadding(v.getPaddingLeft(), v.getPaddingTop(),
+                        v.getPaddingRight(), offset);
+            }
+        }
     }
 
     @Override

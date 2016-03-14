@@ -24,6 +24,7 @@ import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -36,14 +37,19 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     private String mLogin;
     private String mRepoType;
     private boolean mIsOrg;
+    private String mSortOrder;
+    private String mSortDirection;
 
-    public static RepositoryListFragment newInstance(String login, String userType, String repoType) {
+    public static RepositoryListFragment newInstance(String login, String userType,
+            String repoType, String sortOrder, String sortDirection) {
         RepositoryListFragment f = new RepositoryListFragment();
 
         Bundle args = new Bundle();
         args.putString(Constants.User.LOGIN, login);
         args.putString(Constants.User.TYPE, userType);
         args.putString(Constants.Repository.TYPE, repoType);
+        args.putString("sortOrder", sortOrder);
+        args.putString("sortDirection", sortDirection);
         f.setArguments(args);
 
         return f;
@@ -55,10 +61,12 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
         mLogin = getArguments().getString(Constants.User.LOGIN);
         mRepoType = getArguments().getString(Constants.Repository.TYPE);
         mIsOrg = Constants.User.TYPE_ORG.equals(getArguments().getString(Constants.User.TYPE));
+        mSortOrder = getArguments().getString("sortOrder");
+        mSortDirection = getArguments().getString("sortDirection");
     }
 
     @Override
-    protected RootAdapter<Repository> onCreateAdapter() {
+    protected RootAdapter<Repository, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         return new RepositoryAdapter(getActivity());
     }
 
@@ -68,7 +76,8 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     }
 
     @Override
-    protected void onAddData(RootAdapter<Repository> adapter, Collection<Repository> repositories) {
+    protected void onAddData(RootAdapter<Repository, ? extends RecyclerView.ViewHolder> adapter,
+            Collection<Repository> repositories) {
         if (!mIsOrg && ("sources".equals(mRepoType) || "forks".equals(mRepoType))) {
             for (Repository repository : repositories) {
                 if ("sources".equals(mRepoType) && !repository.isFork()) {
@@ -84,7 +93,7 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     }
 
     @Override
-    protected void onItemClick(Repository repository) {
+    public void onItemClick(Repository repository) {
         IntentUtils.openRepositoryInfoActivity(getActivity(), repository);
     }
 
@@ -101,6 +110,10 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
             filterData.put("affiliation", "owner,collaborator");
         } else {
             filterData.put("type", mRepoType);
+        }
+        if (mSortOrder != null) {
+            filterData.put("sort", mSortOrder);
+            filterData.put("direction", mSortDirection);
         }
 
         if (isSelf) {

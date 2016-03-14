@@ -1,36 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:gravity="center_vertical"
     android:paddingLeft="@dimen/content_padding"
     android:paddingRight="@dimen/content_padding" >
 
-    <EditText
-        android:id="@+id/et_username_main"
-        android:layout_height="wrap_content"
+    <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_above="@+id/spacer"
-        android:layout_gravity="center"
-        android:imeOptions="actionNext"
-        android:hint="@string/user_username"
-        android:singleLine="true"
-        android:nextFocusDown="@+id/et_password_main"/>
+        android:layout_height="wrap_content"
+        android:hint="@string/user_username">
+
+        <EditText
+            android:id="@+id/et_username_main"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_above="@+id/spacer"
+            android:layout_gravity="center"
+            android:imeOptions="actionNext"
+            android:singleLine="true"
+            android:nextFocusDown="@+id/et_password_main"/>
+
+    </android.support.design.widget.TextInputLayout>
+
     <View
         android:id="@+id/spacer"
         android:layout_width="match_parent"
-        android:layout_height="10dp"
-        android:layout_centerVertical="true" />
-    <EditText
-        android:id="@id/et_password_main"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:layout_below="@+id/spacer"
-        android:imeOptions="actionDone"
-        android:inputType="textPassword"
-        android:hint="@string/user_password"
-        android:singleLine="true" />
+        android:layout_height="10dp" />
 
-</RelativeLayout>
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/user_password">
+
+        <EditText
+            android:id="@id/et_password_main"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_below="@+id/spacer"
+            android:imeOptions="actionDone"
+            android:inputType="textPassword"
+            android:singleLine="true" />
+
+    </android.support.design.widget.TextInputLayout>
+
+</LinearLayout>

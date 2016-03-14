@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="DarkTheme" parent="DarkThemeBase">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="LightTheme" parent="LightThemeBase">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+</resources>

@@ -32,7 +32,6 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.StringUtils;
 
 import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.util.EncodingUtils;
@@ -51,22 +50,19 @@ public class FileViewerActivity extends WebViewerActivity {
     private static final int MENU_ITEM_HISTORY = 10;
 
     private LoaderCallbacks<List<RepositoryContents>> mFileCallback =
-            new LoaderCallbacks<List<RepositoryContents>>() {
+            new LoaderCallbacks<List<RepositoryContents>>(this) {
         @Override
-        public Loader<LoaderResult<List<RepositoryContents>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<RepositoryContents>>> onCreateLoader() {
             return new ContentLoader(FileViewerActivity.this, mRepoOwner, mRepoName, mPath, mRef);
         }
 
         @Override
-        public void onResultReady(LoaderResult<List<RepositoryContents>> result) {
+        protected void onResultReady(List<RepositoryContents> result) {
             boolean dataLoaded = false;
 
-            if (!result.handleError(FileViewerActivity.this)) {
-                List<RepositoryContents> data = result.getData();
-                if (data != null && !data.isEmpty()) {
-                    loadContent(data.get(0));
-                    dataLoaded = true;
-                }
+            if (result != null && !result.isEmpty()) {
+                loadContent(result.get(0));
+                dataLoaded = true;
             }
             if (!dataLoaded) {
                 setContentEmpty(true);
@@ -78,10 +74,6 @@ public class FileViewerActivity extends WebViewerActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (hasErrorView()) {
-            return;
-        }
 
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.OWNER);
@@ -97,6 +89,14 @@ public class FileViewerActivity extends WebViewerActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         getSupportLoaderManager().initLoader(0, null, mFileCallback);
+    }
+
+    @Override
+    public void onRefresh() {
+        getSupportLoaderManager().getLoader(0).onContentChanged();
+        setContentShown(false);
+        setContentEmpty(false);
+        super.onRefresh();
     }
 
     private void loadContent(RepositoryContents content) {

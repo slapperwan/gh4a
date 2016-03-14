@@ -3,6 +3,7 @@ package com.gh4a.adapter;
 import org.eclipse.egit.github.core.Release;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,35 +13,26 @@ import android.widget.TextView;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
-public class ReleaseAdapter extends RootAdapter<Release> {
+public class ReleaseAdapter extends RootAdapter<Release, ReleaseAdapter.ViewHolder> {
     public ReleaseAdapter(Context context) {
         super(context);
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
-        View v = inflater.inflate(R.layout.row_release, null);
-        ViewHolder viewHolder = new ViewHolder();
-
-        viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvType = (TextView) v.findViewById(R.id.tv_type);
-        viewHolder.tvCreatedAt  = (TextView) v.findViewById(R.id.tv_created_at);
-
-        v.setTag(viewHolder);
-        return v;
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+        View v = inflater.inflate(R.layout.row_release, parent, false);
+        return new ViewHolder(v);
     }
 
     @Override
-    protected void bindView(View v, Release release) {
-        ViewHolder viewHolder = (ViewHolder) v.getTag();
+    public void onBindViewHolder(ViewHolder holder, Release release) {
         String name = release.getName();
         if (TextUtils.isEmpty(name)) {
             name = release.getTagName();
         }
-
-        viewHolder.tvTitle.setText(name);
-        viewHolder.tvType.setText(formatReleaseType(release));
-        viewHolder.tvCreatedAt.setText(mContext.getString(R.string.download_created,
+        holder.tvTitle.setText(name);
+        holder.tvType.setText(formatReleaseType(release));
+        holder.tvCreatedAt.setText(mContext.getString(R.string.download_created,
                 StringUtils.formatRelativeTime(mContext, release.getCreatedAt(), true)));
     }
 
@@ -54,9 +46,16 @@ public class ReleaseAdapter extends RootAdapter<Release> {
         return mContext.getString(R.string.release_type_final);
     }
 
-    private static class ViewHolder {
-        public TextView tvTitle;
-        public TextView tvType;
-        public TextView tvCreatedAt;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private ViewHolder(View view) {
+            super(view);
+            tvTitle = (TextView) view.findViewById(R.id.tv_title);
+            tvType = (TextView) view.findViewById(R.id.tv_type);
+            tvCreatedAt  = (TextView) view.findViewById(R.id.tv_created_at);
+        }
+
+        private TextView tvTitle;
+        private TextView tvType;
+        private TextView tvCreatedAt;
     }
 }

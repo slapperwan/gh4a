@@ -1,10 +1,10 @@
 package com.gh4a.widget;
 
 import android.content.Context;
-import android.preference.ListPreference;
+import android.support.v7.preference.ListPreference;
 import android.util.AttributeSet;
 
-public class IntegerListPreference extends AppCompatListPreference {
+public class IntegerListPreference extends ListPreference {
     public IntegerListPreference(Context context) {
         super(context);
     }

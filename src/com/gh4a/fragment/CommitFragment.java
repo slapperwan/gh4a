@@ -50,39 +50,29 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
     private List<CommitComment> mComments;
     protected View mContentView;
 
-    private LoaderCallbacks<RepositoryCommit> mCommitCallback = new LoaderCallbacks<RepositoryCommit>() {
+    private LoaderCallbacks<RepositoryCommit> mCommitCallback = new LoaderCallbacks<RepositoryCommit>(this) {
         @Override
-        public Loader<LoaderResult<RepositoryCommit>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<RepositoryCommit>> onCreateLoader() {
             return new CommitLoader(getActivity(), mRepoOwner, mRepoName, mObjectSha);
         }
 
         @Override
-        public void onResultReady(LoaderResult<RepositoryCommit> result) {
-            if (result.handleError(getActivity())) {
-                setContentShown(true);
-                setContentEmpty(true);
-                return;
-            }
-            mCommit = result.getData();
+        protected void onResultReady(RepositoryCommit result) {
+            mCommit = result;
             fillDataIfReady();
         }
     };
     private LoaderCallbacks<List<CommitComment>> mCommentCallback =
-            new LoaderCallbacks<List<CommitComment>>() {
+            new LoaderCallbacks<List<CommitComment>>(this) {
         @Override
-        public Loader<LoaderResult<List<CommitComment>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<CommitComment>>> onCreateLoader() {
             return new CommitCommentListLoader(getActivity(), mRepoOwner, mRepoName,
                     mObjectSha, false, true);
         }
 
         @Override
-        public void onResultReady(LoaderResult<List<CommitComment>> result) {
-            if (result.handleError(getActivity())) {
-                setContentShown(true);
-                setContentEmpty(true);
-                return;
-            }
-            mComments = result.getData();
+        protected void onResultReady(List<CommitComment> result) {
+            mComments = result;
             fillDataIfReady();
         }
     };
@@ -104,6 +94,17 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
         mRepoName = getArguments().getString(Constants.Repository.NAME);
         mObjectSha = getArguments().getString(Constants.Object.OBJECT_SHA);
+    }
+
+    @Override
+    public void onRefresh() {
+        mCommit = null;
+        mComments = null;
+        if (isAdded()) {
+            setContentShown(false);
+            getLoaderManager().getLoader(0).onContentChanged();
+            getLoaderManager().getLoader(1).onContentChanged();
+        }
     }
 
     @Override

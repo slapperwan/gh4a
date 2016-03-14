@@ -1,16 +1,16 @@
 package com.gh4a.fragment;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.support.v4.preference.PreferenceFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialog;
+import android.support.v7.preference.Preference;
+import android.support.v7.preference.PreferenceFragmentCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +24,7 @@ import com.gh4a.R;
 import com.gh4a.activities.IssueEditActivity;
 import com.gh4a.widget.IntegerListPreference;
 
-public class SettingsFragment extends PreferenceFragment implements
+public class SettingsFragment extends PreferenceFragmentCompat implements
         Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
     public interface OnStateChangeListener {
         void onThemeChanged();
@@ -34,7 +34,9 @@ public class SettingsFragment extends PreferenceFragment implements
     public static final String PREF_NAME = "Gh4a-pref";
 
     public static final String KEY_THEME = "theme";
+    public static final String KEY_START_PAGE = "start_page";
     public static final String KEY_TEXT_SIZE = "webview_initial_zoom";
+    public static final String KEY_GIF_LOADING = "http_gif_load_mode";
     private static final String KEY_LOGOUT = "logout";
     private static final String KEY_ABOUT = "about";
     private static final String KEY_OPEN_SOURCE_COMPONENTS = "open_source_components";
@@ -46,20 +48,23 @@ public class SettingsFragment extends PreferenceFragment implements
     private Preference mOpenSourcePref;
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        if (!(activity instanceof OnStateChangeListener)) {
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (!(context instanceof OnStateChangeListener)) {
             throw new IllegalArgumentException("Activity must implement OnStateChangeListener");
         }
-        mListener = (OnStateChangeListener) activity;
+        mListener = (OnStateChangeListener) context;
+    }
+
+    @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        getPreferenceManager().setSharedPreferencesName(PREF_NAME);
+        addPreferencesFromResource(R.xml.settings);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        getPreferenceManager().setSharedPreferencesName(PREF_NAME);
-        addPreferencesFromResource(R.xml.settings);
 
         mThemePref = (IntegerListPreference) findPreference(KEY_THEME);
         mThemePref.setOnPreferenceChangeListener(this);
@@ -73,6 +78,10 @@ public class SettingsFragment extends PreferenceFragment implements
 
         mOpenSourcePref = findPreference(KEY_OPEN_SOURCE_COMPONENTS);
         mOpenSourcePref.setOnPreferenceClickListener(this);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+            getPreferenceScreen().removePreference(findPreference(KEY_GIF_LOADING));
+        }
 
         updateLogoutPrefState();
     }
@@ -197,10 +206,9 @@ public class SettingsFragment extends PreferenceFragment implements
 
     private static class OpenSourceComponentAdapter extends BaseAdapter {
         private static final String[][] COMPONENTS = new String[][] {
+            { "android-gif-drawable", "https://github.com/koral--/android-gif-drawable" },
+            { "AndroidSVG", "https://github.com/BigBadaboom/androidsvg" },
             { "Android-ProgressFragment", "https://github.com/johnkil/Android-ProgressFragment" },
-            { "android-support-v4-preferencefragment",
-                    "https://github.com/kolavar/android-support-v4-preferencefragment" },
-            { "Floating Action Button", "https://github.com/shamanland/floating-action-button" },
             { "Github Java bindings", "https://github.com/maniac103/egit-github" },
             { "HoloColorPicker", "https://github.com/LarsWerkman/HoloColorPicker" },
             { "Material Design Icons", "https://github.com/google/material-design-icons" },

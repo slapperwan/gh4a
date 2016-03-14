@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="?attr/listPreferredItemHeightLarge"
+    android:background="?attr/selectableItemBackground"
     android:padding="@dimen/content_padding">
 
     <LinearLayout

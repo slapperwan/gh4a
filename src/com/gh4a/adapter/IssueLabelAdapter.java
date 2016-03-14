@@ -5,6 +5,7 @@ import org.eclipse.egit.github.core.Label;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -20,8 +21,8 @@ import com.gh4a.utils.UiUtils;
 import com.gh4a.R;
 import com.gh4a.widget.StyleableTextView;
 
-public class IssueLabelAdapter extends RootAdapter<IssueLabelAdapter.EditableLabel> implements
-        View.OnClickListener {
+public class IssueLabelAdapter extends
+        RootAdapter<IssueLabelAdapter.EditableLabel, IssueLabelAdapter.ViewHolder> {
     public static class EditableLabel extends Label {
         public String editedName;
         public String editedColor;
@@ -48,15 +49,9 @@ public class IssueLabelAdapter extends RootAdapter<IssueLabelAdapter.EditableLab
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_issue_label, parent, false);
-        final ViewHolder holder = new ViewHolder();
-
-        holder.color = v.findViewById(R.id.view_color);
-        holder.label = (StyleableTextView) v.findViewById(R.id.tv_title);
-        holder.editor = (EditText) v.findViewById(R.id.et_label);
-        holder.collapsedContainer = v.findViewById(R.id.collapsed);
-        holder.expandedContainer = v.findViewById(R.id.expanded);
+        final ViewHolder holder = new ViewHolder(v);
 
         holder.editor.addTextChangedListener(new TextWatcher() {
             @Override
@@ -81,20 +76,14 @@ public class IssueLabelAdapter extends RootAdapter<IssueLabelAdapter.EditableLab
         for (int i = 0; i < count; i++) {
             View child = colors.getChildAt(i);
             child.setOnClickListener(this);
-            if (child.getId() == R.id.custom) {
-                holder.customColorButton = (TextView) child;
-            }
         }
         colors.setTag(holder);
 
-        v.setTag(holder);
-        return v;
+        return holder;
     }
 
     @Override
-    protected void bindView(View v, EditableLabel label) {
-        ViewHolder holder = (ViewHolder) v.getTag();
-
+    public void onBindViewHolder(ViewHolder holder, EditableLabel label) {
         holder.lastAssignedLabel = label;
 
         holder.collapsedContainer.setVisibility(label.isEditing ? View.GONE : View.VISIBLE);
@@ -129,29 +118,44 @@ public class IssueLabelAdapter extends RootAdapter<IssueLabelAdapter.EditableLab
 
     @Override
     public void onClick(View v) {
-        final ViewHolder holder = (ViewHolder) ((View) v.getParent()).getTag();
-        if (v == holder.customColorButton) {
-            final String color = holder.lastAssignedLabel.editedColor;
-            ColorPickerDialog dialog = new ColorPickerDialog(mContext, color, new OnColorChangedListener() {
-                @Override
-                public void colorChanged(String color) {
-                    assignColor(holder, color);
-                }
-            });
-            dialog.show();
+        View parent = (View) v.getParent();
+        if (parent.getId() == R.id.colors) {
+            final ViewHolder holder = (ViewHolder) parent.getTag();
+            if (v.getId() == R.id.custom) {
+                final String color = holder.lastAssignedLabel.editedColor;
+                ColorPickerDialog dialog = new ColorPickerDialog(mContext, color, new OnColorChangedListener() {
+                    @Override
+                    public void colorChanged(String color) {
+                        assignColor(holder, color);
+                    }
+                });
+                dialog.show();
+            } else {
+                assignColor(holder, (String) v.getTag());
+            }
         } else {
-            assignColor(holder, (String) v.getTag());
+            super.onClick(v);
         }
     }
 
-    private static class ViewHolder {
-        public EditableLabel lastAssignedLabel;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private ViewHolder(View view) {
+            super(view);
+            color = view.findViewById(R.id.view_color);
+            label = (StyleableTextView) view.findViewById(R.id.tv_title);
+            editor = (EditText) view.findViewById(R.id.et_label);
+            collapsedContainer = view.findViewById(R.id.collapsed);
+            expandedContainer = view.findViewById(R.id.expanded);
+            customColorButton = (TextView) view.findViewById(R.id.custom);
+        }
 
-        public View color;
-        public StyleableTextView label;
-        public EditText editor;
-        public TextView customColorButton;
-        public View collapsedContainer;
-        public View expandedContainer;
+        private EditableLabel lastAssignedLabel;
+
+        private View color;
+        private StyleableTextView label;
+        private EditText editor;
+        private TextView customColorButton;
+        private View collapsedContainer;
+        private View expandedContainer;
     }
 }

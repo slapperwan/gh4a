@@ -16,19 +16,16 @@ public class CustomTypefaceSpan extends MetricAffectingSpan {
     }
 
     @Override
-    public void updateDrawState(final TextPaint drawState)
-    {
+    public void updateDrawState(final TextPaint drawState) {
         apply(drawState);
     }
 
     @Override
-    public void updateMeasureState(final TextPaint paint)
-    {
+    public void updateMeasureState(final TextPaint paint) {
         apply(paint);
     }
 
-    private void apply(final Paint paint)
-    {
+    private void apply(final Paint paint) {
         final Typeface oldTypeface = paint.getTypeface();
         final int oldStyle = oldTypeface != null ? oldTypeface.getStyle() : 0;
         final int fakeStyle = oldStyle & ~mTypeface.getStyle();

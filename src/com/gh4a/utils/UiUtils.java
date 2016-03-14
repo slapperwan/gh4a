@@ -2,10 +2,14 @@ package com.gh4a.utils;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.DownloadManager;
@@ -13,6 +17,7 @@ import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -21,17 +26,20 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.method.LinkMovementMethod;
 import android.view.ContextThemeWrapper;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.EdgeEffect;
-import android.widget.ListView;
 import android.widget.TextView;
 
 public class UiUtils {
@@ -64,31 +72,103 @@ public class UiUtils {
         int luminance = Math.round(0.213F * red + 0.715F * green + 0.072F * blue);
 
         if (luminance >= 128) {
-            return context.getResources().getColor(R.color.label_fg_dark);
+            return ContextCompat.getColor(context, R.color.label_fg_dark);
         }
-        return context.getResources().getColor(R.color.label_fg_light);
+        return ContextCompat.getColor(context, R.color.label_fg_light);
     }
 
-    public static void trySetListOverscrollColor(ListView view, int color) {
+    public static void trySetListOverscrollColor(RecyclerView view, int color) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            trySetEdgeEffectColor(view, "mEdgeGlowTop", color);
-            trySetEdgeEffectColor(view, "mEdgeGlowBottom", color);
+            RecyclerViewEdgeColorHelper helper =
+                    (RecyclerViewEdgeColorHelper) view.getTag(R.id.RecyclerViewEdgeColorHelper);
+            if (helper == null) {
+                helper = new RecyclerViewEdgeColorHelper(view);
+                view.setTag(R.id.RecyclerViewEdgeColorHelper, helper);
+            }
+            helper.setColor(color);
         }
     }
 
     @TargetApi(21)
-    private static void trySetEdgeEffectColor(ListView view, String fieldName, int color) {
-        try {
-            Field effectField = AbsListView.class.getDeclaredField(fieldName);
-            effectField.setAccessible(true);
-            EdgeEffect effect = (EdgeEffect) effectField.get(view);
-            final int alpha = Color.alpha(effect.getColor());
-            effect.setColor(Color.argb(alpha, Color.red(color),
-                    Color.green(color), Color.blue(color)));
-        } catch (NoSuchFieldException e) {
-            // ignored
-        } catch (IllegalAccessException e) {
-            // ignored
+    private static class RecyclerViewEdgeColorHelper implements ViewTreeObserver.OnGlobalLayoutListener {
+        private RecyclerView mView;
+        private int mColor;
+        private EdgeEffect mTopEffect, mBottomEffect;
+        private Object mLastTopEffect, mLastBottomEffect;
+
+        private static Method sTopEnsureMethod, sBottomEnsureMethod;
+        private static Field sTopEffectField, sBottomEffectField;
+
+        public RecyclerViewEdgeColorHelper(RecyclerView view) {
+            mView = view;
+            mColor = 0;
+            mView.getViewTreeObserver().addOnGlobalLayoutListener(this);
+        }
+        public void setColor(int color) {
+            mColor = color;
+            applyIfPossible();
+        }
+        @Override
+        public void onGlobalLayout() {
+            applyIfPossible();
+        }
+
+        private void applyIfPossible() {
+            if (!ensureStaticMethodsAndFields()) {
+                return;
+            }
+            try {
+                Object topEffect = sTopEffectField.get(mView);
+                Object bottomEffect = sBottomEffectField.get(mView);
+                if (topEffect == null || bottomEffect == null
+                        || topEffect != mLastTopEffect || bottomEffect != mLastBottomEffect) {
+                    sTopEnsureMethod.invoke(mView);
+                    sBottomEnsureMethod.invoke(mView);
+                    mLastTopEffect = sTopEffectField.get(mView);
+                    mLastBottomEffect = sBottomEffectField.get(mView);
+
+                    final Field edgeField = mLastTopEffect.getClass().getDeclaredField("mEdgeEffect");
+                    edgeField.setAccessible(true);
+                    mTopEffect = (EdgeEffect) edgeField.get(mLastTopEffect);
+                    mBottomEffect = (EdgeEffect) edgeField.get(mLastBottomEffect);
+                }
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                mTopEffect = mBottomEffect = null;
+            } catch (NoSuchFieldException e) {
+                mTopEffect = mBottomEffect = null;
+            }
+            applyColor(mTopEffect);
+            applyColor(mBottomEffect);
+        }
+
+        private void applyColor(EdgeEffect effect) {
+            if (effect != null) {
+                final int alpha = Color.alpha(effect.getColor());
+                effect.setColor(Color.argb(alpha, Color.red(mColor),
+                        Color.green(mColor), Color.blue(mColor)));
+            }
+        }
+
+        private boolean ensureStaticMethodsAndFields() {
+            if (sTopEnsureMethod != null && sBottomEnsureMethod != null) {
+                return true;
+            }
+            try {
+                sTopEnsureMethod = RecyclerView.class.getDeclaredMethod("ensureTopGlow");
+                sTopEnsureMethod.setAccessible(true);
+                sBottomEnsureMethod = RecyclerView.class.getDeclaredMethod("ensureBottomGlow");
+                sBottomEnsureMethod.setAccessible(true);
+                sTopEffectField = RecyclerView.class.getDeclaredField("mTopGlow");
+                sTopEffectField.setAccessible(true);
+                sBottomEffectField = RecyclerView.class.getDeclaredField("mBottomGlow");
+                sBottomEffectField.setAccessible(true);
+                return true;
+            } catch (NoSuchMethodException e) {
+                // ignored
+            } catch (NoSuchFieldException e) {
+                // ignored
+            }
+            return false;
         }
     }
 
@@ -213,6 +293,8 @@ public class UiUtils {
         }
     }
 
+    // FIXME: Remove this and use setDestinationInExternalPublicDir() when removing GB compatibility
+    //        (and re-check whether WRITE_EXTERNAL_STORAGE permission can be dropped when doing that)
     private static Uri buildDownloadDestinationUri(String fileName) {
         final File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         if (file.exists()) {
@@ -225,7 +307,24 @@ public class UiUtils {
         return Uri.withAppendedPath(Uri.fromFile(file), fileName);
     }
 
-    public static void enqueueDownload(final Context context, String url, final String mimeType,
+    public static void enqueueDownloadWithPermissionCheck(final BaseActivity activity,
+            final String url, final String mimeType, final String fileName,
+            final String description, final String mediaType) {
+        final ActivityCompat.OnRequestPermissionsResultCallback cb =
+                new ActivityCompat.OnRequestPermissionsResultCallback() {
+            @Override
+            public void onRequestPermissionsResult(int requestCode,
+                    @NonNull String[] permissions, @NonNull int[] grantResults) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    enqueueDownload(activity, url, mimeType, fileName, description, mediaType);
+                }
+            }
+        };
+        activity.requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, cb,
+                R.string.download_permission_rationale);
+    }
+
+    private static void enqueueDownload(final Context context, String url, final String mimeType,
             final String fileName, final String description, final String mediaType) {
         if (url == null) {
             return;
@@ -264,7 +363,7 @@ public class UiUtils {
     }
 
     @SuppressLint("NewApi")
-    private static boolean downloadNeedsWarning(Context context) {
+    public static boolean downloadNeedsWarning(Context context) {
         ConnectivityManager cm =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 

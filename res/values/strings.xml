@@ -14,6 +14,7 @@
     <string name="search">Search</string>
     <string name="logout">Logout</string>
     <string name="login">Login</string>
+    <string name="try_again">Try again</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="settings">Settings</string>
@@ -41,8 +42,7 @@
     <string name="closed">Closed</string>
     <string name="theme">Theme</string>
     <string name="pub_timeline">Public Timeline</string>
-    <string name="error_connection">Connection error</string>
-    <string name="home">Home</string>
+    <string name="load_failure_explanation">Loading the data from Github failed. Please verify you have a working network connection and try again.</string>
     <string name="share">Share</string>
     <string name="download">Download</string>
     <string name="downloads">Downloads</string>
@@ -84,6 +84,8 @@
     <string name="download_now_button">Download now</string>
     <string name="download_wifi_button">Download over Wi-Fi</string>
     <string name="download_fail_no_storage_toast">The file could not be downloaded - the storage or SD card isn\'t available.</string>
+    <string name="download_permission_rationale">Permission to write to USB storage or SD card is required in order to download files.</string>
+    <string name="load_auth_failure_notice">Your authentication credentials aren\'t valid anymore, please log in again.</string>
 	<string name="auth_code">Authentication Code</string>
 	<string name="two_factor_auth">Two-factor Authentication</string>
 	<string name="verify">Verify</string>
@@ -96,8 +98,12 @@
     <string name="created">Created</string>
     <string name="assigned">Assigned</string>
     <string name="mentioned">Mentioned</string>
+    <string name="my_repositories">My repositories</string>
     <string name="my_issues">My issues</string>
     <string name="my_pull_requests">My pull requests</string>
+    <string name="my_gists">My gists</string>
+    <string name="start_page">Start page</string>
+    <string name="start_page_last_selected">Last selected</string>
 
     <plurals name="contributor_extra_data">
         <item quantity="one">%1$d contribution</item>
@@ -113,6 +119,14 @@
     <string name="repo_type_forks">Forks</string>
     <string name="repo_type_watched">Watched</string>
     <string name="repo_type_starred">Starred</string>
+    <string name="repo_filter">Filter</string>
+    <string name="repo_sort">Sort order</string>
+    <string name="repo_sort_order_name_asc">By name (A-Z)</string>
+    <string name="repo_sort_order_name_desc">By name (Z-A)</string>
+    <string name="repo_sort_order_creation_desc">Newest</string>
+    <string name="repo_sort_order_creation_asc">Oldest</string>
+    <string name="repo_sort_order_pushed_desc">Most recently pushed</string>
+    <string name="repo_sort_order_pushed_asc">Least recently pushed</string>
 
     <string name="no_blogs_found">No blogs found.</string>
     <string name="no_comments_found">Nobody has commented so far.</string>
@@ -129,6 +143,8 @@
     <string name="no_pull_requests_found">No pull requests were opened so far.</string>
     <string name="no_repos_found">No repositories found.</string>
     <string name="no_search_repos_found">No repositories found matching the criteria.</string>
+    <string name="no_search_users_found">No users found matching the criteria.</string>
+    <string name="no_search_code_found">No code occurences found matching the criteria.</string>
     <string name="no_starred_repos_found">No repositories were starred yet.</string>
     <string name="no_watched_repos_found">No repositories are being watched yet.</string>
     <string name="no_watchers_found">Nobody is watching this repository yet.</string>
@@ -186,7 +202,6 @@
     <string name="user_pub_repos">Repositories</string>
     <string name="user_extra_data">%1$d followers\u00a0\u00a0\u00a0%2$d repos</string>
     <string name="user_news_feed">News Feed</string>
-    <string name="user_your_actions">Your Actions</string>
     <string name="user_public_activity">Public Activity</string>
     <string name="user_organizations">Organizations</string>
     <string name="user_follow_action">Follow</string>
@@ -204,8 +219,6 @@
     <string name="repo_star_action">Star</string>
     <string name="repo_select_ref">Select branch</string>
     <string name="repo_select_ref_dialog_title">Select branch or tag</string>
-    <string name="repo_branches">Branches</string>
-    <string name="repo_tags">Tags</string>
     <string name="repo_unwatch_action">Unwatch</string>
     <string name="repo_unstar_action">Unstar</string>
     <string name="repo_download_action">Download code as ZIP</string>
@@ -227,6 +240,7 @@
     <string name="issue_event_assigned">Issue was assigned to [b]%2$s[/b] by %1$s</string>
     <string name="issue_event_assigned_self">Issue was self-assigned by %1$s</string>
     <string name="issue_event_unassigned">Issue was unassigned from [b]%2$s[/b] by %1$s</string>
+    <string name="issue_event_unassigned_self">Issue was self-unassigned from %1$s</string>
 
     <!-- Commit -->
     <string name="commit_title">Commit %1$s</string>
@@ -291,7 +305,6 @@
     <string name="issue_error_create_milestone">Cannot create milestone</string>
     <string name="issue_error_milestone_title">Please enter a title</string>
     <string name="issue_label_new">New Label</string>
-    <string name="issue_milestone">Milestone: %1$s</string>
     <string name="issue_milestone_new">New Milestone</string>
     <string name="issue_milestone_edit">Edit Milestone</string>
     <string name="issue_milestone_open_issues">%d open</string>
@@ -310,7 +323,6 @@
     <string name="issue_labels_collab_only">Labels can only be set by repo collaborators</string>
     <string name="issue_milestone_due_date">Due Date</string>
     <string name="issue_milestone_due_unset">No date set</string>
-    <string name="issue_assignee">%1$s is assigned</string>
     <string name="issue_comment_title">Comment</string>
     <string name="issue_comment_update_title">Update</string>
     <string name="issue_comment_hint">Comment on this issue</string>
@@ -334,6 +346,11 @@
     <string name="pull_error_merge">Pull request could not be merged</string>
     <string name="pull_message_dialog_title">Merge pull request #%1$d</string>
     <string name="pull_merge_message_description">If you want to add additional details to the merge commit message, please enter them below.</string>
+    <string name="pull_merge_status_clean">Pull request can be merged</string>
+    <string name="pull_merge_status_unstable">Pull request didn\'t pass all checks</string>
+    <string name="pull_merge_status_dirty">Pull request has conflicts that need to be resolved manually</string>
+    <string name="pull_merge_status_unknown">The status of the pull request could not be determined</string>
+    <string name="pull_no_commit_status">No additional checks are attached to this pull request</string>
 
     <!-- Object -->
     <string name="object_view_file_at">View file @ %1$s</string>
@@ -370,8 +387,12 @@
     <!-- Search -->
     <string name="search_type_repo">Repository</string>
     <string name="search_type_user">User</string>
+    <string name="search_type_code">Code</string>
     <string name="search_hint_repo">Search for repositories</string>
     <string name="search_hint_user">Search for users</string>
+    <string name="search_hint_code">Search for code</string>
+    <string name="code_search_result_in">In repo %1$s/%2$s</string>
+    <string name="code_search_too_broad">Your search was too broad. You need to specify both at least one search term as well as either a user or a repo.</string>
 
     <!-- Sharing -->
     <string name="send_email_title">Select email application</string>
@@ -385,5 +406,6 @@
     <string name="share_user_subject_loginonly">User %1$s</string>
 
     <!-- Webview text size -->
-    <string name="menu_text_size">Text size</string>
+    <string name="menu_text_size">Code view text size</string>
+    <string name="menu_gif_load_mode">Animated GIF loading</string>
 </resources>

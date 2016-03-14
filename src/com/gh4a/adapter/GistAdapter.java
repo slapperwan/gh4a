@@ -19,6 +19,7 @@ import org.eclipse.egit.github.core.Gist;
 import org.eclipse.egit.github.core.User;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +30,7 @@ import com.gh4a.R;
 import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.StringUtils;
 
-public class GistAdapter extends RootAdapter<Gist> {
+public class GistAdapter extends RootAdapter<Gist, GistAdapter.ViewHolder> {
     private String mOwnerLogin;
 
     public GistAdapter(Context context, String owner) {
@@ -38,46 +39,48 @@ public class GistAdapter extends RootAdapter<Gist> {
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_gist, parent, false);
-        ViewHolder viewHolder = new ViewHolder();
-
-        viewHolder.tvTitle = (TextView) v.findViewById(R.id.tv_title);
-        viewHolder.tvCreator = (TextView) v.findViewById(R.id.tv_creator);
-        viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
-        viewHolder.tvSha = (TextView) v.findViewById(R.id.tv_sha);
-        viewHolder.tvFiles = (TextView) v.findViewById(R.id.tv_files);
-
-        v.setTag(viewHolder);
-        return v;
+        return new ViewHolder(v);
     }
 
     @Override
-    protected void bindView(View v, Gist gist) {
-        ViewHolder viewHolder = (ViewHolder) v.getTag();
+    public void onBindViewHolder(ViewHolder holder, Gist gist) {
         User user = gist.getOwner();
         boolean isSelf = user != null && TextUtils.equals(user.getLogin(), mOwnerLogin);
 
         if (isSelf) {
-            viewHolder.tvCreator.setVisibility(View.GONE);
+            holder.tvCreator.setVisibility(View.GONE);
         } else {
-            viewHolder.tvCreator.setText(CommitUtils.getUserLogin(mContext, user));
-            viewHolder.tvCreator.setVisibility(View.VISIBLE);
+            holder.tvCreator.setText(CommitUtils.getUserLogin(mContext, user));
+            holder.tvCreator.setVisibility(View.VISIBLE);
         }
 
-        viewHolder.tvTimestamp.setText(
+        holder.tvTimestamp.setText(
                 StringUtils.formatRelativeTime(mContext, gist.getCreatedAt(), false));
-        viewHolder.tvTitle.setText(TextUtils.isEmpty(gist.getDescription())
+        holder.tvTitle.setText(TextUtils.isEmpty(gist.getDescription())
                 ? mContext.getString(R.string.gist_no_description) : gist.getDescription());
-        viewHolder.tvSha.setText(gist.getId());
-        viewHolder.tvFiles.setText(String.valueOf(gist.getFiles().size()));
+        holder.tvSha.setText(gist.getId());
+        holder.tvFiles.setText(String.valueOf(gist.getFiles().size()));
+        holder.tvPrivate.setVisibility(gist.isPublic() ? View.GONE : View.VISIBLE);
     }
 
-    private static class ViewHolder {
-        public TextView tvCreator;
-        public TextView tvTimestamp;
-        public TextView tvTitle;
-        public TextView tvSha;
-        public TextView tvFiles;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private ViewHolder(View view) {
+            super(view);
+            tvTitle = (TextView) view.findViewById(R.id.tv_title);
+            tvCreator = (TextView) view.findViewById(R.id.tv_creator);
+            tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
+            tvSha = (TextView) view.findViewById(R.id.tv_sha);
+            tvFiles = (TextView) view.findViewById(R.id.tv_files);
+            tvPrivate = (TextView) view.findViewById(R.id.tv_private);
+        }
+
+        private TextView tvCreator;
+        private TextView tvTimestamp;
+        private TextView tvTitle;
+        private TextView tvSha;
+        private TextView tvFiles;
+        private TextView tvPrivate;
     }
 }

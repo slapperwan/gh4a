@@ -3,18 +3,15 @@ package com.gh4a.widget;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.graphics.Rect;
+import android.graphics.Typeface;
+import android.support.v7.text.AllCapsTransformationMethod;
 import android.text.method.LinkMovementMethod;
-import android.text.method.TransformationMethod;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.utils.TypefaceCache;
 import com.gh4a.utils.UiUtils;
-
-import java.util.Locale;
 
 public class StyleableTextView extends TextView {
     private static final int[] TEXT_APPEARANCE_ATTRS = new int[] {
@@ -98,28 +95,19 @@ public class StyleableTextView extends TextView {
     }
 
     @Override
+    public void setTypeface(Typeface tf, int style) {
+        if (tf == getTypeface()) {
+            setTypeface(TypefaceCache.getTypeface(getContext(), mTypefaceValue, style));
+        } else {
+            super.setTypeface(tf, style);
+        }
+    }
+
+    @Override
     public void setText(CharSequence text, BufferType type) {
         super.setText(text, type);
         if (getMovementMethod() == LinkMovementMethod.getInstance()) {
             setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
-        }
-    }
-
-    private static class AllCapsTransformationMethod implements TransformationMethod {
-        private final Locale mLocale;
-
-        public AllCapsTransformationMethod(Context context) {
-            mLocale = context.getResources().getConfiguration().locale;
-        }
-
-        @Override
-        public CharSequence getTransformation(CharSequence source, View view) {
-            return source != null ? source.toString().toUpperCase(mLocale) : null;
-        }
-
-        @Override
-        public void onFocusChanged(View view, CharSequence sourceText, boolean focused,
-                int direction, Rect previouslyFocusedRect) {
         }
     }
 }

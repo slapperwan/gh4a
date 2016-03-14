@@ -20,6 +20,7 @@ import org.eclipse.egit.github.core.User;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,51 +33,40 @@ import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
-public class PullRequestAdapter extends RootAdapter<PullRequest> implements View.OnClickListener {
+public class PullRequestAdapter extends RootAdapter<PullRequest, PullRequestAdapter.ViewHolder> {
     public PullRequestAdapter(Context context) {
         super(context);
     }
 
     @Override
-    protected View createView(LayoutInflater inflater, ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_issue, parent, false);
-        ViewHolder viewHolder = new ViewHolder();
-
-        viewHolder.ivGravatar = (ImageView) v.findViewById(R.id.iv_gravatar);
-        viewHolder.ivGravatar.setOnClickListener(this);
-
-        viewHolder.tvDesc = (TextView) v.findViewById(R.id.tv_desc);
-        viewHolder.tvCreator = (TextView) v.findViewById(R.id.tv_creator);
-        viewHolder.tvTimestamp = (TextView) v.findViewById(R.id.tv_timestamp);
-        viewHolder.tvNumber = (TextView) v.findViewById(R.id.tv_number);
-        viewHolder.tvComments = (TextView) v.findViewById(R.id.tv_comments);
-
         v.findViewById(R.id.labels).setVisibility(View.GONE);
 
-        v.setTag(viewHolder);
-        return v;
+        ViewHolder holder = new ViewHolder(v);
+        holder.ivGravatar.setOnClickListener(this);
+        return holder;
     }
 
     @Override
-    protected void bindView(View v, PullRequest pullRequest) {
-        ViewHolder viewHolder = (ViewHolder) v.getTag();
+    public void onBindViewHolder(ViewHolder holder, PullRequest pullRequest) {
         final User user = pullRequest.getUser();
 
-        AvatarHandler.assignAvatar(viewHolder.ivGravatar, user);
-        viewHolder.ivGravatar.setTag(pullRequest.getUser());
+        AvatarHandler.assignAvatar(holder.ivGravatar, user);
+        holder.ivGravatar.setTag(pullRequest.getUser());
 
-        viewHolder.tvNumber.setText("#" + pullRequest.getNumber());
-        viewHolder.tvDesc.setText(pullRequest.getTitle());
-        viewHolder.tvCreator.setText(CommitUtils.getUserLogin(mContext, user));
-        viewHolder.tvTimestamp.setText(
+        holder.tvNumber.setText("#" + pullRequest.getNumber());
+        holder.tvDesc.setText(pullRequest.getTitle());
+        holder.tvCreator.setText(CommitUtils.getUserLogin(mContext, user));
+        holder.tvTimestamp.setText(
                 StringUtils.formatRelativeTime(mContext, pullRequest.getCreatedAt(), true));
 
         int comments = pullRequest.getComments() + pullRequest.getReviewComments();
         if (comments > 0) {
-            viewHolder.tvComments.setVisibility(View.VISIBLE);
-            viewHolder.tvComments.setText(String.valueOf(comments));
+            holder.tvComments.setVisibility(View.VISIBLE);
+            holder.tvComments.setText(String.valueOf(comments));
         } else {
-            viewHolder.tvComments.setVisibility(View.GONE);
+            holder.tvComments.setVisibility(View.GONE);
         }
     }
 
@@ -88,15 +78,27 @@ public class PullRequestAdapter extends RootAdapter<PullRequest> implements View
             if (intent != null) {
                 mContext.startActivity(intent);
             }
+        } else {
+            super.onClick(v);
         }
     }
 
-    private static class ViewHolder {
-        public ImageView ivGravatar;
-        public TextView tvCreator;
-        public TextView tvTimestamp;
-        public TextView tvDesc;
-        public TextView tvNumber;
-        public TextView tvComments;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private ViewHolder(View view) {
+            super(view);
+            ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
+            tvDesc = (TextView) view.findViewById(R.id.tv_desc);
+            tvCreator = (TextView) view.findViewById(R.id.tv_creator);
+            tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
+            tvNumber = (TextView) view.findViewById(R.id.tv_number);
+            tvComments = (TextView) view.findViewById(R.id.tv_comments);
+        }
+
+        private ImageView ivGravatar;
+        private TextView tvCreator;
+        private TextView tvTimestamp;
+        private TextView tvDesc;
+        private TextView tvNumber;
+        private TextView tvComments;
     }
 }

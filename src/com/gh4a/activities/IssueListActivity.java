@@ -15,21 +15,32 @@
  */
 package com.gh4a.activities;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.widget.ListAdapter;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 
+import com.gh4a.BasePagerActivity;
 import com.gh4a.Constants;
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.adapter.DrawerAdapter;
 import com.gh4a.fragment.IssueListFragment;
+import com.gh4a.fragment.LoadingListFragmentBase;
 import com.gh4a.loader.CollaboratorListLoader;
 import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.LabelListLoader;
@@ -44,12 +55,14 @@ import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class IssueListActivity extends IssueListBaseActivity {
+public class IssueListActivity extends BasePagerActivity implements
+        View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener {
+    private static final int REQUEST_ISSUE_CREATE = 1001;
+
     private String mRepoOwner;
     private String mRepoName;
 
@@ -57,6 +70,7 @@ public class IssueListActivity extends IssueListBaseActivity {
     private int mSelectedMilestone;
     private String mSelectedAssignee;
 
+    private FloatingActionButton mCreateFab;
     private IssueListFragment mOpenFragment;
     private IssueListFragment mClosedFragment;
     private Boolean mIsCollaborator;
@@ -65,119 +79,120 @@ public class IssueListActivity extends IssueListBaseActivity {
     private List<Milestone> mMilestones;
     private List<User> mAssignees;
 
+    protected IssueListFragment.SortDrawerHelper mSortHelper =
+            new IssueListFragment.SortDrawerHelper();
+
     private static final int[] TITLES = new int[] {
         R.string.open, R.string.closed
     };
 
-    private static final List<DrawerAdapter.Item> FILTER_DRAWER_ITEMS = Arrays.asList(
-        new DrawerAdapter.DividerItem(),
-        new DrawerAdapter.SectionHeaderItem(R.string.issue_filter),
-        new DrawerAdapter.EntryItem(R.string.issue_filter_by_milestone, 0, ITEM_FILTER_MILESTONE),
-        new DrawerAdapter.EntryItem(R.string.issue_filter_by_labels, 0, ITEM_FILTER_LABEL)
-    );
-
-    private static final List<DrawerAdapter.Item> COLLAB_DRAWER_ITEMS = Arrays.asList(
-        new DrawerAdapter.EntryItem(R.string.issue_filter_by_assignee, 0, ITEM_FILTER_ASSIGNEE),
-        new DrawerAdapter.DividerItem(),
-        new DrawerAdapter.EntryItem(R.string.issue_manage_labels, 0, ITEM_MANAGE_LABELS),
-        new DrawerAdapter.EntryItem(R.string.issue_manage_milestones, 0, ITEM_MANAGE_MILESTONES)
-    );
-
-    private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
+    private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>(this) {
         @Override
-        public Loader<LoaderResult<List<Label>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<Label>>> onCreateLoader() {
             return new LabelListLoader(IssueListActivity.this, mRepoOwner, mRepoName);
         }
 
         @Override
-        public void onResultReady(LoaderResult<List<Label>> result) {
-            if (checkForError(result)) {
-                return;
-            }
+        protected void onResultReady(List<Label> result) {
             stopProgressDialog(mProgressDialog);
-            mLabels = result.getData();
+            mLabels = result;
             showLabelsDialog();
             getSupportLoaderManager().destroyLoader(0);
+        }
+
+        @Override
+        protected boolean onError(Exception e) {
+            stopProgressDialog(mProgressDialog);
+            return false;
         }
     };
 
     private LoaderCallbacks<List<Milestone>> mMilestoneCallback =
-            new LoaderCallbacks<List<Milestone>>() {
+            new LoaderCallbacks<List<Milestone>>(this) {
         @Override
-        public Loader<LoaderResult<List<Milestone>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<Milestone>>> onCreateLoader() {
             return new MilestoneListLoader(IssueListActivity.this, mRepoOwner, mRepoName,
                     Constants.Issue.STATE_OPEN);
         }
 
         @Override
-        public void onResultReady(LoaderResult<List<Milestone>> result) {
-            if (checkForError(result)) {
-                return;
-            }
+        protected void onResultReady(List<Milestone> result) {
             stopProgressDialog(mProgressDialog);
-            mMilestones = result.getData();
+            mMilestones = result;
             showMilestonesDialog();
             getSupportLoaderManager().destroyLoader(1);
+        }
 
+        @Override
+        protected boolean onError(Exception e) {
+            stopProgressDialog(mProgressDialog);
+            return false;
         }
     };
 
     private LoaderCallbacks<List<User>> mCollaboratorListCallback =
-            new LoaderCallbacks<List<User>>() {
+            new LoaderCallbacks<List<User>>(this) {
         @Override
-        public Loader<LoaderResult<List<User>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<User>>> onCreateLoader() {
             return new CollaboratorListLoader(IssueListActivity.this, mRepoOwner, mRepoName);
         }
 
         @Override
-        public void onResultReady(LoaderResult<List<User>> result) {
-            if (checkForError(result)) {
-                return;
-            }
+        protected void onResultReady(List<User> result) {
             stopProgressDialog(mProgressDialog);
-            mAssignees = result.getData();
+            mAssignees = result;
             showAssigneesDialog();
             getSupportLoaderManager().destroyLoader(2);
         }
+
+        @Override
+        protected boolean onError(Exception e) {
+            stopProgressDialog(mProgressDialog);
+            return false;
+        }
     };
 
-    private LoaderCallbacks<Boolean> mIsCollaboratorCallback = new LoaderCallbacks<Boolean>() {
+    private LoaderCallbacks<Boolean> mIsCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
-        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsCollaboratorLoader(IssueListActivity.this, mRepoOwner, mRepoName);
         }
 
         @Override
-        public void onResultReady(LoaderResult<Boolean> result) {
-            if (checkForError(result)) {
-                return;
-            }
+        protected void onResultReady(Boolean result) {
             if (mIsCollaborator == null) {
-                mIsCollaborator = result.getData();
+                mIsCollaborator = result;
                 if (mIsCollaborator) {
-                    mDrawerItems.addAll(COLLAB_DRAWER_ITEMS);
-                    mDrawerAdapter.notifyDataSetChanged();
+                    updateRightNavigationDrawer();
                 }
             }
+        }
+
+        @Override
+        protected boolean onError(Exception e) {
+            stopProgressDialog(mProgressDialog);
+            return false;
         }
     };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (hasErrorView()) {
-            return;
-        }
 
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.OWNER);
         mRepoName = data.getString(Constants.Repository.NAME);
-        mSortMode = SORT_MODE_CREATED;
-        mSortAscending = false;
-        updateSortDrawerItemState(ITEM_SORT_CREATED_DESC);
 
         if (TextUtils.equals(data.getString(Constants.Issue.STATE), Constants.Issue.STATE_CLOSED)) {
             getPager().setCurrentItem(1);
+        }
+
+        if (Gh4Application.get().isAuthorized()) {
+            CoordinatorLayout rootLayout = getRootLayout();
+            mCreateFab = (FloatingActionButton) getLayoutInflater().inflate(
+                    R.layout.add_fab, rootLayout, false);
+            mCreateFab.setOnClickListener(this);
+            rootLayout.addView(mCreateFab);
         }
 
         getSupportLoaderManager().initLoader(3, null, mIsCollaboratorCallback);
@@ -189,8 +204,43 @@ public class IssueListActivity extends IssueListBaseActivity {
     }
 
     @Override
+    public void onRefresh() {
+        mAssignees = null;
+        mMilestones = null;
+        mLabels = null;
+        mIsCollaborator = null;
+        updateRightNavigationDrawer();
+
+        LoaderManager lm = getSupportLoaderManager();
+        for (int i = 0; i < 4; i++) {
+            Loader loader = lm.getLoader(i);
+            if (loader != null) {
+                loader.onContentChanged();
+            }
+        }
+        super.onRefresh();
+    }
+
+    @Override
     protected int[] getTabTitleResIds() {
         return TITLES;
+    }
+
+    @Override
+    public void onRecyclerViewCreated(Fragment fragment, RecyclerView recyclerView) {
+        if (fragment == mOpenFragment) {
+            recyclerView.setTag(R.id.FloatingActionButtonScrollEnabled, new Object());
+        }
+    }
+
+    @Override
+    protected void onPageMoved(int position, float fraction) {
+        super.onPageMoved(position, fraction);
+        float openFraction = 1 - position - fraction;
+        ViewCompat.setScaleX(mCreateFab, openFraction);
+        ViewCompat.setScaleY(mCreateFab, openFraction);
+        mCreateFab.setVisibility(openFraction == 0 ? View.INVISIBLE : View.VISIBLE);
+
     }
 
     @Override
@@ -210,8 +260,8 @@ public class IssueListActivity extends IssueListBaseActivity {
     @Override
     protected Fragment getFragment(int position) {
         Map<String, String> filterData = new HashMap<>();
-        filterData.put("sort", mSortMode);
-        filterData.put("direction", mSortAscending ? "asc" : "desc");
+        filterData.put("sort", mSortHelper.getSortMode());
+        filterData.put("direction", mSortHelper.getSortDirection());
         if (mSelectedLabels != null) {
             filterData.put("labels", TextUtils.join(",", mSelectedLabels));
         }
@@ -244,14 +294,78 @@ public class IssueListActivity extends IssueListBaseActivity {
     }
 
     @Override
-    protected ListAdapter getNavigationDrawerAdapter() {
-        mDrawerItems = new ArrayList<>(DRAWER_ITEMS);
-        mDrawerItems.addAll(FILTER_DRAWER_ITEMS);
-        if (mIsCollaborator != null && mIsCollaborator) {
-            mDrawerItems.addAll(COLLAB_DRAWER_ITEMS);
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_ISSUE_CREATE) {
+            if (resultCode == Activity.RESULT_OK) {
+                mOpenFragment.onRefresh();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
-        mDrawerAdapter = new DrawerAdapter(this, mDrawerItems);
-        return mDrawerAdapter;
+    }
+
+    @Override
+    protected int[] getRightNavigationDrawerMenuResources() {
+        int[] menuResIds = new int[2];
+        menuResIds[0] = IssueListFragment.SortDrawerHelper.getMenuResId();
+        menuResIds[1] = mIsCollaborator != null && mIsCollaborator
+                ? R.menu.issue_list_filter_collab : R.menu.issue_list_filter;
+        return menuResIds;
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        super.onNavigationItemSelected(item);
+
+        if (mSortHelper.handleItemSelection(item)) {
+            reloadIssueList();
+            return true;
+        }
+
+        switch (item.getItemId()) {
+            case R.id.filter_by_assignee:
+                filterAssignee();
+                return true;
+            case R.id.filter_by_label:
+                filterLabel();
+                return true;
+            case R.id.filter_by_milestone:
+                filterMilestone();
+                return true;
+            case R.id.manage_labels:
+                manageLabels();
+                return true;
+            case R.id.manage_milestones:
+                manageMilestones();
+                return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuItem item = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.actions)
+                .setIcon(R.drawable.overflow);
+        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == Menu.FIRST) {
+            toggleRightSideDrawer();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View view) {
+        Intent intent = new Intent(this, IssueEditActivity.class);
+        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+        intent.putExtra(Constants.Repository.NAME, mRepoName);
+        startActivityForResult(intent, REQUEST_ISSUE_CREATE);
     }
 
     @Override
@@ -259,8 +373,7 @@ public class IssueListActivity extends IssueListBaseActivity {
         return IntentUtils.getRepoActivityIntent(this, mRepoOwner, mRepoName, null);
     }
 
-    @Override
-    public void reloadIssueList() {
+    private void reloadIssueList() {
         mOpenFragment = null;
         mClosedFragment = null;
         invalidateFragments();
@@ -368,38 +481,6 @@ public class IssueListActivity extends IssueListBaseActivity {
                 .setSingleChoiceItems(assignees, selected, selectCb)
                 .setNegativeButton(R.string.cancel, null)
                 .show();
-    }
-
-    private boolean checkForError(LoaderResult<?> result) {
-        if (result.handleError(IssueListActivity.this)) {
-            stopProgressDialog(mProgressDialog);
-            supportInvalidateOptionsMenu();
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    protected boolean onDrawerItemSelected(int position) {
-        int id = mDrawerItems.get(position).getId();
-        switch (id) {
-            case ITEM_FILTER_ASSIGNEE:
-                filterAssignee();
-                return true;
-            case ITEM_FILTER_LABEL:
-                filterLabel();
-                return true;
-            case ITEM_FILTER_MILESTONE:
-                filterMilestone();
-                return true;
-            case ITEM_MANAGE_LABELS:
-                manageLabels();
-                return true;
-            case ITEM_MANAGE_MILESTONES:
-                manageMilestones();
-                return true;
-        }
-        return super.onDrawerItemSelected(position);
     }
 
     private void filterAssignee() {

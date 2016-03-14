@@ -23,7 +23,6 @@ import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gh4a.BasePagerActivity;
@@ -53,26 +52,25 @@ public class PullRequestActivity extends BasePagerActivity implements
 
     private ViewGroup mHeader;
 
+    private static final int[] TITLES_LOADING = new int[] {
+        R.string.pull_request_conversation
+    };
     private static final int[] TITLES = new int[] {
         R.string.pull_request_conversation, R.string.commits, R.string.pull_request_files
     };
 
-    private LoaderCallbacks<PullRequest> mPullRequestCallback = new LoaderCallbacks<PullRequest>() {
+    private LoaderCallbacks<PullRequest> mPullRequestCallback = new LoaderCallbacks<PullRequest>(this) {
         @Override
-        public Loader<LoaderResult<PullRequest>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<PullRequest>> onCreateLoader() {
             return new PullRequestLoader(PullRequestActivity.this,
                     mRepoOwner, mRepoName, mPullRequestNumber);
         }
         @Override
-        public void onResultReady(LoaderResult<PullRequest> result) {
-            boolean success = !result.handleError(PullRequestActivity.this);
-            if (success) {
-                mPullRequest = result.getData();
-                fillHeader();
-                setTabsEnabled(true);
-            }
-            setContentEmpty(!success);
+        protected void onResultReady(PullRequest result) {
+            mPullRequest = result;
+            fillHeader();
             setContentShown(true);
+            invalidateTabs();
             supportInvalidateOptionsMenu();
         }
     };
@@ -80,22 +78,18 @@ public class PullRequestActivity extends BasePagerActivity implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (hasErrorView()) {
-            return;
-        }
 
         Bundle data = getIntent().getExtras();
         mRepoOwner = data.getString(Constants.Repository.OWNER);
         mRepoName = data.getString(Constants.Repository.NAME);
         mPullRequestNumber = data.getInt(Constants.PullRequest.NUMBER);
 
-        LinearLayout header = (LinearLayout) findViewById(R.id.header);
         LayoutInflater inflater = getLayoutInflater();
 
-        mHeader = (ViewGroup) inflater.inflate(R.layout.issue_header, header, false);
+        mHeader = (ViewGroup) inflater.inflate(R.layout.issue_header, null);
         mHeader.setClickable(false);
         mHeader.setVisibility(View.GONE);
-        header.addView(mHeader, 1);
+        addHeaderView(mHeader, true);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getResources().getString(R.string.pull_request_title) + " #" + mPullRequestNumber);
@@ -103,7 +97,6 @@ public class PullRequestActivity extends BasePagerActivity implements
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         setContentShown(false);
-        setTabsEnabled(false);
 
         getSupportLoaderManager().initLoader(0, null, mPullRequestCallback);
     }
@@ -115,15 +108,16 @@ public class PullRequestActivity extends BasePagerActivity implements
 
     @Override
     public void onRefresh() {
-        if (mPullRequestFragment != null) {
-            mPullRequestFragment.refresh();
-        }
-        refreshDone();
+        mPullRequest = null;
+        setContentShown(false);
+        getSupportLoaderManager().getLoader(0).onContentChanged();
+        invalidateTabs();
+        super.onRefresh();
     }
 
     @Override
     protected int[] getTabTitleResIds() {
-        return TITLES;
+        return mPullRequest != null ? TITLES : TITLES_LOADING;
     }
 
     @Override

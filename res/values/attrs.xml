@@ -15,6 +15,8 @@
     <attr name="colorCommitAddition" format="color" />
     <attr name="colorCommitDeletion" format="color" />
     <attr name="colorFab" format="color" />
+    <attr name="colorPrimaryTextEmphasized" format="color" />
+    <attr name="colorBreadcrumbBackground" format="color" />
 
     <attr name="sendIcon" format="reference" />
     <attr name="contentEditIcon" format="reference" />
@@ -22,6 +24,7 @@
     <attr name="contentPictureIcon" format="reference" />
     <attr name="searchUserIcon" format="reference" />
     <attr name="searchRepoIcon" format="reference" />
+    <attr name="searchCodeIcon" format="reference" />
     <attr name="userBookmarkIcon" format="reference" />
     <attr name="repoBookmarkIcon" format="reference" />
     <attr name="submoduleIcon" format="reference" />
@@ -36,12 +39,20 @@
     <attr name="milestoneSmallIcon" format="reference" />
     <attr name="downloadSmallIcon" format="reference" />
     <attr name="filesSmallIcon" format="reference" />
+    <attr name="privateSmallIcon" format="reference" />
     <attr name="dueIcon" format="reference" />
     <attr name="milestoneIcon" format="reference" />
     <attr name="assigneeIcon" format="reference" />
     <attr name="labelsIcon" format="reference" />
     <attr name="branchIcon" format="reference" />
     <attr name="tagIcon" format="reference" />
+    <attr name="pullRequestMergeOkIcon" format="reference" />
+    <attr name="pullRequestMergeUnstableIcon" format="reference" />
+    <attr name="pullRequestMergeDirtyIcon" format="reference" />
+    <attr name="pullRequestMergeUnknownIcon" format="reference" />
+    <attr name="commitStatusOkIcon" format="reference" />
+    <attr name="commitStatusUnknownIcon" format="reference" />
+    <attr name="commitStatusFailIcon" format="reference" />
 
     <declare-styleable name="LabelBadgeView">
         <attr name="badgeSize" format="dimension"/>
@@ -59,4 +70,7 @@
         </attr>
         <attr name="allCaps" format="boolean"/>
     </declare-styleable>
+
+    <item name="RecyclerViewEdgeColorHelper" type="id" />
+    <item name="FloatingActionButtonScrollEnabled" type="id" />
 </resources>

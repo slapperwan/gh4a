@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group
+        android:id="@+id/my_items"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/news_feed"
+            android:title="@string/user_news_feed"
+            android:checked="true" />
+        <item
+            android:id="@+id/my_repos"
+            android:title="@string/my_repositories" />
+        <item
+            android:id="@+id/my_issues"
+            android:title="@string/my_issues" />
+        <item
+            android:id="@+id/my_prs"
+            android:title="@string/my_pull_requests" />
+        <item
+            android:id="@+id/my_gists"
+            android:title="@string/my_gists" />
+    </group>
+    <item android:title="@string/navigation">
+        <menu>
+            <group
+                android:checkableBehavior="none">
+                <item
+                    android:id="@+id/search"
+                    android:title="@string/search" />
+                <item
+                    android:id="@+id/bookmarks"
+                    android:title="@string/bookmarks" />
+            </group>
+        </menu>
+    </item>
+    <item android:title="@string/explore">
+        <menu>
+            <group
+                android:id="@+id/explore"
+                android:checkableBehavior="single"
+                android:title="@string/explore">
+                <item
+                    android:id="@+id/pub_timeline"
+                    android:title="@string/pub_timeline" />
+                <item
+                    android:id="@+id/trend"
+                    android:title="@string/trend" />
+                <item
+                    android:id="@+id/blog"
+                    android:title="@string/blog" />
+            </group>
+        </menu>
+    </item>
+    <group android:id="@+id/settings">
+        <item
+            android:id="@id/settings"
+            android:title="@string/settings" />
+    </group>
+</menu>

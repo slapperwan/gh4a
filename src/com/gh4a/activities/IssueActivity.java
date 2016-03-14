@@ -29,10 +29,15 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,7 +45,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.gh4a.BaseActivity;
@@ -61,10 +65,10 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.DividerItemDecoration;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
-import com.shamanland.fab.FloatingActionButton;
 
 public class IssueActivity extends BaseActivity implements
         View.OnClickListener, IssueEventAdapter.OnEditComment,
@@ -80,68 +84,53 @@ public class IssueActivity extends BaseActivity implements
     private View mListHeaderView;
     private boolean mEventsLoaded;
     private IssueEventAdapter mEventAdapter;
-    private ListView mListView;
+    private RecyclerView mRecyclerView;
     private boolean mIsCollaborator;
     private FloatingActionButton mEditFab;
     private CommentBoxFragment mCommentFragment;
     private HttpImageGetter mImageGetter;
 
-    private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>() {
+    private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>(this) {
         @Override
-        public Loader<LoaderResult<Issue>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Issue>> onCreateLoader() {
             return new IssueLoader(IssueActivity.this, mRepoOwner, mRepoName, mIssueNumber);
         }
         @Override
-        public void onResultReady(LoaderResult<Issue> result) {
-            if (!result.handleError(IssueActivity.this)) {
-                mIssue = result.getData();
-                fillDataIfDone();
-                supportInvalidateOptionsMenu();
-            } else {
-                setContentEmpty(true);
-                setContentShown(true);
-            }
+        protected void onResultReady(Issue result) {
+            mIssue = result;
+            fillDataIfDone();
+            supportInvalidateOptionsMenu();
         }
     };
 
     private LoaderCallbacks<List<IssueEventHolder>> mEventCallback =
-            new LoaderCallbacks<List<IssueEventHolder>>() {
+            new LoaderCallbacks<List<IssueEventHolder>>(this) {
         @Override
-        public Loader<LoaderResult<List<IssueEventHolder>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<IssueEventHolder>>> onCreateLoader() {
             return new IssueCommentListLoader(IssueActivity.this, mRepoOwner, mRepoName, mIssueNumber);
         }
         @Override
-        public void onResultReady(LoaderResult<List<IssueEventHolder>> result) {
-            if (!result.handleError(IssueActivity.this)) {
-                List<IssueEventHolder> events = result.getData();
-                mEventAdapter.clear();
-                if (events != null) {
-                    mEventAdapter.addAll(events);
-                }
-                mEventAdapter.notifyDataSetChanged();
-                mEventsLoaded = true;
-                fillDataIfDone();
-            } else {
-                setContentEmpty(true);
-                setContentShown(true);
+        protected void onResultReady(List<IssueEventHolder> result) {
+            mEventAdapter.clear();
+            if (result != null) {
+                mEventAdapter.addAll(result);
             }
+            mEventAdapter.notifyDataSetChanged();
+            mEventsLoaded = true;
+            fillDataIfDone();
         }
     };
 
-    private LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>() {
+    private LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
-        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsCollaboratorLoader(IssueActivity.this, mRepoOwner, mRepoName);
         }
         @Override
-        public void onResultReady(LoaderResult<Boolean> result) {
-            if (!result.handleError(IssueActivity.this)) {
-                mIsCollaborator = result.getData();
-                if (mIsCollaborator && mIssue != null && mEventsLoaded) {
-                    mEditFab.setVisibility(View.VISIBLE);
-                }
-                supportInvalidateOptionsMenu();
-            }
+        protected void onResultReady(Boolean result) {
+            mIsCollaborator = result;
+            updateFabVisibility();
+            supportInvalidateOptionsMenu();
         }
     };
 
@@ -154,10 +143,6 @@ public class IssueActivity extends BaseActivity implements
         mRepoName = data.getString(Constants.Repository.NAME);
         mIssueNumber = data.getInt(Constants.Issue.NUMBER);
 
-        if (hasErrorView()) {
-            return;
-        }
-
         setContentView(R.layout.issue);
         setContentShown(false);
 
@@ -166,22 +151,23 @@ public class IssueActivity extends BaseActivity implements
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        mListView = (ListView) findViewById(android.R.id.list);
+        mRecyclerView = (RecyclerView) findViewById(R.id.list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(this));
         mImageGetter = new HttpImageGetter(this);
 
-        ViewGroup header = (ViewGroup) findViewById(R.id.header);
         LayoutInflater inflater = getLayoutInflater();
 
-        mHeader = (ViewGroup) inflater.inflate(R.layout.issue_header, header, false);
+        mHeader = (ViewGroup) inflater.inflate(R.layout.issue_header, null);
         mHeader.setClickable(false);
         mHeader.setVisibility(View.GONE);
-        header.addView(mHeader);
+        addHeaderView(mHeader, false);
 
-        mListHeaderView = inflater.inflate(R.layout.issue_comment_list_header, mListView, false);
-        mListView.addHeaderView(mListHeaderView);
+        mListHeaderView = inflater.inflate(R.layout.issue_comment_list_header, mRecyclerView, false);
 
         mEventAdapter = new IssueEventAdapter(this, mRepoOwner, mRepoName, this);
-        mListView.setAdapter(mEventAdapter);
+        mEventAdapter.setHeaderView(mListHeaderView);
+        mRecyclerView.setAdapter(mEventAdapter);
 
         setChildScrollDelegate(this);
 
@@ -192,10 +178,7 @@ public class IssueActivity extends BaseActivity implements
         FragmentManager fm = getSupportFragmentManager();
         mCommentFragment = (CommentBoxFragment) fm.findFragmentById(R.id.comment_box);
 
-        mEditFab = (FloatingActionButton) inflater.inflate(R.layout.issue_edit_fab, null);
-        mEditFab.setOnClickListener(this);
-        mEditFab.setVisibility(View.GONE);
-        setHeaderAlignedActionButton(mEditFab);
+        setToolbarScrollable(true);
 
         getSupportLoaderManager().initLoader(0, null, mIssueCallback);
         getSupportLoaderManager().initLoader(1, null, mCollaboratorCallback);
@@ -205,12 +188,24 @@ public class IssueActivity extends BaseActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mImageGetter != null) {
-            mImageGetter.destroy();
-        }
+        mImageGetter.destroy();
         if (mEventAdapter != null) {
             mEventAdapter.destroy();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mEventAdapter.resume();
+        mImageGetter.resume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mEventAdapter.pause();
+        mImageGetter.pause();
     }
 
     @Override
@@ -218,7 +213,7 @@ public class IssueActivity extends BaseActivity implements
         if (mCommentFragment != null && mCommentFragment.canChildScrollUp()) {
             return true;
         }
-        return UiUtils.canViewScrollUp(mListView);
+        return UiUtils.canViewScrollUp(mRecyclerView);
     }
 
     private void fillDataIfDone() {
@@ -243,9 +238,8 @@ public class IssueActivity extends BaseActivity implements
         tvState.setText(getString(stateTextResId).toUpperCase(Locale.getDefault()));
         transitionHeaderToColor(stateColorAttributeId,
                 closed ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark);
-        UiUtils.trySetListOverscrollColor(mListView,
+        UiUtils.trySetListOverscrollColor(mRecyclerView,
                 UiUtils.resolveColor(this, stateColorAttributeId));
-        mEditFab.setSelected(closed);
 
         TextView tvExtra = (TextView) mListHeaderView.findViewById(R.id.tv_extra);
         tvExtra.setText(mIssue.getUser().getLogin());
@@ -317,12 +311,8 @@ public class IssueActivity extends BaseActivity implements
             tvPull.setVisibility(View.GONE);
         }
 
-        if (mHeader.getVisibility() == View.GONE) {
-            mHeader.setVisibility(View.VISIBLE);
-            mEditFab.setVisibility(mIsCollaborator ? View.VISIBLE : View.GONE);
-        }
-
-        refreshDone();
+        mHeader.setVisibility(View.VISIBLE);
+        updateFabVisibility();
     }
 
     @Override
@@ -390,11 +380,34 @@ public class IssueActivity extends BaseActivity implements
     public void onRefresh() {
         mIssue = null;
         mEventsLoaded = false;
+        mIsCollaborator = false;
         setContentShown(false);
-        getSupportLoaderManager().restartLoader(0, null, mIssueCallback);
-        getSupportLoaderManager().restartLoader(1, null, mCollaboratorCallback);
-        getSupportLoaderManager().restartLoader(2, null, mEventCallback);
-        supportInvalidateOptionsMenu();
+        updateFabVisibility();
+
+        LoaderManager lm = getSupportLoaderManager();
+        for (int i = 0; i < 3; i++) {
+            lm.getLoader(i).onContentChanged();
+        }
+        super.onRefresh();
+    }
+
+    private void updateFabVisibility() {
+        boolean shouldHaveFab = mIsCollaborator && mIssue != null && mEventsLoaded;
+        CoordinatorLayout rootLayout = getRootLayout();
+
+        if (shouldHaveFab && mEditFab == null) {
+            mEditFab = (FloatingActionButton)
+                    getLayoutInflater().inflate(R.layout.issue_edit_fab, rootLayout, false);
+            mEditFab.setOnClickListener(this);
+            rootLayout.addView(mEditFab);
+        } else if (!shouldHaveFab && mEditFab != null) {
+            rootLayout.removeView(mEditFab);
+            mEditFab = null;
+        }
+        if (mEditFab != null) {
+            boolean closed = Constants.Issue.STATE_CLOSED.equals(mIssue.getState());
+            mEditFab.setSelected(closed);
+        }
     }
 
     private boolean checkForAuthOrExit() {

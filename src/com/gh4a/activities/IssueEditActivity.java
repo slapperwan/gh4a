@@ -21,6 +21,11 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
@@ -29,7 +34,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gh4a.BaseActivity;
@@ -47,7 +51,6 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
-import com.shamanland.fab.FloatingActionButton;
 
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
@@ -71,6 +74,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
     private List<Label> mAllLabels;
     private Issue mEditIssue;
 
+    private TextInputLayout mTitleWrapper;
     private EditText mTitleView;
     private EditText mDescView;
     private TextView mTvSelectedMilestone;
@@ -85,67 +89,74 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
     private static final String STATE_KEY_ISSUE = "issue";
 
-    private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>() {
+    private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>(this) {
         @Override
-        public Loader<LoaderResult<List<Label>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<Label>>> onCreateLoader() {
             return new LabelListLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
         }
         @Override
-        public void onResultReady(LoaderResult<List<Label>> result) {
+        protected void onResultReady(List<Label> result) {
             stopProgressDialog(mProgressDialog);
-            if (!result.handleError(IssueEditActivity.this)) {
-                mAllLabels = result.getData();
-                showLabelDialog(null);
-                getSupportLoaderManager().destroyLoader(0);
-            }
+            mAllLabels = result;
+            showLabelDialog();
+            getSupportLoaderManager().destroyLoader(0);
+        }
+        @Override
+        protected boolean onError(Exception e) {
+            stopProgressDialog(mProgressDialog);
+            return false;
         }
     };
 
-    private LoaderCallbacks<List<Milestone>> mMilestoneCallback = new LoaderCallbacks<List<Milestone>>() {
+    private LoaderCallbacks<List<Milestone>> mMilestoneCallback = new LoaderCallbacks<List<Milestone>>(this) {
         @Override
-        public Loader<LoaderResult<List<Milestone>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<Milestone>>> onCreateLoader() {
             return new MilestoneListLoader(IssueEditActivity.this,
                     mRepoOwner, mRepoName, Constants.Issue.STATE_OPEN);
         }
         @Override
-        public void onResultReady(LoaderResult<List<Milestone>> result) {
+        protected void onResultReady(List<Milestone> result) {
             stopProgressDialog(mProgressDialog);
-            if (!result.handleError(IssueEditActivity.this)) {
-                mAllMilestone = result.getData();
-                showMilestonesDialog(null);
-                getSupportLoaderManager().destroyLoader(1);
-            }
+            mAllMilestone = result;
+            showMilestonesDialog();
+            getSupportLoaderManager().destroyLoader(1);
+        }
+        @Override
+        protected boolean onError(Exception e) {
+            stopProgressDialog(mProgressDialog);
+            return false;
         }
     };
 
-    private LoaderCallbacks<List<User>> mCollaboratorListCallback = new LoaderCallbacks<List<User>>() {
+    private LoaderCallbacks<List<User>> mCollaboratorListCallback = new LoaderCallbacks<List<User>>(this) {
         @Override
-        public Loader<LoaderResult<List<User>>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<List<User>>> onCreateLoader() {
             return new CollaboratorListLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
         }
         @Override
-        public void onResultReady(LoaderResult<List<User>> result) {
+        protected void onResultReady(List<User> result) {
             stopProgressDialog(mProgressDialog);
-            if (!result.handleError(IssueEditActivity.this)) {
-                mAllAssignee = result.getData();
-                showAssigneesDialog(null);
-                getSupportLoaderManager().destroyLoader(2);
-            }
+            mAllAssignee = result;
+            showAssigneesDialog();
+            getSupportLoaderManager().destroyLoader(2);
+        }
+        @Override
+        protected boolean onError(Exception e) {
+            stopProgressDialog(mProgressDialog);
+            return false;
         }
     };
 
-    private LoaderCallbacks<Boolean> mIsCollaboratorCallback = new LoaderCallbacks<Boolean>() {
+    private LoaderCallbacks<Boolean> mIsCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
-        public Loader<LoaderResult<Boolean>> onCreateLoader(int id, Bundle args) {
+        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsCollaboratorLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
         }
         @Override
-        public void onResultReady(LoaderResult<Boolean> result) {
-            if (!result.handleError(IssueEditActivity.this)) {
-                mIsCollaborator = result.getData();
-                updateLabels();
-                updateLabelStates();
-            }
+        protected void onResultReady(Boolean result) {
+            mIsCollaborator = result;
+            updateLabels();
+            updateLabelStates();
         }
     };
 
@@ -159,10 +170,6 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         mRepoName = data.getString(Constants.Repository.NAME);
         mEditIssue = (Issue) data.getSerializable(EXTRA_ISSUE);
 
-        if (hasErrorView()) {
-            return;
-        }
-
         if (!Gh4Application.get().isAuthorized()) {
             Intent intent = new Intent(this, Github4AndroidActivity.class);
             startActivity(intent);
@@ -171,18 +178,23 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         }
         setContentView(R.layout.issue_create);
 
-        LinearLayout headerContainer = (LinearLayout) findViewById(R.id.header);
         LayoutInflater headerInflater = LayoutInflater.from(UiUtils.makeHeaderThemedContext(this));
-        View header = headerInflater.inflate(R.layout.issue_create_header, headerContainer);
+        View header = headerInflater.inflate(R.layout.issue_create_header, null);
+        addHeaderView(header, false);
 
+        mTitleWrapper = (TextInputLayout) header.findViewById(R.id.title_wrapper);
         mTitleView = (EditText) header.findViewById(R.id.et_title);
         mDescView = (EditText) header.findViewById(R.id.et_desc);
 
-        FloatingActionButton fab =
-                (FloatingActionButton) getLayoutInflater().inflate(R.layout.default_fab, null);
-        fab.setImageResource(R.drawable.navigation_accept);
+        CoordinatorLayout rootLayout = getRootLayout();
+        FloatingActionButton fab = (FloatingActionButton)
+                getLayoutInflater().inflate(R.layout.accept_fab, rootLayout, false);
         fab.setOnClickListener(this);
-        setHeaderAlignedActionButton(fab);
+        rootLayout.addView(fab);
+
+        findViewById(R.id.milestone_container).setOnClickListener(this);
+        findViewById(R.id.assignee_container).setOnClickListener(this);
+        findViewById(R.id.label_container).setOnClickListener(this);
 
         mTvSelectedMilestone = (TextView) findViewById(R.id.tv_milestone);
         mTvSelectedAssignee = (TextView) findViewById(R.id.tv_assignee);
@@ -215,19 +227,48 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         updateLabelStates();
     }
 
+    @Override
+    public void onRefresh() {
+        mAllAssignee = null;
+        mAllMilestone = null;
+        mAllLabels = null;
+        mIsCollaborator = false;
+        updateLabels();
+        updateLabelStates();
+
+        LoaderManager lm = getSupportLoaderManager();
+        for (int i = 0; i < 4; i++) {
+            Loader loader = lm.getLoader(i);
+            if (loader != null) {
+                loader.onContentChanged();
+            }
+        }
+        super.onRefresh();
+    }
+
     private boolean isInEditMode() {
         return getIntent().hasExtra(EXTRA_ISSUE);
     }
 
     @Override
     public void onClick(View view) {
-        String title = mTitleView.getText() == null ? null : mTitleView.getText().toString();
-        if (StringUtils.isBlank(title)) {
-            mTitleView.setError(getString(R.string.issue_error_title));
-        } else {
-            mEditIssue.setTitle(title);
-            mEditIssue.setBody(mDescView.getText().toString());
-            AsyncTaskCompat.executeParallel(new SaveIssueTask(mEditIssue));
+        int id = view.getId();
+        if (id == R.id.milestone_container) {
+            showMilestonesDialog();
+        } else if (id == R.id.assignee_container) {
+            showAssigneesDialog();
+        } else if (id == R.id.label_container) {
+            showLabelDialog();
+        } else if (view instanceof FloatingActionButton) {
+            String title = mTitleView.getText() == null ? null : mTitleView.getText().toString();
+            if (StringUtils.isBlank(title)) {
+                mTitleWrapper.setError(getString(R.string.issue_error_title));
+            } else {
+                mTitleWrapper.setErrorEnabled(false);
+                mEditIssue.setTitle(title);
+                mEditIssue.setBody(mDescView.getText().toString());
+                AsyncTaskCompat.executeParallel(new SaveIssueTask(mEditIssue));
+            }
         }
     }
 
@@ -245,7 +286,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
                 mRepoOwner, mRepoName, Constants.Issue.STATE_OPEN);
     }
 
-    public void showMilestonesDialog(View view) {
+    private void showMilestonesDialog() {
         if (mAllMilestone == null) {
             mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
             getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
@@ -285,7 +326,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
-    public void showAssigneesDialog(View view) {
+    private void showAssigneesDialog() {
         if (mAllAssignee == null) {
             mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
             getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
@@ -327,7 +368,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
-    public void showLabelDialog(View view) {
+    private void showLabelDialog() {
         if (mAllLabels == null) {
             mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
             getSupportLoaderManager().initLoader(0, null, mLabelCallback);
@@ -392,7 +433,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         } else {
             view.setTypeface(view.getTypeface(), 0);
             view.setBackgroundColor(0);
-            view.setTextColor(getResources().getColor(Gh4Application.THEME != R.style.LightTheme
+            view.setTextColor(ContextCompat.getColor(this, Gh4Application.THEME != R.style.LightTheme
                     ? R.color.label_fg_light : R.color.label_fg_dark));
         }
     }

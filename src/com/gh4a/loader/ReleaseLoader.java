@@ -1,9 +1,6 @@
 package com.gh4a.loader;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 import org.eclipse.egit.github.core.Release;
 import org.eclipse.egit.github.core.RepositoryId;

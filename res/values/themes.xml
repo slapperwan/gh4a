@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="DarkTheme" parent="Theme.AppCompat">
+    <style name="DarkThemeBase" parent="Theme.AppCompat">
+        <item name="android:windowSoftInputMode">adjustResize</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="windowActionModeOverlay">true</item>
@@ -13,6 +14,7 @@
         <item name="contentPictureIcon">@drawable/content_picture_dark</item>
         <item name="searchUserIcon">@drawable/search_users_dark</item>
         <item name="searchRepoIcon">@drawable/search_repos_dark</item>
+        <item name="searchCodeIcon">@drawable/search_code_dark</item>
         <item name="userBookmarkIcon">@drawable/user_bookmark_dark</item>
         <item name="repoBookmarkIcon">@drawable/repo_bookmark_dark</item>
         <item name="submoduleIcon">@drawable/submodule_dark</item>
@@ -27,17 +29,27 @@
         <item name="milestoneSmallIcon">@drawable/milestone_small_dark</item>
         <item name="downloadSmallIcon">@drawable/download_small_dark</item>
         <item name="filesSmallIcon">@drawable/files_small_dark</item>
+        <item name="privateSmallIcon">@drawable/private_small_dark</item>
         <item name="dueIcon">@drawable/due_dark</item>
         <item name="milestoneIcon">@drawable/milestone_dark</item>
         <item name="assigneeIcon">@drawable/assignee_dark</item>
         <item name="labelsIcon">@drawable/labels_dark</item>
         <item name="branchIcon">@drawable/branch_dark</item>
         <item name="tagIcon">@drawable/label_dark</item>
+        <item name="commitStatusOkIcon">@drawable/commit_status_ok_dark</item>
+        <item name="commitStatusUnknownIcon">@drawable/commit_status_unknown_dark</item>
+        <item name="commitStatusFailIcon">@drawable/commit_status_fail_dark</item>
+        <item name="pullRequestMergeOkIcon">@drawable/pull_request_merge_ok_dark</item>
+        <item name="pullRequestMergeDirtyIcon">@drawable/pull_request_merge_dirty_dark</item>
+        <item name="pullRequestMergeUnstableIcon">@drawable/pull_request_merge_unstable_dark</item>
+        <item name="pullRequestMergeUnknownIcon">@drawable/pull_request_merge_unknown_dark</item>
         <item name="cardViewTheme">@style/Theme.CardView.Dark</item>
+        <item name="preferenceTheme">@style/PreferenceTheme</item>
         <item name="colorAccent">@color/dark_accent</item>
-        <item name="colorPrimary">@color/dark_accent</item>
-        <item name="colorPrimaryDark">@color/dark_accent_dark</item>
-        <item name="android:textColorLink">@color/dark_link_color</item>
+        <item name="colorPrimary">@color/dark_primary</item>
+        <item name="colorPrimaryDark">@color/dark_primary_dark</item>
+        <item name="colorBreadcrumbBackground">#587849</item>
+        <item name="android:textColorLink">@color/dark_accent</item>
         <item name="actionBarTabStyle">@style/Widget.ActionBar.TabView</item>
         <item name="listBackground">@android:color/transparent</item>
         <item name="drawerBackground">@color/background_floating_material_dark</item>
@@ -51,14 +63,18 @@
         <item name="colorCommitAddition">#79d242</item>
         <item name="colorCommitDeletion">#d25151</item>
         <item name="colorFab">@color/default_fab_dark</item>
+        <item name="colorPrimaryTextEmphasized">@android:color/white</item>
     </style>
 
+    <style name="DarkTheme" parent="DarkThemeBase" />
+
     <style name="DarkAlertDialogTheme" parent="Theme.AppCompat.Dialog.Alert">
-        <item name="colorPrimary">@color/dark_accent</item>
+        <item name="colorPrimary">@color/dark_primary</item>
         <item name="colorAccent">@color/dark_accent</item>
     </style>
 
-    <style name="LightTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="LightThemeBase" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:windowSoftInputMode">adjustResize</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="windowActionModeOverlay">true</item>
@@ -71,6 +87,7 @@
         <item name="contentPictureIcon">@drawable/content_picture</item>
         <item name="searchUserIcon">@drawable/search_users</item>
         <item name="searchRepoIcon">@drawable/search_repos</item>
+        <item name="searchCodeIcon">@drawable/search_code</item>
         <item name="userBookmarkIcon">@drawable/user_bookmark</item>
         <item name="repoBookmarkIcon">@drawable/repo_bookmark</item>
         <item name="submoduleIcon">@drawable/submodule</item>
@@ -85,18 +102,28 @@
         <item name="milestoneSmallIcon">@drawable/milestone_small</item>
         <item name="downloadSmallIcon">@drawable/download_small</item>
         <item name="filesSmallIcon">@drawable/files_small</item>
+        <item name="privateSmallIcon">@drawable/private_small</item>
         <item name="dueIcon">@drawable/due</item>
         <item name="milestoneIcon">@drawable/milestone</item>
         <item name="assigneeIcon">@drawable/assignee</item>
         <item name="labelsIcon">@drawable/labels</item>
         <item name="branchIcon">@drawable/branch</item>
         <item name="tagIcon">@drawable/label</item>
+        <item name="commitStatusOkIcon">@drawable/commit_status_ok</item>
+        <item name="commitStatusUnknownIcon">@drawable/commit_status_unknown</item>
+        <item name="commitStatusFailIcon">@drawable/commit_status_fail</item>
+        <item name="pullRequestMergeOkIcon">@drawable/pull_request_merge_ok</item>
+        <item name="pullRequestMergeDirtyIcon">@drawable/pull_request_merge_dirty</item>
+        <item name="pullRequestMergeUnstableIcon">@drawable/pull_request_merge_unstable</item>
+        <item name="pullRequestMergeUnknownIcon">@drawable/pull_request_merge_unknown</item>
         <item name="listPopupWindowStyle">@style/Widget.AppCompat.Light.ListPopupWindow</item>
         <item name="cardViewTheme">@style/Theme.CardView.Light</item>
+        <item name="preferenceTheme">@style/PreferenceTheme</item>
         <item name="colorAccent">@color/light_accent</item>
-        <item name="colorPrimary">@color/light_accent</item>
-        <item name="colorPrimaryDark">@color/light_accent_dark</item>
-        <item name="android:textColorLink">@color/light_link_color</item>
+        <item name="colorPrimary">@color/light_primary</item>
+        <item name="colorPrimaryDark">@color/light_primary_dark</item>
+        <item name="colorBreadcrumbBackground">#7baa67</item>
+        <item name="android:textColorLink">@color/light_accent</item>
         <item name="actionBarTabStyle">@style/Widget.ActionBar.TabView</item>
         <item name="listBackground">@android:color/white</item>
         <item name="drawerBackground">@color/background_floating_material_light</item>
@@ -110,11 +137,14 @@
         <item name="colorCommitAddition">#65b345</item>
         <item name="colorCommitDeletion">#b34545</item>
         <item name="colorFab">@color/default_fab_light</item>
+        <item name="colorPrimaryTextEmphasized">@android:color/black</item>
     </style>
 
+    <style name="LightTheme" parent="LightThemeBase" />
+
     <style name="LightAlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="colorPrimary">@color/light_accent</item>
-        <item name="colorAccent">@color/light_accent</item>
+        <item name="colorPrimary">@color/light_primary</item>
+        <item name="colorAccent">@color/light_primary</item>
     </style>
 
     <style name="Theme.Header" parent="Theme.AppCompat">
@@ -126,5 +156,9 @@
         <item name="android:spinnerStyle">@style/Widget.Spinner.ActionBar.Light</item>
         <!-- used by appcompat to tint the spinner background drawable -->
         <item name="android:colorBackground">#ffffff</item>
+    </style>
+
+    <style name="PreferenceTheme" parent="PreferenceThemeOverlay">
+        <item name="android:textAppearanceLarge">@style/TextAppearance.AppCompat.Subhead</item>
     </style>
 </resources>

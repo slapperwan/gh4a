@@ -17,53 +17,44 @@ package com.gh4a.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
-import android.text.TextUtils;
 
-import com.gh4a.BasePagerActivity;
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.GistListFragment;
 import com.gh4a.utils.IntentUtils;
 
-public class GistListActivity extends BasePagerActivity {
+public class GistListActivity extends BaseActivity {
     private String mUserLogin;
-    private boolean mIsSelf;
-
-    private static final int[] TITLES_SELF = new int[] {
-        R.string.mine, R.string.starred
-    };
-    private static final int[] TITLES_OTHER = new int[] {
-        R.string.gists
-    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        mUserLogin = getIntent().getExtras().getString(Constants.User.LOGIN);
-        mIsSelf = TextUtils.equals(mUserLogin, Gh4Application.get().getAuthLogin());
-
         super.onCreate(savedInstanceState);
 
-        if (hasErrorView()) {
-            return;
+        mUserLogin = getIntent().getExtras().getString(Constants.User.LOGIN);
+
+        FragmentManager fm = getSupportFragmentManager();
+        final GistListFragment fragment;
+        if (savedInstanceState == null) {
+            fragment = GistListFragment.newInstance(mUserLogin, false);
+            fm.beginTransaction().add(R.id.content_container, fragment).commit();
+        } else {
+            fragment = (GistListFragment) fm.findFragmentById(R.id.content_container);
         }
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.gists);
         actionBar.setSubtitle(mUserLogin);
         actionBar.setDisplayHomeAsUpEnabled(true);
+
+        setChildScrollDelegate(fragment);
     }
 
     @Override
-    protected int[] getTabTitleResIds() {
-        return mIsSelf ? TITLES_SELF : TITLES_OTHER;
-    }
-
-    @Override
-    protected Fragment getFragment(int position) {
-        return GistListFragment.newInstance(mUserLogin, position == 1);
+    protected boolean canSwipeToRefresh() {
+        return true;
     }
 
     @Override
