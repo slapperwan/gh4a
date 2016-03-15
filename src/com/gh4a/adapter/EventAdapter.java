@@ -70,14 +70,14 @@ import com.gh4a.widget.CustomTypefaceSpan;
 import com.gh4a.widget.EllipsizeLineSpan;
 import com.gh4a.widget.StyleableTextView;
 
-public class FeedAdapter extends RootAdapter<Event, FeedAdapter.EventViewHolder> {
-    public FeedAdapter(Context context) {
+public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolder> {
+    public EventAdapter(Context context) {
         super(context);
     }
 
     @Override
     public EventViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
-        View v = inflater.inflate(R.layout.feed_row, parent, false);
+        View v = inflater.inflate(R.layout.row_event, parent, false);
         EventViewHolder holder = new EventViewHolder(v);
         holder.ivGravatar.setOnClickListener(this);
         return holder;

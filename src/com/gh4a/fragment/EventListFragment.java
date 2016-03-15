@@ -33,7 +33,7 @@ import com.gh4a.R;
 import com.gh4a.activities.CompareActivity;
 import com.gh4a.activities.ReleaseInfoActivity;
 import com.gh4a.activities.WikiListActivity;
-import com.gh4a.adapter.FeedAdapter;
+import com.gh4a.adapter.EventAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.ToastUtils;
@@ -74,7 +74,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
     private static final int MENU_DOWNLOAD_END = 199;
 
     protected String mLogin;
-    private FeedAdapter mAdapter;
+    private EventAdapter mAdapter;
 
     private static final String[] REPO_EVENTS = new String[] {
         Event.TYPE_PUSH, Event.TYPE_ISSUES, Event.TYPE_WATCH, Event.TYPE_CREATE,
@@ -97,7 +97,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
 
     @Override
     protected RootAdapter<Event, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        mAdapter = new FeedAdapter(getActivity());
+        mAdapter = new EventAdapter(getActivity());
         return mAdapter;
     }
 
@@ -117,7 +117,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
     public void onItemClick(Event event) {
         Gh4Application context = Gh4Application.get();
 
-        if (FeedAdapter.hasInvalidPayload(event)) {
+        if (EventAdapter.hasInvalidPayload(event)) {
             return;
         }
 
@@ -282,7 +282,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         Event event = mAdapter.getItem(info.position);
 
-        if (FeedAdapter.hasInvalidPayload(event)) {
+        if (EventAdapter.hasInvalidPayload(event)) {
             return;
         }
 
