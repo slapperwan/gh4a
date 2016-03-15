@@ -112,13 +112,13 @@ public abstract class BasePagerActivity extends BaseActivity implements
     }
 
     private void updateTabVisibility() {
-        int[] titleResIds = getTabTitleResIds();
+        int count = mAdapter.getCount();
 
         // We never have many pages, make sure to keep them all alive
-        mPager.setOffscreenPageLimit(titleResIds.length - 1);
+        mPager.setOffscreenPageLimit(count > 0 ? count - 1 : 0);
 
-        mTabs.setVisibility(titleResIds.length > 1 && !mErrorViewVisible ? View.VISIBLE : View.GONE);
-        setToolbarScrollable(titleResIds.length > 1
+        mTabs.setVisibility(count > 1 && !mErrorViewVisible ? View.VISIBLE : View.GONE);
+        setToolbarScrollable(count > 1
                 && getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE);
 
         LinearLayout tabStrip = (LinearLayout) mTabs.getChildAt(0);
@@ -180,7 +180,8 @@ public abstract class BasePagerActivity extends BaseActivity implements
 
         @Override
         public int getCount() {
-            return getTabTitleResIds().length;
+            int[] titleResIds = getTabTitleResIds();
+            return titleResIds != null ? titleResIds.length : 0;
         }
 
         @Override

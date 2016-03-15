@@ -52,9 +52,6 @@ public class PullRequestActivity extends BasePagerActivity implements
 
     private ViewGroup mHeader;
 
-    private static final int[] TITLES_LOADING = new int[] {
-        R.string.pull_request_conversation
-    };
     private static final int[] TITLES = new int[] {
         R.string.pull_request_conversation, R.string.commits, R.string.pull_request_files
     };
@@ -117,7 +114,7 @@ public class PullRequestActivity extends BasePagerActivity implements
 
     @Override
     protected int[] getTabTitleResIds() {
-        return mPullRequest != null ? TITLES : TITLES_LOADING;
+        return mPullRequest != null ? TITLES : null;
     }
 
     @Override

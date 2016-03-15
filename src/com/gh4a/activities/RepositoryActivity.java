@@ -65,9 +65,6 @@ public class RepositoryActivity extends BasePagerActivity {
     public static final int PAGE_FILES = 1;
     public static final int PAGE_COMMITS = 2;
 
-    private static final int[] TITLES_LOADING = new int[] {
-        R.string.about
-    };
     private static final int[] TITLES = new int[] {
         R.string.about, R.string.repo_files, R.string.commits
     };
@@ -200,7 +197,7 @@ public class RepositoryActivity extends BasePagerActivity {
 
     @Override
     protected int[] getTabTitleResIds() {
-        return mRepository != null ? TITLES : TITLES_LOADING;
+        return mRepository != null ? TITLES : null;
     }
 
     @Override
