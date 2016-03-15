@@ -2,6 +2,8 @@ package com.gh4a.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -86,5 +88,18 @@ public abstract class LoadingListFragmentBase extends ProgressFragment implement
 
     protected boolean hasDividers() {
         return true;
+    }
+
+    protected void hideContentAndRestartLoaders(int... loaderIds) {
+        if (getView() != null) {
+            setContentShown(false);
+        }
+        LoaderManager lm = getLoaderManager();
+        for (int id : loaderIds) {
+            Loader loader = lm.getLoader(id);
+            if (loader != null) {
+                loader.onContentChanged();
+            }
+        }
     }
 }

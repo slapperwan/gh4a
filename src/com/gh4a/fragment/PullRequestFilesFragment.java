@@ -98,11 +98,7 @@ public class PullRequestFilesFragment extends CommitFragment {
     public void onRefresh() {
         mFiles = null;
         mComments = null;
-        if (isAdded()) {
-            setContentShown(false);
-            getLoaderManager().getLoader(0).onContentChanged();
-            getLoaderManager().getLoader(1).onContentChanged();
-        }
+        hideContentAndRestartLoaders(0, 1);
     }
 
     @Override

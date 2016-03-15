@@ -100,11 +100,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
     public void onRefresh() {
         mCommit = null;
         mComments = null;
-        if (isAdded()) {
-            setContentShown(false);
-            getLoaderManager().getLoader(0).onContentChanged();
-            getLoaderManager().getLoader(1).onContentChanged();
-        }
+        hideContentAndRestartLoaders(0, 1);
     }
 
     @Override

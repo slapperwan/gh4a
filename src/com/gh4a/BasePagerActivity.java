@@ -115,7 +115,9 @@ public abstract class BasePagerActivity extends BaseActivity implements
         int count = mAdapter.getCount();
 
         // We never have many pages, make sure to keep them all alive
-        mPager.setOffscreenPageLimit(count > 0 ? count - 1 : 0);
+        if (count > 0) {
+            mPager.setOffscreenPageLimit(count - 1);
+        }
 
         mTabs.setVisibility(count > 1 && !mErrorViewVisible ? View.VISIBLE : View.GONE);
         setToolbarScrollable(count > 1

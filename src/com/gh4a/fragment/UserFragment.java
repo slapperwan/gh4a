@@ -127,13 +127,10 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
     public void onRefresh() {
         mUser = null;
         if (mContentView != null) {
-            setContentShown(false);
             fillOrganizations(null);
             fillTopRepos(null);
         }
-        if (isAdded()) {
-            getLoaderManager().getLoader(0).onContentChanged();
-        }
+        hideContentAndRestartLoaders(0);
     }
 
     @Override

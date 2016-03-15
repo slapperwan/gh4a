@@ -256,14 +256,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
             fillLabels(new ArrayList<Label>());
             fillStatus(new ArrayList<CommitStatus>());
         }
-        if (isAdded()) {
-            for (int i = 1; i < 4; i++) {
-                Loader loader = getLoaderManager().getLoader(i);
-                if (loader != null) {
-                    loader.onContentChanged();
-                }
-            }
-        }
+        hideContentAndRestartLoaders(1, 2, 3);
         super.onRefresh();
     }
 

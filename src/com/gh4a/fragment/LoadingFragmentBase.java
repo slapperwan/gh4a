@@ -1,6 +1,8 @@
 package com.gh4a.fragment;
 
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,5 +54,18 @@ public abstract class LoadingFragmentBase extends ProgressFragment implements
     @Override
     public boolean canChildScrollUp() {
         return UiUtils.canViewScrollUp(getContentView());
+    }
+
+    protected void hideContentAndRestartLoaders(int... loaderIds) {
+        if (getView() != null) {
+            setContentShown(false);
+        }
+        LoaderManager lm = getLoaderManager();
+        for (int id : loaderIds) {
+            Loader loader = lm.getLoader(id);
+            if (loader != null) {
+                loader.onContentChanged();
+            }
+        }
     }
 }

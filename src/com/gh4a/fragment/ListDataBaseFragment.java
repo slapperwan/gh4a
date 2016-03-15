@@ -46,12 +46,7 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase im
 
     @Override
     public void onRefresh() {
-        if (isAdded()) {
-            if (getView() != null) {
-                setContentShown(false);
-            }
-            getLoaderManager().getLoader(0).onContentChanged();
-        }
+        hideContentAndRestartLoaders(0);
         if (mAdapter != null) {
             mAdapter.clear();
         }

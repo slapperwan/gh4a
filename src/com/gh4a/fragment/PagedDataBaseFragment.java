@@ -90,11 +90,8 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
             mAdapter.clear();
         }
         mIsLoadCompleted = false;
-        if (isAdded()) {
-            setContentShown(false);
-            getLoaderManager().getLoader(0).onContentChanged();
-            getActivity().supportInvalidateOptionsMenu();
-        }
+        hideContentAndRestartLoaders(0);
+        getActivity().supportInvalidateOptionsMenu();
     }
 
     @Override
