@@ -257,11 +257,6 @@ public class HomeActivity extends BasePagerActivity implements
     }
 
     @Override
-    protected boolean canSwipeToRefresh() {
-        return true;
-    }
-
-    @Override
     public void onRefresh() {
         getSupportLoaderManager().getLoader(0).onContentChanged();
         super.onRefresh();

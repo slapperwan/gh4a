@@ -49,6 +49,12 @@ public abstract class EditCommentActivity extends BaseActivity {
     }
 
     @Override
+    protected boolean canSwipeToRefresh() {
+        // everything was passed in via intent extras
+        return false;
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.accept_delete, menu);

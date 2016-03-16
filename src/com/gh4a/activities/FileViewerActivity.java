@@ -92,6 +92,11 @@ public class FileViewerActivity extends WebViewerActivity {
     }
 
     @Override
+    protected boolean canSwipeToRefresh() {
+        return true;
+    }
+
+    @Override
     public void onRefresh() {
         getSupportLoaderManager().getLoader(0).onContentChanged();
         setContentShown(false);

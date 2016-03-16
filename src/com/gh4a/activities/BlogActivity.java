@@ -39,6 +39,12 @@ public class BlogActivity extends WebViewerActivity {
     }
 
     @Override
+    protected boolean canSwipeToRefresh() {
+        // content is contained in the intent extras
+        return false;
+    }
+
+    @Override
     protected Intent navigateUp() {
         return new Intent(this, BlogListActivity.class);
     }

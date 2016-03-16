@@ -41,6 +41,12 @@ public class SettingsActivity extends BaseActivity implements
     }
 
     @Override
+    protected boolean canSwipeToRefresh() {
+        // we don't have any loaded content
+        return false;
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(STATE_KEY_RESULT, mResultIntent);

@@ -163,7 +163,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     protected boolean canSwipeToRefresh() {
-        return false;
+        return true;
     }
 
     protected void setChildScrollDelegate(SwipeRefreshLayout.ChildScrollDelegate delegate) {

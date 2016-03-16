@@ -149,11 +149,6 @@ public class UserActivity extends BasePagerActivity {
     }
 
     @Override
-    protected boolean canSwipeToRefresh() {
-        return true;
-    }
-
-    @Override
     public void onRefresh() {
         Loader loader = getSupportLoaderManager().getLoader(4);
         if (loader != null) {

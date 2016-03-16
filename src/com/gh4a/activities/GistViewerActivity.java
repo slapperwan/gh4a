@@ -67,6 +67,11 @@ public class GistViewerActivity extends WebViewerActivity {
     }
 
     @Override
+    protected boolean canSwipeToRefresh() {
+        return true;
+    }
+
+    @Override
     public void onRefresh() {
         setContentShown(false);
         getSupportLoaderManager().getLoader(0).onContentChanged();

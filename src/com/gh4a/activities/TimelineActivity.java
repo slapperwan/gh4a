@@ -46,11 +46,6 @@ public class TimelineActivity extends BaseActivity {
     }
 
     @Override
-    protected boolean canSwipeToRefresh() {
-        return true;
-    }
-
-    @Override
     protected Intent navigateUp() {
         return getToplevelActivityIntent();
     }

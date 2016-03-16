@@ -326,4 +326,7 @@ public abstract class WebViewerActivity extends BaseActivity {
         builder.append(ThemeUtils.getCssTheme(Gh4Application.THEME));
         builder.append(".css' rel='stylesheet' type='text/css'/>");
     }
+
+    @Override
+    protected abstract boolean canSwipeToRefresh();
 }

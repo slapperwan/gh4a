@@ -105,11 +105,6 @@ public class RepositoryListActivity extends BaseActivity implements
     }
 
     @Override
-    protected boolean canSwipeToRefresh() {
-        return true;
-    }
-
-    @Override
     public void initiateFilter() {
         toggleRightSideDrawer();
     }

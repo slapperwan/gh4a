@@ -43,6 +43,12 @@ public class WikiActivity extends WebViewerActivity {
     }
 
     @Override
+    protected boolean canSwipeToRefresh() {
+        // content is passed in intent extras
+        return false;
+    }
+
+    @Override
     protected Intent navigateUp() {
         Intent intent = new Intent(this, WikiListActivity.class);
         intent.putExtra(Constants.Repository.OWNER, mUserLogin);

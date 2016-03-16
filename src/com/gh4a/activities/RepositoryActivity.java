@@ -228,11 +228,6 @@ public class RepositoryActivity extends BasePagerActivity {
     }
 
     @Override
-    protected boolean canSwipeToRefresh() {
-        return true;
-    }
-
-    @Override
     public void onRefresh() {
         mRepositoryFragment = null;
         mRepository = null;

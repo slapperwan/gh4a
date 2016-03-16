@@ -53,11 +53,6 @@ public class GistListActivity extends BaseActivity {
     }
 
     @Override
-    protected boolean canSwipeToRefresh() {
-        return true;
-    }
-
-    @Override
     protected Intent navigateUp() {
         return IntentUtils.getUserActivityIntent(this, mUserLogin);
     }

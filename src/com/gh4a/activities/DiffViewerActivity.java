@@ -124,6 +124,12 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     }
 
     @Override
+    protected boolean canSwipeToRefresh() {
+        // no need for pull-to-refresh if everything was passed in the intent extras
+        return !getIntent().hasExtra(Constants.Commit.COMMENTS);
+    }
+
+    @Override
     public void onRefresh() {
         Loader loader = getSupportLoaderManager().getLoader(0);
         if (loader != null) {

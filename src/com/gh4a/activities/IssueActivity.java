@@ -372,11 +372,6 @@ public class IssueActivity extends BaseActivity implements
     }
 
     @Override
-    protected boolean canSwipeToRefresh() {
-        return true;
-    }
-
-    @Override
     public void onRefresh() {
         mIssue = null;
         mEventsLoaded = false;

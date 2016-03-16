@@ -176,6 +176,12 @@ public class SearchActivity extends BaseActivity implements
     }
 
     @Override
+    protected boolean canSwipeToRefresh() {
+        // User can resubmit the query to restart the search
+        return false;
+    }
+
+    @Override
     public void onRefresh() {
         Loader loader = getSupportLoaderManager().getLoader(0);
         if (loader != null) {

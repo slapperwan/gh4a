@@ -99,11 +99,6 @@ public class PullRequestActivity extends BasePagerActivity implements
     }
 
     @Override
-    protected boolean canSwipeToRefresh() {
-        return true;
-    }
-
-    @Override
     public void onRefresh() {
         mPullRequest = null;
         setContentShown(false);

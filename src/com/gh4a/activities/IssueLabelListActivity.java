@@ -141,6 +141,13 @@ public class IssueLabelListActivity extends BaseActivity implements
     }
 
     @Override
+    protected boolean canSwipeToRefresh() {
+        // swipe-to-refresh doesn't make much sense in the
+        // interaction model of this activity
+        return false;
+    }
+
+    @Override
     public void onRefresh() {
         setContentShown(false);
         mAdapter.clear();

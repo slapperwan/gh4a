@@ -104,6 +104,11 @@ public class Github4AndroidActivity extends BaseActivity {
     }
 
     @Override
+    protected boolean canSwipeToRefresh() {
+        return false;
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuItem item = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.login);
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);

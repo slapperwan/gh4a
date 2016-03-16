@@ -53,6 +53,12 @@ public class BookmarkListActivity extends BaseActivity implements
     }
 
     @Override
+    protected boolean canSwipeToRefresh() {
+        // content can't change while we're in foreground
+        return false;
+    }
+
+    @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Cursor cursor = (Cursor) mAdapter.getItem(position);
         String uri = cursor.getString(cursor.getColumnIndexOrThrow(Columns.URI));
