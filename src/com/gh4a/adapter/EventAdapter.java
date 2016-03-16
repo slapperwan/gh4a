@@ -90,6 +90,8 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
         AvatarHandler.assignAvatar(holder.ivGravatar, actor);
         holder.ivGravatar.setTag(actor);
 
+        holder.tvActor.setText(CommitUtils.getUserLogin(mContext, actor));
+
         StringUtils.applyBoldTagsAndSetText(holder.tvTitle, formatTitle(event));
         holder.tvCreatedAt.setText(StringUtils.formatRelativeTime(
                 mContext, event.getCreatedAt(), false));
@@ -208,8 +210,11 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
                 float density = mContext.getResources().getDisplayMetrics().density;
                 int bottomMargin = Math.round(2 /* dp */ * density);
                 int count = commits.size();
+                int maxLines =
+                        mContext.getResources().getInteger(R.integer.event_description_max_lines);
+                int max = count > maxLines ? maxLines - 1 : count;
 
-                for (int i = 0; i < count && i < 3; i++) {
+                for (int i = 0; i < max; i++) {
                     Commit commit = commits.get(i);
                     if (i != 0) {
                         ssb.append("\n");
@@ -227,8 +232,8 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
                     ssb.setSpan(new EllipsizeLineSpan(i == (count - 1) ? 0 : bottomMargin),
                             lastLength, ssb.length(), 0);
                 }
-                if (count > 3) {
-                    String text = res.getString(R.string.event_push_desc, count - 3);
+                if (count > maxLines) {
+                    String text = res.getString(R.string.event_push_desc, count - max);
                     ssb.append("\n");
                     ssb.append(text);
                     ssb.setSpan(new CustomTypefaceSpan(mContext, typefaceValue, Typeface.ITALIC),
@@ -276,7 +281,7 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
 
         if (Event.TYPE_COMMIT_COMMENT.equals(eventType)) {
             CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
-            return res.getString(R.string.event_commit_comment_title, actorLogin,
+            return res.getString(R.string.event_commit_comment_title,
                     payload.getComment().getCommitId().substring(0, 7),
                     formatFromRepoName(eventRepo));
 
@@ -284,59 +289,53 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
             CreatePayload payload = (CreatePayload) event.getPayload();
             String type = payload.getRefType();
             if ("repository".equals(type)) {
-                return res.getString(R.string.event_create_repo_title, actorLogin,
+                return res.getString(R.string.event_create_repo_title,
                         formatFromRepoName(eventRepo));
             } else if ("branch".equals(type) || "tag".equals(type)) {
-                return res.getString(R.string.event_create_branch_title,
-                        actorLogin, type, payload.getRef(), formatFromRepoName(eventRepo));
+                int resId = "branch".equals(type)
+                        ? R.string.event_create_branch_title : R.string.event_create_tag_title;
+                return res.getString(resId, payload.getRef(), formatFromRepoName(eventRepo));
             }
 
         } else if (Event.TYPE_DELETE.equals(eventType)) {
             DeletePayload payload = (DeletePayload) event.getPayload();
-            if ("repository".equals(payload.getRefType())) {
-                return res.getString(R.string.event_delete_repo_title,
-                        actorLogin, payload.getRef());
-            } else {
-                return res.getString(R.string.event_delete_branch_title,
-                        actorLogin, payload.getRefType(), payload.getRef(),
-                        formatFromRepoName(eventRepo));
+            String type = payload.getRefType();
+            if ("repository".equals(type)) {
+                return res.getString(R.string.event_delete_repo_title, payload.getRef());
+            } else if ("branch".equals(type) || "tag".equals(type)) {
+                int resId = "branch".equals(type)
+                        ? R.string.event_delete_branch_title : R.string.event_delete_tag_title;
+                return res.getString(resId, payload.getRef(), formatFromRepoName(eventRepo));
             }
 
         } else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
-            return res.getString(R.string.event_download_title,
-                    actorLogin, formatFromRepoName(eventRepo));
+            return res.getString(R.string.event_download_title, formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_FOLLOW.equals(eventType)) {
             FollowPayload payload = (FollowPayload) event.getPayload();
             return res.getString(R.string.event_follow_title,
-                    actorLogin, payload.getTarget().getLogin());
+                    CommitUtils.getUserLogin(mContext, payload.getTarget()));
 
         } else if (Event.TYPE_FORK.equals(event.getType())) {
-            return res.getString(R.string.event_fork_title,
-                    actorLogin, formatFromRepoName(eventRepo));
+            return res.getString(R.string.event_fork_title, formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_FORK_APPLY.equals(eventType)) {
-            return res.getString(R.string.event_fork_apply_title,
-                    actorLogin, formatFromRepoName(eventRepo));
+            return res.getString(R.string.event_fork_apply_title, formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_GIST.equals(eventType)) {
             GistPayload payload = (GistPayload) event.getPayload();
             Gist gist = payload.getGist();
-            String login = event.getActor().getLogin();
-            if (TextUtils.isEmpty(login)) {
-                login = CommitUtils.getUserLogin(mContext, gist.getOwner());
-            }
 
             String id = gist != null ? gist.getId() : mContext.getString(R.string.deleted);
             int resId = TextUtils.equals(payload.getAction(), "update")
                     ? R.string.event_update_gist_title : R.string.event_create_gist_title;
-            return res.getString(resId, login, id);
+            return res.getString(resId, id);
 
         } else if (Event.TYPE_GOLLUM.equals(eventType)) {
             GollumPayload payload = (GollumPayload) event.getPayload();
             List<GollumPage> pages = payload.getPages();
             int count = pages == null ? 0 : pages.size();
-            return res.getString(R.string.event_gollum_title, actorLogin,
+            return res.getString(R.string.event_gollum_title,
                     res.getQuantityString(R.plurals.page, count, count),
                     formatFromRepoName(eventRepo));
 
@@ -346,58 +345,53 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
             if (issue != null) {
                 int formatResId = issue.getPullRequest() != null
                         ? R.string.event_pull_request_comment : R.string.event_issue_comment;
-                return res.getString(formatResId, actorLogin,
-                        issue.getNumber(), formatFromRepoName(eventRepo));
+                return res.getString(formatResId, issue.getNumber(), formatFromRepoName(eventRepo));
             }
 
         } else if (Event.TYPE_ISSUES.equals(eventType)) {
             IssuesPayload eventPayload = (IssuesPayload) event.getPayload();
+            // XXX
             return res.getString(R.string.event_issues_title,
-                    actorLogin, eventPayload.getAction(),
+                    eventPayload.getAction(),
                     eventPayload.getIssue().getNumber(), formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_MEMBER.equals(eventType)) {
             MemberPayload payload = (MemberPayload) event.getPayload();
             return res.getString(R.string.event_member_title,
-                    actorLogin, payload.getMember() != null ? payload.getMember().getLogin() : "",
-                            formatFromRepoName(eventRepo));
+                    CommitUtils.getUserLogin(mContext, payload.getMember()),
+                    formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_PUBLIC.equals(eventType)) {
-            return res.getString(R.string.event_public_title,
-                    actorLogin, formatFromRepoName(eventRepo));
+            return res.getString(R.string.event_public_title, formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_PULL_REQUEST.equals(eventType)) {
             PullRequestPayload payload = (PullRequestPayload) event.getPayload();
+            // XXX
             return res.getString(R.string.event_pull_request_title,
-                    actorLogin, payload.getAction(),
-                    payload.getNumber(), formatFromRepoName(eventRepo));
+                    payload.getAction(), payload.getNumber(), formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
             PullRequestReviewCommentPayload payload =
                     (PullRequestReviewCommentPayload) event.getPayload();
-            if (payload.getPullRequest() != null) {
+            PullRequest pr = payload.getPullRequest();
+            CommitComment comment = payload.getComment();
+            if (pr != null) {
                 return res.getString(R.string.event_pull_request_review_comment_title,
-                        actorLogin, payload.getPullRequest().getNumber(),
-                        formatFromRepoName(eventRepo));
-            } else {
-                CommitComment comment = payload.getComment();
-                if (comment != null) {
-                    return res.getString(R.string.event_commit_comment_title,
-                            actorLogin, payload.getComment().getCommitId().substring(0, 7),
-                            formatFromRepoName(eventRepo));
-                }
+                        pr.getNumber(), formatFromRepoName(eventRepo));
+            } else if (comment != null) {
+                return res.getString(R.string.event_commit_comment_title,
+                        comment.getCommitId().substring(0, 7), formatFromRepoName(eventRepo));
             }
 
         } else if (Event.TYPE_PUSH.equals(eventType)) {
             PushPayload payload = (PushPayload) event.getPayload();
             String[] refPart = payload.getRef().split("/");
             return res.getString(R.string.event_push_title,
-                    actorLogin, refPart.length == 3 ? refPart[2] : payload.getRef(),
-                            formatFromRepoName(eventRepo));
+                    refPart.length == 3 ? refPart[2] : payload.getRef(),
+                    formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_RELEASE.equals(eventType)) {
-            return res.getString(R.string.event_release_title, actorLogin,
-                    formatFromRepoName(eventRepo));
+            return res.getString(R.string.event_release_title, formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_TEAM_ADD.equals(eventType)) {
             TeamAddPayload payload = (TeamAddPayload) event.getPayload();
@@ -406,16 +400,15 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
                 Repository repo = payload.getRepo();
                 if (repo != null) {
                     return res.getString(R.string.event_team_repo_add,
-                            actorLogin, formatToRepoName(repo), team.getName());
-                } else if (payload.getUser() != null) {
+                            formatToRepoName(repo), team.getName());
+                } else {
                     return res.getString(R.string.event_team_user_add,
-                            actorLogin, payload.getUser().getLogin(), team.getName());
+                            CommitUtils.getUserLogin(mContext, payload.getUser()), team.getName());
                 }
             }
 
         } else if (Event.TYPE_WATCH.equals(eventType)) {
-            return res.getString(R.string.event_watch_title,
-                    actorLogin, formatFromRepoName(eventRepo));
+            return res.getString(R.string.event_watch_title, formatFromRepoName(eventRepo));
         }
 
         return "";
@@ -452,12 +445,14 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
         private EventViewHolder(View view) {
             super(view);
             ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
+            tvActor = (TextView) view.findViewById(R.id.tv_actor);
             tvTitle = (StyleableTextView) view.findViewById(R.id.tv_title);
             tvDesc = (StyleableTextView) view.findViewById(R.id.tv_desc);
             tvCreatedAt = (TextView) view.findViewById(R.id.tv_created_at);
         }
 
         private ImageView ivGravatar;
+        private TextView tvActor;
         private StyleableTextView tvTitle;
         private StyleableTextView tvDesc;
         private TextView tvCreatedAt;
