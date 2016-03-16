@@ -29,7 +29,7 @@ public class ReadmeLoader extends BaseLoader<String> {
     @Override
     public String doLoadInBackground() throws IOException {
         Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new DefaultClient("application/vnd.github.beta.html");
+        GitHubClient client = new DefaultClient("application/vnd.github.v3.html");
         client.setOAuth2Token(app.getAuthToken());
 
         ContentsService contentService = new ContentsService(client);
