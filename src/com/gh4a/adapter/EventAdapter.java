@@ -138,11 +138,9 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
 
         } else if (Event.TYPE_CREATE.equals(eventType)) {
             CreatePayload payload = (CreatePayload) event.getPayload();
-            if ("repository".equals(payload.getRefType())) {
+            String refType = payload.getRefType();
+            if (CreatePayload.REF_TYPE_REPO.equals(refType)) {
                 return res.getString(R.string.event_create_repo_desc, eventRepo.getName());
-            } else if ("branch".equals(payload.getRefType()) || "tag".equals(payload.getRefType())) {
-                return res.getString(R.string.event_create_branch_desc,
-                        payload.getRefType(), eventRepo.getName(), payload.getRef());
             }
 
         } else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
@@ -253,6 +251,14 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
                 }
                 return release.getTagName();
             }
+
+        } else if (Event.TYPE_TEAM_ADD.equals(eventType)) {
+            TeamAddPayload payload = (TeamAddPayload) event.getPayload();
+            Team team = payload.getTeam();
+            if (team != null) {
+                return res.getString(R.string.event_team_add_desc, team.getName(),
+                        team.getMembersCount(), team.getReposCount());
+            }
         }
 
         return null;
@@ -272,7 +278,6 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
     private String formatTitle(Event event) {
         String eventType = event.getType();
         EventRepository eventRepo = event.getRepo();
-        String actorLogin = CommitUtils.getUserLogin(mContext, event.getActor());
         Resources res = mContext.getResources();
 
         if (hasInvalidPayload(event)) {
@@ -288,24 +293,23 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
         } else if (Event.TYPE_CREATE.equals(eventType)) {
             CreatePayload payload = (CreatePayload) event.getPayload();
             String type = payload.getRefType();
-            if ("repository".equals(type)) {
-                return res.getString(R.string.event_create_repo_title,
-                        formatFromRepoName(eventRepo));
-            } else if ("branch".equals(type) || "tag".equals(type)) {
-                int resId = "branch".equals(type)
+            if (CreatePayload.REF_TYPE_REPO.equals(type)) {
+                return res.getString(R.string.event_create_repo_title);
+            } else if (CreatePayload.REF_TYPE_BRANCH.equals(type)
+                    || CreatePayload.REF_TYPE_TAG.equals(type)) {
+                int resId = CreatePayload.REF_TYPE_BRANCH.equals(type)
                         ? R.string.event_create_branch_title : R.string.event_create_tag_title;
-                return res.getString(resId, payload.getRef(), formatFromRepoName(eventRepo));
+                return res.getString(resId, formatFromRepoName(eventRepo), payload.getRef());
             }
 
         } else if (Event.TYPE_DELETE.equals(eventType)) {
             DeletePayload payload = (DeletePayload) event.getPayload();
             String type = payload.getRefType();
-            if ("repository".equals(type)) {
-                return res.getString(R.string.event_delete_repo_title, payload.getRef());
-            } else if ("branch".equals(type) || "tag".equals(type)) {
-                int resId = "branch".equals(type)
+            if (DeletePayload.REF_TYPE_BRANCH.equals(type)
+                    || DeletePayload.REF_TYPE_TAG.equals(type)) {
+                int resId = CreatePayload.REF_TYPE_BRANCH.equals(type)
                         ? R.string.event_delete_branch_title : R.string.event_delete_tag_title;
-                return res.getString(resId, payload.getRef(), formatFromRepoName(eventRepo));
+                return res.getString(resId, formatFromRepoName(eventRepo), payload.getRef());
             }
 
         } else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
@@ -327,7 +331,7 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
             Gist gist = payload.getGist();
 
             String id = gist != null ? gist.getId() : mContext.getString(R.string.deleted);
-            int resId = TextUtils.equals(payload.getAction(), "update")
+            int resId = TextUtils.equals(payload.getAction(), GistPayload.ACTION_UPDATE)
                     ? R.string.event_update_gist_title : R.string.event_create_gist_title;
             return res.getString(resId, id);
 
@@ -349,11 +353,16 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
             }
 
         } else if (Event.TYPE_ISSUES.equals(eventType)) {
-            IssuesPayload eventPayload = (IssuesPayload) event.getPayload();
-            // XXX
-            return res.getString(R.string.event_issues_title,
-                    eventPayload.getAction(),
-                    eventPayload.getIssue().getNumber(), formatFromRepoName(eventRepo));
+            IssuesPayload payload = (IssuesPayload) event.getPayload();
+            final int resId;
+            switch (payload.getAction()) {
+                case IssuesPayload.ACTION_OPEN: resId = R.string.event_issues_open_title; break;
+                case IssuesPayload.ACTION_CLOSE: resId = R.string.event_issues_close_title; break;
+                case IssuesPayload.ACTION_REOPEN: resId = R.string.event_issues_reopen_title; break;
+                default: return "";
+            }
+            return res.getString(resId, payload.getIssue().getNumber(),
+                    formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_MEMBER.equals(eventType)) {
             MemberPayload payload = (MemberPayload) event.getPayload();
@@ -366,9 +375,25 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
 
         } else if (Event.TYPE_PULL_REQUEST.equals(eventType)) {
             PullRequestPayload payload = (PullRequestPayload) event.getPayload();
-            // XXX
-            return res.getString(R.string.event_pull_request_title,
-                    payload.getAction(), payload.getNumber(), formatFromRepoName(eventRepo));
+            PullRequest pr = payload.getPullRequest();
+            final int resId;
+            switch (payload.getAction()) {
+                case PullRequestPayload.ACTION_OPEN:
+                    resId = R.string.event_pr_open_title;
+                    break;
+                case PullRequestPayload.ACTION_CLOSE:
+                    resId = pr.isMerged() ? R.string.event_pr_merge_title : R.string.event_pr_close_title;
+                    break;
+                case PullRequestPayload.ACTION_REOPEN:
+                    resId = R.string.event_pr_reopen_title;
+                    break;
+                case PullRequestPayload.ACTION_SYNCHRONIZE:
+                    resId = R.string.event_pr_update_title;
+                    break;
+                default:
+                    return "";
+            }
+            return res.getString(resId, payload.getNumber(), formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
             PullRequestReviewCommentPayload payload =
@@ -385,10 +410,11 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
 
         } else if (Event.TYPE_PUSH.equals(eventType)) {
             PushPayload payload = (PushPayload) event.getPayload();
-            String[] refPart = payload.getRef().split("/");
-            return res.getString(R.string.event_push_title,
-                    refPart.length == 3 ? refPart[2] : payload.getRef(),
-                    formatFromRepoName(eventRepo));
+            String ref = payload.getRef();
+            if (ref.startsWith("refs/heads/")) {
+                ref = ref.substring(11);
+            }
+            return res.getString(R.string.event_push_title, ref, formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_RELEASE.equals(eventType)) {
             return res.getString(R.string.event_release_title, formatFromRepoName(eventRepo));

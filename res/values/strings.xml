@@ -164,14 +164,20 @@
     <string name="event_commit_comment_title">Commented on commit [b]%1$s[/b] at [b]%2$s[/b]</string>
     <string name="event_fork_apply_title">Applied fork commits to [b]%1$s[/b]</string>
     <string name="event_follow_title">Started following [b]%1$s[/b]</string>
-    <string name="event_create_repo_title">Created repository [b]%1$s[/b]</string>
+    <string name="event_create_repo_title">Created a repository</string>
     <string name="event_create_branch_title">Created branch [b]%1$s[/b] at [b]%2$s[/b]</string>
     <string name="event_create_tag_title">Created tag [b]%1$s[/b] at [b]%2$s[/b]</string>
-    <string name="event_issues_title">%1$s issue [b]%2$s[/b] on [b]%3$s[/b]</string>
+    <string name="event_issues_open_title">Opened issue [b]%1$d[/b] on [b]%2$s[/b]</string>
+    <string name="event_issues_close_title">Closed issue [b]%1$d[/b] on [b]%2$s[/b]</string>
+    <string name="event_issues_reopen_title">Reopened issue [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_delete_repo_title">Deleted repository [b]%1$s[/b]</string>
     <string name="event_delete_branch_title">Deleted branch [b]%1$s[/b] at [b]%2$s[/b]</string>
     <string name="event_delete_tag_title">Deleted tag [b]%1$s[/b] at [b]%2$s[/b]</string>
-    <string name="event_pull_request_title">%1$s pull request [b]%2$s[/b] on [b]%3$s[/b]</string>
+    <string name="event_pr_open_title">Opened pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
+    <string name="event_pr_close_title">Closed pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
+    <string name="event_pr_merge_title">Merged pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
+    <string name="event_pr_reopen_title">Reopened pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
+    <string name="event_pr_update_title">Updated pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_pull_request_review_comment_title">Commented on pull request [b]%1$d[/b] in [b]%2$s[/b]</string>
     <string name="event_member_title">Added [b]%1$s[/b] to [b]%2$s[/b]</string>
     <string name="event_download_title">Uploaded a file to [b]%1$s[/b]</string>
@@ -191,9 +197,9 @@
     <string name="event_follow_desc">%1$s has %2$d repositories and %3$d followers</string>
     <string name="event_fork_desc">Forked repository is at %1$s</string>
     <string name="event_create_repo_desc">New repository is at %1$s</string>
-    <string name="event_create_branch_desc">New %1$s is at %2$s/tree/%3$s</string>
     <string name="event_gollum_desc">View %1$s</string>
     <string name="event_push_desc">%1$d more commits\u2026</string>
+    <string name="event_team_add_desc">%1$s now has %2$d members and %3$d repositories</string>
 
     <string name="user_username">Username</string>
     <string name="user_password">Password</string>
