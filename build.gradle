@@ -60,6 +60,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.2.1'
     compile 'com.android.support:cardview-v7:23.2.1'
     compile 'com.android.support:preference-v7:23.2.1'
+    compile 'com.android.support:preference-v14:23.2.1'
     compile 'com.android.support:design:23.2.1'
     compile 'com.larswerkman:HoloColorPicker:1.5@aar'
     compile 'com.github.johnkil.android-progressfragment:progressfragment:1.4.0@aar'

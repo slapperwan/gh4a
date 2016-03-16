@@ -4,6 +4,10 @@
     package="com.gh4a"
     android:installLocation="auto">
 
+    <!-- see http://stackoverflow.com/questions/32070670/preferencefragmentcompat-requires-preferencetheme-to-be-set -->
+    <uses-sdk xmlns:tools="http://schemas.android.com/tools"
+        tools:overrideLibrary="android.support.v14.preference" />
+
     <uses-permission
         android:name="android.permission.INTERNET" />
     <uses-permission
