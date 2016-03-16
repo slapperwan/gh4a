@@ -24,6 +24,7 @@ import android.text.Html.TagHandler;
 import android.text.Layout;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.BackgroundColorSpan;
 import android.text.style.LeadingMarginSpan;
 import android.text.style.QuoteSpan;
 import android.text.style.StrikethroughSpan;
@@ -186,10 +187,13 @@ public class HtmlUtils {
             }
 
             if (TAG_CODE.equalsIgnoreCase(tag)) {
-                if (opening)
+                if (opening) {
                     startSpan(new TypefaceSpan("monospace"), output);
-                else
+                    startSpan(new BackgroundColorSpan(0x30aaaaaa), output);
+                } else {
                     endSpan(TypefaceSpan.class, output);
+                    endSpan(BackgroundColorSpan.class, output);
+                }
                 return;
             }
 
