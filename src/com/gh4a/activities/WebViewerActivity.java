@@ -41,11 +41,14 @@ import com.gh4a.R;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.ThemeUtils;
+import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.SwipeRefreshLayout;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-public abstract class WebViewerActivity extends BaseActivity {
+public abstract class WebViewerActivity extends BaseActivity implements
+        SwipeRefreshLayout.ChildScrollDelegate {
     protected WebView mWebView;
     private boolean mStarted;
 
@@ -103,6 +106,7 @@ public abstract class WebViewerActivity extends BaseActivity {
 
         setContentShown(false);
         setupWebView();
+        setChildScrollDelegate(this);
     }
 
     @Override
@@ -115,6 +119,11 @@ public abstract class WebViewerActivity extends BaseActivity {
     protected void onStop() {
         mStarted = false;
         super.onStop();
+    }
+
+    @Override
+    public boolean canChildScrollUp() {
+        return UiUtils.canViewScrollUp(mWebView);
     }
 
     @SuppressWarnings("deprecation")
