@@ -37,7 +37,6 @@ import org.eclipse.egit.github.core.service.PullRequestService;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
@@ -402,7 +401,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
             for (Label label : labels) {
                 TextView tvLabel = (TextView) inflater.inflate(R.layout.issue_label,
                         labelContainer, false);
-                int color = Color.parseColor("#" + label.getColor());
+                int color = UiUtils.colorForLabel(label);
 
                 tvLabel.setText(label.getName());
                 tvLabel.setBackgroundColor(color);

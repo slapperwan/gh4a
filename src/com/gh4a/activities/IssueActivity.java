@@ -27,7 +27,6 @@ import org.eclipse.egit.github.core.service.IssueService;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -289,7 +288,7 @@ public class IssueActivity extends BaseActivity implements
             for (Label label : labels) {
                 TextView tvLabel = (TextView) getLayoutInflater().inflate(R.layout.issue_label,
                         labelContainer, false);
-                int color = Color.parseColor("#" + label.getColor());
+                int color = UiUtils.colorForLabel(label);
 
                 tvLabel.setText(label.getName());
                 tvLabel.setBackgroundColor(color);

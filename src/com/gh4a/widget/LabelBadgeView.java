@@ -3,13 +3,13 @@ package com.gh4a.widget;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
 
 import com.gh4a.R;
+import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Label;
 
@@ -45,7 +45,7 @@ public class LabelBadgeView extends View {
     public void setLabels(List<Label> labels) {
         mColors = new int[labels.size()];
         for (int i = 0; i < labels.size(); i++) {
-            mColors[i] = Color.parseColor("#" + labels.get(i).getColor());
+            mColors[i] = UiUtils.colorForLabel(labels.get(i));
         }
         requestLayout();
     }

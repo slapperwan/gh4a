@@ -403,7 +403,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
             for (final Label label : mAllLabels) {
                 final View rowView = inflater.inflate(R.layout.row_issue_create_label, container, false);
                 View viewColor = rowView.findViewById(R.id.view_color);
-                viewColor.setBackgroundColor(Color.parseColor("#" + label.getColor()));
+                viewColor.setBackgroundColor(UiUtils.colorForLabel(label));
 
                 final TextView tvLabel = (TextView) rowView.findViewById(R.id.tv_title);
                 tvLabel.setText(label.getName());
@@ -433,7 +433,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
     private void setLabelSelection(TextView view, boolean selected) {
         Label label = (Label) view.getTag();
         if (selected) {
-            int color = Color.parseColor("#" + label.getColor());
+            int color = UiUtils.colorForLabel(label);
             view.setTypeface(view.getTypeface(), Typeface.BOLD);
             view.setBackgroundColor(color);
             view.setTextColor(UiUtils.textColorForBackground(this, color));

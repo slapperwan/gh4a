@@ -22,7 +22,11 @@ public class IssueCommentListLoader extends BaseLoader<List<IssueEventHolder>> {
     private int mIssueNumber;
 
     private static final List<String> INTERESTING_EVENTS = Arrays.asList(
-        "closed", "reopened", "merged", "referenced", "assigned", "unassigned"
+        IssueEvent.TYPE_CLOSED, IssueEvent.TYPE_REOPENED, IssueEvent.TYPE_MERGED,
+        IssueEvent.TYPE_REFERENCED, IssueEvent.TYPE_ASSIGNED, IssueEvent.TYPE_UNASSIGNED,
+        IssueEvent.TYPE_LABELED, IssueEvent.TYPE_UNLABELED, IssueEvent.TYPE_LOCKED,
+        IssueEvent.TYPE_UNLOCKED, IssueEvent.TYPE_MILESTONED, IssueEvent.TYPE_DEMILESTONED,
+        IssueEvent.TYPE_RENAMED
     );
 
     protected static Comparator<IssueEventHolder> SORTER = new Comparator<IssueEventHolder>() {

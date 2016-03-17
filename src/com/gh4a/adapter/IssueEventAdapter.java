@@ -18,16 +18,22 @@ package com.gh4a.adapter;
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.IssueEvent;
+import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.Rename;
 import org.eclipse.egit.github.core.User;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.TextUtils;
+import android.text.style.BackgroundColorSpan;
 import android.text.style.ClickableSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -139,80 +145,117 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
     }
 
     private CharSequence formatEvent(final IssueEvent event, final User user, int typefaceValue) {
-        String type = event.getEvent();
         String textBase = null;
         int textResId = 0;
 
-        if (TextUtils.equals(type, "closed")) {
-            textResId = event.getCommitId() != null
-                    ? R.string.issue_event_closed_with_commit : R.string.issue_event_closed;
-        } else if (TextUtils.equals(type, "reopened")) {
-            textResId = R.string.issue_event_reopened;
-        } else if (TextUtils.equals(type, "merged")) {
-            textResId = R.string.issue_event_merged;
-        } else if (TextUtils.equals(type, "referenced")) {
-            textResId = event.getCommitId() != null
-                    ? R.string.issue_event_referenced_with_commit : R.string.issue_event_referenced;
-        } else if (TextUtils.equals(type, "assigned") || TextUtils.equals(type, "unassigned")) {
-            boolean isAssign = TextUtils.equals(type, "assigned");
-            String actorLogin = user != null ? user.getLogin() : null;
-            String assigneeLogin = event.getAssignee() != null ? event.getAssignee().getLogin() : null;
-            if (assigneeLogin != null && assigneeLogin.equals(actorLogin)) {
-                textResId = isAssign
-                        ? R.string.issue_event_assigned_self : R.string.issue_event_unassigned_self;
-            } else {
-                textResId = isAssign
-                        ? R.string.issue_event_assigned : R.string.issue_event_unassigned;
-                textBase = mContext.getString(textResId,
-                        CommitUtils.getUserLogin(mContext, user),
-                        CommitUtils.getUserLogin(mContext, event.getAssignee()));
+        switch (event.getEvent()) {
+            case IssueEvent.TYPE_CLOSED:
+                textResId = event.getCommitId() != null
+                        ? R.string.issue_event_closed_with_commit
+                        : R.string.issue_event_closed;
+                break;
+            case IssueEvent.TYPE_REOPENED:
+                textResId = R.string.issue_event_reopened;
+            case IssueEvent.TYPE_MERGED:
+                textResId = R.string.issue_event_merged;
+            case IssueEvent.TYPE_REFERENCED:
+                textResId = event.getCommitId() != null
+                        ? R.string.issue_event_referenced_with_commit
+                        : R.string.issue_event_referenced;
+            case IssueEvent.TYPE_ASSIGNED:
+            case IssueEvent.TYPE_UNASSIGNED: {
+                boolean isAssign = TextUtils.equals(event.getEvent(), IssueEvent.TYPE_ASSIGNED);
+                String actorLogin = user != null ? user.getLogin() : null;
+                String assigneeLogin = event.getAssignee() != null
+                        ? event.getAssignee().getLogin() : null;
+                if (assigneeLogin != null && assigneeLogin.equals(actorLogin)) {
+                    textResId = isAssign
+                            ? R.string.issue_event_assigned_self
+                            : R.string.issue_event_unassigned_self;
+                } else {
+                    textResId = isAssign
+                            ? R.string.issue_event_assigned
+                            : R.string.issue_event_unassigned;
+                    textBase = mContext.getString(textResId,
+                            CommitUtils.getUserLogin(mContext, user),
+                            CommitUtils.getUserLogin(mContext, event.getAssignee()));
+                }
+                break;
             }
-        } else if (TextUtils.equals(type, "unassigned")) {
-            textBase = mContext.getString(R.string.issue_event_unassigned,
-                    CommitUtils.getUserLogin(mContext, user),
-                    CommitUtils.getUserLogin(mContext, event.getAssignee()));
-        } else {
-            return null;
+            case IssueEvent.TYPE_LABELED:
+                textResId = R.string.issue_event_labeled;
+                break;
+            case IssueEvent.TYPE_UNLABELED:
+                textResId = R.string.issue_event_unlabeled;
+                break;
+            case IssueEvent.TYPE_LOCKED:
+                textResId = R.string.issue_event_locked;
+                break;
+            case IssueEvent.TYPE_UNLOCKED:
+                textResId = R.string.issue_event_unlocked;
+                break;
+            case IssueEvent.TYPE_MILESTONED:
+            case IssueEvent.TYPE_DEMILESTONED:
+                textResId = TextUtils.equals(event.getEvent(), IssueEvent.TYPE_MILESTONED)
+                        ? R.string.issue_event_milestoned : R.string.issue_event_demilestoned;
+                textBase = mContext.getString(textResId, event.getMilestone().getTitle(),
+                        CommitUtils.getUserLogin(mContext, user));
+                break;
+            case IssueEvent.TYPE_RENAMED: {
+                Rename rename = event.getRename();
+                textBase = mContext.getString(R.string.issue_event_renamed,
+                        rename.getFrom(), rename.getTo(), CommitUtils.getUserLogin(mContext, user));
+                break;
+            }
+            default:
+                return null;
         }
 
         if (textBase == null) {
             textBase = mContext.getString(textResId, CommitUtils.getUserLogin(mContext, user));
         }
         SpannableStringBuilder text = StringUtils.applyBoldTags(mContext, textBase, typefaceValue);
-        if (event.getCommitId() == null) {
-            return text;
-        }
 
         int pos = text.toString().indexOf("[commit]");
-        if (pos < 0) {
-            return text;
-        }
-
-        text.replace(pos, pos + 8, event.getCommitId().substring(0, 7));
-        text.setSpan(new TypefaceSpan("monospace"), pos, pos + 7, 0);
-        text.setSpan(new ClickableSpan() {
-            @Override
-            public void onClick(View view) {
-                // The commit might be in a different repo. The API doesn't provide
-                // that information directly, so get it indirectly by parsing the URL
-                String repoOwner = mRepoOwner, repoName = mRepoName;
-                String url = event.getCommitUrl();
-                if (url != null) {
-                    Matcher matcher = COMMIT_URL_REPO_NAME_AND_OWNER_PATTERN.matcher(url);
-                    if (matcher.find()) {
-                        repoOwner = matcher.group(1);
-                        repoName = matcher.group(2);
+        if (event.getCommitId() != null && pos >= 0) {
+            text.replace(pos, pos + 8, event.getCommitId().substring(0, 7));
+            text.setSpan(new TypefaceSpan("monospace"), pos, pos + 7, 0);
+            text.setSpan(new ClickableSpan() {
+                @Override
+                public void onClick(View view) {
+                    // The commit might be in a different repo. The API doesn't provide
+                    // that information directly, so get it indirectly by parsing the URL
+                    String repoOwner = mRepoOwner, repoName = mRepoName;
+                    String url = event.getCommitUrl();
+                    if (url != null) {
+                        Matcher matcher = COMMIT_URL_REPO_NAME_AND_OWNER_PATTERN.matcher(url);
+                        if (matcher.find()) {
+                            repoOwner = matcher.group(1);
+                            repoName = matcher.group(2);
+                        }
                     }
+
+                    mContext.startActivity(IntentUtils.getCommitInfoActivityIntent(mContext,
+                            repoOwner, repoName, event.getCommitId()));
                 }
 
-                mContext.startActivity(IntentUtils.getCommitInfoActivityIntent(mContext,
-                        repoOwner, repoName, event.getCommitId()));
-            }
-            @Override
-            public void updateDrawState(@NonNull TextPaint ds) {
-                ds.setColor(UiUtils.resolveColor(mContext, android.R.attr.textColorLink));
-            }
-        }, pos, pos + 7, 0);
+                @Override
+                public void updateDrawState(@NonNull TextPaint ds) {
+                    ds.setColor(UiUtils.resolveColor(mContext, android.R.attr.textColorLink));
+                }
+            }, pos, pos + 7, 0);
+        }
+
+        pos = text.toString().indexOf("[label]");
+        Label label = event.getLabel();
+        if (label != null && pos >= 0) {
+            int bgColor = UiUtils.colorForLabel(label);
+            int fgColor = UiUtils.textColorForBackground(mContext, bgColor);
+            int length = label.getName().length();
+            text.replace(pos, pos + 7, label.getName());
+            text.setSpan(new BackgroundColorSpan(bgColor), pos, pos + length, 0);
+            text.setSpan(new ForegroundColorSpan(fgColor), pos, pos + length, 0);
+        }
 
         return text;
     }
