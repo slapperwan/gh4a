@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.text.style.ReplacementSpan;
 
 import com.gh4a.R;
@@ -12,6 +13,7 @@ import com.gh4a.utils.UiUtils;
 import org.eclipse.egit.github.core.Label;
 
 public class IssueLabelSpan extends ReplacementSpan {
+    private RectF mTmpRect = new RectF();
     private int mFgColor;
     private int mBgColor;
     private int mPadding;
@@ -60,8 +62,11 @@ public class IssueLabelSpan extends ReplacementSpan {
         final float bgRight = bgLeft + textSize + 2 * mPadding;
         final float bgTop = y - mAscent - mPadding;
         final float bgBottom = y + mDescent + mPadding;
+        final float cornerRadius = mPadding;
+
         paint.setColor(mBgColor);
-        canvas.drawRect(bgLeft, bgTop, bgRight, bgBottom, paint);
+        mTmpRect.set(bgLeft, bgTop, bgRight, bgBottom);
+        canvas.drawRoundRect(mTmpRect, cornerRadius, cornerRadius, paint);
 
         paint.setColor(mFgColor);
         canvas.drawText(text, start, end, x + mPadding, y, paint);
