@@ -113,6 +113,7 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
 
         if (mMilestone == null) {
             mMilestone = new Milestone();
+            mMilestone.setState("open");
         }
 
         mTitleView.setText(mMilestone.getTitle());
