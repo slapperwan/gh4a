@@ -52,12 +52,16 @@ public abstract class BasePagerActivity extends BaseActivity implements
 
     protected void invalidateTabs() {
         invalidateFragments();
-        int[][] oldTabHeaderColors = mTabHeaderColors;
         mTabHeaderColors = getTabHeaderColors();
         if (mTabHeaderColors != null) {
             onPageMoved(0, 0);
-        } else if (oldTabHeaderColors != null) {
-            transitionHeaderToColor(R.attr.colorPrimary, R.attr.colorPrimaryDark);
+        } else {
+            int[] colorAttrs = getHeaderColors();
+            if (colorAttrs != null) {
+                transitionHeaderToColor(colorAttrs[0], colorAttrs[1]);
+            } else {
+                transitionHeaderToColor(R.attr.colorPrimary, R.attr.colorPrimaryDark);
+            }
         }
     }
 
@@ -142,6 +146,11 @@ public abstract class BasePagerActivity extends BaseActivity implements
 
     /* expected format: int[tabCount][2] - 0 is header, 1 is status bar */
     protected int[][] getTabHeaderColors() {
+        return null;
+    }
+
+    /* expected format: int[2] - 0 is header, 1 is status bar */
+    protected int[] getHeaderColors() {
         return null;
     }
 

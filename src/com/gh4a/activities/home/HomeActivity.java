@@ -205,6 +205,11 @@ public class HomeActivity extends BasePagerActivity implements
     }
 
     @Override
+    protected int[] getHeaderColors() {
+        return mFactory.getHeaderColors();
+    }
+
+    @Override
     protected Fragment getFragment(int position) {
         return mFactory.getFragment(position);
     }
@@ -294,6 +299,11 @@ public class HomeActivity extends BasePagerActivity implements
     public void doInvalidateOptionsMenuAndToolDrawer() {
         super.supportInvalidateOptionsMenu();
         updateRightNavigationDrawer();
+    }
+
+    @Override
+    public void invalidateTabs() {
+        super.invalidateTabs();
     }
 
     @Override

@@ -25,6 +25,7 @@ public class IssueListFactory extends FragmentFactory {
     private boolean mIsPullRequest;
     private IssueListFragment.SortDrawerHelper mDrawerHelper =
             new IssueListFragment.SortDrawerHelper();
+    private int[] mHeaderColors;
 
     public IssueListFactory(HomeActivity activity, String userLogin, boolean pr) {
         super(activity);
@@ -45,6 +46,11 @@ public class IssueListFactory extends FragmentFactory {
     @Override
     protected int[] getTabTitleResIds() {
         return TAB_TITLES;
+    }
+
+    @Override
+    protected int[] getHeaderColors() {
+        return mHeaderColors;
     }
 
     @Override
@@ -124,10 +130,10 @@ public class IssueListFactory extends FragmentFactory {
 
     private void updateHeaderColor() {
         boolean showingClosed = Constants.Issue.STATE_CLOSED.equals(mState);
-        int headerColorAttrId = showingClosed
-                ? R.attr.colorIssueClosed : R.attr.colorIssueOpen;
-        int statusBarColorAttrId = showingClosed
-                ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark;
-        mActivity.transitionHeaderToColor(headerColorAttrId, statusBarColorAttrId);
+        mHeaderColors = new int[] {
+            showingClosed ? R.attr.colorIssueClosed : R.attr.colorIssueOpen,
+            showingClosed ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark
+        };
+        mActivity.invalidateTabs();
     }
 }

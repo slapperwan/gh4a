@@ -21,6 +21,10 @@ public abstract class FragmentFactory {
         return null;
     }
 
+    protected int[] getHeaderColors() {
+        return null;
+    }
+
     protected int[] getToolDrawerMenuResIds() {
         return null;
     }

@@ -35,7 +35,6 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestLoader;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.User;
@@ -52,7 +51,7 @@ public class PullRequestActivity extends BasePagerActivity implements
     private PullRequestFragment mPullRequestFragment;
 
     private ViewGroup mHeader;
-    private int[][] mTabHeaderColorAttrs = null;
+    private int[] mHeaderColorAttrs;
 
     private static final int[] TITLES = new int[] {
         R.string.pull_request_conversation, R.string.commits, R.string.pull_request_files
@@ -105,7 +104,7 @@ public class PullRequestActivity extends BasePagerActivity implements
         mPullRequest = null;
         setContentShown(false);
         mHeader.setVisibility(View.GONE);
-        mTabHeaderColorAttrs = null;
+        mHeaderColorAttrs = null;
         getSupportLoaderManager().getLoader(0).onContentChanged();
         invalidateTabs();
         super.onRefresh();
@@ -117,8 +116,8 @@ public class PullRequestActivity extends BasePagerActivity implements
     }
 
     @Override
-    protected int[][] getTabHeaderColors() {
-        return mTabHeaderColorAttrs;
+    protected int[] getHeaderColors() {
+        return mHeaderColorAttrs;
     }
 
     @Override
@@ -163,24 +162,19 @@ public class PullRequestActivity extends BasePagerActivity implements
 
         if (mPullRequest.isMerged()) {
             stateTextResId = R.string.pull_request_merged;
-            stateColorAttributeId = R.attr.colorPullRequestMerged;
-            statusBarColorAttributeId = R.attr.colorPullRequestMergedDark;
+            mHeaderColorAttrs = new int[] {
+                R.attr.colorPullRequestMerged, R.attr.colorPullRequestMergedDark
+            };
         } else if (Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState())) {
             stateTextResId = R.string.closed;
-            stateColorAttributeId = R.attr.colorIssueClosed;
-            statusBarColorAttributeId = R.attr.colorIssueClosedDark;
+            mHeaderColorAttrs = new int[] {
+                R.attr.colorIssueClosed, R.attr.colorIssueClosedDark
+            };
         } else {
             stateTextResId = R.string.open;
-            stateColorAttributeId = R.attr.colorIssueOpen;
-            statusBarColorAttributeId = R.attr.colorIssueOpenDark;
-        }
-
-        mTabHeaderColorAttrs = new int[TITLES.length][2];
-        final int stateColor = UiUtils.resolveColor(this, stateColorAttributeId);
-        final int statusBarColor = UiUtils.resolveColor(this, statusBarColorAttributeId);
-        for (int i = 0; i < mTabHeaderColorAttrs.length; i++) {
-            mTabHeaderColorAttrs[i][0] = stateColor;
-            mTabHeaderColorAttrs[i][1] = statusBarColor;
+            mHeaderColorAttrs = new int[]{
+                R.attr.colorIssueOpen, R.attr.colorIssueOpenDark
+            };
         }
 
         TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
