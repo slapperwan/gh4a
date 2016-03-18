@@ -72,6 +72,7 @@ public class IssueListFactory extends FragmentFactory {
                 mState, action, mLogin));
 
         return RepositoryIssueListFragment.newInstance(filterData,
+                Constants.Issue.STATE_CLOSED.equals(mState),
                 mIsPullRequest ? R.string.no_pull_requests_found : R.string.no_issues_found);
     }
 

@@ -36,9 +36,10 @@ import java.util.Map;
 public class RepositoryIssueListFragment extends PagedDataBaseFragment<Issue> {
     private Map<String, String> mFilterData;
     private int mEmptyTextResId;
+    private boolean mShowingClosed;
 
     public static RepositoryIssueListFragment newInstance(Map<String, String> filterData,
-            int emptyTextResId) {
+            boolean showingClosed, int emptyTextResId) {
         RepositoryIssueListFragment f = new RepositoryIssueListFragment();
 
         Bundle args = new Bundle();
@@ -48,6 +49,8 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Issue> {
             }
         }
         args.putInt("emptytext", emptyTextResId);
+        args.putBoolean("closed", showingClosed);
+
         f.setArguments(args);
         return f;
     }
@@ -66,6 +69,7 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Issue> {
             }
         }
         mEmptyTextResId = args.getInt("emptytext");
+        mShowingClosed = args.getBoolean("closed");
     }
 
     @Override
@@ -73,10 +77,10 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Issue> {
         super.onViewCreated(view, savedInstanceState);
 
         final String state = mFilterData.get(Constants.Issue.STATE);
-        if (Constants.Issue.STATE_OPEN.equals(state)) {
-            setHighlightColors(R.attr.colorIssueOpen, R.attr.colorIssueOpenDark);
-        } else if (Constants.Issue.STATE_CLOSED.equals(state)) {
+        if (mShowingClosed) {
             setHighlightColors(R.attr.colorIssueClosed, R.attr.colorIssueClosedDark);
+        } else {
+            setHighlightColors(R.attr.colorIssueOpen, R.attr.colorIssueOpenDark);
         }
     }
 
