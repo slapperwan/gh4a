@@ -226,16 +226,22 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         FragmentManager fm = getChildFragmentManager();
         mCommentFragment = (CommentBoxFragment) fm.findFragmentById(R.id.comment_box);
 
-        final int stateColor;
+        final int stateColorAttr, stateColorDarkAttr;
         if (mPullRequest.isMerged()) {
-            stateColor = R.attr.colorPullRequestMerged;
+            stateColorAttr = R.attr.colorPullRequestMerged;
+            stateColorDarkAttr = R.attr.colorPullRequestMergedDark;
         } else if (Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState())) {
-            stateColor = R.attr.colorIssueClosed;
+            stateColorAttr = R.attr.colorIssueClosed;
+            stateColorDarkAttr = R.attr.colorIssueClosedDark;
         } else {
-            stateColor = R.attr.colorIssueOpen;
+            stateColorAttr = R.attr.colorIssueOpen;
+            stateColorDarkAttr = R.attr.colorIssueOpenDark;
         }
 
+        final int stateColor = UiUtils.resolveColor(getActivity(), stateColorAttr);
+        final int stateColorDark = UiUtils.resolveColor(getActivity(), stateColorDarkAttr);
         UiUtils.trySetListOverscrollColor(getRecyclerView(), stateColor);
+        setProgressColors(stateColor, stateColorDark);
 
         super.onActivityCreated(savedInstanceState);
 

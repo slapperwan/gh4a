@@ -24,6 +24,8 @@ import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 public abstract class LoadingListFragmentBase extends ProgressFragment implements
         LoaderCallbacks.ParentCallback, SwipeRefreshLayout.ChildScrollDelegate {
     private RecyclerView mRecyclerView;
+    private SmoothProgressBar mProgress;
+    private int[] mProgressColors = new int[2];
 
     public interface OnRecyclerViewCreatedListener {
         void onRecyclerViewCreated(Fragment fragment, RecyclerView recyclerView);
@@ -59,11 +61,10 @@ public abstract class LoadingListFragmentBase extends ProgressFragment implement
             ((OnRecyclerViewCreatedListener) getActivity()).onRecyclerViewCreated(this, mRecyclerView);
         }
 
-        SmoothProgressBar progress = (SmoothProgressBar) view.findViewById(R.id.progress);
-        progress.setSmoothProgressDrawableColors(new int[]{
-                UiUtils.resolveColor(view.getContext(), R.attr.colorPrimary),
-                UiUtils.resolveColor(view.getContext(), R.attr.colorPrimaryDark)
-        });
+        mProgress = (SmoothProgressBar) view.findViewById(R.id.progress);
+        mProgressColors[0] = UiUtils.resolveColor(mProgress.getContext(), R.attr.colorPrimary);
+        mProgressColors[1] = UiUtils.resolveColor(mProgress.getContext(), R.attr.colorPrimaryDark);
+        mProgress.setSmoothProgressDrawableColors(mProgressColors);
     }
 
     @Override
@@ -88,6 +89,12 @@ public abstract class LoadingListFragmentBase extends ProgressFragment implement
 
     protected boolean hasDividers() {
         return true;
+    }
+
+    protected void setProgressColors(int color, int statusBarColor) {
+        mProgressColors[0] = color;
+        mProgressColors[1] = statusBarColor;
+        mProgress.invalidate();
     }
 
     protected void hideContentAndRestartLoaders(int... loaderIds) {

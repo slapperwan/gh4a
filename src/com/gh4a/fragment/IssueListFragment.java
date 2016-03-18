@@ -66,13 +66,25 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        String stateFilter = mFilterData.get(Constants.Issue.STATE);
-        int stateColorAttr = TextUtils.equals(stateFilter, Constants.Issue.STATE_OPEN)
-                ? R.attr.colorIssueOpen : TextUtils.equals(stateFilter, Constants.Issue.STATE_CLOSED)
-                ? R.attr.colorIssueClosed : 0;
+        final int stateColorAttr, darkStateColorAttr;
+        switch (mFilterData.get(Constants.Issue.STATE)) {
+            case Constants.Issue.STATE_OPEN:
+                stateColorAttr = R.attr.colorIssueOpen;
+                darkStateColorAttr = R.attr.colorIssueOpenDark;
+                break;
+            case Constants.Issue.STATE_CLOSED:
+                stateColorAttr = R.attr.colorIssueClosed;
+                darkStateColorAttr = R.attr.colorIssueClosedDark;
+                break;
+            default:
+                stateColorAttr = darkStateColorAttr = 0;
+                break;
+        }
         if (stateColorAttr != 0) {
-            UiUtils.trySetListOverscrollColor(getRecyclerView(),
-                    UiUtils.resolveColor(getActivity(), stateColorAttr));
+            int stateColor = UiUtils.resolveColor(getActivity(), stateColorAttr);
+            int stateColorDark = UiUtils.resolveColor(getActivity(), darkStateColorAttr);
+            UiUtils.trySetListOverscrollColor(getRecyclerView(), stateColor);
+            setProgressColors(stateColor, stateColorDark);
         }
     }
 

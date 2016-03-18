@@ -63,6 +63,7 @@ import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ArgbEvaluator;
 import com.nineoldandroids.animation.ObjectAnimator;
+import com.nineoldandroids.animation.ValueAnimator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,6 +96,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     private final List<ColorDrawable> mHeaderDrawables = new ArrayList<>();
     private final List<ColorDrawable> mStatusBarDrawables = new ArrayList<>();
+    private final int[] mProgressColors = new int[2];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -214,18 +216,39 @@ public abstract class BaseActivity extends AppCompatActivity implements
         for (ColorDrawable d : mStatusBarDrawables) {
             d.setColor(statusBarColor);
         }
+        mProgressColors[0] = color;
+        mProgressColors[1] = statusBarColor;
+        mProgress.invalidate();
     }
 
     public void transitionHeaderToColor(int colorAttrId, int statusBarColorAttrId) {
         final AnimatorSet animation = new AnimatorSet();
         List<Animator> animators = new ArrayList<>();
+        int color = UiUtils.resolveColor(this, colorAttrId);
+        int statusBarColor = UiUtils.resolveColor(this, statusBarColorAttrId);
 
         for (ColorDrawable d : mHeaderDrawables) {
-            animators.add(createColorTransition(d, colorAttrId));
+            animators.add(createColorTransition(d, color));
         }
         for (ColorDrawable d : mStatusBarDrawables) {
-            animators.add(createColorTransition(d, statusBarColorAttrId));
+            animators.add(createColorTransition(d, statusBarColor));
         }
+
+        final ValueAnimator progressAnimator1 = ValueAnimator.ofInt(mProgressColors[0], color);
+        progressAnimator1.setEvaluator(new ArgbEvaluator());
+        animators.add(progressAnimator1);
+        final ValueAnimator progressAnimator2 = ValueAnimator.ofInt(mProgressColors[1], statusBarColor);
+        progressAnimator2.setEvaluator(new ArgbEvaluator());
+        animators.add(progressAnimator2);
+
+        progressAnimator1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                mProgressColors[0] = (int) progressAnimator1.getAnimatedValue();
+                mProgressColors[1] = (int) progressAnimator2.getAnimatedValue();
+                mProgress.invalidate();
+            }
+        });
 
         animation.playTogether(animators);
         animation.setDuration(200);
@@ -507,9 +530,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
         mStatusBarDrawables.add(d);
     }
 
-    private ObjectAnimator createColorTransition(ColorDrawable drawable, int colorAttrId) {
+    private ObjectAnimator createColorTransition(ColorDrawable drawable, int color) {
         final ObjectAnimator animation = ObjectAnimator.ofInt(drawable,
-                "color", drawable.getColor(), UiUtils.resolveColor(this, colorAttrId));
+                "color", drawable.getColor(), color);
         animation.setEvaluator(new ArgbEvaluator());
         return animation;
     }
@@ -647,10 +670,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
             return;
         }
         mProgress = (SmoothProgressBar) findViewById(R.id.progress);
-        mProgress.setSmoothProgressDrawableColors(new int[] {
-                UiUtils.resolveColor(this, R.attr.colorPrimary),
-                UiUtils.resolveColor(this, R.attr.colorPrimaryDark)
-        });
+        mProgressColors[0] = UiUtils.resolveColor(this, R.attr.colorPrimary);
+        mProgressColors[1] = UiUtils.resolveColor(this, R.attr.colorPrimaryDark);
+        mProgress.setSmoothProgressDrawableColors(mProgressColors);
 
         mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
         mContentContainer = (ViewGroup) findViewById(R.id.content_container);
