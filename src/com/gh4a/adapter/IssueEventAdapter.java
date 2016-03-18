@@ -24,16 +24,12 @@ import org.eclipse.egit.github.core.User;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.TextUtils;
-import android.text.style.BackgroundColorSpan;
 import android.text.style.ClickableSpan;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,6 +46,7 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.IssueLabelSpan;
 import com.gh4a.widget.StyleableTextView;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
@@ -254,12 +251,9 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         pos = text.toString().indexOf("[label]");
         Label label = event.getLabel();
         if (label != null && pos >= 0) {
-            int bgColor = UiUtils.colorForLabel(label);
-            int fgColor = UiUtils.textColorForBackground(mContext, bgColor);
             int length = label.getName().length();
             text.replace(pos, pos + 7, label.getName());
-            text.setSpan(new BackgroundColorSpan(bgColor), pos, pos + length, 0);
-            text.setSpan(new ForegroundColorSpan(fgColor), pos, pos + length, 0);
+            text.setSpan(new IssueLabelSpan(mContext, label, false), pos, pos + length, 0);
         }
 
         return text;

@@ -153,14 +153,12 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textColor="?android:attr/textColorPrimary" />
 
-        <org.apmem.tools.layouts.FlowLayout
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/labels"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_below="@id/tv_labels_label"
-            android:layout_toRightOf="@id/iv_labels"
-            android:visibility="gone" />
+            android:layout_toRightOf="@id/iv_labels" />
 
     </RelativeLayout>
 

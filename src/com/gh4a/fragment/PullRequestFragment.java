@@ -43,6 +43,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -74,6 +75,7 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.IssueLabelSpan;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
@@ -400,23 +402,17 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     private void fillLabels(List<Label> labels) {
         View labelGroup = mListHeaderView.findViewById(R.id.label_container);
         if (labels != null && !labels.isEmpty()) {
-            ViewGroup labelContainer = (ViewGroup) mListHeaderView.findViewById(R.id.labels);
-            LayoutInflater inflater = getLayoutInflater(null);
-            labelContainer.removeAllViews();
+            TextView labelView = (TextView) mListHeaderView.findViewById(R.id.labels);
+            SpannableStringBuilder builder = new SpannableStringBuilder();
 
             for (Label label : labels) {
-                TextView tvLabel = (TextView) inflater.inflate(R.layout.issue_label,
-                        labelContainer, false);
-                int color = UiUtils.colorForLabel(label);
-
-                tvLabel.setText(label.getName());
-                tvLabel.setBackgroundColor(color);
-                tvLabel.setTextColor(UiUtils.textColorForBackground(getActivity(), color));
-
-                labelContainer.addView(tvLabel);
+                int pos = builder.length();
+                IssueLabelSpan span = new IssueLabelSpan(getActivity(), label, true);
+                builder.append(label.getName());
+                builder.setSpan(span, pos, pos + label.getName().length(), 0);
             }
+            labelView.setText(builder);
             labelGroup.setVisibility(View.VISIBLE);
-            labelContainer.setVisibility(View.VISIBLE);
         } else {
             labelGroup.setVisibility(View.GONE);
         }
