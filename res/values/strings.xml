@@ -251,7 +251,7 @@
     <string name="issue_event_unassigned">Issue was unassigned from [b]%2$s[/b] by %1$s</string>
     <string name="issue_event_unassigned_self">Issue was self-unassigned from %1$s</string>
     <string name="issue_event_labeled">Label [label] was added by %1$s</string>
-    <string name="issue_event_unlabeled">Label [label] was removed by %2$s</string>
+    <string name="issue_event_unlabeled">Label [label] was removed by %1$s</string>
     <string name="issue_event_milestoned">Milestone [b]%1$s[/b] was set by %2$s</string>
     <string name="issue_event_demilestoned">Milestone [b]%1$s[/b] was removed by %2$s</string>
     <string name="issue_event_renamed">Title was changed from [b]%1$s[/b] to [b]%2$s[/b] by %3$s</string>
