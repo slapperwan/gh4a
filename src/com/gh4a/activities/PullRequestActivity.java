@@ -35,6 +35,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestLoader;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.User;
@@ -51,6 +52,7 @@ public class PullRequestActivity extends BasePagerActivity implements
     private PullRequestFragment mPullRequestFragment;
 
     private ViewGroup mHeader;
+    private int[][] mTabHeaderColorAttrs = null;
 
     private static final int[] TITLES = new int[] {
         R.string.pull_request_conversation, R.string.commits, R.string.pull_request_files
@@ -102,6 +104,8 @@ public class PullRequestActivity extends BasePagerActivity implements
     public void onRefresh() {
         mPullRequest = null;
         setContentShown(false);
+        mHeader.setVisibility(View.GONE);
+        mTabHeaderColorAttrs = null;
         getSupportLoaderManager().getLoader(0).onContentChanged();
         invalidateTabs();
         super.onRefresh();
@@ -110,6 +114,11 @@ public class PullRequestActivity extends BasePagerActivity implements
     @Override
     protected int[] getTabTitleResIds() {
         return mPullRequest != null ? TITLES : null;
+    }
+
+    @Override
+    protected int[][] getTabHeaderColors() {
+        return mTabHeaderColorAttrs;
     }
 
     @Override
@@ -150,7 +159,6 @@ public class PullRequestActivity extends BasePagerActivity implements
     }
 
     private void fillHeader() {
-        TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
         final int stateTextResId, stateColorAttributeId, statusBarColorAttributeId;
 
         if (mPullRequest.isMerged()) {
@@ -167,8 +175,16 @@ public class PullRequestActivity extends BasePagerActivity implements
             statusBarColorAttributeId = R.attr.colorIssueOpenDark;
         }
 
+        mTabHeaderColorAttrs = new int[TITLES.length][2];
+        final int stateColor = UiUtils.resolveColor(this, stateColorAttributeId);
+        final int statusBarColor = UiUtils.resolveColor(this, statusBarColorAttributeId);
+        for (int i = 0; i < mTabHeaderColorAttrs.length; i++) {
+            mTabHeaderColorAttrs[i][0] = stateColor;
+            mTabHeaderColorAttrs[i][1] = statusBarColor;
+        }
+
+        TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
         tvState.setText(getString(stateTextResId).toUpperCase(Locale.getDefault()));
-        transitionHeaderToColor(stateColorAttributeId, statusBarColorAttributeId);
 
         TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
         tvTitle.setText(mPullRequest.getTitle());
