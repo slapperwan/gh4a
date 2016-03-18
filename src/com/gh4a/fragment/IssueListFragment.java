@@ -27,7 +27,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -37,7 +36,6 @@ import com.gh4a.R;
 import com.gh4a.activities.IssueActivity;
 import com.gh4a.adapter.IssueAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.utils.UiUtils;
 
 public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     private static final int REQUEST_ISSUE = 1000;
@@ -66,25 +64,12 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        final int stateColorAttr, darkStateColorAttr;
-        switch (mFilterData.get(Constants.Issue.STATE)) {
-            case Constants.Issue.STATE_OPEN:
-                stateColorAttr = R.attr.colorIssueOpen;
-                darkStateColorAttr = R.attr.colorIssueOpenDark;
-                break;
-            case Constants.Issue.STATE_CLOSED:
-                stateColorAttr = R.attr.colorIssueClosed;
-                darkStateColorAttr = R.attr.colorIssueClosedDark;
-                break;
-            default:
-                stateColorAttr = darkStateColorAttr = 0;
-                break;
-        }
-        if (stateColorAttr != 0) {
-            int stateColor = UiUtils.resolveColor(getActivity(), stateColorAttr);
-            int stateColorDark = UiUtils.resolveColor(getActivity(), darkStateColorAttr);
-            UiUtils.trySetListOverscrollColor(getRecyclerView(), stateColor);
-            setProgressColors(stateColor, stateColorDark);
+        String state = mFilterData.get(Constants.Issue.STATE);
+
+        if (Constants.Issue.STATE_OPEN.equals(state)) {
+            setHighlightColors(R.attr.colorIssueOpen, R.attr.colorIssueOpenDark);
+        } else if (Constants.Issue.STATE_CLOSED.equals(state)) {
+            setHighlightColors(R.attr.colorIssueClosed, R.attr.colorIssueClosedDark);
         }
     }
 

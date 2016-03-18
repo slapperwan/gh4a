@@ -17,9 +17,11 @@ package com.gh4a.fragment;
 
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.R;
 import com.gh4a.adapter.RepositoryIssueAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.IntentUtils;
@@ -64,6 +66,18 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Issue> {
             }
         }
         mEmptyTextResId = args.getInt("emptytext");
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        final String state = mFilterData.get(Constants.Issue.STATE);
+        if (Constants.Issue.STATE_OPEN.equals(state)) {
+            setHighlightColors(R.attr.colorIssueOpen, R.attr.colorIssueOpenDark);
+        } else if (Constants.Issue.STATE_CLOSED.equals(state)) {
+            setHighlightColors(R.attr.colorIssueClosed, R.attr.colorIssueClosedDark);
+        }
     }
 
     @Override

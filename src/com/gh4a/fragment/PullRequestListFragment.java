@@ -31,7 +31,6 @@ import com.gh4a.R;
 import com.gh4a.adapter.PullRequestAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.UiUtils;
 
 public class PullRequestListFragment extends PagedDataBaseFragment<PullRequest> {
     private String mRepoOwner;
@@ -61,19 +60,11 @@ public class PullRequestListFragment extends PagedDataBaseFragment<PullRequest> 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        final int stateColorAttr, darkStateColorAttr;
         if (TextUtils.equals(mState, Constants.Issue.STATE_CLOSED)) {
-            stateColorAttr = R.attr.colorIssueClosed;
-            darkStateColorAttr = R.attr.colorIssueClosedDark;
+            setHighlightColors(R.attr.colorIssueClosed, R.attr.colorIssueClosedDark);
         } else {
-            stateColorAttr = R.attr.colorIssueOpen;
-            darkStateColorAttr = R.attr.colorIssueOpenDark;
+            setHighlightColors(R.attr.colorIssueOpen, R.attr.colorIssueOpenDark);
         }
-
-        int stateColor = UiUtils.resolveColor(getActivity(), stateColorAttr);
-        int stateColorDark = UiUtils.resolveColor(getActivity(), darkStateColorAttr);
-        UiUtils.trySetListOverscrollColor(getRecyclerView(), stateColor);
-        setProgressColors(stateColor, stateColorDark);
     }
 
     @Override

@@ -91,10 +91,11 @@ public abstract class LoadingListFragmentBase extends ProgressFragment implement
         return true;
     }
 
-    protected void setProgressColors(int color, int statusBarColor) {
-        mProgressColors[0] = color;
-        mProgressColors[1] = statusBarColor;
+    protected void setHighlightColors(int colorAttrId, int statusBarColorAttrId) {
+        mProgressColors[0] = UiUtils.resolveColor(getActivity(), colorAttrId);
+        mProgressColors[1] = UiUtils.resolveColor(getActivity(), statusBarColorAttrId);
         mProgress.invalidate();
+        UiUtils.trySetListOverscrollColor(mRecyclerView, mProgressColors[0]);
     }
 
     protected void hideContentAndRestartLoaders(int... loaderIds) {

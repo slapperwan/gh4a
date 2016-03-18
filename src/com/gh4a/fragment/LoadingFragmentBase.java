@@ -18,9 +18,6 @@ import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 public abstract class LoadingFragmentBase extends ProgressFragment implements
         LoaderCallbacks.ParentCallback, SwipeRefreshLayout.ChildScrollDelegate {
-    private SmoothProgressBar mProgress;
-    private int[] mProgressColors = new int[2];
-
     public LoadingFragmentBase() {
     }
 
@@ -39,27 +36,16 @@ public abstract class LoadingFragmentBase extends ProgressFragment implements
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mProgress = (SmoothProgressBar) view.findViewById(R.id.progress);
-        mProgressColors[0] = UiUtils.resolveColor(mProgress.getContext(), R.attr.colorPrimary);
-        mProgressColors[1] = UiUtils.resolveColor(mProgress.getContext(), R.attr.colorPrimaryDark);
-        mProgress.setSmoothProgressDrawableColors(mProgressColors);
-    }
-
-    @Override
-    public void onDestroyView() {
-        mProgress = null;
-        super.onDestroyView();
+        SmoothProgressBar progress = (SmoothProgressBar) view.findViewById(R.id.progress);
+        progress.setSmoothProgressDrawableColors(new int[] {
+            UiUtils.resolveColor(progress.getContext(), R.attr.colorPrimary),
+            UiUtils.resolveColor(progress.getContext(), R.attr.colorPrimaryDark)
+        });
     }
 
     @Override
     public boolean canChildScrollUp() {
         return UiUtils.canViewScrollUp(getContentView());
-    }
-
-    protected void setProgressColors(int color, int statusBarColor) {
-        mProgressColors[0] = color;
-        mProgressColors[1] = statusBarColor;
-        mProgress.invalidate();
     }
 
     protected void hideContentAndRestartLoaders(int... loaderIds) {
