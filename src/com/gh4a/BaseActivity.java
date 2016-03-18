@@ -97,6 +97,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private final List<ColorDrawable> mHeaderDrawables = new ArrayList<>();
     private final List<ColorDrawable> mStatusBarDrawables = new ArrayList<>();
     private final int[] mProgressColors = new int[2];
+    private Animator mHeaderTransition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -210,6 +211,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     protected void setHeaderColor(int color, int statusBarColor) {
+        cancelHeaderTransition();
+
         for (ColorDrawable d : mHeaderDrawables) {
             d.setColor(color);
         }
@@ -250,9 +253,19 @@ public abstract class BaseActivity extends AppCompatActivity implements
             }
         });
 
+        cancelHeaderTransition();
+
         animation.playTogether(animators);
         animation.setDuration(200);
         animation.start();
+        mHeaderTransition = animation;
+    }
+
+    private void cancelHeaderTransition() {
+        if (mHeaderTransition != null && mHeaderTransition.isRunning()) {
+            mHeaderTransition.cancel();
+        }
+        mHeaderTransition = null;
     }
 
     protected void updateRightNavigationDrawer() {
