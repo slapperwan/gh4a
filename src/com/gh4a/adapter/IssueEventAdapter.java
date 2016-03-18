@@ -156,12 +156,17 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
                 break;
             case IssueEvent.TYPE_REOPENED:
                 textResId = R.string.issue_event_reopened;
+                break;
             case IssueEvent.TYPE_MERGED:
-                textResId = R.string.issue_event_merged;
+                textResId = event.getCommitId() != null
+                        ? R.string.issue_event_merged_with_commit
+                        : R.string.issue_event_merged;
+                break;
             case IssueEvent.TYPE_REFERENCED:
                 textResId = event.getCommitId() != null
                         ? R.string.issue_event_referenced_with_commit
                         : R.string.issue_event_referenced;
+                break;
             case IssueEvent.TYPE_ASSIGNED:
             case IssueEvent.TYPE_UNASSIGNED: {
                 boolean isAssign = TextUtils.equals(event.getEvent(), IssueEvent.TYPE_ASSIGNED);

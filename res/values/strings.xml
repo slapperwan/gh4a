@@ -243,6 +243,7 @@
     <string name="issue_event_closed_with_commit">Issue was closed by %1$s with commit [commit]</string>
     <string name="issue_event_reopened">Issue was reopened by %1$s</string>
     <string name="issue_event_merged">Pull request was merged by %1$s</string>
+    <string name="issue_event_merged_with_commit">Pull request was merged as commit [commit] by %1$s</string>
     <string name="issue_event_referenced">Issue was referenced by %1$s</string>
     <string name="issue_event_referenced_with_commit">Issue was referenced by %1$s from commit [commit]</string>
     <string name="issue_event_assigned">Issue was assigned to [b]%2$s[/b] by %1$s</string>
