@@ -373,6 +373,8 @@ public class IssueActivity extends BaseActivity implements
         mEventsLoaded = false;
         mIsCollaborator = false;
         setContentShown(false);
+        transitionHeaderToColor(R.attr.colorPrimary, R.attr.colorPrimaryDark);
+        mHeader.setVisibility(View.GONE);
         updateFabVisibility();
 
         LoaderManager lm = getSupportLoaderManager();
