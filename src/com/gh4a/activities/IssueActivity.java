@@ -28,6 +28,7 @@ import org.eclipse.egit.github.core.service.IssueService;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
@@ -91,6 +92,7 @@ public class IssueActivity extends BaseActivity implements
     private FloatingActionButton mEditFab;
     private CommentBoxFragment mCommentFragment;
     private HttpImageGetter mImageGetter;
+    private Handler mHandler = new Handler();
 
     private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>(this) {
         @Override
@@ -376,7 +378,15 @@ public class IssueActivity extends BaseActivity implements
         setContentShown(false);
         transitionHeaderToColor(R.attr.colorPrimary, R.attr.colorPrimaryDark);
         mHeader.setVisibility(View.GONE);
-        updateFabVisibility();
+
+        // onRefresh() can be triggered in the draw loop, and CoordinatorLayout doesn't
+        // like its child list being changed while drawing
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                updateFabVisibility();
+            }
+        });
 
         LoaderManager lm = getSupportLoaderManager();
         for (int i = 0; i < 3; i++) {
