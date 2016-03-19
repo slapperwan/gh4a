@@ -60,6 +60,7 @@ import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.loader.IssueLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
@@ -243,7 +244,7 @@ public class IssueActivity extends BaseActivity implements
                 UiUtils.resolveColor(this, stateColorAttributeId));
 
         TextView tvExtra = (TextView) mListHeaderView.findViewById(R.id.tv_extra);
-        tvExtra.setText(mIssue.getUser().getLogin());
+        tvExtra.setText(ApiHelpers.getUserLogin(this, mIssue.getUser()));
 
         TextView tvTimestamp = (TextView) mListHeaderView.findViewById(R.id.tv_timestamp);
         tvTimestamp.setText(StringUtils.formatRelativeTime(this, mIssue.getCreatedAt(), true));

@@ -42,8 +42,6 @@ import android.widget.AbsListView;
 import android.widget.EdgeEffect;
 import android.widget.TextView;
 
-import org.eclipse.egit.github.core.Label;
-
 public class UiUtils {
     public static final LinkMovementMethod CHECKING_LINK_METHOD = new LinkMovementMethod() {
         @Override
@@ -77,10 +75,6 @@ public class UiUtils {
             return ContextCompat.getColor(context, R.color.label_fg_dark);
         }
         return ContextCompat.getColor(context, R.color.label_fg_light);
-    }
-
-    public static int colorForLabel(Label label) {
-        return Color.parseColor("#" + label.getColor());
     }
 
     public static void trySetListOverscrollColor(RecyclerView view, int color) {

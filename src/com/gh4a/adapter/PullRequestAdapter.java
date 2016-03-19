@@ -28,8 +28,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
@@ -57,7 +57,7 @@ public class PullRequestAdapter extends RootAdapter<PullRequest, PullRequestAdap
 
         holder.tvNumber.setText("#" + pullRequest.getNumber());
         holder.tvDesc.setText(pullRequest.getTitle());
-        holder.tvCreator.setText(CommitUtils.getUserLogin(mContext, user));
+        holder.tvCreator.setText(ApiHelpers.getUserLogin(mContext, user));
         holder.tvTimestamp.setText(
                 StringUtils.formatRelativeTime(mContext, pullRequest.getCreatedAt(), true));
 

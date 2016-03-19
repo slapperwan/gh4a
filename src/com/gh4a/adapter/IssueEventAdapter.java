@@ -40,7 +40,7 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.loader.IssueEventHolder;
-import com.gh4a.utils.CommitUtils;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
@@ -107,7 +107,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
 
         StringUtils.applyBoldTagsAndSetText(holder.tvExtra,
                 mContext.getString(R.string.issue_comment_header,
-                        CommitUtils.getUserLogin(mContext, event.getUser())));
+                        ApiHelpers.getUserLogin(mContext, event.getUser())));
         holder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
                 event.getCreatedAt(), true));
 
@@ -179,8 +179,8 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
                             ? R.string.issue_event_assigned
                             : R.string.issue_event_unassigned;
                     textBase = mContext.getString(textResId,
-                            CommitUtils.getUserLogin(mContext, user),
-                            CommitUtils.getUserLogin(mContext, event.getAssignee()));
+                            ApiHelpers.getUserLogin(mContext, user),
+                            ApiHelpers.getUserLogin(mContext, event.getAssignee()));
                 }
                 break;
             }
@@ -201,12 +201,12 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
                 textResId = TextUtils.equals(event.getEvent(), IssueEvent.TYPE_MILESTONED)
                         ? R.string.issue_event_milestoned : R.string.issue_event_demilestoned;
                 textBase = mContext.getString(textResId, event.getMilestone().getTitle(),
-                        CommitUtils.getUserLogin(mContext, user));
+                        ApiHelpers.getUserLogin(mContext, user));
                 break;
             case IssueEvent.TYPE_RENAMED: {
                 Rename rename = event.getRename();
                 textBase = mContext.getString(R.string.issue_event_renamed,
-                        rename.getFrom(), rename.getTo(), CommitUtils.getUserLogin(mContext, user));
+                        rename.getFrom(), rename.getTo(), ApiHelpers.getUserLogin(mContext, user));
                 break;
             }
             default:
@@ -214,7 +214,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         }
 
         if (textBase == null) {
-            textBase = mContext.getString(textResId, CommitUtils.getUserLogin(mContext, user));
+            textBase = mContext.getString(textResId, ApiHelpers.getUserLogin(mContext, user));
         }
         SpannableStringBuilder text = StringUtils.applyBoldTags(mContext, textBase, typefaceValue);
 

@@ -32,6 +32,7 @@ import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
@@ -75,7 +76,8 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
 
         AvatarHandler.assignAvatar(holder.ivGravatar, user);
 
-        SpannableString userName = new SpannableString(comment.getUser().getLogin());
+        SpannableString userName = new SpannableString(
+                ApiHelpers.getUserLogin(mContext, comment.getUser()));
         userName.setSpan(new StyleSpan(Typeface.BOLD), 0, userName.length(), 0);
 
         holder.ivGravatar.setTag(comment);

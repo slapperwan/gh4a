@@ -28,7 +28,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.R;
-import com.gh4a.utils.CommitUtils;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
@@ -68,7 +68,7 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit, CommitAdapter.V
             holder.tvComments.setVisibility(View.GONE);
         }
 
-        holder.tvExtra.setText(CommitUtils.getAuthorName(mContext, commit));
+        holder.tvExtra.setText(ApiHelpers.getAuthorName(mContext, commit));
         holder.tvTimestamp.setText(
                 StringUtils.formatRelativeTime(mContext, commit.getCommit().getAuthor().getDate(), false));
     }
@@ -78,7 +78,7 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit, CommitAdapter.V
         if (v.getId() == R.id.iv_gravatar) {
             RepositoryCommit commit = (RepositoryCommit) v.getTag();
             Intent intent = IntentUtils.getUserActivityIntent(mContext,
-                    CommitUtils.getAuthorLogin(commit));
+                    ApiHelpers.getAuthorLogin(commit));
             if (intent != null) {
                 mContext.startActivity(intent);
             }

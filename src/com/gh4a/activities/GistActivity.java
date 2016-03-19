@@ -46,7 +46,7 @@ import com.gh4a.loader.GistLoader;
 import com.gh4a.loader.GistStarLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.utils.CommitUtils;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
@@ -193,7 +193,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.share:
-                String login = CommitUtils.getUserLogin(this, mGist.getOwner());
+                String login = ApiHelpers.getUserLogin(this, mGist.getOwner());
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
                 shareIntent.setType("text/plain");
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT,

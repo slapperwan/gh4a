@@ -8,6 +8,7 @@ import android.graphics.RectF;
 import android.text.style.ReplacementSpan;
 
 import com.gh4a.R;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Label;
@@ -25,7 +26,7 @@ public class IssueLabelSpan extends ReplacementSpan {
 
     public IssueLabelSpan(Context context, Label label, boolean withMargin) {
         super();
-        mBgColor = UiUtils.colorForLabel(label);
+        mBgColor = ApiHelpers.colorForLabel(label);
         mFgColor = UiUtils.textColorForBackground(context, mBgColor);
 
         Resources res = context.getResources();

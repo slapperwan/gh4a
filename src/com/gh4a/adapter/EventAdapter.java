@@ -62,8 +62,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.CustomTypefaceSpan;
@@ -90,7 +90,7 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
         AvatarHandler.assignAvatar(holder.ivGravatar, actor);
         holder.ivGravatar.setTag(actor);
 
-        holder.tvActor.setText(CommitUtils.getUserLogin(mContext, actor));
+        holder.tvActor.setText(ApiHelpers.getUserLogin(mContext, actor));
 
         StringUtils.applyBoldTagsAndSetText(holder.tvTitle, formatTitle(event));
         holder.tvCreatedAt.setText(StringUtils.formatRelativeTime(
@@ -318,7 +318,7 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
         } else if (Event.TYPE_FOLLOW.equals(eventType)) {
             FollowPayload payload = (FollowPayload) event.getPayload();
             return res.getString(R.string.event_follow_title,
-                    CommitUtils.getUserLogin(mContext, payload.getTarget()));
+                    ApiHelpers.getUserLogin(mContext, payload.getTarget()));
 
         } else if (Event.TYPE_FORK.equals(event.getType())) {
             return res.getString(R.string.event_fork_title, formatFromRepoName(eventRepo));
@@ -367,7 +367,7 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
         } else if (Event.TYPE_MEMBER.equals(eventType)) {
             MemberPayload payload = (MemberPayload) event.getPayload();
             return res.getString(R.string.event_member_title,
-                    CommitUtils.getUserLogin(mContext, payload.getMember()),
+                    ApiHelpers.getUserLogin(mContext, payload.getMember()),
                     formatFromRepoName(eventRepo));
 
         } else if (Event.TYPE_PUBLIC.equals(eventType)) {
@@ -429,7 +429,7 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
                             formatToRepoName(repo), team.getName());
                 } else {
                     return res.getString(R.string.event_team_user_add,
-                            CommitUtils.getUserLogin(mContext, payload.getUser()), team.getName());
+                            ApiHelpers.getUserLogin(mContext, payload.getUser()), team.getName());
                 }
             }
 

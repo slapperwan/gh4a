@@ -1,15 +1,17 @@
 package com.gh4a.utils;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.text.TextUtils;
 
 import com.gh4a.R;
 
 import org.eclipse.egit.github.core.CommitUser;
+import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.User;
 
-public class CommitUtils {
+public class ApiHelpers {
 
     //RepositoryCommit
     public static String getAuthorName(Context context, RepositoryCommit commit) {
@@ -57,5 +59,9 @@ public class CommitUtils {
             return user.getLogin();
         }
         return context.getString(R.string.unknown);
+    }
+
+    public static int colorForLabel(Label label) {
+        return Color.parseColor("#" + label.getColor());
     }
 }

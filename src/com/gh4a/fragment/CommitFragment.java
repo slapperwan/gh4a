@@ -29,7 +29,7 @@ import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.CommitLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.utils.CommitUtils;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
@@ -141,7 +141,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         ImageView ivGravatar = (ImageView) mContentView.findViewById(R.id.iv_gravatar);
         AvatarHandler.assignAvatar(ivGravatar, mCommit.getAuthor());
 
-        String login = CommitUtils.getAuthorLogin(mCommit);
+        String login = ApiHelpers.getAuthorLogin(mCommit);
         if (login != null) {
             ivGravatar.setOnClickListener(this);
             ivGravatar.setTag(login);
@@ -167,7 +167,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         Commit commit = mCommit.getCommit();
 
         TextView tvAuthor = (TextView) mContentView.findViewById(R.id.tv_author);
-        tvAuthor.setText(CommitUtils.getAuthorName(app, mCommit));
+        tvAuthor.setText(ApiHelpers.getAuthorName(app, mCommit));
 
         TextView tvTimestamp = (TextView) mContentView.findViewById(R.id.tv_timestamp);
         tvTimestamp.setText(StringUtils.formatRelativeTime(
@@ -175,14 +175,14 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
 
         View committerContainer = mContentView.findViewById(R.id.committer);
 
-        if (!CommitUtils.authorEqualsCommitter(mCommit)) {
+        if (!ApiHelpers.authorEqualsCommitter(mCommit)) {
             ImageView commitGravatar = (ImageView) mContentView.findViewById(R.id.iv_commit_gravatar);
             StyleableTextView commitExtra =
                     (StyleableTextView) mContentView.findViewById(R.id.tv_commit_extra);
 
             AvatarHandler.assignAvatar(commitGravatar, mCommit.getCommitter());
             String committerText = getString(R.string.commit_details,
-                    CommitUtils.getCommitterName(app, mCommit),
+                    ApiHelpers.getCommitterName(app, mCommit),
                     StringUtils.formatRelativeTime(activity, commit.getCommitter().getDate(), true));
             StringUtils.applyBoldTagsAndSetText(commitExtra, committerText);
 

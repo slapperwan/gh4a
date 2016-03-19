@@ -51,6 +51,7 @@ import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
@@ -239,7 +240,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                     }
                     content.append("><div class=\"change\">");
                     content.append(getString(R.string.commit_comment_header,
-                            "<b>" + comment.getUser().getLogin() + "</b>",
+                            "<b>" + ApiHelpers.getUserLogin(this, comment.getUser()) + "</b>",
                             StringUtils.formatRelativeTime(DiffViewerActivity.this, comment.getCreatedAt(), true)));
                     content.append("</div>").append(comment.getBodyHtml()).append("</div>");
                 }
@@ -377,7 +378,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             String login = Gh4Application.get().getAuthLogin();
             CommitComment comment = mCommitComments.get(id);
             User user = comment.getUser();
-            return user != null && TextUtils.equals(login, comment.getUser().getLogin());
+            return user != null && TextUtils.equals(login, user.getLogin());
         }
 
         private String[] populateChoices(boolean ownComment) {

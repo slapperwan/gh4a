@@ -9,7 +9,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.gh4a.R;
-import com.gh4a.utils.UiUtils;
+import com.gh4a.utils.ApiHelpers;
 
 import org.eclipse.egit.github.core.Label;
 
@@ -46,7 +46,7 @@ public class LabelBadgeView extends View {
         int count = labels != null ? labels.size() : 0;
         mColors = new int[count];
         for (int i = 0; i < count; i++) {
-            mColors[i] = UiUtils.colorForLabel(labels.get(i));
+            mColors[i] = ApiHelpers.colorForLabel(labels.get(i));
         }
         requestLayout();
     }

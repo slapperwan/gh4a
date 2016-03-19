@@ -47,6 +47,7 @@ import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.ToastUtils;
@@ -403,7 +404,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
             for (final Label label : mAllLabels) {
                 final View rowView = inflater.inflate(R.layout.row_issue_create_label, container, false);
                 View viewColor = rowView.findViewById(R.id.view_color);
-                viewColor.setBackgroundColor(UiUtils.colorForLabel(label));
+                viewColor.setBackgroundColor(ApiHelpers.colorForLabel(label));
 
                 final TextView tvLabel = (TextView) rowView.findViewById(R.id.tv_title);
                 tvLabel.setText(label.getName());
@@ -433,7 +434,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
     private void setLabelSelection(TextView view, boolean selected) {
         Label label = (Label) view.getTag();
         if (selected) {
-            int color = UiUtils.colorForLabel(label);
+            int color = ApiHelpers.colorForLabel(label);
             view.setTypeface(view.getTypeface(), Typeface.BOLD);
             view.setBackgroundColor(color);
             view.setTextColor(UiUtils.textColorForBackground(this, color));
