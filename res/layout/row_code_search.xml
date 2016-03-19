@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:gravity="center_vertical"
+    android:background="?attr/selectableItemBackground"
+    android:orientation="vertical"
+    android:padding="@dimen/content_padding">
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.ItemTitle" />
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/tv_repo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:textColor="?android:attr/textColorPrimary" />
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/tv_matches"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.VerySmall" />
+
+</LinearLayout>
