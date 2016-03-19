@@ -16,104 +16,24 @@
 package com.gh4a.adapter;
 
 import android.content.Context;
-import android.content.Intent;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.gh4a.R;
-import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.StringUtils;
-import com.gh4a.widget.LabelBadgeView;
 
 import org.eclipse.egit.github.core.Issue;
 
-public class RepositoryIssueAdapter extends RootAdapter<Issue, RepositoryIssueAdapter.ViewHolder> {
+public class RepositoryIssueAdapter extends IssueAdapter {
     public RepositoryIssueAdapter(Context context) {
         super(context);
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
-        View v = inflater.inflate(R.layout.row_issue, parent, false);
-        ViewHolder holder = new ViewHolder(v);
-        holder.ivGravatar.setOnClickListener(this);
-        return holder;
-    }
-
-    @Override
     public void onBindViewHolder(ViewHolder holder, Issue issue) {
-        AvatarHandler.assignAvatar(holder.ivGravatar, issue.getUser());
-        holder.ivGravatar.setTag(issue);
-
-        holder.lvLabels.setLabels(issue.getLabels());
-
-        String userName = issue.getUser() != null
-                ? issue.getUser().getLogin() : mContext.getString(R.string.deleted);
-
-        holder.tvDesc.setText(issue.getTitle());
-        holder.tvCreator.setText(userName);
-        holder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
-                issue.getCreatedAt(), true));
-
-        if (issue.getComments() > 0) {
-            holder.tvComments.setVisibility(View.VISIBLE);
-            holder.tvComments.setText(String.valueOf(issue.getComments()));
-        } else {
-            holder.tvComments.setVisibility(View.GONE);
-        }
+        super.onBindViewHolder(holder, issue);
 
         // https://api.github.com/repos/batterseapower/pinyin-toolkit/issues/132
         String[] urlPart = issue.getUrl().split("/");
         String repoName = urlPart[4] + "/" + urlPart[5];
         holder.tvNumber.setText(mContext.getString(R.string.repo_issue_on,
                 issue.getNumber(), repoName));
-
-        if (issue.getMilestone() != null) {
-            holder.tvMilestone.setVisibility(View.VISIBLE);
-            holder.tvMilestone.setText(issue.getMilestone().getTitle());
-        } else {
-            holder.tvMilestone.setVisibility(View.GONE);
-        }
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.iv_gravatar) {
-            Issue issue = (Issue) v.getTag();
-            Intent intent = IntentUtils.getUserActivityIntent(mContext, issue.getUser());
-            if (intent != null) {
-                mContext.startActivity(intent);
-            }
-        } else {
-            super.onClick(v);
-        }
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        private ViewHolder(View view) {
-            super(view);
-            ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
-            tvDesc = (TextView) view.findViewById(R.id.tv_desc);
-            tvCreator = (TextView) view.findViewById(R.id.tv_creator);
-            tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
-            tvNumber = (TextView) view.findViewById(R.id.tv_number);
-            lvLabels = (LabelBadgeView) view.findViewById(R.id.labels);
-            tvComments = (TextView) view.findViewById(R.id.tv_comments);
-            tvMilestone = (TextView) view.findViewById(R.id.tv_milestone);
-        }
-
-        private ImageView ivGravatar;
-        private TextView tvNumber;
-        private TextView tvDesc;
-        private TextView tvCreator;
-        private TextView tvTimestamp;
-        private LabelBadgeView lvLabels;
-        private TextView tvComments;
-        private TextView tvMilestone;
     }
 }

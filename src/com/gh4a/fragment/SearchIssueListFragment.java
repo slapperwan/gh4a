@@ -22,6 +22,7 @@ import android.view.View;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.adapter.IssueAdapter;
 import com.gh4a.adapter.RepositoryIssueAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.IntentUtils;
@@ -33,14 +34,15 @@ import org.eclipse.egit.github.core.service.IssueService;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RepositoryIssueListFragment extends PagedDataBaseFragment<Issue> {
+public class SearchIssueListFragment extends PagedDataBaseFragment<Issue> {
     private Map<String, String> mFilterData;
     private int mEmptyTextResId;
+    private boolean mShowRepository;
     private boolean mShowingClosed;
 
-    public static RepositoryIssueListFragment newInstance(Map<String, String> filterData,
-            boolean showingClosed, int emptyTextResId) {
-        RepositoryIssueListFragment f = new RepositoryIssueListFragment();
+    public static SearchIssueListFragment newInstance(Map<String, String> filterData,
+            boolean showingClosed, int emptyTextResId, boolean showRepository) {
+        SearchIssueListFragment f = new SearchIssueListFragment();
 
         Bundle args = new Bundle();
         if (filterData != null) {
@@ -50,6 +52,7 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Issue> {
         }
         args.putInt("emptytext", emptyTextResId);
         args.putBoolean("closed", showingClosed);
+        args.putBoolean("withrepo", showRepository);
 
         f.setArguments(args);
         return f;
@@ -65,18 +68,21 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Issue> {
         for (String key : args.keySet()) {
             if (!key.equals(Constants.User.LOGIN)
                     && !key.equals(Constants.Repository.NAME)) {
-                mFilterData.put(key, args.getString(key));
+                String arg = args.getString(key);
+                if (arg != null) {
+                    mFilterData.put(key, arg);
+                }
             }
         }
         mEmptyTextResId = args.getInt("emptytext");
         mShowingClosed = args.getBoolean("closed");
+        mShowRepository = args.getBoolean("withrepo");
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        final String state = mFilterData.get(Constants.Issue.STATE);
         if (mShowingClosed) {
             setHighlightColors(R.attr.colorIssueClosed, R.attr.colorIssueClosedDark);
         } else {
@@ -99,7 +105,9 @@ public class RepositoryIssueListFragment extends PagedDataBaseFragment<Issue> {
 
     @Override
     protected RootAdapter<Issue, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        return new RepositoryIssueAdapter(getActivity());
+        return mShowRepository
+                ? new RepositoryIssueAdapter(getActivity())
+                : new IssueAdapter(getActivity());
     }
 
     @Override

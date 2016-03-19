@@ -20,6 +20,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -30,6 +31,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -41,6 +43,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueListFragment;
 import com.gh4a.fragment.LoadingListFragmentBase;
+import com.gh4a.fragment.SearchIssueListFragment;
 import com.gh4a.loader.CollaboratorListLoader;
 import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.LabelListLoader;
@@ -57,10 +60,13 @@ import org.eclipse.egit.github.core.User;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class IssueListActivity extends BasePagerActivity implements
-        View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener {
+        View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener,
+        SearchView.OnCloseListener, SearchView.OnQueryTextListener,
+        MenuItemCompat.OnActionExpandListener {
     private static final int REQUEST_ISSUE_CREATE = 1001;
 
     private String mRepoOwner;
@@ -69,6 +75,8 @@ public class IssueListActivity extends BasePagerActivity implements
     private List<String> mSelectedLabels;
     private int mSelectedMilestone;
     private String mSelectedAssignee;
+    private String mSearchQuery;
+    private boolean mSearchMode;
 
     private FloatingActionButton mCreateFab;
     private IssueListFragment mOpenFragment;
@@ -81,6 +89,11 @@ public class IssueListActivity extends BasePagerActivity implements
 
     protected IssueListFragment.SortDrawerHelper mSortHelper =
             new IssueListFragment.SortDrawerHelper();
+
+    private static final String STATE_KEY_SEARCH_QUERY = "search_query";
+    private static final String STATE_KEY_SEARCH_MODE = "search_mode";
+
+    private static final String SEARCH_QUERY = "is:%s repo:%s/%s %s";
 
     private static final int[] TITLES = new int[] {
         R.string.open, R.string.closed
@@ -187,6 +200,11 @@ public class IssueListActivity extends BasePagerActivity implements
             getPager().setCurrentItem(1);
         }
 
+        if (savedInstanceState != null) {
+            mSearchQuery = savedInstanceState.getString(STATE_KEY_SEARCH_QUERY);
+            mSearchMode = savedInstanceState.getBoolean(STATE_KEY_SEARCH_MODE);
+        }
+
         if (Gh4Application.get().isAuthorized()) {
             CoordinatorLayout rootLayout = getRootLayout();
             mCreateFab = (FloatingActionButton) getLayoutInflater().inflate(
@@ -222,6 +240,13 @@ public class IssueListActivity extends BasePagerActivity implements
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        outState.putString(STATE_KEY_SEARCH_QUERY, mSearchQuery);
+        outState.putBoolean(STATE_KEY_SEARCH_MODE, mSearchMode);
+    }
+
+    @Override
     protected int[] getTabTitleResIds() {
         return TITLES;
     }
@@ -236,11 +261,12 @@ public class IssueListActivity extends BasePagerActivity implements
     @Override
     protected void onPageMoved(int position, float fraction) {
         super.onPageMoved(position, fraction);
-        float openFraction = 1 - position - fraction;
-        ViewCompat.setScaleX(mCreateFab, openFraction);
-        ViewCompat.setScaleY(mCreateFab, openFraction);
-        mCreateFab.setVisibility(openFraction == 0 ? View.INVISIBLE : View.VISIBLE);
-
+        if (!mSearchMode) {
+            float openFraction = 1 - position - fraction;
+            ViewCompat.setScaleX(mCreateFab, openFraction);
+            ViewCompat.setScaleY(mCreateFab, openFraction);
+            mCreateFab.setVisibility(openFraction == 0 ? View.INVISIBLE : View.VISIBLE);
+        }
     }
 
     @Override
@@ -259,36 +285,24 @@ public class IssueListActivity extends BasePagerActivity implements
 
     @Override
     protected Fragment getFragment(int position) {
-        Map<String, String> filterData = new HashMap<>();
-        filterData.put("sort", mSortHelper.getSortMode());
-        filterData.put("direction", mSortHelper.getSortDirection());
-        if (mSelectedLabels != null) {
-            filterData.put("labels", TextUtils.join(",", mSelectedLabels));
-        }
-        if (mSelectedMilestone > 0) {
-            filterData.put("milestone", String.valueOf(mSelectedMilestone));
-        }
-        if (mSelectedAssignee != null) {
-            filterData.put("assignee", mSelectedAssignee);
-        }
-
-        if (position == 1) {
-            filterData.put(Constants.Issue.STATE, Constants.Issue.STATE_CLOSED);
-            mClosedFragment = IssueListFragment.newInstance(mRepoOwner, mRepoName, filterData);
-            return mClosedFragment;
+        if (mSearchMode) {
+            return makeSearchFragment(position);
         } else {
-            filterData.put(Constants.Issue.STATE, Constants.Issue.STATE_OPEN);
-            mOpenFragment = IssueListFragment.newInstance(mRepoOwner, mRepoName, filterData);
-            return mOpenFragment;
+            return makeListFragment(position);
         }
     }
 
     @Override
     protected boolean fragmentNeedsRefresh(Fragment object) {
         if (object instanceof IssueListFragment) {
+            if (mSearchMode) {
+                return true;
+            }
             if (object != mOpenFragment && object != mClosedFragment) {
                 return true;
             }
+        } else if (object instanceof SearchIssueListFragment) {
+            return true;
         }
         return false;
     }
@@ -296,7 +310,7 @@ public class IssueListActivity extends BasePagerActivity implements
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ISSUE_CREATE) {
-            if (resultCode == Activity.RESULT_OK) {
+            if (resultCode == Activity.RESULT_OK && mOpenFragment != null) {
                 mOpenFragment.onRefresh();
             }
         } else {
@@ -306,10 +320,12 @@ public class IssueListActivity extends BasePagerActivity implements
 
     @Override
     protected int[] getRightNavigationDrawerMenuResources() {
-        int[] menuResIds = new int[2];
+        int[] menuResIds = new int[mSearchMode ? 1 : 2];
         menuResIds[0] = IssueListFragment.SortDrawerHelper.getMenuResId();
-        menuResIds[1] = mIsCollaborator != null && mIsCollaborator
-                ? R.menu.issue_list_filter_collab : R.menu.issue_list_filter;
+        if (!mSearchMode) {
+            menuResIds[1] = mIsCollaborator != null && mIsCollaborator
+                    ? R.menu.issue_list_filter_collab : R.menu.issue_list_filter;
+        }
         return menuResIds;
     }
 
@@ -345,19 +361,60 @@ public class IssueListActivity extends BasePagerActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuItem item = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.actions)
-                .setIcon(R.drawable.overflow);
-        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+        getMenuInflater().inflate(R.menu.issue_list_menu, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.search);
+        MenuItemCompat.setOnActionExpandListener(searchItem, this);
+
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        if (mSearchQuery != null) {
+            MenuItemCompat.expandActionView(searchItem);
+            searchView.setQuery(mSearchQuery, false);
+        }
+        searchView.setOnCloseListener(this);
+        searchView.setOnQueryTextListener(this);
+
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == Menu.FIRST) {
+        if (item.getItemId() == R.id.overflow) {
             toggleRightSideDrawer();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onMenuItemActionExpand(MenuItem item) {
+        return true;
+    }
+
+    @Override
+    public boolean onMenuItemActionCollapse(MenuItem item) {
+        mSearchQuery = null;
+        setSearchMode(false);
+        return true;
+    }
+
+    @Override
+    public boolean onClose() {
+        mSearchQuery = null;
+        setSearchMode(false);
+        return true;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        setSearchMode(true);
+        return true;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        mSearchQuery = newText;
+        return false;
     }
 
     @Override
@@ -371,6 +428,53 @@ public class IssueListActivity extends BasePagerActivity implements
     @Override
     protected Intent navigateUp() {
         return IntentUtils.getRepoActivityIntent(this, mRepoOwner, mRepoName, null);
+    }
+
+    private void setSearchMode(boolean enabled) {
+        boolean changed = mSearchMode != enabled;
+        mSearchMode = enabled;
+        mCreateFab.setVisibility(enabled ? View.GONE : View.VISIBLE);
+        reloadIssueList();
+        if (changed) {
+            updateRightNavigationDrawer();
+        }
+    }
+
+    private Fragment makeListFragment(int position) {
+        Map<String, String> filterData = new HashMap<>();
+        filterData.put("sort", mSortHelper.getSortMode());
+        filterData.put("direction", mSortHelper.getSortDirection());
+        if (mSelectedLabels != null) {
+            filterData.put("labels", TextUtils.join(",", mSelectedLabels));
+        }
+        if (mSelectedMilestone > 0) {
+            filterData.put("milestone", String.valueOf(mSelectedMilestone));
+        }
+        if (mSelectedAssignee != null) {
+            filterData.put("assignee", mSelectedAssignee);
+        }
+
+        if (position == 1) {
+            filterData.put(Constants.Issue.STATE, Constants.Issue.STATE_CLOSED);
+            mClosedFragment = IssueListFragment.newInstance(mRepoOwner, mRepoName, filterData);
+            return mClosedFragment;
+        } else {
+            filterData.put(Constants.Issue.STATE, Constants.Issue.STATE_OPEN);
+            mOpenFragment = IssueListFragment.newInstance(mRepoOwner, mRepoName, filterData);
+            return mOpenFragment;
+        }
+    }
+
+    private Fragment makeSearchFragment(int position) {
+        boolean closed = position == 1;
+        Map<String, String> filterData = new HashMap<>();
+        filterData.put("sort", mSortHelper.getSortMode());
+        filterData.put("direction", mSortHelper.getSortDirection());
+        filterData.put("q", String.format(Locale.US, SEARCH_QUERY,
+                closed ? Constants.Issue.STATE_CLOSED : Constants.Issue.STATE_OPEN,
+                mRepoOwner, mRepoName, mSearchQuery));
+
+        return SearchIssueListFragment.newInstance(filterData, closed, R.string.no_issues_found, false);
     }
 
     private void reloadIssueList() {

@@ -55,7 +55,6 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
             fillData(result.results, result.hasMoreData);
             mIsLoadCompleted = true;
             setContentShown(true);
-            getActivity().supportInvalidateOptionsMenu();
             mAdapter.notifyDataSetChanged();
             updateEmptyState();
         }
@@ -91,7 +90,6 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         }
         mIsLoadCompleted = false;
         hideContentAndRestartLoaders(0);
-        getActivity().supportInvalidateOptionsMenu();
     }
 
     @Override

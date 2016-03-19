@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.utils.AvatarHandler;
+import com.gh4a.utils.CommitUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.LabelBadgeView;
@@ -53,7 +54,7 @@ public class IssueAdapter extends RootAdapter<Issue, IssueAdapter.ViewHolder> {
         holder.lvLabels.setLabels(issue.getLabels());
         holder.tvNumber.setText("#" + issue.getNumber());
         holder.tvDesc.setText(issue.getTitle());
-        holder.tvCreator.setText(issue.getUser().getLogin());
+        holder.tvCreator.setText(CommitUtils.getUserLogin(mContext, issue.getUser()));
         holder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
                 issue.getCreatedAt(), true));
 
@@ -98,13 +99,13 @@ public class IssueAdapter extends RootAdapter<Issue, IssueAdapter.ViewHolder> {
             tvMilestone = (TextView) view.findViewById(R.id.tv_milestone);
         }
 
-        private ImageView ivGravatar;
-        private TextView tvNumber;
-        private TextView tvDesc;
-        private TextView tvCreator;
-        private TextView tvTimestamp;
-        private LabelBadgeView lvLabels;
-        private TextView tvComments;
-        private TextView tvMilestone;
+        ImageView ivGravatar;
+        TextView tvNumber;
+        TextView tvDesc;
+        TextView tvCreator;
+        TextView tvTimestamp;
+        LabelBadgeView lvLabels;
+        TextView tvComments;
+        TextView tvMilestone;
     }
 }

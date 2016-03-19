@@ -43,8 +43,9 @@ public class LabelBadgeView extends View {
     }
 
     public void setLabels(List<Label> labels) {
-        mColors = new int[labels.size()];
-        for (int i = 0; i < labels.size(); i++) {
+        int count = labels != null ? labels.size() : 0;
+        mColors = new int[count];
+        for (int i = 0; i < count; i++) {
             mColors[i] = UiUtils.colorForLabel(labels.get(i));
         }
         requestLayout();
