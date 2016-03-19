@@ -23,7 +23,7 @@ public class ContributorAdapter extends RootAdapter<Contributor, ContributorAdap
 
     @Override
     public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
-        View v = inflater.inflate(R.layout.row_gravatar_2, parent, false);
+        View v = inflater.inflate(R.layout.row_gravatar_twoline, parent, false);
         ViewHolder holder = new ViewHolder(v);
         holder.ivGravatar.setOnClickListener(this);
         return holder;

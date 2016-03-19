@@ -41,7 +41,7 @@ public class CommonFeedAdapter extends RootAdapter<Feed, CommonFeedAdapter.ViewH
 
     @Override
     public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
-        View v = inflater.inflate(R.layout.row_gravatar_3, parent, false);
+        View v = inflater.inflate(R.layout.row_feed, parent, false);
         ViewHolder holder = new ViewHolder(v);
         holder.ivGravatar.setOnClickListener(this);
         return holder;
