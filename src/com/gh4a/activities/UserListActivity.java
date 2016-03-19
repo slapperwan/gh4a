@@ -31,13 +31,15 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
+import com.gh4a.widget.SwipeRefreshLayout;
 
 import org.eclipse.egit.github.core.User;
 
 import java.util.List;
 
 public abstract class UserListActivity extends BaseActivity implements
-        RootAdapter.OnItemClickListener<User> {
+        SwipeRefreshLayout.ChildScrollDelegate, RootAdapter.OnItemClickListener<User> {
+    private RecyclerView mRecyclerView;
     private UserAdapter mUserAdapter;
 
     private LoaderCallbacks<List<User>> mUserListCallback = new LoaderCallbacks<List<User>>(this) {
@@ -69,14 +71,18 @@ public abstract class UserListActivity extends BaseActivity implements
         mUserAdapter = new UserAdapter(this);
         mUserAdapter.setOnItemClickListener(this);
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.addItemDecoration(new DividerItemDecoration(this));
-        recyclerView.setAdapter(mUserAdapter);
-        recyclerView.setBackgroundResource(
-                UiUtils.resolveDrawable(this, R.attr.listBackground));
+        mRecyclerView = (RecyclerView) findViewById(R.id.list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(this));
+        mRecyclerView.setAdapter(mUserAdapter);
+        setChildScrollDelegate(this);
 
         getSupportLoaderManager().initLoader(0, null, mUserListCallback);
+    }
+
+    @Override
+    public boolean canChildScrollUp() {
+        return UiUtils.canViewScrollUp(mRecyclerView);
     }
 
     @Override

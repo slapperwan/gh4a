@@ -39,11 +39,14 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
+import com.gh4a.widget.SwipeRefreshLayout;
 
 public class WikiListActivity extends BaseActivity
-        implements RootAdapter.OnItemClickListener<Feed> {
+        implements SwipeRefreshLayout.ChildScrollDelegate, RootAdapter.OnItemClickListener<Feed> {
     private String mUserLogin;
     private String mRepoName;
+
+    private RecyclerView mRecyclerView;
     private CommonFeedAdapter mAdapter;
 
     private LoaderCallbacks<List<Feed>> mFeedCallback = new LoaderCallbacks<List<Feed>>(this) {
@@ -90,14 +93,18 @@ public class WikiListActivity extends BaseActivity
         mAdapter = new CommonFeedAdapter(this, false);
         mAdapter.setOnItemClickListener(this);
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.addItemDecoration(new DividerItemDecoration(this));
-        recyclerView.setAdapter(mAdapter);
-        recyclerView.setBackgroundResource(
-                UiUtils.resolveDrawable(this, R.attr.listBackground));
+        mRecyclerView = (RecyclerView) findViewById(R.id.list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(this));
+        mRecyclerView.setAdapter(mAdapter);
+        setChildScrollDelegate(this);
 
         getSupportLoaderManager().initLoader(0, null, mFeedCallback);
+    }
+
+    @Override
+    public boolean canChildScrollUp() {
+        return UiUtils.canViewScrollUp(mRecyclerView);
     }
 
     @Override

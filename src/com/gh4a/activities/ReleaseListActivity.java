@@ -35,12 +35,15 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.ReleaseListLoader;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
+import com.gh4a.widget.SwipeRefreshLayout;
 
 public class ReleaseListActivity extends BaseActivity implements
-        RootAdapter.OnItemClickListener<Release> {
+        SwipeRefreshLayout.ChildScrollDelegate, RootAdapter.OnItemClickListener<Release> {
     private String mUserLogin;
     private String mRepoName;
+    private RecyclerView mRecyclerView;
     private ReleaseAdapter mAdapter;
 
     private LoaderCallbacks<List<Release>> mReleaseCallback = new LoaderCallbacks<List<Release>>(this) {
@@ -72,14 +75,21 @@ public class ReleaseListActivity extends BaseActivity implements
         actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list);
         mAdapter = new ReleaseAdapter(this);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.addItemDecoration(new DividerItemDecoration(this));
-        recyclerView.setAdapter(mAdapter);
         mAdapter.setOnItemClickListener(this);
 
+        mRecyclerView = (RecyclerView) findViewById(R.id.list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(this));
+        mRecyclerView.setAdapter(mAdapter);
+        setChildScrollDelegate(this);
+
         getSupportLoaderManager().initLoader(0, null, mReleaseCallback);
+    }
+
+    @Override
+    public boolean canChildScrollUp() {
+        return UiUtils.canViewScrollUp(mRecyclerView);
     }
 
     @Override

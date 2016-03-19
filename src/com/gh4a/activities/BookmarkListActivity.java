@@ -47,7 +47,6 @@ public class BookmarkListActivity extends BaseActivity implements
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
         listView.setOnItemLongClickListener(this);
-        listView.setBackgroundResource(UiUtils.resolveDrawable(this, R.attr.listBackground));
 
         getSupportLoaderManager().initLoader(0, null, this);
     }

@@ -44,16 +44,19 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
+import com.gh4a.widget.SwipeRefreshLayout;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 public class ReleaseInfoActivity extends BaseActivity implements
-        View.OnClickListener, RootAdapter.OnItemClickListener<Download> {
+        View.OnClickListener, SwipeRefreshLayout.ChildScrollDelegate,
+        RootAdapter.OnItemClickListener<Download> {
     private String mRepoOwner;
     private String mRepoName;
     private Release mRelease;
     private long mReleaseId;
 
+    private View mRootView;
     private HttpImageGetter mImageGetter;
 
     private LoaderCallbacks<Release> mReleaseCallback = new LoaderCallbacks<Release>(this) {
@@ -93,7 +96,9 @@ public class ReleaseInfoActivity extends BaseActivity implements
         mRelease = (Release) extras.getSerializable(Constants.Release.RELEASE);
         mReleaseId = extras.getLong(Constants.Release.ID);
 
+        mRootView = findViewById(R.id.root);
         mImageGetter = new HttpImageGetter(this);
+        setChildScrollDelegate(this);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.release_title);
@@ -106,6 +111,11 @@ public class ReleaseInfoActivity extends BaseActivity implements
             setContentShown(false);
             getSupportLoaderManager().initLoader(0, null, mReleaseCallback);
         }
+    }
+
+    @Override
+    public boolean canChildScrollUp() {
+        return UiUtils.canViewScrollUp(mRootView);
     }
 
     @Override
