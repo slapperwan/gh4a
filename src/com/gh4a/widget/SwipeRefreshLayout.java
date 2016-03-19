@@ -58,6 +58,12 @@ public class SwipeRefreshLayout extends android.support.v4.widget.SwipeRefreshLa
     }
 
     @Override
+    public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes) {
+        // Leave nested scrolling up to CoordinatorLayout
+        return false;
+    }
+
+    @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
         if (event.getAction() != MotionEvent.ACTION_DOWN && shouldPreventRefresh()) {
             return false;
