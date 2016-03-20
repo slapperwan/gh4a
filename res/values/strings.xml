@@ -141,6 +141,7 @@
     <string name="no_following_found">No users are followed so far.</string>
     <string name="no_forks_found">This repository wasn\'t forked yet.</string>
     <string name="no_issues_found">No issues were reported so far.</string>
+    <string name="no_search_issues_found">No issues found matching the criteria.</string>
     <string name="no_events_found">No events found.</string>
     <string name="no_pull_requests_found">No pull requests were opened so far.</string>
     <string name="no_repos_found">No repositories found.</string>

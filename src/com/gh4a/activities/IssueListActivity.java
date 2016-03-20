@@ -475,7 +475,7 @@ public class IssueListActivity extends BasePagerActivity implements
                 mRepoOwner, mRepoName, mSearchQuery));
 
         return SearchIssueListFragment.newInstance(filterData, closed,
-                R.string.no_issues_found, false, false);
+                R.string.no_search_issues_found, false, false);
     }
 
     private void reloadIssueList() {
