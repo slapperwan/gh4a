@@ -74,7 +74,7 @@ public class IssueListFactory extends FragmentFactory {
         return SearchIssueListFragment.newInstance(filterData,
                 Constants.Issue.STATE_CLOSED.equals(mState),
                 mIsPullRequest ? R.string.no_pull_requests_found : R.string.no_issues_found,
-                true);
+                true, mIsPullRequest);
     }
 
     @Override

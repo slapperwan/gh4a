@@ -39,9 +39,11 @@ public class SearchIssueListFragment extends PagedDataBaseFragment<Issue> {
     private int mEmptyTextResId;
     private boolean mShowRepository;
     private boolean mShowingClosed;
+    private boolean mShowingPullRequests;
 
     public static SearchIssueListFragment newInstance(Map<String, String> filterData,
-            boolean showingClosed, int emptyTextResId, boolean showRepository) {
+            boolean showingClosed, int emptyTextResId,
+            boolean showRepository, boolean showingPullRequests) {
         SearchIssueListFragment f = new SearchIssueListFragment();
 
         Bundle args = new Bundle();
@@ -53,6 +55,7 @@ public class SearchIssueListFragment extends PagedDataBaseFragment<Issue> {
         args.putInt("emptytext", emptyTextResId);
         args.putBoolean("closed", showingClosed);
         args.putBoolean("withrepo", showRepository);
+        args.putBoolean("pr", showingPullRequests);
 
         f.setArguments(args);
         return f;
@@ -77,6 +80,7 @@ public class SearchIssueListFragment extends PagedDataBaseFragment<Issue> {
         mEmptyTextResId = args.getInt("emptytext");
         mShowingClosed = args.getBoolean("closed");
         mShowRepository = args.getBoolean("withrepo");
+        mShowingPullRequests = args.getBoolean("pr");
     }
 
     @Override
@@ -94,7 +98,7 @@ public class SearchIssueListFragment extends PagedDataBaseFragment<Issue> {
     public void onItemClick(Issue issue) {
         String[] urlPart = issue.getUrl().split("/");
 
-        if (issue.getPullRequest() != null) {
+        if (mShowingPullRequests && issue.getPullRequest() != null) {
             startActivity(IntentUtils.getPullRequestActivityIntent(getActivity(), urlPart[4],
                     urlPart[5], issue.getNumber()));
         } else {

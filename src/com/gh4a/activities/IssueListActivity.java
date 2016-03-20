@@ -474,7 +474,8 @@ public class IssueListActivity extends BasePagerActivity implements
                 closed ? Constants.Issue.STATE_CLOSED : Constants.Issue.STATE_OPEN,
                 mRepoOwner, mRepoName, mSearchQuery));
 
-        return SearchIssueListFragment.newInstance(filterData, closed, R.string.no_issues_found, false);
+        return SearchIssueListFragment.newInstance(filterData, closed,
+                R.string.no_issues_found, false, false);
     }
 
     private void reloadIssueList() {
