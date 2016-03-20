@@ -154,7 +154,25 @@ public class RepositoryListContainerFragment extends Fragment implements
         if (!TextUtils.equals(sortOrder, mSortOrder) || !TextUtils.equals(mSortDirection, direction)) {
             mSortOrder = sortOrder;
             mSortDirection = direction;
+            validateSortOrder();
             applyFilterTypeAndSortOrder();
+        }
+    }
+
+    private void validateSortOrder() {
+        if (TextUtils.equals(mFilterType, "starred")) {
+            if (!TextUtils.equals(mSortOrder, "updated")
+                    && !TextUtils.equals(mSortOrder, "created")) {
+                mSortOrder = "created";
+                mSortDirection = "desc";
+            }
+        } else {
+            if (!TextUtils.equals(mSortOrder, "full_name")
+                    && !TextUtils.equals(mSortOrder, "created")
+                    && !TextUtils.equals(mSortOrder, "pushed")) {
+                mSortOrder = "full_name";
+                mSortDirection = "asc";
+            }
         }
     }
 
@@ -166,7 +184,8 @@ public class RepositoryListContainerFragment extends Fragment implements
 
         switch (mFilterType) {
             case "starred":
-                mMainFragment = StarredRepositoryListFragment.newInstance(mUserLogin);
+                mMainFragment = StarredRepositoryListFragment.newInstance(mUserLogin,
+                        mSortOrder, mSortDirection);
                 break;
             case "watched":
                 mMainFragment = WatchedRepositoryListFragment.newInstance(mUserLogin);
@@ -193,6 +212,7 @@ public class RepositoryListContainerFragment extends Fragment implements
     }
 
     public String getSortOrder() {
+        validateSortOrder();
         return mSortOrder;
     }
 
@@ -387,6 +407,8 @@ public class RepositoryListContainerFragment extends Fragment implements
             SORT_LOOKUP.put(R.id.sort_created_desc, new String[] { "created", "desc" });
             SORT_LOOKUP.put(R.id.sort_pushed_asc, new String[] { "pushed", "asc" });
             SORT_LOOKUP.put(R.id.sort_pushed_desc, new String[] { "pushed", "desc" });
+            SORT_LOOKUP.put(R.id.sort_updated_asc, new String[] { "updated", "asc" });
+            SORT_LOOKUP.put(R.id.sort_updated_desc, new String[] { "updated", "desc" });
         }
 
         public SortDrawerHelper() {
@@ -397,8 +419,9 @@ public class RepositoryListContainerFragment extends Fragment implements
         }
 
         public int getMenuResId() {
-            return TextUtils.equals(mFilterType, "starred") || TextUtils.equals(mFilterType, "watched")
-                    ? 0 : R.menu.repo_sort;
+            return TextUtils.equals(mFilterType, "starred") ? R.menu.repo_starred_sort
+                    : TextUtils.equals(mFilterType, "watched") ? 0
+                    : R.menu.repo_sort;
         }
 
         public void selectSortType(Menu menu, String order, String direction) {

@@ -129,6 +129,7 @@ public class RepositoryFactory extends FragmentFactory {
         String lastDir = mPrefs.getString(PREF_KEY_SORT_DIR, null);
         if (lastType != null) {
             mFragment.setFilterType(lastType);
+            mSortDrawerHelper.setFilterType(lastType);
         }
         if (lastOrder != null && lastDir != null) {
             mFragment.setSortOrder(lastOrder, lastDir);

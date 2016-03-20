@@ -29,14 +29,21 @@ import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.IntentUtils;
 
+import java.util.HashMap;
+
 public class StarredRepositoryListFragment extends PagedDataBaseFragment<Repository> {
     private String mLogin;
+    private String mSortOrder;
+    private String mSortDirection;
 
-    public static StarredRepositoryListFragment newInstance(String login) {
+    public static StarredRepositoryListFragment newInstance(String login,
+            String sortOrder, String sortDirection) {
         StarredRepositoryListFragment f = new StarredRepositoryListFragment();
 
         Bundle args = new Bundle();
         args.putString(Constants.User.LOGIN, login);
+        args.putString("sortOrder", sortOrder);
+        args.putString("sortDirection", sortDirection);
         f.setArguments(args);
 
         return f;
@@ -46,6 +53,8 @@ public class StarredRepositoryListFragment extends PagedDataBaseFragment<Reposit
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mLogin = getArguments().getString(Constants.User.LOGIN);
+        mSortOrder = getArguments().getString("sortOrder");
+        mSortDirection = getArguments().getString("sortDirection");
     }
 
     @Override
@@ -67,6 +76,9 @@ public class StarredRepositoryListFragment extends PagedDataBaseFragment<Reposit
     protected PageIterator<Repository> onCreateIterator() {
         StarService starService = (StarService)
                 Gh4Application.get().getService(Gh4Application.STAR_SERVICE);
-        return starService.pageStarred(mLogin);
+        HashMap<String, String> filterData = new HashMap<>();
+        filterData.put("sort", mSortOrder);
+        filterData.put("direction", mSortDirection);
+        return starService.pageStarred(mLogin, filterData);
     }
 }
