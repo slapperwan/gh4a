@@ -15,6 +15,7 @@
  */
 package com.gh4a.activities;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 import org.xml.sax.SAXException;
@@ -36,7 +37,6 @@ import com.gh4a.loader.FeedLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
 import com.gh4a.widget.SwipeRefreshLayout;
@@ -65,8 +65,7 @@ public class WikiListActivity extends BaseActivity
 
         @Override
         protected boolean onError(Exception e) {
-            if (e instanceof SAXException) {
-                ToastUtils.notFoundMessage(WikiListActivity.this, getString(R.string.recent_wiki));
+            if (e instanceof SAXException || e instanceof FileNotFoundException) {
                 setContentEmpty(true);
                 setContentShown(true);
                 return true;
@@ -83,6 +82,7 @@ public class WikiListActivity extends BaseActivity
         mRepoName = getIntent().getStringExtra(Constants.Repository.NAME);
 
         setContentView(R.layout.generic_list);
+        setEmptyText(R.string.no_wiki_updates_found);
         setContentShown(false);
 
         ActionBar actionBar = getSupportActionBar();

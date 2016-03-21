@@ -154,6 +154,7 @@
     <string name="no_gists_found">No gists were created so far.</string>
     <string name="no_starred_gists_found">No gists were starred so far.</string>
     <string name="no_bookmarks">No bookmarks were created so far.</string>
+    <string name="no_wiki_updates_found">No recent Wiki updates found.</string>
 
     <!-- Activity event -->
     <string name="event_push_title">Pushed to [b]%1$s[/b] at [b]%2$s[/b]</string>
