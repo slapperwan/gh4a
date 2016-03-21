@@ -191,6 +191,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
             adapter.addAll(mRelease.getAssets());
             adapter.setOnItemClickListener(this);
             downloadsList.setLayoutManager(new LinearLayoutManager(this));
+            downloadsList.setNestedScrollingEnabled(false);
             downloadsList.setAdapter(adapter);
         } else {
             findViewById(R.id.downloads).setVisibility(View.GONE);
