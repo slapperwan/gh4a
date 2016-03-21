@@ -31,8 +31,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -49,7 +47,6 @@ import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.TwoFactorAuthException;
-import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
@@ -149,8 +146,9 @@ public class Github4AndroidActivity extends BaseActivity {
         String username = loginView.getText().toString().trim();
         String password = passwordView.getText().toString();
 
+        // XXX: error view
         if (!StringUtils.checkEmail(username)) {
-            AsyncTaskCompat.executeParallel(new LoginTask(username, password));
+            new LoginTask(username, password).schedule();
         } else {
             Toast.makeText(Github4AndroidActivity.this,
                     getString(R.string.enter_username_toast), Toast.LENGTH_LONG).show();
@@ -166,9 +164,7 @@ public class Github4AndroidActivity extends BaseActivity {
          * Instantiates a new load repository list task.
          */
         public LoginTask(String userName, String password) {
-            super(Github4AndroidActivity.this, R.string.please_wait, R.string.authenticating);
-            mUserName = userName;
-            mPassword = password;
+            this(userName, password, null);
         }
         
         public LoginTask(String userName, String password, String otpCode) {
@@ -178,8 +174,13 @@ public class Github4AndroidActivity extends BaseActivity {
             mOtpCode = otpCode;
         }
 
-        public LoginTask(FragmentActivity activity, int resWaitId, int resWaitMsg) {
+        protected LoginTask(BaseActivity activity, int resWaitId, int resWaitMsg) {
             super(activity, resWaitId, resWaitMsg);
+        }
+
+        @Override
+        protected ProgressDialogTask<Authorization> clone() {
+            return new LoginTask(mUserName, mPassword, mOtpCode);
         }
 
         @Override
@@ -223,13 +224,18 @@ public class Github4AndroidActivity extends BaseActivity {
         protected void onError(Exception e) {
             if (e instanceof TwoFactorAuthException) {
                 if ("sms".equals(((TwoFactorAuthException) e).getTwoFactorAuthType())) {
-                    AsyncTaskCompat.executeParallel(new DummyPostTask(mUserName, mPassword));
+                    new DummyPostTask(mUserName, mPassword).schedule();
                 } else {
                     open2FADialog(mUserName, mPassword);
                 }
             } else {
-                Toast.makeText(Github4AndroidActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                super.onError(e);
             }
+        }
+
+        @Override
+        protected String getErrorMessage() {
+            return getContext().getString(R.string.login_failed);
         }
 
         @Override
@@ -278,6 +284,11 @@ public class Github4AndroidActivity extends BaseActivity {
         }
 
         @Override
+        protected ProgressDialogTask<Authorization> clone() {
+            return new DummyPostTask(mUserName, mPassword);
+        }
+
+        @Override
         protected Authorization run() throws IOException {
             GitHubClient client = new ClientForAuthorization(null);
             client.setCredentials(mUserName, mPassword);
@@ -314,7 +325,7 @@ public class Github4AndroidActivity extends BaseActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         LoginTask task = new LoginTask(username,
                                 password, authCode.getText().toString());
-                        AsyncTaskCompat.executeParallel(task);
+                        task.schedule();
                     }
                 })
                 .setNegativeButton(R.string.cancel, null)

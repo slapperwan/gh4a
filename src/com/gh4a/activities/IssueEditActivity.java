@@ -18,7 +18,6 @@ package com.gh4a.activities;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -27,7 +26,6 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
-import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -49,8 +47,6 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Issue;
@@ -217,6 +213,18 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         mTitleView.setText(mEditIssue.getTitle());
         mDescView.setText(mEditIssue.getBody());
 
+        mTitleView.addTextChangedListener(new UiUtils.ButtonEnableTextWatcher(mTitleView, fab));
+        mTitleView.addTextChangedListener(new UiUtils.EmptinessWatchingTextWatcher(mTitleView) {
+            @Override
+            public void onIsEmpty(boolean isEmpty) {
+                if (isEmpty) {
+                    mTitleWrapper.setError(getString(R.string.issue_error_title));
+                } else {
+                    mTitleWrapper.setErrorEnabled(false);
+                }
+            }
+        });
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(isInEditMode()
                 ? getString(R.string.issue_edit_title, mEditIssue.getNumber())
@@ -268,15 +276,9 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         } else if (id == R.id.label_container) {
             showLabelDialog();
         } else if (view instanceof FloatingActionButton) {
-            String title = mTitleView.getText() == null ? null : mTitleView.getText().toString();
-            if (StringUtils.isBlank(title)) {
-                mTitleWrapper.setError(getString(R.string.issue_error_title));
-            } else {
-                mTitleWrapper.setErrorEnabled(false);
-                mEditIssue.setTitle(title);
-                mEditIssue.setBody(mDescView.getText().toString());
-                AsyncTaskCompat.executeParallel(new SaveIssueTask(mEditIssue));
-            }
+            mEditIssue.setTitle(mTitleView.getText().toString());
+            mEditIssue.setBody(mDescView.getText().toString());
+            new SaveIssueTask(mEditIssue).schedule();
         }
     }
 
@@ -455,6 +457,11 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         }
 
         @Override
+        protected ProgressDialogTask<Void> clone() {
+            return new SaveIssueTask(mIssue);
+        }
+
+        @Override
         protected Void run() throws IOException {
             IssueService issueService = (IssueService)
                     Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
@@ -469,14 +476,21 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
         @Override
         protected void onSuccess(Void result) {
-            ToastUtils.showMessage(mContext,
-                    isInEditMode() ? R.string.issue_success_edit : R.string.issue_success_create);
             Intent intent = IntentUtils.getIssueActivityIntent(IssueEditActivity.this,
                     mRepoOwner, mRepoName, mEditIssue.getNumber());
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             setResult(RESULT_OK);
             finish();
+        }
+
+        @Override
+        protected String getErrorMessage() {
+            if (isInEditMode()) {
+                return getContext().getString(R.string.issue_error_edit, mIssue.getNumber());
+            } else {
+                return getContext().getString(R.string.issue_error_create);
+            }
         }
     }
 

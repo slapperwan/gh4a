@@ -40,7 +40,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
-import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
@@ -73,7 +72,6 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IssueLabelSpan;
 import com.github.mobile.util.HtmlUtils;
@@ -304,8 +302,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
                 break;
             case R.id.pull_close:
             case R.id.pull_reopen:
-                AsyncTaskCompat.executeParallel(
-                        new PullRequestOpenCloseTask(item.getItemId() == R.id.pull_reopen));
+                new PullRequestOpenCloseTask(item.getItemId() == R.id.pull_reopen).schedule();
                 break;
             case R.id.share:
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
@@ -489,7 +486,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String text = editor.getText() == null ? null : editor.getText().toString();
-                        AsyncTaskCompat.executeParallel(new PullRequestMergeTask(text));
+                        new PullRequestMergeTask(text).schedule();
                     }
                 })
                 .setNegativeButton(getString(R.string.cancel), null)
@@ -565,8 +562,13 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         private boolean mOpen;
 
         public PullRequestOpenCloseTask(boolean open) {
-            super(getActivity(), 0, open ? R.string.opening_msg : R.string.closing_msg);
+            super(getBaseActivity(), 0, open ? R.string.opening_msg : R.string.closing_msg);
             mOpen = open;
+        }
+
+        @Override
+        protected ProgressDialogTask<PullRequest> clone() {
+            return new PullRequestOpenCloseTask(mOpen);
         }
 
         @Override
@@ -585,8 +587,6 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         @Override
         protected void onSuccess(PullRequest result) {
             mPullRequest = result;
-            ToastUtils.showMessage(mContext,
-                    mOpen ? R.string.issue_success_reopen : R.string.issue_success_close);
 
             fillData();
             // reload events, the action will have triggered an additional one
@@ -595,9 +595,10 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         }
 
         @Override
-        protected void onError(Exception e) {
-            ToastUtils.showMessage(mContext,
-                    mOpen ? R.string.issue_error_reopen : R.string.issue_error_close);
+        protected String getErrorMessage() {
+            int errorMessageResId =
+                    mOpen ? R.string.issue_error_reopen : R.string.issue_error_close;
+            return getContext().getString(errorMessageResId, mPullRequest.getNumber());
         }
     }
 
@@ -605,8 +606,13 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         private String mCommitMessage;
 
         public PullRequestMergeTask(String commitMessage) {
-            super(getActivity(), 0, R.string.merging_msg);
+            super(getBaseActivity(), 0, R.string.merging_msg);
             mCommitMessage = commitMessage;
+        }
+
+        @Override
+        protected ProgressDialogTask<MergeStatus> clone() {
+            return new PullRequestMergeTask(mCommitMessage);
         }
 
         @Override
@@ -620,17 +626,13 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
         @Override
         protected void onSuccess(MergeStatus result) {
-            if (result.isMerged()) {
-                setContentShown(false);
-                getLoaderManager().getLoader(1).onContentChanged();
-            } else {
-                ToastUtils.showMessage(mContext, R.string.pull_error_merge);
-            }
+            setContentShown(false);
+            getLoaderManager().getLoader(1).onContentChanged();
         }
 
         @Override
-        protected void onError(Exception e) {
-            ToastUtils.showMessage(mContext, R.string.pull_error_merge);
+        protected String getErrorMessage() {
+            return getContext().getString(R.string.pull_error_merge, mPullRequest.getNumber());
         }
     }
 }

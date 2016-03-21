@@ -18,7 +18,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.util.Pair;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
@@ -316,12 +315,12 @@ public class RepositoryActivity extends BasePagerActivity {
             case R.id.watch:
                 MenuItemCompat.setActionView(item, R.layout.ab_loading);
                 MenuItemCompat.expandActionView(item);
-                AsyncTaskCompat.executeParallel(new UpdateWatchTask());
+                new UpdateWatchTask().schedule();
                 return true;
             case R.id.star:
                 MenuItemCompat.setActionView(item, R.layout.ab_loading);
                 MenuItemCompat.expandActionView(item);
-                AsyncTaskCompat.executeParallel(new UpdateStarTask());
+                new UpdateStarTask().schedule();
                 return true;
             case R.id.ref:
                 if (mBranches == null) {

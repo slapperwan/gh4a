@@ -7,15 +7,6 @@ import android.widget.Toast;
 import com.gh4a.R;
 
 public class ToastUtils {
-    public static void showError(Context context) {
-        showMessage(context, R.string.error_toast);
-
-    }
-
-    public static void showMessage(Context context, int resId) {
-        Toast.makeText(context, context.getString(resId), Toast.LENGTH_SHORT).show();
-    }
-
     public static void notFoundMessage(Context context, int stringId) {
         notFoundMessage(context, context.getString(stringId));
     }

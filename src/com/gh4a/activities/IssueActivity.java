@@ -34,7 +34,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -65,7 +64,6 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
 import com.gh4a.widget.IssueLabelSpan;
@@ -354,7 +352,7 @@ public class IssueActivity extends BaseActivity implements
             case R.id.issue_close:
             case R.id.issue_reopen:
                 if (checkForAuthOrExit()) {
-                    AsyncTaskCompat.executeParallel(new IssueOpenCloseTask(itemId == R.id.issue_reopen));
+                    new IssueOpenCloseTask(itemId == R.id.issue_reopen).schedule();
                 }
                 return true;
             case R.id.share:
@@ -510,6 +508,11 @@ public class IssueActivity extends BaseActivity implements
         }
 
         @Override
+        protected ProgressDialogTask<Issue> clone() {
+            return new IssueOpenCloseTask(mOpen);
+        }
+
+        @Override
         protected Issue run() throws IOException {
             IssueService issueService = (IssueService)
                     Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
@@ -524,8 +527,6 @@ public class IssueActivity extends BaseActivity implements
         @Override
         protected void onSuccess(Issue result) {
             mIssue = result;
-            ToastUtils.showMessage(mContext,
-                    mOpen ? R.string.issue_success_reopen : R.string.issue_success_close);
 
             // reload issue state
             fillDataIfDone();
@@ -536,8 +537,8 @@ public class IssueActivity extends BaseActivity implements
         }
 
         @Override
-        protected void onError(Exception e) {
-            ToastUtils.showMessage(mContext, R.string.issue_error_close);
+        protected String getErrorMessage() {
+            return getContext().getString(R.string.issue_error_close, mIssueNumber);
         }
     }
 }

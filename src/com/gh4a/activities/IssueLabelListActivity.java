@@ -21,7 +21,6 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.Loader;
-import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -43,7 +42,6 @@ import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
 
@@ -235,11 +233,10 @@ public class IssueLabelListActivity extends BaseActivity implements
             switch (item.getItemId()) {
             case Menu.FIRST:
                 if (mLabel == mAddedLabel) {
-                    AsyncTaskCompat.executeParallel(new AddIssueLabelTask(
-                            mLabel.editedName, mLabel.editedColor));
+                    new AddIssueLabelTask(mLabel.editedName, mLabel.editedColor).schedule();
                 } else {
-                    AsyncTaskCompat.executeParallel(new EditIssueLabelTask(
-                            mLabel.getName(), mLabel.editedName, mLabel.editedColor));
+                    new EditIssueLabelTask(mLabel.getName(), mLabel.editedName, mLabel.editedColor)
+                            .schedule();
                 }
                 break;
             case Menu.FIRST + 1:
@@ -249,8 +246,7 @@ public class IssueLabelListActivity extends BaseActivity implements
                         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                AsyncTaskCompat.executeParallel(new DeleteIssueLabelTask(
-                                        mLabel.getName()));
+                                new DeleteIssueLabelTask(mLabel.getName()).schedule();
                             }
                         })
                         .setNegativeButton(R.string.cancel, null)
@@ -286,6 +282,11 @@ public class IssueLabelListActivity extends BaseActivity implements
         }
 
         @Override
+        protected ProgressDialogTask<Void> clone() {
+            return new DeleteIssueLabelTask(mLabelName);
+        }
+
+        @Override
         protected Void run() throws IOException {
             LabelService labelService = (LabelService)
                     Gh4Application.get().getService(Gh4Application.LABEL_SERVICE);
@@ -296,6 +297,11 @@ public class IssueLabelListActivity extends BaseActivity implements
         @Override
         protected void onSuccess(Void result) {
             getSupportLoaderManager().getLoader(0).onContentChanged();
+        }
+
+        @Override
+        protected String getErrorMessage() {
+            return getContext().getString(R.string.issue_error_delete_label, mLabelName);
         }
     }
 
@@ -309,6 +315,11 @@ public class IssueLabelListActivity extends BaseActivity implements
             mOldLabelName = oldLabelName;
             mNewLabelName = newLabelName;
             mColor = color;
+        }
+
+        @Override
+        protected ProgressDialogTask<Void> clone() {
+            return new EditIssueLabelTask(mOldLabelName, mNewLabelName, mColor);
         }
 
         @Override
@@ -331,8 +342,8 @@ public class IssueLabelListActivity extends BaseActivity implements
         }
 
         @Override
-        protected void onError(Exception e) {
-            ToastUtils.showMessage(mContext, R.string.issue_error_edit_label);
+        protected String getErrorMessage() {
+            return getContext().getString(R.string.issue_error_edit_label, mOldLabelName);
         }
     }
 
@@ -344,6 +355,11 @@ public class IssueLabelListActivity extends BaseActivity implements
             super(IssueLabelListActivity.this, 0, R.string.saving_msg);
             mLabelName = labelName;
             mColor = color;
+        }
+
+        @Override
+        protected ProgressDialogTask<Void> clone() {
+            return new AddIssueLabelTask(mLabelName, mColor);
         }
 
         @Override
@@ -366,8 +382,13 @@ public class IssueLabelListActivity extends BaseActivity implements
         }
 
         @Override
+        protected String getErrorMessage() {
+            return getContext().getString(R.string.issue_error_create_label, mLabelName);
+        }
+
+        @Override
         protected void onError(Exception e) {
-            ToastUtils.showMessage(mContext, R.string.issue_error_create_label);
+            super.onError(e);
             mAdapter.remove(mAddedLabel);
             mAddedLabel = null;
         }

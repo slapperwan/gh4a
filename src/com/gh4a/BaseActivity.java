@@ -48,6 +48,7 @@ import android.view.ViewStub;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gh4a.activities.Github4AndroidActivity;
 import com.gh4a.activities.SearchActivity;
@@ -55,7 +56,6 @@ import com.gh4a.activities.home.HomeActivity;
 import com.gh4a.db.BookmarksProvider;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ColorDrawable;
 import com.gh4a.widget.SwipeRefreshLayout;
@@ -205,7 +205,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         }
     }
 
-    protected CoordinatorLayout getRootLayout() {
+    public CoordinatorLayout getRootLayout() {
         ensureContent();
         return mCoordinatorLayout;
     }
@@ -345,7 +345,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         cv.put(BookmarksProvider.Columns.URI, intent.toUri(0));
         cv.put(BookmarksProvider.Columns.EXTRA, extraData);
         if (getContentResolver().insert(BookmarksProvider.Columns.CONTENT_URI, cv) != null) {
-            ToastUtils.showMessage(this, R.string.bookmark_saved);
+            Toast.makeText(this, R.string.bookmark_saved, Toast.LENGTH_LONG).show();
         }
     }
 

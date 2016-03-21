@@ -1,40 +1,38 @@
 package com.gh4a;
 
-import com.gh4a.utils.ToastUtils;
-
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
+import android.view.View;
 
-import java.lang.ref.WeakReference;
-
-public abstract class ProgressDialogTask<T> extends BackgroundTask<T> {
+public abstract class ProgressDialogTask<T> extends BackgroundTask<T>
+        implements View.OnClickListener {
     private ProgressDialogFragment mFragment;
-    private WeakReference<FragmentActivity> mActivity;
+    private BaseActivity mActivity;
     private int mTitleResId;
     private int mMessageResId;
 
-    public ProgressDialogTask(FragmentActivity activity, int titleResId, int messageResId) {
+    public ProgressDialogTask(BaseActivity activity, int titleResId, int messageResId) {
         super(activity);
-        mActivity = new WeakReference<>(activity);
+        mActivity = activity;
         mTitleResId = titleResId;
         mMessageResId = messageResId;
     }
 
+    protected abstract ProgressDialogTask<T> clone();
+    protected abstract String getErrorMessage();
+
     @Override
     protected void onPreExecute() {
-        FragmentActivity fa = mActivity.get();
-        if (fa != null) {
-            Bundle args = new Bundle();
-            args.putInt("title_res", mTitleResId);
-            args.putInt("message_res", mMessageResId);
-            mFragment = new ProgressDialogFragment();
-            mFragment.setArguments(args);
-            mFragment.show(fa.getSupportFragmentManager(), "progressdialog");
-        }
+        Bundle args = new Bundle();
+        args.putInt("title_res", mTitleResId);
+        args.putInt("message_res", mMessageResId);
+        mFragment = new ProgressDialogFragment();
+        mFragment.setArguments(args);
+        mFragment.show(mActivity.getSupportFragmentManager(), "progressdialog");
 
         super.onPreExecute();
     }
@@ -51,7 +49,14 @@ public abstract class ProgressDialogTask<T> extends BackgroundTask<T> {
     @Override
     protected void onError(Exception e) {
         super.onError(e);
-        ToastUtils.showError(mContext);
+        Snackbar.make(mActivity.getRootLayout(), getErrorMessage(), Snackbar.LENGTH_LONG)
+                .setAction(R.string.retry, this)
+                .show();
+    }
+
+    @Override
+    public void onClick(View v) {
+        clone().schedule();
     }
 
     public static class ProgressDialogFragment extends DialogFragment {

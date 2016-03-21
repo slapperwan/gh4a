@@ -31,16 +31,21 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.text.Spannable;
+import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.view.ContextThemeWrapper;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.EdgeEffect;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class UiUtils {
     public static final LinkMovementMethod CHECKING_LINK_METHOD = new LinkMovementMethod() {
@@ -50,7 +55,8 @@ public class UiUtils {
             try {
                 return super.onTouchEvent(widget, buffer, event);
             } catch (ActivityNotFoundException e) {
-                ToastUtils.showMessage(widget.getContext(), R.string.link_not_openable);
+                Toast.makeText(widget.getContext(), R.string.link_not_openable, Toast.LENGTH_LONG)
+                        .show();
                 return true;
             }
         }
@@ -335,7 +341,8 @@ public class UiUtils {
                 .build();
         final Uri destinationUri = buildDownloadDestinationUri(fileName);
         if (destinationUri == null) {
-            ToastUtils.showMessage(context, R.string.download_fail_no_storage_toast);
+            Toast.makeText(context, R.string.download_fail_no_storage_toast, Toast.LENGTH_LONG)
+                    .show();
             return;
         }
 
@@ -381,6 +388,49 @@ public class UiUtils {
             request.setAllowedOverMetered(false);
         } else {
             request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI);
+        }
+    }
+
+    public static abstract class EmptinessWatchingTextWatcher implements TextWatcher {
+        public EmptinessWatchingTextWatcher(EditText editor) {
+            afterTextChanged(editor.getText());
+        }
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+        }
+        @Override
+        public void afterTextChanged(Editable s) {
+            onIsEmpty(s == null || s.length() == 0);
+        }
+        public abstract void onIsEmpty(boolean isEmpty);
+    }
+
+    public static class ButtonEnableTextWatcher extends EmptinessWatchingTextWatcher {
+        private View mView;
+        private MenuItem mItem;
+
+        public ButtonEnableTextWatcher(EditText editor, View view) {
+            super(editor);
+            mView = view;
+            afterTextChanged(editor.getText());
+        }
+
+        public ButtonEnableTextWatcher(EditText editor, MenuItem item) {
+            super(editor);
+            mItem = item;
+            afterTextChanged(editor.getText());
+        }
+
+        @Override
+        public void onIsEmpty(boolean isEmpty) {
+            if (mView != null) {
+                mView.setEnabled(!isEmpty);
+            } else if (mItem != null) {
+                mItem.setEnabled(!isEmpty);
+            }
         }
     }
 }

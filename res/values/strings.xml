@@ -19,6 +19,7 @@
     <string name="cancel">Cancel</string>
     <string name="settings">Settings</string>
     <string name="about">About</string>
+    <string name="retry">Retry</string>
     <string name="open_source_components">Open source components</string>
     <string name="my_email">slapperwan@gmail.com</string>
     <string name="my_web">http://slapperwan.github.com/gh4a</string>
@@ -50,7 +51,6 @@
     <string name="open_in_browser">Open in browser</string>
     <string name="no_browser_found">The link could not be opened: no browser was found on your device</string>
     <string name="wrap_lines">Wrap lines</string>
-    <string name="error_toast">An error occurred while fetching data</string>
     <string name="unknown">unknown</string>
     <string name="history">History</string>
     <string name="deleted">(deleted)</string>
@@ -69,6 +69,7 @@
     <string name="menu_pull">Pull request %1$d</string>
     <string name="menu_issues">Open issues</string>
     <string name="delete_comment_message">Delete this comment?</string>
+    <string name="saving_comment">Saving comment\u2026</string>
     <string name="please_wait">Please wait</string>
     <string name="bookmark_user">Bookmark user</string>
     <string name="bookmark_repo">Bookmark repo</string>
@@ -104,6 +105,7 @@
     <string name="my_gists">My gists</string>
     <string name="start_page">Start page</string>
     <string name="start_page_last_selected">Last selected</string>
+    <string name="login_failed">Login failed.</string>
 
     <plurals name="contributor_extra_data">
         <item quantity="one">%1$d contribution</item>
@@ -272,7 +274,10 @@
     <string name="commit_comment_hint">Comment on this commit</string>
     <string name="commit_details">Committed by [b]%1$s[/b] %2$s</string>
     <string name="commit_comment_dialog_title">Comment on line %1$d</string>
-    <string name="commit_comment_error_body">Please enter your comment.</string>
+    <string name="error_edit_commit_comment">Saving comment on line %1$d failed.</string>
+    <string name="error_delete_commit_comment">Deletion of commit comment failed.</string>
+    <string name="error_edit_comment">Saving comment failed.</string>
+    <string name="error_delete_comment">Comment deletion failed.</string>
 
     <!-- Release -->
     <string name="release_title">Release</string>
@@ -295,13 +300,9 @@
     <string name="issue_body">Body</string>
     <string name="issue_create">New Issue</string>
     <string name="issue_error_title">Please enter a title</string>
-    <string name="issue_success_create">Successfully created issue</string>
     <string name="issue_edit_title">Edit Issue #%1$d</string>
-    <string name="issue_success_edit">Successfully edited issue</string>
-    <string name="issue_success_close">Successfully closed issue</string>
-    <string name="issue_error_close">Cannot close issue</string>
-    <string name="issue_success_reopen">Successfully reopened issue</string>
-    <string name="issue_error_reopen">Cannot reopen issue</string>
+    <string name="issue_error_close">Closing issue #%1$d failed.</string>
+    <string name="issue_error_reopen">Reopening issue #%1$d failed.</string>
     <string name="issue_sort_order">Sort order</string>
     <string name="issue_sort_created_asc">Oldest</string>
     <string name="issue_sort_created_desc">Newest</string>
@@ -315,11 +316,14 @@
     <string name="issue_milestones">Milestones</string>
     <string name="issue_dialog_delete_title">Delete %1$s?</string>
     <string name="issue_dialog_delete_message">Are you sure?</string>
-    <string name="issue_success_comment">Successfully created comment</string>
-    <string name="issue_error_comment">Cannot create comment</string>
-    <string name="issue_error_create_label">Cannot create label</string>
-    <string name="issue_error_edit_label">Cannot edit label</string>
-    <string name="issue_error_create_milestone">Cannot create milestone</string>
+    <string name="issue_error_comment">Comment creation failed.</string>
+    <string name="issue_error_create">Issue creation failed.</string>
+    <string name="issue_error_edit">Editing issue #%1$d failed.</string>
+    <string name="issue_error_create_label">Creation of label \'%1$s\' failed</string>
+    <string name="issue_error_edit_label">Editing label \'%1$s\' failed</string>
+    <string name="issue_error_delete_label">Deletion of label \'%1$s\' failed</string>
+    <string name="issue_error_create_milestone">Creation of milestone \'%1$s\' failed.</string>
+    <string name="issue_error_delete_milestone">Deletion of milestone failed.</string>
     <string name="issue_error_milestone_title">Please enter a title</string>
     <string name="issue_label_new">New Label</string>
     <string name="issue_milestone_new">New Milestone</string>
@@ -360,7 +364,7 @@
     <string name="pull_request_close">Close</string>
     <string name="pull_request_merge">Merge</string>
     <string name="pull_request_merged">Merged</string>
-    <string name="pull_error_merge">Pull request could not be merged</string>
+    <string name="pull_error_merge">Merging pull request #%1$d failed.</string>
     <string name="pull_message_dialog_title">Merge pull request #%1$d</string>
     <string name="pull_merge_message_description">If you want to add additional details to the merge commit message, please enter them below.</string>
     <string name="pull_merge_status_clean">Pull request can be merged</string>

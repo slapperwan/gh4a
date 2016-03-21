@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import com.gh4a.Constants;
 import com.gh4a.R;
@@ -151,7 +152,7 @@ public class IntentUtils {
         if (intent != null) {
             context.startActivity(intent);
         } else {
-            ToastUtils.showMessage(context, R.string.no_browser_found);
+            Toast.makeText(context, R.string.no_browser_found, Toast.LENGTH_LONG).show();
         }
     }
 

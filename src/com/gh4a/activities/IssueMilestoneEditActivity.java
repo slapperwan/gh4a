@@ -25,7 +25,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.text.format.DateFormat;
@@ -44,8 +43,6 @@ import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Milestone;
@@ -116,6 +113,18 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
             mMilestone.setState("open");
         }
 
+        mTitleView.addTextChangedListener(new UiUtils.ButtonEnableTextWatcher(mTitleView, fab));
+        mTitleView.addTextChangedListener(new UiUtils.EmptinessWatchingTextWatcher(mTitleView) {
+            @Override
+            public void onIsEmpty(boolean isEmpty) {
+                if (isEmpty) {
+                    mTitleWrapper.setError(getString(R.string.issue_error_milestone_title));
+                } else {
+                    mTitleWrapper.setErrorEnabled(false);
+                }
+            }
+        });
+
         mTitleView.setText(mMilestone.getTitle());
         mDescriptionView.setText(mMilestone.getDescription());
         updateLabels();
@@ -162,18 +171,13 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
             DialogFragment newFragment = new DatePickerFragment();
             newFragment.show(getSupportFragmentManager(), "datePicker");
         } else if (view instanceof FloatingActionButton) {
-            String title = mTitleView.getText() == null ? null : mTitleView.getText().toString();
-            if (StringUtils.isBlank(title)) {
-                mTitleWrapper.setError(getString(R.string.issue_error_milestone_title));
-            } else {
-                String desc = mDescriptionView.getText() != null ?
+            String title = mTitleView.getText().toString();
+            String desc = mDescriptionView.getText() != null ?
                     mDescriptionView.getText().toString() : null;
 
-                mTitleWrapper.setErrorEnabled(false);
-                mMilestone.setTitle(title);
-                mMilestone.setDescription(desc);
-                AsyncTaskCompat.executeParallel(new SaveIssueMilestoneTask(mMilestone));
-            }
+            mMilestone.setTitle(title);
+            mMilestone.setDescription(desc);
+            new SaveIssueMilestoneTask(mMilestone).schedule();
         }
     }
 
@@ -188,8 +192,7 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
                         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                AsyncTaskCompat.executeParallel(
-                                        new DeleteIssueMilestoneTask(mMilestone.getNumber()));
+                                new DeleteIssueMilestoneTask(mMilestone.getNumber()).schedule();
                             }
                         })
                         .setNegativeButton(R.string.cancel, null)
@@ -237,6 +240,11 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         }
 
         @Override
+        protected ProgressDialogTask<Void> clone() {
+            return new SaveIssueMilestoneTask(mMilestone);
+        }
+
+        @Override
         protected Void run() throws IOException {
             MilestoneService milestoneService = (MilestoneService)
                     Gh4Application.get().getService(Gh4Application.MILESTONE_SERVICE);
@@ -257,8 +265,9 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         }
 
         @Override
-        protected void onError(Exception e) {
-            ToastUtils.showMessage(mContext, R.string.issue_error_create_milestone);
+        protected String getErrorMessage() {
+            return getContext().getString(R.string.issue_error_create_milestone,
+                    mMilestone.getTitle());
         }
     }
 
@@ -268,6 +277,11 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         public DeleteIssueMilestoneTask(int number) {
             super(IssueMilestoneEditActivity.this, 0, R.string.deleting_msg);
             mNumber = number;
+        }
+
+        @Override
+        protected ProgressDialogTask<Void> clone() {
+            return new DeleteIssueMilestoneTask(mNumber);
         }
 
         @Override
@@ -281,6 +295,11 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         @Override
         protected void onSuccess(Void result) {
             openIssueMilestones();
+        }
+
+        @Override
+        protected String getErrorMessage() {
+            return getContext().getString(R.string.issue_error_delete_milestone);
         }
     }
 

@@ -2,6 +2,7 @@ package com.gh4a;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.v4.os.AsyncTaskCompat;
 
 public abstract class BackgroundTask<T> extends AsyncTask<Void, Void, T> {
     protected final Context mContext;
@@ -9,6 +10,14 @@ public abstract class BackgroundTask<T> extends AsyncTask<Void, Void, T> {
 
     public BackgroundTask(Context context) {
         mContext = context;
+    }
+
+    protected Context getContext() {
+        return mContext;
+    }
+
+    public void schedule() {
+        AsyncTaskCompat.executeParallel(this);
     }
 
     @Override

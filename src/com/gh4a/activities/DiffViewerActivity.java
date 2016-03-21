@@ -22,7 +22,6 @@ import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.support.v4.os.AsyncTaskCompat;
 import android.support.v4.util.LongSparseArray;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
@@ -55,7 +54,7 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.ToastUtils;
+import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.User;
@@ -269,11 +268,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String text = body.getText().toString();
-                if (!StringUtils.isBlank(text)) {
-                    AsyncTaskCompat.executeParallel(new CommentTask(id, text, position));
-                } else {
-                    ToastUtils.showMessage(DiffViewerActivity.this, R.string.commit_comment_error_body);
-                }
+                new CommentTask(id, text, position).schedule();
             }
         };
 
@@ -284,7 +279,9 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                 .setPositiveButton(saveButtonResId, saveCb)
                 .setNegativeButton(R.string.cancel, null);
 
-        builder.show();
+        AlertDialog d = builder.show();
+        body.addTextChangedListener(new UiUtils.ButtonEnableTextWatcher(
+                body, d.getButton(DialogInterface.BUTTON_POSITIVE)));
     }
 
     @Override
@@ -363,7 +360,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                         .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                AsyncTaskCompat.executeParallel(new DeleteCommentTask(mId));
+                                new DeleteCommentTask(mId).schedule();
                             }
                         })
                         .setNegativeButton(R.string.cancel, null)
@@ -420,6 +417,11 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         }
 
         @Override
+        protected ProgressDialogTask<Void> clone() {
+            return new CommentTask(mId, mBody, mPosition);
+        }
+
+        @Override
         protected Void run() throws IOException {
             updateComment(mId, mBody, mPosition);
             return null;
@@ -429,6 +431,11 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         protected void onSuccess(Void result) {
             refresh();
             setResult(RESULT_OK);
+        }
+
+        @Override
+        protected String getErrorMessage() {
+            return getContext().getString(R.string.error_edit_commit_comment, mPosition);
         }
     }
 
@@ -441,6 +448,11 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         }
 
         @Override
+        protected ProgressDialogTask<Void> clone() {
+            return new DeleteCommentTask(mId);
+        }
+
+        @Override
         protected Void run() throws IOException {
             deleteComment(mId);
             return null;
@@ -450,6 +462,11 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         protected void onSuccess(Void result) {
             refresh();
             setResult(RESULT_OK);
+        }
+
+        @Override
+        protected String getErrorMessage() {
+            return getContext().getString(R.string.error_delete_commit_comment);
         }
     }
 }
