@@ -42,7 +42,8 @@ import org.eclipse.egit.github.core.User;
 import java.util.Locale;
 
 public class PullRequestActivity extends BasePagerActivity implements
-        View.OnClickListener, PullRequestFilesFragment.CommentUpdateListener {
+        View.OnClickListener, PullRequestFragment.StateChangeListener,
+        PullRequestFilesFragment.CommentUpdateListener {
     private String mRepoOwner;
     private String mRepoName;
     private int mPullRequestNumber;
@@ -147,6 +148,13 @@ public class PullRequestActivity extends BasePagerActivity implements
     }
 
     @Override
+    public void onPullRequestStateChanged(PullRequest newState) {
+        mPullRequest = newState;
+        fillHeader();
+        transitionHeaderToColor(mHeaderColorAttrs[0], mHeaderColorAttrs[1]);
+    }
+
+    @Override
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             User user = (User) v.getTag();
@@ -158,7 +166,7 @@ public class PullRequestActivity extends BasePagerActivity implements
     }
 
     private void fillHeader() {
-        final int stateTextResId, stateColorAttributeId, statusBarColorAttributeId;
+        final int stateTextResId;
 
         if (mPullRequest.isMerged()) {
             stateTextResId = R.string.pull_request_merged;
@@ -172,7 +180,7 @@ public class PullRequestActivity extends BasePagerActivity implements
             };
         } else {
             stateTextResId = R.string.open;
-            mHeaderColorAttrs = new int[]{
+            mHeaderColorAttrs = new int[] {
                 R.attr.colorIssueOpen, R.attr.colorIssueOpenDark
             };
         }

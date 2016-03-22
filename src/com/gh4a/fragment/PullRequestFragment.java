@@ -54,6 +54,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
@@ -80,6 +81,10 @@ import com.github.mobile.util.HttpImageGetter;
 public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> implements
         View.OnClickListener, IssueEventAdapter.OnEditComment, CommentBoxFragment.Callback {
     private static final int REQUEST_EDIT = 1000;
+
+    public interface StateChangeListener {
+        void onPullRequestStateChanged(PullRequest newState);
+    }
 
     private View mListHeaderView;
     private PullRequest mPullRequest;
@@ -222,26 +227,16 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-
         FragmentManager fm = getChildFragmentManager();
         mCommentFragment = (CommentBoxFragment) fm.findFragmentById(R.id.comment_box);
 
-        if (mPullRequest.isMerged()) {
-            setHighlightColors(R.attr.colorPullRequestMerged, R.attr.colorPullRequestMergedDark);
-        } else if (Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState())) {
-            setHighlightColors(R.attr.colorIssueClosed, R.attr.colorIssueClosedDark);
-        } else {
-            setHighlightColors(R.attr.colorIssueOpen, R.attr.colorIssueOpenDark);
-        }
+        fillData();
 
         super.onActivityCreated(savedInstanceState);
 
-        fillData();
         getLoaderManager().initLoader(1, null, mCollaboratorCallback);
         getLoaderManager().initLoader(2, null, mIssueCallback);
-        if (Constants.Issue.STATE_OPEN.equals(mPullRequest.getState())) {
-            getLoaderManager().initLoader(3, null, mStatusCallback);
-        }
+        loadStatusIfOpen();
     }
 
     @Override
@@ -342,6 +337,12 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         v.findViewById(R.id.comment_box).setVisibility(commentVisibility);
     }
 
+    private void loadStatusIfOpen() {
+        if (Constants.Issue.STATE_OPEN.equals(mPullRequest.getState())) {
+            getLoaderManager().initLoader(3, null, mStatusCallback);
+        }
+    }
+
     private void fillData() {
         ImageView ivGravatar = (ImageView) mListHeaderView.findViewById(R.id.iv_gravatar);
         AvatarHandler.assignAvatar(ivGravatar, mPullRequest.getUser());
@@ -384,6 +385,14 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
             assigneeGroup.setVisibility(View.VISIBLE);
         } else {
             assigneeGroup.setVisibility(View.GONE);
+        }
+
+        if (mPullRequest.isMerged()) {
+            setHighlightColors(R.attr.colorPullRequestMerged, R.attr.colorPullRequestMergedDark);
+        } else if (Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState())) {
+            setHighlightColors(R.attr.colorIssueClosed, R.attr.colorIssueClosedDark);
+        } else {
+            setHighlightColors(R.attr.colorIssueOpen, R.attr.colorIssueOpenDark);
         }
     }
 
@@ -589,9 +598,15 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
             mPullRequest = result;
 
             fillData();
+            loadStatusIfOpen();
             // reload events, the action will have triggered an additional one
             PullRequestFragment.super.onRefresh();
-            getActivity().supportInvalidateOptionsMenu();
+
+            BaseActivity activity = getBaseActivity();
+            if (activity instanceof StateChangeListener) {
+                ((StateChangeListener) activity).onPullRequestStateChanged(result);
+            }
+            activity.supportInvalidateOptionsMenu();
         }
 
         @Override
