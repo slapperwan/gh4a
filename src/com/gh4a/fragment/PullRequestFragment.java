@@ -233,6 +233,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         mCommentFragment = (CommentBoxFragment) fm.findFragmentById(R.id.comment_box);
 
         fillData();
+        updateCommentLockState();
 
         super.onActivityCreated(savedInstanceState);
 
@@ -346,8 +347,10 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     }
 
     private void updateCommentLockState() {
-        boolean locked = mPullRequest.isLocked() && !mIsCollaborator;
-        mCommentFragment.setLocked(locked);
+        if (mCommentFragment != null) {
+            boolean locked = mPullRequest.isLocked() && !mIsCollaborator;
+            mCommentFragment.setLocked(locked);
+        }
     }
 
     private void fillData() {
