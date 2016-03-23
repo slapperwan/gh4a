@@ -54,7 +54,7 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
 
         if (filterData != null) {
             for (String key : filterData.keySet()) {
-                args.putString(key, filterData.get(key));
+                args.putString("filter_" + key, filterData.get(key));
             }
         }
         f.setArguments(args);
@@ -84,9 +84,8 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
 
         Bundle args = getArguments();
         for (String key : args.keySet()) {
-            if (!key.equals(Constants.Repository.OWNER)
-                    && !key.equals(Constants.Repository.NAME)) {
-                mFilterData.put(key, args.getString(key));
+            if (key.startsWith("filter_")) {
+                mFilterData.put(key.substring(7), args.getString(key));
             }
         }
     }

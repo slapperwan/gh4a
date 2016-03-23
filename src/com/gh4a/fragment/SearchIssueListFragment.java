@@ -49,7 +49,7 @@ public class SearchIssueListFragment extends PagedDataBaseFragment<Issue> {
         Bundle args = new Bundle();
         if (filterData != null) {
             for (String key : filterData.keySet()) {
-                args.putString(key, filterData.get(key));
+                args.putString("filter_" + key, filterData.get(key));
             }
         }
         args.putInt("emptytext", emptyTextResId);
@@ -69,12 +69,8 @@ public class SearchIssueListFragment extends PagedDataBaseFragment<Issue> {
 
         Bundle args = getArguments();
         for (String key : args.keySet()) {
-            if (!key.equals(Constants.User.LOGIN)
-                    && !key.equals(Constants.Repository.NAME)) {
-                String arg = args.getString(key);
-                if (arg != null) {
-                    mFilterData.put(key, arg);
-                }
+            if (key.startsWith("filter_")) {
+                mFilterData.put(key.substring(7), args.getString(key));
             }
         }
         mEmptyTextResId = args.getInt("emptytext");
