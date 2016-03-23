@@ -1,7 +1,9 @@
 package com.gh4a.activities.home;
 
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -15,6 +17,8 @@ import java.util.Map;
 
 public class IssueListFactory extends FragmentFactory {
     private static final String QUERY = "is:%s is:%s %s:%s";
+
+    private static final String STATE_KEY_STATE = "issue:state";
 
     private static final int[] TAB_TITLES = new int[] {
             R.string.created, R.string.assigned, R.string.mentioned
@@ -116,6 +120,24 @@ public class IssueListFactory extends FragmentFactory {
             return true;
         }
         return false;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(STATE_KEY_STATE, mState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle state) {
+        super.onRestoreInstanceState(state);
+        String newState = state.getString(STATE_KEY_STATE);
+        if (!TextUtils.equals(mState, newState)) {
+            mState = newState;
+            reloadIssueList();
+            updateHeaderColor();
+            mActivity.invalidateTitle();
+        }
     }
 
     private void reloadIssueList() {
