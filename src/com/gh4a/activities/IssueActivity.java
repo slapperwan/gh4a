@@ -132,6 +132,7 @@ public class IssueActivity extends BaseActivity implements
         protected void onResultReady(Boolean result) {
             mIsCollaborator = result;
             updateFabVisibility();
+            updateCommentLockState();
             supportInvalidateOptionsMenu();
         }
     };
@@ -310,6 +311,7 @@ public class IssueActivity extends BaseActivity implements
 
         mHeader.setVisibility(View.VISIBLE);
         updateFabVisibility();
+        updateCommentLockState();
     }
 
     @Override
@@ -383,6 +385,7 @@ public class IssueActivity extends BaseActivity implements
             @Override
             public void run() {
                 updateFabVisibility();
+                updateCommentLockState();
             }
         });
 
@@ -391,6 +394,11 @@ public class IssueActivity extends BaseActivity implements
             lm.getLoader(i).onContentChanged();
         }
         super.onRefresh();
+    }
+
+    private void updateCommentLockState() {
+        boolean locked = mIssue != null && mIssue.isLocked() && !mIsCollaborator;
+        mCommentFragment.setLocked(locked);
     }
 
     private void updateFabVisibility() {

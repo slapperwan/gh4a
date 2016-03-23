@@ -33,6 +33,12 @@ public class CommentBoxFragment extends Fragment implements
     private View mSendButton;
     private EditText mCommentEditor;
     private Callback mCallback;
+    private boolean mLocked;
+
+    public void setLocked(boolean locked) {
+        mLocked = locked;
+        updateLockState();
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -61,7 +67,6 @@ public class CommentBoxFragment extends Fragment implements
         mSendButton.setEnabled(false);
 
         mCommentEditor = (EditText) view.findViewById(R.id.et_comment);
-        mCommentEditor.setHint(mCallback.getCommentEditorHintResId());
         mCommentEditor.addTextChangedListener(
                 new UiUtils.ButtonEnableTextWatcher(mCommentEditor, mSendButton));
 
@@ -69,6 +74,7 @@ public class CommentBoxFragment extends Fragment implements
         if (activity instanceof BaseActivity) {
             ((BaseActivity) activity).addAppBarOffsetListener(this);
         }
+        updateLockState();
     }
 
     @Override
@@ -104,6 +110,19 @@ public class CommentBoxFragment extends Fragment implements
     public boolean canChildScrollUp() {
         return mCommentEditor != null && mCommentEditor.hasFocus()
                 && UiUtils.canViewScrollUp(mCommentEditor);
+    }
+
+    private void updateLockState() {
+        if (mCommentEditor == null) {
+            return;
+        }
+
+        mCommentEditor.setEnabled(!mLocked);
+        mSendButton.setEnabled(!mLocked);
+
+        int hintResId = mLocked
+                ? R.string.comment_editor_locked_hint : mCallback.getCommentEditorHintResId();
+        mCommentEditor.setHint(hintResId);
     }
 
     private class CommentTask extends ProgressDialogTask<Void> {

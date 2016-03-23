@@ -130,6 +130,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         @Override
         protected void onResultReady(Boolean result) {
             mIsCollaborator = result;
+            updateCommentLockState();
             getActivity().supportInvalidateOptionsMenu();
         }
     };
@@ -154,6 +155,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         mRepoName = repo.getName();
 
         setHasOptionsMenu(true);
+        updateCommentLockState();
     }
 
     @Override
@@ -341,6 +343,11 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         if (Constants.Issue.STATE_OPEN.equals(mPullRequest.getState())) {
             getLoaderManager().initLoader(3, null, mStatusCallback);
         }
+    }
+
+    private void updateCommentLockState() {
+        boolean locked = mPullRequest.isLocked() && !mIsCollaborator;
+        mCommentFragment.setLocked(locked);
     }
 
     private void fillData() {
