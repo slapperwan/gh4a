@@ -15,6 +15,8 @@
  */
 package com.gh4a;
 
+import android.annotation.TargetApi;
+import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -22,8 +24,11 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -98,6 +103,24 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private final List<ColorDrawable> mStatusBarDrawables = new ArrayList<>();
     private final int[] mProgressColors = new int[2];
     private Animator mHeaderTransition;
+    private Handler mHandler = new Handler();
+
+    private Runnable mUpdateTaskDescriptionRunnable = new Runnable() {
+        private String mLabel;
+        private Bitmap mIcon;
+
+        @TargetApi(21)
+        @Override
+        public void run() {
+            if (mIcon == null) {
+                mLabel = getString(R.string.app_name);
+                mIcon = BitmapFactory.decodeResource(getResources(), R.drawable.octodroid);
+            }
+            ActivityManager.TaskDescription desc = new ActivityManager.TaskDescription(
+                    mLabel, mIcon, mProgressColors[0]);
+            setTaskDescription(desc);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -222,6 +245,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         mProgressColors[0] = color;
         mProgressColors[1] = statusBarColor;
         mProgress.invalidate();
+        scheduleTaskDescriptionUpdate();
     }
 
     public void transitionHeaderToColor(int colorAttrId, int statusBarColorAttrId) {
@@ -259,6 +283,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         animation.setDuration(200);
         animation.start();
         mHeaderTransition = animation;
+        scheduleTaskDescriptionUpdate();
     }
 
     private void cancelHeaderTransition() {
@@ -266,6 +291,13 @@ public abstract class BaseActivity extends AppCompatActivity implements
             mHeaderTransition.cancel();
         }
         mHeaderTransition = null;
+    }
+
+    private void scheduleTaskDescriptionUpdate() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mHandler.removeCallbacks(mUpdateTaskDescriptionRunnable);
+            mHandler.postDelayed(mUpdateTaskDescriptionRunnable, 500);
+        }
     }
 
     protected void updateRightNavigationDrawer() {

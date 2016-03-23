@@ -1,6 +1,9 @@
 package com.gh4a;
 
+import android.annotation.TargetApi;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -10,11 +13,14 @@ import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EdgeEffect;
 import android.widget.LinearLayout;
 
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
+
+import java.lang.reflect.Field;
 
 public abstract class BasePagerActivity extends BaseActivity implements
         SwipeRefreshLayout.ChildScrollDelegate, ViewPager.OnPageChangeListener {
@@ -24,6 +30,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
     private int[][] mTabHeaderColors;
     private boolean mScrolling;
     private boolean mErrorViewVisible;
+    private int mCurrentHeaderColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +39,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
         mAdapter = new FragmentAdapter();
         setContentView(R.layout.view_pager);
 
+        mCurrentHeaderColor = UiUtils.resolveColor(this, R.attr.colorPrimary);
         mTabHeaderColors = getTabHeaderColors();
         mPager = setupPager();
         updateTabVisibility();
@@ -63,6 +71,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
                 transitionHeaderToColor(R.attr.colorPrimary, R.attr.colorPrimaryDark);
             }
         }
+        tryUpdatePagerColor();
     }
 
     protected ViewPager getPager() {
@@ -138,6 +147,18 @@ public abstract class BasePagerActivity extends BaseActivity implements
         }
     }
 
+    @Override
+    protected void setHeaderColor(int color, int statusBarColor) {
+        super.setHeaderColor(color, statusBarColor);
+        mCurrentHeaderColor = color;
+    }
+
+    @Override
+    public void transitionHeaderToColor(int colorAttrId, int statusBarColorAttrId) {
+        super.transitionHeaderToColor(colorAttrId, statusBarColorAttrId);
+        mCurrentHeaderColor = UiUtils.resolveColor(this, colorAttrId);
+    }
+
     protected abstract int[] getTabTitleResIds();
     protected abstract Fragment getFragment(int position);
     protected boolean fragmentNeedsRefresh(Fragment object) {
@@ -169,6 +190,9 @@ public abstract class BasePagerActivity extends BaseActivity implements
     @Override
     public void onPageScrollStateChanged(int state) {
         mScrolling = state != ViewPager.SCROLL_STATE_IDLE;
+        if (!mScrolling) {
+            tryUpdatePagerColor();
+        }
     }
 
     protected void onPageMoved(int position, float fraction) {
@@ -239,4 +263,81 @@ public abstract class BasePagerActivity extends BaseActivity implements
             return POSITION_UNCHANGED;
         }
     }
+
+    private void tryUpdatePagerColor() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ViewPagerEdgeColorHelper helper =
+                    (ViewPagerEdgeColorHelper) mPager.getTag(R.id.EdgeColorHelper);
+            if (helper == null) {
+                helper = new ViewPagerEdgeColorHelper(mPager);
+                mPager.setTag(R.id.EdgeColorHelper, helper);
+            }
+            helper.setColor(mCurrentHeaderColor);
+        }
+    }
+
+    @TargetApi(21)
+    private static class ViewPagerEdgeColorHelper {
+        private ViewPager mPager;
+        private int mColor;
+        private EdgeEffect mLeftEffect, mRightEffect;
+
+        private static Field sLeftEffectField, sRightEffectField;
+
+        public ViewPagerEdgeColorHelper(ViewPager pager) {
+            mPager = pager;
+            mColor = 0;
+        }
+        public void setColor(int color) {
+            mColor = color;
+            applyIfPossible();
+        }
+
+        private void applyIfPossible() {
+            if (!ensureStaticFields()) {
+                return;
+            }
+            if (mLeftEffect == null || mRightEffect == null) {
+                try {
+                    Object leftEffect = sLeftEffectField.get(mPager);
+                    Object rightEffect = sRightEffectField.get(mPager);
+
+                    final Field edgeField = leftEffect.getClass().getDeclaredField("mEdgeEffect");
+                    edgeField.setAccessible(true);
+
+                    mLeftEffect = (EdgeEffect) edgeField.get(leftEffect);
+                    mRightEffect = (EdgeEffect) edgeField.get(rightEffect);
+                } catch (IllegalAccessException | NoSuchFieldException e) {
+                    mLeftEffect = mRightEffect = null;
+                }
+            }
+            applyColor(mLeftEffect);
+            applyColor(mRightEffect);
+        }
+
+        private void applyColor(EdgeEffect effect) {
+            if (effect != null) {
+                final int alpha = Color.alpha(effect.getColor());
+                effect.setColor(Color.argb(alpha, Color.red(mColor),
+                        Color.green(mColor), Color.blue(mColor)));
+            }
+        }
+
+        private boolean ensureStaticFields() {
+            if (sLeftEffectField != null && sRightEffectField != null) {
+                return true;
+            }
+            try {
+                sLeftEffectField = ViewPager.class.getDeclaredField("mLeftEdge");
+                sLeftEffectField.setAccessible(true);
+                sRightEffectField = ViewPager.class.getDeclaredField("mRightEdge");
+                sRightEffectField.setAccessible(true);
+                return true;
+            } catch (NoSuchFieldException e) {
+                // ignored
+            }
+            return false;
+        }
+    }
+
 }

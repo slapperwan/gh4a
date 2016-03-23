@@ -86,10 +86,10 @@ public class UiUtils {
     public static void trySetListOverscrollColor(RecyclerView view, int color) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             RecyclerViewEdgeColorHelper helper =
-                    (RecyclerViewEdgeColorHelper) view.getTag(R.id.RecyclerViewEdgeColorHelper);
+                    (RecyclerViewEdgeColorHelper) view.getTag(R.id.EdgeColorHelper);
             if (helper == null) {
                 helper = new RecyclerViewEdgeColorHelper(view);
-                view.setTag(R.id.RecyclerViewEdgeColorHelper, helper);
+                view.setTag(R.id.EdgeColorHelper, helper);
             }
             helper.setColor(color);
         }

@@ -71,6 +71,6 @@
         <attr name="allCaps" format="boolean"/>
     </declare-styleable>
 
-    <item name="RecyclerViewEdgeColorHelper" type="id" />
+    <item name="EdgeColorHelper" type="id" />
     <item name="FloatingActionButtonScrollEnabled" type="id" />
 </resources>
