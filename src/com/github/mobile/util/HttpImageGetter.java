@@ -31,6 +31,7 @@ import android.text.Html.ImageGetter;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ImageSpan;
+import android.view.Display;
 import android.view.WindowManager;
 import android.widget.TextView;
 
@@ -154,6 +155,7 @@ public class HttpImageGetter implements ImageGetter {
     private final File dir;
 
     private final int width;
+    private final int height;
 
     private final Map<Object, CharSequence> rawHtmlCache = new HashMap<>();
 
@@ -176,11 +178,15 @@ public class HttpImageGetter implements ImageGetter {
         dir = context.getCacheDir();
 
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        final Point size;
         if (Build.VERSION.SDK_INT < 13) {
-            width = fetchDisplayWidthPreHoneycomb(wm);
+            size = fetchDisplaySizePreHoneycomb(wm);
         } else {
-            width = fetchDisplayWidth(wm);
+            size = fetchDisplaySize(wm);
         }
+
+        width = size.x;
+        height = size.y;
 
         loadedBitmaps = new ArrayList<>();
         loading = new LoadingImageGetter(context, 24);
@@ -237,15 +243,16 @@ public class HttpImageGetter implements ImageGetter {
     }
 
     @SuppressWarnings("deprecation")
-    private int fetchDisplayWidthPreHoneycomb(WindowManager wm) {
-        return wm.getDefaultDisplay().getWidth();
+    private Point fetchDisplaySizePreHoneycomb(WindowManager wm) {
+        Display display = wm.getDefaultDisplay();
+        return new Point(display.getWidth(), display.getHeight());
     }
 
     @TargetApi(13)
-    private int fetchDisplayWidth(WindowManager wm) {
+    private Point fetchDisplaySize(WindowManager wm) {
         Point size = new Point();
         wm.getDefaultDisplay().getSize(size);
-        return size.x;
+        return size;
     }
 
     private HttpImageGetter show(final TextView view, final CharSequence html, final Object id) {
@@ -404,7 +411,7 @@ public class HttpImageGetter implements ImageGetter {
                     }
                     if (mime != null && mime.startsWith("image/svg")) {
                         bitmap = ImageUtils.renderSvgToBitmap(context.getResources(),
-                                is, width, Integer.MAX_VALUE);
+                                is, width, height);
                     } else {
                         boolean isGif = mime != null && mime.startsWith("image/gif");
                         if (!isGif || canLoadGif()) {
@@ -415,7 +422,7 @@ public class HttpImageGetter implements ImageGetter {
                                     d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
                                     return d;
                                 } else {
-                                    bitmap = ImageUtils.getBitmap(output, width, Integer.MAX_VALUE);
+                                    bitmap = ImageUtils.getBitmap(output, width, height);
                                 }
                             }
                         }

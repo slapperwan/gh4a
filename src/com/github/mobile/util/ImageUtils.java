@@ -100,12 +100,13 @@ public class ImageUtils {
     /**
      * Get bitmap with maximum height or width
      *
-     * @param imagePath
+     * @param image
      * @param width
      * @param height
      * @return image
      */
-    public static Bitmap getBitmap(final String imagePath, int width, int height) {
+    public static Bitmap getBitmap(final File image, int width, int height) {
+        String imagePath = image.getAbsolutePath();
         Point size = getSize(imagePath);
         if (size == null) {
             return null;
@@ -124,35 +125,51 @@ public class ImageUtils {
         return getBitmap(imagePath, scale);
     }
 
-    /**
-     * Get bitmap with maximum height or width
-     *
-     * @param image
-     * @param width
-     * @param height
-     * @return image
-     */
-    public static Bitmap getBitmap(final File image, int width, int height) {
-        return getBitmap(image.getAbsolutePath(), width, height);
-    }
-
-    public static Bitmap renderSvgToBitmap(Resources res, InputStream is, int width, int height) {
+    public static Bitmap renderSvgToBitmap(Resources res, InputStream is,
+            int maxWidth, int maxHeight) {
         try {
             SVG svg = SVG.getFromInputStream(is);
             if (svg != null) {
                 svg.setRenderDPI(DisplayMetrics.DENSITY_DEFAULT);
-                float density = res.getDisplayMetrics().density;
+                Float density = res.getDisplayMetrics().density;
                 int docWidth = (int) (svg.getDocumentWidth() * density);
                 int docHeight = (int) (svg.getDocumentHeight() * density);
-                while (docWidth >= width || docHeight >= height) {
+                if (docWidth < 0 || docHeight < 0) {
+                    float aspectRatio = svg.getDocumentAspectRatio();
+                    if (aspectRatio > 0) {
+                        float heightForAspect = (float) maxWidth / aspectRatio;
+                        float widthForAspect = (float) maxHeight * aspectRatio;
+                        if (widthForAspect < heightForAspect) {
+                            docWidth = Math.round(widthForAspect);
+                            docHeight = maxHeight;
+                        } else {
+                            docWidth = maxWidth;
+                            docHeight = Math.round(heightForAspect);
+                        }
+                    } else {
+                        docWidth = maxWidth;
+                        docHeight = maxHeight;
+                    }
+
+                    // we didn't take density into account anymore when calculating docWidth
+                    // and docHeight, so don't scale with it and just let the renderer
+                    // figure out the scaling
+                    density = null;
+                }
+
+                while (docWidth >= maxWidth || docHeight >= maxHeight) {
                     docWidth /= 2;
                     docHeight /= 2;
-                    density /= 2;
+                    if (density != null) {
+                        density /= 2;
+                    }
                 }
 
                 Bitmap bitmap = Bitmap.createBitmap(docWidth, docHeight, Bitmap.Config.ARGB_8888);
                 Canvas canvas = new Canvas(bitmap);
-                canvas.scale(density, density);
+                if (density != null) {
+                    canvas.scale(density, density);
+                }
                 svg.renderToCanvas(canvas);
                 return bitmap;
             }
