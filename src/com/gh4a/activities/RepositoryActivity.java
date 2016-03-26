@@ -162,12 +162,6 @@ public class RepositoryActivity extends BasePagerActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle bundle = getIntent().getExtras();
-        mRepoOwner = bundle.getString(Constants.Repository.OWNER);
-        mRepoName = bundle.getString(Constants.Repository.NAME);
-        mSelectedRef = bundle.getString(Constants.Repository.SELECTED_REF);
-        mInitialPage = bundle.getInt(EXTRA_INITIAL_PAGE, -1);
-
         mActionBar = getSupportActionBar();
         mActionBar.setTitle(mRepoOwner + "/" + mRepoName);
         mActionBar.setDisplayHomeAsUpEnabled(true);
@@ -180,6 +174,15 @@ public class RepositoryActivity extends BasePagerActivity {
             getSupportLoaderManager().initLoader(LOADER_WATCHING, null, mWatchCallback);
             getSupportLoaderManager().initLoader(LOADER_STARRING, null, mStarCallback);
         }
+    }
+
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mRepoOwner = extras.getString(Constants.Repository.OWNER);
+        mRepoName = extras.getString(Constants.Repository.NAME);
+        mSelectedRef = extras.getString(Constants.Repository.SELECTED_REF);
+        mInitialPage = extras.getInt(EXTRA_INITIAL_PAGE, -1);
     }
 
     private void updateTitle() {

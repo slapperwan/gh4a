@@ -15,34 +15,44 @@
  */
 package com.gh4a.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 
-import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.fragment.ForkListFragment;
+import com.gh4a.utils.IntentUtils;
 
-public class ForkListActivity extends BaseActivity {
+public class ForkListActivity extends FragmentContainerActivity {
+    private String mRepoOwner;
+    private String mRepoName;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle data = getIntent().getExtras();
-        String repoOwner = data.getString(Constants.Repository.OWNER);
-        String repoName = data.getString(Constants.Repository.NAME);
-
-        if (savedInstanceState == null) {
-            Fragment fragment = ForkListFragment.newInstance(repoOwner, repoName);
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.content_container, fragment)
-                    .commit();
-        }
-
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.repo_forks);
-        actionBar.setSubtitle(repoOwner + "/" + repoName);
+        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mRepoOwner = extras.getString(Constants.Repository.OWNER);
+        mRepoName = extras.getString(Constants.Repository.NAME);
+    }
+
+    @Override
+    protected Fragment onCreateFragment() {
+        return ForkListFragment.newInstance(mRepoOwner, mRepoName);
+    }
+
+    @Override
+    protected Intent navigateUp() {
+        return IntentUtils.getRepoActivityIntent(this, mRepoOwner, mRepoName, null);
     }
 }

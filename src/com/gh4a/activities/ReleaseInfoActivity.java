@@ -90,12 +90,6 @@ public class ReleaseInfoActivity extends BaseActivity implements
 
         setContentView(R.layout.release);
 
-        Bundle extras = getIntent().getExtras();
-        mRepoOwner = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
-        mRelease = (Release) extras.getSerializable(Constants.Release.RELEASE);
-        mReleaseId = extras.getLong(Constants.Release.ID);
-
         mRootView = findViewById(R.id.root);
         mImageGetter = new HttpImageGetter(this);
         setChildScrollDelegate(this);
@@ -111,6 +105,15 @@ public class ReleaseInfoActivity extends BaseActivity implements
             setContentShown(false);
             getSupportLoaderManager().initLoader(0, null, mReleaseCallback);
         }
+    }
+
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mRepoOwner = extras.getString(Constants.Repository.OWNER);
+        mRepoName = extras.getString(Constants.Repository.NAME);
+        mRelease = (Release) extras.getSerializable(Constants.Release.RELEASE);
+        mReleaseId = extras.getLong(Constants.Release.ID);
     }
 
     @Override

@@ -98,13 +98,6 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle data = getIntent().getExtras();
-        mRepoOwner = data.getString(Constants.Repository.OWNER);
-        mRepoName = data.getString(Constants.Repository.NAME);
-        mPath = data.getString(Constants.Object.PATH);
-        mSha = data.getString(Constants.Object.OBJECT_SHA);
-        mDiff = data.getString(Constants.Commit.DIFF);
-
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(FileUtils.getFileName(mPath));
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
@@ -112,8 +105,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
 
         mWebView.setOnTouchListener(this);
 
-        List<CommitComment> comments =
-                (ArrayList<CommitComment>) data.getSerializable(Constants.Commit.COMMENTS);
+        List<CommitComment> comments = (ArrayList<CommitComment>)
+                getIntent().getSerializableExtra(Constants.Commit.COMMENTS);
 
         if (comments != null) {
             addCommentsToMap(comments);
@@ -121,6 +114,16 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         } else {
             getSupportLoaderManager().initLoader(0, null, mCommentCallback);
         }
+    }
+
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mRepoOwner = extras.getString(Constants.Repository.OWNER);
+        mRepoName = extras.getString(Constants.Repository.NAME);
+        mPath = extras.getString(Constants.Object.PATH);
+        mSha = extras.getString(Constants.Object.OBJECT_SHA);
+        mDiff = extras.getString(Constants.Commit.DIFF);
     }
 
     @Override

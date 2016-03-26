@@ -56,14 +56,18 @@ public class GistViewerActivity extends WebViewerActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mFileName = getIntent().getExtras().getString(Constants.Gist.FILENAME);
-        mGistId = getIntent().getExtras().getString(Constants.Gist.ID);
-
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(mFileName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         getSupportLoaderManager().initLoader(0, null, mGistCallback);
+    }
+
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mFileName = extras.getString(Constants.Gist.FILENAME);
+        mGistId = extras.getString(Constants.Gist.ID);
     }
 
     @Override

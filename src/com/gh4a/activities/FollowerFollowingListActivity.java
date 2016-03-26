@@ -20,14 +20,14 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 
-import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.fragment.FollowersFollowingListFragment;
 import com.gh4a.utils.IntentUtils;
 
-public class FollowerFollowingListActivity extends BaseActivity {
+public class FollowerFollowingListActivity extends FragmentContainerActivity {
     private String mUserLogin;
+    private boolean mShowFollowers;
 
     public static final String EXTRA_SHOW_FOLLOWERS = "show_followers";
 
@@ -35,21 +35,22 @@ public class FollowerFollowingListActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle data = getIntent().getExtras();
-        boolean showFollowers = data.getBoolean(EXTRA_SHOW_FOLLOWERS);
-        mUserLogin = data.getString(Constants.User.LOGIN);
-
-        if (savedInstanceState == null) {
-            Fragment fragment = FollowersFollowingListFragment.newInstance(mUserLogin, showFollowers);
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.content_container, fragment)
-                    .commit();
-        }
-
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(showFollowers ? R.string.user_followers : R.string.user_following);
+        actionBar.setTitle(mShowFollowers ? R.string.user_followers : R.string.user_following);
         actionBar.setSubtitle(mUserLogin);
         actionBar.setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mShowFollowers = extras.getBoolean(EXTRA_SHOW_FOLLOWERS);
+        mUserLogin = extras.getString(Constants.User.LOGIN);
+    }
+
+    @Override
+    protected Fragment onCreateFragment() {
+        return FollowersFollowingListFragment.newInstance(mUserLogin, mShowFollowers);
     }
 
     @Override

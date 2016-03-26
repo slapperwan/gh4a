@@ -17,15 +17,15 @@ package com.gh4a.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 
-import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.fragment.ContributorListFragment;
 import com.gh4a.utils.IntentUtils;
 
-public class ContributorListActivity extends BaseActivity {
+public class ContributorListActivity extends FragmentContainerActivity {
     private String mUserLogin;
     private String mRepoName;
 
@@ -33,22 +33,22 @@ public class ContributorListActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle extras = getIntent().getExtras();
-        mUserLogin = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
-
-        if (savedInstanceState == null) {
-            ContributorListFragment fragment = ContributorListFragment.newInstance(
-                    mUserLogin, mRepoName);
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.content_container, fragment)
-                    .commit();
-        }
-
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.repo_contributors);
         actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mUserLogin = extras.getString(Constants.Repository.OWNER);
+        mRepoName = extras.getString(Constants.Repository.NAME);
+    }
+
+    @Override
+    protected Fragment onCreateFragment() {
+        return ContributorListFragment.newInstance(mUserLogin, mRepoName);
     }
 
     @Override

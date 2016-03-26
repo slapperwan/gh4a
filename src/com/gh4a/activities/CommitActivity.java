@@ -44,15 +44,18 @@ public class CommitActivity extends BasePagerActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle data = getIntent().getExtras();
-        mRepoOwner = data.getString(Constants.Repository.OWNER);
-        mRepoName = data.getString(Constants.Repository.NAME);
-        mObjectSha = data.getString(Constants.Object.OBJECT_SHA);
-
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getString(R.string.commit_title, mObjectSha.substring(0, 7)));
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mRepoOwner = extras.getString(Constants.Repository.OWNER);
+        mRepoName = extras.getString(Constants.Repository.NAME);
+        mObjectSha = extras.getString(Constants.Object.OBJECT_SHA);
     }
 
     @Override

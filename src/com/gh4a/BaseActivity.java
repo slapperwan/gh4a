@@ -35,8 +35,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -125,6 +123,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME);
+        onInitExtras(getIntent().getExtras());
         super.onCreate(savedInstanceState);
 
         super.setContentView(R.layout.base_activity);
@@ -233,6 +232,10 @@ public abstract class BaseActivity extends AppCompatActivity implements
         return mCoordinatorLayout;
     }
 
+    protected void onInitExtras(Bundle extras) {
+
+    }
+
     protected void setHeaderColor(int color, int statusBarColor) {
         cancelHeaderTransition();
 
@@ -319,7 +322,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
     protected void onPrepareRightNavigationDrawerMenu(Menu menu) {
 
     }
-
 
     protected void goToToplevelActivity() {
         Intent intent = getToplevelActivityIntent();
@@ -454,11 +456,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     @Override
     public void onRefresh() {
-        FragmentManager fm = getSupportFragmentManager();
-        Fragment f = fm.findFragmentById(R.id.content_container);
-        if (f instanceof LoaderCallbacks.ParentCallback) {
-            ((LoaderCallbacks.ParentCallback) f).onRefresh();
-        }
         supportInvalidateOptionsMenu();
         mSwipeLayout.setRefreshing(false);
     }

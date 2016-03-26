@@ -51,11 +51,6 @@ public class UserActivity extends BasePagerActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Bundle data = getIntent().getExtras();
-        mUserLogin = data.getString(Constants.User.LOGIN);
-        mUserName = data.getString(Constants.User.NAME);
-        mIsSelf = mUserLogin.equals(Gh4Application.get().getAuthLogin());
-
         super.onCreate(savedInstanceState);
 
         ActionBar actionBar = getSupportActionBar();
@@ -64,6 +59,14 @@ public class UserActivity extends BasePagerActivity {
         if (!mIsSelf && Gh4Application.get().isAuthorized()) {
             getSupportLoaderManager().initLoader(4, null, mIsFollowingCallback);
         }
+    }
+
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mUserLogin = extras.getString(Constants.User.LOGIN);
+        mUserName = extras.getString(Constants.User.NAME);
+        mIsSelf = mUserLogin.equals(Gh4Application.get().getAuthLogin());
     }
 
     @Override

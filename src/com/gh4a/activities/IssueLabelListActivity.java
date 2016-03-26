@@ -87,9 +87,6 @@ public class IssueLabelListActivity extends BaseActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.OWNER);
-        mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);
-
         setContentView(R.layout.generic_list);
         setContentShown(false);
 
@@ -136,6 +133,13 @@ public class IssueLabelListActivity extends BaseActivity implements
                 }
             }
         }
+    }
+
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mRepoOwner = extras.getString(Constants.Repository.OWNER);
+        mRepoName = extras.getString(Constants.Repository.NAME);
     }
 
     @Override

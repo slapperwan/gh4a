@@ -192,11 +192,8 @@ public class IssueListActivity extends BasePagerActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle data = getIntent().getExtras();
-        mRepoOwner = data.getString(Constants.Repository.OWNER);
-        mRepoName = data.getString(Constants.Repository.NAME);
-
-        if (TextUtils.equals(data.getString(Constants.Issue.STATE), Constants.Issue.STATE_CLOSED)) {
+        String state = getIntent().getStringExtra(Constants.Issue.STATE);
+        if (TextUtils.equals(state, Constants.Issue.STATE_CLOSED)) {
             getPager().setCurrentItem(1);
         }
 
@@ -219,6 +216,13 @@ public class IssueListActivity extends BasePagerActivity implements
         actionBar.setTitle(R.string.issues);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mRepoOwner = extras.getString(Constants.Repository.OWNER);
+        mRepoName = extras.getString(Constants.Repository.NAME);
     }
 
     @Override

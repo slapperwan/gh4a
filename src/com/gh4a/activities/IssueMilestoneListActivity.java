@@ -24,7 +24,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -32,23 +31,13 @@ import com.gh4a.fragment.IssueMilestoneListFragment;
 import com.gh4a.fragment.LoadingListFragmentBase;
 import com.gh4a.utils.IntentUtils;
 
-public class IssueMilestoneListActivity extends BaseActivity implements
+public class IssueMilestoneListActivity extends FragmentContainerActivity implements
         View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener {
     private String mRepoOwner;
     private String mRepoName;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mRepoOwner = getIntent().getExtras().getString(Constants.Repository.OWNER);
-        mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);
-
-        if (savedInstanceState == null) {
-            Fragment fragment = IssueMilestoneListFragment.newInstance(mRepoOwner, mRepoName);
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.content_container, fragment)
-                    .commit();
-        }
 
         if (Gh4Application.get().isAuthorized()) {
             CoordinatorLayout rootLayout = getRootLayout();
@@ -62,6 +51,18 @@ public class IssueMilestoneListActivity extends BaseActivity implements
         actionBar.setTitle(R.string.issue_milestones);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mRepoOwner = extras.getString(Constants.Repository.OWNER);
+        mRepoName = extras.getString(Constants.Repository.NAME);
+    }
+
+    @Override
+    protected Fragment onCreateFragment() {
+        return IssueMilestoneListFragment.newInstance(mRepoOwner, mRepoName);
     }
 
     @Override

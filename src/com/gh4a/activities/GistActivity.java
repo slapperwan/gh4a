@@ -83,8 +83,6 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mGistId = getIntent().getExtras().getString(Constants.Gist.ID);
-
         setContentView(R.layout.gist);
         setContentShown(false);
 
@@ -94,6 +92,12 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
 
         getSupportLoaderManager().initLoader(0, null, mGistCallback);
         getSupportLoaderManager().initLoader(1, null, mStarCallback);
+    }
+
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mGistId = extras.getString(Constants.Gist.ID);
     }
 
     @Override

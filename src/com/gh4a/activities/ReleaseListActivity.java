@@ -63,9 +63,6 @@ public class ReleaseListActivity extends BaseActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mUserLogin = getIntent().getStringExtra(Constants.Repository.OWNER);
-        mRepoName = getIntent().getStringExtra(Constants.Repository.NAME);
-
         setContentView(R.layout.generic_list);
         setContentShown(false);
         setEmptyText(R.string.no_releases_found);
@@ -85,6 +82,13 @@ public class ReleaseListActivity extends BaseActivity implements
         setChildScrollDelegate(this);
 
         getSupportLoaderManager().initLoader(0, null, mReleaseCallback);
+    }
+
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mUserLogin = extras.getString(Constants.Repository.OWNER);
+        mRepoName = extras.getString(Constants.Repository.NAME);
     }
 
     @Override

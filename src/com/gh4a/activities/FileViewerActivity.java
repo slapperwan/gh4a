@@ -75,20 +75,23 @@ public class FileViewerActivity extends WebViewerActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle data = getIntent().getExtras();
-        mRepoOwner = data.getString(Constants.Repository.OWNER);
-        mRepoName = data.getString(Constants.Repository.NAME);
-        mPath = data.getString(Constants.Object.PATH);
-        mRef = data.getString(Constants.Object.REF);
-        mHighlightStart = data.getInt(Constants.Object.HIGHLIGHT_START, -1);
-        mHighlightEnd = data.getInt(Constants.Object.HIGHLIGHT_END, -1);
-
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(FileUtils.getFileName(mPath));
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         getSupportLoaderManager().initLoader(0, null, mFileCallback);
+    }
+
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mRepoOwner = extras.getString(Constants.Repository.OWNER);
+        mRepoName = extras.getString(Constants.Repository.NAME);
+        mPath = extras.getString(Constants.Object.PATH);
+        mRef = extras.getString(Constants.Object.REF);
+        mHighlightStart = extras.getInt(Constants.Object.HIGHLIGHT_START, -1);
+        mHighlightEnd = extras.getInt(Constants.Object.HIGHLIGHT_END, -1);
     }
 
     @Override

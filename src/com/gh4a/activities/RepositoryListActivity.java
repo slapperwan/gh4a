@@ -16,17 +16,17 @@
 package com.gh4a.activities;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
+import android.os.PersistableBundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.fragment.RepositoryListContainerFragment;
 
-public class RepositoryListActivity extends BaseActivity implements
+public class RepositoryListActivity extends FragmentContainerActivity implements
         RepositoryListContainerFragment.Callback {
     private String mUserLogin;
     private String mUserType;
@@ -36,24 +36,9 @@ public class RepositoryListActivity extends BaseActivity implements
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Bundle data = getIntent().getExtras();
-        mUserLogin = data.getString(Constants.User.LOGIN);
-        mUserType = data.getString(Constants.User.TYPE);
-
-        mFilterDrawerHelper = RepositoryListContainerFragment.FilterDrawerHelper.create(
-                mUserLogin, mUserType);
-        mSortDrawerHelper = new RepositoryListContainerFragment.SortDrawerHelper();
-
         super.onCreate(savedInstanceState);
 
-        FragmentManager fm = getSupportFragmentManager();
-        if (savedInstanceState == null) {
-            mFragment = RepositoryListContainerFragment.newInstance(mUserLogin, mUserType);
-            fm.beginTransaction().add(R.id.content_container, mFragment).commit();
-        } else {
-            mFragment = (RepositoryListContainerFragment) fm.findFragmentById(R.id.content_container);
-        }
-
+        mFragment = (RepositoryListContainerFragment) getFragment();
         mSortDrawerHelper.setFilterType(mFragment.getFilterType());
         updateRightNavigationDrawer();
 
@@ -61,8 +46,23 @@ public class RepositoryListActivity extends BaseActivity implements
         actionBar.setTitle(R.string.user_pub_repos);
         actionBar.setSubtitle(mUserLogin);
         actionBar.setDisplayHomeAsUpEnabled(true);
+    }
 
-        setChildScrollDelegate(mFragment);
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        Bundle data = getIntent().getExtras();
+        mUserLogin = data.getString(Constants.User.LOGIN);
+        mUserType = data.getString(Constants.User.TYPE);
+
+        mFilterDrawerHelper = RepositoryListContainerFragment.FilterDrawerHelper.create(
+                mUserLogin, mUserType);
+        mSortDrawerHelper = new RepositoryListContainerFragment.SortDrawerHelper();
+    }
+
+    @Override
+    protected Fragment onCreateFragment() {
+        return RepositoryListContainerFragment.newInstance(mUserLogin, mUserType);
     }
 
     @Override

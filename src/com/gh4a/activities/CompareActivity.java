@@ -20,13 +20,12 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 
-import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.fragment.CommitCompareFragment;
 import com.gh4a.utils.IntentUtils;
 
-public class CompareActivity extends BaseActivity {
+public class CompareActivity extends FragmentContainerActivity {
     private String mRepoOwner;
     private String mRepoName;
 
@@ -34,24 +33,25 @@ public class CompareActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mRepoOwner = getIntent().getStringExtra(Constants.Repository.OWNER);
-        mRepoName = getIntent().getStringExtra(Constants.Repository.NAME);
-
-        String base = getIntent().getStringExtra(Constants.Repository.BASE);
-        String head = getIntent().getStringExtra(Constants.Repository.HEAD);
-
-        if (savedInstanceState == null) {
-            Fragment fragment =
-                    CommitCompareFragment.newInstance(mRepoOwner, mRepoName, base, head);
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.content_container, fragment)
-                    .commit();
-        }
-
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.commit_compare);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mRepoOwner = extras.getString(Constants.Repository.OWNER);
+        mRepoName = extras.getString(Constants.Repository.NAME);
+    }
+
+    @Override
+    protected Fragment onCreateFragment() {
+        String base = getIntent().getStringExtra(Constants.Repository.BASE);
+        String head = getIntent().getStringExtra(Constants.Repository.HEAD);
+
+        return CommitCompareFragment.newInstance(mRepoOwner, mRepoName, base, head);
     }
 
     @Override

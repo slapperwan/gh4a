@@ -78,11 +78,6 @@ public class PullRequestActivity extends BasePagerActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle data = getIntent().getExtras();
-        mRepoOwner = data.getString(Constants.Repository.OWNER);
-        mRepoName = data.getString(Constants.Repository.NAME);
-        mPullRequestNumber = data.getInt(Constants.PullRequest.NUMBER);
-
         LayoutInflater inflater = getLayoutInflater();
 
         mHeader = (ViewGroup) inflater.inflate(R.layout.issue_header, null);
@@ -98,6 +93,14 @@ public class PullRequestActivity extends BasePagerActivity implements
         setContentShown(false);
 
         getSupportLoaderManager().initLoader(0, null, mPullRequestCallback);
+    }
+
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mRepoOwner = extras.getString(Constants.Repository.OWNER);
+        mRepoName = extras.getString(Constants.Repository.NAME);
+        mPullRequestNumber = extras.getInt(Constants.PullRequest.NUMBER);
     }
 
     @Override

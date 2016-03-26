@@ -33,20 +33,22 @@ public abstract class EditCommentActivity extends BaseActivity {
 
         setContentView(R.layout.edit_text);
 
-        Bundle data = getIntent().getExtras();
-        mRepoOwner = data.getString(Constants.Repository.OWNER);
-        mRepoName = data.getString(Constants.Repository.NAME);
-        mCommentId = data.getLong(Constants.Comment.ID);
-        String text = data.getString(Constants.Comment.BODY);
-
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getString(R.string.issue_comment_title) + " " + mCommentId);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         mEditText = (EditText) findViewById(R.id.et_text);
-        mEditText.setText(text);
+        mEditText.setText(getIntent().getStringExtra(Constants.Comment.BODY));
 
         setResult(RESULT_CANCELED);
+    }
+
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mRepoOwner = extras.getString(Constants.Repository.OWNER);
+        mRepoName = extras.getString(Constants.Repository.NAME);
+        mCommentId = extras.getLong(Constants.Comment.ID);
     }
 
     @Override

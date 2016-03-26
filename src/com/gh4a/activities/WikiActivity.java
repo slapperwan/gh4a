@@ -29,17 +29,19 @@ public class WikiActivity extends WebViewerActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mUserLogin = getIntent().getStringExtra(Constants.Repository.OWNER);
-        mRepoName = getIntent().getStringExtra(Constants.Repository.NAME);
-        String title = getIntent().getStringExtra(Constants.Blog.TITLE);
-        String content = getIntent().getStringExtra(Constants.Blog.CONTENT);
-
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(title);
+        actionBar.setTitle(getIntent().getStringExtra(Constants.Blog.TITLE));
         actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        loadUnthemedHtml(content);
+        loadUnthemedHtml(getIntent().getStringExtra(Constants.Blog.CONTENT));
+    }
+
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mUserLogin = extras.getString(Constants.Repository.OWNER);
+        mRepoName = extras.getString(Constants.Repository.NAME);
     }
 
     @Override

@@ -70,11 +70,6 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle data = getIntent().getExtras();
-        mRepoOwner = data.getString(Constants.Repository.OWNER);
-        mRepoName = data.getString(Constants.Repository.NAME);
-        mMilestone = (Milestone) data.getSerializable(EXTRA_MILESTONE);
-
         if (!Gh4Application.get().isAuthorized()) {
             Intent intent = new Intent(this, Github4AndroidActivity.class);
             startActivity(intent);
@@ -128,6 +123,14 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         mTitleView.setText(mMilestone.getTitle());
         mDescriptionView.setText(mMilestone.getDescription());
         updateLabels();
+    }
+
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mRepoOwner = extras.getString(Constants.Repository.OWNER);
+        mRepoName = extras.getString(Constants.Repository.NAME);
+        mMilestone = (Milestone) extras.getSerializable(EXTRA_MILESTONE);
     }
 
     private boolean isInEditMode() {

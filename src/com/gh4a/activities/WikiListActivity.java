@@ -78,9 +78,6 @@ public class WikiListActivity extends BaseActivity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mUserLogin = getIntent().getStringExtra(Constants.Repository.OWNER);
-        mRepoName = getIntent().getStringExtra(Constants.Repository.NAME);
-
         setContentView(R.layout.generic_list);
         setEmptyText(R.string.no_wiki_updates_found);
         setContentShown(false);
@@ -100,6 +97,13 @@ public class WikiListActivity extends BaseActivity
         setChildScrollDelegate(this);
 
         getSupportLoaderManager().initLoader(0, null, mFeedCallback);
+    }
+
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mUserLogin = extras.getString(Constants.Repository.OWNER);
+        mRepoName = extras.getString(Constants.Repository.NAME);
     }
 
     @Override

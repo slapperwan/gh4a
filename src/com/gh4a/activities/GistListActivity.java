@@ -17,39 +17,36 @@ package com.gh4a.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 
-import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.fragment.GistListFragment;
 import com.gh4a.utils.IntentUtils;
 
-public class GistListActivity extends BaseActivity {
+public class GistListActivity extends FragmentContainerActivity {
     private String mUserLogin;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mUserLogin = getIntent().getExtras().getString(Constants.User.LOGIN);
-
-        FragmentManager fm = getSupportFragmentManager();
-        final GistListFragment fragment;
-        if (savedInstanceState == null) {
-            fragment = GistListFragment.newInstance(mUserLogin, false);
-            fm.beginTransaction().add(R.id.content_container, fragment).commit();
-        } else {
-            fragment = (GistListFragment) fm.findFragmentById(R.id.content_container);
-        }
-
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.gists);
         actionBar.setSubtitle(mUserLogin);
         actionBar.setDisplayHomeAsUpEnabled(true);
+    }
 
-        setChildScrollDelegate(fragment);
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mUserLogin = extras.getString(Constants.User.LOGIN);
+    }
+
+    @Override
+    protected Fragment onCreateFragment() {
+        return GistListFragment.newInstance(mUserLogin, false);
     }
 
     @Override

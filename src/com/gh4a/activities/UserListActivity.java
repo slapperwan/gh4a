@@ -61,7 +61,6 @@ public abstract class UserListActivity extends BaseActivity implements
 
         setContentView(R.layout.generic_list);
         setContentShown(false);
-        setRequestData();
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getActionBarTitle());
@@ -100,8 +99,6 @@ public abstract class UserListActivity extends BaseActivity implements
     }
 
     protected abstract Loader<LoaderResult<List<User>>> getUserListLoader();
-
-    protected abstract void setRequestData();
 
     protected abstract String getActionBarTitle();
     protected abstract String getSubTitle();

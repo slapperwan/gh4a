@@ -141,11 +141,6 @@ public class IssueActivity extends BaseActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle data = getIntent().getExtras();
-        mRepoOwner = data.getString(Constants.Repository.OWNER);
-        mRepoName = data.getString(Constants.Repository.NAME);
-        mIssueNumber = data.getInt(Constants.Issue.NUMBER);
-
         setContentView(R.layout.issue);
         setContentShown(false);
 
@@ -186,6 +181,14 @@ public class IssueActivity extends BaseActivity implements
         getSupportLoaderManager().initLoader(0, null, mIssueCallback);
         getSupportLoaderManager().initLoader(1, null, mCollaboratorCallback);
         getSupportLoaderManager().initLoader(2, null, mEventCallback);
+    }
+
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mRepoOwner = extras.getString(Constants.Repository.OWNER);
+        mRepoName = extras.getString(Constants.Repository.NAME);
+        mIssueNumber = extras.getInt(Constants.Issue.NUMBER);
     }
 
     @Override

@@ -20,6 +20,7 @@ import java.util.List;
 import org.eclipse.egit.github.core.User;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.content.Loader;
 
 import com.gh4a.Constants;
@@ -32,8 +33,9 @@ public class OrganizationMemberListActivity extends UserListActivity {
     private String mUserLogin;
 
     @Override
-    protected void setRequestData() {
-        mUserLogin = getIntent().getExtras().getString(Constants.Repository.OWNER);
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mUserLogin = extras.getString(Constants.Repository.OWNER);
     }
 
     @Override

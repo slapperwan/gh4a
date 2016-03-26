@@ -20,6 +20,7 @@ import java.util.List;
 import org.eclipse.egit.github.core.User;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.content.Loader;
 
 import com.gh4a.Constants;
@@ -33,9 +34,9 @@ public class CollaboratorListActivity extends UserListActivity {
     private String mRepoName;
 
     @Override
-    protected void setRequestData() {
-        mUserLogin = getIntent().getExtras().getString(Constants.Repository.OWNER);
-        mRepoName = getIntent().getExtras().getString(Constants.Repository.NAME);
+    protected void onInitExtras(Bundle extras) {
+        mUserLogin = extras.getString(Constants.Repository.OWNER);
+        mRepoName = extras.getString(Constants.Repository.NAME);
     }
 
     @Override

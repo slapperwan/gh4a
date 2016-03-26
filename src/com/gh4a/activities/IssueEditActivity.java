@@ -161,12 +161,6 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle data = getIntent().getExtras();
-
-        mRepoOwner = data.getString(Constants.Repository.OWNER);
-        mRepoName = data.getString(Constants.Repository.NAME);
-        mEditIssue = (Issue) data.getSerializable(EXTRA_ISSUE);
-
         if (!Gh4Application.get().isAuthorized()) {
             Intent intent = new Intent(this, Github4AndroidActivity.class);
             startActivity(intent);
@@ -234,6 +228,14 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
         updateLabels();
         updateLabelStates();
+    }
+
+    @Override
+    protected void onInitExtras(Bundle extras) {
+        super.onInitExtras(extras);
+        mRepoOwner = extras.getString(Constants.Repository.OWNER);
+        mRepoName = extras.getString(Constants.Repository.NAME);
+        mEditIssue = (Issue) extras.getSerializable(EXTRA_ISSUE);
     }
 
     @Override
