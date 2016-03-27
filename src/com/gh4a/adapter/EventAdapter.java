@@ -299,7 +299,7 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
                     || CreatePayload.REF_TYPE_TAG.equals(type)) {
                 int resId = CreatePayload.REF_TYPE_BRANCH.equals(type)
                         ? R.string.event_create_branch_title : R.string.event_create_tag_title;
-                return res.getString(resId, formatFromRepoName(eventRepo), payload.getRef());
+                return res.getString(resId, payload.getRef(), formatFromRepoName(eventRepo));
             }
 
         } else if (Event.TYPE_DELETE.equals(eventType)) {
@@ -309,7 +309,7 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
                     || DeletePayload.REF_TYPE_TAG.equals(type)) {
                 int resId = CreatePayload.REF_TYPE_BRANCH.equals(type)
                         ? R.string.event_delete_branch_title : R.string.event_delete_tag_title;
-                return res.getString(resId, formatFromRepoName(eventRepo), payload.getRef());
+                return res.getString(resId, payload.getRef(), formatFromRepoName(eventRepo));
             }
 
         } else if (Event.TYPE_DOWNLOAD.equals(eventType)) {
