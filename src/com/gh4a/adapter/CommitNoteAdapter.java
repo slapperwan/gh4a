@@ -71,13 +71,11 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
 
     @Override
     public void onBindViewHolder(ViewHolder holder, CommitComment comment) {
-        String ourLogin = Gh4Application.get().getAuthLogin();
         User user = comment.getUser();
 
         AvatarHandler.assignAvatar(holder.ivGravatar, user);
 
-        SpannableString userName = new SpannableString(
-                ApiHelpers.getUserLogin(mContext, comment.getUser()));
+        SpannableString userName = new SpannableString(ApiHelpers.getUserLogin(mContext, user));
         userName.setSpan(new StyleSpan(Typeface.BOLD), 0, userName.length(), 0);
 
         holder.ivGravatar.setTag(comment);
@@ -88,8 +86,11 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
         String body = HtmlUtils.format(comment.getBodyHtml()).toString();
         mImageGetter.bind(holder.tvDesc, body, comment.getId());
 
-        if (mEditCallback != null &&
-                (user.getLogin().equals(ourLogin) || mRepoOwner.equals(ourLogin))) {
+        String ourLogin = Gh4Application.get().getAuthLogin();
+        boolean canEdit = ApiHelpers.loginEquals(user, ourLogin)
+                || ApiHelpers.loginEquals(mRepoOwner, ourLogin);
+
+        if (mEditCallback != null && canEdit) {
             holder.ivEdit.setVisibility(View.VISIBLE);
             holder.ivEdit.setTag(comment);
             holder.ivEdit.setOnClickListener(this);

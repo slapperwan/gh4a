@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.utils.ApiHelpers;
 
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.service.RepositoryService;
@@ -31,7 +32,7 @@ public class RepositoryListLoader extends BaseLoader<Collection<Repository>> {
     public Collection<Repository> doLoadInBackground() throws IOException {
         Gh4Application app = Gh4Application.get();
         RepositoryService repoService = (RepositoryService) app.getService(Gh4Application.REPO_SERVICE);
-        if (mLogin.equals(app.getAuthLogin())) {
+        if (ApiHelpers.loginEquals(mLogin, app.getAuthLogin())) {
             if (mSize > 0) {
                 return repoService.pageRepositories(mFilterData, mSize).next();
             } else {

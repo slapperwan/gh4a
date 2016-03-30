@@ -38,6 +38,7 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.OrganizationListLoader;
 import com.gh4a.loader.RepositoryListLoader;
 import com.gh4a.loader.UserLoader;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
@@ -165,7 +166,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         mContentView.findViewById(R.id.cell_repos).setOnClickListener(this);
 
         TextView tvReposCount = (TextView) mContentView.findViewById(R.id.tv_repos_count);
-        if (mUserLogin.equals(Gh4Application.get().getAuthLogin())) {
+        if (ApiHelpers.loginEquals(mUserLogin, Gh4Application.get().getAuthLogin())) {
             tvReposCount.setText(String.valueOf(mUser.getTotalPrivateRepos() + mUser.getPublicRepos()));
         } else {
             tvReposCount.setText(String.valueOf(mUser.getPublicRepos()));

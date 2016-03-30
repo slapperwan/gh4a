@@ -23,6 +23,7 @@ import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
 
@@ -361,7 +362,7 @@ public class RepositoryListContainerFragment extends Fragment implements
 
         public static FilterDrawerHelper create(String userLogin, String userType) {
             int menuResId;
-            if (userLogin.equals(Gh4Application.get().getAuthLogin())) {
+            if (ApiHelpers.loginEquals(userLogin, Gh4Application.get().getAuthLogin())) {
                 menuResId = R.menu.repo_filter_logged_in;
             } else if (Constants.User.TYPE_ORG.equals(userType)) {
                 menuResId = R.menu.repo_filter_org;

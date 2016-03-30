@@ -99,9 +99,6 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
 
     @Override
     public void onBindViewHolder(ViewHolder holder, IssueEventHolder event) {
-        String ourLogin = Gh4Application.get().getAuthLogin();
-        String login = event.getUser() != null ? event.getUser().getLogin() : null;
-
         AvatarHandler.assignAvatar(holder.ivGravatar, event.getUser());
         holder.ivGravatar.setTag(event);
 
@@ -131,7 +128,9 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
                     holder.tvExtra.getTypefaceValue()));
         }
 
-        boolean canEdit = (login != null && login.equals(ourLogin)) || mRepoOwner.equals(ourLogin);
+        String ourLogin = Gh4Application.get().getAuthLogin();
+        boolean canEdit = ApiHelpers.loginEquals(event.getUser(), ourLogin)
+                || ApiHelpers.loginEquals(mRepoOwner, ourLogin);
         if (event.comment != null && canEdit && mEditCallback != null) {
             holder.ivEdit.setVisibility(View.VISIBLE);
             holder.ivEdit.setTag(event.comment);

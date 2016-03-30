@@ -21,6 +21,7 @@ import com.gh4a.fragment.UserFragment;
 import com.gh4a.loader.IsFollowingUserLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.StringUtils;
 
 import org.eclipse.egit.github.core.service.UserService;
@@ -66,7 +67,7 @@ public class UserActivity extends BasePagerActivity {
         super.onInitExtras(extras);
         mUserLogin = extras.getString(Constants.User.LOGIN);
         mUserName = extras.getString(Constants.User.NAME);
-        mIsSelf = mUserLogin.equals(Gh4Application.get().getAuthLogin());
+        mIsSelf = ApiHelpers.loginEquals(mUserLogin, Gh4Application.get().getAuthLogin());
     }
 
     @Override

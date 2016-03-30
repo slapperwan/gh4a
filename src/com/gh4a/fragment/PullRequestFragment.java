@@ -70,6 +70,7 @@ import com.gh4a.loader.PullRequestCommentListLoader;
 import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
@@ -165,7 +166,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         Gh4Application app = Gh4Application.get();
         boolean authorized = app.isAuthorized();
 
-        boolean isCreator = mPullRequest.getUser().getLogin().equals(app.getAuthLogin());
+        boolean isCreator = ApiHelpers.loginEquals(mPullRequest.getUser(), app.getAuthLogin());
         boolean canOpenOrClose = authorized && (isCreator || mIsCollaborator);
         boolean canMerge = authorized && mIsCollaborator;
 

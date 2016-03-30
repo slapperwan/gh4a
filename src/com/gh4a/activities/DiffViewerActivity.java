@@ -377,8 +377,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         private boolean isOwnComment(long id) {
             String login = Gh4Application.get().getAuthLogin();
             CommitComment comment = mCommitComments.get(id);
-            User user = comment.getUser();
-            return user != null && TextUtils.equals(login, user.getLogin());
+            return ApiHelpers.loginEquals(comment.getUser(), login);
         }
 
         private String[] populateChoices(boolean ownComment) {

@@ -31,6 +31,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 
 public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
@@ -100,7 +101,7 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     @Override
     protected PageIterator<Repository> onCreateIterator() {
         Gh4Application app = Gh4Application.get();
-        boolean isSelf = mLogin.equals(app.getAuthLogin());
+        boolean isSelf = ApiHelpers.loginEquals(mLogin, app.getAuthLogin());
         RepositoryService repoService = (RepositoryService) app.getService(Gh4Application.REPO_SERVICE);
 
         Map<String, String> filterData = new HashMap<>();

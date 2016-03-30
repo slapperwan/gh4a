@@ -9,6 +9,7 @@ import org.eclipse.egit.github.core.service.OrganizationService;
 import android.content.Context;
 
 import com.gh4a.Gh4Application;
+import com.gh4a.utils.ApiHelpers;
 
 public class OrganizationListLoader extends BaseLoader<List<User>> {
     private String mUserLogin;
@@ -23,7 +24,7 @@ public class OrganizationListLoader extends BaseLoader<List<User>> {
         Gh4Application app = Gh4Application.get();
         OrganizationService orgService = (OrganizationService)
                 app.getService(Gh4Application.ORG_SERVICE);
-        if (mUserLogin.equals(app.getAuthLogin())) {
+        if (ApiHelpers.loginEquals(mUserLogin, app.getAuthLogin())) {
             return orgService.getOrganizations();
         } else {
             return orgService.getOrganizations(mUserLogin);
