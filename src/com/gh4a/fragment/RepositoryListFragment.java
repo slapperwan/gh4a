@@ -80,7 +80,7 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     @Override
     protected void onAddData(RootAdapter<Repository, ? extends RecyclerView.ViewHolder> adapter,
             Collection<Repository> repositories) {
-        if (!mIsOrg && ("sources".equals(mRepoType) || "forks".equals(mRepoType))) {
+        if ("sources".equals(mRepoType) || "forks".equals(mRepoType)) {
             for (Repository repository : repositories) {
                 if ("sources".equals(mRepoType) && !repository.isFork()) {
                     adapter.add(repository);
