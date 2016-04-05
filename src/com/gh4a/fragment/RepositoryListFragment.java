@@ -25,6 +25,7 @@ import org.eclipse.egit.github.core.service.RepositoryService;
 
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
@@ -105,12 +106,15 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
         RepositoryService repoService = (RepositoryService) app.getService(Gh4Application.REPO_SERVICE);
 
         Map<String, String> filterData = new HashMap<>();
-        if (!mIsOrg && ("sources".equals(mRepoType) || "forks".equals(mRepoType))) {
-            filterData.put("type", "all");
-        } else if (isSelf && "all".equals(mRepoType)) {
+        // We'll filter those out later
+        String actualFilterType = "sources".equals(mRepoType) || "forks".equals(mRepoType)
+                ? "all" : mRepoType;
+
+        if (!TextUtils.equals(actualFilterType, "all") || !mIsOrg) {
+            filterData.put("type", actualFilterType);
+        }
+        if (isSelf && TextUtils.equals(actualFilterType, "all")) {
             filterData.put("affiliation", "owner,collaborator");
-        } else {
-            filterData.put("type", mRepoType);
         }
         if (mSortOrder != null) {
             filterData.put("sort", mSortOrder);
