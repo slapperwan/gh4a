@@ -78,7 +78,7 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
         SpannableString userName = new SpannableString(ApiHelpers.getUserLogin(mContext, user));
         userName.setSpan(new StyleSpan(Typeface.BOLD), 0, userName.length(), 0);
 
-        holder.ivGravatar.setTag(comment);
+        holder.ivGravatar.setTag(user);
         holder.tvExtra.setText(userName);
         holder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
                 comment.getCreatedAt(), true));
@@ -120,13 +120,14 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
 
     @Override
     public void onClick(View v) {
-        CommitComment comment = (CommitComment) v.getTag();
         if (v.getId() == R.id.iv_gravatar) {
-            Intent intent = IntentUtils.getUserActivityIntent(mContext, comment.getUser());
+            User user = (User) v.getTag();
+            Intent intent = IntentUtils.getUserActivityIntent(mContext, user);
             if (intent != null) {
                 mContext.startActivity(intent);
             }
         } else if (v.getId() == R.id.iv_edit) {
+            CommitComment comment = (CommitComment) v.getTag();
             mEditCallback.editComment(comment);
         } else {
             super.onClick(v);
