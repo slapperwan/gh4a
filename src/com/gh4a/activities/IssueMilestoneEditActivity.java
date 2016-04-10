@@ -123,6 +123,7 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         mTitleView.setText(mMilestone.getTitle());
         mDescriptionView.setText(mMilestone.getDescription());
         updateLabels();
+        setToolbarScrollable(false);
     }
 
     @Override

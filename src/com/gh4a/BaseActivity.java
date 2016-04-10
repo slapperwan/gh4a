@@ -62,6 +62,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ColorDrawable;
 import com.gh4a.widget.SwipeRefreshLayout;
+import com.gh4a.widget.ToggleableAppBarLayoutBehavior;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ArgbEvaluator;
@@ -84,6 +85,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private boolean mContentEmpty;
 
     private AppBarLayout mHeader;
+    private ToggleableAppBarLayoutBehavior mHeaderBehavior;
     private SmoothProgressBar mProgress;
     private SwipeRefreshLayout mSwipeLayout;
     private DrawerLayout mDrawerLayout;
@@ -359,6 +361,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     protected void setToolbarScrollable(boolean scrollable) {
         setAppBarChildScrollable(mToolbar, scrollable);
+        mHeaderBehavior.setEnabled(scrollable);
     }
 
     private void setAppBarChildScrollable(View view, boolean scrollable) {
@@ -722,6 +725,11 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
         mHeader = (AppBarLayout) findViewById(R.id.header);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        mHeaderBehavior = new ToggleableAppBarLayoutBehavior();
+        CoordinatorLayout.LayoutParams lp =
+                (CoordinatorLayout.LayoutParams) mHeader.getLayoutParams();
+        lp.setBehavior(mHeaderBehavior);
 
         mSwipeLayout.setAppBarLayout(mHeader);
 

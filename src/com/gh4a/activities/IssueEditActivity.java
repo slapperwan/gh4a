@@ -168,6 +168,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
             return;
         }
         setContentView(R.layout.issue_create);
+        setToolbarScrollable(false);
 
         LayoutInflater headerInflater = LayoutInflater.from(UiUtils.makeHeaderThemedContext(this));
         View header = headerInflater.inflate(R.layout.issue_create_header, null);
@@ -228,6 +229,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
         updateLabels();
         updateLabelStates();
+        setToolbarScrollable(false);
     }
 
     @Override
