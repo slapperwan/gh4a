@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:hint="@string/auth_code">
 
-        <EditText
+        <android.support.design.widget.TextInputEditText
             android:id="@+id/auth_code"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

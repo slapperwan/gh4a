@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:hint="@string/issue_title">
 
-        <EditText
+        <android.support.design.widget.TextInputEditText
             android:id="@+id/et_title"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
@@ -31,7 +31,7 @@
         android:layout_height="wrap_content"
         android:hint="@string/issue_body">
 
-        <EditText
+        <android.support.design.widget.TextInputEditText
             android:id="@+id/et_desc"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
