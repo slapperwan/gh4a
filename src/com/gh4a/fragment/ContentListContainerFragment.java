@@ -19,6 +19,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.widget.PathBreadcrumbs;
+import com.gh4a.widget.SwipeRefreshLayout;
 
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryContents;
@@ -33,7 +34,7 @@ import java.util.Stack;
 
 public class ContentListContainerFragment extends Fragment implements
         ContentListFragment.ParentCallback, PathBreadcrumbs.SelectionCallback,
-        LoaderCallbacks.ParentCallback {
+        LoaderCallbacks.ParentCallback, SwipeRefreshLayout.ChildScrollDelegate {
     private static final int LOADER_MODULEMAP = 100;
 
     private static final String STATE_KEY_DIR_STACK = "dir_stack";
@@ -109,6 +110,14 @@ public class ContentListContainerFragment extends Fragment implements
         } else {
             mDirStack.push("");
         }
+    }
+
+    @Override
+    public boolean canChildScrollUp() {
+        if (mContentListFragment != null) {
+            return mContentListFragment.canChildScrollUp();
+        }
+        return false;
     }
 
     @Override
