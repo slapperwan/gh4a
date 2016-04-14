@@ -301,6 +301,7 @@
     <string name="issue_title">Title</string>
     <string name="issue_body">Body</string>
     <string name="issue_create">New Issue</string>
+    <string name="issue_loading_template_hint">Loading issue body template\u2026</string>
     <string name="issue_error_title">Please enter a title</string>
     <string name="issue_edit_title">Edit Issue #%1$d</string>
     <string name="issue_error_close">Closing issue #%1$d failed.</string>

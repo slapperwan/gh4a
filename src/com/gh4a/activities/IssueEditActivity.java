@@ -41,6 +41,7 @@ import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.loader.CollaboratorListLoader;
 import com.gh4a.loader.IsCollaboratorLoader;
+import com.gh4a.loader.IssueTemplateLoader;
 import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
@@ -73,6 +74,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
     private TextInputLayout mTitleWrapper;
     private EditText mTitleView;
+    private TextInputLayout mDescWrapper;
     private EditText mDescView;
     private TextView mTvSelectedMilestone;
     private TextView mTvSelectedAssignee;
@@ -157,6 +159,21 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         }
     };
 
+    private LoaderCallbacks<String> mIssueTemplateCallback = new LoaderCallbacks<String>(this) {
+        @Override
+        protected Loader<LoaderResult<String>> onCreateLoader() {
+            return new IssueTemplateLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
+        }
+
+        @Override
+        protected void onResultReady(String result) {
+            getSupportLoaderManager().destroyLoader(4);
+            mDescWrapper.setHint(getString(R.string.issue_body));
+            mDescView.setEnabled(true);
+            mDescView.setText(result);
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -176,6 +193,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
         mTitleWrapper = (TextInputLayout) header.findViewById(R.id.title_wrapper);
         mTitleView = (EditText) header.findViewById(R.id.et_title);
+        mDescWrapper = (TextInputLayout) header.findViewById(R.id.desc_wrapper);
         mDescView = (EditText) header.findViewById(R.id.et_desc);
 
         CoordinatorLayout rootLayout = getRootLayout();
@@ -197,6 +215,11 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         mLabelContainer = findViewById(R.id.label_container);
 
         getSupportLoaderManager().initLoader(3, null, mIsCollaboratorCallback);
+        if (!isInEditMode()) {
+            getSupportLoaderManager().initLoader(4, null, mIssueTemplateCallback);
+            mDescView.setEnabled(false);
+            mDescWrapper.setHint(getString(R.string.issue_loading_template_hint));
+        }
 
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_KEY_ISSUE)) {
             mEditIssue = (Issue) savedInstanceState.getSerializable(STATE_KEY_ISSUE);
