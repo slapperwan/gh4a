@@ -223,7 +223,10 @@ public class RepositoryActivity extends BasePagerActivity {
     protected boolean fragmentNeedsRefresh(Fragment fragment) {
         if (fragment instanceof CommitListFragment && mCommitListFragment == null) {
             return true;
-        } else if (fragment instanceof RepositoryFragment && mRepositoryFragment == null) {
+        } else if (fragment instanceof ContentListContainerFragment
+                && mContentListFragment == null) {
+            return true;
+        } if (fragment instanceof RepositoryFragment && mRepositoryFragment == null) {
             return true;
         }
         return false;
@@ -232,6 +235,7 @@ public class RepositoryActivity extends BasePagerActivity {
     @Override
     public void onRefresh() {
         mRepositoryFragment = null;
+        mContentListFragment = null;
         mRepository = null;
         mIsStarring = null;
         mIsWatching = null;
