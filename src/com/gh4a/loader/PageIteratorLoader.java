@@ -3,6 +3,7 @@ package com.gh4a.loader;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.eclipse.egit.github.core.client.NoSuchPageException;
 import org.eclipse.egit.github.core.client.PageIterator;
 
 import android.content.Context;
@@ -52,6 +53,9 @@ public class PageIteratorLoader<T> extends AsyncTaskLoader<LoaderResult<PageIter
                 Collection<T> newData = mPageIterator.next();
                 mPreviouslyLoadedData = new ArrayList<>(mPreviouslyLoadedData);
                 mPreviouslyLoadedData.addAll(newData);
+            } catch (NoSuchPageException e) {
+                // should only happen in case of an empty repo
+                return new LoaderResult<>(new LoadedPage<>(mPreviouslyLoadedData, false));
             } catch (Exception e) {
                 Log.e(Constants.LOG_TAG, e.getMessage(), e);
                 return new LoaderResult<>(e);
