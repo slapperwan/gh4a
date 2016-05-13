@@ -265,7 +265,7 @@ public class IssueListActivity extends BasePagerActivity implements
     @Override
     protected void onPageMoved(int position, float fraction) {
         super.onPageMoved(position, fraction);
-        if (!mSearchMode) {
+        if (!mSearchMode && mCreateFab != null) {
             float openFraction = 1 - position - fraction;
             ViewCompat.setScaleX(mCreateFab, openFraction);
             ViewCompat.setScaleY(mCreateFab, openFraction);
