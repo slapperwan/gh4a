@@ -48,16 +48,22 @@ public class GitModuleParserLoader extends BaseLoader<Map<String, String>> {
         }
         Map<String, String> gitModuleMap = new HashMap<>();
         String[] lines = data.split("\n");
-        String path = null;
+        String pendingPath = null;
+        String pendingTarget = null;
+
         for (String line : lines) {
             line = line.trim();
-            if (line.startsWith("path = ")) {
-                String[] pathPart = line.split("=");
-                path = pathPart[1].trim();
+            if (line.startsWith("[submodule")) {
+                if (pendingPath != null && pendingTarget != null) {
+                    gitModuleMap.put(pendingPath, pendingTarget);
+                }
+                pendingPath = null;
+                pendingTarget = null;
+            } else if (line.startsWith("path = ")) {
+                // chop off "path ="
+                pendingPath = line.substring(6).trim();
             } else if (line.startsWith("url = ")) {
-                String[] urlPart = line.split("=");
-
-                String url = urlPart[1].trim().replace("github.com:", "github.com/");
+                String url = line.substring(5).trim().replace("github.com:", "github.com/");
                 int pos = url.indexOf("git@");
                 if (pos == 0) {
                     url = "ssh://" + url.substring(4);
@@ -78,9 +84,14 @@ public class GitModuleParserLoader extends BaseLoader<Map<String, String>> {
                 if (pos != -1) {
                     repo = repo.substring(0, pos);
                 }
-                gitModuleMap.put(path, user + "/" + repo);
+                pendingTarget = user + "/" + repo;
             }
         }
+
+        if (pendingPath != null && pendingTarget != null) {
+            gitModuleMap.put(pendingPath, pendingTarget);
+        }
+
         return gitModuleMap;
     }
 }

@@ -211,7 +211,9 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
         if (mItemClickListener != null) {
             VH holder = (VH) view.getTag();
             int position = holder.getAdapterPosition();
-            mItemClickListener.onItemClick(getItemFromAdapterPosition(position));
+            if (position != RecyclerView.NO_POSITION) {
+                mItemClickListener.onItemClick(getItemFromAdapterPosition(position));
+            }
         }
     }
 

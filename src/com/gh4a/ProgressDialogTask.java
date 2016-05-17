@@ -39,11 +39,12 @@ public abstract class ProgressDialogTask<T> extends BackgroundTask<T>
 
     @Override
     protected void onPostExecute(T result) {
-        if (mFragment != null) {
+        if (mFragment.getActivity() != null) {
             mFragment.dismissAllowingStateLoss();
-            mFragment = null;
         }
         super.onPostExecute(result);
+        mFragment = null;
+        mActivity = null;
     }
 
     @Override

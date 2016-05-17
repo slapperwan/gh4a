@@ -255,7 +255,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
             // can't use the clause below, as it'll overwrite the user data
             startActivity(IntentUtils.getUserActivityIntent(getActivity(), user));
         }
-        if (intent != null) {
+        if (intent != null && mUser != null) {
             intent.putExtra(Constants.User.LOGIN, mUserLogin);
             intent.putExtra(Constants.User.NAME, mUserName);
             intent.putExtra(Constants.User.TYPE, mUser.getType());
