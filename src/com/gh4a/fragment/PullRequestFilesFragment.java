@@ -32,6 +32,7 @@ public class PullRequestFilesFragment extends CommitFragment {
     private String mRepoOwner;
     private String mRepoName;
     private int mPullRequestNumber;
+    private String mHeadSha;
     private List<CommitFile> mFiles;
     private List<CommitComment> mComments;
 
@@ -63,13 +64,15 @@ public class PullRequestFilesFragment extends CommitFragment {
         }
     };
 
-    public static PullRequestFilesFragment newInstance(String repoOwner, String repoName, int pullRequestNumber) {
+    public static PullRequestFilesFragment newInstance(String repoOwner, String repoName,
+            int pullRequestNumber, String headSha) {
         PullRequestFilesFragment f = new PullRequestFilesFragment();
 
         Bundle args = new Bundle();
         args.putString(Constants.Repository.OWNER, repoOwner);
         args.putString(Constants.Repository.NAME, repoName);
         args.putInt(Constants.PullRequest.NUMBER, pullRequestNumber);
+        args.putString(Constants.Object.REF, headSha);
         f.setArguments(args);
         return f;
     }
@@ -77,9 +80,11 @@ public class PullRequestFilesFragment extends CommitFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.NAME);
-        mPullRequestNumber = getArguments().getInt(Constants.PullRequest.NUMBER);
+        final Bundle args = getArguments();
+        mRepoOwner = args.getString(Constants.Repository.OWNER);
+        mRepoName = args.getString(Constants.Repository.NAME);
+        mPullRequestNumber = args.getInt(Constants.PullRequest.NUMBER);
+        mHeadSha = args.getString(Constants.Object.REF);
     }
 
     @Override
@@ -120,13 +125,12 @@ public class PullRequestFilesFragment extends CommitFragment {
 
         Intent intent = new Intent(getActivity(), FileUtils.isImage(file.getFilename())
                 ? FileViewerActivity.class : PullRequestDiffViewerActivity.class);
-        String commitSha = file.getRawUrl().split("/")[6];
 
         intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
         intent.putExtra(Constants.Repository.NAME, mRepoName);
         intent.putExtra(Constants.PullRequest.NUMBER, mPullRequestNumber);
-        intent.putExtra(Constants.Object.REF, commitSha);
-        intent.putExtra(Constants.Object.OBJECT_SHA, commitSha);
+        intent.putExtra(Constants.Object.REF, mHeadSha);
+        intent.putExtra(Constants.Object.OBJECT_SHA, mHeadSha);
         intent.putExtra(Constants.Commit.DIFF, file.getPatch());
         intent.putExtra(Constants.Commit.COMMENTS, new ArrayList<>(mComments));
         intent.putExtra(Constants.Object.PATH, file.getFilename());

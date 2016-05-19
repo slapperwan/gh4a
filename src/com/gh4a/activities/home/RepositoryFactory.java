@@ -101,7 +101,9 @@ public class RepositoryFactory extends FragmentFactory {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mFragment.destroyChildren();
+        if (mFragment != null) {
+            mFragment.destroyChildren();
+        }
     }
 
     @Override

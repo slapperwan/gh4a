@@ -130,7 +130,8 @@ public class PullRequestActivity extends BasePagerActivity implements
             return CommitCompareFragment.newInstance(mRepoOwner, mRepoName,
                     mPullRequest.getBase().getSha(), mPullRequest.getHead().getSha());
         } else if (position == 2) {
-            return PullRequestFilesFragment.newInstance(mRepoOwner, mRepoName, mPullRequestNumber);
+            return PullRequestFilesFragment.newInstance(mRepoOwner, mRepoName,
+                    mPullRequestNumber, mPullRequest.getHead().getSha());
         } else {
             mPullRequestFragment = PullRequestFragment.newInstance(mPullRequest);
             return mPullRequestFragment;
