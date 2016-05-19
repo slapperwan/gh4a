@@ -1,6 +1,7 @@
 package com.gh4a.utils;
 
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 
 import com.gh4a.Constants;
 
@@ -14,10 +15,6 @@ import java.util.List;
 import java.util.Locale;
 
 public class FileUtils {
-    private static final List<String> IMAGE_EXTS = Arrays.asList(
-        "png", "gif", "jpeg", "jpg", "bmp", "ico"
-    );
-
     private static final List<String> MARKDOWN_EXTS = Arrays.asList(
         "markdown", "md", "mdown", "mkdn", "mkd"
     );
@@ -72,11 +69,27 @@ public class FileUtils {
     }
 
     public static boolean isImage(String filename) {
-        return isExtensionIn(filename, IMAGE_EXTS);
+        String mime = getMimeTypeFor(filename);
+        return mime != null && mime.startsWith("image/");
+    }
+
+    public static boolean isBinaryFormat(String filename) {
+        String mime = getMimeTypeFor(filename);
+        return mime != null && !mime.startsWith("text/")
+                // cover cases like application/xhtml+xml or image/svg+xml
+                && !mime.endsWith("+xml");
     }
 
     public static boolean isMarkdown(String filename) {
         return isExtensionIn(filename, MARKDOWN_EXTS);
+    }
+
+    public static String getMimeTypeFor(String filename) {
+        String extension = filename == null ? null : getFileExtension(filename);
+        if (StringUtils.isBlank(extension)) {
+            return null;
+        }
+        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
     }
 
     private static boolean isExtensionIn(String filename, List<String> extensions) {

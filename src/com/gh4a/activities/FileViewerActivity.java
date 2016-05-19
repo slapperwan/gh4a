@@ -15,6 +15,7 @@
  */
 package com.gh4a.activities;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.gh4a.Constants;
 import com.gh4a.R;
@@ -33,7 +35,10 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 
+import org.eclipse.egit.github.core.FieldError;
 import org.eclipse.egit.github.core.RepositoryContents;
+import org.eclipse.egit.github.core.RequestError;
+import org.eclipse.egit.github.core.client.RequestException;
 import org.eclipse.egit.github.core.util.EncodingUtils;
 
 import java.util.List;
@@ -48,6 +53,7 @@ public class FileViewerActivity extends WebViewerActivity {
     private int mHighlightEnd;
 
     private static final int MENU_ITEM_HISTORY = 10;
+    private static final String RAW_URL_FORMAT = "https://raw.githubusercontent.com/%s/%s/%s/%s";
 
     private LoaderCallbacks<List<RepositoryContents>> mFileCallback =
             new LoaderCallbacks<List<RepositoryContents>>(this) {
@@ -69,18 +75,40 @@ public class FileViewerActivity extends WebViewerActivity {
                 setContentShown(true);
             }
         }
+
+        @Override
+        protected boolean onError(Exception e) {
+            if (e instanceof RequestException) {
+                RequestError error = ((RequestException) e).getError();
+                List<FieldError> errors = error != null ? error.getErrors() : null;
+                if (errors != null) {
+                    for (FieldError fe : errors) {
+                        if ("too_large".equals(fe.getCode())) {
+                            openUnsuitableFileAndFinish();
+                            return true;
+                        }
+                    }
+                }
+            }
+            return super.onError(e);
+        }
     };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        String filename = FileUtils.getFileName(mPath);
+        if (FileUtils.isBinaryFormat(filename) && !FileUtils.isImage(filename)) {
+            openUnsuitableFileAndFinish();
+        } else {
+            getSupportLoaderManager().initLoader(0, null, mFileCallback);
+        }
+
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(FileUtils.getFileName(mPath));
+        actionBar.setTitle(filename);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
-
-        getSupportLoaderManager().initLoader(0, null, mFileCallback);
     }
 
     @Override
@@ -168,6 +196,19 @@ public class FileViewerActivity extends WebViewerActivity {
     @Override
     protected Intent navigateUp() {
         return IntentUtils.getRepoActivityIntent(this, mRepoOwner, mRepoName, null);
+    }
+
+    private void openUnsuitableFileAndFinish() {
+        String url = String.format(Locale.US, RAW_URL_FORMAT, mRepoOwner, mRepoName, mRef, mPath);
+        String mime = FileUtils.getMimeTypeFor(FileUtils.getFileName(mPath));
+        Intent intent = IntentUtils.createViewerOrBrowserIntent(this, Uri.parse(url), mime);
+        if (intent == null) {
+            handleLoadFailure(new ActivityNotFoundException());
+            findViewById(R.id.retry_button).setVisibility(View.GONE);
+        } else {
+            startActivity(intent);
+            finish();
+        }
     }
 
     private static String highlightImage(String imageUrl) {

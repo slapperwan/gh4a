@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import com.gh4a.Constants;
@@ -163,12 +164,32 @@ public class IntentUtils {
     // When doing that, pass a dummy URI to the resolver and swap in our real URI
     // later, as otherwise the system might return our package only if it's set
     // to handle the Github URIs by default
-    private static final Uri DUMMY_URI = Uri.parse("http://www.somedummy.com");
+    private static Uri buildDummyUri(Uri uri) {
+        return uri.buildUpon().authority("www.somedummy.com").build();
+    }
+
     private static Intent createBrowserIntent(Context context, Uri uri) {
-        final Intent browserIntent = new Intent(Intent.ACTION_VIEW, DUMMY_URI)
+        final Uri dummyUri = buildDummyUri(uri);
+        final Intent browserIntent = new Intent(Intent.ACTION_VIEW, dummyUri)
                 .addCategory(Intent.CATEGORY_BROWSABLE);
+        return createActivityChooserIntent(context, browserIntent, uri);
+    }
+
+    public static Intent createViewerOrBrowserIntent(Context context, Uri uri, String mime) {
+        final Uri dummyUri = buildDummyUri(uri);
+        final Intent viewIntent = new Intent(Intent.ACTION_VIEW).setDataAndType(dummyUri, mime);
+        final Intent resolvedViewIntent = createActivityChooserIntent(context, viewIntent, uri);
+        if (resolvedViewIntent != null) {
+            return resolvedViewIntent;
+        }
+        return createBrowserIntent(context, uri);
+    }
+
+    private static Intent createActivityChooserIntent(Context context, Intent intent, Uri uri) {
+        intent.addFlags(Intent.FLAG_DEBUG_LOG_RESOLUTION);
+
         final PackageManager pm = context.getPackageManager();
-        final List<ResolveInfo> activities = pm.queryIntentActivities(browserIntent,
+        final List<ResolveInfo> activities = pm.queryIntentActivities(intent,
                 PackageManager.MATCH_DEFAULT_ONLY);
         final ArrayList<Intent> chooserIntents = new ArrayList<>();
         final String ourPackageName = context.getPackageName();
@@ -184,7 +205,7 @@ public class IntentUtils {
                 continue;
             }
 
-            Intent targetIntent = new Intent(browserIntent);
+            Intent targetIntent = new Intent(intent);
             targetIntent.setPackage(info.packageName);
             targetIntent.setData(uri);
             chooserIntents.add(targetIntent);
