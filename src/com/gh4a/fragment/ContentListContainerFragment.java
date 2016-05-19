@@ -74,12 +74,14 @@ public class ContentListContainerFragment extends Fragment implements
         }
     };
 
-    public static ContentListContainerFragment newInstance(Repository repository, String ref) {
+    public static ContentListContainerFragment newInstance(Repository repository,
+            String ref, String initialPath) {
         ContentListContainerFragment f = new ContentListContainerFragment();
 
         Bundle args = new Bundle();
         args.putSerializable("repository", repository);
         args.putString("ref", ref);
+        args.putString("initialpath", initialPath);
         f.setArguments(args);
         return f;
     }
@@ -109,6 +111,17 @@ public class ContentListContainerFragment extends Fragment implements
             }
         } else {
             mDirStack.push("");
+
+            String initialPath = getArguments().getString("initialpath");
+            if (initialPath != null) {
+                mInitialPathToLoad = new ArrayList<>();
+                int pos = initialPath.indexOf("/");
+                while (pos > 0) {
+                    mInitialPathToLoad.add(initialPath.substring(0, pos));
+                    pos = initialPath.indexOf("/", pos + 1);
+                }
+                mInitialPathToLoad.add(initialPath);
+            }
         }
     }
 

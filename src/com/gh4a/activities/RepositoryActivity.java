@@ -59,6 +59,7 @@ public class RepositoryActivity extends BasePagerActivity {
     private static final int LOADER_WATCHING = 2;
     private static final int LOADER_STARRING = 3;
 
+    public static final String EXTRA_INITIAL_PATH = "initial_path";
     public static final String EXTRA_INITIAL_PAGE = "initial_page";
     public static final int PAGE_REPO_OVERVIEW = 0;
     public static final int PAGE_FILES = 1;
@@ -145,6 +146,7 @@ public class RepositoryActivity extends BasePagerActivity {
     private ActionBar mActionBar;
     private ProgressDialog mProgressDialog;
     private int mInitialPage;
+    private String mInitialPath;
 
     private Repository mRepository;
     private List<RepositoryBranch> mBranches;
@@ -183,6 +185,7 @@ public class RepositoryActivity extends BasePagerActivity {
         mRepoName = extras.getString(Constants.Repository.NAME);
         mSelectedRef = extras.getString(Constants.Repository.SELECTED_REF);
         mInitialPage = extras.getInt(EXTRA_INITIAL_PAGE, -1);
+        mInitialPath = extras.getString(EXTRA_INITIAL_PATH);
     }
 
     private void updateTitle() {
@@ -210,7 +213,8 @@ public class RepositoryActivity extends BasePagerActivity {
                 return mRepositoryFragment;
             case 1:
                 mContentListFragment = ContentListContainerFragment.newInstance(mRepository,
-                        mSelectedRef);
+                        mSelectedRef, mInitialPath);
+                mInitialPath = null;
                 return mContentListFragment;
             case 2:
                 mCommitListFragment = CommitListFragment.newInstance(mRepository, mSelectedRef);

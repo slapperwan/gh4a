@@ -73,6 +73,11 @@ public class IntentUtils {
 
     public static Intent getRepoActivityIntent(Context context,
             String repoOwner, String repoName, String ref, int initialPage) {
+        return getRepoActivityIntent(context, repoOwner, repoName, ref, null, initialPage);
+    }
+
+    public static Intent getRepoActivityIntent(Context context,
+            String repoOwner, String repoName, String ref, String initialPath, int initialPage) {
         Intent intent = new Intent(context, RepositoryActivity.class);
         if (TextUtils.isEmpty(ref)) {
             ref = null;
@@ -80,6 +85,7 @@ public class IntentUtils {
         intent.putExtra(Constants.Repository.OWNER, repoOwner);
         intent.putExtra(Constants.Repository.NAME, repoName);
         intent.putExtra(Constants.Repository.SELECTED_REF, ref);
+        intent.putExtra(RepositoryActivity.EXTRA_INITIAL_PATH, initialPath);
         intent.putExtra(RepositoryActivity.EXTRA_INITIAL_PAGE, initialPage);
         return intent;
     }

@@ -3,13 +3,24 @@ package com.gh4a;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.egit.github.core.RepositoryBranch;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.RepositoryTag;
 import org.eclipse.egit.github.core.client.IGitHubConstants;
+import org.eclipse.egit.github.core.service.RepositoryService;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Pair;
 
 import com.gh4a.activities.BlogListActivity;
 import com.gh4a.activities.DownloadsActivity;
@@ -20,10 +31,14 @@ import com.gh4a.activities.WikiListActivity;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
-public class BrowseFilter extends Activity {
+public class BrowseFilter extends AppCompatActivity {
 
     public void onCreate(Bundle savedInstanceState) {
+        setTheme(Gh4Application.THEME == R.style.DarkTheme
+                ? R.style.TransparentDarkTheme : R.style.TransparentLightTheme);
+
         super.onCreate(savedInstanceState);
+
         Uri uri = getIntent().getData();
         if (uri == null) {
             finish();
@@ -76,14 +91,12 @@ public class BrowseFilter extends Activity {
                 intent = new Intent(this, ReleaseListActivity.class);
                 intent.putExtra(Constants.Repository.OWNER, user);
                 intent.putExtra(Constants.Repository.NAME, repo);
-            } else if ("tree".equals(action)) {
-                String ref = TextUtils.join("/", parts.subList(3, parts.size()));
-                intent = IntentUtils.getRepoActivityIntent(this, user, repo,
-                        ref, RepositoryActivity.PAGE_FILES);
-            } else if ("commits".equals(action)) {
-                String ref = TextUtils.join("/", parts.subList(3, parts.size()));
-                intent = IntentUtils.getRepoActivityIntent(this, user, repo,
-                        ref, RepositoryActivity.PAGE_COMMITS);
+            } else if ("tree".equals(action) || "commits".equals(action)) {
+                int page = "tree".equals(action)
+                        ? RepositoryActivity.PAGE_FILES : RepositoryActivity.PAGE_COMMITS;
+                String refAndPath = TextUtils.join("/", parts.subList(3, parts.size()));
+                new RefPathDisambiguationTask(user, repo, refAndPath, page).execute();
+                return; // avoid finish() for now
             } else if ("issues".equals(action)) {
                 if (!StringUtils.isBlank(id)) {
                     try {
@@ -149,6 +162,105 @@ public class BrowseFilter extends Activity {
             }
         } catch (NumberFormatException e) {
             // ignore
+        }
+    }
+
+    public static class ProgressDialogFragment extends DialogFragment {
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            ProgressDialog pd = new ProgressDialog(getActivity());
+            pd.setMessage(getString(R.string.loading_msg));
+            return pd;
+        }
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            super.onDismiss(dialog);
+            Activity activity = getActivity();
+            if (activity != null) {
+                activity.finish();
+            }
+        }
+    }
+
+    private class RefPathDisambiguationTask extends BackgroundTask<Pair<String, String>> {
+        private String mRepoOwner;
+        private String mRepoName;
+        private String mRefAndPath;
+        private int mInitialPage;
+
+        public RefPathDisambiguationTask(String repoOwner, String repoName,
+                String refAndPath, int initialPage) {
+            super(BrowseFilter.this);
+            mRepoOwner = repoOwner;
+            mRepoName = repoName;
+            mRefAndPath = refAndPath;
+            mInitialPage = initialPage;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            new ProgressDialogFragment().show(getSupportFragmentManager(), "progress");
+        }
+
+        @Override
+        // returns ref, path
+        protected Pair<String, String> run() throws Exception {
+            RepositoryService repoService = (RepositoryService)
+                    Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
+            RepositoryId repo = new RepositoryId(mRepoOwner, mRepoName);
+
+            // try branches first
+            List<RepositoryBranch> branches = repoService.getBranches(repo);
+            if (branches != null) {
+                for (RepositoryBranch branch : branches) {
+                    String nameWithSlash = branch.getName() + "/";
+                    if (mRefAndPath.startsWith(nameWithSlash)) {
+                        return Pair.create(branch.getName(),
+                                mRefAndPath.substring(nameWithSlash.length()));
+                    }
+                }
+            }
+
+            if (isFinishing()) {
+                return null;
+            }
+
+            // and tags second
+            List<RepositoryTag> tags = repoService.getTags(repo);
+            if (tags != null) {
+                for (RepositoryTag tag : tags) {
+                    String nameWithSlash = tag.getName() + "/";
+                    if (mRefAndPath.startsWith(nameWithSlash)) {
+                        return Pair.create(tag.getName(),
+                                mRefAndPath.substring(nameWithSlash.length()));
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onSuccess(Pair<String, String> result) {
+            if (isFinishing()) {
+                // dialog was dismissed
+                return;
+            }
+            if (result != null) {
+                startActivity(IntentUtils.getRepoActivityIntent(BrowseFilter.this,
+                        mRepoOwner, mRepoName, result.first, result.second, mInitialPage));
+            } else {
+                IntentUtils.launchBrowser(BrowseFilter.this, getIntent().getData());
+            }
+            finish();
+        }
+
+        @Override
+        protected void onError(Exception e) {
+            IntentUtils.launchBrowser(BrowseFilter.this, getIntent().getData());
+            finish();
         }
     }
 }

@@ -4,7 +4,15 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
+    <style name="TransparentDarkTheme" parent="TransparentDarkThemeBase">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
     <style name="LightTheme" parent="LightThemeBase">
         <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="TransparentLightTheme" parent="TransparentLightThemeBase">
+        <item name="android:windowTranslucentStatus">true</item>
     </style>
 </resources>

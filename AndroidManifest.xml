@@ -80,7 +80,9 @@
             android:name=".activities.SettingsActivity"
             android:title="@string/settings" />
 
-        <activity android:name="BrowseFilter">
+        <activity android:name="BrowseFilter"
+            android:excludeFromRecents="true"
+            android:theme="@style/TransparentLightTheme">
             <intent-filter>
                 <action
                     android:name="android.intent.action.VIEW" />
