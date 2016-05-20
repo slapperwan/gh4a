@@ -192,8 +192,6 @@ public class IntentUtils {
     }
 
     private static Intent createActivityChooserIntent(Context context, Intent intent, Uri uri) {
-        intent.addFlags(Intent.FLAG_DEBUG_LOG_RESOLUTION);
-
         final PackageManager pm = context.getPackageManager();
         final List<ResolveInfo> activities = pm.queryIntentActivities(intent,
                 PackageManager.MATCH_DEFAULT_ONLY);
