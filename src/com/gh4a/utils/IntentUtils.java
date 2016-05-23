@@ -211,7 +211,7 @@ public class IntentUtils {
 
             Intent targetIntent = new Intent(intent);
             targetIntent.setPackage(info.packageName);
-            targetIntent.setData(uri);
+            targetIntent.setDataAndType(uri, intent.getType());
             chooserIntents.add(targetIntent);
         }
 
