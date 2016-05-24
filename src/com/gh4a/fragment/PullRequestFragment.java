@@ -61,6 +61,7 @@ import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.activities.EditIssueCommentActivity;
 import com.gh4a.activities.EditPullRequestCommentActivity;
+import com.gh4a.activities.IssueEditActivity;
 import com.gh4a.adapter.IssueEventAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.CommitStatusLoader;
@@ -89,6 +90,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
     private View mListHeaderView;
     private PullRequest mPullRequest;
+    private Issue mIssue;
     private String mRepoOwner;
     private String mRepoName;
     private boolean mIsCollaborator;
@@ -111,18 +113,6 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         }
     };
 
-    private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>(this) {
-        @Override
-        protected Loader<LoaderResult<Issue>> onCreateLoader() {
-            return new IssueLoader(getActivity(), mRepoOwner, mRepoName, mPullRequest.getNumber());
-        }
-
-        @Override
-        protected void onResultReady(Issue result) {
-            fillLabels(result.getLabels());
-        }
-    };
-
     private LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
         protected Loader<LoaderResult<Boolean>> onCreateLoader() {
@@ -136,11 +126,12 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         }
     };
 
-    public static PullRequestFragment newInstance(PullRequest pullRequest) {
+    public static PullRequestFragment newInstance(PullRequest pr, Issue issue) {
         PullRequestFragment f = new PullRequestFragment();
 
         Bundle args = new Bundle();
-        args.putSerializable("PULL", pullRequest);
+        args.putSerializable("PULL", pr);
+        args.putSerializable("ISSUE", issue);
         f.setArguments(args);
 
         return f;
@@ -150,6 +141,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPullRequest = (PullRequest) getArguments().getSerializable("PULL");
+        mIssue = (Issue) getArguments().getSerializable("ISSUE");
 
         Repository repo = mPullRequest.getBase().getRepo();
         mRepoOwner = repo.getOwner().getLogin();
@@ -239,7 +231,6 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         super.onActivityCreated(savedInstanceState);
 
         getLoaderManager().initLoader(1, null, mCollaboratorCallback);
-        getLoaderManager().initLoader(2, null, mIssueCallback);
         loadStatusIfOpen();
     }
 
@@ -251,7 +242,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
             fillLabels(new ArrayList<Label>());
             fillStatus(new ArrayList<CommitStatus>());
         }
-        hideContentAndRestartLoaders(1, 2, 3);
+        hideContentAndRestartLoaders(1, 2);
         super.onRefresh();
     }
 
@@ -343,7 +334,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
     private void loadStatusIfOpen() {
         if (Constants.Issue.STATE_OPEN.equals(mPullRequest.getState())) {
-            getLoaderManager().initLoader(3, null, mStatusCallback);
+            getLoaderManager().initLoader(2, null, mStatusCallback);
         }
     }
 
@@ -533,6 +524,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         if (requestCode == REQUEST_EDIT) {
             if (resultCode == Activity.RESULT_OK) {
                 refreshComments();
+                getActivity().setResult(Activity.RESULT_OK);
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);

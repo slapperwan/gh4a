@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.FloatingActionButton
+<!-- FIXME: use 16dp right margin instead of compat padding once the fix in
+     https://code.google.com/p/android/issues/detail?id=175330 actually works -->
+<com.gh4a.widget.IssueStateTrackingFloatingActionButton
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/edit_fab"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginRight="16dp"
     android:src="@drawable/content_edit_white"
     app:backgroundTint="?attr/colorIssueEditFab"
     app:layout_anchor="@id/header"
     app:layout_anchorGravity="right|bottom"
+    app:useCompatPadding="true"
     app:fabSize="mini" />

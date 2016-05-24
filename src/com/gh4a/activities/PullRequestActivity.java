@@ -15,10 +15,14 @@
  */
 package com.gh4a.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,11 +35,15 @@ import com.gh4a.R;
 import com.gh4a.fragment.CommitCompareFragment;
 import com.gh4a.fragment.PullRequestFilesFragment;
 import com.gh4a.fragment.PullRequestFragment;
+import com.gh4a.loader.IsCollaboratorLoader;
+import com.gh4a.loader.IssueLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestLoader;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
 
+import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.User;
 
@@ -44,12 +52,17 @@ import java.util.Locale;
 public class PullRequestActivity extends BasePagerActivity implements
         View.OnClickListener, PullRequestFragment.StateChangeListener,
         PullRequestFilesFragment.CommentUpdateListener {
+    private static final int REQUEST_EDIT_ISSUE = 1001;
+
     private String mRepoOwner;
     private String mRepoName;
     private int mPullRequestNumber;
+    private boolean mIsCollaborator;
 
+    private Issue mIssue;
     private PullRequest mPullRequest;
     private PullRequestFragment mPullRequestFragment;
+    private IssueStateTrackingFloatingActionButton mEditFab;
 
     private ViewGroup mHeader;
     private int[] mHeaderColorAttrs;
@@ -70,7 +83,34 @@ public class PullRequestActivity extends BasePagerActivity implements
             fillHeader();
             setContentShown(true);
             invalidateTabs();
+            updateFabVisibility();
             supportInvalidateOptionsMenu();
+        }
+    };
+
+    private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>(this) {
+        @Override
+        protected Loader<LoaderResult<Issue>> onCreateLoader() {
+            return new IssueLoader(PullRequestActivity.this,
+                    mRepoOwner, mRepoName, mPullRequestNumber);
+        }
+        @Override
+        protected void onResultReady(Issue result) {
+            mIssue = result;
+            updateFabVisibility();
+            invalidateTabs();
+        }
+    };
+
+    private LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
+        @Override
+        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
+            return new IsCollaboratorLoader(PullRequestActivity.this, mRepoOwner, mRepoName);
+        }
+        @Override
+        protected void onResultReady(Boolean result) {
+            mIsCollaborator = result;
+            updateFabVisibility();
         }
     };
 
@@ -93,6 +133,20 @@ public class PullRequestActivity extends BasePagerActivity implements
         setContentShown(false);
 
         getSupportLoaderManager().initLoader(0, null, mPullRequestCallback);
+        getSupportLoaderManager().initLoader(1, null, mIssueCallback);
+        getSupportLoaderManager().initLoader(2, null, mCollaboratorCallback);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_EDIT_ISSUE) {
+            if (resultCode == Activity.RESULT_OK) {
+                setResult(Activity.RESULT_OK);
+                onRefresh();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override
@@ -105,18 +159,22 @@ public class PullRequestActivity extends BasePagerActivity implements
 
     @Override
     public void onRefresh() {
+        mIssue = null;
         mPullRequest = null;
         setContentShown(false);
         mHeader.setVisibility(View.GONE);
         mHeaderColorAttrs = null;
-        getSupportLoaderManager().getLoader(0).onContentChanged();
+        LoaderManager lm = getSupportLoaderManager();
+        for (int i = 0; i < 3; i++) {
+            lm.getLoader(i).onContentChanged();
+        }
         invalidateTabs();
         super.onRefresh();
     }
 
     @Override
     protected int[] getTabTitleResIds() {
-        return mPullRequest != null ? TITLES : null;
+        return mPullRequest != null && mIssue != null ? TITLES : null;
     }
 
     @Override
@@ -133,7 +191,7 @@ public class PullRequestActivity extends BasePagerActivity implements
             return PullRequestFilesFragment.newInstance(mRepoOwner, mRepoName,
                     mPullRequestNumber, mPullRequest.getHead().getSha());
         } else {
-            mPullRequestFragment = PullRequestFragment.newInstance(mPullRequest);
+            mPullRequestFragment = PullRequestFragment.newInstance(mPullRequest, mIssue);
             return mPullRequestFragment;
         }
     }
@@ -155,17 +213,55 @@ public class PullRequestActivity extends BasePagerActivity implements
     public void onPullRequestStateChanged(PullRequest newState) {
         mPullRequest = newState;
         fillHeader();
+        updateFabVisibility();
         transitionHeaderToColor(mHeaderColorAttrs[0], mHeaderColorAttrs[1]);
     }
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.iv_gravatar) {
+        if (v == mEditFab) {
+            Intent editIntent = new Intent(this, IssueEditActivity.class);
+            editIntent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+            editIntent.putExtra(Constants.Repository.NAME, mRepoName);
+            editIntent.putExtra(IssueEditActivity.EXTRA_ISSUE, mIssue);
+            startActivityForResult(editIntent, REQUEST_EDIT_ISSUE);
+        } else if (v.getId() == R.id.iv_gravatar) {
             User user = (User) v.getTag();
             Intent intent = IntentUtils.getUserActivityIntent(this, user);
             if (intent != null) {
                 startActivity(intent);
             }
+        }
+    }
+
+    private void updateTabRightMargin(int dimensionResId) {
+        int margin = dimensionResId != 0
+                ? getResources().getDimensionPixelSize(dimensionResId) : 0;
+
+        View tabs = findViewById(R.id.tabs);
+        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) tabs.getLayoutParams();
+        lp.rightMargin = margin;
+        tabs.setLayoutParams(lp);
+    }
+
+    private void updateFabVisibility() {
+        boolean shouldHaveFab = mIsCollaborator && mPullRequest != null && mIssue != null;
+        CoordinatorLayout rootLayout = getRootLayout();
+
+        if (shouldHaveFab && mEditFab == null) {
+            mEditFab = (IssueStateTrackingFloatingActionButton)
+                    getLayoutInflater().inflate(R.layout.issue_edit_fab, rootLayout, false);
+            mEditFab.setOnClickListener(this);
+            rootLayout.addView(mEditFab);
+            updateTabRightMargin(R.dimen.mini_fab_size_with_margin);
+        } else if (!shouldHaveFab && mEditFab != null) {
+            rootLayout.removeView(mEditFab);
+            updateTabRightMargin(0);
+            mEditFab = null;
+        }
+        if (mEditFab != null) {
+            mEditFab.setState(mPullRequest.getState());
+            mEditFab.setMerged(mPullRequest.isMerged());
         }
     }
 

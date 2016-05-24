@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_selected="true" android:state_pressed="true" android:color="@color/issue_closed_light"/>
-    <item android:state_selected="true" android:color="@color/issue_closed_light_button"/>
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item app:state_merged="true" android:state_pressed="true" android:color="@color/pr_merged_light"/>
+    <item app:state_merged="true" android:color="@color/pr_merged_light_button"/>
+    <item app:state_closed="true" android:state_pressed="true" android:color="@color/issue_closed_light"/>
+    <item app:state_closed="true" android:color="@color/issue_closed_light_button"/>
     <item android:state_pressed="true" android:color="@color/issue_open_light"/>
     <item android:color="@color/issue_open_light_button"/>
 </selector>

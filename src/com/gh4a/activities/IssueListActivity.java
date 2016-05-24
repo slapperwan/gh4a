@@ -43,7 +43,6 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueListFragment;
 import com.gh4a.fragment.LoadingListFragmentBase;
-import com.gh4a.fragment.SearchIssueListFragment;
 import com.gh4a.loader.CollaboratorListLoader;
 import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.LabelListLoader;
@@ -81,6 +80,7 @@ public class IssueListActivity extends BasePagerActivity implements
     private FloatingActionButton mCreateFab;
     private IssueListFragment mOpenFragment;
     private IssueListFragment mClosedFragment;
+    private IssueListFragment mSearchFragment;
     private Boolean mIsCollaborator;
     private ProgressDialog mProgressDialog;
     private List<Label> mLabels;
@@ -93,6 +93,7 @@ public class IssueListActivity extends BasePagerActivity implements
     private static final String STATE_KEY_SEARCH_QUERY = "search_query";
     private static final String STATE_KEY_SEARCH_MODE = "search_mode";
 
+    private static final String LIST_QUERY = "is:issue is:%s repo:%s/%s %s %s %s";
     private static final String SEARCH_QUERY = "is:%s repo:%s/%s %s";
 
     private static final int[] TITLES = new int[] {
@@ -299,14 +300,11 @@ public class IssueListActivity extends BasePagerActivity implements
     @Override
     protected boolean fragmentNeedsRefresh(Fragment object) {
         if (object instanceof IssueListFragment) {
-            if (mSearchMode) {
+            if (mSearchMode && object != mSearchFragment) {
+                return true;
+            } else if (!mSearchMode && object != mOpenFragment && object != mClosedFragment) {
                 return true;
             }
-            if (object != mOpenFragment && object != mClosedFragment) {
-                return true;
-            }
-        } else if (object instanceof SearchIssueListFragment) {
-            return true;
         }
         return false;
     }
@@ -448,25 +446,22 @@ public class IssueListActivity extends BasePagerActivity implements
         Map<String, String> filterData = new HashMap<>();
         filterData.put("sort", mSortHelper.getSortMode());
         filterData.put("direction", mSortHelper.getSortDirection());
-        if (mSelectedLabels != null) {
-            filterData.put("labels", TextUtils.join(",", mSelectedLabels));
-        }
-        if (mSelectedMilestone > 0) {
-            filterData.put("milestone", String.valueOf(mSelectedMilestone));
-        }
-        if (mSelectedAssignee != null) {
-            filterData.put("assignee", mSelectedAssignee);
-        }
+        filterData.put("q", String.format(Locale.US, LIST_QUERY,
+                position == 1 ? Constants.Issue.STATE_CLOSED : Constants.Issue.STATE_OPEN,
+                mRepoOwner, mRepoName,
+                mSelectedLabels != null ? "labels:" + TextUtils.join(",", mSelectedLabels) : "",
+                mSelectedMilestone > 0 ? "milestone:" + mSelectedMilestone : "", // XXX: milestone name?
+                mSelectedAssignee != null ? "assignee:" + mSelectedAssignee : ""));
+
+        final IssueListFragment f = IssueListFragment.newInstance(filterData,
+                position == 1, R.string.no_issues_found, false);
 
         if (position == 1) {
-            filterData.put(Constants.Issue.STATE, Constants.Issue.STATE_CLOSED);
-            mClosedFragment = IssueListFragment.newInstance(mRepoOwner, mRepoName, filterData);
-            return mClosedFragment;
+            mClosedFragment = f;
         } else {
-            filterData.put(Constants.Issue.STATE, Constants.Issue.STATE_OPEN);
-            mOpenFragment = IssueListFragment.newInstance(mRepoOwner, mRepoName, filterData);
-            return mOpenFragment;
+            mOpenFragment = f;
         }
+        return f;
     }
 
     private Fragment makeSearchFragment(int position) {
@@ -478,8 +473,9 @@ public class IssueListActivity extends BasePagerActivity implements
                 closed ? Constants.Issue.STATE_CLOSED : Constants.Issue.STATE_OPEN,
                 mRepoOwner, mRepoName, mSearchQuery));
 
-        return SearchIssueListFragment.newInstance(filterData, closed,
-                R.string.no_search_issues_found, false, false);
+        mSearchFragment = IssueListFragment.newInstance(filterData, closed,
+                R.string.no_search_issues_found, false);
+        return mSearchFragment;
     }
 
     private void reloadIssueList() {

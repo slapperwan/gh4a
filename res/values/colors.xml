@@ -19,6 +19,7 @@
     <color name="pr_merged_light_dark">#5e3da0</color>
     <color name="issue_open_light_button">#83e658</color>
     <color name="issue_closed_light_button">#e65858</color>
+    <color name="pr_merged_light_button">#8558e6</color>
 
     <color name="issue_open_dark">#396426</color>
     <color name="issue_closed_dark">#642626</color>
@@ -28,6 +29,7 @@
     <color name="pr_merged_dark_dark">#2e1e50</color>
     <color name="issue_open_dark_button">#569639</color>
     <color name="issue_closed_dark_button">#963939</color>
+    <color name="pr_merged_dark_button">#563996</color>
 
     <color name="fab_light">#89f05c</color>
     <color name="fab_pressed_light">#5aa03d</color>

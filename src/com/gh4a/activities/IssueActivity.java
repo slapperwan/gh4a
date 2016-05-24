@@ -30,7 +30,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -67,6 +66,7 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
 import com.gh4a.widget.IssueLabelSpan;
+import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
@@ -87,7 +87,7 @@ public class IssueActivity extends BaseActivity implements
     private IssueEventAdapter mEventAdapter;
     private RecyclerView mRecyclerView;
     private boolean mIsCollaborator;
-    private FloatingActionButton mEditFab;
+    private IssueStateTrackingFloatingActionButton mEditFab;
     private CommentBoxFragment mCommentFragment;
     private HttpImageGetter mImageGetter;
     private Handler mHandler = new Handler();
@@ -408,7 +408,7 @@ public class IssueActivity extends BaseActivity implements
         CoordinatorLayout rootLayout = getRootLayout();
 
         if (shouldHaveFab && mEditFab == null) {
-            mEditFab = (FloatingActionButton)
+            mEditFab = (IssueStateTrackingFloatingActionButton)
                     getLayoutInflater().inflate(R.layout.issue_edit_fab, rootLayout, false);
             mEditFab.setOnClickListener(this);
             rootLayout.addView(mEditFab);
@@ -417,8 +417,7 @@ public class IssueActivity extends BaseActivity implements
             mEditFab = null;
         }
         if (mEditFab != null) {
-            boolean closed = Constants.Issue.STATE_CLOSED.equals(mIssue.getState());
-            mEditFab.setSelected(closed);
+            mEditFab.setState(mIssue.getState());
         }
     }
 

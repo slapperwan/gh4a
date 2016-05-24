@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueListFragment;
-import com.gh4a.fragment.SearchIssueListFragment;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -75,10 +74,10 @@ public class IssueListFactory extends FragmentFactory {
         filterData.put("q", String.format(QUERY, mIsPullRequest ? "pr" : "issue",
                 mState, action, mLogin));
 
-        return SearchIssueListFragment.newInstance(filterData,
+        return IssueListFragment.newInstance(filterData,
                 Constants.Issue.STATE_CLOSED.equals(mState),
                 mIsPullRequest ? R.string.no_pull_requests_found : R.string.no_issues_found,
-                true, mIsPullRequest);
+                true);
     }
 
     @Override

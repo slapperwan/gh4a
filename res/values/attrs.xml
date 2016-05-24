@@ -71,6 +71,11 @@
         <attr name="allCaps" format="boolean"/>
     </declare-styleable>
 
+    <declare-styleable name="IssueStateTrackingFloatingActionButton">
+        <attr name="state_closed" format="boolean" />
+        <attr name="state_merged" format="boolean" />
+    </declare-styleable>
+
     <item name="EdgeColorHelper" type="id" />
     <item name="FloatingActionButtonScrollEnabled" type="id" />
 </resources>

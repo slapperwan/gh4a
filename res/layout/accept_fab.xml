@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- FIXME: use 16dp right margin instead of compat padding once the fix in
+     https://code.google.com/p/android/issues/detail?id=175330 actually works -->
 <android.support.design.widget.FloatingActionButton
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginRight="16dp"
     android:src="@drawable/navigation_accept"
     app:backgroundTint="?attr/colorFab"
     app:layout_anchor="@+id/header"
     app:layout_anchorGravity="right|bottom"
+    app:useCompatPadding="true"
     app:fabSize="mini" />

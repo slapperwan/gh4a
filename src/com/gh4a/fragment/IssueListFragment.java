@@ -15,14 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.PageIterator;
-import org.eclipse.egit.github.core.service.IssueService;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -33,52 +25,47 @@ import android.view.View;
 import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.activities.IssueActivity;
 import com.gh4a.adapter.IssueAdapter;
+import com.gh4a.adapter.RepositoryIssueAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.utils.IntentUtils;
+
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.client.PageIterator;
+import org.eclipse.egit.github.core.service.IssueService;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     private static final int REQUEST_ISSUE = 1000;
 
-    private String mRepoOwner;
-    private String mRepoName;
     private Map<String, String> mFilterData;
+    private int mEmptyTextResId;
+    private boolean mShowRepository;
+    private boolean mShowingClosed;
 
-    public static IssueListFragment newInstance(String repoOwner, String repoName,
-            Map<String, String> filterData) {
-
+    public static IssueListFragment newInstance(Map<String, String> filterData,
+            boolean showingClosed, int emptyTextResId, boolean showRepository) {
         IssueListFragment f = new IssueListFragment();
-        Bundle args = new Bundle();
-        args.putString(Constants.Repository.OWNER, repoOwner);
-        args.putString(Constants.Repository.NAME, repoName);
 
+        Bundle args = new Bundle();
         if (filterData != null) {
             for (String key : filterData.keySet()) {
                 args.putString("filter_" + key, filterData.get(key));
             }
         }
+        args.putInt("emptytext", emptyTextResId);
+        args.putBoolean("closed", showingClosed);
+        args.putBoolean("withrepo", showRepository);
+
         f.setArguments(args);
         return f;
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        String state = mFilterData.get(Constants.Issue.STATE);
-
-        if (Constants.Issue.STATE_OPEN.equals(state)) {
-            setHighlightColors(R.attr.colorIssueOpen, R.attr.colorIssueOpenDark);
-        } else if (Constants.Issue.STATE_CLOSED.equals(state)) {
-            setHighlightColors(R.attr.colorIssueClosed, R.attr.colorIssueClosedDark);
-        }
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.NAME);
 
         mFilterData = new HashMap<>();
 
@@ -88,25 +75,30 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
                 mFilterData.put(key.substring(7), args.getString(key));
             }
         }
+        mEmptyTextResId = args.getInt("emptytext");
+        mShowingClosed = args.getBoolean("closed");
+        mShowRepository = args.getBoolean("withrepo");
     }
 
     @Override
-    protected RootAdapter<Issue, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        return new IssueAdapter(getActivity());
-    }
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-    @Override
-    protected int getEmptyTextResId() {
-        return R.string.no_issues_found;
+        if (mShowingClosed) {
+            setHighlightColors(R.attr.colorIssueClosed, R.attr.colorIssueClosedDark);
+        } else {
+            setHighlightColors(R.attr.colorIssueOpen, R.attr.colorIssueOpenDark);
+        }
     }
 
     @Override
     public void onItemClick(Issue issue) {
-        Intent intent = new Intent(getActivity(), IssueActivity.class);
-        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.NAME, mRepoName);
-        intent.putExtra(Constants.Issue.NUMBER, issue.getNumber());
-        intent.putExtra(Constants.Issue.STATE, issue.getState());
+        String[] urlPart = issue.getUrl().split("/");
+        Intent intent = issue.getPullRequest() != null
+                ? IntentUtils.getPullRequestActivityIntent(getActivity(),
+                        urlPart[4], urlPart[5], issue.getNumber())
+                : IntentUtils.getIssueActivityIntent(getActivity(),
+                        urlPart[4], urlPart[5], issue.getNumber());
         startActivityForResult(intent, REQUEST_ISSUE);
     }
 
@@ -121,11 +113,24 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
         }
     }
 
+
+    @Override
+    protected RootAdapter<Issue, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
+        return mShowRepository
+                ? new RepositoryIssueAdapter(getActivity())
+                : new IssueAdapter(getActivity());
+    }
+
+    @Override
+    protected int getEmptyTextResId() {
+        return mEmptyTextResId;
+    }
+
     @Override
     protected PageIterator<Issue> onCreateIterator() {
         IssueService issueService = (IssueService)
                 Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
-        return issueService.pageIssues(new RepositoryId(mRepoOwner, mRepoName), mFilterData);
+        return issueService.pageSearchIssues(mFilterData);
     }
 
     public static class SortDrawerHelper {
