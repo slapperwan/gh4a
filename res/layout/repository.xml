@@ -90,11 +90,23 @@
                         android:gravity="center_horizontal"
                         android:orientation="vertical">
 
-                        <com.gh4a.widget.StyleableTextView
-                            android:id="@+id/tv_issues_count"
+                        <FrameLayout
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextAppearance.CountHeaderItem" />
+                            android:layout_height="wrap_content">
+
+                            <ProgressBar
+                                android:id="@+id/issues_progress"
+                                style="@style/LoadingProgress"
+                                android:layout_gravity="center" />
+
+                            <com.gh4a.widget.StyleableTextView
+                                android:id="@+id/tv_issues_count"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:textAppearance="@style/TextAppearance.CountHeaderItem" />
+
+                        </FrameLayout>
 
                         <com.gh4a.widget.StyleableTextView
                             android:id="@+id/tv_issues_label"

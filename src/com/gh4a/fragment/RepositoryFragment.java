@@ -85,7 +85,11 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         @Override
         protected void onResultReady(Integer result) {
             View v = getView();
+            v.findViewById(R.id.issues_progress).setVisibility(View.GONE);
             v.findViewById(R.id.pull_requests_progress).setVisibility(View.GONE);
+
+            TextView tvIssuesCount = (TextView) mContentView.findViewById(R.id.tv_issues_count);
+            tvIssuesCount.setText(String.valueOf(mRepository.getOpenIssues() - result));
 
             TextView tvPullRequestsCountView = (TextView) v.findViewById(R.id.tv_pull_requests_count);
             tvPullRequestsCountView.setText(String.valueOf(result));
@@ -236,22 +240,14 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         TextView tvForksCount = (TextView) mContentView.findViewById(R.id.tv_forks_count);
         tvForksCount.setText(String.valueOf(mRepository.getForks()));
 
-        TextView tvIssues = (TextView) mContentView.findViewById(R.id.tv_issues_label);
-        TextView tvIssuesCount = (TextView) mContentView.findViewById(R.id.tv_issues_count);
         LinearLayout llIssues = (LinearLayout) mContentView.findViewById(R.id.cell_issues);
 
         if (mRepository.isHasIssues()) {
             llIssues.setVisibility(View.VISIBLE);
             llIssues.setOnClickListener(this);
-
-            tvIssues.setVisibility(View.VISIBLE);
-
-            tvIssuesCount.setText(String.valueOf(mRepository.getOpenIssues()));
-            tvIssuesCount.setVisibility(View.VISIBLE);
+            // value will be filled when PR count arrives
         } else {
             llIssues.setVisibility(View.GONE);
-            tvIssues.setVisibility(View.GONE);
-            tvIssuesCount.setVisibility(View.GONE);
         }
 
         mContentView.findViewById(R.id.tv_private).setVisibility(
