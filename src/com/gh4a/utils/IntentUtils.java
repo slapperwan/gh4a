@@ -10,7 +10,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.text.TextUtils;
-import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import com.gh4a.Constants;

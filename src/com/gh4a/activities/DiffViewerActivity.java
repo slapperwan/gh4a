@@ -57,7 +57,6 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.User;
 
 import java.io.IOException;
 import java.util.ArrayList;
