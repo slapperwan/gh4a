@@ -80,9 +80,7 @@ public class PullRequestActivity extends BasePagerActivity implements
         protected void onResultReady(PullRequest result) {
             mPullRequest = result;
             fillHeader();
-            setContentShown(true);
-            invalidateTabs();
-            updateFabVisibility();
+            showContentIfReady();
             supportInvalidateOptionsMenu();
         }
     };
@@ -96,8 +94,7 @@ public class PullRequestActivity extends BasePagerActivity implements
         @Override
         protected void onResultReady(Issue result) {
             mIssue = result;
-            updateFabVisibility();
-            invalidateTabs();
+            showContentIfReady();
         }
     };
 
@@ -230,6 +227,14 @@ public class PullRequestActivity extends BasePagerActivity implements
             if (intent != null) {
                 startActivity(intent);
             }
+        }
+    }
+
+    private void showContentIfReady() {
+        if (mPullRequest != null && mIssue != null) {
+            setContentShown(true);
+            invalidateTabs();
+            updateFabVisibility();
         }
     }
 
