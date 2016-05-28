@@ -435,7 +435,9 @@ public class IssueListActivity extends BasePagerActivity implements
     private void setSearchMode(boolean enabled) {
         boolean changed = mSearchMode != enabled;
         mSearchMode = enabled;
-        mCreateFab.setVisibility(enabled ? View.GONE : View.VISIBLE);
+        if (mCreateFab != null) {
+            mCreateFab.setVisibility(enabled ? View.GONE : View.VISIBLE);
+        }
         reloadIssueList();
         if (changed) {
             updateRightNavigationDrawer();
