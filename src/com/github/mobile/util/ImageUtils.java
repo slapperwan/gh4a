@@ -175,6 +175,9 @@ public class ImageUtils {
             }
         } catch (SVGParseException e) {
             // fall through
+        } catch (NullPointerException e) {
+            // https://github.com/BigBadaboom/androidsvg/issues/81
+            // remove me when there's a 1.2.3 release
         }
         return null;
     }
