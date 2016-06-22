@@ -642,8 +642,10 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
         @Override
         protected void onSuccess(MergeStatus result) {
-            setContentShown(false);
-            getLoaderManager().getLoader(1).onContentChanged();
+            if (isAdded()) {
+                setContentShown(false);
+                getLoaderManager().getLoader(1).onContentChanged();
+            }
         }
 
         @Override

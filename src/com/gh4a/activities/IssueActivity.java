@@ -504,7 +504,10 @@ public class IssueActivity extends BaseActivity implements
     @Override
     public void onCommentSent() {
         //reload comments
-        getSupportLoaderManager().getLoader(2).onContentChanged();
+        Loader loader = getSupportLoaderManager().getLoader(2);
+        if (loader != null) {
+            loader.onContentChanged();
+        }
         setResult(RESULT_OK);
     }
 

@@ -39,6 +39,7 @@ public class ContentListContainerFragment extends Fragment implements
 
     private static final String STATE_KEY_DIR_STACK = "dir_stack";
     private static final String STATE_KEY_CONTENT_CACHE_PREFIX = "content_cache_";
+    private static final String STATE_KEY_INITIAL_PATH = "initial_path";
 
     private PathBreadcrumbs mBreadcrumbs;
     private ContentListFragment mContentListFragment;
@@ -47,6 +48,7 @@ public class ContentListContainerFragment extends Fragment implements
     private Map<String, String> mGitModuleMap;
     private Stack<String> mDirStack = new Stack<>();
     private ArrayList<String> mInitialPathToLoad;
+    private boolean mStateSaved;
     private Map<String, ArrayList<RepositoryContents>> mContentCache =
             new LinkedHashMap<String, ArrayList<RepositoryContents>>() {
         private static final long serialVersionUID = -2379579224736389357L;
@@ -92,6 +94,7 @@ public class ContentListContainerFragment extends Fragment implements
 
         mRepository = (Repository) getArguments().getSerializable("repository");
         mSelectedRef = getArguments().getString("ref");
+        mStateSaved = false;
 
         if (savedInstanceState != null) {
             for (String entry : savedInstanceState.getStringArrayList(STATE_KEY_DIR_STACK)) {
@@ -109,6 +112,7 @@ public class ContentListContainerFragment extends Fragment implements
                             (ArrayList<RepositoryContents>) savedInstanceState.getSerializable(key));
                 }
             }
+            mInitialPathToLoad = savedInstanceState.getStringArrayList(STATE_KEY_INITIAL_PATH);
         } else {
             mDirStack.push("");
 
@@ -186,6 +190,7 @@ public class ContentListContainerFragment extends Fragment implements
         super.onViewCreated(view, savedInstanceState);
         mBreadcrumbs = (PathBreadcrumbs) view.findViewById(R.id.breadcrumbs);
         mBreadcrumbs.setCallback(this);
+        mStateSaved = false;
         updateBreadcrumbs();
         addFragmentForTopOfStack();
     }
@@ -194,10 +199,12 @@ public class ContentListContainerFragment extends Fragment implements
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putStringArrayList(STATE_KEY_DIR_STACK, new ArrayList<>(mDirStack));
+        outState.putStringArrayList(STATE_KEY_INITIAL_PATH, mInitialPathToLoad);
         for (Map.Entry<String, ArrayList<RepositoryContents>> entry : mContentCache.entrySet()) {
             String key = entry.getKey();
             outState.putSerializable(STATE_KEY_CONTENT_CACHE_PREFIX + key, entry.getValue());
         }
+        mStateSaved = true;
     }
 
     @Override
@@ -217,7 +224,7 @@ public class ContentListContainerFragment extends Fragment implements
                 }
             }
         }
-        if (mInitialPathToLoad != null && !mInitialPathToLoad.isEmpty()) {
+        if (mInitialPathToLoad != null && !mInitialPathToLoad.isEmpty() && !mStateSaved) {
             String itemToLoad = mInitialPathToLoad.get(0);
             boolean found = false;
             for (RepositoryContents content : contents) {

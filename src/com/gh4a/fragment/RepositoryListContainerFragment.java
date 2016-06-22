@@ -99,7 +99,7 @@ public class RepositoryListContainerFragment extends Fragment implements
         getChildFragmentManager().beginTransaction()
                 .remove(mMainFragment)
                 .remove(mSearchFragment)
-                .commit();
+                .commitNowAllowingStateLoss();
     }
 
     @Nullable

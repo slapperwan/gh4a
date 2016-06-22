@@ -499,6 +499,10 @@ public class RepositoryActivity extends BasePagerActivity {
 
         @Override
         protected void onSuccess(Void result) {
+            if (mIsStarring == null) {
+                // user refreshed while the action was in progress
+                return;
+            }
             mIsStarring = !mIsStarring;
             if (mRepositoryFragment != null) {
                 mRepositoryFragment.updateStargazerCount(mIsStarring);
@@ -527,6 +531,10 @@ public class RepositoryActivity extends BasePagerActivity {
 
         @Override
         protected void onSuccess(Void result) {
+            if (mIsWatching == null) {
+                // user refreshed while the action was in progress
+                return;
+            }
             mIsWatching = !mIsWatching;
             supportInvalidateOptionsMenu();
         }
