@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -18,6 +19,13 @@ public class FileUtils {
     private static final List<String> MARKDOWN_EXTS = Arrays.asList(
         "markdown", "md", "mdown", "mkdn", "mkd"
     );
+
+    private static final HashMap<String, String> MIME_TYPE_OVERRIDES = new HashMap<>();
+    static {
+        // .ts can be both a TypeScript file and a MPEG2 transport stream file. As the former is the
+        // more likely case for us and the framework returns the latter, override to assume a text file.
+        MIME_TYPE_OVERRIDES.put("ts", "text/x-typescript");
+    }
 
     public static boolean save(File file, InputStream inputStream) {
         OutputStream out = null;
@@ -88,6 +96,9 @@ public class FileUtils {
         String extension = filename == null ? null : getFileExtension(filename);
         if (StringUtils.isBlank(extension)) {
             return null;
+        }
+        if (MIME_TYPE_OVERRIDES.containsKey(extension)) {
+            return MIME_TYPE_OVERRIDES.get(extension);
         }
         return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
     }
