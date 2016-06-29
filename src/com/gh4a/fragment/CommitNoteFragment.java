@@ -168,6 +168,8 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
     @Override
     public void onCommentSent() {
-        onRefresh();
+        if (isAdded()) {
+            onRefresh();
+        }
     }
 }

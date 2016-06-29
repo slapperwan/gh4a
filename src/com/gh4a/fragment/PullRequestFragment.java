@@ -560,7 +560,9 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     @Override
     public void onCommentSent() {
         // reload comments
-        super.onRefresh();
+        if (isAdded()) {
+            super.onRefresh();
+        }
     }
 
     public void refreshComments() {

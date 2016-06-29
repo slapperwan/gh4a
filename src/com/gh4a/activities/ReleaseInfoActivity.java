@@ -128,6 +128,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
             mRelease = null;
             setContentShown(false);
             loader.onContentChanged();
+            getSupportLoaderManager().destroyLoader(1);
         }
         super.onRefresh();
     }
