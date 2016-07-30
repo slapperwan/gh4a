@@ -64,6 +64,7 @@
         <item name="colorCommitDeletion">#d25151</item>
         <item name="colorFab">@color/default_fab_dark</item>
         <item name="colorPrimaryTextEmphasized">@android:color/white</item>
+        <item name="colorWebViewBackground">#111111</item>
     </style>
 
     <style name="DarkTheme" parent="DarkThemeBase" />
@@ -149,6 +150,7 @@
         <item name="colorCommitDeletion">#b34545</item>
         <item name="colorFab">@color/default_fab_light</item>
         <item name="colorPrimaryTextEmphasized">@android:color/black</item>
+        <item name="colorWebViewBackground">#f7f7f9</item>
     </style>
 
     <style name="LightTheme" parent="LightThemeBase" />

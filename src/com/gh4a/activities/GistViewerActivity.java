@@ -29,6 +29,7 @@ import com.gh4a.R;
 import com.gh4a.loader.GistLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.Gist;
@@ -38,6 +39,7 @@ public class GistViewerActivity extends WebViewerActivity {
     private String mFileName;
     private String mGistId;
     private GistFile mGistFile;
+    private String mGistOwner;
 
     private LoaderCallbacks<Gist> mGistCallback = new LoaderCallbacks<Gist>(this) {
         @Override
@@ -46,9 +48,9 @@ public class GistViewerActivity extends WebViewerActivity {
         }
         @Override
         protected void onResultReady(Gist result) {
+            mGistOwner = ApiHelpers.getUserLogin(GistViewerActivity.this, result.getOwner());
             mGistFile = result.getFiles().get(mFileName);
-            loadCode(mGistFile.getContent(), mFileName);
-            supportInvalidateOptionsMenu();
+            onDataReady();
         }
     };
 
@@ -84,15 +86,21 @@ public class GistViewerActivity extends WebViewerActivity {
     }
 
     @Override
+    protected String generateHtml(String cssTheme) {
+        return generateCodeHtml(mGistFile.getContent(), mFileName, cssTheme);
+    }
+
+    @Override
+    protected String getDocumentTitle() {
+        return getString(R.string.gist_print_document_title, mFileName, mGistId, mGistOwner);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.download_menu, menu);
+        inflater.inflate(R.menu.file_viewer_menu, menu);
 
-        menu.removeItem(R.id.download);
         menu.removeItem(R.id.share);
-        if (mGistFile == null) {
-            menu.removeItem(R.id.browser);
-        }
 
         return super.onCreateOptionsMenu(menu);
     }

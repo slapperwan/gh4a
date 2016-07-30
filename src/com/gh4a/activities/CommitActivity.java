@@ -75,11 +75,7 @@ public class CommitActivity extends BasePagerActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.download_menu, menu);
-
-        menu.removeItem(R.id.download);
-        menu.removeItem(R.id.search);
-        menu.removeItem(R.id.wrap);
+        inflater.inflate(R.menu.commit_menu, menu);
 
         return super.onCreateOptionsMenu(menu);
     }

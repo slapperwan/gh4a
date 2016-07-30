@@ -27,21 +27,28 @@ public class BlogActivity extends WebViewerActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String title = getIntent().getStringExtra(Constants.Blog.TITLE);
-        String content = getIntent().getStringExtra(Constants.Blog.CONTENT);
-
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(title);
+        actionBar.setTitle(getDocumentTitle());
         actionBar.setSubtitle(R.string.blog);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        loadUnthemedHtml(content);
+        onDataReady();
     }
 
     @Override
     protected boolean canSwipeToRefresh() {
         // content is contained in the intent extras
         return false;
+    }
+
+    @Override
+    protected String generateHtml(String cssTheme) {
+        return wrapUnthemedHtml(getIntent().getStringExtra(Constants.Blog.CONTENT), cssTheme);
+    }
+
+    @Override
+    protected String getDocumentTitle() {
+        return getIntent().getStringExtra(Constants.Blog.TITLE);
     }
 
     @Override

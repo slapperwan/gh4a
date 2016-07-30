@@ -26,11 +26,16 @@ import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.print.PrintAttributes;
+import android.print.PrintDocumentAdapter;
+import android.print.PrintManager;
 import android.text.TextUtils;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -40,7 +45,6 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.utils.FileUtils;
-import com.gh4a.utils.ThemeUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
 
@@ -50,7 +54,15 @@ import java.util.ArrayList;
 public abstract class WebViewerActivity extends BaseActivity implements
         SwipeRefreshLayout.ChildScrollDelegate {
     protected WebView mWebView;
+    private WebView mPrintWebView;
     private boolean mStarted;
+    private boolean mHasData;
+    private boolean mRequiresJsInterface;
+    private Handler mHandler = new Handler();
+
+    private static final String DARK_CSS_THEME = "dark";
+    private static final String LIGHT_CSS_THEME = "light";
+    private static final String PRINT_CSS_THEME = "print";
 
     private static ArrayList<String> sLanguagePlugins = new ArrayList<>();
 
@@ -64,11 +76,39 @@ public abstract class WebViewerActivity extends BaseActivity implements
         WebSettings.TextSize.LARGEST
     };
 
+    private class RenderingDoneInterface {
+        @JavascriptInterface
+        public void onRenderingDone() {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    applyLineWrapping(shouldWrapLines());
+                    setContentShown(true);
+                }
+            });
+        }
+    }
+
+    private class PrintRenderingDoneInterface {
+        @JavascriptInterface
+        public void onRenderingDone() {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mPrintWebView.loadUrl("javascript:applyLineWrapping(true)");
+                    doPrintHtml();
+                }
+            });
+        }
+    }
+
     private WebViewClient mWebViewClient = new WebViewClient() {
         @Override
-        public void onPageFinished(WebView webView, String url) {
-            applyLineWrapping(shouldWrapLines());
-            setContentShown(true);
+        public void onPageFinished(WebView view, String url) {
+            if (!mRequiresJsInterface) {
+                applyLineWrapping(shouldWrapLines());
+                setContentShown(true);
+            }
         }
 
         @Override
@@ -126,12 +166,20 @@ public abstract class WebViewerActivity extends BaseActivity implements
         return UiUtils.canViewScrollUp(mWebView);
     }
 
-    @SuppressWarnings("deprecation")
-    @SuppressLint("SetJavaScriptEnabled")
     private void setupWebView() {
         mWebView = (WebView) findViewById(R.id.web_view);
 
         WebSettings s = mWebView.getSettings();
+        initWebViewSettings(s);
+        applyDefaultTextSize(s);
+
+        mWebView.setBackgroundColor(UiUtils.resolveColor(this, R.attr.colorWebViewBackground));
+        mWebView.setWebViewClient(mWebViewClient);
+    }
+
+    @SuppressWarnings("deprecation")
+    @SuppressLint("SetJavaScriptEnabled")
+    private void initWebViewSettings(WebSettings s) {
         s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
         s.setAllowFileAccess(true);
         s.setBuiltInZoomControls(true);
@@ -143,16 +191,21 @@ public abstract class WebViewerActivity extends BaseActivity implements
         s.setSupportZoom(true);
         s.setJavaScriptEnabled(true);
         s.setUseWideViewPort(false);
-        applyDefaultTextSize(s);
-
-        mWebView.setBackgroundColor(ThemeUtils.getWebViewBackgroundColor(Gh4Application.THEME));
-        mWebView.setWebViewClient(mWebViewClient);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
             menu.removeItem(R.id.search);
+        }
+        if (!mHasData) {
+            menu.removeItem(R.id.browser);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && mHasData) {
+            getMenuInflater().inflate(R.menu.print_menu, menu);
+            if (mPrintWebView != null) {
+                menu.findItem(R.id.print).setEnabled(false);
+            }
         }
         return super.onCreateOptionsMenu(menu);
     }
@@ -179,6 +232,9 @@ public abstract class WebViewerActivity extends BaseActivity implements
             setLineWrapping(newState);
             applyLineWrapping(newState);
             return true;
+        } else if (itemId == R.id.print) {
+            doPrint();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -189,6 +245,50 @@ public abstract class WebViewerActivity extends BaseActivity implements
     private void doSearch() {
         if (mWebView != null) {
             mWebView.showFindDialog(null, true);
+        }
+    }
+
+    @TargetApi(19)
+    private void doPrint() {
+        if (handlePrintRequest()) {
+            return;
+        }
+
+        mPrintWebView = new WebView(this);
+        initWebViewSettings(mPrintWebView.getSettings());
+
+        if (mRequiresJsInterface) {
+            mPrintWebView.addJavascriptInterface(new PrintRenderingDoneInterface(), "NativeClient");
+        } else {
+            mPrintWebView.setWebViewClient(new WebViewClient() {
+                @Override
+                public void onPageFinished(WebView webView, String url) {
+                    doPrintHtml();
+                }
+            });
+        }
+        final String html = generateHtml(PRINT_CSS_THEME);
+        mPrintWebView.loadDataWithBaseURL("file:///android_asset/", html, null, "utf-8", null);
+        supportInvalidateOptionsMenu();
+    }
+
+    @TargetApi(19)
+    private void doPrintHtml() {
+        final String title = getDocumentTitle();
+        PrintManager printManager = (PrintManager) getSystemService(Context.PRINT_SERVICE);
+        PrintDocumentAdapter printAdapter = getPrintAdapterForWebView(mPrintWebView, title);
+        printManager.print(title, printAdapter, new PrintAttributes.Builder().build());
+        mPrintWebView = null;
+        supportInvalidateOptionsMenu();
+    }
+
+    @SuppressWarnings("deprecation")
+    @TargetApi(19)
+    private PrintDocumentAdapter getPrintAdapterForWebView(WebView webView, String title) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return webView.createPrintDocumentAdapter(title);
+        } else {
+            return webView.createPrintDocumentAdapter();
         }
     }
 
@@ -207,18 +307,13 @@ public abstract class WebViewerActivity extends BaseActivity implements
         }
     }
 
-    protected void loadUnthemedHtml(String html) {
-        if (Gh4Application.THEME == R.style.DarkTheme) {
-            html = "<style type=\"text/css\">" +
-                    "body { color: #A3A3A5 !important }" +
-                    "a { color: #4183C4 !important }</style><body>" +
-                    html + "</body>";
+    @Override
+    protected void setContentShown(boolean shown) {
+        super.setContentShown(shown);
+        if (!shown) {
+            mHasData = false;
+            supportInvalidateOptionsMenu();
         }
-        loadThemedHtml(html);
-    }
-
-    protected void loadThemedHtml(String html) {
-        mWebView.loadDataWithBaseURL("file:///android_asset/", html, null, "utf-8", null);
     }
 
     private boolean shouldWrapLines() {
@@ -237,8 +332,16 @@ public abstract class WebViewerActivity extends BaseActivity implements
         return false;
     }
 
-    protected void loadCode(String data, String fileName) {
-        loadCode(data, fileName, null, null, null, -1, -1);
+    protected void onDataReady() {
+        final String cssTheme = Gh4Application.THEME == R.style.DarkTheme
+                ? DARK_CSS_THEME : LIGHT_CSS_THEME;
+        final String html = generateHtml(cssTheme);
+        if (mRequiresJsInterface) {
+            mWebView.addJavascriptInterface(new RenderingDoneInterface(), "NativeClient");
+        }
+        mWebView.loadDataWithBaseURL("file:///android_asset/", html, null, "utf-8", null);
+        mHasData = true;
+        supportInvalidateOptionsMenu();
     }
 
     private void loadLanguagePluginListIfNeeded() {
@@ -263,9 +366,13 @@ public abstract class WebViewerActivity extends BaseActivity implements
         }
     }
 
-    protected void loadCode(String data, String fileName,
-            String repoOwner, String repoName, String ref,
-            int highlightStart, int highlightEnd) {
+    protected String generateCodeHtml(String data, String fileName, String cssTheme) {
+        return generateCodeHtml(data, fileName, null, null, null, -1, -1, cssTheme);
+    }
+
+    protected String generateCodeHtml(String data, String fileName,
+                String repoOwner, String repoName, String ref,
+                int highlightStart, int highlightEnd, String cssTheme) {
         String ext = FileUtils.getFileExtension(fileName);
         boolean isMarkdown = FileUtils.isMarkdown(fileName);
 
@@ -275,12 +382,12 @@ public abstract class WebViewerActivity extends BaseActivity implements
 
         if (isMarkdown) {
             writeScriptInclude(content, "showdown");
-            writeCssInclude(content, "markdown");
+            writeCssInclude(content, "markdown", cssTheme);
             content.append("</head>");
             content.append("<body>");
             content.append("<div id='content'>");
         } else {
-            writeCssInclude(content, "prettify");
+            writeCssInclude(content, "prettify", cssTheme);
             writeScriptInclude(content, "prettify");
             loadLanguagePluginListIfNeeded();
             for (String plugin : sLanguagePlugins) {
@@ -288,7 +395,8 @@ public abstract class WebViewerActivity extends BaseActivity implements
             }
             content.append("</head>");
             content.append("<body onload='prettyPrint(function() { highlightLines(");
-            content.append(highlightStart).append(",").append(highlightEnd).append("); })'");
+            content.append(highlightStart).append(",").append(highlightEnd).append("); ");
+            content.append("NativeClient.onRenderingDone(); })'");
             content.append(" onresize='scrollToHighlight();'>");
             content.append("<pre id='content' class='prettyprint linenums lang-");
             content.append(ext).append("'>");
@@ -312,14 +420,25 @@ public abstract class WebViewerActivity extends BaseActivity implements
             content.append("var converter = new Showdown.converter();");
             content.append("var html = converter.makeHtml(text);");
             content.append("document.getElementById('content').innerHTML = html;");
+            content.append("NativeClient.onRenderingDone();");
             content.append("</script>");
         } else {
             content.append("</pre>");
         }
 
         content.append("</body></html>");
+        mRequiresJsInterface = true;
+        return content.toString();
+    }
 
-        loadThemedHtml(content.toString());
+    protected static String wrapUnthemedHtml(String html, String cssTheme) {
+        if (TextUtils.equals(cssTheme, DARK_CSS_THEME)) {
+            return "<style type=\"text/css\">" +
+                    "body { color: #A3A3A5 !important }" +
+                    "a { color: #4183C4 !important }</style><body>" +
+                    html + "</body>";
+        }
+        return html;
     }
 
     protected static void writeScriptInclude(StringBuilder builder, String scriptName) {
@@ -328,14 +447,20 @@ public abstract class WebViewerActivity extends BaseActivity implements
         builder.append(".js' type='text/javascript'></script>");
     }
 
-    protected static void writeCssInclude(StringBuilder builder, String cssType) {
+    protected static void writeCssInclude(StringBuilder builder, String cssType, String cssTheme) {
         builder.append("<link href='file:///android_asset/");
         builder.append(cssType);
         builder.append("-");
-        builder.append(ThemeUtils.getCssTheme(Gh4Application.THEME));
+        builder.append(cssTheme);
         builder.append(".css' rel='stylesheet' type='text/css'/>");
     }
 
     @Override
     protected abstract boolean canSwipeToRefresh();
+
+    protected boolean handlePrintRequest() {
+        return false;
+    }
+    protected abstract String generateHtml(String cssTheme);
+    protected abstract String getDocumentTitle();
 }

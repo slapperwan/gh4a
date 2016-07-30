@@ -1,0 +1,44 @@
+body {
+    font-family: Helvetica,arial,sans-serif;
+    font-size: 12px;
+    line-height: 1.4;
+    color: #48484C;
+    margin: 6px 0 6px 0;
+}
+
+pre {
+    display: table;
+    min-width: 100%;
+}
+
+pre > div {
+    margin-left: 6px;
+    margin-right: 6px;
+}
+
+.image {
+    border: 1px solid #7a7a7a;
+    display: table;
+    padding: 3px;
+}
+
+.change {
+    background-color: #9ea1a1;
+    color: #eee;
+}
+
+.add {
+    background-color: #DFD;
+}
+
+.remove {
+    background-color: #FDD;
+}
+
+.comment {
+    white-space: normal;
+    border: 1px solid #7a7a7a;
+    padding: 2px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+}

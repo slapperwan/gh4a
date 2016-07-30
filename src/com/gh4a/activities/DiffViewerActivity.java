@@ -88,7 +88,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         @Override
         protected void onResultReady(List<CommitComment> result) {
             addCommentsToMap(result);
-            showDiff();
+            onDataReady();
         }
     };
 
@@ -109,7 +109,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
 
         if (comments != null) {
             addCommentsToMap(comments);
-            showDiff();
+            onDataReady();
         } else {
             getSupportLoaderManager().initLoader(0, null, mCommentCallback);
         }
@@ -145,9 +145,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.download_menu, menu);
-
-        menu.removeItem(R.id.download);
+        inflater.inflate(R.menu.file_viewer_menu, menu);
 
         String viewAtTitle = getString(R.string.object_view_file_at, mSha.substring(0, 7));
         MenuItem item = menu.add(0, MENU_ITEM_VIEW, Menu.NONE, viewAtTitle);
@@ -157,51 +155,12 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        String url = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/commit/" + mSha;
-
-        switch (item.getItemId()) {
-            case R.id.browser:
-                IntentUtils.launchBrowser(this, Uri.parse(url));
-                return true;
-            case R.id.share:
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_commit_subject,
-                        mSha.substring(0, 7), mRepoOwner + "/" + mRepoName));
-                shareIntent.putExtra(Intent.EXTRA_TEXT, url);
-                shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
-                startActivity(shareIntent);
-                return true;
-            case MENU_ITEM_VIEW:
-                startActivity(IntentUtils.getFileViewerActivityIntent(this,
-                        mRepoOwner, mRepoName, mSha, mPath));
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void addCommentsToMap(List<CommitComment> comments) {
-        for (CommitComment comment : comments) {
-            if (!TextUtils.equals(comment.getPath(), mPath)) {
-                continue;
-            }
-            int position = comment.getPosition();
-            List<CommitComment> commentsByPos = mCommitCommentsByPos.get(position);
-            if (commentsByPos == null) {
-                commentsByPos = new ArrayList<>();
-                mCommitCommentsByPos.put(position, commentsByPos);
-            }
-            commentsByPos.add(comment);
-        }
-    }
-
-    protected void showDiff() {
+    protected String generateHtml(String cssTheme) {
         StringBuilder content = new StringBuilder();
         boolean authorized = Gh4Application.get().isAuthorized();
 
         content.append("<html><head><title></title>");
-        writeCssInclude(content, "text");
+        writeCssInclude(content, "text", cssTheme);
         writeScriptInclude(content, "codeutils");
         content.append("</head><body><pre>");
 
@@ -248,7 +207,53 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             }
         }
         content.append("</pre></body></html>");
-        loadThemedHtml(content.toString());
+        return content.toString();
+    }
+
+    @Override
+    protected String getDocumentTitle() {
+        return getString(R.string.diff_print_document_title,
+                FileUtils.getFileName(mPath), mSha.substring(0, 7), mRepoOwner, mRepoName);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        String url = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/commit/" + mSha;
+
+        switch (item.getItemId()) {
+            case R.id.browser:
+                IntentUtils.launchBrowser(this, Uri.parse(url));
+                return true;
+            case R.id.share:
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_commit_subject,
+                        mSha.substring(0, 7), mRepoOwner + "/" + mRepoName));
+                shareIntent.putExtra(Intent.EXTRA_TEXT, url);
+                shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
+                startActivity(shareIntent);
+                return true;
+            case MENU_ITEM_VIEW:
+                startActivity(IntentUtils.getFileViewerActivityIntent(this,
+                        mRepoOwner, mRepoName, mSha, mPath));
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void addCommentsToMap(List<CommitComment> comments) {
+        for (CommitComment comment : comments) {
+            if (!TextUtils.equals(comment.getPath(), mPath)) {
+                continue;
+            }
+            int position = comment.getPosition();
+            List<CommitComment> commentsByPos = mCommitCommentsByPos.get(position);
+            if (commentsByPos == null) {
+                commentsByPos = new ArrayList<>();
+                mCommitCommentsByPos.put(position, commentsByPos);
+            }
+            commentsByPos.add(comment);
+        }
     }
 
     private void openCommentDialog(final long id, String line, final int position) {

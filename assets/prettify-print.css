@@ -51,13 +51,8 @@ body {
 }
 
 pre.prettyprint {
-    background-color: #F7F7F9;
     min-width: 100%;
     display: table;
-}
-
-pre.prettyprint.linenums {
-    box-shadow: 40px 0 0 #FBFBFC inset,41px 0 0 #ECECF0 inset;
 }
 
 pre.prettyprint > ol {
@@ -87,6 +82,3 @@ li.L1,li.L3,li.L5,li.L7,li.L9 {
     background: #eee;
 }
 
-li.highlighted {
-    background: #ffffb8;
-}

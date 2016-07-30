@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 
 import com.gh4a.Constants;
+import com.gh4a.R;
 
 public class WikiActivity extends WebViewerActivity {
     private String mUserLogin;
@@ -34,7 +35,7 @@ public class WikiActivity extends WebViewerActivity {
         actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        loadUnthemedHtml(getIntent().getStringExtra(Constants.Blog.CONTENT));
+        onDataReady();
     }
 
     @Override
@@ -42,6 +43,17 @@ public class WikiActivity extends WebViewerActivity {
         super.onInitExtras(extras);
         mUserLogin = extras.getString(Constants.Repository.OWNER);
         mRepoName = extras.getString(Constants.Repository.NAME);
+    }
+
+    @Override
+    protected String generateHtml(String cssTheme) {
+        return wrapUnthemedHtml(getIntent().getStringExtra(Constants.Blog.CONTENT), cssTheme);
+    }
+
+    @Override
+    protected String getDocumentTitle() {
+        return getString(R.string.wiki_print_document_title,
+                getIntent().getStringExtra(Constants.Blog.TITLE), mUserLogin, mRepoName);
     }
 
     @Override
