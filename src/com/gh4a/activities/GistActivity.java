@@ -130,6 +130,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
             ViewGroup container = (ViewGroup) findViewById(R.id.file_container);
             LayoutInflater inflater = getLayoutInflater();
 
+            container.removeAllViews();
             for (GistFile gistFile : files.values()) {
                 TextView rowView = (TextView) inflater.inflate(R.layout.selectable_label,
                         container, false);
