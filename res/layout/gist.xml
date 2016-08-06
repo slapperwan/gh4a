@@ -51,7 +51,6 @@
             style="?attr/cardViewTheme">
 
             <LinearLayout
-                android:id="@+id/file_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
@@ -63,6 +62,12 @@
                     android:layout_height="wrap_content"
                     style="@style/HeaderLabel"
                     android:text="@string/gist_files" />
+
+                <LinearLayout
+                    android:id="@+id/file_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
 
             </LinearLayout>
 
