@@ -82,6 +82,7 @@
 
         <activity android:name="BrowseFilter"
             android:excludeFromRecents="true"
+            android:taskAffinity=""
             android:theme="@style/TransparentLightTheme">
             <intent-filter>
                 <action
