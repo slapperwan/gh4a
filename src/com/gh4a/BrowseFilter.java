@@ -52,28 +52,12 @@ public class BrowseFilter extends AppCompatActivity {
         if (IGitHubConstants.HOST_GISTS.equals(uri.getHost())) {
             if (!parts.isEmpty()) {
                 intent = IntentUtils.getGistActivityIntent(this, parts.get(parts.size() - 1));
-            } else {
-                IntentUtils.launchBrowser(this, uri);
             }
-        } else if (first == null
-                || "languages".equals(first)
-                || "training".equals(first)
-                || "login".equals(first)
-                || "contact".equals(first)
-                || "features".equals(first)) {
-            IntentUtils.launchBrowser(this, uri);
         } else if ("explore".equals(first)) {
             intent = new Intent(this, TrendingActivity.class);
         } else if ("blog".equals(first)) {
             intent = new Intent(this, BlogListActivity.class);
-        } else {
-            // strip off extra data like line numbers etc.
-            String last = parts.get(parts.size() - 1);
-            int pos = last.indexOf('#');
-            if (pos >= 0) {
-                parts.set(parts.size() - 1, last.substring(0, pos));
-            }
-
+        } else if (first != null) {
             String user = first;
             String repo = parts.size() >= 2 ? parts.get(1) : null;
             String action = parts.size() >= 3 ? parts.get(2) : null;
@@ -94,7 +78,13 @@ public class BrowseFilter extends AppCompatActivity {
             } else if ("tree".equals(action) || "commits".equals(action)) {
                 int page = "tree".equals(action)
                         ? RepositoryActivity.PAGE_FILES : RepositoryActivity.PAGE_COMMITS;
-                String refAndPath = TextUtils.join("/", parts.subList(3, parts.size()));
+                int refStart = 3;
+                if (parts.size() >= 6
+                        && TextUtils.equals(parts.get(3), "refs")
+                        && TextUtils.equals(parts.get(4), "heads")) {
+                    refStart = 5;
+                }
+                String refAndPath = TextUtils.join("/", parts.subList(refStart, parts.size()));
                 new RefPathDisambiguationTask(user, repo, refAndPath, page).execute();
                 return; // avoid finish() for now
             } else if ("issues".equals(action)) {
@@ -126,16 +116,16 @@ public class BrowseFilter extends AppCompatActivity {
             } else if ("commit".equals(action) && !StringUtils.isBlank(id)) {
                 intent = IntentUtils.getCommitInfoActivityIntent(this, user, repo, id);
                 addLineNumbersToIntentIfPresent(intent, uri.getFragment());
-            } else if ("blob".equals(action) && !StringUtils.isBlank(id) && parts.size() >= 5) {
-                String fullPath = TextUtils.join("/", parts.subList(4, parts.size()));
-                intent = IntentUtils.getFileViewerActivityIntent(this, user, repo, id, fullPath);
-                addLineNumbersToIntentIfPresent(intent, uri.getFragment());
-            } else {
-                IntentUtils.launchBrowser(this, uri);
+            } else if ("blob".equals(action) && !StringUtils.isBlank(id) && parts.size() >= 4) {
+                String refAndPath = TextUtils.join("/", parts.subList(3, parts.size()));
+                new RefPathDisambiguationTask(user, repo, refAndPath, uri.getFragment()).execute();
+                return; // avoid finish() for now
             }
         }
         if (intent != null) {
             startActivity(intent);
+        } else {
+            IntentUtils.launchBrowser(this, uri);
         }
         finish();
     }
@@ -150,12 +140,12 @@ public class BrowseFilter extends AppCompatActivity {
             return;
         }
         try {
-            int dashPos = fragment.indexOf("-");
+            int dashPos = fragment.indexOf("-L");
             if (dashPos > 0) {
                 intent.putExtra(Constants.Object.HIGHLIGHT_START,
                         Integer.valueOf(fragment.substring(1, dashPos)));
                 intent.putExtra(Constants.Object.HIGHLIGHT_END,
-                        Integer.valueOf(fragment.substring(dashPos + 1)));
+                        Integer.valueOf(fragment.substring(dashPos + 2)));
             } else {
                 intent.putExtra(Constants.Object.HIGHLIGHT_START,
                         Integer.valueOf(fragment.substring(1)));
@@ -188,6 +178,8 @@ public class BrowseFilter extends AppCompatActivity {
         private String mRepoName;
         private String mRefAndPath;
         private int mInitialPage;
+        private String mFragment;
+        private boolean mGoToFileViewer;
 
         public RefPathDisambiguationTask(String repoOwner, String repoName,
                 String refAndPath, int initialPage) {
@@ -196,6 +188,17 @@ public class BrowseFilter extends AppCompatActivity {
             mRepoName = repoName;
             mRefAndPath = refAndPath;
             mInitialPage = initialPage;
+            mGoToFileViewer = false;
+        }
+
+        public RefPathDisambiguationTask(String repoOwner, String repoName,
+                String refAndPath, String fragment) {
+            super(BrowseFilter.this);
+            mRepoOwner = repoOwner;
+            mRepoName = repoName;
+            mRefAndPath = refAndPath;
+            mFragment = fragment;
+            mGoToFileViewer = true;
         }
 
         @Override
@@ -215,10 +218,14 @@ public class BrowseFilter extends AppCompatActivity {
             List<RepositoryBranch> branches = repoService.getBranches(repo);
             if (branches != null) {
                 for (RepositoryBranch branch : branches) {
-                    String nameWithSlash = branch.getName() + "/";
-                    if (mRefAndPath.startsWith(nameWithSlash)) {
-                        return Pair.create(branch.getName(),
-                                mRefAndPath.substring(nameWithSlash.length()));
+                    if (TextUtils.equals(mRefAndPath, branch.getName())) {
+                        return Pair.create(branch.getName(), null);
+                    } else {
+                        String nameWithSlash = branch.getName() + "/";
+                        if (mRefAndPath.startsWith(nameWithSlash)) {
+                            return Pair.create(branch.getName(),
+                                    mRefAndPath.substring(nameWithSlash.length()));
+                        }
                     }
                 }
             }
@@ -231,10 +238,14 @@ public class BrowseFilter extends AppCompatActivity {
             List<RepositoryTag> tags = repoService.getTags(repo);
             if (tags != null) {
                 for (RepositoryTag tag : tags) {
-                    String nameWithSlash = tag.getName() + "/";
-                    if (mRefAndPath.startsWith(nameWithSlash)) {
-                        return Pair.create(tag.getName(),
-                                mRefAndPath.substring(nameWithSlash.length()));
+                    if (TextUtils.equals(mRefAndPath, tag.getName())) {
+                        return Pair.create(tag.getName(), null);
+                    } else {
+                        String nameWithSlash = tag.getName() + "/";
+                        if (mRefAndPath.startsWith(nameWithSlash)) {
+                            return Pair.create(tag.getName(),
+                                    mRefAndPath.substring(nameWithSlash.length()));
+                        }
                     }
                 }
             }
@@ -248,9 +259,19 @@ public class BrowseFilter extends AppCompatActivity {
                 // dialog was dismissed
                 return;
             }
+            Intent intent = null;
             if (result != null) {
-                startActivity(IntentUtils.getRepoActivityIntent(BrowseFilter.this,
-                        mRepoOwner, mRepoName, result.first, result.second, mInitialPage));
+                if (mGoToFileViewer && result.second != null) {
+                    intent = IntentUtils.getFileViewerActivityIntent(BrowseFilter.this,
+                            mRepoOwner, mRepoName, result.first, result.second);
+                    addLineNumbersToIntentIfPresent(intent, mFragment);
+                } else if (!mGoToFileViewer) {
+                    intent = IntentUtils.getRepoActivityIntent(BrowseFilter.this,
+                            mRepoOwner, mRepoName, result.first, result.second, mInitialPage);
+                }
+            }
+            if (intent != null) {
+                startActivity(intent);
             } else {
                 IntentUtils.launchBrowser(BrowseFilter.this, getIntent().getData());
             }
