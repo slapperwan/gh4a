@@ -18,6 +18,7 @@ package com.github.mobile.util;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
@@ -49,6 +50,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import pl.droidsonroids.gif.GifDrawable;
@@ -142,6 +144,38 @@ public class HttpImageGetter implements ImageGetter {
             mDrawable = new WeakReference<>(d);
             d.setCallback(mCallback);
         }
+        public void destroy() {
+            GifDrawable drawable = mDrawable.get();
+            if (drawable != null) {
+                drawable.setCallback(null);
+                drawable.stop();
+                drawable.recycle();
+            }
+        }
+    }
+
+    private static class LoadedImageInfo {
+        final List<GifInfo> gifs = new ArrayList<>();
+        final List<WeakReference<Bitmap>> bitmaps = new ArrayList<>();
+
+        public void destroy() {
+            for (WeakReference<Bitmap> ref : bitmaps) {
+                Bitmap bitmap = ref.get();
+                if (bitmap != null) {
+                    bitmap.recycle();
+                }
+            }
+            for (GifInfo info : gifs) {
+                info.destroy();
+            }
+        }
+    }
+
+    // interface just used for tracking purposes
+    private static class LoadedBitmapDrawable extends BitmapDrawable {
+        public LoadedBitmapDrawable(Resources res, Bitmap bitmap) {
+            super(res, bitmap);
+        }
     }
 
     private static boolean containsImages(final String html) {
@@ -157,13 +191,17 @@ public class HttpImageGetter implements ImageGetter {
     private final int width;
     private final int height;
 
+    // cache for encoded HTML with pending image loads, keyed by id
     private final Map<Object, CharSequence> rawHtmlCache = new HashMap<>();
 
+    // cache for encoded HTML that either has all images loaded
+    // or didn't have any images, keyed by id
     private final Map<Object, CharSequence> fullHtmlCache = new HashMap<>();
 
-    private final Map<Object, GifInfo> knownGifs = new HashMap<>();
-
-    private ArrayList<WeakReference<Bitmap>> loadedBitmaps;
+    // cache for image information associated to loaded HTML images, keyed by id
+    // (and e.g. used for invalidating TextViews associated with the given id
+    // on new gif playback frames)
+    private final Map<Object, LoadedImageInfo> imageCache = new HashMap<>();
 
     private boolean destroyed;
     private boolean resumed;
@@ -188,7 +226,6 @@ public class HttpImageGetter implements ImageGetter {
         width = size.x;
         height = size.y;
 
-        loadedBitmaps = new ArrayList<>();
         loading = new LoadingImageGetter(context, 24);
     }
 
@@ -206,38 +243,35 @@ public class HttpImageGetter implements ImageGetter {
         return resumed;
     }
 
+    public void clearHtmlCache() {
+        synchronized (this) {
+            rawHtmlCache.clear();
+            fullHtmlCache.clear();
+        }
+    }
+
     public void destroy() {
         synchronized (this) {
-            for (WeakReference<Bitmap> ref : loadedBitmaps) {
-                Bitmap bitmap = ref.get();
-                if (bitmap != null) {
-                    bitmap.recycle();
-                }
+            for (LoadedImageInfo loaded : imageCache.values()) {
+                loaded.destroy();
             }
-            loadedBitmaps.clear();
-            for (GifInfo info : knownGifs.values()) {
-                GifDrawable drawable = info.mDrawable.get();
-                if (drawable != null) {
-                    drawable.setCallback(null);
-                    drawable.stop();
-                    drawable.recycle();
-                }
-            }
-            knownGifs.clear();
+            imageCache.clear();
             destroyed = true;
         }
     }
 
     private synchronized void updateGifPlayState() {
-        for (GifInfo info : knownGifs.values()) {
-            GifDrawable drawable = info.mDrawable.get();
-            if (drawable == null) {
-                continue;
-            }
-            if (resumed) {
-                drawable.start();
-            } else {
-                drawable.stop();
+        for (LoadedImageInfo loaded : imageCache.values()) {
+            for (GifInfo info : loaded.gifs) {
+                GifDrawable drawable = info.mDrawable.get();
+                if (drawable == null) {
+                    continue;
+                }
+                if (resumed) {
+                    drawable.start();
+                } else {
+                    drawable.stop();
+                }
             }
         }
     }
@@ -336,15 +370,19 @@ public class HttpImageGetter implements ImageGetter {
     }
 
     private synchronized void unbindViewFromGifs(TextView view) {
-        for (GifInfo info : knownGifs.values()) {
-            info.mCallback.removeView(view);
+        for (LoadedImageInfo loaded : imageCache.values()) {
+            for (GifInfo info : loaded.gifs) {
+                info.mCallback.removeView(view);
+            }
         }
     }
 
     private synchronized void addViewToGifCb(TextView view, Object id) {
-        GifInfo info = knownGifs.get(id);
-        if (info != null) {
-            info.mCallback.addView(view);
+        LoadedImageInfo loaded = imageCache.get(id);
+        if (loaded != null) {
+            for (GifInfo info : loaded.gifs) {
+                info.mCallback.addView(view);
+            }
         }
     }
 
@@ -362,30 +400,39 @@ public class HttpImageGetter implements ImageGetter {
         }
 
         protected void onPostExecute(CharSequence result) {
-            if (result != null) {
-                rawHtmlCache.remove(id);
-                fullHtmlCache.put(id, result);
+            if (result == null) {
+                return;
+            }
 
-                Spanned spanned = (Spanned) result;
-                ImageSpan[] spans = spanned.getSpans(0, result.length(), ImageSpan.class);
-                for (ImageSpan span : spans) {
-                    Drawable d = span.getDrawable();
-                    if (d instanceof GifDrawable) {
-                        GifDrawable gd = (GifDrawable) d;
-                        synchronized (this) {
-                            if (resumed) {
-                                gd.start();
-                            }
-                            knownGifs.put(id, new GifInfo(gd));
-                        }
+            rawHtmlCache.remove(id);
+            fullHtmlCache.put(id, result);
+
+            LoadedImageInfo old = imageCache.remove(id);
+            LoadedImageInfo loaded = new LoadedImageInfo();
+            imageCache.put(id, loaded);
+
+            Spanned spanned = (Spanned) result;
+            ImageSpan[] spans = spanned.getSpans(0, result.length(), ImageSpan.class);
+            for (ImageSpan span : spans) {
+                Drawable d = span.getDrawable();
+                if (d instanceof GifDrawable) {
+                    GifDrawable gd = (GifDrawable) d;
+                    if (resumed) {
+                        gd.start();
                     }
+                    loaded.gifs.add(new GifInfo(gd));
+                } else if (d instanceof LoadedBitmapDrawable) {
+                    BitmapDrawable bd = (BitmapDrawable) d;
+                    loaded.bitmaps.add(new WeakReference<>(bd.getBitmap()));
                 }
+            }
 
-
-                if (id.equals(view.getTag())) {
-                    addViewToGifCb(view, id);
-                    show(view, result, id);
-                }
+            if (id.equals(view.getTag())) {
+                addViewToGifCb(view, id);
+                show(view, result, id);
+            }
+            if (old != null) {
+                old.destroy();
             }
         }
     }
@@ -451,8 +498,6 @@ public class HttpImageGetter implements ImageGetter {
             if (destroyed && bitmap != null) {
                 bitmap.recycle();
                 bitmap = null;
-            } else if (bitmap != null) {
-                loadedBitmaps.add(new WeakReference<>(bitmap));
             }
         }
 
@@ -460,7 +505,7 @@ public class HttpImageGetter implements ImageGetter {
             return loading.getDrawable(source);
         }
 
-        BitmapDrawable drawable = new BitmapDrawable(context.getResources(), bitmap);
+        BitmapDrawable drawable = new LoadedBitmapDrawable(context.getResources(), bitmap);
         drawable.setBounds(0, 0, bitmap.getWidth(), bitmap.getHeight());
         return drawable;
     }

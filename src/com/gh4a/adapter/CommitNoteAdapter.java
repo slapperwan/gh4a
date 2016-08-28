@@ -110,12 +110,7 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
     @Override
     public void clear() {
         super.clear();
-        boolean resumed = mImageGetter.isResumed();
-        mImageGetter.destroy();
-        mImageGetter = new HttpImageGetter(mContext);
-        if (resumed) {
-            mImageGetter.resume();
-        }
+        mImageGetter.clearHtmlCache();
     }
 
     @Override
