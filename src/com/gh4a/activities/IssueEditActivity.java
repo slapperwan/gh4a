@@ -28,6 +28,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -368,29 +369,37 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
             mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
             getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
         } else {
-            final String[] assignees = new String[mAllAssignee.size() + 1];
-            User selectedAssignee = mEditIssue.getAssignee();
-            int selected = 0;
-
-            assignees[0] = getResources().getString(R.string.issue_clear_assignee);
-
-            for (int i = 1; i <= mAllAssignee.size(); i++) {
-                User u = mAllAssignee.get(i - 1);
-                assignees[i] = u.getLogin();
-                if (selectedAssignee != null
-                        && u.getLogin().equalsIgnoreCase(selectedAssignee.getLogin())) {
-                    selected = i;
-                }
+            final String[] assigneeNames = new String[mAllAssignee.size()];
+            final boolean[] selection = new boolean[mAllAssignee.size()];
+            final List<User> oldAssigneeList = mEditIssue.getAssignees() != null
+                    ? mEditIssue.getAssignees() : new ArrayList<User>();
+            List<String> assigneeLogins = new ArrayList<>();
+            for (User assignee : oldAssigneeList) {
+                assigneeLogins.add(assignee.getLogin());
             }
 
-            DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
+            for (int i = 0; i < mAllAssignee.size(); i++) {
+                String login = mAllAssignee.get(i).getLogin();
+                assigneeNames[i] = login;
+                selection[i] = assigneeLogins.contains(login);
+            }
+
+            DialogInterface.OnMultiChoiceClickListener selectCb = new DialogInterface.OnMultiChoiceClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int which, boolean isChecked) {
+                    selection[which] = isChecked;
+                }
+            };
+            DialogInterface.OnClickListener okCb = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    if (which == 0) {
-                        mEditIssue.setAssignee(null);
-                    } else {
-                        mEditIssue.setAssignee(mAllAssignee.get(which - 1));
+                    List<User> newAssigneeList = new ArrayList<>();
+                    for (int i = 0; i < selection.length; i++) {
+                        if (selection[i]) {
+                            newAssigneeList.add(mAllAssignee.get(i));
+                        }
                     }
+                    mEditIssue.setAssignees(newAssigneeList);
                     updateLabels();
                     dialog.dismiss();
                 }
@@ -399,7 +408,8 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
             new AlertDialog.Builder(this)
                     .setCancelable(true)
                     .setTitle(R.string.issue_assignee_hint)
-                    .setSingleChoiceItems(assignees, selected, selectCb)
+                    .setMultiChoiceItems(assigneeNames, selection, selectCb)
+                    .setPositiveButton(R.string.ok, okCb)
                     .setNegativeButton(R.string.cancel, null)
                     .show();
         }
@@ -530,8 +540,16 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
             mTvSelectedMilestone.setText(R.string.issue_clear_milestone);
         }
 
-        if (mEditIssue.getAssignee() != null) {
-            mTvSelectedAssignee.setText(mEditIssue.getAssignee().getLogin());
+        List<User> assignees = mEditIssue.getAssignees();
+        if (assignees != null && !assignees.isEmpty()) {
+            StringBuilder assigneeText = new StringBuilder();
+            for (int i = 0; i < assignees.size(); i++) {
+                if (i != 0) {
+                    assigneeText.append(", ");
+                }
+                assigneeText.append(ApiHelpers.getUserLogin(this, assignees.get(i)));
+            }
+            mTvSelectedAssignee.setText(assigneeText);
         } else if (!mIsCollaborator && !isInEditMode()) {
             mTvSelectedAssignee.setText(R.string.issue_assignee_collab_only);
         } else {

@@ -23,6 +23,7 @@ import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.IssueService;
 
 import android.app.Activity;
@@ -274,13 +275,22 @@ public class IssueActivity extends BaseActivity implements
         }
 
         View assigneeGroup = mListHeaderView.findViewById(R.id.assignee_container);
-        if (mIssue.getAssignee() != null) {
-            TextView tvAssignee = (TextView) mListHeaderView.findViewById(R.id.tv_assignee);
-            tvAssignee.setText(mIssue.getAssignee().getLogin());
+        List<User> assignees = mIssue.getAssignees();
+        if (assignees != null && !assignees.isEmpty()) {
+            ViewGroup assigneeContainer = (ViewGroup) mListHeaderView.findViewById(R.id.assignee_list);
+            LayoutInflater inflater = getLayoutInflater();
+            for (User assignee : assignees) {
+                View row = inflater.inflate(R.layout.row_assignee, assigneeContainer, false);
+                TextView tvAssignee = (TextView) row.findViewById(R.id.tv_assignee);
+                tvAssignee.setText(ApiHelpers.getUserLogin(this, assignee));
 
-            ImageView ivAssignee = (ImageView) mListHeaderView.findViewById(R.id.iv_assignee);
-            AvatarHandler.assignAvatar(ivAssignee, mIssue.getAssignee());
-            ivAssignee.setOnClickListener(this);
+                ImageView ivAssignee = (ImageView) row.findViewById(R.id.iv_assignee);
+                AvatarHandler.assignAvatar(ivAssignee, assignee);
+                ivAssignee.setTag(assignee);
+                ivAssignee.setOnClickListener(this);
+
+                assigneeContainer.addView(row);
+            }
             assigneeGroup.setVisibility(View.VISIBLE);
         } else {
             assigneeGroup.setVisibility(View.GONE);
@@ -447,9 +457,8 @@ public class IssueActivity extends BaseActivity implements
         case R.id.iv_gravatar:
             intent = IntentUtils.getUserActivityIntent(this, mIssue.getUser());
             break;
-        case R.id.tv_assignee:
         case R.id.iv_assignee:
-            intent = IntentUtils.getUserActivityIntent(this, mIssue.getAssignee());
+            intent = IntentUtils.getUserActivityIntent(this, (User) v.getTag());
             break;
         case R.id.tv_pull:
             intent = IntentUtils.getPullRequestActivityIntent(this,

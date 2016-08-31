@@ -78,7 +78,7 @@
     <string name="view_more">View more\u2026</string>
     <string name="pulls">Pulls</string>
     <string name="issue_milestone_hint">Milestone</string>
-    <string name="issue_assignee_hint">Assignee</string>
+    <string name="issue_assignee_hint">Assignees</string>
     <string name="link_not_openable">Link could not be opened</string>
     <string name="download_created">Created %1$s</string>
     <string name="download_mobile_warning_title">Mobile connection download</string>

@@ -374,14 +374,22 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         }
 
         View assigneeGroup = mListHeaderView.findViewById(R.id.assignee_container);
-        if (mPullRequest.getAssignee() != null) {
-            TextView tvAssignee = (TextView) mListHeaderView.findViewById(R.id.tv_assignee);
-            tvAssignee.setText(mPullRequest.getAssignee().getLogin());
+        List<User> assignees = mPullRequest.getAssignees();
+        if (assignees != null && !assignees.isEmpty()) {
+            ViewGroup assigneeContainer = (ViewGroup) mListHeaderView.findViewById(R.id.assignee_list);
+            LayoutInflater inflater = getLayoutInflater(null);
+            for (User assignee : assignees) {
+                View row = inflater.inflate(R.layout.row_assignee, assigneeContainer, false);
+                TextView tvAssignee = (TextView) row.findViewById(R.id.tv_assignee);
+                tvAssignee.setText(ApiHelpers.getUserLogin(getActivity(), assignee));
 
-            ImageView ivAssignee = (ImageView) mListHeaderView.findViewById(R.id.iv_assignee);
-            AvatarHandler.assignAvatar(ivAssignee, mPullRequest.getAssignee());
-            ivAssignee.setTag(mPullRequest.getAssignee());
-            ivAssignee.setOnClickListener(this);
+                ImageView ivAssignee = (ImageView) row.findViewById(R.id.iv_assignee);
+                AvatarHandler.assignAvatar(ivAssignee, assignee);
+                ivAssignee.setTag(assignee);
+                ivAssignee.setOnClickListener(this);
+
+                assigneeContainer.addView(row);
+            }
             assigneeGroup.setVisibility(View.VISIBLE);
         } else {
             assigneeGroup.setVisibility(View.GONE);
