@@ -56,12 +56,12 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
 
-    compile 'com.android.support:support-compat:24.2.0'
-    compile 'com.android.support:appcompat-v7:24.2.0'
-    compile 'com.android.support:cardview-v7:24.2.0'
-    compile 'com.android.support:preference-v7:24.2.0'
-    compile 'com.android.support:preference-v14:24.2.0'
-    compile 'com.android.support:design:24.2.0'
+    compile 'com.android.support:support-v4:24.1.1'
+    compile 'com.android.support:appcompat-v7:24.1.1'
+    compile 'com.android.support:cardview-v7:24.1.1'
+    compile 'com.android.support:preference-v7:24.1.1'
+    compile 'com.android.support:preference-v14:24.1.1'
+    compile 'com.android.support:design:24.1.1'
     compile 'com.larswerkman:HoloColorPicker:1.5@aar'
     compile 'com.github.johnkil.android-progressfragment:progressfragment:1.4.0@aar'
     compile 'com.caverock:androidsvg:1.2.2-beta-1@aar'
