@@ -23,6 +23,7 @@
     <attr name="contentEditIcon" format="reference" />
     <attr name="sortIcon" format="reference" />
     <attr name="contentPictureIcon" format="reference" />
+    <attr name="loadingPictureIcon" format="reference" />
     <attr name="searchUserIcon" format="reference" />
     <attr name="searchRepoIcon" format="reference" />
     <attr name="searchCodeIcon" format="reference" />

@@ -69,13 +69,10 @@ public class HttpImageGetter implements ImageGetter {
 
         private final Drawable image;
 
-        private LoadingImageGetter(final Context context, final int size) {
-            int imageSize = Math.round(context.getResources()
-                    .getDisplayMetrics().density * size + 0.5F);
+        private LoadingImageGetter(final Context context) {
             image = ContextCompat.getDrawable(context,
-                    UiUtils.resolveDrawable(context, R.attr.contentPictureIcon));
-
-            image.setBounds(0, 0, imageSize, imageSize);
+                    UiUtils.resolveDrawable(context, R.attr.loadingPictureIcon));
+            image.setBounds(0, 0, image.getIntrinsicWidth(), image.getIntrinsicHeight());
         }
 
         public Drawable getDrawable(String source) {
@@ -183,6 +180,7 @@ public class HttpImageGetter implements ImageGetter {
     }
 
     private final LoadingImageGetter loading;
+    private final Drawable errorDrawable;
 
     private final Context context;
 
@@ -226,7 +224,11 @@ public class HttpImageGetter implements ImageGetter {
         width = size.x;
         height = size.y;
 
-        loading = new LoadingImageGetter(context, 24);
+        loading = new LoadingImageGetter(context);
+        errorDrawable = ContextCompat.getDrawable(context,
+                UiUtils.resolveDrawable(context, R.attr.contentPictureIcon));
+        errorDrawable.setBounds(0, 0,
+                errorDrawable.getIntrinsicWidth(), errorDrawable.getIntrinsicHeight());
     }
 
     public void pause() {
@@ -476,7 +478,7 @@ public class HttpImageGetter implements ImageGetter {
                     }
                 }
             } catch (IOException e) {
-                // fall through to showing the loading bitmap
+                // fall through to showing the error bitmap
             } finally {
                 if (output != null) {
                     output.delete();
@@ -502,7 +504,7 @@ public class HttpImageGetter implements ImageGetter {
         }
 
         if (bitmap == null) {
-            return loading.getDrawable(source);
+            return errorDrawable;
         }
 
         BitmapDrawable drawable = new LoadedBitmapDrawable(context.getResources(), bitmap);
