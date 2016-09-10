@@ -20,6 +20,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.gh4a.PageIteratorWithSaveableState;
 import com.gh4a.R;
@@ -64,7 +65,6 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        setEmptyText(getString(getEmptyTextResId()));
         setContentShown(false);
 
         mIterator = (PageIteratorWithSaveableState<T>) onCreateIterator();
@@ -93,30 +93,28 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    protected void onRecyclerViewInflated(RecyclerView view, LayoutInflater inflater) {
+        super.onRecyclerViewInflated(view, inflater);
         mAdapter = onCreateAdapter();
 
-        super.onViewCreated(view, savedInstanceState);
-
-        RecyclerView recyclerView = getRecyclerView();
-        LayoutInflater inflater = getLayoutInflater(savedInstanceState);
-        View loadingContainer = inflater.inflate(R.layout.list_loading_view, recyclerView, false);
+        View loadingContainer = inflater.inflate(R.layout.list_loading_view, view, false);
         mLoadingView = loadingContainer.findViewById(R.id.loading);
         mLoadingView.setVisibility(View.GONE);
 
         mAdapter.setFooterView(loadingContainer, this);
         mAdapter.setOnItemClickListener(this);
-        if (!mAdapter.isCardStyle()) {
-            recyclerView.setBackgroundResource(
-                    UiUtils.resolveDrawable(getActivity(), R.attr.listBackground));
-        }
-        recyclerView.setAdapter(mAdapter);
+        view.setAdapter(mAdapter);
         updateEmptyState();
     }
 
     @Override
     protected boolean hasDividers() {
         return !mAdapter.isCardStyle();
+    }
+
+    @Override
+    protected boolean hasCards() {
+        return mAdapter.isCardStyle();
     }
 
     private void fillData(Collection<T> data, boolean hasMoreData) {
@@ -152,7 +150,6 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         }
     }
 
-    protected abstract int getEmptyTextResId();
     protected abstract RootAdapter<T, ? extends RecyclerView.ViewHolder> onCreateAdapter();
     protected abstract PageIterator<T> onCreateIterator();
     public abstract void onItemClick(T item);

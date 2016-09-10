@@ -63,7 +63,6 @@ dependencies {
     compile 'com.android.support:preference-v14:24.1.1'
     compile 'com.android.support:design:24.1.1'
     compile 'com.larswerkman:HoloColorPicker:1.5@aar'
-    compile 'com.github.johnkil.android-progressfragment:progressfragment:1.4.0@aar'
     compile 'com.caverock:androidsvg:1.2.2-beta-1@aar'
     compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.+'
     compile 'com.google.code.gson:gson:2.4'

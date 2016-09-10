@@ -83,7 +83,6 @@ Open Source Libraries
 * [HoloColorPicker](https://github.com/LarsWerkman/HoloColorPicker)
 * [Material Design Icons](https://github.com/google/material-design-icons)
 * [Nine Old Androids](https://github.com/JakeWharton/NineOldAndroids)
-* [ProgressFragment](https://github.com/johnkil/Android-ProgressFragment)
 * [SmoothProgressBar](https://github.com/castorflex/SmoothProgressBar)
 
 Contributions

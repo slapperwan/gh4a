@@ -117,11 +117,9 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        mContentView = inflater.inflate(R.layout.user, null);
-
-        return super.onCreateView(inflater, container, savedInstanceState);
+    protected View onCreateContentView(LayoutInflater inflater, ViewGroup parent) {
+        mContentView = inflater.inflate(R.layout.user, parent, false);
+        return mContentView;
     }
 
     @Override
@@ -138,8 +136,6 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        setEmptyText(R.string.user_no_data);
-        setContentView(mContentView);
         setContentShown(false);
 
         getLoaderManager().initLoader(0, null, mUserCallback);

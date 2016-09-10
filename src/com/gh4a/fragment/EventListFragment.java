@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -90,9 +91,9 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        registerForContextMenu(getRecyclerView());
+    protected void onRecyclerViewInflated(RecyclerView view, LayoutInflater inflater) {
+        super.onRecyclerViewInflated(view, inflater);
+        registerForContextMenu(view);
     }
 
     @Override

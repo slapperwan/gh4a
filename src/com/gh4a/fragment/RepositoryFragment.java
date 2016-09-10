@@ -135,11 +135,9 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        mContentView = inflater.inflate(R.layout.repository, null);
-        mImageGetter = new HttpImageGetter(inflater.getContext());
-        return super.onCreateView(inflater, container, savedInstanceState);
+    protected View onCreateContentView(LayoutInflater inflater, ViewGroup parent) {
+        mContentView = inflater.inflate(R.layout.repository, parent, false);
+        return mContentView;
     }
 
     @Override
@@ -163,9 +161,9 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        setContentView(mContentView);
+        mImageGetter = new HttpImageGetter(getActivity());
         fillData();
-        setContentShownNoAnimation(true);
+        setContentShown(true);
 
         getLoaderManager().initLoader(0, null, mReadmeCallback);
         getLoaderManager().initLoader(1, null, mPullRequestsCallback);

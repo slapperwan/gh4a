@@ -4,7 +4,9 @@ import java.util.List;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
@@ -26,11 +28,7 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase im
         protected void onResultReady(List<T> result) {
             mAdapter.clear();
             onAddData(mAdapter, result);
-            if (isResumed()) {
-                setContentShown(true);
-            } else {
-                setContentShownNoAnimation(true);
-            }
+            setContentShown(true);
             updateEmptyState();
             getActivity().supportInvalidateOptionsMenu();
         }
@@ -63,29 +61,20 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase im
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    protected void onRecyclerViewInflated(RecyclerView view, LayoutInflater inflater) {
+        super.onRecyclerViewInflated(view, inflater);
         mAdapter = onCreateAdapter();
         mAdapter.setOnItemClickListener(this);
-
-        super.onViewCreated(view, savedInstanceState);
-
-        RecyclerView recyclerView = getRecyclerView();
-        if (!mAdapter.isCardStyle()) {
-            recyclerView.setBackgroundResource(
-                    UiUtils.resolveDrawable(getActivity(), R.attr.listBackground));
-        }
-        recyclerView.setAdapter(mAdapter);
-
-        int emptyResId = getEmptyTextResId();
-        if (emptyResId != 0) {
-            setEmptyText(getString(emptyResId));
-        }
-
+        view.setAdapter(mAdapter);
         updateEmptyState();
     }
 
+    @Override
+    protected boolean hasCards() {
+        return mAdapter.isCardStyle();
+    }
+
     protected abstract Loader<LoaderResult<List<T>>> onCreateLoader();
-    protected abstract int getEmptyTextResId();
     protected abstract RootAdapter<T, ? extends RecyclerView.ViewHolder> onCreateAdapter();
     public abstract void onItemClick(T item);
 }

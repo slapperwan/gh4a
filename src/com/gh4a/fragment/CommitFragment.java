@@ -104,18 +104,15 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        mContentView = inflater.inflate(R.layout.commit, null);
-
-        return super.onCreateView(inflater, container, savedInstanceState);
+    protected View onCreateContentView(LayoutInflater inflater, ViewGroup parent) {
+        mContentView = inflater.inflate(R.layout.commit, parent, false);
+        return mContentView;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        setContentView(mContentView);
         setContentShown(false);
 
         initLoader();

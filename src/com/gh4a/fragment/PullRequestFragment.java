@@ -209,12 +209,10 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    protected void onRecyclerViewInflated(RecyclerView view, LayoutInflater inflater) {
+        super.onRecyclerViewInflated(view, inflater);
 
-        LayoutInflater inflater = getLayoutInflater(savedInstanceState);
-        mListHeaderView = inflater.inflate(R.layout.issue_comment_list_header,
-                getRecyclerView(), false);
+        mListHeaderView = inflater.inflate(R.layout.issue_comment_list_header, view, false);
         mAdapter.setHeaderView(mListHeaderView);
     }
 
@@ -279,7 +277,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
     @Override
     protected void updateEmptyState() {
-        setContentEmpty(false);
+        // we're never empty -> don't call super
     }
 
     @Override
@@ -309,13 +307,6 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     @Override
     public void setContentShown(boolean shown) {
         super.setContentShown(shown);
-        mListShown = shown;
-        updateCommentSectionVisibility(getView());
-    }
-
-    @Override
-    public void setContentShownNoAnimation(boolean shown) {
-        super.setContentShownNoAnimation(shown);
         mListShown = shown;
         updateCommentSectionVisibility(getView());
     }
