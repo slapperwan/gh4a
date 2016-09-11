@@ -268,7 +268,8 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
     @Override
     protected RootAdapter<IssueEventHolder, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        mAdapter = new IssueEventAdapter(getActivity(), mRepoOwner, mRepoName, this);
+        mAdapter = new IssueEventAdapter(getActivity(), mRepoOwner, mRepoName,
+                mPullRequest.getNumber(), this);
         return mAdapter;
     }
 
