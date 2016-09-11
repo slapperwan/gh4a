@@ -153,16 +153,17 @@ public class FileViewerActivity extends WebViewerActivity {
     }
 
     @Override
-    protected String generateHtml(String cssTheme) {
+    protected String generateHtml(String cssTheme, boolean addTitleHeader) {
         String base64Data = mContent.getContent();
+        String title = addTitleHeader ? getDocumentTitle() : null;
         if (base64Data != null && FileUtils.isImage(mPath)) {
             String imageUrl = "data:image/" + FileUtils.getFileExtension(mPath) +
                     ";base64," + base64Data;
-            return highlightImage(imageUrl, cssTheme);
+            return highlightImage(imageUrl, cssTheme, addTitleHeader ? getDocumentTitle() : null);
         } else {
             String data = base64Data != null ? new String(EncodingUtils.fromBase64(base64Data)) : "";
             return generateCodeHtml(data, mPath, mRepoOwner, mRepoName,
-                    mRef, mHighlightStart, mHighlightEnd, cssTheme);
+                    mRef, mHighlightStart, mHighlightEnd, cssTheme, addTitleHeader);
         }
     }
 
@@ -249,11 +250,15 @@ public class FileViewerActivity extends WebViewerActivity {
         }
     }
 
-    private static String highlightImage(String imageUrl, String cssTheme) {
+    private static String highlightImage(String imageUrl, String cssTheme, String title) {
         StringBuilder content = new StringBuilder();
         content.append("<html><head>");
         writeCssInclude(content, "text", cssTheme);
-        content.append("</head><body><div class='image'>");
+        content.append("</head><body>");
+        if (title != null) {
+            content.append("<h2>").append(title).append("</h2>");
+        }
+        content.append("<div class='image'>");
         content.append("<img src='").append(imageUrl).append("' />");
         content.append("</div></body></html>");
         return content.toString();

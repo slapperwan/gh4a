@@ -92,8 +92,8 @@ public class GistViewerActivity extends WebViewerActivity {
     }
 
     @Override
-    protected String generateHtml(String cssTheme) {
-        return generateCodeHtml(mGistFile.getContent(), mFileName, cssTheme);
+    protected String generateHtml(String cssTheme, boolean addTitleHeader) {
+        return generateCodeHtml(mGistFile.getContent(), mFileName, cssTheme, addTitleHeader);
     }
 
     @Override

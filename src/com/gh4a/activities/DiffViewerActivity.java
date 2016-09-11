@@ -168,11 +168,16 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     }
 
     @Override
-    protected String generateHtml(String cssTheme) {
+    protected String generateHtml(String cssTheme, boolean addTitleHeader) {
         StringBuilder content = new StringBuilder();
         boolean authorized = Gh4Application.get().isAuthorized();
+        String title = addTitleHeader ? getDocumentTitle() : null;
 
-        content.append("<html><head><title></title>");
+        content.append("<html><head><title>");
+        if (title != null) {
+            content.append(title);
+        }
+        content.append("</title>");
         writeCssInclude(content, "text", cssTheme);
         writeScriptInclude(content, "codeutils");
         content.append("</head><body");
@@ -180,7 +185,11 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             content.append(" onload='scrollToElement(\"line");
             content.append(mInitialLine).append("\")' onresize='scrollToHighlight();'");
         }
-        content.append("><pre>");
+        content.append(">");
+        if (title != null) {
+            content.append("<h2>").append(title).append("</h2>");
+        }
+        content.append("<pre>");
 
         String encoded = TextUtils.htmlEncode(mDiff);
         mDiffLines = encoded.split("\n");

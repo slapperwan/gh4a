@@ -265,7 +265,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
                 }
             });
         }
-        final String html = generateHtml(PRINT_CSS_THEME);
+        final String html = generateHtml(PRINT_CSS_THEME, true);
         mPrintWebView.loadDataWithBaseURL("file:///android_asset/", html, null, "utf-8", null);
         supportInvalidateOptionsMenu();
     }
@@ -327,7 +327,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
     protected void onDataReady() {
         final String cssTheme = Gh4Application.THEME == R.style.DarkTheme
                 ? DARK_CSS_THEME : LIGHT_CSS_THEME;
-        final String html = generateHtml(cssTheme);
+        final String html = generateHtml(cssTheme, false);
         if (mRequiresJsInterface) {
             mWebView.addJavascriptInterface(new RenderingDoneInterface(), "NativeClient");
         }
@@ -358,18 +358,24 @@ public abstract class WebViewerActivity extends BaseActivity implements
         }
     }
 
-    protected String generateCodeHtml(String data, String fileName, String cssTheme) {
-        return generateCodeHtml(data, fileName, null, null, null, -1, -1, cssTheme);
+    protected String generateCodeHtml(String data, String fileName,
+            String cssTheme, boolean addTitleHeader) {
+        return generateCodeHtml(data, fileName, null, null, null, -1, -1, cssTheme, addTitleHeader);
     }
 
     protected String generateCodeHtml(String data, String fileName,
                 String repoOwner, String repoName, String ref,
-                int highlightStart, int highlightEnd, String cssTheme) {
+                int highlightStart, int highlightEnd, String cssTheme, boolean addTitleHeader) {
         String ext = FileUtils.getFileExtension(fileName);
+        String title = addTitleHeader ? getDocumentTitle() : null;
         boolean isMarkdown = FileUtils.isMarkdown(fileName);
 
         StringBuilder content = new StringBuilder();
-        content.append("<html><head><title></title>");
+        content.append("<html><head><title>");
+        if (title != null) {
+            content.append(title);
+        }
+        content.append("</title>");
         writeScriptInclude(content, "codeutils");
 
         if (isMarkdown) {
@@ -377,6 +383,9 @@ public abstract class WebViewerActivity extends BaseActivity implements
             writeCssInclude(content, "markdown", cssTheme);
             content.append("</head>");
             content.append("<body>");
+            if (title != null) {
+                content.append("<h2>").append(title).append("</h2>");
+            }
             content.append("<div id='content'>");
         } else {
             writeCssInclude(content, "prettify", cssTheme);
@@ -390,6 +399,9 @@ public abstract class WebViewerActivity extends BaseActivity implements
             content.append(highlightStart).append(",").append(highlightEnd).append("); ");
             content.append("NativeClient.onRenderingDone(); })'");
             content.append(" onresize='scrollToHighlight();'>");
+            if (title != null) {
+                content.append("<h2>").append(title).append("</h2>");
+            }
             content.append("<pre id='content' class='prettyprint linenums lang-");
             content.append(ext).append("'>");
         }
@@ -423,14 +435,14 @@ public abstract class WebViewerActivity extends BaseActivity implements
         return content.toString();
     }
 
-    protected static String wrapUnthemedHtml(String html, String cssTheme) {
-        if (TextUtils.equals(cssTheme, DARK_CSS_THEME)) {
-            return "<style type=\"text/css\">" +
+    protected static String wrapUnthemedHtml(String html, String cssTheme, String title) {
+        String style = TextUtils.equals(cssTheme, DARK_CSS_THEME)
+                ? "<style type=\"text/css\">" +
                     "body { color: #A3A3A5 !important }" +
-                    "a { color: #4183C4 !important }</style><body>" +
-                    html + "</body>";
-        }
-        return html;
+                    "a { color: #4183C4 !important }</style>"
+                : "";
+        String titleHeader = title != null ? "<h2>" + title + "</h2>" : "";
+        return style + "<body>" + titleHeader + html + "</body>";
     }
 
     protected static void writeScriptInclude(StringBuilder builder, String scriptName) {
@@ -453,6 +465,6 @@ public abstract class WebViewerActivity extends BaseActivity implements
     protected boolean handlePrintRequest() {
         return false;
     }
-    protected abstract String generateHtml(String cssTheme);
+    protected abstract String generateHtml(String cssTheme, boolean addTitleHeader);
     protected abstract String getDocumentTitle();
 }

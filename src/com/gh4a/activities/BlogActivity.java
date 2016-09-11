@@ -49,8 +49,9 @@ public class BlogActivity extends WebViewerActivity {
     }
 
     @Override
-    protected String generateHtml(String cssTheme) {
-        return wrapUnthemedHtml(getIntent().getStringExtra("content"), cssTheme);
+    protected String generateHtml(String cssTheme, boolean addTitleHeader) {
+        String title = addTitleHeader ? getDocumentTitle() : null;
+        return wrapUnthemedHtml(getIntent().getStringExtra("content"), cssTheme, title);
     }
 
     @Override
