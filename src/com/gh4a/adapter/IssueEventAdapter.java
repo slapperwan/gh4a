@@ -135,7 +135,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
                             intent.putExtra(Constants.Commit.DIFF, file.getPatch());
                             intent.putExtra(Constants.PullRequest.NUMBER, mIssueId);
                             intent.putExtra(PullRequestDiffViewerActivity.EXTRA_INITIAL_LINE,
-                                    commitComment.getLine());
+                                    commitComment.getPosition());
                             return intent;
                         }
                     }, pos, pos + fileName.length(), 0);

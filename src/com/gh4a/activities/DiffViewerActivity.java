@@ -209,7 +209,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         writeScriptInclude(content, "codeutils");
         content.append("</head><body");
         if (mInitialLine > 0) {
-            content.append(" onload='srollToElement(\"line");
+            content.append(" onload='scrollToElement(\"line");
             content.append(mInitialLine).append("\")' onresize='scrollToHighlight();'");
         }
         content.append("><pre>");
@@ -228,7 +228,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                 cssClass = "remove";
             }
 
-            content.append("<div ");
+            content.append("<div id=\"line").append(i).append("\"");
             if (cssClass != null) {
                 content.append("class=\"").append(cssClass).append("\"");
             }
