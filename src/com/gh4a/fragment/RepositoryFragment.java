@@ -15,17 +15,13 @@
  */
 package com.gh4a.fragment;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.content.Loader;
 import android.support.v4.os.AsyncTaskCompat;
 import android.text.SpannableStringBuilder;
-import android.text.TextPaint;
-import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -49,6 +45,7 @@ import com.gh4a.loader.ReadmeLoader;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.IntentSpan;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
@@ -93,26 +90,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
 
             TextView tvPullRequestsCountView = (TextView) v.findViewById(R.id.tv_pull_requests_count);
             tvPullRequestsCountView.setText(String.valueOf(result));
-        }
-    };
-
-    private ClickableSpan mLoginClickSpan = new ClickableSpan() {
-        @Override
-        public void onClick(View view) {
-            Context context = getActivity();
-            if (context != null) {
-                startActivity(IntentUtils.getUserActivityIntent(context, mRepository.getOwner()));
-            }
-        }
-
-        @Override
-        public void updateDrawState(@NonNull TextPaint ds) {
-            super.updateDrawState(ds);
-            ds.setUnderlineText(false);
-            Context context = getActivity();
-            if (context != null) {
-                ds.setColor(UiUtils.resolveColor(context, android.R.attr.textColorLink));
-            }
         }
     };
 
@@ -198,7 +175,12 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         repoName.append(mRepository.getOwner().getLogin());
         repoName.append("/");
         repoName.append(mRepository.getName());
-        repoName.setSpan(mLoginClickSpan, 0, mRepository.getOwner().getLogin().length(), 0);
+        repoName.setSpan(new IntentSpan(tvRepoName.getContext()) {
+            @Override
+            protected Intent getIntent() {
+                return IntentUtils.getUserActivityIntent(getActivity(), mRepository.getOwner());
+            }
+        }, 0, mRepository.getOwner().getLogin().length(), 0);
         tvRepoName.setText(repoName);
         tvRepoName.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
 

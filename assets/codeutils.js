@@ -58,3 +58,23 @@ window.highlightLines = function(from, to) {
         window.scrollToHighlight();
     }
 };
+
+window.scrollToElement = function(elemName) {
+    if (!elemName) {
+        return;
+    }
+
+    var elem = document.getElementById(elemName);
+    if (elem) {
+         var top = 0, bottom = elem.offsetHeight;
+         while (elem) {
+            top += elem.offsetTop;
+            bottom += elem.offsetTop;
+            elem = elem.offsetParent;
+         }
+
+         window.highlightTop = top;
+         window.highlightBottom = bottom;
+         window.scrollToHighlight();
+    }
+}
