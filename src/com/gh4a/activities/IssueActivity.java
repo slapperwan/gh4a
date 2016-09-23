@@ -163,7 +163,7 @@ public class IssueActivity extends BaseActivity implements
 
         mListHeaderView = inflater.inflate(R.layout.issue_comment_list_header, mRecyclerView, false);
 
-        mEventAdapter = new IssueEventAdapter(this, mRepoOwner, mRepoName, this);
+        mEventAdapter = new IssueEventAdapter(this, mRepoOwner, mRepoName, mIssueNumber, this);
         mEventAdapter.setHeaderView(mListHeaderView);
         mRecyclerView.setAdapter(mEventAdapter);
 

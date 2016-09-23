@@ -17,6 +17,7 @@ package com.gh4a.adapter;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.IssueEvent;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Rename;
@@ -24,12 +25,9 @@ import org.eclipse.egit.github.core.User;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
-import android.text.TextPaint;
 import android.text.TextUtils;
-import android.text.style.ClickableSpan;
 import android.text.style.TypefaceSpan;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,8 +35,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.PullRequestDiffViewerActivity;
 import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
@@ -46,6 +46,7 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.IntentSpan;
 import com.gh4a.widget.IssueLabelSpan;
 import com.gh4a.widget.StyleableTextView;
 import com.github.mobile.util.HtmlUtils;
@@ -67,13 +68,15 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
     private OnEditComment mEditCallback;
     private String mRepoOwner;
     private String mRepoName;
+    private int mIssueId;
 
     public IssueEventAdapter(Context context, String repoOwner, String repoName,
-            OnEditComment editCallback) {
+            int issueId, OnEditComment editCallback) {
         super(context);
         mImageGetter = new HttpImageGetter(mContext);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
+        mIssueId = issueId;
         mEditCallback = editCallback;
     }
 
@@ -109,12 +112,39 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
                 event.getCreatedAt(), true));
 
         if (event.comment instanceof CommitComment) {
-            CommitComment commitComment = (CommitComment) event.comment;
-            String text = mContext.getString(R.string.issue_commit_comment_file,
-                    FileUtils.getFileName(commitComment.getPath()));
+            final CommitComment commitComment = (CommitComment) event.comment;
+            SpannableStringBuilder text = StringUtils.applyBoldTags(mContext,
+                    mContext.getString(R.string.issue_commit_comment_file),
+                    holder.tvFile.getTypefaceValue());
+
+            int pos = text.toString().indexOf("[file]");
+            if (pos >= 0) {
+                String fileName = FileUtils.getFileName(commitComment.getPath());
+                final CommitFile file = event.file;
+
+                text.replace(pos, pos + 6, fileName);
+                if (file != null) {
+                    text.setSpan(new IntentSpan(mContext) {
+                        @Override
+                        protected Intent getIntent() {
+                            Intent intent = new Intent(mContext, PullRequestDiffViewerActivity.class);
+                            intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
+                            intent.putExtra(Constants.Repository.NAME, mRepoName);
+                            intent.putExtra(Constants.Object.PATH, commitComment.getPath());
+                            intent.putExtra(Constants.Object.OBJECT_SHA, commitComment.getCommitId());
+                            intent.putExtra(Constants.Commit.DIFF, file.getPatch());
+                            intent.putExtra(Constants.PullRequest.NUMBER, mIssueId);
+                            intent.putExtra(PullRequestDiffViewerActivity.EXTRA_INITIAL_LINE,
+                                    commitComment.getPosition());
+                            return intent;
+                        }
+                    }, pos, pos + fileName.length(), 0);
+                }
+            }
 
             holder.tvFile.setVisibility(View.VISIBLE);
-            StringUtils.applyBoldTagsAndSetText(holder.tvFile, text);
+            holder.tvFile.setText(text);
+            holder.tvFile.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         } else {
             holder.tvFile.setVisibility(View.GONE);
         }
@@ -221,9 +251,9 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         if (event.getCommitId() != null && pos >= 0) {
             text.replace(pos, pos + 8, event.getCommitId().substring(0, 7));
             text.setSpan(new TypefaceSpan("monospace"), pos, pos + 7, 0);
-            text.setSpan(new ClickableSpan() {
+            text.setSpan(new IntentSpan(mContext) {
                 @Override
-                public void onClick(View view) {
+                protected Intent getIntent() {
                     // The commit might be in a different repo. The API doesn't provide
                     // that information directly, so get it indirectly by parsing the URL
                     String repoOwner = mRepoOwner, repoName = mRepoName;
@@ -236,13 +266,8 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
                         }
                     }
 
-                    mContext.startActivity(IntentUtils.getCommitInfoActivityIntent(mContext,
-                            repoOwner, repoName, event.getCommitId()));
-                }
-
-                @Override
-                public void updateDrawState(@NonNull TextPaint ds) {
-                    ds.setColor(UiUtils.resolveColor(mContext, android.R.attr.textColorLink));
+                    return IntentUtils.getCommitInfoActivityIntent(mContext,
+                            repoOwner, repoName, event.getCommitId());
                 }
             }, pos, pos + 7, 0);
         }

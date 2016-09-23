@@ -351,7 +351,7 @@
     <string name="issue_comment_update_title">Update</string>
     <string name="issue_comment_hint">Comment on this issue</string>
     <string name="issue_comment_header">[b]%1$s[/b]</string>
-    <string name="issue_commit_comment_file">Comment on [b]%1$s[/b]</string>
+    <string name="issue_commit_comment_file">Comment on [b][file][/b]</string>
     <string name="commit_comment_header">%1$s added a note %2$s</string>
 
     <!-- Pull Request -->

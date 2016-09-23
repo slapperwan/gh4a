@@ -68,6 +68,9 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     protected String mRepoName;
     protected String mPath;
     protected String mSha;
+    private int mInitialLine;
+
+    public static final String EXTRA_INITIAL_LINE = "initial_line";
 
     private String mDiff;
     private String[] mDiffLines;
@@ -123,6 +126,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         mPath = extras.getString(Constants.Object.PATH);
         mSha = extras.getString(Constants.Object.OBJECT_SHA);
         mDiff = extras.getString(Constants.Commit.DIFF);
+        mInitialLine = extras.getInt(EXTRA_INITIAL_LINE, -1);
     }
 
     @Override
@@ -203,7 +207,12 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         content.append("<html><head><title></title>");
         writeCssInclude(content, "text");
         writeScriptInclude(content, "codeutils");
-        content.append("</head><body><pre>");
+        content.append("</head><body");
+        if (mInitialLine > 0) {
+            content.append(" onload='scrollToElement(\"line");
+            content.append(mInitialLine).append("\")' onresize='scrollToHighlight();'");
+        }
+        content.append("><pre>");
 
         String encoded = TextUtils.htmlEncode(mDiff);
         mDiffLines = encoded.split("\n");
@@ -219,7 +228,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                 cssClass = "remove";
             }
 
-            content.append("<div ");
+            content.append("<div id=\"line").append(i).append("\"");
             if (cssClass != null) {
                 content.append("class=\"").append(cssClass).append("\"");
             }

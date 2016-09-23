@@ -2,9 +2,11 @@ package com.gh4a.loader;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
@@ -32,13 +34,19 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
 
         PullRequestService pullRequestService = (PullRequestService)
                 Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
-        List<CommitComment> commitComments =
-                pullRequestService.getComments(new RepositoryId(mRepoOwner, mRepoName), mIssueNumber);
+        RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+        List<CommitComment> commitComments = pullRequestService.getComments(repoId, mIssueNumber);
+        HashMap<String, CommitFile> filesByName = new HashMap<>();
+
+        for (CommitFile file : pullRequestService.getFiles(repoId, mIssueNumber)) {
+            filesByName.put(file.getFilename(), file);
+        }
 
         // only add comment that is not outdated
         for (CommitComment commitComment: commitComments) {
             if (commitComment.getPosition() != -1) {
-                events.add(new IssueEventHolder(commitComment));
+                CommitFile file = filesByName.get(commitComment.getPath());
+                events.add(new IssueEventHolder(commitComment, file));
             }
         }
 
