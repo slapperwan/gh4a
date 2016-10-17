@@ -30,6 +30,7 @@ import android.widget.TextView;
 
 import com.gh4a.BasePagerActivity;
 import com.gh4a.Constants;
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.CommitCompareFragment;
 import com.gh4a.fragment.PullRequestFilesFragment;
@@ -39,6 +40,7 @@ import com.gh4a.loader.IssueLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestLoader;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
 
@@ -249,7 +251,10 @@ public class PullRequestActivity extends BasePagerActivity implements
     }
 
     private void updateFabVisibility() {
-        boolean shouldHaveFab = mIsCollaborator && mPullRequest != null && mIssue != null;
+        boolean isIssueOwner = mIssue != null
+                && ApiHelpers.loginEquals(mIssue.getUser(), Gh4Application.get().getAuthLogin());
+        boolean shouldHaveFab = (isIssueOwner || mIsCollaborator)
+                && mPullRequest != null && mIssue != null;
         CoordinatorLayout rootLayout = getRootLayout();
 
         if (shouldHaveFab && mEditFab == null) {
