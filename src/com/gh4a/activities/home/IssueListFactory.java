@@ -149,6 +149,7 @@ public class IssueListFactory extends FragmentFactory {
         reloadIssueList();
         updateHeaderColor();
         mActivity.invalidateTitle();
+        mActivity.supportInvalidateOptionsMenu();
     }
 
     private void updateHeaderColor() {
