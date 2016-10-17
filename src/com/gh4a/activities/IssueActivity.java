@@ -414,7 +414,9 @@ public class IssueActivity extends BaseActivity implements
     }
 
     private void updateFabVisibility() {
-        boolean shouldHaveFab = mIsCollaborator && mIssue != null && mEventsLoaded;
+        boolean isIssueOwner = mIssue != null
+                && ApiHelpers.loginEquals(mIssue.getUser(), Gh4Application.get().getAuthLogin());
+        boolean shouldHaveFab = (isIssueOwner || mIsCollaborator) && mIssue != null && mEventsLoaded;
         CoordinatorLayout rootLayout = getRootLayout();
 
         if (shouldHaveFab && mEditFab == null) {
