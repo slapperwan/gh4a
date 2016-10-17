@@ -215,15 +215,15 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         mLabelContainer = findViewById(R.id.label_container);
 
         getSupportLoaderManager().initLoader(3, null, mIsCollaboratorCallback);
-        if (!isInEditMode()) {
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_KEY_ISSUE)) {
+            mEditIssue = (Issue) savedInstanceState.getSerializable(STATE_KEY_ISSUE);
+        } else if (!isInEditMode()) {
             getSupportLoaderManager().initLoader(4, null, mIssueTemplateCallback);
             mDescView.setEnabled(false);
             mDescWrapper.setHint(getString(R.string.issue_loading_template_hint));
         }
 
-        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_KEY_ISSUE)) {
-            mEditIssue = (Issue) savedInstanceState.getSerializable(STATE_KEY_ISSUE);
-        }
         if (mEditIssue == null) {
             mEditIssue = new Issue();
         }
