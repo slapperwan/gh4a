@@ -29,19 +29,22 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.activities.CollaboratorListActivity;
 import com.gh4a.activities.ContributorListActivity;
 import com.gh4a.activities.DownloadsActivity;
 import com.gh4a.activities.ForkListActivity;
+import com.gh4a.activities.IssueListActivity;
+import com.gh4a.activities.PullRequestListActivity;
 import com.gh4a.activities.ReleaseListActivity;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.activities.WatcherListActivity;
 import com.gh4a.activities.WikiListActivity;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestCountLoader;
 import com.gh4a.loader.ReadmeLoader;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
@@ -53,6 +56,17 @@ import org.eclipse.egit.github.core.Permissions;
 import org.eclipse.egit.github.core.Repository;
 
 public class RepositoryFragment extends LoadingFragmentBase implements OnClickListener {
+    public static RepositoryFragment newInstance(Repository repository, String ref) {
+        RepositoryFragment f = new RepositoryFragment();
+
+        Bundle args = new Bundle();
+        args.putSerializable("repo", repository);
+        args.putString("ref", ref);
+        f.setArguments(args);
+
+        return f;
+    }
+
     private Repository mRepository;
     private View mContentView;
     private String mRef;
@@ -76,7 +90,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     private LoaderCallbacks<Integer> mPullRequestsCallback = new LoaderCallbacks<Integer>(this) {
         @Override
         protected Loader<LoaderResult<Integer>> onCreateLoader() {
-            return new PullRequestCountLoader(getActivity(), mRepository, Constants.Issue.STATE_OPEN);
+            return new PullRequestCountLoader(getActivity(), mRepository, ApiHelpers.IssueState.OPEN);
         }
 
         @Override
@@ -93,22 +107,11 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         }
     };
 
-    public static RepositoryFragment newInstance(Repository repository, String ref) {
-        RepositoryFragment f = new RepositoryFragment();
-
-        Bundle args = new Bundle();
-        args.putSerializable("REPOSITORY", repository);
-        args.putString(Constants.Object.REF, ref);
-        f.setArguments(args);
-
-        return f;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepository = (Repository) getArguments().getSerializable("REPOSITORY");
-        mRef = getArguments().getString(Constants.Object.REF);
+        mRepository = (Repository) getArguments().getSerializable("repo");
+        mRef = getArguments().getString("ref");
     }
 
     @Override
@@ -160,7 +163,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
 
     public void setRef(String ref) {
         mRef = ref;
-        getArguments().putString(Constants.Object.REF, ref);
+        getArguments().putString("ref", ref);
         // reload readme
         getLoaderManager().restartLoader(0, null, mReadmeCallback);
         if (mContentView != null) {
@@ -178,7 +181,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         repoName.setSpan(new IntentSpan(tvRepoName.getContext()) {
             @Override
             protected Intent getIntent() {
-                return IntentUtils.getUserActivityIntent(getActivity(), mRepository.getOwner());
+                return UserActivity.makeIntent(getActivity(), mRepository.getOwner());
             }
         }, 0, mRepository.getOwner().getLogin().length(), 0);
         tvRepoName.setText(repoName);
@@ -275,33 +278,29 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         Intent intent = null;
 
         if (id == R.id.cell_pull_requests) {
-            intent = IntentUtils.getPullRequestListActivityIntent(getActivity(), owner, name,
-                    Constants.Issue.STATE_OPEN);
+            intent = PullRequestListActivity.makeIntent(getActivity(), owner, name);
         } else if (id == R.id.tv_contributors_label) {
-            intent = new Intent(getActivity(), ContributorListActivity.class);
+            intent = ContributorListActivity.makeIntent(getActivity(), owner, name);
         } else if (id == R.id.tv_collaborators_label) {
-            intent = new Intent(getActivity(), CollaboratorListActivity.class);
+            intent = CollaboratorListActivity.makeIntent(getActivity(), owner, name);
         } else if (id == R.id.cell_issues) {
-            intent = IntentUtils.getIssueListActivityIntent(getActivity(), owner, name,
-                    Constants.Issue.STATE_OPEN);
+            intent = IssueListActivity.makeIntent(getActivity(), owner, name);
         } else if (id == R.id.cell_stargazers) {
-            intent = new Intent(getActivity(), WatcherListActivity.class);
+            intent = WatcherListActivity.makeIntent(getActivity(), owner, name);
         } else if (id == R.id.cell_forks) {
-            intent = new Intent(getActivity(), ForkListActivity.class);
+            intent = ForkListActivity.makeIntent(getActivity(), owner, name);
         } else if (id == R.id.tv_wiki_label) {
-            intent = new Intent(getActivity(), WikiListActivity.class);
+            intent = WikiListActivity.makeIntent(getActivity(), owner, name, null);
         } else if (id == R.id.tv_downloads_label) {
-            intent = new Intent(getActivity(), DownloadsActivity.class);
+            intent = DownloadsActivity.makeIntent(getActivity(), owner, name);
         } else if (id == R.id.tv_releases_label) {
-            intent = new Intent(getActivity(), ReleaseListActivity.class);
+            intent = ReleaseListActivity.makeIntent(getActivity(), owner, name);
         } else if (view.getTag() instanceof Repository) {
             Repository repo = (Repository) view.getTag();
             IntentUtils.openRepositoryInfoActivity(getActivity(), repo);
         }
 
         if (intent != null) {
-            intent.putExtra(Constants.Repository.OWNER, owner);
-            intent.putExtra(Constants.Repository.NAME, name);
             startActivity(intent);
         }
     }

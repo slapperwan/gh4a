@@ -54,29 +54,36 @@ import io.fabric.sdk.android.Fabric;
  * The Class Gh4Application.
  */
 public class Gh4Application extends Application implements OnSharedPreferenceChangeListener {
+    public static final String LOG_TAG = "Gh4a";
     public static int THEME = R.style.LightTheme;
 
-    public static String STAR_SERVICE = "github.star";
-    public static String WATCHER_SERVICE = "github.watcher";
-    public static String LABEL_SERVICE = "github.label";
-    public static String ISSUE_SERVICE = "github.issue";
-    public static String COMMIT_SERVICE = "github.commit";
-    public static String REPO_SERVICE = "github.repository";
-    public static String USER_SERVICE = "github.user";
-    public static String MILESTONE_SERVICE = "github.milestone";
-    public static String COLLAB_SERVICE = "github.collaborator";
-    public static String DOWNLOAD_SERVICE = "github.download";
-    public static String CONTENTS_SERVICE = "github.contents";
-    public static String GIST_SERVICE = "github.gist";
-    public static String ORG_SERVICE = "github.organization";
-    public static String PULL_SERVICE = "github.pullrequest";
-    public static String EVENT_SERVICE = "github.event";
-    public static String MARKDOWN_SERVICE = "github.markdown";
+    public static final String STAR_SERVICE = "github.star";
+    public static final String WATCHER_SERVICE = "github.watcher";
+    public static final String LABEL_SERVICE = "github.label";
+    public static final String ISSUE_SERVICE = "github.issue";
+    public static final String COMMIT_SERVICE = "github.commit";
+    public static final String REPO_SERVICE = "github.repository";
+    public static final String USER_SERVICE = "github.user";
+    public static final String MILESTONE_SERVICE = "github.milestone";
+    public static final String COLLAB_SERVICE = "github.collaborator";
+    public static final String DOWNLOAD_SERVICE = "github.download";
+    public static final String CONTENTS_SERVICE = "github.contents";
+    public static final String GIST_SERVICE = "github.gist";
+    public static final String ORG_SERVICE = "github.organization";
+    public static final String PULL_SERVICE = "github.pullrequest";
+    public static final String EVENT_SERVICE = "github.event";
+    public static final String MARKDOWN_SERVICE = "github.markdown";
 
     private static Gh4Application sInstance;
     private GitHubClient mClient;
     private HashMap<String, GitHubService> mServices;
     private PrettyTime mPt;
+
+    private static final int THEME_DARK = 0;
+    private static final int THEME_LIGHT = 1;
+
+    private static final String KEY_LOGIN = "USER_LOGIN";
+    private static final String KEY_TOKEN = "Token";
 
     private static final int MAX_TRACKED_URLS = 5;
     private static int sNextUrlTrackingPosition = 0;
@@ -93,7 +100,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         sInstance = this;
 
         SharedPreferences prefs = getPrefs();
-        selectTheme(prefs.getInt(SettingsFragment.KEY_THEME, Constants.Theme.LIGHT));
+        selectTheme(prefs.getInt(SettingsFragment.KEY_THEME, THEME_LIGHT));
         prefs.registerOnSharedPreferenceChangeListener(this);
 
         boolean isDebuggable = (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
@@ -132,11 +139,11 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
 
     private void selectTheme(int theme) {
         switch (theme) {
-            case Constants.Theme.DARK:
+            case THEME_DARK:
                 THEME = R.style.DarkTheme;
                 break;
-            case Constants.Theme.LIGHT:
-            case Constants.Theme.LIGHTDARK: /* backwards compat with old settings */
+            case THEME_LIGHT:
+            case 2: /* for backwards compat with old settings, was light-dark theme */
                 THEME = R.style.LightTheme;
                 break;
         }
@@ -170,18 +177,22 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     }
 
     public String getAuthLogin() {
-        return getPrefs().getString(Constants.User.LOGIN, null);
+        return getPrefs().getString(KEY_LOGIN, null);
     }
 
     public String getAuthToken() {
-        return getPrefs().getString(Constants.User.AUTH_TOKEN, null);
+        return getPrefs().getString(KEY_TOKEN, null);
+    }
+
+    public void setLogin(String login, String token) {
+        getPrefs().edit()
+                .putString(KEY_TOKEN, token)
+                .putString(KEY_LOGIN, login)
+                .apply();
     }
 
     public void logout() {
-        getPrefs().edit()
-                .remove(Constants.User.LOGIN)
-                .remove(Constants.User.AUTH_TOKEN)
-                .apply();
+        setLogin(null, null);
     }
 
     private SharedPreferences getPrefs() {
@@ -198,10 +209,10 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(Constants.User.AUTH_TOKEN)) {
+        if (key.equals(KEY_TOKEN)) {
             mClient.setOAuth2Token(getAuthToken());
         } else if (key.equals(SettingsFragment.KEY_THEME)) {
-            selectTheme(sharedPreferences.getInt(key, Constants.Theme.LIGHT));
+            selectTheme(sharedPreferences.getInt(key, THEME_LIGHT));
         }
     }
 }

@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.view.View;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.PullRequestDiffViewerActivity;
@@ -19,10 +18,22 @@ import com.gh4a.utils.FileUtils;
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitFile;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PullRequestFilesFragment extends CommitFragment {
+    public static PullRequestFilesFragment newInstance(String repoOwner, String repoName,
+                                                       int pullRequestNumber, String headSha) {
+        PullRequestFilesFragment f = new PullRequestFilesFragment();
+
+        Bundle args = new Bundle();
+        args.putString("owner", repoOwner);
+        args.putString("repo", repoName);
+        args.putInt("number", pullRequestNumber);
+        args.putString("head", headSha);
+        f.setArguments(args);
+        return f;
+    }
+
     private static final int REQUEST_DIFF_VIEWER = 1000;
 
     public interface CommentUpdateListener {
@@ -64,27 +75,14 @@ public class PullRequestFilesFragment extends CommitFragment {
         }
     };
 
-    public static PullRequestFilesFragment newInstance(String repoOwner, String repoName,
-            int pullRequestNumber, String headSha) {
-        PullRequestFilesFragment f = new PullRequestFilesFragment();
-
-        Bundle args = new Bundle();
-        args.putString(Constants.Repository.OWNER, repoOwner);
-        args.putString(Constants.Repository.NAME, repoName);
-        args.putInt(Constants.PullRequest.NUMBER, pullRequestNumber);
-        args.putString(Constants.Object.REF, headSha);
-        f.setArguments(args);
-        return f;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final Bundle args = getArguments();
-        mRepoOwner = args.getString(Constants.Repository.OWNER);
-        mRepoName = args.getString(Constants.Repository.NAME);
-        mPullRequestNumber = args.getInt(Constants.PullRequest.NUMBER);
-        mHeadSha = args.getString(Constants.Object.REF);
+        mRepoOwner = args.getString("owner");
+        mRepoName = args.getString("repo");
+        mPullRequestNumber = args.getInt("number");
+        mHeadSha = args.getString("head");
     }
 
     @Override
@@ -123,17 +121,16 @@ public class PullRequestFilesFragment extends CommitFragment {
     public void onClick(View v) {
         CommitFile file = (CommitFile) v.getTag();
 
-        Intent intent = new Intent(getActivity(), FileUtils.isImage(file.getFilename())
-                ? FileViewerActivity.class : PullRequestDiffViewerActivity.class);
+        final Intent intent;
+        if (FileUtils.isImage(file.getFilename())) {
+            intent = FileViewerActivity.makeIntent(getActivity(),
+                    mRepoOwner, mRepoName, mHeadSha, file.getFilename());
+        } else {
+            intent = PullRequestDiffViewerActivity.makeIntent(getActivity(),
+                    mRepoOwner, mRepoName, mPullRequestNumber, mHeadSha,
+                    file.getFilename(), file.getPatch(), mComments, -1);
+        }
 
-        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.NAME, mRepoName);
-        intent.putExtra(Constants.PullRequest.NUMBER, mPullRequestNumber);
-        intent.putExtra(Constants.Object.REF, mHeadSha);
-        intent.putExtra(Constants.Object.OBJECT_SHA, mHeadSha);
-        intent.putExtra(Constants.Commit.DIFF, file.getPatch());
-        intent.putExtra(Constants.Commit.COMMENTS, new ArrayList<>(mComments));
-        intent.putExtra(Constants.Object.PATH, file.getFilename());
         startActivityForResult(intent, REQUEST_DIFF_VIEWER);
     }
 

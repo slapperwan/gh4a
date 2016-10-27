@@ -15,15 +15,14 @@
  */
 package com.gh4a.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestCommentsLoader;
-import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -33,12 +32,21 @@ import java.io.IOException;
 import java.util.List;
 
 public class PullRequestDiffViewerActivity extends DiffViewerActivity {
+    public static Intent makeIntent(Context context, String repoOwner, String repoName, int number,
+                String commitSha, String path, String diff,
+                List<CommitComment> comments, int initialLine) {
+        Intent intent = new Intent(context, PullRequestDiffViewerActivity.class)
+                .putExtra("number", number);
+        return DiffViewerActivity.fillInIntent(intent, repoOwner, repoName, commitSha, path,
+                diff, comments, initialLine);
+    }
+
     private int mPullRequestNumber;
 
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mPullRequestNumber = extras.getInt(Constants.PullRequest.NUMBER, -1);
+        mPullRequestNumber = extras.getInt("number", -1);
     }
 
     @Override
@@ -48,8 +56,7 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity {
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getPullRequestListActivityIntent(this,
-                mRepoOwner, mRepoName, Constants.Issue.STATE_OPEN);
+        return PullRequestListActivity.makeIntent(this, mRepoOwner, mRepoName);
     }
 
     @Override

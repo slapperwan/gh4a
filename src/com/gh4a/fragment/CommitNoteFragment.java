@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.EditCommitCommentActivity;
@@ -29,6 +28,17 @@ import com.gh4a.loader.LoaderResult;
 
 public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> implements
         CommitNoteAdapter.OnEditComment, CommentBoxFragment.Callback {
+    public static CommitNoteFragment newInstance(String repoOwner, String repoName, String commitSha) {
+        CommitNoteFragment f = new CommitNoteFragment();
+
+        Bundle args = new Bundle();
+        args.putString("owner", repoOwner);
+        args.putString("repo", repoName);
+        args.putString("sha", commitSha);
+        f.setArguments(args);
+        return f;
+    }
+
     private static final int REQUEST_EDIT = 1000;
 
     private String mRepoOwner;
@@ -38,23 +48,12 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     private CommitNoteAdapter mAdapter;
     private CommentBoxFragment mCommentFragment;
 
-    public static CommitNoteFragment newInstance(String repoOwner, String repoName, String objectSha) {
-        CommitNoteFragment f = new CommitNoteFragment();
-
-        Bundle args = new Bundle();
-        args.putString(Constants.Repository.OWNER, repoOwner);
-        args.putString(Constants.Repository.NAME, repoName);
-        args.putString(Constants.Object.OBJECT_SHA, objectSha);
-        f.setArguments(args);
-        return f;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.NAME);
-        mObjectSha = getArguments().getString(Constants.Object.OBJECT_SHA);
+        mRepoOwner = getArguments().getString("owner");
+        mRepoName = getArguments().getString("repo");
+        mObjectSha = getArguments().getString("sha");
     }
 
     @Override
@@ -143,12 +142,8 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
     @Override
     public void editComment(CommitComment comment) {
-        Intent intent = new Intent(getActivity(), EditCommitCommentActivity.class);
-
-        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.NAME, mRepoName);
-        intent.putExtra(Constants.Comment.ID, comment.getId());
-        intent.putExtra(Constants.Comment.BODY, comment.getBody());
+        Intent intent = EditCommitCommentActivity.makeIntent(getActivity(),
+                mRepoOwner, mRepoName, comment);
         startActivityForResult(intent, REQUEST_EDIT);
     }
 

@@ -11,8 +11,8 @@ import org.eclipse.egit.github.core.service.MilestoneService;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.utils.ApiHelpers;
 
 public class MilestoneListLoader extends BaseLoader<List<Milestone>> {
     private String mRepoOwner;
@@ -44,7 +44,7 @@ public class MilestoneListLoader extends BaseLoader<List<Milestone>> {
                     String rightState = rhs.getState();
                     if (TextUtils.equals(leftState, rightState)) {
                         return 0;
-                    } else if (Constants.Issue.STATE_CLOSED.equals(leftState)) {
+                    } else if (ApiHelpers.IssueState.CLOSED.equals(leftState)) {
                         return 1;
                     } else {
                         return -1;

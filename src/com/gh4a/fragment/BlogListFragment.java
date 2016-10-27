@@ -17,11 +17,9 @@ package com.gh4a.fragment;
 
 import java.util.List;
 
-import android.content.Intent;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.activities.BlogActivity;
 import com.gh4a.adapter.CommonFeedAdapter;
@@ -49,11 +47,7 @@ public class BlogListFragment extends ListDataBaseFragment<Feed> {
 
     @Override
     public void onItemClick(Feed blog) {
-        Intent intent = new Intent(getActivity(), BlogActivity.class);
-        intent.putExtra(Constants.Blog.TITLE, blog.getTitle());
-        intent.putExtra(Constants.Blog.CONTENT, blog.getContent());
-        intent.putExtra(Constants.Blog.LINK, blog.getLink());
-        startActivity(intent);
+        startActivity(BlogActivity.makeIntent(getActivity(), blog));
     }
 
     @Override

@@ -19,23 +19,27 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.User;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.OrganizationMemberListLoader;
-import com.gh4a.utils.IntentUtils;
 
 public class OrganizationMemberListActivity extends UserListActivity {
+    public static Intent makeIntent(Context context, String org) {
+        return new Intent(context, OrganizationMemberListActivity.class)
+                .putExtra("login", org);
+    }
+
     private String mUserLogin;
 
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mUserLogin = extras.getString(Constants.Repository.OWNER);
+        mUserLogin = extras.getString("login");
     }
 
     @Override
@@ -55,6 +59,6 @@ public class OrganizationMemberListActivity extends UserListActivity {
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getUserActivityIntent(this, mUserLogin);
+        return UserActivity.makeIntent(this, mUserLogin);
     }
 }

@@ -28,9 +28,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
 public class CommitAdapter extends RootAdapter<RepositoryCommit, CommitAdapter.ViewHolder> {
@@ -77,8 +77,7 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit, CommitAdapter.V
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             RepositoryCommit commit = (RepositoryCommit) v.getTag();
-            Intent intent = IntentUtils.getUserActivityIntent(mContext,
-                    ApiHelpers.getAuthorLogin(commit));
+            Intent intent = UserActivity.makeIntent(mContext, ApiHelpers.getAuthorLogin(commit));
             if (intent != null) {
                 mContext.startActivity(intent);
             }

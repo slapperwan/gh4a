@@ -15,19 +15,24 @@
  */
 package com.gh4a.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 
 import com.gh4a.BasePagerActivity;
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.fragment.PullRequestListFragment;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 
 public class PullRequestListActivity extends BasePagerActivity {
+    public static Intent makeIntent(Context context, String repoOwner, String repoName) {
+        return new Intent(context, PullRequestListActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName);
+    }
+
     private String mRepoOwner;
     private String mRepoName;
 
@@ -48,8 +53,8 @@ public class PullRequestListActivity extends BasePagerActivity {
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
+        mRepoOwner = extras.getString("owner");
+        mRepoName = extras.getString("repo");
     }
 
     @Override
@@ -73,12 +78,11 @@ public class PullRequestListActivity extends BasePagerActivity {
 
     @Override
     protected Fragment getFragment(int position) {
-        return PullRequestListFragment.newInstance(mRepoOwner, mRepoName,
-                position == 1 ? Constants.Issue.STATE_CLOSED : Constants.Issue.STATE_OPEN);
+        return PullRequestListFragment.newInstance(mRepoOwner, mRepoName, position == 1);
     }
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getRepoActivityIntent(this, mRepoOwner, mRepoName, null);
+        return RepositoryActivity.makeIntent(this, mRepoOwner, mRepoName);
     }
 }

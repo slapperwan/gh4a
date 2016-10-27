@@ -24,33 +24,32 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.UserAdapter;
-import com.gh4a.utils.IntentUtils;
 
 public class StargazerListFragment extends PagedDataBaseFragment<User> {
-    private String mRepoOwner;
-    private String mRepoName;
-
     public static StargazerListFragment newInstance(String repoOwner, String repoName) {
         StargazerListFragment f = new StargazerListFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.Repository.OWNER, repoOwner);
-        args.putString(Constants.Repository.NAME, repoName);
+        args.putString("owner", repoOwner);
+        args.putString("repo", repoName);
         f.setArguments(args);
 
         return f;
     }
 
+    private String mRepoOwner;
+    private String mRepoName;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.NAME);
+        mRepoOwner = getArguments().getString("owner");
+        mRepoName = getArguments().getString("repo");
     }
 
     @Override
@@ -65,7 +64,7 @@ public class StargazerListFragment extends PagedDataBaseFragment<User> {
 
     @Override
     public void onItemClick(User user) {
-        Intent intent = IntentUtils.getUserActivityIntent(getActivity(), user);
+        Intent intent = UserActivity.makeIntent(getActivity(), user);
         if (intent != null) {
             startActivity(intent);
         }

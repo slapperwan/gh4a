@@ -6,7 +6,6 @@ import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.fragment.RepositoryListContainerFragment;
 
@@ -30,8 +29,7 @@ public class RepositoryFactory extends FragmentFactory {
         super(activity);
         mUserLogin = userLogin;
 
-        mFilterDrawerHelper = RepositoryListContainerFragment.FilterDrawerHelper.create(mUserLogin,
-                Constants.User.TYPE_USER);
+        mFilterDrawerHelper = RepositoryListContainerFragment.FilterDrawerHelper.create(mUserLogin, false);
         mSortDrawerHelper = new RepositoryListContainerFragment.SortDrawerHelper();
         mPrefs = prefs;
     }
@@ -119,8 +117,7 @@ public class RepositoryFactory extends FragmentFactory {
 
     @Override
     protected Fragment getFragment(int position) {
-        mFragment = RepositoryListContainerFragment.newInstance(mUserLogin,
-                Constants.User.TYPE_USER);
+        mFragment = RepositoryListContainerFragment.newInstance(mUserLogin, false);
         restorePreviouslySelectedFilterAndSort();
         return mFragment;
     }

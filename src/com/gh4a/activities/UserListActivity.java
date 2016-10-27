@@ -28,7 +28,6 @@ import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.UserAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
 import com.gh4a.widget.SwipeRefreshLayout;
@@ -101,7 +100,7 @@ public abstract class UserListActivity extends BaseActivity implements
 
     @Override
     public void onItemClick(User user) {
-        Intent intent = IntentUtils.getUserActivityIntent(this, user);
+        Intent intent = UserActivity.makeIntent(this, user);
         if (intent != null) {
             startActivity(intent);
         }

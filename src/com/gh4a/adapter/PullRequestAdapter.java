@@ -28,9 +28,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
 public class PullRequestAdapter extends RootAdapter<PullRequest, PullRequestAdapter.ViewHolder> {
@@ -74,7 +74,7 @@ public class PullRequestAdapter extends RootAdapter<PullRequest, PullRequestAdap
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             User user = (User) v.getTag();
-            Intent intent = IntentUtils.getUserActivityIntent(mContext, user);
+            Intent intent = UserActivity.makeIntent(mContext, user);
             if (intent != null) {
                 mContext.startActivity(intent);
             }

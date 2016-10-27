@@ -2,7 +2,6 @@ package com.gh4a.loader;
 
 import android.content.Context;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
 
@@ -38,7 +37,7 @@ public class RepositoryListLoader extends BaseLoader<Collection<Repository>> {
             } else {
                 return repoService.getRepositories(mFilterData);
             }
-        } else if (Constants.User.TYPE_ORG.equals(mUserType)) {
+        } else if (ApiHelpers.UserType.ORG.equals(mUserType)) {
             if (mSize > 0) {
                 return repoService.pageOrgRepositories(mLogin, mFilterData, mSize).next();
             } else {

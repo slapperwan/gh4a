@@ -17,6 +17,7 @@ package com.gh4a.activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -38,7 +39,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.gh4a.BasePagerActivity;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueListFragment;
@@ -49,7 +49,7 @@ import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
-import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Label;
@@ -66,6 +66,12 @@ public class IssueListActivity extends BasePagerActivity implements
         View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener,
         SearchView.OnCloseListener, SearchView.OnQueryTextListener,
         MenuItemCompat.OnActionExpandListener {
+    public static Intent makeIntent(Context context, String repoOwner, String repoName) {
+        return new Intent(context, IssueListActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName);
+    }
+
     private static final int REQUEST_ISSUE_CREATE = 1001;
 
     private String mRepoOwner;
@@ -126,7 +132,7 @@ public class IssueListActivity extends BasePagerActivity implements
         @Override
         protected Loader<LoaderResult<List<Milestone>>> onCreateLoader() {
             return new MilestoneListLoader(IssueListActivity.this, mRepoOwner, mRepoName,
-                    Constants.Issue.STATE_OPEN);
+                    ApiHelpers.IssueState.OPEN);
         }
 
         @Override
@@ -193,11 +199,6 @@ public class IssueListActivity extends BasePagerActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String state = getIntent().getStringExtra(Constants.Issue.STATE);
-        if (TextUtils.equals(state, Constants.Issue.STATE_CLOSED)) {
-            getPager().setCurrentItem(1);
-        }
-
         if (savedInstanceState != null) {
             mSearchQuery = savedInstanceState.getString(STATE_KEY_SEARCH_QUERY);
             mSearchMode = savedInstanceState.getBoolean(STATE_KEY_SEARCH_MODE);
@@ -222,8 +223,8 @@ public class IssueListActivity extends BasePagerActivity implements
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
+        mRepoOwner = extras.getString("owner");
+        mRepoName = extras.getString("repo");
     }
 
     @Override
@@ -351,10 +352,10 @@ public class IssueListActivity extends BasePagerActivity implements
                 filterMilestone();
                 return true;
             case R.id.manage_labels:
-                manageLabels();
+                startActivity(IssueLabelListActivity.makeIntent(this, mRepoOwner, mRepoName));
                 return true;
             case R.id.manage_milestones:
-                manageMilestones();
+                startActivity(IssueMilestoneListActivity.makeIntent(this, mRepoOwner, mRepoName));
                 return true;
         }
 
@@ -421,15 +422,13 @@ public class IssueListActivity extends BasePagerActivity implements
 
     @Override
     public void onClick(View view) {
-        Intent intent = new Intent(this, IssueEditActivity.class);
-        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.NAME, mRepoName);
+        Intent intent = IssueEditActivity.makeCreateIntent(this, mRepoOwner, mRepoName);
         startActivityForResult(intent, REQUEST_ISSUE_CREATE);
     }
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getRepoActivityIntent(this, mRepoOwner, mRepoName, null);
+        return RepositoryActivity.makeIntent(this, mRepoOwner, mRepoName);
     }
 
     private void setSearchMode(boolean enabled) {
@@ -449,7 +448,7 @@ public class IssueListActivity extends BasePagerActivity implements
         filterData.put("sort", mSortHelper.getSortMode());
         filterData.put("direction", mSortHelper.getSortDirection());
         filterData.put("q", String.format(Locale.US, LIST_QUERY,
-                position == 1 ? Constants.Issue.STATE_CLOSED : Constants.Issue.STATE_OPEN,
+                position == 1 ? ApiHelpers.IssueState.CLOSED : ApiHelpers.IssueState.OPEN,
                 mRepoOwner, mRepoName,
                 mSelectedLabels != null ? "labels:" + TextUtils.join(",", mSelectedLabels) : "",
                 mSelectedMilestone > 0 ? "milestone:" + mSelectedMilestone : "", // XXX: milestone name?
@@ -472,7 +471,7 @@ public class IssueListActivity extends BasePagerActivity implements
         filterData.put("sort", mSortHelper.getSortMode());
         filterData.put("direction", mSortHelper.getSortDirection());
         filterData.put("q", String.format(Locale.US, SEARCH_QUERY,
-                closed ? Constants.Issue.STATE_CLOSED : Constants.Issue.STATE_OPEN,
+                closed ? ApiHelpers.IssueState.CLOSED : ApiHelpers.IssueState.OPEN,
                 mRepoOwner, mRepoName, mSearchQuery));
 
         mSearchFragment = IssueListFragment.newInstance(filterData, closed,
@@ -615,19 +614,5 @@ public class IssueListActivity extends BasePagerActivity implements
         } else {
             showLabelsDialog();
         }
-    }
-
-    private void manageLabels() {
-        Intent intent = new Intent(this, IssueLabelListActivity.class);
-        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.NAME, mRepoName);
-        startActivity(intent);
-    }
-
-    private void manageMilestones() {
-        Intent intent = new Intent(this, IssueMilestoneListActivity.class);
-        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.NAME, mRepoName);
-        startActivity(intent);
     }
 }

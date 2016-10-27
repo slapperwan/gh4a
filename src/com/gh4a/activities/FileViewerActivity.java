@@ -16,6 +16,7 @@
 package com.gh4a.activities;
 
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -30,7 +31,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.loader.ContentLoader;
 import com.gh4a.loader.LoaderCallbacks;
@@ -48,6 +48,22 @@ import java.util.List;
 import java.util.Locale;
 
 public class FileViewerActivity extends WebViewerActivity {
+    public static Intent makeIntent(Context context, String repoOwner, String repoName,
+            String ref, String fullPath) {
+        return makeIntentWithHighlight(context, repoOwner, repoName, ref, fullPath, -1, -1);
+    }
+
+    public static Intent makeIntentWithHighlight(Context context, String repoOwner, String repoName,
+            String ref, String fullPath, int highlightStart, int highlightEnd) {
+        return new Intent(context, FileViewerActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName)
+                .putExtra("path", fullPath)
+                .putExtra("ref", ref)
+                .putExtra("highlight_start", highlightStart)
+                .putExtra("highlight_end", highlightEnd);
+    }
+
     private String mRepoName;
     private String mRepoOwner;
     private String mPath;
@@ -115,12 +131,12 @@ public class FileViewerActivity extends WebViewerActivity {
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
-        mPath = extras.getString(Constants.Object.PATH);
-        mRef = extras.getString(Constants.Object.REF);
-        mHighlightStart = extras.getInt(Constants.Object.HIGHLIGHT_START, -1);
-        mHighlightEnd = extras.getInt(Constants.Object.HIGHLIGHT_END, -1);
+        mRepoOwner = extras.getString("owner");
+        mRepoName = extras.getString("repo");
+        mPath = extras.getString("path");
+        mRef = extras.getString("ref");
+        mHighlightStart = extras.getInt("highlight_start", -1);
+        mHighlightEnd = extras.getInt("highlight_end", -1);
     }
 
     @Override
@@ -208,12 +224,8 @@ public class FileViewerActivity extends WebViewerActivity {
                 startActivity(shareIntent);
                 return true;
             case MENU_ITEM_HISTORY:
-                Intent historyIntent = new Intent(this, CommitHistoryActivity.class);
-                historyIntent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-                historyIntent.putExtra(Constants.Repository.NAME, mRepoName);
-                historyIntent.putExtra(Constants.Object.PATH, mPath);
-                historyIntent.putExtra(Constants.Object.REF, mRef);
-                startActivity(historyIntent);
+                startActivity(CommitHistoryActivity.makeIntent(this,
+                        mRepoOwner, mRepoName, mRef, mPath));
                 return true;
          }
          return super.onOptionsItemSelected(item);
@@ -221,7 +233,7 @@ public class FileViewerActivity extends WebViewerActivity {
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getRepoActivityIntent(this, mRepoOwner, mRepoName, null);
+        return RepositoryActivity.makeIntent(this, mRepoOwner, mRepoName);
     }
 
     private void openUnsuitableFileAndFinish() {

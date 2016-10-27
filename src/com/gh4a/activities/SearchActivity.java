@@ -54,7 +54,6 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.RepositorySearchLoader;
 import com.gh4a.loader.UserSearchLoader;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
 
@@ -361,18 +360,17 @@ public class SearchActivity extends BaseActivity implements
     public void onItemClick(Object item) {
         if (item instanceof Repository) {
             Repository repository = (Repository) item;
-            startActivity(IntentUtils.getRepoActivityIntent(this,
-                    repository.getOwner().getLogin(), repository.getName(), null));
+            startActivity(RepositoryActivity.makeIntent(this, repository));
         } else if (item instanceof CodeSearchResult) {
             CodeSearchResult result = (CodeSearchResult) item;
             Repository repo = result.getRepository();
             Uri uri = Uri.parse(result.getUrl());
             String ref = uri.getQueryParameter("ref");
-            startActivity(IntentUtils.getFileViewerActivityIntent(this,
+            startActivity(FileViewerActivity.makeIntent(this,
                     repo.getOwner().getLogin(), repo.getName(), ref, result.getPath()));
         } else {
             SearchUser user = (SearchUser) item;
-            startActivity(IntentUtils.getUserActivityIntent(this, user.getLogin(), user.getName()));
+            startActivity(UserActivity.makeIntent(this, user.getLogin(), user.getName()));
         }
     }
 }

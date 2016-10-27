@@ -27,6 +27,7 @@ import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.IssueService;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -48,7 +49,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.BaseActivity;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
@@ -62,7 +62,6 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
@@ -75,6 +74,13 @@ import com.github.mobile.util.HttpImageGetter;
 public class IssueActivity extends BaseActivity implements
         View.OnClickListener, IssueEventAdapter.OnEditComment,
         SwipeRefreshLayout.ChildScrollDelegate, CommentBoxFragment.Callback {
+    public static Intent makeIntent(Context context, String login, String repoName, int number) {
+        return new Intent(context, IssueActivity.class)
+                .putExtra("owner", login)
+                .putExtra("repo", repoName)
+                .putExtra("number", number);
+    }
+
     private static final int REQUEST_EDIT = 1000;
     private static final int REQUEST_EDIT_ISSUE = 1001;
 
@@ -187,9 +193,9 @@ public class IssueActivity extends BaseActivity implements
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
-        mIssueNumber = extras.getInt(Constants.Issue.NUMBER);
+        mRepoOwner = extras.getString("owner");
+        mRepoName = extras.getString("repo");
+        mIssueNumber = extras.getInt("number");
     }
 
     @Override
@@ -238,7 +244,7 @@ public class IssueActivity extends BaseActivity implements
         ivGravatar.setOnClickListener(this);
 
         TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
-        boolean closed = Constants.Issue.STATE_CLOSED.equals(mIssue.getState());
+        boolean closed = ApiHelpers.IssueState.CLOSED.equals(mIssue.getState());
         int stateTextResId = closed ? R.string.closed : R.string.open;
         int stateColorAttributeId = closed ? R.attr.colorIssueClosed : R.attr.colorIssueOpen;
 
@@ -340,7 +346,7 @@ public class IssueActivity extends BaseActivity implements
         if (!canOpenOrClose) {
             menu.removeItem(R.id.issue_close);
             menu.removeItem(R.id.issue_reopen);
-        } else if (Constants.Issue.STATE_CLOSED.equals(mIssue.getState())) {
+        } else if (ApiHelpers.IssueState.CLOSED.equals(mIssue.getState())) {
             menu.removeItem(R.id.issue_close);
         } else {
             menu.removeItem(R.id.issue_reopen);
@@ -355,8 +361,7 @@ public class IssueActivity extends BaseActivity implements
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getIssueListActivityIntent(this,
-                mRepoOwner, mRepoName, Constants.Issue.STATE_OPEN);
+        return IssueListActivity.makeIntent(this, mRepoOwner, mRepoName);
     }
 
     @Override
@@ -449,22 +454,19 @@ public class IssueActivity extends BaseActivity implements
         switch (v.getId()) {
         case R.id.edit_fab:
             if (checkForAuthOrExit()) {
-                Intent editIntent = new Intent(this, IssueEditActivity.class);
-                editIntent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-                editIntent.putExtra(Constants.Repository.NAME, mRepoName);
-                editIntent.putExtra(IssueEditActivity.EXTRA_ISSUE, mIssue);
+                Intent editIntent = IssueEditActivity.makeEditIntent(this,
+                        mRepoOwner, mRepoName, mIssue);
                 startActivityForResult(editIntent, REQUEST_EDIT_ISSUE);
             }
             break;
         case R.id.iv_gravatar:
-            intent = IntentUtils.getUserActivityIntent(this, mIssue.getUser());
+            intent = UserActivity.makeIntent(this, mIssue.getUser());
             break;
         case R.id.iv_assignee:
-            intent = IntentUtils.getUserActivityIntent(this, (User) v.getTag());
+            intent = UserActivity.makeIntent(this, (User) v.getTag());
             break;
         case R.id.tv_pull:
-            intent = IntentUtils.getPullRequestActivityIntent(this,
-                    mRepoOwner, mRepoName, mIssueNumber);
+            intent = PullRequestActivity.makeIntent(this, mRepoOwner, mRepoName, mIssueNumber);
             break;
         }
         if (intent != null) {
@@ -491,12 +493,7 @@ public class IssueActivity extends BaseActivity implements
 
     @Override
     public void editComment(Comment comment) {
-        Intent intent = new Intent(this, EditIssueCommentActivity.class);
-
-        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.NAME, mRepoName);
-        intent.putExtra(Constants.Comment.ID, comment.getId());
-        intent.putExtra(Constants.Comment.BODY, comment.getBody());
+        Intent intent = EditIssueCommentActivity.makeIntent(this, mRepoOwner, mRepoName, comment);
         startActivityForResult(intent, REQUEST_EDIT);
     }
 
@@ -542,7 +539,7 @@ public class IssueActivity extends BaseActivity implements
             RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
 
             Issue issue = issueService.getIssue(repoId, mIssueNumber);
-            issue.setState(mOpen ? Constants.Issue.STATE_OPEN : Constants.Issue.STATE_CLOSED);
+            issue.setState(mOpen ? ApiHelpers.IssueState.OPEN : ApiHelpers.IssueState.CLOSED);
 
             return issueService.editIssue(repoId, issue);
         }

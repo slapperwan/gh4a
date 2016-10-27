@@ -25,15 +25,27 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
+import com.gh4a.activities.CommitActivity;
 import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.CommitCompareLoader;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.utils.IntentUtils;
 
 public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit> {
+    public static CommitCompareFragment newInstance(String repoOwner, String repoName,
+            String baseRef, String headRef) {
+        Bundle args = new Bundle();
+        args.putString("owner", repoOwner);
+        args.putString("repo", repoName);
+        args.putString("base", baseRef);
+        args.putString("head", headRef);
+
+        CommitCompareFragment f = new CommitCompareFragment();
+        f.setArguments(args);
+        return f;
+    }
+
     private static final int REQUEST_COMMIT = 2000;
 
     private String mRepoOwner;
@@ -41,28 +53,15 @@ public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit
     private String mBase;
     private String mHead;
 
-    public static CommitCompareFragment newInstance(String repoOwner, String repoName,
-            String base, String head) {
-        Bundle args = new Bundle();
-        args.putString(Constants.Repository.OWNER, repoOwner);
-        args.putString(Constants.Repository.NAME, repoName);
-        args.putString(Constants.Repository.BASE, base);
-        args.putString(Constants.Repository.HEAD, head);
-
-        CommitCompareFragment f = new CommitCompareFragment();
-        f.setArguments(args);
-        return f;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Bundle args = getArguments();
-        mRepoOwner = args.getString(Constants.Repository.OWNER);
-        mRepoName = args.getString(Constants.Repository.NAME);
-        mBase = args.getString(Constants.Repository.BASE);
-        mHead = args.getString(Constants.Repository.HEAD);
+        mRepoOwner = args.getString("owner");
+        mRepoName = args.getString("repo");
+        mBase = args.getString("base");
+        mHead = args.getString("head");
     }
 
     @Override
@@ -77,7 +76,7 @@ public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit
 
     @Override
     public void onItemClick(RepositoryCommit commit) {
-        Intent intent = IntentUtils.getCommitInfoActivityIntent(getActivity(),
+        Intent intent = CommitActivity.makeIntent(getActivity(),
                 mRepoOwner, mRepoName, commit.getSha());
         startActivityForResult(intent, REQUEST_COMMIT);
     }

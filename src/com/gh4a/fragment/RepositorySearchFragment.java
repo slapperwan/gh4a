@@ -8,13 +8,12 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
+import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.RepositorySearchLoader;
-import com.gh4a.utils.IntentUtils;
 
 public class RepositorySearchFragment extends ListDataBaseFragment<Repository> {
     private RepositorySearchLoader mLoader;
@@ -23,7 +22,7 @@ public class RepositorySearchFragment extends ListDataBaseFragment<Repository> {
         RepositorySearchFragment f = new RepositorySearchFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.User.LOGIN, userLogin);
+        args.putString("user", userLogin);
         f.setArguments(args);
 
         return f;
@@ -39,7 +38,7 @@ public class RepositorySearchFragment extends ListDataBaseFragment<Repository> {
 
     @Override
     public Loader<LoaderResult<List<Repository>>> onCreateLoader() {
-        String login = getArguments().getString(Constants.User.LOGIN);
+        String login = getArguments().getString("user");
         mLoader = new RepositorySearchLoader(getActivity(), login);
         mLoader.setQuery(getArguments().getString("query"));
         return mLoader;
@@ -57,7 +56,6 @@ public class RepositorySearchFragment extends ListDataBaseFragment<Repository> {
 
     @Override
     public void onItemClick(Repository item) {
-        startActivity(IntentUtils.getRepoActivityIntent(getActivity(),
-                item.getOwner().getLogin(), item.getName(), null));
+        startActivity(RepositoryActivity.makeIntent(getActivity(), item));
     }
 }

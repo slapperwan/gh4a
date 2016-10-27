@@ -23,33 +23,32 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.UserAdapter;
-import com.gh4a.utils.IntentUtils;
 
 public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> {
-    private String mLogin;
-    private boolean mFindFollowers;
-
-    public static FollowersFollowingListFragment newInstance(String login, boolean mFindFollowers) {
+    public static FollowersFollowingListFragment newInstance(String login, boolean showFollowers) {
         FollowersFollowingListFragment f = new FollowersFollowingListFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.User.LOGIN, login);
-        args.putBoolean("FIND_FOLLOWER", mFindFollowers);
+        args.putString("user", login);
+        args.putBoolean("show_followers", showFollowers);
         f.setArguments(args);
 
         return f;
     }
 
+    private String mLogin;
+    private boolean mShowFollowers;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mLogin = getArguments().getString(Constants.User.LOGIN);
-        mFindFollowers = getArguments().getBoolean("FIND_FOLLOWER");
+        mLogin = getArguments().getString("user");
+        mShowFollowers = getArguments().getBoolean("show_followers");
     }
 
     @Override
@@ -59,12 +58,12 @@ public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> 
 
     @Override
     protected int getEmptyTextResId() {
-        return mFindFollowers ? R.string.no_followers_found : R.string.no_following_found;
+        return mShowFollowers ? R.string.no_followers_found : R.string.no_following_found;
     }
 
     @Override
     public void onItemClick(User user) {
-        Intent intent = IntentUtils.getUserActivityIntent(getActivity(), user);
+        Intent intent = UserActivity.makeIntent(getActivity(), user);
         if (intent != null) {
             startActivity(intent);
         }
@@ -74,6 +73,6 @@ public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> 
     protected PageIterator<User> onCreateIterator() {
         UserService userService = (UserService)
                 Gh4Application.get().getService(Gh4Application.USER_SERVICE);
-        return mFindFollowers ? userService.pageFollowers(mLogin) : userService.pageFollowing(mLogin);
+        return mShowFollowers ? userService.pageFollowers(mLogin) : userService.pageFollowing(mLogin);
     }
 }

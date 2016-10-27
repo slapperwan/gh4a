@@ -16,6 +16,7 @@
 package com.gh4a.activities;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -35,7 +36,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.gh4a.BaseActivity;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
@@ -47,7 +47,6 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
 import com.gh4a.utils.ApiHelpers;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Issue;
@@ -61,6 +60,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class IssueEditActivity extends BaseActivity implements View.OnClickListener {
+    public static Intent makeCreateIntent(Context context, String repoOwner, String repoName) {
+        return makeEditIntent(context, repoOwner, repoName, null);
+    }
+
+    public static Intent makeEditIntent(Context context, String repoOwner,
+            String repoName, Issue issue) {
+        return new Intent(context, IssueEditActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName)
+                .putExtra("issue", issue);
+    }
+
     public static final String EXTRA_ISSUE = "issue";
 
     private String mRepoOwner;
@@ -111,7 +122,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         @Override
         protected Loader<LoaderResult<List<Milestone>>> onCreateLoader() {
             return new MilestoneListLoader(IssueEditActivity.this,
-                    mRepoOwner, mRepoName, Constants.Issue.STATE_OPEN);
+                    mRepoOwner, mRepoName, ApiHelpers.IssueState.OPEN);
         }
         @Override
         protected void onResultReady(List<Milestone> result) {
@@ -258,9 +269,9 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
-        mEditIssue = (Issue) extras.getSerializable(EXTRA_ISSUE);
+        mRepoOwner = extras.getString("owner");
+        mRepoName = extras.getString("repo");
+        mEditIssue = (Issue) extras.getSerializable("issue");
     }
 
     @Override
@@ -319,8 +330,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getIssueListActivityIntent(this,
-                mRepoOwner, mRepoName, Constants.Issue.STATE_OPEN);
+        return IssueListActivity.makeIntent(this, mRepoOwner, mRepoName);
     }
 
     private void showMilestonesDialog() {
@@ -512,7 +522,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
         @Override
         protected void onSuccess(Void result) {
-            Intent intent = IntentUtils.getIssueActivityIntent(IssueEditActivity.this,
+            Intent intent = IssueActivity.makeIntent(IssueEditActivity.this,
                     mRepoOwner, mRepoName, mEditIssue.getNumber());
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);

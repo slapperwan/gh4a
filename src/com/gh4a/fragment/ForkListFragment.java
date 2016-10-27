@@ -23,12 +23,11 @@ import org.eclipse.egit.github.core.service.RepositoryService;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.utils.IntentUtils;
 
 public class ForkListFragment extends PagedDataBaseFragment<Repository> {
     private String mRepoOwner;
@@ -38,8 +37,8 @@ public class ForkListFragment extends PagedDataBaseFragment<Repository> {
         ForkListFragment f = new ForkListFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.Repository.OWNER, repoOwner);
-        args.putString(Constants.Repository.NAME, repoName);
+        args.putString("owner", repoOwner);
+        args.putString("repo", repoName);
         f.setArguments(args);
 
         return f;
@@ -48,8 +47,8 @@ public class ForkListFragment extends PagedDataBaseFragment<Repository> {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.NAME);
+        mRepoOwner = getArguments().getString("owner");
+        mRepoName = getArguments().getString("repo");
     }
 
     @Override
@@ -64,8 +63,7 @@ public class ForkListFragment extends PagedDataBaseFragment<Repository> {
 
     @Override
     public void onItemClick(Repository repo) {
-        startActivity(IntentUtils.getRepoActivityIntent(getActivity(),
-                repo.getOwner().getLogin(), repo.getName(), null));
+        startActivity(RepositoryActivity.makeIntent(getActivity(), repo));
     }
 
     @Override

@@ -21,13 +21,13 @@ import com.gh4a.R;
 import com.gh4a.activities.BookmarkListActivity;
 import com.gh4a.activities.SearchActivity;
 import com.gh4a.activities.SettingsActivity;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.fragment.RepositoryListContainerFragment;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.UserLoader;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.User;
 
@@ -104,7 +104,7 @@ public class HomeActivity extends BasePagerActivity implements
     @Override
     public void onClick(View view) {
         User user = (User) view.getTag();
-        Intent intent = IntentUtils.getUserActivityIntent(this, user);
+        Intent intent = UserActivity.makeIntent(this, user);
         if (intent != null) {
             closeDrawers();
             startActivity(intent);

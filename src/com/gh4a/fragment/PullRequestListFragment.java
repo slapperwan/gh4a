@@ -22,27 +22,25 @@ import org.eclipse.egit.github.core.service.PullRequestService;
 
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.View;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.adapter.PullRequestAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.utils.IntentUtils;
 
 public class PullRequestListFragment extends PagedDataBaseFragment<PullRequest> {
     private String mRepoOwner;
     private String mRepoName;
-    private String mState;
+    private boolean mShowClosed;
 
-    public static PullRequestListFragment newInstance(String repoOwner, String repoName, String state) {
+    public static PullRequestListFragment newInstance(String repoOwner, String repoName, boolean showClosed) {
         PullRequestListFragment f = new PullRequestListFragment();
         Bundle args = new Bundle();
-        args.putString(Constants.Repository.OWNER, repoOwner);
-        args.putString(Constants.Repository.NAME, repoName);
-        args.putString(Constants.Issue.STATE, state);
+        args.putString("owner", repoOwner);
+        args.putString("repo", repoName);
+        args.putBoolean("closed", showClosed);
 
         f.setArguments(args);
         return f;
@@ -52,24 +50,22 @@ public class PullRequestListFragment extends PagedDataBaseFragment<PullRequest> 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.NAME);
-        mState = getArguments().getString(Constants.Issue.STATE);
+        mRepoOwner = getArguments().getString("owner");
+        mRepoName = getArguments().getString("repo");
+        mShowClosed = getArguments().getBoolean("closed");
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (TextUtils.equals(mState, Constants.Issue.STATE_CLOSED)) {
-            setHighlightColors(R.attr.colorIssueClosed, R.attr.colorIssueClosedDark);
-        } else {
-            setHighlightColors(R.attr.colorIssueOpen, R.attr.colorIssueOpenDark);
-        }
+        setHighlightColors(
+                mShowClosed ? R.attr.colorIssueClosed : R.attr.colorIssueOpen,
+                mShowClosed ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark);
     }
 
     @Override
     public void onItemClick(PullRequest pullRequest) {
-        startActivity(IntentUtils.getPullRequestActivityIntent(getActivity(),
+        startActivity(PullRequestActivity.makeIntent(getActivity(),
                 mRepoOwner, mRepoName, pullRequest.getNumber()));
     }
 
@@ -87,6 +83,7 @@ public class PullRequestListFragment extends PagedDataBaseFragment<PullRequest> 
     protected PageIterator<PullRequest> onCreateIterator() {
         PullRequestService pullRequestService = (PullRequestService)
                 Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
-        return pullRequestService.pagePullRequests(new RepositoryId(mRepoOwner, mRepoName), mState);
+        return pullRequestService.pagePullRequests(new RepositoryId(mRepoOwner, mRepoName),
+                mShowClosed ? "closed" : "open");
     }
 }

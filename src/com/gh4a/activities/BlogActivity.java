@@ -15,14 +15,21 @@
  */
 package com.gh4a.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
+import com.gh4a.holder.Feed;
 
 public class BlogActivity extends WebViewerActivity {
+    public static Intent makeIntent(Context context, Feed blog) {
+        return new Intent(context, BlogActivity.class)
+                .putExtra("title", blog.getTitle())
+                .putExtra("content", blog.getContent());
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,12 +50,12 @@ public class BlogActivity extends WebViewerActivity {
 
     @Override
     protected String generateHtml(String cssTheme) {
-        return wrapUnthemedHtml(getIntent().getStringExtra(Constants.Blog.CONTENT), cssTheme);
+        return wrapUnthemedHtml(getIntent().getStringExtra("content"), cssTheme);
     }
 
     @Override
     protected String getDocumentTitle() {
-        return getIntent().getStringExtra(Constants.Blog.TITLE);
+        return getIntent().getStringExtra("title");
     }
 
     @Override

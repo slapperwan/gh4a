@@ -1,6 +1,7 @@
 package com.gh4a.activities;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -11,7 +12,6 @@ import android.view.MenuItem;
 import android.widget.EditText;
 
 import com.gh4a.BaseActivity;
-import com.gh4a.Constants;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.utils.UiUtils;
@@ -21,6 +21,14 @@ import org.eclipse.egit.github.core.RepositoryId;
 import java.io.IOException;
 
 public abstract class EditCommentActivity extends BaseActivity {
+    protected static Intent fillInIntent(Intent baseIntent, String repoOwner, String repoName,
+            long id, String body) {
+        return baseIntent.putExtra("owner", repoOwner)
+                .putExtra("repo", repoName)
+                .putExtra("id", id)
+                .putExtra("body", body);
+    }
+
     private String mRepoOwner;
     private String mRepoName;
     private long mCommentId;
@@ -38,7 +46,7 @@ public abstract class EditCommentActivity extends BaseActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         mEditText = (EditText) findViewById(R.id.et_text);
-        mEditText.setText(getIntent().getStringExtra(Constants.Comment.BODY));
+        mEditText.setText(getIntent().getStringExtra("body"));
 
         setResult(RESULT_CANCELED);
     }
@@ -46,9 +54,9 @@ public abstract class EditCommentActivity extends BaseActivity {
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
-        mCommentId = extras.getLong(Constants.Comment.ID);
+        mRepoOwner = extras.getString("owner");
+        mRepoName = extras.getString("repo");
+        mCommentId = extras.getLong("id");
     }
 
     @Override

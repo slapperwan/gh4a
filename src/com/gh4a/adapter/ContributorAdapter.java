@@ -12,8 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
 public class ContributorAdapter extends RootAdapter<Contributor, ContributorAdapter.ViewHolder> {
@@ -44,7 +44,7 @@ public class ContributorAdapter extends RootAdapter<Contributor, ContributorAdap
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             Contributor contributor = (Contributor) v.getTag();
-            Intent intent = IntentUtils.getUserActivityIntent(mContext,
+            Intent intent = UserActivity.makeIntent(mContext,
                     contributor.getLogin(), contributor.getName());
             if (intent != null) {
                 mContext.startActivity(intent);

@@ -15,6 +15,7 @@
  */
 package com.gh4a.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,13 +26,19 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.gh4a.BasePagerActivity;
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.fragment.CommitFragment;
 import com.gh4a.fragment.CommitNoteFragment;
 import com.gh4a.utils.IntentUtils;
 
 public class CommitActivity extends BasePagerActivity {
+    public static Intent makeIntent(Context context, String repoOwner, String repoName, String sha) {
+        return new Intent(context, CommitActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName)
+                .putExtra("sha", sha);
+    }
+
     private String mRepoOwner;
     private String mRepoName;
     private String mObjectSha;
@@ -53,9 +60,9 @@ public class CommitActivity extends BasePagerActivity {
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
-        mObjectSha = extras.getString(Constants.Object.OBJECT_SHA);
+        mRepoOwner = extras.getString("owner");
+        mRepoName = extras.getString("repo");
+        mObjectSha = extras.getString("sha");
     }
 
     @Override
@@ -82,7 +89,7 @@ public class CommitActivity extends BasePagerActivity {
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getRepoActivityIntent(this, mRepoOwner, mRepoName, null);
+        return RepositoryActivity.makeIntent(this, mRepoOwner, mRepoName);
     }
 
     @Override

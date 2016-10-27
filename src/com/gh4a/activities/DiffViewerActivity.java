@@ -44,7 +44,6 @@ import android.widget.FrameLayout;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
@@ -64,13 +63,23 @@ import java.util.List;
 
 public abstract class DiffViewerActivity extends WebViewerActivity implements
         View.OnTouchListener {
+    protected static Intent fillInIntent(Intent baseIntent, String repoOwner, String repoName,
+            String commitSha, String path, String diff,
+            List<CommitComment> comments, int initialLine) {
+        return baseIntent.putExtra("owner", repoOwner)
+                .putExtra("repo", repoName)
+                .putExtra("sha", commitSha)
+                .putExtra("path", path)
+                .putExtra("diff", diff)
+                .putExtra("comments", comments != null ? new ArrayList<>(comments) : null)
+                .putExtra("initial_line", initialLine);
+    }
+
     protected String mRepoOwner;
     protected String mRepoName;
     protected String mPath;
     protected String mSha;
     private int mInitialLine;
-
-    public static final String EXTRA_INITIAL_LINE = "initial_line";
 
     private String mDiff;
     private String[] mDiffLines;
@@ -108,7 +117,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         mWebView.setOnTouchListener(this);
 
         List<CommitComment> comments = (ArrayList<CommitComment>)
-                getIntent().getSerializableExtra(Constants.Commit.COMMENTS);
+                getIntent().getSerializableExtra("comments");
 
         if (comments != null) {
             addCommentsToMap(comments);
@@ -121,18 +130,18 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
-        mPath = extras.getString(Constants.Object.PATH);
-        mSha = extras.getString(Constants.Object.OBJECT_SHA);
-        mDiff = extras.getString(Constants.Commit.DIFF);
-        mInitialLine = extras.getInt(EXTRA_INITIAL_LINE, -1);
+        mRepoOwner = extras.getString("owner");
+        mRepoName = extras.getString("repo");
+        mPath = extras.getString("path");
+        mSha = extras.getString("sha");
+        mDiff = extras.getString("diff");
+        mInitialLine = extras.getInt("initial_line", -1);
     }
 
     @Override
     protected boolean canSwipeToRefresh() {
         // no need for pull-to-refresh if everything was passed in the intent extras
-        return !getIntent().hasExtra(Constants.Commit.COMMENTS);
+        return !getIntent().hasExtra("comments");
     }
 
     @Override
@@ -243,8 +252,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                 startActivity(shareIntent);
                 return true;
             case MENU_ITEM_VIEW:
-                startActivity(IntentUtils.getFileViewerActivityIntent(this,
-                        mRepoOwner, mRepoName, mSha, mPath));
+                startActivity(FileViewerActivity.makeIntent(this, mRepoOwner, mRepoName, mSha, mPath));
                 return true;
         }
         return super.onOptionsItemSelected(item);

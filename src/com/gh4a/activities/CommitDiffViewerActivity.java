@@ -15,13 +15,13 @@
  */
 package com.gh4a.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.Loader;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -31,9 +31,15 @@ import java.io.IOException;
 import java.util.List;
 
 public class CommitDiffViewerActivity extends DiffViewerActivity {
+    public static Intent makeIntent(Context context, String repoOwner, String repoName,
+                String commitSha, String path, String diff, List<CommitComment> comments) {
+        return DiffViewerActivity.fillInIntent(new Intent(context, CommitDiffViewerActivity.class),
+                repoOwner, repoName, commitSha, path, diff, comments, -1);
+    }
+
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getCommitInfoActivityIntent(this, mRepoOwner, mRepoName, mSha);
+        return CommitActivity.makeIntent(this, mRepoOwner, mRepoName, mSha);
     }
 
     @Override

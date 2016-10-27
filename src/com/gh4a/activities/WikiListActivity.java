@@ -18,8 +18,10 @@ package com.gh4a.activities;
 import java.io.FileNotFoundException;
 import java.util.List;
 
+import org.eclipse.egit.github.core.GollumPage;
 import org.xml.sax.SAXException;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
@@ -28,7 +30,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.BaseActivity;
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.adapter.CommonFeedAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -36,13 +37,21 @@ import com.gh4a.holder.Feed;
 import com.gh4a.loader.FeedLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
 import com.gh4a.widget.SwipeRefreshLayout;
 
 public class WikiListActivity extends BaseActivity
         implements SwipeRefreshLayout.ChildScrollDelegate, RootAdapter.OnItemClickListener<Feed> {
+    public static Intent makeIntent(Context context, String repoOwner,
+            String repoName, GollumPage initialPage) {
+        String initialPageId = initialPage != null ? initialPage.getSha() : null;
+        return new Intent(context, WikiListActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName)
+                .putExtra("initial_page", initialPageId);
+    }
+
     private String mUserLogin;
     private String mRepoName;
 
@@ -102,8 +111,8 @@ public class WikiListActivity extends BaseActivity
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mUserLogin = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
+        mUserLogin = extras.getString("owner");
+        mRepoName = extras.getString("repo");
     }
 
     @Override
@@ -133,7 +142,7 @@ public class WikiListActivity extends BaseActivity
 
         mAdapter.addAll(result);
 
-        String initialPage = getIntent().getStringExtra(Constants.Object.OBJECT_SHA);
+        String initialPage = getIntent().getStringExtra("initial_page");
         if (initialPage != null) {
             for (Feed feed : result) {
                 if (initialPage.equals(feed.getId())) {
@@ -145,17 +154,11 @@ public class WikiListActivity extends BaseActivity
     }
 
     private void openViewer(Feed feed) {
-        Intent intent = new Intent(this, WikiActivity.class);
-        intent.putExtra(Constants.Blog.TITLE, feed.getTitle());
-        intent.putExtra(Constants.Blog.CONTENT, feed.getContent());
-        intent.putExtra(Constants.Repository.OWNER, mUserLogin);
-        intent.putExtra(Constants.Repository.NAME, mRepoName);
-        intent.putExtra(Constants.Blog.LINK, feed.getLink());
-        startActivity(intent);
+        startActivity(WikiActivity.makeIntent(this, mUserLogin, mRepoName, feed));
     }
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getRepoActivityIntent(this, mUserLogin, mRepoName, null);
+        return RepositoryActivity.makeIntent(this, mUserLogin, mRepoName);
     }
 }

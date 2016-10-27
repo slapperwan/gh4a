@@ -19,24 +19,29 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.User;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.loader.CollaboratorListLoader;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.utils.IntentUtils;
 
 public class CollaboratorListActivity extends UserListActivity {
+    public static Intent makeIntent(Context context, String repoOwner, String repoName) {
+        return new Intent(context, CollaboratorListActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName);
+    }
+
     private String mUserLogin;
     private String mRepoName;
 
     @Override
     protected void onInitExtras(Bundle extras) {
-        mUserLogin = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
+        mUserLogin = extras.getString("owner");
+        mRepoName = extras.getString("repo");
     }
 
     @Override
@@ -56,6 +61,6 @@ public class CollaboratorListActivity extends UserListActivity {
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getRepoActivityIntent(this, mUserLogin, mRepoName, null);
+        return RepositoryActivity.makeIntent(this, mUserLogin, mRepoName);
     }
 }

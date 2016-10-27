@@ -10,7 +10,7 @@ import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
-import com.gh4a.Constants;
+import com.gh4a.Gh4Application;
 
 public class PageIteratorLoader<T> extends AsyncTaskLoader<LoaderResult<PageIteratorLoader<T>.LoadedPage>> {
     private PageIterator<T> mPageIterator;
@@ -57,7 +57,7 @@ public class PageIteratorLoader<T> extends AsyncTaskLoader<LoaderResult<PageIter
                 // should only happen in case of an empty repo
                 return new LoaderResult<>(new LoadedPage(mPreviouslyLoadedData, false));
             } catch (Exception e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                Log.e(Gh4Application.LOG_TAG, e.getMessage(), e);
                 return new LoaderResult<>(e);
             }
         }

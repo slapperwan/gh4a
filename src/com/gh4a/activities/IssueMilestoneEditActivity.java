@@ -17,6 +17,7 @@ package com.gh4a.activities;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -38,11 +39,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.gh4a.BaseActivity;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
-import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Milestone;
@@ -54,7 +54,17 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class IssueMilestoneEditActivity extends BaseActivity implements View.OnClickListener {
-    public static final String EXTRA_MILESTONE = "milestone";
+    public static Intent makeCreateIntent(Context context, String repoOwner, String repoName) {
+        return makeEditIntent(context, repoOwner, repoName, null);
+    }
+
+    public static Intent makeEditIntent(Context context, String repoOwner,
+            String repoName, Milestone milestone) {
+        return new Intent(context, IssueMilestoneEditActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName)
+                .putExtra("milestone", milestone);
+    }
 
     private String mRepoOwner;
     private String mRepoName;
@@ -105,7 +115,7 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
 
         if (mMilestone == null) {
             mMilestone = new Milestone();
-            mMilestone.setState("open");
+            mMilestone.setState(ApiHelpers.IssueState.OPEN);
         }
 
         mTitleView.addTextChangedListener(new UiUtils.ButtonEnableTextWatcher(mTitleView, fab));
@@ -129,20 +139,18 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
-        mMilestone = (Milestone) extras.getSerializable(EXTRA_MILESTONE);
+        mRepoOwner = extras.getString("owner");
+        mRepoName = extras.getString("repo");
+        mMilestone = (Milestone) extras.getSerializable("milestone");
     }
 
     private boolean isInEditMode() {
-        return getIntent().hasExtra(EXTRA_MILESTONE);
+        return getIntent().hasExtra("milestone");
     }
 
     private void openIssueMilestones() {
-        Intent intent = new Intent(this, IssueMilestoneListActivity.class);
-        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.NAME, mRepoName);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        Intent intent = IssueMilestoneListActivity.makeIntent(this, mRepoOwner, mRepoName)
+                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
 
@@ -165,8 +173,7 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getIssueListActivityIntent(this, mRepoOwner, mRepoName,
-                Constants.Issue.STATE_OPEN);
+        return IssueListActivity.makeIntent(this, mRepoOwner, mRepoName);
     }
 
     @Override

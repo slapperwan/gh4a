@@ -1,5 +1,6 @@
 package com.gh4a.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,7 +13,6 @@ import android.view.MenuItem;
 
 import com.gh4a.BackgroundTask;
 import com.gh4a.BasePagerActivity;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.db.BookmarksProvider;
@@ -24,9 +24,30 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.StringUtils;
 
+import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.UserService;
 
 public class UserActivity extends BasePagerActivity {
+    public static Intent makeIntent(Context context, String login) {
+        return makeIntent(context, login, null);
+    }
+
+    public static Intent makeIntent(Context context, User user) {
+        if (user == null) {
+            return null;
+        }
+        return makeIntent(context, user.getLogin(), user.getName());
+    }
+
+    public static Intent makeIntent(Context context, String login, String name) {
+        if (login == null) {
+            return null;
+        }
+        return new Intent(context, UserActivity.class)
+                .putExtra("login", login)
+                .putExtra("name", name);
+    }
+
     private String mUserLogin;
     private String mUserName;
     private boolean mIsSelf;
@@ -64,8 +85,8 @@ public class UserActivity extends BasePagerActivity {
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mUserLogin = extras.getString(Constants.User.LOGIN);
-        mUserName = extras.getString(Constants.User.NAME);
+        mUserLogin = extras.getString("login");
+        mUserName = extras.getString("name");
         mIsSelf = ApiHelpers.loginEquals(mUserLogin, Gh4Application.get().getAuthLogin());
     }
 
@@ -139,9 +160,7 @@ public class UserActivity extends BasePagerActivity {
                 startActivity(shareIntent);
                 return true;
             case R.id.bookmark:
-                Intent bookmarkIntent = new Intent(this, getClass());
-                bookmarkIntent.putExtra(Constants.User.LOGIN, mUserLogin);
-                bookmarkIntent.putExtra(Constants.User.NAME, mUserName);
+                Intent bookmarkIntent = makeIntent(this, mUserLogin, mUserName);
                 saveBookmark(mUserLogin, BookmarksProvider.Columns.TYPE_USER, bookmarkIntent, mUserName);
                 return true;
         }

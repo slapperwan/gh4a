@@ -18,6 +18,7 @@ package com.gh4a.activities;
 import org.eclipse.egit.github.core.Download;
 import org.eclipse.egit.github.core.Release;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
@@ -30,7 +31,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.BaseActivity;
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.adapter.DownloadAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -40,7 +40,6 @@ import com.gh4a.loader.MarkdownLoader;
 import com.gh4a.loader.ReleaseLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
@@ -51,6 +50,21 @@ import com.github.mobile.util.HttpImageGetter;
 public class ReleaseInfoActivity extends BaseActivity implements
         View.OnClickListener, SwipeRefreshLayout.ChildScrollDelegate,
         RootAdapter.OnItemClickListener<Download> {
+    public static Intent makeIntent(Context context, String repoOwner, String repoName, long id) {
+        return new Intent(context, ReleaseInfoActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName)
+                .putExtra("id", id);
+    }
+
+    public static Intent makeIntent(Context context, String repoOwner, String repoName,
+                                    Release release) {
+        return new Intent(context, ReleaseInfoActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName)
+                .putExtra("release", release);
+    }
+
     private String mRepoOwner;
     private String mRepoName;
     private Release mRelease;
@@ -110,10 +124,10 @@ public class ReleaseInfoActivity extends BaseActivity implements
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
-        mRelease = (Release) extras.getSerializable(Constants.Release.RELEASE);
-        mReleaseId = extras.getLong(Constants.Release.ID);
+        mRepoOwner = extras.getString("owner");
+        mRepoName = extras.getString("repo");
+        mRelease = (Release) extras.getSerializable("release");
+        mReleaseId = extras.getLong("id");
     }
 
     @Override
@@ -153,7 +167,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getRepoActivityIntent(this, mRepoOwner, mRepoName, null);
+        return RepositoryActivity.makeIntent(this, mRepoOwner, mRepoName);
     }
 
     private void handleReleaseReady() {
@@ -228,7 +242,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.tv_releasetag:
-                startActivity(IntentUtils.getRepoActivityIntent(this,
+                startActivity(RepositoryActivity.makeIntent(this,
                         mRepoOwner, mRepoName, mRelease.getTagName()));
                 break;
         }

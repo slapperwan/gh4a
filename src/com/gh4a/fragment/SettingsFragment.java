@@ -17,7 +17,6 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.IssueEditActivity;
@@ -174,10 +173,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
                         context.getString(R.string.send_email_title));
                 context.startActivity(chooserIntent);
             } else if (id == R.id.btn_by_gh4a) {
-                Intent intent = new Intent(context, IssueEditActivity.class);
-                intent.putExtra(Constants.Repository.OWNER,
-                        context.getString(R.string.my_username));
-                intent.putExtra(Constants.Repository.NAME,
+                Intent intent = IssueEditActivity.makeCreateIntent(context,
+                        context.getString(R.string.my_username),
                         context.getString(R.string.my_repo));
                 context.startActivity(intent);
             }

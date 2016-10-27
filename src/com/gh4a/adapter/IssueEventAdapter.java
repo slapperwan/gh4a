@@ -35,15 +35,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.CommitActivity;
 import com.gh4a.activities.PullRequestDiffViewerActivity;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IntentSpan;
@@ -127,16 +127,10 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
                     text.setSpan(new IntentSpan(mContext) {
                         @Override
                         protected Intent getIntent() {
-                            Intent intent = new Intent(mContext, PullRequestDiffViewerActivity.class);
-                            intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-                            intent.putExtra(Constants.Repository.NAME, mRepoName);
-                            intent.putExtra(Constants.Object.PATH, commitComment.getPath());
-                            intent.putExtra(Constants.Object.OBJECT_SHA, commitComment.getCommitId());
-                            intent.putExtra(Constants.Commit.DIFF, file.getPatch());
-                            intent.putExtra(Constants.PullRequest.NUMBER, mIssueId);
-                            intent.putExtra(PullRequestDiffViewerActivity.EXTRA_INITIAL_LINE,
-                                    commitComment.getPosition());
-                            return intent;
+                            return PullRequestDiffViewerActivity.makeIntent(mContext,
+                                    mRepoOwner, mRepoName, mIssueId,
+                                    commitComment.getCommitId(), commitComment.getPath(),
+                                    file.getPatch(), null, commitComment.getPosition());
                         }
                     }, pos, pos + fileName.length(), 0);
                 }
@@ -266,7 +260,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
                         }
                     }
 
-                    return IntentUtils.getCommitInfoActivityIntent(mContext,
+                    return CommitActivity.makeIntent(mContext,
                             repoOwner, repoName, event.getCommitId());
                 }
             }, pos, pos + 7, 0);
@@ -293,7 +287,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             IssueEventHolder event = (IssueEventHolder) v.getTag();
-            Intent intent = IntentUtils.getUserActivityIntent(mContext, event.getUser());
+            Intent intent = UserActivity.makeIntent(mContext, event.getUser());
             if (intent != null) {
                 mContext.startActivity(intent);
             }

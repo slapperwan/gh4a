@@ -27,7 +27,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.activities.CommitHistoryActivity;
 import com.gh4a.utils.FileUtils;
@@ -69,12 +68,9 @@ public class FileAdapter extends RootAdapter<RepositoryContents, FileAdapter.Vie
         ViewHolder holder = (ViewHolder) v.getTag();
 
         if (mSubModuleNames == null || !mSubModuleNames.contains(holder.contents.getName())) {
-            Intent historyIntent = new Intent(mContext, CommitHistoryActivity.class);
-            historyIntent.putExtra(Constants.Repository.OWNER, mRepository.getOwner().getLogin());
-            historyIntent.putExtra(Constants.Repository.NAME, mRepository.getName());
-            historyIntent.putExtra(Constants.Object.PATH, holder.contents.getPath());
-            historyIntent.putExtra(Constants.Object.REF, mRef);
-
+            Intent historyIntent = CommitHistoryActivity.makeIntent(mContext,
+                    mRepository.getOwner().getLogin(), mRepository.getName(),
+                    mRef, holder.contents.getPath());
             menu.add(Menu.NONE, MENU_HISTORY, Menu.NONE, R.string.history).setIntent(historyIntent);
         }
     }

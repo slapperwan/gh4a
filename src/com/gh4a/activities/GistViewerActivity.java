@@ -15,6 +15,7 @@
  */
 package com.gh4a.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,7 +25,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.loader.GistLoader;
 import com.gh4a.loader.LoaderCallbacks;
@@ -36,6 +36,12 @@ import org.eclipse.egit.github.core.Gist;
 import org.eclipse.egit.github.core.GistFile;
 
 public class GistViewerActivity extends WebViewerActivity {
+    public static Intent makeIntent(Context context, String id, String fileName) {
+        return new Intent(context, GistViewerActivity.class)
+                .putExtra("id", id)
+                .putExtra("file", fileName);
+    }
+
     private String mFileName;
     private String mGistId;
     private GistFile mGistFile;
@@ -68,8 +74,8 @@ public class GistViewerActivity extends WebViewerActivity {
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mFileName = extras.getString(Constants.Gist.FILENAME);
-        mGistId = extras.getString(Constants.Gist.ID);
+        mFileName = extras.getString("file");
+        mGistId = extras.getString("id");
     }
 
     @Override
@@ -107,7 +113,7 @@ public class GistViewerActivity extends WebViewerActivity {
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getGistActivityIntent(this, mGistId);
+        return GistActivity.makeIntent(this, mGistId);
     }
 
     @Override

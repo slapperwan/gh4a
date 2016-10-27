@@ -55,12 +55,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.BaseActivity;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.activities.EditIssueCommentActivity;
 import com.gh4a.activities.EditPullRequestCommentActivity;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.adapter.IssueEventAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.CommitStatusLoader;
@@ -71,7 +71,6 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IssueLabelSpan;
@@ -127,7 +126,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         PullRequestFragment f = new PullRequestFragment();
 
         Bundle args = new Bundle();
-        args.putSerializable("PULL", pr);
+        args.putSerializable("pr", pr);
         f.setArguments(args);
 
         return f;
@@ -136,7 +135,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPullRequest = (PullRequest) getArguments().getSerializable("PULL");
+        mPullRequest = (PullRequest) getArguments().getSerializable("pr");
 
         Repository repo = mPullRequest.getBase().getRepo();
         mRepoOwner = repo.getOwner().getLogin();
@@ -160,7 +159,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         if (!canOpenOrClose) {
             menu.removeItem(R.id.pull_close);
             menu.removeItem(R.id.pull_reopen);
-        } else if (Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState())) {
+        } else if (ApiHelpers.IssueState.CLOSED.equals(mPullRequest.getState())) {
             menu.removeItem(R.id.pull_close);
             if (mPullRequest.isMerged()) {
                 menu.findItem(R.id.pull_reopen).setEnabled(false);
@@ -320,7 +319,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     }
 
     private void loadStatusIfOpen() {
-        if (Constants.Issue.STATE_OPEN.equals(mPullRequest.getState())) {
+        if (ApiHelpers.IssueState.OPEN.equals(mPullRequest.getState())) {
             getLoaderManager().initLoader(2, null, mStatusCallback);
         }
     }
@@ -386,7 +385,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
         if (mPullRequest.isMerged()) {
             setHighlightColors(R.attr.colorPullRequestMerged, R.attr.colorPullRequestMergedDark);
-        } else if (Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState())) {
+        } else if (ApiHelpers.IssueState.CLOSED.equals(mPullRequest.getState())) {
             setHighlightColors(R.attr.colorIssueClosed, R.attr.colorIssueClosedDark);
         } else {
             setHighlightColors(R.attr.colorIssueOpen, R.attr.colorIssueOpenDark);
@@ -501,8 +500,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
     @Override
     public void onClick(View v) {
-        User user = (User) v.getTag();
-        Intent intent = IntentUtils.getUserActivityIntent(getActivity(), user);
+        Intent intent = UserActivity.makeIntent(getActivity(), (User) v.getTag());
         if (intent != null) {
             startActivity(intent);
         }
@@ -532,13 +530,10 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
     @Override
     public void editComment(Comment comment) {
-        Intent intent = new Intent(getActivity(), comment instanceof CommitComment
-                ? EditPullRequestCommentActivity.class : EditIssueCommentActivity.class);
-
-        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.NAME, mRepoName);
-        intent.putExtra(Constants.Comment.ID, comment.getId());
-        intent.putExtra(Constants.Comment.BODY, comment.getBody());
+        Intent intent = comment instanceof CommitComment
+                ? EditPullRequestCommentActivity.makeIntent(getActivity(),
+                        mRepoOwner, mRepoName, (CommitComment) comment)
+                : EditIssueCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName, comment);
         startActivityForResult(intent, REQUEST_EDIT);
     }
 
@@ -588,7 +583,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
             PullRequest pullRequest = new PullRequest();
             pullRequest.setNumber(mPullRequest.getNumber());
-            pullRequest.setState(mOpen ? Constants.Issue.STATE_OPEN : Constants.Issue.STATE_CLOSED);
+            pullRequest.setState(mOpen ? ApiHelpers.IssueState.OPEN : ApiHelpers.IssueState.CLOSED);
 
             return pullService.editPullRequest(repoId, pullRequest);
         }

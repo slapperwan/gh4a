@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
-import com.gh4a.Constants;
+import com.gh4a.Gh4Application;
 
 public abstract class BaseLoader<T> extends AsyncTaskLoader<LoaderResult<T>> {
     private T mPrefilledData;
@@ -26,7 +26,7 @@ public abstract class BaseLoader<T> extends AsyncTaskLoader<LoaderResult<T>> {
             T data = doLoadInBackground();
             return new LoaderResult<>(data);
         } catch (Exception e) {
-            Log.e(Constants.LOG_TAG, e.getMessage(), e);
+            Log.e(Gh4Application.LOG_TAG, e.getMessage(), e);
             return new LoaderResult<>(e);
         }
     }

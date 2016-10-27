@@ -24,10 +24,11 @@ import android.view.View;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.IssueActivity;
+import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.adapter.IssueAdapter;
 import com.gh4a.adapter.RepositoryIssueAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.client.PageIterator;
@@ -94,10 +95,8 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     public void onItemClick(Issue issue) {
         String[] urlPart = issue.getUrl().split("/");
         Intent intent = issue.getPullRequest() != null
-                ? IntentUtils.getPullRequestActivityIntent(getActivity(),
-                        urlPart[4], urlPart[5], issue.getNumber())
-                : IntentUtils.getIssueActivityIntent(getActivity(),
-                        urlPart[4], urlPart[5], issue.getNumber());
+                ? PullRequestActivity.makeIntent(getActivity(), urlPart[4], urlPart[5], issue.getNumber())
+                : IssueActivity.makeIntent(getActivity(), urlPart[4], urlPart[5], issue.getNumber());
         startActivityForResult(intent, REQUEST_ISSUE);
     }
 

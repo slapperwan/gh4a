@@ -22,6 +22,7 @@ import org.eclipse.egit.github.core.Gist;
 import org.eclipse.egit.github.core.GistFile;
 import org.eclipse.egit.github.core.service.GistService;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -38,7 +39,6 @@ import android.widget.TextView;
 
 import com.gh4a.BackgroundTask;
 import com.gh4a.BaseActivity;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.loader.GistLoader;
@@ -50,6 +50,11 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
 public class GistActivity extends BaseActivity implements View.OnClickListener {
+    public static Intent makeIntent(Context context, String gistId) {
+        return new Intent(context, GistActivity.class)
+                .putExtra("id", gistId);
+    }
+
     private String mGistId;
     private Gist mGist;
     private Boolean mIsStarred;
@@ -97,7 +102,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mGistId = extras.getString(Constants.Gist.ID);
+        mGistId = extras.getString("id");
     }
 
     @Override
@@ -150,11 +155,8 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        Intent intent = new Intent(this, GistViewerActivity.class);
-        GistFile gist = (GistFile) view.getTag();
-        intent.putExtra(Constants.Gist.FILENAME, gist.getFilename());
-        intent.putExtra(Constants.Gist.ID, mGistId);
-        startActivity(intent);
+        GistFile file = (GistFile) view.getTag();
+        startActivity(GistViewerActivity.makeIntent(this, mGistId, file.getFilename()));
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -219,12 +221,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
     protected Intent navigateUp() {
         String login = mGist != null && mGist.getOwner() != null
                 ? mGist.getOwner().getLogin() : null;
-        if (login != null) {
-            Intent intent = new Intent(this, GistListActivity.class);
-            intent.putExtra(Constants.User.LOGIN, login);
-            return intent;
-        }
-        return null;
+        return login != null ? GistListActivity.makeIntent(this, login) : null;
     }
 
     private class UpdateStarTask extends BackgroundTask<Void> {

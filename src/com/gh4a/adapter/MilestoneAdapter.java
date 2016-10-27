@@ -25,8 +25,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
@@ -48,7 +48,7 @@ public class MilestoneAdapter extends RootAdapter<Milestone, MilestoneAdapter.Vi
     @Override
     public void onBindViewHolder(ViewHolder holder, Milestone milestone) {
         holder.tvTitle.setText(milestone.getTitle());
-        holder.tvTitle.setTextColor(Constants.Issue.STATE_CLOSED.equals(milestone.getState())
+        holder.tvTitle.setTextColor(ApiHelpers.IssueState.CLOSED.equals(milestone.getState())
                 ? mTextColorSecondary : mTextColorPrimary);
 
         if (!StringUtils.isBlank(milestone.getDescription())) {

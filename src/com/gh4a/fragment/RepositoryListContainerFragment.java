@@ -19,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.gh4a.BaseActivity;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.loader.LoaderCallbacks;
@@ -32,8 +31,19 @@ import org.eclipse.egit.github.core.Repository;
 public class RepositoryListContainerFragment extends Fragment implements
         LoaderCallbacks.ParentCallback, SearchView.OnCloseListener, SearchView.OnQueryTextListener,
         MenuItemCompat.OnActionExpandListener, SwipeRefreshLayout.ChildScrollDelegate {
+    public static RepositoryListContainerFragment newInstance(String userLogin, boolean isOrg) {
+        RepositoryListContainerFragment f = new RepositoryListContainerFragment();
+        Bundle args = new Bundle();
+
+        args.putString("user", userLogin);
+        args.putBoolean("is_org", isOrg);
+        f.setArguments(args);
+
+        return f;
+    }
+
     private String mUserLogin;
-    private String mUserType;
+    private boolean mIsOrg;
     private String mFilterType = "all";
     private String mSortOrder = "full_name";
     private String mSortDirection = "asc";
@@ -55,22 +65,11 @@ public class RepositoryListContainerFragment extends Fragment implements
     private static final String STATE_KEY_SEARCH_VISIBLE = "search_visible";
     private static final String STATE_KEY_QUERY = "search_query";
 
-    public static RepositoryListContainerFragment newInstance(String userLogin, String userType) {
-        RepositoryListContainerFragment f = new RepositoryListContainerFragment();
-        Bundle args = new Bundle();
-
-        args.putString(Constants.User.LOGIN, userLogin);
-        args.putString(Constants.User.TYPE, userType);
-        f.setArguments(args);
-
-        return f;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Bundle data = getArguments();
-        mUserLogin = data.getString(Constants.User.LOGIN);
-        mUserType = data.getString(Constants.User.TYPE);
+        mUserLogin = data.getString("user");
+        mIsOrg = data.getBoolean("is_org");
 
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_KEY_FILTER_TYPE)) {
             mFilterType = savedInstanceState.getString(STATE_KEY_FILTER_TYPE);
@@ -192,7 +191,7 @@ public class RepositoryListContainerFragment extends Fragment implements
                 mMainFragment = WatchedRepositoryListFragment.newInstance(mUserLogin);
                 break;
             default:
-                mMainFragment = RepositoryListFragment.newInstance(mUserLogin, mUserType,
+                mMainFragment = RepositoryListFragment.newInstance(mUserLogin, mIsOrg,
                         mFilterType, mSortOrder, mSortDirection);
                 break;
         }
@@ -360,11 +359,11 @@ public class RepositoryListContainerFragment extends Fragment implements
             FILTER_LOOKUP.put(R.id.filter_type_starred, "starred");
         }
 
-        public static FilterDrawerHelper create(String userLogin, String userType) {
+        public static FilterDrawerHelper create(String userLogin, boolean isOrg) {
             int menuResId;
             if (ApiHelpers.loginEquals(userLogin, Gh4Application.get().getAuthLogin())) {
                 menuResId = R.menu.repo_filter_logged_in;
-            } else if (Constants.User.TYPE_ORG.equals(userType)) {
+            } else if (isOrg) {
                 menuResId = R.menu.repo_filter_org;
             } else {
                 menuResId = R.menu.repo_filter_user;

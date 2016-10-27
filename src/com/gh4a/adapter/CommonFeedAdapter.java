@@ -27,9 +27,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.holder.Feed;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
 
 public class CommonFeedAdapter extends RootAdapter<Feed, CommonFeedAdapter.ViewHolder> {
     private boolean mShowExtra;
@@ -82,7 +82,7 @@ public class CommonFeedAdapter extends RootAdapter<Feed, CommonFeedAdapter.ViewH
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             Feed feed = (Feed) v.getTag();
-            Intent intent = IntentUtils.getUserActivityIntent(mContext, feed.getAuthor());
+            Intent intent = UserActivity.makeIntent(mContext, feed.getAuthor());
             if (intent != null) {
                 mContext.startActivity(intent);
             }

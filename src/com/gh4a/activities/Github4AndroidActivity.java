@@ -42,7 +42,6 @@ import android.widget.Toast;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.ClientForAuthorization;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
@@ -240,11 +239,7 @@ public class Github4AndroidActivity extends BaseActivity {
 
         @Override
         protected void onSuccess(Authorization result) {
-            getPrefs().edit()
-                    .putString(Constants.User.AUTH_TOKEN, result.getToken())
-                    .putString(Constants.User.LOGIN, mUserName)
-                    .apply();
-
+            Gh4Application.get().setLogin(mUserName, result.getToken());
             goToToplevelActivity();
             finish();
         }

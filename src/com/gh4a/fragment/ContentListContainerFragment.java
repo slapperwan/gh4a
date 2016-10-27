@@ -14,10 +14,11 @@ import android.view.ViewGroup;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.R;
+import com.gh4a.activities.FileViewerActivity;
+import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.loader.GitModuleParserLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.widget.PathBreadcrumbs;
 import com.gh4a.widget.SwipeRefreshLayout;
 
@@ -253,10 +254,9 @@ public class ContentListContainerFragment extends Fragment implements
             addFragmentForTopOfStack();
         } else if (mGitModuleMap != null && mGitModuleMap.get(path) != null) {
             String[] userRepo = mGitModuleMap.get(path).split("/");
-            startActivity(IntentUtils.getRepoActivityIntent(getActivity(),
-                    userRepo[0], userRepo[1], null));
+            startActivity(RepositoryActivity.makeIntent(getActivity(), userRepo[0], userRepo[1]));
         } else {
-            startActivity(IntentUtils.getFileViewerActivityIntent(getActivity(),
+            startActivity(FileViewerActivity.makeIntent(getActivity(),
                     mRepository.getOwner().getLogin(), mRepository.getName(),
                     getCurrentRef(), content.getPath()));
         }

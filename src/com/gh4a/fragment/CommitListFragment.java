@@ -26,12 +26,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.CommitActivity;
 import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
 public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> {
@@ -52,10 +51,10 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
         CommitListFragment f = new CommitListFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.Repository.OWNER, repoOwner);
-        args.putString(Constants.Repository.NAME, repoName);
-        args.putString(Constants.Object.REF, ref);
-        args.putString(Constants.Object.PATH, filePath);
+        args.putString("owner", repoOwner);
+        args.putString("repo", repoName);
+        args.putString("ref", ref);
+        args.putString("path", filePath);
         f.setArguments(args);
 
         return f;
@@ -64,10 +63,10 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.NAME);
-        mRef = getArguments().getString(Constants.Object.REF);
-        mFilePath = getArguments().getString(Constants.Object.PATH);
+        mRepoOwner = getArguments().getString("owner");
+        mRepoName = getArguments().getString("repo");
+        mRef = getArguments().getString("ref");
+        mFilePath = getArguments().getString("path");
     }
 
     @Override
@@ -83,7 +82,7 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
     @Override
     public void onItemClick(RepositoryCommit commit) {
         String[] urlPart = commit.getUrl().split("/");
-        Intent intent = IntentUtils.getCommitInfoActivityIntent(getActivity(),
+        Intent intent = CommitActivity.makeIntent(getActivity(),
                 urlPart[4], urlPart[5], commit.getSha());
         startActivityForResult(intent, REQUEST_COMMIT);
     }

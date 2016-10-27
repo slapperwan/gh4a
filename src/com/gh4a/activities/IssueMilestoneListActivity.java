@@ -15,6 +15,7 @@
  */
 package com.gh4a.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -24,15 +25,19 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueMilestoneListFragment;
 import com.gh4a.fragment.LoadingListFragmentBase;
-import com.gh4a.utils.IntentUtils;
 
 public class IssueMilestoneListActivity extends FragmentContainerActivity implements
         View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener {
+    public static Intent makeIntent(Context context, String repoOwner, String repoName) {
+        return new Intent(context, IssueMilestoneListActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName);
+    }
+
     private String mRepoOwner;
     private String mRepoName;
 
@@ -56,8 +61,8 @@ public class IssueMilestoneListActivity extends FragmentContainerActivity implem
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
+        mRepoOwner = extras.getString("owner");
+        mRepoName = extras.getString("repo");
     }
 
     @Override
@@ -72,15 +77,11 @@ public class IssueMilestoneListActivity extends FragmentContainerActivity implem
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getIssueListActivityIntent(this,
-                mRepoOwner, mRepoName, Constants.Issue.STATE_OPEN);
+        return IssueListActivity.makeIntent(this, mRepoOwner, mRepoName);
     }
 
     @Override
     public void onClick(View view) {
-        Intent intent = new Intent(this, IssueMilestoneEditActivity.class);
-        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.NAME, mRepoName);
-        startActivity(intent);
+        startActivity(IssueMilestoneEditActivity.makeCreateIntent(this, mRepoOwner, mRepoName));
     }
 }

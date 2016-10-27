@@ -12,6 +12,15 @@ import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.User;
 
 public class ApiHelpers {
+    public interface IssueState {
+        String OPEN = "open";
+        String CLOSED = "closed";
+    }
+
+    public interface UserType {
+        String USER = "User";
+        String ORG = "Organization";
+    }
 
     //RepositoryCommit
     public static String getAuthorName(Context context, RepositoryCommit commit) {

@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.Release;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
@@ -27,20 +28,24 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.BaseActivity;
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.adapter.ReleaseAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.ReleaseListLoader;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
 import com.gh4a.widget.SwipeRefreshLayout;
 
 public class ReleaseListActivity extends BaseActivity implements
         SwipeRefreshLayout.ChildScrollDelegate, RootAdapter.OnItemClickListener<Release> {
+    public static Intent makeIntent(Context context, String repoOwner, String repoName) {
+        return new Intent(context, ReleaseListActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName);
+    }
+
     private String mUserLogin;
     private String mRepoName;
     private RecyclerView mRecyclerView;
@@ -87,8 +92,8 @@ public class ReleaseListActivity extends BaseActivity implements
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mUserLogin = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
+        mUserLogin = extras.getString("owner");
+        mRepoName = extras.getString("repo");
     }
 
     @Override
@@ -111,15 +116,11 @@ public class ReleaseListActivity extends BaseActivity implements
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getRepoActivityIntent(this, mUserLogin, mRepoName, null);
+        return RepositoryActivity.makeIntent(this, mUserLogin, mRepoName);
     }
 
     @Override
     public void onItemClick(Release release) {
-        Intent intent = new Intent(this, ReleaseInfoActivity.class);
-        intent.putExtra(Constants.Repository.OWNER, mUserLogin);
-        intent.putExtra(Constants.Repository.NAME, mRepoName);
-        intent.putExtra(Constants.Release.RELEASE, release);
-        startActivity(intent);
+        startActivity(ReleaseInfoActivity.makeIntent(this, mUserLogin, mRepoName, release));
     }
 }

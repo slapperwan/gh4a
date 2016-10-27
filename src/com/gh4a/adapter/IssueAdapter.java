@@ -25,9 +25,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.LabelBadgeView;
 
@@ -77,7 +77,7 @@ public class IssueAdapter extends RootAdapter<Issue, IssueAdapter.ViewHolder> {
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             Issue issue = (Issue) v.getTag();
-            Intent intent = IntentUtils.getUserActivityIntent(mContext, issue.getUser());
+            Intent intent = UserActivity.makeIntent(mContext, issue.getUser());
             if (intent != null) {
                 mContext.startActivity(intent);
             }

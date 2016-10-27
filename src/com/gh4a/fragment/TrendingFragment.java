@@ -20,12 +20,12 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.R;
+import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.TrendAdapter;
 import com.gh4a.holder.Trend;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.TrendLoader;
-import com.gh4a.utils.IntentUtils;
 
 import java.util.List;
 import java.util.Locale;
@@ -83,7 +83,7 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
         String owner = trend.getRepoOwner();
         String name = trend.getRepoName();
         if (owner != null && name != null) {
-            startActivity(IntentUtils.getRepoActivityIntent(getActivity(), owner, name, null));
+            startActivity(RepositoryActivity.makeIntent(getActivity(), owner, name));
         }
     }
 

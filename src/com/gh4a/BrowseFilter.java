@@ -23,10 +23,18 @@ import android.text.TextUtils;
 import android.util.Pair;
 
 import com.gh4a.activities.BlogListActivity;
+import com.gh4a.activities.CommitActivity;
 import com.gh4a.activities.DownloadsActivity;
+import com.gh4a.activities.FileViewerActivity;
+import com.gh4a.activities.GistActivity;
+import com.gh4a.activities.IssueActivity;
+import com.gh4a.activities.IssueListActivity;
+import com.gh4a.activities.PullRequestActivity;
+import com.gh4a.activities.PullRequestListActivity;
 import com.gh4a.activities.ReleaseListActivity;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.activities.TrendingActivity;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.activities.WikiListActivity;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
@@ -51,7 +59,7 @@ public class BrowseFilter extends AppCompatActivity {
         String first = parts.isEmpty() ? null : parts.get(0);
         if (IGitHubConstants.HOST_GISTS.equals(uri.getHost())) {
             if (!parts.isEmpty()) {
-                intent = IntentUtils.getGistActivityIntent(this, parts.get(parts.size() - 1));
+                intent = GistActivity.makeIntent(this, parts.get(parts.size() - 1));
             }
         } else if ("explore".equals(first)) {
             intent = new Intent(this, TrendingActivity.class);
@@ -64,17 +72,13 @@ public class BrowseFilter extends AppCompatActivity {
             String id = parts.size() >= 4 ? parts.get(3) : null;
 
             if (repo == null && action == null) {
-                intent = IntentUtils.getUserActivityIntent(this, user);
+                intent = UserActivity.makeIntent(this, user);
             } else if (action == null) {
-                intent = IntentUtils.getRepoActivityIntent(this, user, repo, null);
+                intent = RepositoryActivity.makeIntent(this, user, repo);
             } else if ("downloads".equals(action)) {
-                intent = new Intent(this, DownloadsActivity.class);
-                intent.putExtra(Constants.Repository.OWNER, user);
-                intent.putExtra(Constants.Repository.NAME, repo);
+                intent = DownloadsActivity.makeIntent(this, user, repo);
             } else if ("releases".equals(action)) {
-                intent = new Intent(this, ReleaseListActivity.class);
-                intent.putExtra(Constants.Repository.OWNER, user);
-                intent.putExtra(Constants.Repository.NAME, repo);
+                intent = ReleaseListActivity.makeIntent(this, user, repo);
             } else if ("tree".equals(action) || "commits".equals(action)) {
                 int page = "tree".equals(action)
                         ? RepositoryActivity.PAGE_FILES : RepositoryActivity.PAGE_COMMITS;
@@ -90,32 +94,25 @@ public class BrowseFilter extends AppCompatActivity {
             } else if ("issues".equals(action)) {
                 if (!StringUtils.isBlank(id)) {
                     try {
-                        intent = IntentUtils.getIssueActivityIntent(this, user, repo,
-                                Integer.parseInt(id));
+                        intent = IssueActivity.makeIntent(this, user, repo, Integer.parseInt(id));
                     } catch (NumberFormatException e) {
                         // ignored
                     }
                 } else {
-                    intent = IntentUtils.getIssueListActivityIntent(this, user, repo,
-                            Constants.Issue.STATE_OPEN);
+                    intent = IssueListActivity.makeIntent(this, user, repo);
                 }
             } else if ("pulls".equals(action)) {
-                intent = IntentUtils.getPullRequestListActivityIntent(this, user, repo,
-                        Constants.Issue.STATE_OPEN);
+                intent = PullRequestListActivity.makeIntent(this, user, repo);
             } else if ("wiki".equals(action)) {
-                intent = new Intent(this, WikiListActivity.class);
-                intent.putExtra(Constants.Repository.OWNER, user);
-                intent.putExtra(Constants.Repository.NAME, repo);
+                intent = WikiListActivity.makeIntent(this, user, repo, null);
             } else if ("pull".equals(action) && !StringUtils.isBlank(id)) {
                 try {
-                    intent = IntentUtils.getPullRequestActivityIntent(this,
-                            user, repo, Integer.parseInt(id));
+                    intent = PullRequestActivity.makeIntent(this, user, repo, Integer.parseInt(id));
                 } catch (NumberFormatException e) {
                     // ignored
                 }
             } else if ("commit".equals(action) && !StringUtils.isBlank(id)) {
-                intent = IntentUtils.getCommitInfoActivityIntent(this, user, repo, id);
-                addLineNumbersToIntentIfPresent(intent, uri.getFragment());
+                intent = CommitActivity.makeIntent(this, user, repo, id);
             } else if ("blob".equals(action) && !StringUtils.isBlank(id) && parts.size() >= 4) {
                 String refAndPath = TextUtils.join("/", parts.subList(3, parts.size()));
                 new RefPathDisambiguationTask(user, repo, refAndPath, uri.getFragment()).execute();
@@ -128,31 +125,6 @@ public class BrowseFilter extends AppCompatActivity {
             IntentUtils.launchBrowser(this, uri);
         }
         finish();
-    }
-
-    private void addLineNumbersToIntentIfPresent(Intent intent, String fragment) {
-        if (intent == null || TextUtils.isEmpty(fragment)) {
-            return;
-        }
-
-        // Line numbers are encoded either in the form #L12 or #L12-14
-        if (!fragment.startsWith("L")) {
-            return;
-        }
-        try {
-            int dashPos = fragment.indexOf("-L");
-            if (dashPos > 0) {
-                intent.putExtra(Constants.Object.HIGHLIGHT_START,
-                        Integer.valueOf(fragment.substring(1, dashPos)));
-                intent.putExtra(Constants.Object.HIGHLIGHT_END,
-                        Integer.valueOf(fragment.substring(dashPos + 2)));
-            } else {
-                intent.putExtra(Constants.Object.HIGHLIGHT_START,
-                        Integer.valueOf(fragment.substring(1)));
-            }
-        } catch (NumberFormatException e) {
-            // ignore
-        }
     }
 
     public static class ProgressDialogFragment extends DialogFragment {
@@ -262,11 +234,28 @@ public class BrowseFilter extends AppCompatActivity {
             Intent intent = null;
             if (result != null) {
                 if (mGoToFileViewer && result.second != null) {
-                    intent = IntentUtils.getFileViewerActivityIntent(BrowseFilter.this,
-                            mRepoOwner, mRepoName, result.first, result.second);
-                    addLineNumbersToIntentIfPresent(intent, mFragment);
+                    // parse line numbers from fragment
+                    int highlightStart = -1, highlightEnd = -1;
+                    // Line numbers are encoded either in the form #L12 or #L12-14
+                    if (mFragment != null && mFragment.startsWith("L")) {
+                        try {
+                            int dashPos = mFragment.indexOf("-L");
+                            if (dashPos > 0) {
+                                highlightStart = Integer.valueOf(mFragment.substring(1, dashPos));
+                                highlightEnd = Integer.valueOf(mFragment.substring(dashPos + 2));
+                            } else {
+                                highlightStart = Integer.valueOf(mFragment.substring(1));
+                            }
+                        } catch (NumberFormatException e) {
+                            // ignore
+                        }
+                    }
+
+                    intent = FileViewerActivity.makeIntentWithHighlight(BrowseFilter.this,
+                            mRepoOwner, mRepoName, result.first, result.second,
+                            highlightStart, highlightEnd);
                 } else if (!mGoToFileViewer) {
-                    intent = IntentUtils.getRepoActivityIntent(BrowseFilter.this,
+                    intent = RepositoryActivity.makeIntent(BrowseFilter.this,
                             mRepoOwner, mRepoName, result.first, result.second, mInitialPage);
                 }
             }

@@ -15,21 +15,24 @@
  */
 package com.gh4a.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.fragment.FollowersFollowingListFragment;
-import com.gh4a.utils.IntentUtils;
 
 public class FollowerFollowingListActivity extends FragmentContainerActivity {
+    public static Intent makeIntent(Context context, String user, boolean showFollowers) {
+        return new Intent(context, FollowerFollowingListActivity.class)
+                .putExtra("user", user)
+                .putExtra("show_followers", showFollowers);
+    }
+
     private String mUserLogin;
     private boolean mShowFollowers;
-
-    public static final String EXTRA_SHOW_FOLLOWERS = "show_followers";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,8 +47,8 @@ public class FollowerFollowingListActivity extends FragmentContainerActivity {
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mShowFollowers = extras.getBoolean(EXTRA_SHOW_FOLLOWERS);
-        mUserLogin = extras.getString(Constants.User.LOGIN);
+        mShowFollowers = extras.getBoolean("show_followers");
+        mUserLogin = extras.getString("user");
     }
 
     @Override
@@ -55,6 +58,6 @@ public class FollowerFollowingListActivity extends FragmentContainerActivity {
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getUserActivityIntent(this, mUserLogin);
+        return UserActivity.makeIntent(this, mUserLogin);
     }
 }

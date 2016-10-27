@@ -19,12 +19,10 @@ import java.util.List;
 
 import org.eclipse.egit.github.core.Milestone;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.activities.IssueMilestoneEditActivity;
 import com.gh4a.adapter.MilestoneAdapter;
@@ -40,8 +38,8 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
         IssueMilestoneListFragment f = new IssueMilestoneListFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.Repository.OWNER, repoOwner);
-        args.putString(Constants.Repository.NAME, repoName);
+        args.putString("owner", repoOwner);
+        args.putString("repo", repoName);
         f.setArguments(args);
 
         return f;
@@ -50,8 +48,8 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.NAME);
+        mRepoOwner = getArguments().getString("owner");
+        mRepoName = getArguments().getString("repo");
     }
 
     @Override
@@ -66,11 +64,8 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
 
     @Override
     public void onItemClick(Milestone milestone) {
-        Intent intent = new Intent(getActivity(), IssueMilestoneEditActivity.class);
-        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.NAME, mRepoName);
-        intent.putExtra(IssueMilestoneEditActivity.EXTRA_MILESTONE, milestone);
-        startActivity(intent);
+        startActivity(IssueMilestoneEditActivity.makeEditIntent(
+                getActivity(), mRepoOwner, mRepoName, milestone));
     }
 
     @Override

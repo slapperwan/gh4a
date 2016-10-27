@@ -16,6 +16,7 @@
 package com.gh4a.activities;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -29,7 +30,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.gh4a.BasePagerActivity;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.CommitCompareFragment;
@@ -41,7 +41,6 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestLoader;
 import com.gh4a.utils.ApiHelpers;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
 
 import org.eclipse.egit.github.core.Issue;
@@ -53,6 +52,13 @@ import java.util.Locale;
 public class PullRequestActivity extends BasePagerActivity implements
         View.OnClickListener, PullRequestFragment.StateChangeListener,
         PullRequestFilesFragment.CommentUpdateListener {
+    public static Intent makeIntent(Context context, String repoOwner, String repoName, int number) {
+        return new Intent(context, PullRequestActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName)
+                .putExtra("number", number);
+    }
+
     private static final int REQUEST_EDIT_ISSUE = 1001;
 
     private String mRepoOwner;
@@ -150,9 +156,9 @@ public class PullRequestActivity extends BasePagerActivity implements
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
-        mPullRequestNumber = extras.getInt(Constants.PullRequest.NUMBER);
+        mRepoOwner = extras.getString("owner");
+        mRepoName = extras.getString("repo");
+        mPullRequestNumber = extras.getInt("number");
     }
 
     @Override
@@ -196,8 +202,7 @@ public class PullRequestActivity extends BasePagerActivity implements
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getPullRequestListActivityIntent(this, mRepoOwner, mRepoName,
-                Constants.Issue.STATE_OPEN);
+        return PullRequestListActivity.makeIntent(this, mRepoOwner, mRepoName);
     }
 
     @Override
@@ -218,14 +223,10 @@ public class PullRequestActivity extends BasePagerActivity implements
     @Override
     public void onClick(View v) {
         if (v == mEditFab) {
-            Intent editIntent = new Intent(this, IssueEditActivity.class);
-            editIntent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-            editIntent.putExtra(Constants.Repository.NAME, mRepoName);
-            editIntent.putExtra(IssueEditActivity.EXTRA_ISSUE, mIssue);
+            Intent editIntent = IssueEditActivity.makeEditIntent(this, mRepoOwner, mRepoName, mIssue);
             startActivityForResult(editIntent, REQUEST_EDIT_ISSUE);
         } else if (v.getId() == R.id.iv_gravatar) {
-            User user = (User) v.getTag();
-            Intent intent = IntentUtils.getUserActivityIntent(this, user);
+            Intent intent = UserActivity.makeIntent(this, (User) v.getTag());
             if (intent != null) {
                 startActivity(intent);
             }
@@ -282,7 +283,7 @@ public class PullRequestActivity extends BasePagerActivity implements
             mHeaderColorAttrs = new int[] {
                 R.attr.colorPullRequestMerged, R.attr.colorPullRequestMergedDark
             };
-        } else if (Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState())) {
+        } else if (ApiHelpers.IssueState.CLOSED.equals(mPullRequest.getState())) {
             stateTextResId = R.string.closed;
             mHeaderColorAttrs = new int[] {
                 R.attr.colorIssueClosed, R.attr.colorIssueClosedDark

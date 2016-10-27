@@ -24,8 +24,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
 import org.eclipse.egit.github.core.SearchUser;
@@ -57,7 +57,7 @@ public class SearchUserAdapter extends RootAdapter<SearchUser, SearchUserAdapter
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             SearchUser user = (SearchUser) v.getTag();
-            mContext.startActivity(IntentUtils.getUserActivityIntent(mContext,
+            mContext.startActivity(UserActivity.makeIntent(mContext,
                     user.getLogin(), user.getName()));
         } else {
             super.onClick(v);
