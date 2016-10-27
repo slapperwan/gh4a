@@ -88,7 +88,6 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
     private View mListHeaderView;
     private PullRequest mPullRequest;
-    private Issue mIssue;
     private String mRepoOwner;
     private String mRepoName;
     private boolean mIsCollaborator;
@@ -129,7 +128,6 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
         Bundle args = new Bundle();
         args.putSerializable("PULL", pr);
-        args.putSerializable("ISSUE", issue);
         f.setArguments(args);
 
         return f;
@@ -139,7 +137,6 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPullRequest = (PullRequest) getArguments().getSerializable("PULL");
-        mIssue = (Issue) getArguments().getSerializable("ISSUE");
 
         Repository repo = mPullRequest.getBase().getRepo();
         mRepoOwner = repo.getOwner().getLogin();
@@ -306,7 +303,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     }
 
     @Override
-    public void setContentShown(boolean shown) {
+    protected void setContentShown(boolean shown) {
         super.setContentShown(shown);
         mListShown = shown;
         updateCommentSectionVisibility(getView());

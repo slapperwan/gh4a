@@ -3,7 +3,7 @@
     <string name="app_name">OctoDroid</string>
 
     <!-- Common -->
-    <string name="record_not_found">%1$s not found</string>
+    <string name="repo_not_found_toast">Repository was not found</string>
     <string name="loading_msg">Loading\u2026</string>
     <string name="saving_msg">Saving\u2026</string>
     <string name="deleting_msg">Deleting\u2026</string>

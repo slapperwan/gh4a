@@ -5,14 +5,10 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
-import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.utils.UiUtils;
 
 public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase implements
         RootAdapter.OnItemClickListener<T> {

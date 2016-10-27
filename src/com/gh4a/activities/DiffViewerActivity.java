@@ -301,12 +301,12 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     }
 
     @Override
-    protected boolean handleUrlLoad(String url) {
-        if (!url.startsWith("comment://")) {
-            return false;
+    protected void handleUrlLoad(Uri uri) {
+        if (!uri.getScheme().equals("comment")) {
+            super.handleUrlLoad(uri);
+            return;
         }
 
-        Uri uri = Uri.parse(url);
         int line = Integer.parseInt(uri.getQueryParameter("position"));
         String lineText = Html.fromHtml(mDiffLines[line]).toString();
         String idParam = uri.getQueryParameter("id");
@@ -319,7 +319,6 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                     mLastTouchDown.x, mLastTouchDown.y);
             p.show();
         }
-        return true;
     }
 
     @Override
@@ -330,7 +329,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         return false;
     }
 
-    protected void refresh() {
+    private void refresh() {
         mCommitComments.clear();
         mCommitCommentsByPos.clear();
         getSupportLoaderManager().restartLoader(0, null, mCommentCallback);

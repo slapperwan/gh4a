@@ -31,7 +31,6 @@ public class UserActivity extends BasePagerActivity {
     private String mUserName;
     private boolean mIsSelf;
     private UserFragment mUserFragment;
-    private PublicEventListFragment mPublicEventListFragment;
     private Boolean mIsFollowing;
 
     private static final int[] TAB_TITLES = new int[] {
@@ -82,9 +81,7 @@ public class UserActivity extends BasePagerActivity {
                 mUserFragment = UserFragment.newInstance(mUserLogin, mUserName);
                 return mUserFragment;
             case 1:
-                mPublicEventListFragment =
-                        PublicEventListFragment.newInstance(mUserLogin);
-                return mPublicEventListFragment;
+                return PublicEventListFragment.newInstance(mUserLogin);
         }
         return null;
     }

@@ -269,19 +269,19 @@ public class SearchActivity extends BaseActivity implements
         }
     }
 
-    protected void fillRepositoriesData(List<Repository> repos) {
+    private void fillRepositoriesData(List<Repository> repos) {
         RepositoryAdapter adapter = new RepositoryAdapter(this);
         adapter.addAll(repos);
         setAdapter(adapter);
     }
 
-    protected void fillUsersData(List<SearchUser> users) {
+    private void fillUsersData(List<SearchUser> users) {
         SearchUserAdapter adapter = new SearchUserAdapter(this);
         adapter.addAll(users);
         setAdapter(adapter);
     }
 
-    protected void fillCodeData(List<CodeSearchResult> results) {
+    private void fillCodeData(List<CodeSearchResult> results) {
         CodeSearchAdapter adapter = new CodeSearchAdapter(this);
         adapter.addAll(results);
         setAdapter(adapter);

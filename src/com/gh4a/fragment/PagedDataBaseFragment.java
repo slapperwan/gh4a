@@ -20,7 +20,6 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.gh4a.PageIteratorWithSaveableState;
 import com.gh4a.R;
@@ -28,7 +27,6 @@ import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PageIteratorLoader;
-import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.client.PageIterator;
 
@@ -44,15 +42,15 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
 
     private static final String STATE_KEY_ITERATOR_STATE = "iterator_state";
 
-    private LoaderCallbacks<PageIteratorLoader<T>.LoadedPage<T>> mLoaderCallback =
-            new LoaderCallbacks<PageIteratorLoader<T>.LoadedPage<T>>(this) {
+    private LoaderCallbacks<PageIteratorLoader<T>.LoadedPage> mLoaderCallback =
+            new LoaderCallbacks<PageIteratorLoader<T>.LoadedPage>(this) {
         @Override
-        protected Loader<LoaderResult<PageIteratorLoader<T>.LoadedPage<T>>> onCreateLoader() {
+        protected Loader<LoaderResult<PageIteratorLoader<T>.LoadedPage>> onCreateLoader() {
             return new PageIteratorLoader<>(getActivity(), mIterator);
         }
 
         @Override
-        protected void onResultReady(PageIteratorLoader<T>.LoadedPage<T> result) {
+        protected void onResultReady(PageIteratorLoader<T>.LoadedPage result) {
             fillData(result.results, result.hasMoreData);
             mIsLoadCompleted = true;
             setContentShown(true);

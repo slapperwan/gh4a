@@ -133,9 +133,7 @@ public class UiUtils {
                     mTopEffect = (EdgeEffect) edgeField.get(mLastTopEffect);
                     mBottomEffect = (EdgeEffect) edgeField.get(mLastBottomEffect);
                 }
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                mTopEffect = mBottomEffect = null;
-            } catch (NoSuchFieldException e) {
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchFieldException e) {
                 mTopEffect = mBottomEffect = null;
             }
             applyColor(mTopEffect);
@@ -164,9 +162,7 @@ public class UiUtils {
                 sBottomEffectField = RecyclerView.class.getDeclaredField("mBottomGlow");
                 sBottomEffectField.setAccessible(true);
                 return true;
-            } catch (NoSuchMethodException e) {
-                // ignored
-            } catch (NoSuchFieldException e) {
+            } catch (NoSuchMethodException | NoSuchFieldException e) {
                 // ignored
             }
             return false;

@@ -61,7 +61,6 @@ public class IssueLabelListActivity extends BaseActivity implements
     private IssueLabelAdapter.EditableLabel mAddedLabel;
 
     private FloatingActionButton mFab;
-    private RecyclerView mRecyclerView;
     private IssueLabelAdapter mAdapter;
 
     private static final String STATE_KEY_ADDED_LABEL = "added_label";
@@ -97,11 +96,12 @@ public class IssueLabelListActivity extends BaseActivity implements
 
         mAdapter = new IssueLabelAdapter(this);
         mAdapter.setOnItemClickListener(this);
-        mRecyclerView = (RecyclerView) findViewById(R.id.list);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(this));
-        mRecyclerView.setTag(R.id.FloatingActionButtonScrollEnabled, new Object());
-        mRecyclerView.setAdapter(mAdapter);
+
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this));
+        recyclerView.setTag(R.id.FloatingActionButtonScrollEnabled, new Object());
+        recyclerView.setAdapter(mAdapter);
 
         CoordinatorLayout rootLayout = getRootLayout();
         mFab = (FloatingActionButton) getLayoutInflater().inflate(

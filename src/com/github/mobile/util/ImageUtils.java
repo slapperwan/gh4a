@@ -46,7 +46,7 @@ public class ImageUtils {
      * @param sampleSize
      * @return bitmap or null if read fails
      */
-    public static Bitmap getBitmap(final String imagePath, int sampleSize) {
+    private static Bitmap getBitmap(final String imagePath, int sampleSize) {
         final Options options = new Options();
         options.inDither = false;
         options.inSampleSize = sampleSize;
@@ -75,7 +75,7 @@ public class ImageUtils {
      * @param imagePath
      * @return size
      */
-    public static Point getSize(final String imagePath) {
+    private static Point getSize(final String imagePath) {
         final Options options = new Options();
         options.inJustDecodeBounds = true;
 

@@ -47,7 +47,7 @@ public class IssueAdapter extends RootAdapter<Issue, IssueAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, Issue issue) {
+    protected void onBindViewHolder(ViewHolder holder, Issue issue) {
         AvatarHandler.assignAvatar(holder.ivGravatar, issue.getUser());
         holder.ivGravatar.setTag(issue);
 

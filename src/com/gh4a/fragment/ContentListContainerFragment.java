@@ -65,7 +65,7 @@ public class ContentListContainerFragment extends Fragment implements
         @Override
         protected Loader<LoaderResult<Map<String, String>>> onCreateLoader() {
             return new GitModuleParserLoader(getActivity(), mRepository.getOwner().getLogin(),
-                    mRepository.getName(), ".gitmodules", mSelectedRef);
+                    mRepository.getName(), mSelectedRef);
         }
         @Override
         protected void onResultReady(Map<String, String> result) {

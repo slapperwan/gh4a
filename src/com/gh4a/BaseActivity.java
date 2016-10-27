@@ -207,7 +207,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     protected void setContentShown(boolean shown) {
-        setContentShown(shown, true);
+        mContentShown = shown;
+        updateViewVisibility(true);
     }
 
     protected void setContentEmpty(boolean isEmpty) {
@@ -219,8 +220,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
         return null;
     }
 
-    protected ProgressDialog showProgressDialog(String message, boolean cancelable) {
-        return ProgressDialog.show(this, "", message, cancelable);
+    protected ProgressDialog showProgressDialog(String message) {
+        return ProgressDialog.show(this, "", message, true);
     }
 
     protected void stopProgressDialog(ProgressDialog progressDialog) {
@@ -253,7 +254,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         scheduleTaskDescriptionUpdate();
     }
 
-    public void transitionHeaderToColor(int colorAttrId, int statusBarColorAttrId) {
+    protected void transitionHeaderToColor(int colorAttrId, int statusBarColorAttrId) {
         final AnimatorSet animation = new AnimatorSet();
         List<Animator> animators = new ArrayList<>();
         int color = UiUtils.resolveColor(this, colorAttrId);
@@ -621,7 +622,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
             mLeftDrawer.setNavigationItemSelectedListener(this);
 
             mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolBar, 0, 0);
-            mDrawerLayout.setDrawerListener(this);
+            mDrawerLayout.addDrawerListener(this);
 
             mLeftDrawerTitle = getLeftDrawerTitle(mLeftDrawer);
             if (mLeftDrawerTitle!= null) {
@@ -638,11 +639,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
         mRightDrawerTitle = mRightDrawer.inflateHeaderView(R.layout.drawer_title_right);
 
         updateRightNavigationDrawer();
-    }
-
-    private void setContentShown(boolean shown, boolean animate) {
-        mContentShown = shown;
-        updateViewVisibility(animate);
     }
 
     private void applyHighlightColor(NavigationView view) {

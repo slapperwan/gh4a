@@ -61,7 +61,7 @@ public class ColorPickerDialog extends AlertDialog {
      * @param color
      *         The RGB value of a color
      */
-    public void setColor(String color) {
+    private void setColor(String color) {
         int colorValue = Color.parseColor("#" + color);
         mColorPicker.setColor(colorValue);
         mColorPicker.setOldCenterColor(colorValue);

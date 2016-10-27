@@ -50,7 +50,9 @@ public abstract class UserListActivity extends BaseActivity implements
 
         @Override
         protected void onResultReady(List<User> result) {
-            fillData(result);
+            if (result != null) {
+                mUserAdapter.addAll(result);
+            }
             setContentShown(true);
         }
     };
@@ -90,12 +92,6 @@ public abstract class UserListActivity extends BaseActivity implements
         setContentShown(false);
         getSupportLoaderManager().getLoader(0).onContentChanged();
         super.onRefresh();
-    }
-
-    protected void fillData(List<User> users) {
-        if (users != null) {
-            mUserAdapter.addAll(users);
-        }
     }
 
     protected abstract Loader<LoaderResult<List<User>>> getUserListLoader();

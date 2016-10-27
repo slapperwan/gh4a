@@ -28,7 +28,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -326,7 +325,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
     private void showMilestonesDialog() {
         if (mAllMilestone == null) {
-            mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+            mProgressDialog = showProgressDialog(getString(R.string.loading_msg));
             getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
         } else {
             final String[] milestones = new String[mAllMilestone.size() + 1];
@@ -366,7 +365,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
     private void showAssigneesDialog() {
         if (mAllAssignee == null) {
-            mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+            mProgressDialog = showProgressDialog(getString(R.string.loading_msg));
             getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
         } else {
             final String[] assigneeNames = new String[mAllAssignee.size()];
@@ -417,7 +416,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
     private void showLabelDialog() {
         if (mAllLabels == null) {
-            mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+            mProgressDialog = showProgressDialog(getString(R.string.loading_msg));
             getSupportLoaderManager().initLoader(0, null, mLabelCallback);
         } else {
             LayoutInflater inflater = getLayoutInflater();

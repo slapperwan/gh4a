@@ -18,17 +18,14 @@ import com.gh4a.Gh4Application;
 import com.gh4a.utils.StringUtils;
 
 public class GitModuleParserLoader extends BaseLoader<Map<String, String>> {
-
     private String mRepoOwner;
     private String mRepoName;
-    private String mPath;
     private String mRef;
 
-    public GitModuleParserLoader(Context context, String repoOwner, String repoName, String path, String ref) {
+    public GitModuleParserLoader(Context context, String repoOwner, String repoName, String ref) {
         super(context);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
-        mPath = path;
         mRef = ref;
     }
 
@@ -36,8 +33,8 @@ public class GitModuleParserLoader extends BaseLoader<Map<String, String>> {
     public Map<String, String> doLoadInBackground() throws IOException {
         ContentsService contentService = (ContentsService)
                 Gh4Application.get().getService(Gh4Application.CONTENTS_SERVICE);
-        List<RepositoryContents> contents =
-                contentService.getContents(new RepositoryId(mRepoOwner, mRepoName), mPath, mRef);
+        List<RepositoryContents> contents = contentService.getContents(
+                new RepositoryId(mRepoOwner, mRepoName), ".gitmodules", mRef);
 
         if (contents == null || contents.isEmpty()) {
             return null;

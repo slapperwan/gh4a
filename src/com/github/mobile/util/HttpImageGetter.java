@@ -24,6 +24,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.os.AsyncTaskCompat;
 import android.text.Html.ImageGetter;
@@ -106,7 +107,7 @@ public class HttpImageGetter implements ImageGetter {
         }
 
         @Override
-        public void invalidateDrawable(Drawable drawable) {
+        public void invalidateDrawable(@NonNull Drawable drawable) {
             for (WeakReference<TextView> ref : mViewRefs) {
                 TextView view = ref.get();
                 if (view != null) {
@@ -120,12 +121,13 @@ public class HttpImageGetter implements ImageGetter {
         }
 
         @Override
-        public void scheduleDrawable(Drawable drawable, Runnable runnable, long when) {
+        public void scheduleDrawable(@NonNull Drawable drawable,
+                @NonNull Runnable runnable, long when) {
             mHandler.postAtTime(runnable, when);
         }
 
         @Override
-        public void unscheduleDrawable(Drawable drawable, Runnable runnable) {
+        public void unscheduleDrawable(@NonNull Drawable drawable, @NonNull Runnable runnable) {
             mHandler.removeCallbacks(runnable);
         }
     }
@@ -232,10 +234,6 @@ public class HttpImageGetter implements ImageGetter {
     public void resume() {
         resumed = true;
         updateGifPlayState();
-    }
-
-    public boolean isResumed() {
-        return resumed;
     }
 
     public void clearHtmlCache() {

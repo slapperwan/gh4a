@@ -26,6 +26,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Toast;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
@@ -37,7 +38,6 @@ import com.gh4a.activities.WikiListActivity;
 import com.gh4a.adapter.EventAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.ToastUtils;
 import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Commit;
@@ -137,7 +137,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         }
 
         if (Arrays.binarySearch(REPO_EVENTS, eventType) >= 0 && eventRepo == null) {
-            ToastUtils.notFoundMessage(getActivity(), R.string.repository);
+            Toast.makeText(getActivity(), R.string.repo_not_found_toast, Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -177,7 +177,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             if (forkee != null) {
                 IntentUtils.openRepositoryInfoActivity(getActivity(), forkee);
             } else {
-                ToastUtils.notFoundMessage(getActivity(), R.string.repository);
+                Toast.makeText(getActivity(), R.string.repo_not_found_toast, Toast.LENGTH_LONG).show();
             }
 
         } else if (Event.TYPE_FORK_APPLY.equals(eventType)) {

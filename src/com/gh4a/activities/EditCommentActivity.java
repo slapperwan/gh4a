@@ -65,8 +65,9 @@ public abstract class EditCommentActivity extends BaseActivity {
         if (mTextWatcher != null) {
             mEditText.removeTextChangedListener(mTextWatcher);
         }
-        mEditText.addTextChangedListener(new UiUtils.ButtonEnableTextWatcher(mEditText,
-                menu.findItem(R.id.accept)));
+        mTextWatcher = new UiUtils.ButtonEnableTextWatcher(mEditText,
+                menu.findItem(R.id.accept));
+        mEditText.addTextChangedListener(mTextWatcher);
 
         return super.onCreateOptionsMenu(menu);
     }

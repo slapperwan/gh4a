@@ -143,9 +143,14 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        mPt = new PrettyTime(newConfig.locale);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            mPt = new PrettyTime(newConfig.getLocales().get(0));
+        } else {
+            mPt = new PrettyTime(newConfig.locale);
+        }
     }
 
     /* package */ static void trackVisitedUrl(String url) {

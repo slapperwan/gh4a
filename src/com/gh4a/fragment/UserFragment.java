@@ -259,7 +259,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         }
     }
 
-    public void fillTopRepos(Collection<Repository> topRepos) {
+    private void fillTopRepos(Collection<Repository> topRepos) {
         LinearLayout ll = (LinearLayout) mContentView.findViewById(R.id.ll_top_repos);
         ll.removeAllViews();
 
@@ -306,7 +306,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         getView().findViewById(R.id.ll_top_repos).setVisibility(View.VISIBLE);
     }
 
-    public void fillOrganizations(List<User> organizations) {
+    private void fillOrganizations(List<User> organizations) {
         ViewGroup llOrgs = (ViewGroup) mContentView.findViewById(R.id.ll_orgs);
         LinearLayout llOrg = (LinearLayout) mContentView.findViewById(R.id.ll_org);
         int count = organizations != null ? organizations.size() : 0;

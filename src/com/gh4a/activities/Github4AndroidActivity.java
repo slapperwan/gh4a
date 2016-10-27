@@ -174,8 +174,8 @@ public class Github4AndroidActivity extends BaseActivity {
             mOtpCode = otpCode;
         }
 
-        protected LoginTask(BaseActivity activity, int resWaitId, int resWaitMsg) {
-            super(activity, resWaitId, resWaitMsg);
+        protected LoginTask(BaseActivity activity) {
+            this(null, null, null);
         }
 
         @Override
@@ -278,7 +278,7 @@ public class Github4AndroidActivity extends BaseActivity {
         private String mPassword;
 
         public DummyPostTask(String userName, String password) {
-            super(Github4AndroidActivity.this, R.string.please_wait, R.string.authenticating);
+            super(Github4AndroidActivity.this);
             mUserName = userName;
             mPassword = password;
         }

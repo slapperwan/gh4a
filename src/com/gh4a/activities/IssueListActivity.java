@@ -87,7 +87,7 @@ public class IssueListActivity extends BasePagerActivity implements
     private List<Milestone> mMilestones;
     private List<User> mAssignees;
 
-    protected IssueListFragment.SortDrawerHelper mSortHelper =
+    private IssueListFragment.SortDrawerHelper mSortHelper =
             new IssueListFragment.SortDrawerHelper();
 
     private static final String STATE_KEY_SEARCH_QUERY = "search_query";
@@ -592,7 +592,7 @@ public class IssueListActivity extends BasePagerActivity implements
 
     private void filterAssignee() {
         if (mAssignees == null) {
-            mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+            mProgressDialog = showProgressDialog(getString(R.string.loading_msg));
             getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
         } else {
             showAssigneesDialog();
@@ -601,7 +601,7 @@ public class IssueListActivity extends BasePagerActivity implements
 
     private void filterMilestone() {
         if (mMilestones == null) {
-            mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+            mProgressDialog = showProgressDialog(getString(R.string.loading_msg));
             getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
         } else {
             showMilestonesDialog();
@@ -610,7 +610,7 @@ public class IssueListActivity extends BasePagerActivity implements
 
     private void filterLabel() {
         if (mLabels == null) {
-            mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+            mProgressDialog = showProgressDialog(getString(R.string.loading_msg));
             getSupportLoaderManager().initLoader(0, null, mLabelCallback);
         } else {
             showLabelsDialog();

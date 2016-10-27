@@ -335,7 +335,7 @@ public class RepositoryActivity extends BasePagerActivity {
                 return true;
             case R.id.ref:
                 if (mBranches == null) {
-                    mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
+                    mProgressDialog = showProgressDialog(getString(R.string.loading_msg));
                     getSupportLoaderManager().initLoader(LOADER_BRANCHES_AND_TAGS,
                             null, mBranchesAndTagsCallback);
                 } else {

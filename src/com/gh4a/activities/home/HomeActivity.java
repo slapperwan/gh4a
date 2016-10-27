@@ -200,11 +200,6 @@ public class HomeActivity extends BasePagerActivity implements
     }
 
     @Override
-    protected int[][] getTabHeaderColors() {
-        return mFactory.getTabHeaderColors();
-    }
-
-    @Override
     protected int[] getHeaderColors() {
         return mFactory.getHeaderColors();
     }
@@ -218,7 +213,6 @@ public class HomeActivity extends BasePagerActivity implements
     protected void onStart() {
         super.onStart();
         mStarted = true;
-        mFactory.onStart();
     }
 
     @Override
@@ -349,8 +343,5 @@ public class HomeActivity extends BasePagerActivity implements
                 FragmentManager.POP_BACK_STACK_INCLUSIVE);
         invalidateTitle();
         invalidateTabs();
-        if (mStarted) {
-            mFactory.onStart();
-        }
     }
 }

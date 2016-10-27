@@ -36,6 +36,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -70,6 +71,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
         50, 75, 100, 150, 200
     };
 
+    @SuppressWarnings("unused")
     private class RenderingDoneInterface {
         @JavascriptInterface
         public void onRenderingDone() {
@@ -83,6 +85,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
         }
     }
 
+    @SuppressWarnings("unused")
     private class PrintRenderingDoneInterface {
         @JavascriptInterface
         public void onRenderingDone() {
@@ -106,18 +109,19 @@ public abstract class WebViewerActivity extends BaseActivity implements
         }
 
         @Override
+        @TargetApi(24)
+        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            if (mStarted) {
+                handleUrlLoad(request.getUrl());
+            }
+            return true;
+        }
+
+        @Override
+        @SuppressWarnings("deprecation")
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            if (mStarted && !handleUrlLoad(url)) {
-                try {
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    startActivity(intent);
-                } catch (ActivityNotFoundException e) {
-                    // ignore
-                } catch (SecurityException e) {
-                    // some apps (namely the Wikipedia one) have intent filters set
-                    // for the VIEW action for internal, non-exported activities
-                    // -> ignore
-                }
+            if (mStarted) {
+                handleUrlLoad(Uri.parse(url));
             }
             return true;
         }
@@ -307,8 +311,17 @@ public abstract class WebViewerActivity extends BaseActivity implements
         mWebView.loadUrl("javascript:applyLineWrapping(" + enabled + ")");
     }
 
-    protected boolean handleUrlLoad(String url) {
-        return false;
+    protected void handleUrlLoad(Uri uri) {
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            // ignore
+        } catch (SecurityException e) {
+            // some apps (namely the Wikipedia one) have intent filters set
+            // for the VIEW action for internal, non-exported activities
+            // -> ignore
+        }
     }
 
     protected void onDataReady() {

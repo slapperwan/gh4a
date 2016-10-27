@@ -16,11 +16,6 @@ public abstract class FragmentFactory {
     protected abstract int[] getTabTitleResIds();
     protected abstract Fragment getFragment(int position);
 
-    /* expected format: int[tabCount][2] - 0 is header, 1 is status bar */
-    protected int[][] getTabHeaderColors() {
-        return null;
-    }
-
     protected int[] getHeaderColors() {
         return null;
     }
@@ -50,6 +45,4 @@ public abstract class FragmentFactory {
     protected void onRestoreInstanceState(Bundle state) {}
 
     protected void onDestroy() {}
-
-    protected void onStart() {}
 }

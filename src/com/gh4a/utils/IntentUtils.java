@@ -56,7 +56,7 @@ public class IntentUtils {
                     repository.getName(), null);
             context.startActivity(intent);
         } else {
-            ToastUtils.notFoundMessage(context, R.string.repository);
+            Toast.makeText(context, R.string.repo_not_found_toast, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -66,13 +66,8 @@ public class IntentUtils {
 
     public static Intent getRepoActivityIntent(Context context,
             String repoOwner, String repoName, String ref) {
-        return getRepoActivityIntent(context, repoOwner, repoName, ref,
+        return getRepoActivityIntent(context, repoOwner, repoName, ref, null,
                 RepositoryActivity.PAGE_REPO_OVERVIEW);
-    }
-
-    public static Intent getRepoActivityIntent(Context context,
-            String repoOwner, String repoName, String ref, int initialPage) {
-        return getRepoActivityIntent(context, repoOwner, repoName, ref, null, initialPage);
     }
 
     public static Intent getRepoActivityIntent(Context context,

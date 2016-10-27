@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.support.annotation.NonNull;
 import android.text.style.ReplacementSpan;
 
 import com.gh4a.R;
@@ -37,7 +38,8 @@ public class IssueLabelSpan extends ReplacementSpan {
     }
 
     @Override
-    public int getSize(Paint paint, CharSequence text, int start, int end, Paint.FontMetricsInt fm) {
+    public int getSize(@NonNull Paint paint, CharSequence text,
+            int start, int end, Paint.FontMetricsInt fm) {
         paint.setTextSize(mTextSize);
         if (fm != null) {
             paint.getFontMetricsInt(fm);
@@ -54,8 +56,8 @@ public class IssueLabelSpan extends ReplacementSpan {
     }
 
     @Override
-    public void draw(Canvas canvas, CharSequence text, int start, int end,
-            float x, int top, int y, int bottom, Paint paint) {
+    public void draw(@NonNull Canvas canvas, CharSequence text, int start, int end,
+            float x, int top, int y, int bottom, @NonNull Paint paint) {
         paint.setTextSize(mTextSize);
         float textSize = paint.measureText(text, start, end);
 
