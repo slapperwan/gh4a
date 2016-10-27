@@ -32,7 +32,7 @@ import com.gh4a.holder.Feed;
 import com.gh4a.utils.AvatarHandler;
 
 public class CommonFeedAdapter extends RootAdapter<Feed, CommonFeedAdapter.ViewHolder> {
-    private boolean mShowExtra;
+    private final boolean mShowExtra;
 
     public CommonFeedAdapter(Context context, boolean showExtra) {
         super(context);
@@ -101,10 +101,10 @@ public class CommonFeedAdapter extends RootAdapter<Feed, CommonFeedAdapter.ViewH
             tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
         }
 
-        private ImageView ivGravatar;
-        private TextView tvTitle;
-        private TextView tvDesc;
-        private TextView tvExtra;
-        private TextView tvTimestamp;
+        private final ImageView ivGravatar;
+        private final TextView tvTitle;
+        private final TextView tvDesc;
+        private final TextView tvExtra;
+        private final TextView tvTimestamp;
     }
 }

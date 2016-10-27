@@ -15,9 +15,9 @@ import android.content.Context;
 import com.gh4a.Gh4Application;
 
 public class PullRequestCommentListLoader extends IssueCommentListLoader {
-    private String mRepoOwner;
-    private String mRepoName;
-    private int mIssueNumber;
+    private final String mRepoOwner;
+    private final String mRepoName;
+    private final int mIssueNumber;
 
     public PullRequestCommentListLoader(Context context, String repoOwner,
             String repoName, int issueNumber) {

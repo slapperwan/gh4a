@@ -151,11 +151,11 @@ public class IssueLabelAdapter extends
 
         private EditableLabel lastAssignedLabel;
 
-        private View color;
-        private StyleableTextView label;
-        private EditText editor;
-        private TextView customColorButton;
-        private View collapsedContainer;
-        private View expandedContainer;
+        private final View color;
+        private final StyleableTextView label;
+        private final EditText editor;
+        private final TextView customColorButton;
+        private final View collapsedContainer;
+        private final View expandedContainer;
     }
 }

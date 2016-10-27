@@ -344,9 +344,9 @@ public class RepositoryListContainerFragment extends Fragment implements
     }
 
     public static class FilterDrawerHelper {
-        private int mMenuResId;
+        private final int mMenuResId;
 
-        private static SparseArray<String> FILTER_LOOKUP = new SparseArray<>();
+        private static final SparseArray<String> FILTER_LOOKUP = new SparseArray<>();
         static {
             FILTER_LOOKUP.put(R.id.filter_type_all, "all");
             FILTER_LOOKUP.put(R.id.filter_type_owner, "owner");
@@ -399,7 +399,7 @@ public class RepositoryListContainerFragment extends Fragment implements
     public static class SortDrawerHelper {
         private String mFilterType = "all";
 
-        private static SparseArray<String[]> SORT_LOOKUP = new SparseArray<>();
+        private static final SparseArray<String[]> SORT_LOOKUP = new SparseArray<>();
         static {
             SORT_LOOKUP.put(R.id.sort_name_asc, new String[] { "full_name", "asc" });
             SORT_LOOKUP.put(R.id.sort_name_desc, new String[] { "full_name", "desc" });

@@ -15,9 +15,9 @@ import com.github.mobile.util.HtmlUtils;
 
 public class ReadmeLoader extends BaseLoader<String> {
 
-    private String mRepoOwner;
-    private String mRepoName;
-    private String mRef;
+    private final String mRepoOwner;
+    private final String mRepoName;
+    private final String mRef;
 
     public ReadmeLoader(Context context, String repoOwner, String repoName, String ref) {
         super(context);

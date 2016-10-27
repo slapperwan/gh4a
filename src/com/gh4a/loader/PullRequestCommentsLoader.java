@@ -14,9 +14,9 @@ import java.util.List;
 
 public class PullRequestCommentsLoader extends BaseLoader<List<CommitComment>> {
 
-    private String mRepoOwner;
-    private String mRepoName;
-    private int mPullRequestNumber;
+    private final String mRepoOwner;
+    private final String mRepoName;
+    private final int mPullRequestNumber;
 
     public PullRequestCommentsLoader(Context context, String repoOwner, String repoName, int pullRequestNumber) {
         super(context);

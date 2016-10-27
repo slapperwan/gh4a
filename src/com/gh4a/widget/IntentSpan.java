@@ -10,7 +10,7 @@ import android.view.View;
 import com.gh4a.utils.UiUtils;
 
 public abstract class IntentSpan extends ClickableSpan {
-    private Context mContext;
+    private final Context mContext;
 
     public IntentSpan(Context context) {
         mContext = context;

@@ -94,11 +94,11 @@ public class PullRequestAdapter extends RootAdapter<PullRequest, PullRequestAdap
             tvComments = (TextView) view.findViewById(R.id.tv_comments);
         }
 
-        private ImageView ivGravatar;
-        private TextView tvCreator;
-        private TextView tvTimestamp;
-        private TextView tvDesc;
-        private TextView tvNumber;
-        private TextView tvComments;
+        private final ImageView ivGravatar;
+        private final TextView tvCreator;
+        private final TextView tvTimestamp;
+        private final TextView tvDesc;
+        private final TextView tvNumber;
+        private final TextView tvComments;
     }
 }

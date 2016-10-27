@@ -75,8 +75,8 @@ public class CodeSearchAdapter extends RootAdapter<CodeSearchResult, CodeSearchA
             tvMatches = (TextView) view.findViewById(R.id.tv_matches);
         }
 
-        private TextView tvTitle;
-        private TextView tvRepo;
-        private TextView tvMatches;
+        private final TextView tvTitle;
+        private final TextView tvRepo;
+        private final TextView tvMatches;
     }
 }

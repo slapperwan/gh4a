@@ -79,8 +79,8 @@ public class HttpImageGetter implements ImageGetter {
     }
 
     private static class GifCallback implements Drawable.Callback {
-        private ArrayList<WeakReference<TextView>> mViewRefs = new ArrayList<>();
-        private Handler mHandler = new Handler();
+        private final ArrayList<WeakReference<TextView>> mViewRefs = new ArrayList<>();
+        private final Handler mHandler = new Handler();
 
         public void addView(TextView view) {
             boolean alreadyPresent = false;
@@ -133,8 +133,8 @@ public class HttpImageGetter implements ImageGetter {
     }
 
     private static class GifInfo {
-        WeakReference<GifDrawable> mDrawable;
-        GifCallback mCallback;
+        final WeakReference<GifDrawable> mDrawable;
+        final GifCallback mCallback;
         public GifInfo(GifDrawable d) {
             mCallback = new GifCallback();
             mDrawable = new WeakReference<>(d);

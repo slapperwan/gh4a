@@ -156,7 +156,7 @@ public class HtmlUtils {
     }
 
     private static class MyTagHandler implements TagHandler {
-        private LinkedList<ListSeparator> listElements = new LinkedList<>();
+        private final LinkedList<ListSeparator> listElements = new LinkedList<>();
 
         @Override
         public void handleTag(final boolean opening, final String tag,
@@ -229,7 +229,7 @@ public class HtmlUtils {
                 }
             }
         }
-    };
+    }
 
     private static Object getLast(final Spanned text, final Class<?> kind) {
         Object[] spans = text.getSpans(0, text.length(), kind);

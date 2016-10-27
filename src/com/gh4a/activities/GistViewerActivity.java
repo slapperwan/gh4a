@@ -47,7 +47,7 @@ public class GistViewerActivity extends WebViewerActivity {
     private GistFile mGistFile;
     private String mGistOwner;
 
-    private LoaderCallbacks<Gist> mGistCallback = new LoaderCallbacks<Gist>(this) {
+    private final LoaderCallbacks<Gist> mGistCallback = new LoaderCallbacks<Gist>(this) {
         @Override
         protected Loader<LoaderResult<Gist>> onCreateLoader() {
             return new GistLoader(GistViewerActivity.this, mGistId);

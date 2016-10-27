@@ -59,7 +59,8 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
     private List<CommitComment> mComments;
     protected View mContentView;
 
-    private LoaderCallbacks<RepositoryCommit> mCommitCallback = new LoaderCallbacks<RepositoryCommit>(this) {
+    private final LoaderCallbacks<RepositoryCommit> mCommitCallback =
+            new LoaderCallbacks<RepositoryCommit>(this) {
         @Override
         protected Loader<LoaderResult<RepositoryCommit>> onCreateLoader() {
             return new CommitLoader(getActivity(), mRepoOwner, mRepoName, mObjectSha);
@@ -71,7 +72,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
             fillDataIfReady();
         }
     };
-    private LoaderCallbacks<List<CommitComment>> mCommentCallback =
+    private final LoaderCallbacks<List<CommitComment>> mCommentCallback =
             new LoaderCallbacks<List<CommitComment>>(this) {
         @Override
         protected Loader<LoaderResult<List<CommitComment>>> onCreateLoader() {

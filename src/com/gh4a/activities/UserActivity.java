@@ -58,7 +58,7 @@ public class UserActivity extends BasePagerActivity {
         R.string.about, R.string.user_public_activity
     };
 
-    private LoaderCallbacks<Boolean> mIsFollowingCallback = new LoaderCallbacks<Boolean>(this) {
+    private final LoaderCallbacks<Boolean> mIsFollowingCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
         protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsFollowingUserLoader(UserActivity.this, mUserLogin);
@@ -99,7 +99,7 @@ public class UserActivity extends BasePagerActivity {
     protected Fragment getFragment(int position) {
         switch (position) {
             case 0:
-                mUserFragment = UserFragment.newInstance(mUserLogin, mUserName);
+                mUserFragment = UserFragment.newInstance(mUserLogin);
                 return mUserFragment;
             case 1:
                 return PublicEventListFragment.newInstance(mUserLogin);

@@ -75,7 +75,7 @@ public class SearchActivity extends BaseActivity implements
     private static final int SEARCH_MODE_USER = 2;
     private static final int SEARCH_MODE_CODE = 3;
 
-    private LoaderCallbacks<List<Repository>> mRepoCallback = new LoaderCallbacks<List<Repository>>(this) {
+    private final LoaderCallbacks<List<Repository>> mRepoCallback = new LoaderCallbacks<List<Repository>>(this) {
         @Override
         protected Loader<LoaderResult<List<Repository>>> onCreateLoader() {
             RepositorySearchLoader loader = new RepositorySearchLoader(SearchActivity.this, null);
@@ -89,7 +89,7 @@ public class SearchActivity extends BaseActivity implements
         }
     };
 
-    private LoaderCallbacks<List<SearchUser>> mUserCallback = new LoaderCallbacks<List<SearchUser>>(this) {
+    private final LoaderCallbacks<List<SearchUser>> mUserCallback = new LoaderCallbacks<List<SearchUser>>(this) {
         @Override
         protected Loader<LoaderResult<List<SearchUser>>> onCreateLoader() {
             return new UserSearchLoader(SearchActivity.this, mQuery);
@@ -101,7 +101,7 @@ public class SearchActivity extends BaseActivity implements
         }
     };
 
-    private LoaderCallbacks<List<CodeSearchResult>> mCodeCallback = new LoaderCallbacks<List<CodeSearchResult>>(this) {
+    private final LoaderCallbacks<List<CodeSearchResult>> mCodeCallback = new LoaderCallbacks<List<CodeSearchResult>>(this) {
         @Override
         protected Loader<LoaderResult<List<CodeSearchResult>>> onCreateLoader() {
             return new CodeSearchLoader(SearchActivity.this, mQuery);
@@ -206,9 +206,9 @@ public class SearchActivity extends BaseActivity implements
     }
 
     private static class SearchTypeAdapter extends BaseAdapter implements SpinnerAdapter {
-        private Context mContext;
-        private LayoutInflater mInflater;
-        private LayoutInflater mPopupInflater;
+        private final Context mContext;
+        private final LayoutInflater mInflater;
+        private final LayoutInflater mPopupInflater;
 
         private final int[][] mResources = new int[][] {
             { R.string.search_type_repo, R.drawable.search_repos_dark, R.attr.searchRepoIcon, 0 },

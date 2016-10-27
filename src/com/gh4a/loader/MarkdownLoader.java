@@ -10,8 +10,8 @@ import com.gh4a.Gh4Application;
 
 public class MarkdownLoader extends BaseLoader<String> {
 
-    private String mText;
-    private String mMode;
+    private final String mText;
+    private final String mMode;
 
     public MarkdownLoader(Context context, String text, String mode) {
         super(context);

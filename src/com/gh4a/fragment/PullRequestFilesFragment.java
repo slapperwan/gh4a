@@ -47,7 +47,7 @@ public class PullRequestFilesFragment extends CommitFragment {
     private List<CommitFile> mFiles;
     private List<CommitComment> mComments;
 
-    private LoaderCallbacks<List<CommitFile>> mPullRequestFilesCallback = new LoaderCallbacks<List<CommitFile>>(this) {
+    private final LoaderCallbacks<List<CommitFile>> mPullRequestFilesCallback = new LoaderCallbacks<List<CommitFile>>(this) {
         @Override
         protected Loader<LoaderResult<List<CommitFile>>> onCreateLoader() {
             return new PullRequestFilesLoader(getActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
@@ -60,7 +60,7 @@ public class PullRequestFilesFragment extends CommitFragment {
         }
     };
 
-    private LoaderCallbacks<List<CommitComment>> mPullRequestCommentsCallback =
+    private final LoaderCallbacks<List<CommitComment>> mPullRequestCommentsCallback =
             new LoaderCallbacks<List<CommitComment>>(this) {
         @Override
         protected Loader<LoaderResult<List<CommitComment>>> onCreateLoader() {

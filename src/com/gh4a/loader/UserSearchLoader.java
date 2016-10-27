@@ -12,7 +12,7 @@ import android.text.TextUtils;
 import com.gh4a.Gh4Application;
 
 public class UserSearchLoader extends BaseLoader<List<SearchUser>> {
-    private String mQuery;
+    private final String mQuery;
 
     public UserSearchLoader(Context context, String query) {
         super(context);

@@ -17,9 +17,9 @@ import android.content.Context;
 import com.gh4a.Gh4Application;
 
 public class IssueCommentListLoader extends BaseLoader<List<IssueEventHolder>> {
-    private String mRepoOwner;
-    private String mRepoName;
-    private int mIssueNumber;
+    private final String mRepoOwner;
+    private final String mRepoName;
+    private final int mIssueNumber;
 
     private static final List<String> INTERESTING_EVENTS = Arrays.asList(
         IssueEvent.TYPE_CLOSED, IssueEvent.TYPE_REOPENED, IssueEvent.TYPE_MERGED,
@@ -29,7 +29,7 @@ public class IssueCommentListLoader extends BaseLoader<List<IssueEventHolder>> {
         IssueEvent.TYPE_RENAMED
     );
 
-    protected static Comparator<IssueEventHolder> SORTER = new Comparator<IssueEventHolder>() {
+    protected static final Comparator<IssueEventHolder> SORTER = new Comparator<IssueEventHolder>() {
         @Override
         public int compare(IssueEventHolder lhs, IssueEventHolder rhs) {
             return lhs.getCreatedAt().compareTo(rhs.getCreatedAt());

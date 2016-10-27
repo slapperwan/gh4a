@@ -243,7 +243,7 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
     }
 
     private class SaveIssueMilestoneTask extends ProgressDialogTask<Void> {
-        private Milestone mMilestone;
+        private final Milestone mMilestone;
 
         public SaveIssueMilestoneTask(Milestone milestone) {
             super(IssueMilestoneEditActivity.this, 0, R.string.saving_msg);
@@ -283,7 +283,7 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
     }
 
     private class DeleteIssueMilestoneTask extends ProgressDialogTask<Void> {
-        private int mNumber;
+        private final int mNumber;
 
         public DeleteIssueMilestoneTask(int number) {
             super(IssueMilestoneEditActivity.this, 0, R.string.deleting_msg);

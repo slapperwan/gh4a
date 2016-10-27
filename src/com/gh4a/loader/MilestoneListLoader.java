@@ -15,9 +15,9 @@ import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
 
 public class MilestoneListLoader extends BaseLoader<List<Milestone>> {
-    private String mRepoOwner;
-    private String mRepoName;
-    private String mState;
+    private final String mRepoOwner;
+    private final String mRepoName;
+    private final String mState;
 
     public MilestoneListLoader(Context context, String repoOwner, String repoName) {
         this(context, repoOwner, repoName, null);

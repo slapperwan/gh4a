@@ -14,11 +14,11 @@ public class RepositoryFactory extends FragmentFactory {
         R.string.my_repositories
     };
 
-    private String mUserLogin;
-    private RepositoryListContainerFragment.FilterDrawerHelper mFilterDrawerHelper;
-    private RepositoryListContainerFragment.SortDrawerHelper mSortDrawerHelper;
+    private final String mUserLogin;
+    private final RepositoryListContainerFragment.FilterDrawerHelper mFilterDrawerHelper;
+    private final RepositoryListContainerFragment.SortDrawerHelper mSortDrawerHelper;
     private RepositoryListContainerFragment mFragment;
-    private SharedPreferences mPrefs;
+    private final SharedPreferences mPrefs;
 
     private static final String STATE_KEY_FRAGMENT = "repoFactoryFragment";
     private static final String PREF_KEY_FILTER = "home_repo_list_filter";

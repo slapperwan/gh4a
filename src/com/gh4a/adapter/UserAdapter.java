@@ -68,7 +68,7 @@ public class UserAdapter extends RootAdapter<User, UserAdapter.ViewHolder> {
             tvTitle = (TextView) view.findViewById(R.id.tv_title);
         }
 
-        private TextView tvTitle;
-        private ImageView ivGravatar;
+        private final TextView tvTitle;
+        private final ImageView ivGravatar;
     }
 }

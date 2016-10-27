@@ -47,7 +47,7 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
      * The objects.
      */
     private List<T> mObjects;
-    private List<T> mUnfilteredObjects;
+    private final List<T> mUnfilteredObjects;
 
     /**
      * The context.
@@ -64,7 +64,7 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
     private static final int VIEW_TYPE_HEADER = 1;
     private static final int VIEW_TYPE_FOOTER = 2;
 
-    private Filter mFilter = new Filter() {
+    private final Filter mFilter = new Filter() {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             FilterResults results = new FilterResults();

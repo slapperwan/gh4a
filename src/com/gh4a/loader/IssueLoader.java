@@ -11,9 +11,9 @@ import com.gh4a.Gh4Application;
 
 public class IssueLoader extends BaseLoader<Issue> {
 
-    private String mRepoOwner;
-    private String mRepoName;
-    private int mIssueNumber;
+    private final String mRepoOwner;
+    private final String mRepoName;
+    private final int mIssueNumber;
 
     public IssueLoader(Context context, String repoOwner, String repoName, int issueNumber) {
         super(context);

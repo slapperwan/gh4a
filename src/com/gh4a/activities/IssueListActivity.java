@@ -93,7 +93,7 @@ public class IssueListActivity extends BasePagerActivity implements
     private List<Milestone> mMilestones;
     private List<User> mAssignees;
 
-    private IssueListFragment.SortDrawerHelper mSortHelper =
+    private final IssueListFragment.SortDrawerHelper mSortHelper =
             new IssueListFragment.SortDrawerHelper();
 
     private static final String STATE_KEY_SEARCH_QUERY = "search_query";
@@ -106,7 +106,7 @@ public class IssueListActivity extends BasePagerActivity implements
         R.string.open, R.string.closed
     };
 
-    private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>(this) {
+    private final LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>(this) {
         @Override
         protected Loader<LoaderResult<List<Label>>> onCreateLoader() {
             return new LabelListLoader(IssueListActivity.this, mRepoOwner, mRepoName);
@@ -127,7 +127,7 @@ public class IssueListActivity extends BasePagerActivity implements
         }
     };
 
-    private LoaderCallbacks<List<Milestone>> mMilestoneCallback =
+    private final LoaderCallbacks<List<Milestone>> mMilestoneCallback =
             new LoaderCallbacks<List<Milestone>>(this) {
         @Override
         protected Loader<LoaderResult<List<Milestone>>> onCreateLoader() {
@@ -150,7 +150,7 @@ public class IssueListActivity extends BasePagerActivity implements
         }
     };
 
-    private LoaderCallbacks<List<User>> mCollaboratorListCallback =
+    private final LoaderCallbacks<List<User>> mCollaboratorListCallback =
             new LoaderCallbacks<List<User>>(this) {
         @Override
         protected Loader<LoaderResult<List<User>>> onCreateLoader() {
@@ -172,7 +172,7 @@ public class IssueListActivity extends BasePagerActivity implements
         }
     };
 
-    private LoaderCallbacks<Boolean> mIsCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
+    private final LoaderCallbacks<Boolean> mIsCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
         protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsCollaboratorLoader(IssueListActivity.this, mRepoOwner, mRepoName);

@@ -14,8 +14,8 @@ import android.content.Context;
 import com.gh4a.Gh4Application;
 
 public class IssueTemplateLoader extends BaseLoader<String> {
-    private String mRepoOwner;
-    private String mRepoName;
+    private final String mRepoOwner;
+    private final String mRepoName;
 
     private static final String FILE_NAME_PREFIX = "ISSUE_TEMPLATE";
 

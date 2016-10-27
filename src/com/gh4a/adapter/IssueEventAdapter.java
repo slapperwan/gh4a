@@ -64,11 +64,11 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
     private static final Pattern COMMIT_URL_REPO_NAME_AND_OWNER_PATTERN =
             Pattern.compile(".*github.com\\/repos\\/([^\\/]+)\\/([^\\/]+)\\/commits");
 
-    private HttpImageGetter mImageGetter;
-    private OnEditComment mEditCallback;
-    private String mRepoOwner;
-    private String mRepoName;
-    private int mIssueId;
+    private final HttpImageGetter mImageGetter;
+    private final OnEditComment mEditCallback;
+    private final String mRepoOwner;
+    private final String mRepoName;
+    private final int mIssueId;
 
     public IssueEventAdapter(Context context, String repoOwner, String repoName,
             int issueId, OnEditComment editCallback) {
@@ -311,11 +311,11 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
             ivEdit = (ImageView) view.findViewById(R.id.iv_edit);
         }
 
-        private ImageView ivGravatar;
-        private TextView tvDesc;
-        private StyleableTextView tvExtra;
-        private StyleableTextView tvFile;
-        private TextView tvTimestamp;
-        private ImageView ivEdit;
+        private final ImageView ivGravatar;
+        private final TextView tvDesc;
+        private final StyleableTextView tvExtra;
+        private final StyleableTextView tvFile;
+        private final TextView tvTimestamp;
+        private final ImageView ivEdit;
     }
 }

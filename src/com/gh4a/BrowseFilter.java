@@ -146,12 +146,12 @@ public class BrowseFilter extends AppCompatActivity {
     }
 
     private class RefPathDisambiguationTask extends BackgroundTask<Pair<String, String>> {
-        private String mRepoOwner;
-        private String mRepoName;
-        private String mRefAndPath;
-        private int mInitialPage;
-        private String mFragment;
-        private boolean mGoToFileViewer;
+        private final String mRepoOwner;
+        private final String mRepoName;
+        private final String mRefAndPath;
+        private final int mInitialPage;
+        private final String mFragment;
+        private final boolean mGoToFileViewer;
 
         public RefPathDisambiguationTask(String repoOwner, String repoName,
                 String refAndPath, int initialPage) {
@@ -160,6 +160,7 @@ public class BrowseFilter extends AppCompatActivity {
             mRepoName = repoName;
             mRefAndPath = refAndPath;
             mInitialPage = initialPage;
+            mFragment = null;
             mGoToFileViewer = false;
         }
 
@@ -170,6 +171,7 @@ public class BrowseFilter extends AppCompatActivity {
             mRepoName = repoName;
             mRefAndPath = refAndPath;
             mFragment = fragment;
+            mInitialPage = -1;
             mGoToFileViewer = true;
         }
 

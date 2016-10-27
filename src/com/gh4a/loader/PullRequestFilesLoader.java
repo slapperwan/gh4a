@@ -13,9 +13,9 @@ import java.util.List;
 
 public class PullRequestFilesLoader extends BaseLoader<List<CommitFile>> {
 
-    private String mRepoOwner;
-    private String mRepoName;
-    private int mPullRequestNumber;
+    private final String mRepoOwner;
+    private final String mRepoName;
+    private final int mPullRequestNumber;
 
     public PullRequestFilesLoader(Context context, String repoOwner, String repoName, int pullRequestNumber) {
         super(context);

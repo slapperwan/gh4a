@@ -73,7 +73,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
     private View mRootView;
     private HttpImageGetter mImageGetter;
 
-    private LoaderCallbacks<Release> mReleaseCallback = new LoaderCallbacks<Release>(this) {
+    private final LoaderCallbacks<Release> mReleaseCallback = new LoaderCallbacks<Release>(this) {
         @Override
         protected Loader<LoaderResult<Release>> onCreateLoader() {
             return new ReleaseLoader(ReleaseInfoActivity.this, mRepoOwner, mRepoName, mReleaseId);
@@ -86,7 +86,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
             setContentShown(true);
         }
     };
-    private LoaderCallbacks<String> mBodyCallback = new LoaderCallbacks<String>(this) {
+    private final LoaderCallbacks<String> mBodyCallback = new LoaderCallbacks<String>(this) {
         @Override
         protected Loader<LoaderResult<String>> onCreateLoader() {
             return new MarkdownLoader(ReleaseInfoActivity.this, mRelease.getBody(), null);

@@ -12,9 +12,8 @@ import android.content.Context;
 import com.gh4a.Gh4Application;
 
 public class DownloadsLoader extends BaseLoader<List<Download>> {
-
-    private String mRepoOwner;
-    private String mRepoName;
+    private final String mRepoOwner;
+    private final String mRepoName;
 
     public DownloadsLoader(Context context, String repoOwner, String repoName) {
         super(context);

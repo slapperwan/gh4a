@@ -126,7 +126,7 @@ public class CommentBoxFragment extends Fragment implements
     }
 
     private class CommentTask extends ProgressDialogTask<Void> {
-        private String mText;
+        private final String mText;
 
         public CommentTask(String text) {
             super((BaseActivity) getActivity(), 0, R.string.saving_comment);

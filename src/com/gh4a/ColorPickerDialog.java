@@ -24,8 +24,8 @@ public class ColorPickerDialog extends AlertDialog {
         void colorChanged(String color);
     }
 
-    private OnColorChangedListener mColorChangedListener;
-    private ColorPicker mColorPicker;
+    private final OnColorChangedListener mColorChangedListener;
+    private final ColorPicker mColorPicker;
 
     public ColorPickerDialog(Context context, String color, OnColorChangedListener listener) {
         super(context);

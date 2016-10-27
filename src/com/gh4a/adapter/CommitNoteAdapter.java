@@ -46,9 +46,9 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
         void editComment(CommitComment comment);
     }
 
-    private String mRepoOwner;
-    private HttpImageGetter mImageGetter;
-    private OnEditComment mEditCallback;
+    private final String mRepoOwner;
+    private final HttpImageGetter mImageGetter;
+    private final OnEditComment mEditCallback;
 
     public CommitNoteAdapter(Context context, String repoOwner, OnEditComment editCallback) {
         super(context);
@@ -140,10 +140,10 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
             ivEdit = (ImageView) view.findViewById(R.id.iv_edit);
         }
 
-        private ImageView ivGravatar;
-        private TextView tvDesc;
-        private TextView tvExtra;
-        private TextView tvTimestamp;
-        private ImageView ivEdit;
+        private final ImageView ivGravatar;
+        private final TextView tvDesc;
+        private final TextView tvExtra;
+        private final TextView tvTimestamp;
+        private final ImageView ivEdit;
     }
 }

@@ -9,7 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 public class DividerItemDecoration extends RecyclerView.ItemDecoration {
-    private Drawable mDivider;
+    private final Drawable mDivider;
 
     public DividerItemDecoration(Context context) {
         final TypedArray a = context.obtainStyledAttributes(null, new int[] {

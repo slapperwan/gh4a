@@ -11,9 +11,9 @@ import android.content.Context;
 import com.gh4a.Gh4Application;
 
 public class CommitLoader extends BaseLoader<RepositoryCommit> {
-    private String mRepoOwner;
-    private String mRepoName;
-    private String mObjectSha;
+    private final String mRepoOwner;
+    private final String mRepoName;
+    private final String mObjectSha;
 
     public CommitLoader(Context context, String repoOwner, String repoName, String sha) {
         super(context);

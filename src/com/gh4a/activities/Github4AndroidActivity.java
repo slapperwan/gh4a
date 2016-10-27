@@ -155,9 +155,9 @@ public class Github4AndroidActivity extends BaseActivity {
     }
 
     private class LoginTask extends ProgressDialogTask<Authorization> {
-        private String mUserName;
-        private String mPassword;
-        private String mOtpCode;
+        private final String mUserName;
+        private final String mPassword;
+        private final String mOtpCode;
 
         /**
          * Instantiates a new load repository list task.
@@ -269,8 +269,8 @@ public class Github4AndroidActivity extends BaseActivity {
 
     // POST request so that GitHub trigger the SMS for OTP
     private class DummyPostTask extends LoginTask {
-        private String mUserName;
-        private String mPassword;
+        private final String mUserName;
+        private final String mPassword;
 
         public DummyPostTask(String userName, String password) {
             super(Github4AndroidActivity.this);

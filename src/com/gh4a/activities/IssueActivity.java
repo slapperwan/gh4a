@@ -97,9 +97,9 @@ public class IssueActivity extends BaseActivity implements
     private IssueStateTrackingFloatingActionButton mEditFab;
     private CommentBoxFragment mCommentFragment;
     private HttpImageGetter mImageGetter;
-    private Handler mHandler = new Handler();
+    private final Handler mHandler = new Handler();
 
-    private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>(this) {
+    private final LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>(this) {
         @Override
         protected Loader<LoaderResult<Issue>> onCreateLoader() {
             return new IssueLoader(IssueActivity.this, mRepoOwner, mRepoName, mIssueNumber);
@@ -112,7 +112,7 @@ public class IssueActivity extends BaseActivity implements
         }
     };
 
-    private LoaderCallbacks<List<IssueEventHolder>> mEventCallback =
+    private final LoaderCallbacks<List<IssueEventHolder>> mEventCallback =
             new LoaderCallbacks<List<IssueEventHolder>>(this) {
         @Override
         protected Loader<LoaderResult<List<IssueEventHolder>>> onCreateLoader() {
@@ -130,7 +130,7 @@ public class IssueActivity extends BaseActivity implements
         }
     };
 
-    private LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
+    private final LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
         protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsCollaboratorLoader(IssueActivity.this, mRepoOwner, mRepoName);
@@ -520,7 +520,7 @@ public class IssueActivity extends BaseActivity implements
     }
 
     private class IssueOpenCloseTask extends ProgressDialogTask<Issue> {
-        private boolean mOpen;
+        private final boolean mOpen;
 
         public IssueOpenCloseTask(boolean open) {
             super(IssueActivity.this, 0, open ? R.string.opening_msg : R.string.closing_msg);

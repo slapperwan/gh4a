@@ -41,8 +41,8 @@ public class FileAdapter extends RootAdapter<RepositoryContents, FileAdapter.Vie
         implements View.OnCreateContextMenuListener {
     private static final int MENU_HISTORY = 1;
 
-    private Repository mRepository;
-    private String mRef;
+    private final Repository mRepository;
+    private final String mRef;
     private Set<String> mSubModuleNames;
 
     public FileAdapter(Context context, Repository repository, String ref) {
@@ -117,8 +117,8 @@ public class FileAdapter extends RootAdapter<RepositoryContents, FileAdapter.Vie
 
         private RepositoryContents contents;
 
-        private ImageView icon;
-        private TextView fileName;
-        private TextView fileSize;
+        private final ImageView icon;
+        private final TextView fileName;
+        private final TextView fileSize;
     }
 }

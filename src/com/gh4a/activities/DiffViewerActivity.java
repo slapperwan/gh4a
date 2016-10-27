@@ -83,14 +83,14 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
 
     private String mDiff;
     private String[] mDiffLines;
-    private SparseArray<List<CommitComment>> mCommitCommentsByPos = new SparseArray<>();
-    private LongSparseArray<CommitComment> mCommitComments = new LongSparseArray<>();
+    private final SparseArray<List<CommitComment>> mCommitCommentsByPos = new SparseArray<>();
+    private final LongSparseArray<CommitComment> mCommitComments = new LongSparseArray<>();
 
-    private Point mLastTouchDown = new Point();
+    private final Point mLastTouchDown = new Point();
 
     private static final int MENU_ITEM_VIEW = 10;
 
-    private LoaderCallbacks<List<CommitComment>> mCommentCallback =
+    private final LoaderCallbacks<List<CommitComment>> mCommentCallback =
             new LoaderCallbacks<List<CommitComment>>(this) {
         @Override
         protected Loader<LoaderResult<List<CommitComment>>> onCreateLoader() {
@@ -350,9 +350,9 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
 
     private class CommentActionPopup extends ListPopupWindow implements
             AdapterView.OnItemClickListener {
-        private long mId;
-        private int mPosition;
-        private String mLineText;
+        private final long mId;
+        private final int mPosition;
+        private final String mLineText;
 
         public CommentActionPopup(long id, int position, String lineText, int x, int y) {
             super(DiffViewerActivity.this, null, R.attr.listPopupWindowStyle);
@@ -427,9 +427,9 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     }
 
     private class CommentTask extends ProgressDialogTask<Void> {
-        private String mBody;
-        private int mPosition;
-        private long mId;
+        private final String mBody;
+        private final int mPosition;
+        private final long mId;
 
         public CommentTask(long id, String body, int position) {
             super(DiffViewerActivity.this, 0, R.string.saving_msg);
@@ -462,7 +462,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     }
 
     private class DeleteCommentTask extends ProgressDialogTask<Void> {
-        private long mId;
+        private final long mId;
 
         public DeleteCommentTask(long id) {
             super(DiffViewerActivity.this, 0, R.string.deleting_msg);

@@ -15,12 +15,12 @@ import com.gh4a.utils.UiUtils;
 import org.eclipse.egit.github.core.Label;
 
 public class IssueLabelSpan extends ReplacementSpan {
-    private RectF mTmpRect = new RectF();
-    private int mFgColor;
-    private int mBgColor;
-    private int mPadding;
-    private int mRightAndBottomMargin;
-    private float mTextSize;
+    private final RectF mTmpRect = new RectF();
+    private final int mFgColor;
+    private final int mBgColor;
+    private final int mPadding;
+    private final int mRightAndBottomMargin;
+    private final float mTextSize;
 
     private int mAscent;
     private int mDescent;

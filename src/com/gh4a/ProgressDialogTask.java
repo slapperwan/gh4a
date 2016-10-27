@@ -12,8 +12,8 @@ public abstract class ProgressDialogTask<T> extends BackgroundTask<T>
         implements View.OnClickListener {
     private ProgressDialogFragment mFragment;
     private BaseActivity mActivity;
-    private int mTitleResId;
-    private int mMessageResId;
+    private final int mTitleResId;
+    private final int mMessageResId;
 
     public ProgressDialogTask(BaseActivity activity, int titleResId, int messageResId) {
         super(activity);

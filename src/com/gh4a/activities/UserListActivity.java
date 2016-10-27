@@ -41,7 +41,7 @@ public abstract class UserListActivity extends BaseActivity implements
     private RecyclerView mRecyclerView;
     private UserAdapter mUserAdapter;
 
-    private LoaderCallbacks<List<User>> mUserListCallback = new LoaderCallbacks<List<User>>(this) {
+    private final LoaderCallbacks<List<User>> mUserListCallback = new LoaderCallbacks<List<User>>(this) {
         @Override
         protected Loader<LoaderResult<List<User>>> onCreateLoader() {
             return getUserListLoader();

@@ -71,7 +71,7 @@ public class IssueLabelListActivity extends BaseActivity implements
     private static final String STATE_KEY_ADDED_LABEL = "added_label";
     private static final String STATE_KEY_EDITING_LABEL = "editing_label";
 
-    private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>(this) {
+    private final LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>(this) {
         @Override
         protected Loader<LoaderResult<List<Label>>> onCreateLoader() {
             return new LabelListLoader(IssueLabelListActivity.this, mRepoOwner, mRepoName);
@@ -209,7 +209,7 @@ public class IssueLabelListActivity extends BaseActivity implements
     }
 
     private final class EditActionMode implements ActionMode.Callback {
-        private IssueLabelAdapter.EditableLabel mLabel;
+        private final IssueLabelAdapter.EditableLabel mLabel;
 
         public EditActionMode(IssueLabelAdapter.EditableLabel label) {
             mLabel = label;
@@ -282,7 +282,7 @@ public class IssueLabelListActivity extends BaseActivity implements
     }
 
     private class DeleteIssueLabelTask extends ProgressDialogTask<Void> {
-        private String mLabelName;
+        private final String mLabelName;
 
         public DeleteIssueLabelTask(String labelName) {
             super(IssueLabelListActivity.this, 0, R.string.deleting_msg);
@@ -314,9 +314,9 @@ public class IssueLabelListActivity extends BaseActivity implements
     }
 
     private class EditIssueLabelTask extends ProgressDialogTask<Void> {
-        private String mOldLabelName;
-        private String mNewLabelName;
-        private String mColor;
+        private final String mOldLabelName;
+        private final String mNewLabelName;
+        private final String mColor;
 
         public EditIssueLabelTask(String oldLabelName, String newLabelName, String color) {
             super(IssueLabelListActivity.this, 0, R.string.saving_msg);
@@ -356,8 +356,8 @@ public class IssueLabelListActivity extends BaseActivity implements
     }
 
     private class AddIssueLabelTask extends ProgressDialogTask<Void> {
-        private String mLabelName;
-        private String mColor;
+        private final String mLabelName;
+        private final String mColor;
 
         public AddIssueLabelTask(String labelName, String color) {
             super(IssueLabelListActivity.this, 0, R.string.saving_msg);

@@ -107,8 +107,8 @@ public abstract class EditCommentActivity extends BaseActivity {
     protected abstract void deleteComment(RepositoryId repoId, long id) throws IOException;
 
     private class EditCommentTask extends ProgressDialogTask<Void> {
-        private long mId;
-        private String mBody;
+        private final long mId;
+        private final String mBody;
 
         public EditCommentTask(long id, String body) {
             super(EditCommentActivity.this, 0, R.string.saving_msg);
@@ -141,7 +141,7 @@ public abstract class EditCommentActivity extends BaseActivity {
     }
 
     private class DeleteCommentTask extends ProgressDialogTask<Void> {
-        private long mId;
+        private final long mId;
 
         public DeleteCommentTask(long id) {
             super(EditCommentActivity.this, 0, R.string.deleting_msg);

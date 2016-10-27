@@ -75,7 +75,7 @@ public class FileViewerActivity extends WebViewerActivity {
     private static final int MENU_ITEM_HISTORY = 10;
     private static final String RAW_URL_FORMAT = "https://raw.githubusercontent.com/%s/%s/%s/%s";
 
-    private LoaderCallbacks<List<RepositoryContents>> mFileCallback =
+    private final LoaderCallbacks<List<RepositoryContents>> mFileCallback =
             new LoaderCallbacks<List<RepositoryContents>>(this) {
         @Override
         protected Loader<LoaderResult<List<RepositoryContents>>> onCreateLoader() {

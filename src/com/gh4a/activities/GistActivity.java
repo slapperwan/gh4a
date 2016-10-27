@@ -59,7 +59,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
     private Gist mGist;
     private Boolean mIsStarred;
 
-    private LoaderCallbacks<Gist> mGistCallback = new LoaderCallbacks<Gist>(this) {
+    private final LoaderCallbacks<Gist> mGistCallback = new LoaderCallbacks<Gist>(this) {
         @Override
         protected Loader<LoaderResult<Gist>> onCreateLoader() {
             return new GistLoader(GistActivity.this, mGistId);
@@ -72,7 +72,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
         }
     };
 
-    private LoaderCallbacks<Boolean> mStarCallback = new LoaderCallbacks<Boolean>(this) {
+    private final LoaderCallbacks<Boolean> mStarCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
         protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new GistStarLoader(GistActivity.this, mGistId);

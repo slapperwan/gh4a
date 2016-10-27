@@ -54,8 +54,8 @@ public class ReleaseAdapter extends RootAdapter<Release, ReleaseAdapter.ViewHold
             tvCreatedAt  = (TextView) view.findViewById(R.id.tv_created_at);
         }
 
-        private TextView tvTitle;
-        private TextView tvType;
-        private TextView tvCreatedAt;
+        private final TextView tvTitle;
+        private final TextView tvType;
+        private final TextView tvCreatedAt;
     }
 }

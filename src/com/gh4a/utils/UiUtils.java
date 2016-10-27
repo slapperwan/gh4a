@@ -92,7 +92,7 @@ public class UiUtils {
 
     @TargetApi(21)
     private static class RecyclerViewEdgeColorHelper implements ViewTreeObserver.OnGlobalLayoutListener {
-        private RecyclerView mView;
+        private final RecyclerView mView;
         private int mColor;
         private EdgeEffect mTopEffect, mBottomEffect;
         private Object mLastTopEffect, mLastBottomEffect;

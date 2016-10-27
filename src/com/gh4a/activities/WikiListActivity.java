@@ -58,7 +58,7 @@ public class WikiListActivity extends BaseActivity
     private RecyclerView mRecyclerView;
     private CommonFeedAdapter mAdapter;
 
-    private LoaderCallbacks<List<Feed>> mFeedCallback = new LoaderCallbacks<List<Feed>>(this) {
+    private final LoaderCallbacks<List<Feed>> mFeedCallback = new LoaderCallbacks<List<Feed>>(this) {
         @Override
         protected Loader<LoaderResult<List<Feed>>> onCreateLoader() {
             String url = "https://github.com/" + mUserLogin + "/" + mRepoName + "/wiki.atom";

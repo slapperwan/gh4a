@@ -39,7 +39,6 @@ public class HomeActivity extends BasePagerActivity implements
     private ImageView mAvatarView;
     private String mUserLogin;
     private int mSelectedFactoryId;
-    private boolean mStarted;
 
     private static final String STATE_KEY_FACTORY_ITEM = "factoryItem";
 
@@ -55,7 +54,7 @@ public class HomeActivity extends BasePagerActivity implements
         START_PAGE_MAPPING.put(R.id.blog, "blog");
     }
 
-    private LoaderCallbacks<User> mUserCallback = new LoaderCallbacks<User>(this) {
+    private final LoaderCallbacks<User> mUserCallback = new LoaderCallbacks<User>(this) {
         @Override
         protected Loader<LoaderResult<User>> onCreateLoader() {
             return new UserLoader(HomeActivity.this, mUserLogin);
@@ -207,18 +206,6 @@ public class HomeActivity extends BasePagerActivity implements
     @Override
     protected Fragment getFragment(int position) {
         return mFactory.getFragment(position);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mStarted = true;
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mStarted = false;
     }
 
     @Override

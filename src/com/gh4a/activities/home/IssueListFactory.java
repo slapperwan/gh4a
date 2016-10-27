@@ -23,9 +23,9 @@ public class IssueListFactory extends FragmentFactory {
     };
 
     private boolean mShowingClosed;
-    private String mLogin;
-    private boolean mIsPullRequest;
-    private IssueListFragment.SortDrawerHelper mDrawerHelper =
+    private final String mLogin;
+    private final boolean mIsPullRequest;
+    private final IssueListFragment.SortDrawerHelper mDrawerHelper =
             new IssueListFragment.SortDrawerHelper();
     private int[] mHeaderColors;
 

@@ -12,9 +12,9 @@ import com.gh4a.Gh4Application;
 
 public class PullRequestLoader extends BaseLoader<PullRequest> {
 
-    private String mRepoOwner;
-    private String mRepoName;
-    private int mPullRequestNumber;
+    private final String mRepoOwner;
+    private final String mRepoName;
+    private final int mPullRequestNumber;
 
     public PullRequestLoader(Context context, String repoOwner, String repoName, int pullRequestNumber) {
         super(context);

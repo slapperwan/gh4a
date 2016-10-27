@@ -91,7 +91,7 @@ public class RepositoryActivity extends BasePagerActivity {
         R.string.about, R.string.repo_files, R.string.commits
     };
 
-    private LoaderCallbacks<Repository> mRepoCallback = new LoaderCallbacks<Repository>(this) {
+    private final LoaderCallbacks<Repository> mRepoCallback = new LoaderCallbacks<Repository>(this) {
         @Override
         protected Loader<LoaderResult<Repository>> onCreateLoader() {
             return new RepositoryLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
@@ -112,7 +112,7 @@ public class RepositoryActivity extends BasePagerActivity {
         }
     };
 
-    private LoaderCallbacks<Pair<List<RepositoryBranch>, List<RepositoryTag>>> mBranchesAndTagsCallback =
+    private final LoaderCallbacks<Pair<List<RepositoryBranch>, List<RepositoryTag>>> mBranchesAndTagsCallback =
             new LoaderCallbacks<Pair<List<RepositoryBranch>, List<RepositoryTag>>>(this) {
         @Override
         protected Loader<LoaderResult<Pair<List<RepositoryBranch>, List<RepositoryTag>>>> onCreateLoader() {
@@ -139,7 +139,7 @@ public class RepositoryActivity extends BasePagerActivity {
         }
     };
 
-    private LoaderCallbacks<Boolean> mWatchCallback = new LoaderCallbacks<Boolean>(this) {
+    private final LoaderCallbacks<Boolean> mWatchCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
         protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsWatchingLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
@@ -151,7 +151,7 @@ public class RepositoryActivity extends BasePagerActivity {
         }
     };
 
-    private LoaderCallbacks<Boolean> mStarCallback = new LoaderCallbacks<Boolean>(this) {
+    private final LoaderCallbacks<Boolean> mStarCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
         protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsStarringLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
@@ -252,7 +252,7 @@ public class RepositoryActivity extends BasePagerActivity {
         } else if (fragment instanceof ContentListContainerFragment
                 && mContentListFragment == null) {
             return true;
-        } if (fragment instanceof RepositoryFragment && mRepositoryFragment == null) {
+        } else if (fragment instanceof RepositoryFragment && mRepositoryFragment == null) {
             return true;
         }
         return false;
@@ -435,10 +435,10 @@ public class RepositoryActivity extends BasePagerActivity {
     }
 
     private class BranchAndTagAdapter extends BaseAdapter {
-        private ArrayList<Object> mItems;
-        private LayoutInflater mInflater;
-        private int mBranchDrawableResId;
-        private int mTagDrawableResId;
+        private final ArrayList<Object> mItems;
+        private final LayoutInflater mInflater;
+        private final int mBranchDrawableResId;
+        private final int mTagDrawableResId;
 
         public BranchAndTagAdapter() {
             mItems = new ArrayList<>();

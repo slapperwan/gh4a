@@ -477,10 +477,10 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
             tvCreatedAt = (TextView) view.findViewById(R.id.tv_created_at);
         }
 
-        private ImageView ivGravatar;
-        private TextView tvActor;
-        private StyleableTextView tvTitle;
-        private StyleableTextView tvDesc;
-        private TextView tvCreatedAt;
+        private final ImageView ivGravatar;
+        private final TextView tvActor;
+        private final StyleableTextView tvTitle;
+        private final StyleableTextView tvDesc;
+        private final TextView tvCreatedAt;
     }
 }

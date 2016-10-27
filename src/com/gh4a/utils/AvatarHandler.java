@@ -51,7 +51,7 @@ public class AvatarHandler {
     private static HandlerThread sWorkerThread = null;
     private static Handler sWorkerHandler = null;
 
-    private static Handler sHandler = new Handler() {
+    private static final Handler sHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {

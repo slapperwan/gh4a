@@ -205,7 +205,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
     }
 
     private class FragmentAdapter extends FragmentStatePagerAdapter {
-        private SparseArray<Fragment> mFragments = new SparseArray<>();
+        private final SparseArray<Fragment> mFragments = new SparseArray<>();
         private Fragment mCurrentFragment;
 
         public FragmentAdapter() {
@@ -276,7 +276,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
 
     @TargetApi(21)
     private static class ViewPagerEdgeColorHelper {
-        private ViewPager mPager;
+        private final ViewPager mPager;
         private int mColor;
         private EdgeEffect mLeftEffect, mRightEffect;
 

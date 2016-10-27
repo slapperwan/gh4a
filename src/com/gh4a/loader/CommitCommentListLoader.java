@@ -13,11 +13,11 @@ import android.content.Context;
 import com.gh4a.Gh4Application;
 
 public class CommitCommentListLoader extends BaseLoader<List<CommitComment>> {
-    private String mRepoOwner;
-    private String mRepoName;
-    private String mSha;
-    private boolean mIncludePositional;
-    private boolean mIncludeUnpositional;
+    private final String mRepoOwner;
+    private final String mRepoName;
+    private final String mSha;
+    private final boolean mIncludePositional;
+    private final boolean mIncludeUnpositional;
 
     public CommitCommentListLoader(Context context, String repoOwner, String repoName,
             String sha, boolean includeUnpositional, boolean includePositional) {

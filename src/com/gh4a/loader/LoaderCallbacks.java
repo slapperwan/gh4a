@@ -12,7 +12,7 @@ public abstract class LoaderCallbacks<T> implements
         void onRefresh();
     }
 
-    private ParentCallback mCb;
+    private final ParentCallback mCb;
 
     public LoaderCallbacks(ParentCallback cb) {
         mCb = cb;

@@ -18,8 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TrendLoader extends BaseLoader<List<Trend>> {
-    private String mUrl;
-    private String mQueryTarget;
+    private final String mUrl;
+    private final String mQueryTarget;
 
     public TrendLoader(Context context, String url, String queryTarget) {
         super(context);

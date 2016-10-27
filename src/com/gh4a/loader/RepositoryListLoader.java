@@ -13,10 +13,10 @@ import java.util.Collection;
 import java.util.Map;
 
 public class RepositoryListLoader extends BaseLoader<Collection<Repository>> {
-    private String mLogin;
-    private Map<String, String> mFilterData;
-    private int mSize;
-    private String mUserType;
+    private final String mLogin;
+    private final Map<String, String> mFilterData;
+    private final int mSize;
+    private final String mUserType;
 
     public RepositoryListLoader(Context context, String login, String userType,
             Map<String, String> filterData, int size) {

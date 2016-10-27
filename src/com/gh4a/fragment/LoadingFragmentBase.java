@@ -22,7 +22,7 @@ public abstract class LoadingFragmentBase extends Fragment implements
     private ViewGroup mContentContainer;
     private View mContentView;
     private SmoothProgressBar mProgress;
-    private int[] mProgressColors = new int[2];
+    private final int[] mProgressColors = new int[2];
     private boolean mContentShown = true;
 
     public LoadingFragmentBase() {

@@ -99,7 +99,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
     private static final String STATE_KEY_ISSUE = "issue";
 
-    private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>(this) {
+    private final LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>(this) {
         @Override
         protected Loader<LoaderResult<List<Label>>> onCreateLoader() {
             return new LabelListLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
@@ -118,7 +118,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         }
     };
 
-    private LoaderCallbacks<List<Milestone>> mMilestoneCallback = new LoaderCallbacks<List<Milestone>>(this) {
+    private final LoaderCallbacks<List<Milestone>> mMilestoneCallback = new LoaderCallbacks<List<Milestone>>(this) {
         @Override
         protected Loader<LoaderResult<List<Milestone>>> onCreateLoader() {
             return new MilestoneListLoader(IssueEditActivity.this,
@@ -138,7 +138,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         }
     };
 
-    private LoaderCallbacks<List<User>> mCollaboratorListCallback = new LoaderCallbacks<List<User>>(this) {
+    private final LoaderCallbacks<List<User>> mCollaboratorListCallback = new LoaderCallbacks<List<User>>(this) {
         @Override
         protected Loader<LoaderResult<List<User>>> onCreateLoader() {
             return new CollaboratorListLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
@@ -157,7 +157,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         }
     };
 
-    private LoaderCallbacks<Boolean> mIsCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
+    private final LoaderCallbacks<Boolean> mIsCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
         protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsCollaboratorLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
@@ -170,7 +170,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         }
     };
 
-    private LoaderCallbacks<String> mIssueTemplateCallback = new LoaderCallbacks<String>(this) {
+    private final LoaderCallbacks<String> mIssueTemplateCallback = new LoaderCallbacks<String>(this) {
         @Override
         protected Loader<LoaderResult<String>> onCreateLoader() {
             return new IssueTemplateLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
@@ -495,7 +495,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
     }
 
     private class SaveIssueTask extends ProgressDialogTask<Void> {
-        private Issue mIssue;
+        private final Issue mIssue;
 
         public SaveIssueTask(Issue issue) {
             super(IssueEditActivity.this, 0, R.string.saving_msg);

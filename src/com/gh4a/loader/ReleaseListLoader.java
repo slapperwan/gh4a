@@ -15,8 +15,8 @@ import com.gh4a.Gh4Application;
 
 public class ReleaseListLoader extends BaseLoader<List<Release>> {
 
-    private String mRepoOwner;
-    private String mRepoName;
+    private final String mRepoOwner;
+    private final String mRepoName;
 
     public ReleaseListLoader(Context context, String repoOwner, String repoName) {
         super(context);

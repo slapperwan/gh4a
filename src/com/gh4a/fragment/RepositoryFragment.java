@@ -72,7 +72,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     private String mRef;
     private HttpImageGetter mImageGetter;
 
-    private LoaderCallbacks<String> mReadmeCallback = new LoaderCallbacks<String>(this) {
+    private final LoaderCallbacks<String> mReadmeCallback = new LoaderCallbacks<String>(this) {
         @Override
         protected Loader<LoaderResult<String>> onCreateLoader() {
             return new ReadmeLoader(getActivity(), mRepository.getOwner().getLogin(),
@@ -87,7 +87,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         }
     };
 
-    private LoaderCallbacks<Integer> mPullRequestsCallback = new LoaderCallbacks<Integer>(this) {
+    private final LoaderCallbacks<Integer> mPullRequestsCallback = new LoaderCallbacks<Integer>(this) {
         @Override
         protected Loader<LoaderResult<Integer>> onCreateLoader() {
             return new PullRequestCountLoader(getActivity(), mRepository, ApiHelpers.IssueState.OPEN);
@@ -306,10 +306,10 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     }
 
     private static class FillReadmeTask extends AsyncTask<String, Void, String> {
-        private Long mId;
-        private TextView mReadmeView;
-        private View mProgressView;
-        private HttpImageGetter mImageGetter;
+        private final Long mId;
+        private final TextView mReadmeView;
+        private final View mProgressView;
+        private final HttpImageGetter mImageGetter;
 
         public FillReadmeTask(long id, TextView readmeView, View progressView,
                 HttpImageGetter imageGetter) {

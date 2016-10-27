@@ -9,7 +9,7 @@ import org.eclipse.egit.github.core.service.GistService;
 import java.io.IOException;
 
 public class GistStarLoader extends BaseLoader<Boolean> {
-    private String mGistId;
+    private final String mGistId;
 
     public GistStarLoader(Context context, String id) {
         super(context);

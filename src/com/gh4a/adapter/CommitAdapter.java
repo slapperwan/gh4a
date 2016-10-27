@@ -100,11 +100,11 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit, CommitAdapter.V
             ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
         }
 
-        private ImageView ivGravatar;
-        private TextView tvDesc;
-        private TextView tvExtra;
-        private TextView tvTimestamp;
-        private TextView tvSha;
-        private TextView tvComments;
+        private final ImageView ivGravatar;
+        private final TextView tvDesc;
+        private final TextView tvExtra;
+        private final TextView tvTimestamp;
+        private final TextView tvSha;
+        private final TextView tvComments;
     }
 }

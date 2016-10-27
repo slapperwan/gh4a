@@ -103,9 +103,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private final List<ColorDrawable> mStatusBarDrawables = new ArrayList<>();
     private final int[] mProgressColors = new int[2];
     private Animator mHeaderTransition;
-    private Handler mHandler = new Handler();
+    private final Handler mHandler = new Handler();
 
-    private Runnable mUpdateTaskDescriptionRunnable = new Runnable() {
+    private final Runnable mUpdateTaskDescriptionRunnable = new Runnable() {
         private String mLabel;
         private Bitmap mIcon;
 

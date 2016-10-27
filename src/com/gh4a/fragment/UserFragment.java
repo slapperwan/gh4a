@@ -52,23 +52,21 @@ import java.util.List;
 import java.util.Map;
 
 public class UserFragment extends LoadingFragmentBase implements View.OnClickListener {
-    public static UserFragment newInstance(String login, String name) {
+    public static UserFragment newInstance(String login) {
         UserFragment f = new UserFragment();
 
         Bundle args = new Bundle();
         args.putString("login", login);
-        args.putString("name", name);
         f.setArguments(args);
 
         return f;
     }
 
     private String mUserLogin;
-    private String mUserName;
     private User mUser;
     private View mContentView;
 
-    private LoaderCallbacks<User> mUserCallback = new LoaderCallbacks<User>(this) {
+    private final LoaderCallbacks<User> mUserCallback = new LoaderCallbacks<User>(this) {
         @Override
         protected Loader<LoaderResult<User>> onCreateLoader() {
             return new UserLoader(getActivity(), mUserLogin);
@@ -82,7 +80,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         }
     };
 
-    private LoaderCallbacks<Collection<Repository>> mRepoListCallback =
+    private final LoaderCallbacks<Collection<Repository>> mRepoListCallback =
             new LoaderCallbacks<Collection<Repository>>(this) {
         @Override
         protected Loader<LoaderResult<Collection<Repository>>> onCreateLoader() {
@@ -98,7 +96,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         }
     };
 
-    private LoaderCallbacks<List<User>> mOrganizationCallback = new LoaderCallbacks<List<User>>(this) {
+    private final LoaderCallbacks<List<User>> mOrganizationCallback = new LoaderCallbacks<List<User>>(this) {
         @Override
         protected Loader<LoaderResult<List<User>>> onCreateLoader() {
             return new OrganizationListLoader(getActivity(), mUserLogin);
@@ -113,7 +111,6 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mUserLogin = getArguments().getString("login");
-        mUserName = getArguments().getString("name");
     }
 
     @Override

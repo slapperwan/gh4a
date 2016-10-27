@@ -14,7 +14,7 @@ import android.text.TextUtils;
 import com.gh4a.Gh4Application;
 
 public class RepositorySearchLoader extends BaseLoader<List<Repository>> {
-    private String mUserLogin;
+    private final String mUserLogin;
     private String mQuery;
 
     public RepositorySearchLoader(Context context, String userLogin) {

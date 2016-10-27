@@ -51,7 +51,7 @@ public class ReleaseListActivity extends BaseActivity implements
     private RecyclerView mRecyclerView;
     private ReleaseAdapter mAdapter;
 
-    private LoaderCallbacks<List<Release>> mReleaseCallback = new LoaderCallbacks<List<Release>>(this) {
+    private final LoaderCallbacks<List<Release>> mReleaseCallback = new LoaderCallbacks<List<Release>>(this) {
         @Override
         protected Loader<LoaderResult<List<Release>>> onCreateLoader() {
             return new ReleaseListLoader(ReleaseListActivity.this, mUserLogin, mRepoName);

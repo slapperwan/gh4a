@@ -47,10 +47,10 @@ public class ContentListContainerFragment extends Fragment implements
     private Repository mRepository;
     private String mSelectedRef;
     private Map<String, String> mGitModuleMap;
-    private Stack<String> mDirStack = new Stack<>();
+    private final Stack<String> mDirStack = new Stack<>();
     private ArrayList<String> mInitialPathToLoad;
     private boolean mStateSaved;
-    private Map<String, ArrayList<RepositoryContents>> mContentCache =
+    private final Map<String, ArrayList<RepositoryContents>> mContentCache =
             new LinkedHashMap<String, ArrayList<RepositoryContents>>() {
         private static final long serialVersionUID = -2379579224736389357L;
         private static final int MAX_CACHE_ENTRIES = 100;
@@ -61,7 +61,7 @@ public class ContentListContainerFragment extends Fragment implements
         }
     };
 
-    private LoaderCallbacks<Map<String, String>> mGitModuleCallback =
+    private final LoaderCallbacks<Map<String, String>> mGitModuleCallback =
             new LoaderCallbacks<Map<String, String>>(this) {
         @Override
         protected Loader<LoaderResult<Map<String, String>>> onCreateLoader() {

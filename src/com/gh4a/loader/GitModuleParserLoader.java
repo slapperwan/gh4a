@@ -18,9 +18,9 @@ import com.gh4a.Gh4Application;
 import com.gh4a.utils.StringUtils;
 
 public class GitModuleParserLoader extends BaseLoader<Map<String, String>> {
-    private String mRepoOwner;
-    private String mRepoName;
-    private String mRef;
+    private final String mRepoOwner;
+    private final String mRepoName;
+    private final String mRef;
 
     public GitModuleParserLoader(Context context, String repoOwner, String repoName, String ref) {
         super(context);

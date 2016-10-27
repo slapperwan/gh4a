@@ -46,7 +46,6 @@
     <string name="load_failure_explanation">Loading the data from Github failed. Please verify you have a working network connection and try again.</string>
     <string name="share">Share</string>
     <string name="print">Print</string>
-    <string name="download">Download</string>
     <string name="downloads">Downloads</string>
     <string name="releases">Releases</string>
     <string name="open_in_browser">Open in browser</string>
@@ -85,7 +84,6 @@
     <string name="download_mobile_warning_message">Do you want to download this file using your mobile connection?\nYou can also schedule it for download when you\'re using your Wi-Fi connection next time.</string>
     <string name="download_now_button">Download now</string>
     <string name="download_wifi_button">Download over Wi-Fi</string>
-    <string name="download_fail_no_storage_toast">The file could not be downloaded - the storage or SD card isn\'t available.</string>
     <string name="download_permission_rationale">Permission to write to USB storage or SD card is required in order to download files.</string>
     <string name="load_auth_failure_notice">Your authentication credentials aren\'t valid anymore, please log in again.</string>
 	<string name="auth_code">Authentication Code</string>
@@ -177,7 +175,6 @@
     <string name="event_issues_open_title">Opened issue [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_issues_close_title">Closed issue [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_issues_reopen_title">Reopened issue [b]%1$d[/b] on [b]%2$s[/b]</string>
-    <string name="event_delete_repo_title">Deleted repository [b]%1$s[/b]</string>
     <string name="event_delete_branch_title">Deleted branch [b]%1$s[/b] at [b]%2$s[/b]</string>
     <string name="event_delete_tag_title">Deleted tag [b]%1$s[/b] at [b]%2$s[/b]</string>
     <string name="event_pr_open_title">Opened pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
@@ -224,7 +221,6 @@
     <string name="user_no_repos">No repositories found</string>
 
     <!-- Repository -->
-    <string name="repository">Repository</string>
     <string name="repo_forks">Forks</string>
     <string name="repo_language">Language %1$s</string>
     <string name="repo_watchers">Watchers</string>

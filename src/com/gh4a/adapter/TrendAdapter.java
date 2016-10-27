@@ -58,7 +58,7 @@ public class TrendAdapter extends RootAdapter<Trend, TrendAdapter.ViewHolder> {
             tvDesc = (TextView) view.findViewById(R.id.tv_desc);
         }
 
-        private TextView tvTitle;
-        private TextView tvDesc;
+        private final TextView tvTitle;
+        private final TextView tvDesc;
     }
 }

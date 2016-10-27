@@ -31,7 +31,8 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
 public class MilestoneAdapter extends RootAdapter<Milestone, MilestoneAdapter.ViewHolder> {
-    private int mTextColorPrimary, mTextColorSecondary;
+    private final int mTextColorPrimary;
+    private final int mTextColorSecondary;
 
     public MilestoneAdapter(Context context) {
         super(context);
@@ -82,10 +83,10 @@ public class MilestoneAdapter extends RootAdapter<Milestone, MilestoneAdapter.Vi
             tvDue = (TextView) view.findViewById(R.id.tv_due);
         }
 
-        private TextView tvTitle;
-        private TextView tvDesc;
-        private TextView tvOpen;
-        private TextView tvClosed;
-        private TextView tvDue;
+        private final TextView tvTitle;
+        private final TextView tvDesc;
+        private final TextView tvOpen;
+        private final TextView tvClosed;
+        private final TextView tvDue;
     }
 }

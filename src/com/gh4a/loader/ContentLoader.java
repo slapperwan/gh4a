@@ -12,11 +12,10 @@ import android.content.Context;
 import com.gh4a.Gh4Application;
 
 public class ContentLoader extends BaseLoader<List<RepositoryContents>> {
-
-    private String mRepoOwner;
-    private String mRepoName;
-    private String mPath;
-    private String mRef;
+    private final String mRepoOwner;
+    private final String mRepoName;
+    private final String mPath;
+    private final String mRef;
 
     public ContentLoader(Context context, String repoOwner, String repoName, String path, String ref) {
         super(context);

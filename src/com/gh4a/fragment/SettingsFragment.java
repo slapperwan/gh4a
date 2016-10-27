@@ -208,7 +208,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
             { "SmoothProgressBar", "https://github.com/castorflex/SmoothProgressBar" }
         };
 
-        private LayoutInflater mInflater;
+        private final LayoutInflater mInflater;
 
         public OpenSourceComponentAdapter(Context context) {
             mInflater = LayoutInflater.from(context);

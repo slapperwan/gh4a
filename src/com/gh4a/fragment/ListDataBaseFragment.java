@@ -14,7 +14,7 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase im
         RootAdapter.OnItemClickListener<T> {
     private RootAdapter<T, ? extends RecyclerView.ViewHolder> mAdapter;
 
-    private LoaderCallbacks<List<T>> mLoaderCallback = new LoaderCallbacks<List<T>>(this) {
+    private final LoaderCallbacks<List<T>> mLoaderCallback = new LoaderCallbacks<List<T>>(this) {
         @Override
         protected Loader<LoaderResult<List<T>>> onCreateLoader() {
             return ListDataBaseFragment.this.onCreateLoader();

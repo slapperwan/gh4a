@@ -62,8 +62,8 @@ public class ContributorAdapter extends RootAdapter<Contributor, ContributorAdap
             tvExtra = (TextView) view.findViewById(R.id.tv_extra);
         }
 
-        private TextView tvTitle;
-        private ImageView ivGravatar;
-        private TextView tvExtra;
+        private final TextView tvTitle;
+        private final ImageView ivGravatar;
+        private final TextView tvExtra;
     }
 }

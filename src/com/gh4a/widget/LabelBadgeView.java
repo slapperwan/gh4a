@@ -17,10 +17,10 @@ import java.util.List;
 
 public class LabelBadgeView extends View {
     private int[] mColors;
-    private int mBadgeSize;
-    private int mBadgeSpacing;
+    private final int mBadgeSize;
+    private final int mBadgeSpacing;
     private int mBadgesPerRow;
-    private Paint mBadgePaint;
+    private final Paint mBadgePaint;
 
     public LabelBadgeView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);

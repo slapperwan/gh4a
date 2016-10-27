@@ -13,7 +13,7 @@ import android.util.Log;
 import com.gh4a.Gh4Application;
 
 public class PageIteratorLoader<T> extends AsyncTaskLoader<LoaderResult<PageIteratorLoader<T>.LoadedPage>> {
-    private PageIterator<T> mPageIterator;
+    private final PageIterator<T> mPageIterator;
     private ArrayList<T> mPreviouslyLoadedData;
 
     public class LoadedPage {

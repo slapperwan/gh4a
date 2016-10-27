@@ -6,7 +6,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 public abstract class FragmentFactory {
-    protected HomeActivity mActivity;
+    protected final HomeActivity mActivity;
 
     protected FragmentFactory(HomeActivity activity) {
         mActivity = activity;

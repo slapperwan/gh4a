@@ -42,7 +42,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
 
     private static final String STATE_KEY_ITERATOR_STATE = "iterator_state";
 
-    private LoaderCallbacks<PageIteratorLoader<T>.LoadedPage> mLoaderCallback =
+    private final LoaderCallbacks<PageIteratorLoader<T>.LoadedPage> mLoaderCallback =
             new LoaderCallbacks<PageIteratorLoader<T>.LoadedPage>(this) {
         @Override
         protected Loader<LoaderResult<PageIteratorLoader<T>.LoadedPage>> onCreateLoader() {
@@ -95,11 +95,8 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         super.onRecyclerViewInflated(view, inflater);
         mAdapter = onCreateAdapter();
 
-        View loadingContainer = inflater.inflate(R.layout.list_loading_view, view, false);
-        mLoadingView = loadingContainer.findViewById(R.id.loading);
-        mLoadingView.setVisibility(View.GONE);
-
-        mAdapter.setFooterView(loadingContainer, this);
+        mLoadingView = inflater.inflate(R.layout.list_loading_view, view, false);
+        mAdapter.setFooterView(mLoadingView, this);
         mAdapter.setOnItemClickListener(this);
         view.setAdapter(mAdapter);
         updateEmptyState();

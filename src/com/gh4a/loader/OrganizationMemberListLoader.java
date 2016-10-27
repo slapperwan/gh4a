@@ -12,7 +12,7 @@ import com.gh4a.Gh4Application;
 
 public class OrganizationMemberListLoader extends BaseLoader<List<User>> {
 
-    private String mUserLogin;
+    private final String mUserLogin;
 
     public OrganizationMemberListLoader(Context context, String userLogin) {
         super(context);

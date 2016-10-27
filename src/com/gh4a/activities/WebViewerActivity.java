@@ -59,15 +59,15 @@ public abstract class WebViewerActivity extends BaseActivity implements
     private boolean mStarted;
     private boolean mHasData;
     private boolean mRequiresJsInterface;
-    private Handler mHandler = new Handler();
+    private final Handler mHandler = new Handler();
 
     private static final String DARK_CSS_THEME = "dark";
     private static final String LIGHT_CSS_THEME = "light";
     private static final String PRINT_CSS_THEME = "print";
 
-    private static ArrayList<String> sLanguagePlugins = new ArrayList<>();
+    private static final ArrayList<String> sLanguagePlugins = new ArrayList<>();
 
-    private int[] ZOOM_SIZES = new int[] {
+    private final int[] ZOOM_SIZES = new int[] {
         50, 75, 100, 150, 200
     };
 
@@ -99,7 +99,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
         }
     }
 
-    private WebViewClient mWebViewClient = new WebViewClient() {
+    private final WebViewClient mWebViewClient = new WebViewClient() {
         @Override
         public void onPageFinished(WebView view, String url) {
             if (!mRequiresJsInterface) {

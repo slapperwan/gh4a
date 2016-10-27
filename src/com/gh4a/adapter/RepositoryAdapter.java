@@ -81,12 +81,12 @@ public class RepositoryAdapter extends RootAdapter<Repository, RepositoryAdapter
             tvPrivate = (TextView) view.findViewById(R.id.tv_private);
         }
 
-        private TextView tvTitle;
-        private TextView tvDesc;
-        private TextView tvLanguage;
-        private TextView tvForks;
-        private TextView tvStars;
-        private TextView tvSize;
-        private TextView tvPrivate;
+        private final TextView tvTitle;
+        private final TextView tvDesc;
+        private final TextView tvLanguage;
+        private final TextView tvForks;
+        private final TextView tvStars;
+        private final TextView tvSize;
+        private final TextView tvPrivate;
     }
 }

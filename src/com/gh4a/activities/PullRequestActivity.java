@@ -78,7 +78,7 @@ public class PullRequestActivity extends BasePagerActivity implements
         R.string.pull_request_conversation, R.string.commits, R.string.pull_request_files
     };
 
-    private LoaderCallbacks<PullRequest> mPullRequestCallback = new LoaderCallbacks<PullRequest>(this) {
+    private final LoaderCallbacks<PullRequest> mPullRequestCallback = new LoaderCallbacks<PullRequest>(this) {
         @Override
         protected Loader<LoaderResult<PullRequest>> onCreateLoader() {
             return new PullRequestLoader(PullRequestActivity.this,
@@ -93,7 +93,7 @@ public class PullRequestActivity extends BasePagerActivity implements
         }
     };
 
-    private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>(this) {
+    private final LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>(this) {
         @Override
         protected Loader<LoaderResult<Issue>> onCreateLoader() {
             return new IssueLoader(PullRequestActivity.this,
@@ -106,7 +106,7 @@ public class PullRequestActivity extends BasePagerActivity implements
         }
     };
 
-    private LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
+    private final LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
         protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsCollaboratorLoader(PullRequestActivity.this, mRepoOwner, mRepoName);

@@ -99,13 +99,13 @@ public class IssueAdapter extends RootAdapter<Issue, IssueAdapter.ViewHolder> {
             tvMilestone = (TextView) view.findViewById(R.id.tv_milestone);
         }
 
-        ImageView ivGravatar;
-        TextView tvNumber;
-        TextView tvDesc;
-        TextView tvCreator;
-        TextView tvTimestamp;
-        LabelBadgeView lvLabels;
-        TextView tvComments;
-        TextView tvMilestone;
+        final ImageView ivGravatar;
+        final TextView tvNumber;
+        final TextView tvDesc;
+        final TextView tvCreator;
+        final TextView tvTimestamp;
+        final LabelBadgeView lvLabels;
+        final TextView tvComments;
+        final TextView tvMilestone;
     }
 }

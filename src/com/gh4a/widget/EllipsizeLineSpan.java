@@ -10,8 +10,8 @@ import android.text.style.ReplacementSpan;
 
 public class EllipsizeLineSpan extends ReplacementSpan implements
         LineBackgroundSpan, LineHeightSpan {
-    private Rect mClipRect = new Rect();
-    private int mBottomMargin;
+    private final Rect mClipRect = new Rect();
+    private final int mBottomMargin;
 
     public EllipsizeLineSpan(int bottomMargin) {
         mBottomMargin = bottomMargin;

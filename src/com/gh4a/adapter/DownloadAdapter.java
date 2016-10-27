@@ -50,10 +50,10 @@ public class DownloadAdapter extends RootAdapter<Download, DownloadAdapter.ViewH
             tvDownloads = (TextView) view.findViewById(R.id.tv_downloads);
         }
 
-        private TextView tvTitle;
-        private TextView tvDesc;
-        private TextView tvSize;
-        private TextView tvDownloads;
-        private TextView tvCreatedAt;
+        private final TextView tvTitle;
+        private final TextView tvDesc;
+        private final TextView tvSize;
+        private final TextView tvDownloads;
+        private final TextView tvCreatedAt;
     }
 }

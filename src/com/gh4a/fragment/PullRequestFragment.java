@@ -95,7 +95,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     private IssueEventAdapter mAdapter;
     private HttpImageGetter mImageGetter;
 
-    private LoaderCallbacks<List<CommitStatus>> mStatusCallback =
+    private final LoaderCallbacks<List<CommitStatus>> mStatusCallback =
             new LoaderCallbacks<List<CommitStatus>>(this) {
         @Override
         protected Loader<LoaderResult<List<CommitStatus>>> onCreateLoader() {
@@ -109,7 +109,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         }
     };
 
-    private LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
+    private final LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
         protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsCollaboratorLoader(getActivity(), mRepoOwner, mRepoName);
@@ -563,7 +563,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     }
 
     private class PullRequestOpenCloseTask extends ProgressDialogTask<PullRequest> {
-        private boolean mOpen;
+        private final boolean mOpen;
 
         public PullRequestOpenCloseTask(boolean open) {
             super(getBaseActivity(), 0, open ? R.string.opening_msg : R.string.closing_msg);
@@ -613,7 +613,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     }
 
     private class PullRequestMergeTask extends ProgressDialogTask<MergeStatus> {
-        private String mCommitMessage;
+        private final String mCommitMessage;
 
         public PullRequestMergeTask(String commitMessage) {
             super(getBaseActivity(), 0, R.string.merging_msg);

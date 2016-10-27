@@ -12,9 +12,9 @@ import android.content.Context;
 import com.gh4a.Gh4Application;
 
 public class CommitStatusLoader extends BaseLoader<List<CommitStatus>> {
-    private String mRepoOwner;
-    private String mRepoName;
-    private String mSha;
+    private final String mRepoOwner;
+    private final String mRepoName;
+    private final String mSha;
 
     public CommitStatusLoader(Context context, String repoOwner, String repoName, String sha) {
         super(context);
