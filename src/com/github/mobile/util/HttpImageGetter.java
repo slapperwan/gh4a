@@ -15,7 +15,6 @@
  */
 package com.github.mobile.util;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -24,7 +23,6 @@ import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.os.AsyncTaskCompat;
@@ -32,7 +30,6 @@ import android.text.Html.ImageGetter;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ImageSpan;
-import android.view.Display;
 import android.view.WindowManager;
 import android.widget.TextView;
 
@@ -214,13 +211,9 @@ public class HttpImageGetter implements ImageGetter {
         dir = context.getCacheDir();
 
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        final Point size;
-        if (Build.VERSION.SDK_INT < 13) {
-            size = fetchDisplaySizePreHoneycomb(wm);
-        } else {
-            size = fetchDisplaySize(wm);
-        }
+        final Point size = new Point();
 
+        wm.getDefaultDisplay().getSize(size);
         width = size.x;
         height = size.y;
 
@@ -276,19 +269,6 @@ public class HttpImageGetter implements ImageGetter {
                 }
             }
         }
-    }
-
-    @SuppressWarnings("deprecation")
-    private Point fetchDisplaySizePreHoneycomb(WindowManager wm) {
-        Display display = wm.getDefaultDisplay();
-        return new Point(display.getWidth(), display.getHeight());
-    }
-
-    @TargetApi(13)
-    private Point fetchDisplaySize(WindowManager wm) {
-        Point size = new Point();
-        wm.getDefaultDisplay().getSize(size);
-        return size;
     }
 
     private HttpImageGetter show(final TextView view, final CharSequence html, final Object id) {
@@ -513,11 +493,6 @@ public class HttpImageGetter implements ImageGetter {
     }
 
     private boolean canLoadGif() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-            // animated GIFs cause more memory pressure than GB can handle
-            return false;
-        }
-
         SharedPreferences prefs = context.getSharedPreferences(SettingsFragment.PREF_NAME,
                 Context.MODE_PRIVATE);
         int mode = prefs.getInt(SettingsFragment.KEY_GIF_LOADING, 1);

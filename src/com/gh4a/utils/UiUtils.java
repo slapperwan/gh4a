@@ -1,6 +1,5 @@
 package com.gh4a.utils;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -10,18 +9,15 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -41,7 +37,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AbsListView;
 import android.widget.EdgeEffect;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -200,30 +195,7 @@ public class UiUtils {
         if (view == null) {
             return false;
         }
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            if (view instanceof AbsListView) {
-                final AbsListView absListView = (AbsListView) view;
-                if (absListView.getChildCount() == 0) {
-                    return false;
-                }
-                return absListView.getFirstVisiblePosition() > 0
-                        || absListView.getChildAt(0).getTop() < absListView.getPaddingTop();
-            } else {
-                return view.getScrollY() > 0;
-            }
-        } else {
-            return ViewCompat.canScrollVertically(view, -1);
-        }
-    }
-
-    public static AlertDialog.Builder createDialogBuilderWithAlertIcon(Context context) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            builder.setIconAttribute(android.R.attr.alertDialogIcon);
-        } else {
-            builder.setIcon(android.R.drawable.ic_dialog_alert);
-        }
-        return builder;
+        return ViewCompat.canScrollVertically(view, -1);
     }
 
     public static Context makeHeaderThemedContext(Context context) {
@@ -252,65 +224,25 @@ public class UiUtils {
         return color;
     }
 
-    private static void enqueueDownload(Context context, Uri uri, Uri destinationUri,
+    private static void enqueueDownload(Context context, Uri uri, String fileName,
             String description, String mimeType, String mediaType, boolean wifiOnly) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            final DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-            DownloadManager.Request request = new DownloadManager.Request(uri);
+        final DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        DownloadManager.Request request = new DownloadManager.Request(uri);
 
-            request.setDestinationUri(destinationUri);
-            request.setDescription(description);
-            if (mediaType != null) {
-                request.addRequestHeader("Accept", mediaType);
-            }
-            if (mimeType != null) {
-                request.setMimeType(mimeType);
-            }
-            if (wifiOnly) {
-                restrictDownloadToWifi(request);
-            }
-            request.setAllowedOverRoaming(false);
-
-            dm.enqueue(request);
-        } else {
-            // HACK alert:
-            // Gingerbread's DownloadManager needlessly rejected HTTPS URIs. Circumvent that
-            // by building and enqueing the request to the provider by ourselves. This is safe
-            // as we only rely on internal API that won't change anymore.
-            ContentValues values = new ContentValues();
-            values.put("uri", uri.toString());
-            values.put("is_public_api", true);
-            values.put("notificationpackage", context.getPackageName());
-            values.put("destination", 4);
-            values.put("hint", destinationUri.toString());
-            if (mediaType != null) {
-                values.put("http_header_0", "Accept:" + mediaType);
-            }
-            values.put("description", description);
-            if (mimeType != null) {
-                values.put("mimetype", mimeType);
-            }
-            values.put("visibility", 0);
-            values.put("allowed_network_types", wifiOnly ? DownloadManager.Request.NETWORK_WIFI : ~0);
-            values.put("allow_roaming", false);
-            values.put("is_visible_in_downloads_ui", true);
-
-            context.getContentResolver().insert(Uri.parse("content://downloads/my_downloads"), values);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
+        request.setDescription(description);
+        if (mediaType != null) {
+            request.addRequestHeader("Accept", mediaType);
         }
-    }
-
-    // FIXME: Remove this and use setDestinationInExternalPublicDir() when removing GB compatibility
-    //        (and re-check whether WRITE_EXTERNAL_STORAGE permission can be dropped when doing that)
-    private static Uri buildDownloadDestinationUri(String fileName) {
-        final File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        if (file.exists()) {
-            if (!file.isDirectory()) {
-                return null;
-            }
-        } else if (!file.mkdirs()) {
-            return null;
+        if (mimeType != null) {
+            request.setMimeType(mimeType);
         }
-        return Uri.withAppendedPath(Uri.fromFile(file), fileName);
+        if (wifiOnly) {
+            request.setAllowedOverMetered(false);
+        }
+        request.setAllowedOverRoaming(false);
+
+        dm.enqueue(request);
     }
 
     public static void enqueueDownloadWithPermissionCheck(final BaseActivity activity,
@@ -339,15 +271,9 @@ public class UiUtils {
         final Uri uri = Uri.parse(url).buildUpon()
                 .appendQueryParameter("access_token", Gh4Application.get().getAuthToken())
                 .build();
-        final Uri destinationUri = buildDownloadDestinationUri(fileName);
-        if (destinationUri == null) {
-            Toast.makeText(context, R.string.download_fail_no_storage_toast, Toast.LENGTH_LONG)
-                    .show();
-            return;
-        }
 
         if (!downloadNeedsWarning(context)) {
-            enqueueDownload(context, uri, destinationUri, description, mimeType, mediaType, false);
+            enqueueDownload(context, uri, fileName, description, mimeType, mediaType, false);
             return;
         }
 
@@ -355,7 +281,7 @@ public class UiUtils {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 boolean wifiOnly = which == DialogInterface.BUTTON_NEUTRAL;
-                enqueueDownload(context, uri, destinationUri, description,
+                enqueueDownload(context, uri, fileName, description,
                         mimeType, mediaType, wifiOnly);
             }
         };
@@ -369,26 +295,10 @@ public class UiUtils {
                 .show();
     }
 
-    @SuppressLint("NewApi")
     public static boolean downloadNeedsWarning(Context context) {
         ConnectivityManager cm =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            return cm.isActiveNetworkMetered();
-        }
-
-        NetworkInfo info = cm.getActiveNetworkInfo();
-        return info == null || info.getType() != ConnectivityManager.TYPE_WIFI;
-    }
-
-    @SuppressLint("NewApi")
-    private static void restrictDownloadToWifi(DownloadManager.Request request) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            request.setAllowedOverMetered(false);
-        } else {
-            request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI);
-        }
+        return cm.isActiveNetworkMetered();
     }
 
     public static abstract class EmptinessWatchingTextWatcher implements TextWatcher {

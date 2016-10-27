@@ -12,6 +12,7 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -21,7 +22,6 @@ import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.BookmarkAdapter;
 import com.gh4a.db.BookmarksProvider.Columns;
-import com.gh4a.utils.UiUtils;
 
 public class BookmarkListActivity extends BaseActivity implements
         AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener,
@@ -72,9 +72,10 @@ public class BookmarkListActivity extends BaseActivity implements
 
     @Override
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, final long id) {
-        UiUtils.createDialogBuilderWithAlertIcon(this)
+        new AlertDialog.Builder(this)
                 .setTitle(R.string.remove_bookmark)
                 .setMessage(R.string.remove_bookmark_confirm)
+                .setIconAttribute(android.R.attr.alertDialogIcon)
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {

@@ -7,7 +7,7 @@
     android:orientation="horizontal"
     android:padding="@dimen/breadcrumb_padding_side">
 
-    <com.gh4a.widget.ActivatableStyledTextView
+    <com.gh4a.widget.StyleableTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"

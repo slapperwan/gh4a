@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialog;
@@ -78,10 +77,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
 
         mOpenSourcePref = findPreference(KEY_OPEN_SOURCE_COMPONENTS);
         mOpenSourcePref.setOnPreferenceClickListener(this);
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-            getPreferenceScreen().removePreference(findPreference(KEY_GIF_LOADING));
-        }
 
         updateLogoutPrefState();
     }

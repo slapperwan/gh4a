@@ -69,12 +69,6 @@ public abstract class WebViewerActivity extends BaseActivity implements
     private int[] ZOOM_SIZES = new int[] {
         50, 75, 100, 150, 200
     };
-    @SuppressWarnings("deprecation")
-    private WebSettings.TextSize[] ZOOM_SIZES_API10 = new WebSettings.TextSize[] {
-        WebSettings.TextSize.SMALLEST, WebSettings.TextSize.SMALLER,
-        WebSettings.TextSize.NORMAL, WebSettings.TextSize.LARGER,
-        WebSettings.TextSize.LARGEST
-    };
 
     private class RenderingDoneInterface {
         @JavascriptInterface
@@ -171,7 +165,12 @@ public abstract class WebViewerActivity extends BaseActivity implements
 
         WebSettings s = mWebView.getSettings();
         initWebViewSettings(s);
-        applyDefaultTextSize(s);
+
+        SharedPreferences prefs = getSharedPreferences(SettingsFragment.PREF_NAME, MODE_PRIVATE);
+        int initialZoomLevel = prefs.getInt(SettingsFragment.KEY_TEXT_SIZE, -1);
+        if (initialZoomLevel >= 0 || initialZoomLevel < ZOOM_SIZES.length) {
+            s.setTextZoom(ZOOM_SIZES[initialZoomLevel]);
+        }
 
         mWebView.setBackgroundColor(UiUtils.resolveColor(this, R.attr.colorWebViewBackground));
         mWebView.setWebViewClient(mWebViewClient);
@@ -183,9 +182,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
         s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
         s.setAllowFileAccess(true);
         s.setBuiltInZoomControls(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            s.setDisplayZoomControls(false);
-        }
+        s.setDisplayZoomControls(false);
         s.setLightTouchEnabled(true);
         s.setLoadsImagesAutomatically(true);
         s.setSupportZoom(true);
@@ -195,9 +192,6 @@ public abstract class WebViewerActivity extends BaseActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-            menu.removeItem(R.id.search);
-        }
         if (!mHasData) {
             menu.removeItem(R.id.browser);
         }
@@ -289,21 +283,6 @@ public abstract class WebViewerActivity extends BaseActivity implements
             return webView.createPrintDocumentAdapter(title);
         } else {
             return webView.createPrintDocumentAdapter();
-        }
-    }
-
-    @SuppressWarnings("deprecation")
-    private void applyDefaultTextSize(WebSettings s) {
-        SharedPreferences prefs = getSharedPreferences(SettingsFragment.PREF_NAME, MODE_PRIVATE);
-        int initialZoomLevel = prefs.getInt(SettingsFragment.KEY_TEXT_SIZE, -1);
-        if (initialZoomLevel < 0 || initialZoomLevel >= ZOOM_SIZES.length) {
-            return;
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            s.setTextZoom(ZOOM_SIZES[initialZoomLevel]);
-        } else {
-            s.setTextSize(ZOOM_SIZES_API10[initialZoomLevel]);
         }
     }
 

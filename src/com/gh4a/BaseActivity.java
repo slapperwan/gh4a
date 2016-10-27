@@ -26,6 +26,7 @@ import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -60,7 +61,6 @@ import com.gh4a.db.BookmarksProvider;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.utils.UiUtils;
-import com.gh4a.widget.ColorDrawable;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.gh4a.widget.ToggleableAppBarLayoutBehavior;
 import com.nineoldandroids.animation.Animator;
@@ -570,7 +570,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         assignBackground(mHeader, primaryColor);
 
         int primaryDarkColor = UiUtils.resolveColor(this, R.attr.colorPrimaryDark);
-        ColorDrawable d = ColorDrawable.create(primaryDarkColor);
+        ColorDrawable d = new ColorDrawable(primaryDarkColor);
         mDrawerLayout.setStatusBarBackground(d);
         mStatusBarDrawables.add(d);
     }
@@ -587,12 +587,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
         if (view == null) {
             return;
         }
-        ColorDrawable background = ColorDrawable.create(color);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            view.setBackground(background);
-        } else {
-            view.setBackgroundDrawable(background);
-        }
+        ColorDrawable background = new ColorDrawable(color);
+        view.setBackground(background);
         mHeaderDrawables.add(background);
     }
 

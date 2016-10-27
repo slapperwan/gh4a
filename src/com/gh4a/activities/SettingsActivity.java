@@ -1,7 +1,6 @@
 package com.gh4a.activities;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 
@@ -61,21 +60,5 @@ public class SettingsActivity extends BaseActivity implements
     @Override
     public void onAuthStateChanged() {
         mResultIntent.putExtra(RESULT_EXTRA_AUTH_CHANGED, true);
-    }
-
-    @Override
-    public void recreate() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            super.recreate();
-        } else {
-            final Intent intent = getIntent();
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-
-            startActivity(intent);
-            overridePendingTransition(0, 0);
-
-            finish();
-            overridePendingTransition(0, 0);
-        }
     }
 }
