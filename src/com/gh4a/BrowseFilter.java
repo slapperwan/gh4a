@@ -2,6 +2,7 @@ package com.gh4a;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.eclipse.egit.github.core.RepositoryBranch;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -40,6 +41,7 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
 public class BrowseFilter extends AppCompatActivity {
+    private static final Pattern SHA1_PATTERN = Pattern.compile("[a-z0-9]{40}");
 
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME == R.style.DarkTheme
@@ -221,6 +223,15 @@ public class BrowseFilter extends AppCompatActivity {
                                     mRefAndPath.substring(nameWithSlash.length()));
                         }
                     }
+                }
+            }
+
+            // at this point, the first item may still be a SHA1 - check with a simple regex
+            int slashPos = mRefAndPath.indexOf('/');
+            if (slashPos > 0) {
+                String potentialSha = mRefAndPath.substring(0, slashPos);
+                if (SHA1_PATTERN.matcher(potentialSha).matches()) {
+                    return Pair.create(potentialSha, mRefAndPath.substring(slashPos + 1));
                 }
             }
 
