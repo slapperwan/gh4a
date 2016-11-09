@@ -62,8 +62,8 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
         mLogin = getArguments().getString("user");
         mRepoType = getArguments().getString("repo_type");
         mIsOrg = getArguments().getBoolean("is_org");
-        mSortOrder = getArguments().getString("sortOrder");
-        mSortDirection = getArguments().getString("sortDirection");
+        mSortOrder = getArguments().getString("sort_order");
+        mSortDirection = getArguments().getString("sort_direction");
     }
 
     @Override
