@@ -17,6 +17,7 @@ package com.gh4a.adapter;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.support.annotation.StringRes;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
@@ -29,8 +30,11 @@ import com.gh4a.R;
 import com.gh4a.holder.Trend;
 
 public class TrendAdapter extends RootAdapter<Trend, TrendAdapter.ViewHolder> {
-    public TrendAdapter(Context context) {
+    private @StringRes int mStarsTemplate;
+
+    public TrendAdapter(Context context, @StringRes int starsTemplate) {
         super(context);
+        mStarsTemplate = starsTemplate;
     }
 
     @Override
@@ -49,6 +53,9 @@ public class TrendAdapter extends RootAdapter<Trend, TrendAdapter.ViewHolder> {
         title.setSpan(new StyleSpan(Typeface.BOLD), 0, owner.length(), 0);
         holder.tvTitle.setText(title);
         holder.tvDesc.setText(trend.getDescription());
+        holder.tvStars.setText(mContext.getString(mStarsTemplate,
+                trend.getNewStars(), trend.getStars()));
+        holder.tvForks.setText(String.valueOf(trend.getForks()));
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -56,9 +63,13 @@ public class TrendAdapter extends RootAdapter<Trend, TrendAdapter.ViewHolder> {
             super(view);
             tvTitle = (TextView) view.findViewById(R.id.tv_title);
             tvDesc = (TextView) view.findViewById(R.id.tv_desc);
+            tvStars = (TextView) view.findViewById(R.id.tv_stars);
+            tvForks = (TextView) view.findViewById(R.id.tv_forks);
         }
 
         private final TextView tvTitle;
         private final TextView tvDesc;
+        private final TextView tvStars;
+        private final TextView tvForks;
     }
 }

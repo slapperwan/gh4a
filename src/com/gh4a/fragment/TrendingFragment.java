@@ -16,6 +16,7 @@
 package com.gh4a.fragment;
 
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 
@@ -48,6 +49,7 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
     public static final String TYPE_MONTHLY = "monthly";
 
     private String mUrl;
+    private @StringRes int mStarsTemplate;
 
     public static TrendingFragment newInstance(String type) {
         if (type == null) {
@@ -57,6 +59,12 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
         TrendingFragment f = new TrendingFragment();
         Bundle args = new Bundle();
         args.putString("url", String.format(Locale.US, TREND_URL_TEMPLATE, type));
+        switch (type) {
+            case TYPE_DAILY: args.putInt("stars_template", R.string.trend_stars_today); break;
+            case TYPE_WEEKLY: args.putInt("stars_template", R.string.trend_stars_week); break;
+            case TYPE_MONTHLY: args.putInt("stars_template", R.string.trend_stars_month); break;
+            default: throw new IllegalArgumentException();
+        }
         f.setArguments(args);
 
         return f;
@@ -66,11 +74,12 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mUrl = getArguments().getString("url");
+        mStarsTemplate = getArguments().getInt("stars_template", 0);
     }
 
     @Override
     protected RootAdapter<Trend, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        return new TrendAdapter(getActivity());
+        return new TrendAdapter(getActivity(), mStarsTemplate);
     }
 
     @Override

@@ -393,6 +393,9 @@
     <string name="trend_today">Today</string>
     <string name="trend_week">Week</string>
     <string name="trend_month">Month</string>
+    <string name="trend_stars_today">%1$d today, %2$d total</string>
+    <string name="trend_stars_week">%1$d this week, %2$d total</string>
+    <string name="trend_stars_month">%1$d this month, %2$d total</string>
 
     <!-- GitHub Blog -->
     <string name="blog">GitHub Blog</string>

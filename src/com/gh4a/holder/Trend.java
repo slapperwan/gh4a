@@ -19,11 +19,19 @@ public class Trend {
     private String repoOwner;
     private String repoName;
     private String description;
+    private int stars;
+    private int newStars;
+    private int forks;
 
-    public void setRepo(String owner, String repo) {
+    public Trend(String owner, String repo, String desc, int stars, int newStars, int forks) {
         this.repoOwner = owner;
         this.repoName = repo;
+        this.description = desc;
+        this.forks = forks;
+        this.stars = stars;
+        this.newStars = newStars;
     }
+
     public String getRepoOwner() {
         return repoOwner;
     }
@@ -33,7 +41,13 @@ public class Trend {
     public String getDescription() {
         return description;
     }
-    public void setDescription(String description) {
-        this.description = description;
+    public int getStars() {
+        return stars;
+    }
+    public int getNewStars() {
+        return newStars;
+    }
+    public int getForks() {
+        return forks;
     }
 }
