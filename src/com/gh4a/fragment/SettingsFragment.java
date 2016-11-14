@@ -203,7 +203,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
             { "Github Java bindings", "https://github.com/maniac103/egit-github" },
             { "HoloColorPicker", "https://github.com/LarsWerkman/HoloColorPicker" },
             { "Material Design Icons", "https://github.com/google/material-design-icons" },
-            { "Nine Old Androids", "https://github.com/JakeWharton/NineOldAndroids" },
             { "PrettyTime", "https://github.com/ocpsoft/prettytime" },
             { "SmoothProgressBar", "https://github.com/castorflex/SmoothProgressBar" }
         };
