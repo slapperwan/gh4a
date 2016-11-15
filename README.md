@@ -82,7 +82,6 @@ Open Source Libraries
 * [GitHub Java API](https://github.com/maniac103/egit-github/tree/master/org.eclipse.egit.github.core)
 * [HoloColorPicker](https://github.com/LarsWerkman/HoloColorPicker)
 * [Material Design Icons](https://github.com/google/material-design-icons)
-* [Nine Old Androids](https://github.com/JakeWharton/NineOldAndroids)
 * [SmoothProgressBar](https://github.com/castorflex/SmoothProgressBar)
 
 Contributions

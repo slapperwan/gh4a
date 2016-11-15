@@ -69,7 +69,6 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:1.6.0'
     compile 'org.ocpsoft.prettytime:prettytime:3.0.0.Final'
     compile 'com.github.castorflex.smoothprogressbar:library:1.1.0'
-    compile 'com.nineoldandroids:library:2.4.0+'
     compile('com.crashlytics.sdk.android:crashlytics:2.4.0@aar') {
         transitive = true;
     }
