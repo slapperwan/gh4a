@@ -7,6 +7,7 @@ import android.graphics.Typeface;
 import android.support.v7.text.AllCapsTransformationMethod;
 import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.widget.TextView;
 
 import com.gh4a.R;
@@ -109,5 +110,18 @@ public class StyleableTextView extends TextView {
         if (getMovementMethod() == LinkMovementMethod.getInstance()) {
             setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         }
+    }
+
+    // workaround for https://code.google.com/p/android/issues/detail?id=191430
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        int startSelection = getSelectionStart();
+        int endSelection = getSelectionEnd();
+        if (startSelection != endSelection && event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+            final CharSequence text = getText();
+            setText(null);
+            setText(text);
+        }
+        return super.dispatchTouchEvent(event);
     }
 }
