@@ -327,6 +327,7 @@ public class HtmlUtils {
         // Replace paragraphs with breaks
         replace(formatted, PARAGRAPH_START, BREAK);
         replace(formatted, PARAGRAPH_END, BREAK);
+        replace(formatted, "\n", BREAK);
 
         formatPres(formatted);
 
