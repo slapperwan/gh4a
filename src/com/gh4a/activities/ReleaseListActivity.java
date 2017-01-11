@@ -25,6 +25,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.Constants;
@@ -41,8 +42,11 @@ import com.gh4a.widget.SwipeRefreshLayout;
 
 public class ReleaseListActivity extends BaseActivity implements
         SwipeRefreshLayout.ChildScrollDelegate, RootAdapter.OnItemClickListener<Release> {
+    public static String EXTRA_INITIAL_SELECTION = "initial_selection";
+
     private String mUserLogin;
     private String mRepoName;
+    private String mInitialSelection;
     private RecyclerView mRecyclerView;
     private ReleaseAdapter mAdapter;
 
@@ -54,8 +58,22 @@ public class ReleaseListActivity extends BaseActivity implements
 
         @Override
         protected void onResultReady(List<Release> result) {
-            fillData(result);
-            setContentShown(true);
+            Release initialRelease = null;
+            if (mInitialSelection != null && result != null) {
+                for (Release release : result) {
+                    if (TextUtils.equals(release.getName(), mInitialSelection)) {
+                        initialRelease = release;
+                        break;
+                    }
+                }
+            }
+            if (initialRelease != null) {
+                onItemClick(initialRelease);
+                finish();
+            } else {
+                fillData(result);
+                setContentShown(true);
+            }
         }
     };
 
@@ -89,6 +107,7 @@ public class ReleaseListActivity extends BaseActivity implements
         super.onInitExtras(extras);
         mUserLogin = extras.getString(Constants.Repository.OWNER);
         mRepoName = extras.getString(Constants.Repository.NAME);
+        mInitialSelection = extras.getString(EXTRA_INITIAL_SELECTION);
     }
 
     @Override

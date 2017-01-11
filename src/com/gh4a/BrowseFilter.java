@@ -74,9 +74,17 @@ public class BrowseFilter extends AppCompatActivity {
                 intent.putExtra(Constants.Repository.OWNER, user);
                 intent.putExtra(Constants.Repository.NAME, repo);
             } else if ("releases".equals(action)) {
+                final String release;
+                if ("tag".equals(id)) {
+                    release = parts.size() >= 5 ? parts.get(4) : null;
+                } else {
+                    release = id;
+                }
+
                 intent = new Intent(this, ReleaseListActivity.class);
                 intent.putExtra(Constants.Repository.OWNER, user);
                 intent.putExtra(Constants.Repository.NAME, repo);
+                intent.putExtra(ReleaseListActivity.EXTRA_INITIAL_SELECTION, release);
             } else if ("tree".equals(action) || "commits".equals(action)) {
                 int page = "tree".equals(action)
                         ? RepositoryActivity.PAGE_FILES : RepositoryActivity.PAGE_COMMITS;
@@ -254,11 +262,10 @@ public class BrowseFilter extends AppCompatActivity {
 
             // at this point, the first item may still be a SHA1 - check with a simple regex
             int slashPos = mRefAndPath.indexOf('/');
-            if (slashPos > 0) {
-                String potentialSha = mRefAndPath.substring(0, slashPos);
-                if (SHA1_PATTERN.matcher(potentialSha).matches()) {
-                    return Pair.create(potentialSha, mRefAndPath.substring(slashPos + 1));
-                }
+            String potentialSha = slashPos > 0 ? mRefAndPath.substring(0, slashPos) : mRefAndPath;
+            if (SHA1_PATTERN.matcher(potentialSha).matches()) {
+                return Pair.create(potentialSha,
+                        slashPos > 0 ? mRefAndPath.substring(slashPos + 1) : "");
             }
 
             return null;
