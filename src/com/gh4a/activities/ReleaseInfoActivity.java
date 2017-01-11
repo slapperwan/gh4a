@@ -75,7 +75,8 @@ public class ReleaseInfoActivity extends BaseActivity implements
     private LoaderCallbacks<String> mBodyCallback = new LoaderCallbacks<String>(this) {
         @Override
         protected Loader<LoaderResult<String>> onCreateLoader() {
-            return new MarkdownLoader(ReleaseInfoActivity.this, mRelease.getBody(), null);
+            return new MarkdownLoader(ReleaseInfoActivity.this,
+                    mRepoOwner, mRepoName, mRelease.getBody());
         }
 
         @Override
