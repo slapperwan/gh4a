@@ -53,6 +53,11 @@ public class UiUtils {
                 Toast.makeText(widget.getContext(), R.string.link_not_openable, Toast.LENGTH_LONG)
                         .show();
                 return true;
+            } catch (SecurityException e) {
+                // some apps have intent filters set for the VIEW action for
+                // internal, non-exported activities
+                // -> ignore
+                return true;
             }
         }
     };
