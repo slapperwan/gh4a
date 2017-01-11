@@ -7,6 +7,7 @@ import android.graphics.Typeface;
 import android.support.v7.text.AllCapsTransformationMethod;
 import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.widget.TextView;
 
 import com.gh4a.R;
