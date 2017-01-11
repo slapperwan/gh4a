@@ -43,7 +43,7 @@ public class MilestoneListLoader extends BaseLoader<List<Milestone>> {
                     String leftState = lhs.getState();
                     String rightState = rhs.getState();
                     if (TextUtils.equals(leftState, rightState)) {
-                        return 0;
+                        return lhs.getTitle().compareToIgnoreCase(rhs.getTitle());
                     } else if (Constants.Issue.STATE_CLOSED.equals(leftState)) {
                         return 1;
                     } else {
