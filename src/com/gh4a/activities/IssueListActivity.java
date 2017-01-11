@@ -78,7 +78,7 @@ public class IssueListActivity extends BasePagerActivity implements
     private String mRepoName;
 
     private List<String> mSelectedLabels;
-    private int mSelectedMilestone;
+    private String mSelectedMilestone;
     private String mSelectedAssignee;
     private String mSearchQuery;
     private boolean mSearchMode;
@@ -451,7 +451,7 @@ public class IssueListActivity extends BasePagerActivity implements
                 position == 1 ? ApiHelpers.IssueState.CLOSED : ApiHelpers.IssueState.OPEN,
                 mRepoOwner, mRepoName,
                 mSelectedLabels != null ? "labels:" + TextUtils.join(",", mSelectedLabels) : "",
-                mSelectedMilestone > 0 ? "milestone:" + mSelectedMilestone : "", // XXX: milestone name?
+                mSelectedMilestone != null ? "milestone:\"" + mSelectedMilestone + "\"" : "",
                 mSelectedAssignee != null ? "assignee:" + mSelectedAssignee : ""));
 
         final IssueListFragment f = IssueListFragment.newInstance(filterData,
@@ -525,18 +525,14 @@ public class IssueListActivity extends BasePagerActivity implements
     }
 
     private void showMilestonesDialog() {
-        String[] milestones = new String[mMilestones.size() + 1];
-        final int[] milestoneIds = new int[mMilestones.size() + 1];
+        final String[] milestones = new String[mMilestones.size() + 1];
         int selected = 0;
 
         milestones[0] = getResources().getString(R.string.issue_filter_by_any_milestone);
-        milestoneIds[0] = 0;
 
         for (int i = 1; i <= mMilestones.size(); i++) {
-            Milestone m = mMilestones.get(i - 1);
-            milestones[i] = m.getTitle();
-            milestoneIds[i] = m.getNumber();
-            if (m.getNumber() == mSelectedMilestone) {
+            milestones[i] = mMilestones.get(i - 1).getTitle();
+            if (TextUtils.equals(mSelectedMilestone, milestones[i])) {
                 selected = i;
             }
         }
@@ -544,7 +540,7 @@ public class IssueListActivity extends BasePagerActivity implements
         DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mSelectedMilestone = milestoneIds[which];
+                mSelectedMilestone = which != 0 ? milestones[which] : null;
                 dialog.dismiss();
                 reloadIssueList();
             }
