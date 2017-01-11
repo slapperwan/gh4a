@@ -68,7 +68,7 @@ dependencies {
     compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.+'
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.squareup.okhttp:okhttp:1.6.0'
-    compile 'org.ocpsoft.prettytime:prettytime:3.0.0.Final'
+    compile 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
     compile 'com.github.castorflex.smoothprogressbar:library:1.1.0'
     compile 'com.nineoldandroids:library:2.4.0+'
     compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
