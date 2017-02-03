@@ -6,19 +6,24 @@
         <item
             android:id="@+id/news_feed"
             android:title="@string/user_news_feed"
+            android:icon="@drawable/nav_icon_news_feed"
             android:checked="true" />
         <item
             android:id="@+id/my_repos"
-            android:title="@string/my_repositories" />
+            android:title="@string/my_repositories"
+            android:icon="@drawable/nav_icon_repositories"/>
         <item
             android:id="@+id/my_issues"
-            android:title="@string/my_issues" />
+            android:title="@string/my_issues"
+            android:icon="@drawable/nav_icon_issues"/>
         <item
             android:id="@+id/my_prs"
-            android:title="@string/my_pull_requests" />
+            android:title="@string/my_pull_requests"
+            android:icon="@drawable/nav_icon_pull_request"/>
         <item
             android:id="@+id/my_gists"
-            android:title="@string/my_gists" />
+            android:title="@string/my_gists"
+            android:icon="@drawable/nav_icon_gists"/>
     </group>
     <item android:title="@string/navigation">
         <menu>
