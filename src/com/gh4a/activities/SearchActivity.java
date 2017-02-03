@@ -23,9 +23,12 @@ import org.eclipse.egit.github.core.RequestError;
 import org.eclipse.egit.github.core.SearchUser;
 import org.eclipse.egit.github.core.client.RequestException;
 
+import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
@@ -49,6 +52,7 @@ import com.gh4a.adapter.CodeSearchAdapter;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.SearchUserAdapter;
+import com.gh4a.db.SearchProvider;
 import com.gh4a.loader.CodeSearchLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
@@ -154,6 +158,8 @@ public class SearchActivity extends BaseActivity implements
         mSearch.setOnQueryTextListener(this);
         mSearch.setOnCloseListener(this);
         mSearch.onActionViewExpanded();
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        mSearch.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         updateSelectedSearchType();
 
@@ -172,6 +178,26 @@ public class SearchActivity extends BaseActivity implements
                 case SEARCH_MODE_USER: lm.initLoader(0, null, mUserCallback); break;
                 case SEARCH_MODE_CODE: lm.initLoader(0, null, mCodeCallback); break;
             }
+        }
+
+        handleIntent(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        setIntent(intent);
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
+                    SearchProvider.AUTHORITY, SearchProvider.MODE);
+            suggestions.saveRecentQuery(query, null);
+            mQuery = query;
+            mSearch.setQuery(mQuery, false);
+            onQueryTextSubmit(mQuery);
         }
     }
 
@@ -325,6 +351,11 @@ public class SearchActivity extends BaseActivity implements
             default: lm.restartLoader(0, null, mRepoCallback); break;
         }
         setContentShown(false);
+
+        SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
+                SearchProvider.AUTHORITY, SearchProvider.MODE);
+        suggestions.saveRecentQuery(mQuery, null);
+
         mSearch.clearFocus();
         return true;
     }

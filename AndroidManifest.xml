@@ -67,7 +67,13 @@
         <activity android:name=".activities.ReleaseListActivity" android:exported="false" />
         <activity android:name=".activities.RepositoryActivity" android:exported="false" />
         <activity android:name=".activities.RepositoryListActivity" android:exported="false" />
-        <activity android:name=".activities.SearchActivity" android:exported="false" />
+        <activity android:name=".activities.SearchActivity" android:exported="false" android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+            <meta-data android:name="android.app.searchable"
+                android:resource="@xml/searchable"/>
+        </activity>
         <activity android:name=".activities.TimelineActivity" android:exported="false" />
         <activity android:name=".activities.TrendingActivity" android:exported="false" />
         <activity android:name=".activities.UserActivity" android:exported="false" />
@@ -109,6 +115,11 @@
         <provider
             android:name=".db.BookmarksProvider"
             android:authorities="com.gh4a"
+            android:exported="false" />
+
+        <provider
+            android:name=".db.SearchProvider"
+            android:authorities="com.gh4a.db.SearchProvider"
             android:exported="false" />
 
         <receiver
