@@ -9,6 +9,7 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     static final String BOOKMARKS_TABLE = "bookmarks";
+    static final String SUGGESTIONS_TABLE = "suggestions";
 
     public DbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -22,6 +23,12 @@ public class DbHelper extends SQLiteOpenHelper {
                 + "type integer not null, "
                 + "uri text not null, "
                 + "extra_data text);");
+        db.execSQL("create table " + SUGGESTIONS_TABLE + " ("
+                + "_id integer primary key autoincrement, "
+                + "type integer not null, "
+                + "suggestion text, "
+                + "date long, "
+                + "unique (type, suggestion) on conflict replace);");
     }
 
     @Override
