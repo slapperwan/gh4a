@@ -180,16 +180,16 @@ public class SearchActivity extends BaseActivity implements
             }
         }
 
-        handleIntent(getIntent());
+        handleIntent(getIntent(), true);
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
-        handleIntent(intent);
+        handleIntent(intent, false);
     }
 
-    private void handleIntent(Intent intent) {
+    private void handleIntent(Intent intent, boolean performSearch) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
@@ -197,7 +197,9 @@ public class SearchActivity extends BaseActivity implements
             suggestions.saveRecentQuery(query, null);
             mQuery = query;
             mSearch.setQuery(mQuery, false);
-            onQueryTextSubmit(mQuery);
+            if (performSearch) {
+                onQueryTextSubmit(mQuery);
+            }
         }
     }
 
