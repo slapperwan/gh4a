@@ -53,7 +53,7 @@
                 <item
                     android:id="@+id/trend"
                     android:title="@string/trend"
-                    android:icon="@drawable/nav_icon_treding"/>
+                    android:icon="@drawable/nav_icon_trending"/>
                 <item
                     android:id="@+id/blog"
                     android:title="@string/blog"
