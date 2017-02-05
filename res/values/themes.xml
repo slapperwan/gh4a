@@ -97,7 +97,7 @@
         <item name="contentEditIcon">@drawable/content_edit</item>
         <item name="contentPictureIcon">@drawable/content_picture</item>
         <item name="searchUserIcon">@drawable/search_users</item>
-        <item name="searchRepoIcon">@drawable/search_repos</item>
+        <item name="searchRepoIcon">@drawable/icon_repositories</item>
         <item name="searchCodeIcon">@drawable/search_code</item>
         <item name="userBookmarkIcon">@drawable/user_bookmark</item>
         <item name="repoBookmarkIcon">@drawable/repo_bookmark</item>
