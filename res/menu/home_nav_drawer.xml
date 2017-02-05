@@ -6,24 +6,24 @@
         <item
             android:id="@+id/news_feed"
             android:title="@string/user_news_feed"
-            android:icon="@drawable/nav_icon_news_feed"
+            android:icon="@drawable/icon_news_feed"
             android:checked="true" />
         <item
             android:id="@+id/my_repos"
             android:title="@string/my_repositories"
-            android:icon="@drawable/nav_icon_repositories"/>
+            android:icon="@drawable/icon_repositories"/>
         <item
             android:id="@+id/my_issues"
             android:title="@string/my_issues"
-            android:icon="@drawable/nav_icon_issues"/>
+            android:icon="@drawable/icon_issues"/>
         <item
             android:id="@+id/my_prs"
             android:title="@string/my_pull_requests"
-            android:icon="@drawable/nav_icon_pull_request"/>
+            android:icon="@drawable/icon_pull_request"/>
         <item
             android:id="@+id/my_gists"
             android:title="@string/my_gists"
-            android:icon="@drawable/nav_icon_gists"/>
+            android:icon="@drawable/icon_gists"/>
     </group>
     <item android:title="@string/navigation">
         <menu>
@@ -32,11 +32,11 @@
                 <item
                     android:id="@+id/search"
                     android:title="@string/search"
-                    android:icon="@drawable/nav_icon_search"/>
+                    android:icon="@drawable/icon_search"/>
                 <item
                     android:id="@+id/bookmarks"
                     android:title="@string/bookmarks"
-                    android:icon="@drawable/nav_icon_bookmark" />
+                    android:icon="@drawable/icon_bookmark" />
             </group>
         </menu>
     </item>
@@ -49,15 +49,15 @@
                 <item
                     android:id="@+id/pub_timeline"
                     android:title="@string/pub_timeline"
-                    android:icon="@drawable/nav_icon_timeline" />
+                    android:icon="@drawable/icon_timeline" />
                 <item
                     android:id="@+id/trend"
                     android:title="@string/trend"
-                    android:icon="@drawable/nav_icon_trending"/>
+                    android:icon="@drawable/icon_trending"/>
                 <item
                     android:id="@+id/blog"
                     android:title="@string/blog"
-                    android:icon="@drawable/nav_icon_github"/>
+                    android:icon="@drawable/icon_github"/>
             </group>
         </menu>
     </item>
@@ -65,6 +65,6 @@
         <item
             android:id="@id/settings"
             android:title="@string/settings"
-            android:icon="@drawable/nav_icon_settings"/>
+            android:icon="@drawable/icon_settings"/>
     </group>
 </menu>
