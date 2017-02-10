@@ -14,37 +14,35 @@ import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-public class BookmarksProvider extends ContentProvider {
-    private static final String TAG = "BookmarksProvider";
+public class SuggestionsProvider extends ContentProvider {
+    private static final String TAG = "SuggestionsProvider";
 
     public interface Columns extends BaseColumns {
-        Uri CONTENT_URI = Uri.parse("content://com.gh4a/bookmarks");
+        Uri CONTENT_URI = Uri.parse("content://com.gh4a.SuggestionsProvider/suggestions");
 
-        String NAME = "name";
         String TYPE = "type";
-        String URI = "uri";
-        String EXTRA = "extra_data";
+        String SUGGESTION = "suggestion";
+        String DATE = "date";
 
-        int TYPE_USER = 0;
-        int TYPE_REPO = 1;
+        int TYPE_REPO = 0;
+        int TYPE_USER = 1;
+        int TYPE_CODE = 2;
     }
 
     private static final int MATCH_ALL = 0;
-    private static final int MATCH_ID  = 1;
 
     private static final UriMatcher
             sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
-        sURIMatcher.addURI("com.gh4a", "bookmarks", MATCH_ALL);
-        sURIMatcher.addURI("com.gh4a", "bookmarks/#", MATCH_ID);
+        sURIMatcher.addURI("com.gh4a.SuggestionsProvider", "suggestions", MATCH_ALL);
     }
 
     private static class DbHelper extends SQLiteOpenHelper {
-        private static final String DATABASE_NAME = "gh4adb.db";
+        private static final String DATABASE_NAME = "suggestion.db";
         private static final int DATABASE_VERSION = 1;
 
-        static final String BOOKMARKS_TABLE = "bookmarks";
+        static final String SUGGESTIONS_TABLE = "suggestions";
 
         public DbHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -52,12 +50,12 @@ public class BookmarksProvider extends ContentProvider {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            db.execSQL("create table " + BOOKMARKS_TABLE + " ("
+            db.execSQL("create table " + SUGGESTIONS_TABLE + " ("
                     + "_id integer primary key autoincrement, "
-                    + "name text not null, "
                     + "type integer not null, "
-                    + "uri text not null, "
-                    + "extra_data text);");
+                    + "suggestion text, "
+                    + "date long, "
+                    + "unique (type, suggestion) on conflict replace);");
         }
 
         @Override
@@ -75,17 +73,14 @@ public class BookmarksProvider extends ContentProvider {
 
     @Override
     public Cursor query(@NonNull Uri uri, String[] projection, String selection,
-            String[] selectionArgs, String sortOrder) {
+                        String[] selectionArgs, String sortOrder) {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         int match = sURIMatcher.match(uri);
 
-        qb.setTables(DbHelper.BOOKMARKS_TABLE);
+        qb.setTables(DbHelper.SUGGESTIONS_TABLE);
 
         switch (match) {
             case MATCH_ALL:
-                break;
-            case MATCH_ID:
-                qb.appendWhere(Columns._ID + " = " + uri.getLastPathSegment());
                 break;
             default:
                 Log.e(TAG, "query: invalid request: " + uri);
@@ -93,7 +88,7 @@ public class BookmarksProvider extends ContentProvider {
         }
 
         if (sortOrder == null) {
-            sortOrder = Columns.TYPE + " asc";
+            sortOrder = Columns.DATE + " desc";
         }
 
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
@@ -116,7 +111,7 @@ public class BookmarksProvider extends ContentProvider {
         }
 
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        long rowID = db.insert(DbHelper.BOOKMARKS_TABLE, null, values);
+        long rowID = db.insert(DbHelper.SUGGESTIONS_TABLE, null, values);
         if (rowID <= 0) {
             return null;
         }
@@ -134,15 +129,7 @@ public class BookmarksProvider extends ContentProvider {
 
         switch (match) {
             case MATCH_ALL:
-                count = db.update(DbHelper.BOOKMARKS_TABLE, values, selection, selectionArgs);
-                break;
-            case MATCH_ID:
-                if (selection != null || selectionArgs != null) {
-                    throw new UnsupportedOperationException(
-                            "Cannot update URI " + uri + " with a where clause");
-                }
-                count = db.update(DbHelper.BOOKMARKS_TABLE, values, Columns._ID + " = ?",
-                        new String[] { uri.getLastPathSegment() });
+                count = db.update(DbHelper.SUGGESTIONS_TABLE, values, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Cannot update that URI: " + uri);
@@ -163,19 +150,11 @@ public class BookmarksProvider extends ContentProvider {
         switch (match) {
             case MATCH_ALL:
                 break;
-            case MATCH_ID:
-                if (selection != null || selectionArgs != null) {
-                    throw new UnsupportedOperationException(
-                            "Cannot delete URI " + uri + " with a where clause");
-                }
-                selection = Columns._ID + " = ?";
-                selectionArgs = new String[] { uri.getLastPathSegment() };
-                break;
             default:
                 throw new UnsupportedOperationException("Cannot delete the URI " + uri);
         }
 
-        int count = db.delete(DbHelper.BOOKMARKS_TABLE, selection, selectionArgs);
+        int count = db.delete(DbHelper.SUGGESTIONS_TABLE, selection, selectionArgs);
 
         if (count > 0) {
             getContext().getContentResolver().notifyChange(Columns.CONTENT_URI, null);
