@@ -15,6 +15,7 @@
  */
 package com.gh4a.activities;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.egit.github.core.CodeSearchResult;
@@ -29,6 +30,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -47,6 +49,7 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
+import com.gh4a.BackgroundTask;
 import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.CodeSearchAdapter;
@@ -60,6 +63,7 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.RepositorySearchLoader;
 import com.gh4a.loader.UserSearchLoader;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
 
@@ -133,6 +137,28 @@ public class SearchActivity extends BaseActivity implements
         }
     };
 
+    private LoaderManager.LoaderCallbacks<Cursor> mSuggestionCallback = new LoaderManager.LoaderCallbacks<Cursor>() {
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            return new CursorLoader(getApplicationContext(), SuggestionsProvider.Columns.CONTENT_URI,
+                    new String[]{SuggestionsProvider.Columns._ID, SuggestionsProvider.Columns.SUGGESTION},
+                    SuggestionsProvider.Columns.TYPE + " = ? and " + SuggestionsProvider.Columns.SUGGESTION + " like ?",
+                    new String[]{String.valueOf(mSearchType.getSelectedItemPosition()), mQuery + "%"},
+                    SuggestionsProvider.Columns.DATE + " desc");
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            mSearch.getSuggestionsAdapter().changeCursor(data);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+            mSearch.getSuggestionsAdapter().changeCursor(null);
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -175,6 +201,8 @@ public class SearchActivity extends BaseActivity implements
                 complete.showDropDown();
             }
         });
+
+        getSupportLoaderManager().initLoader(1, null, mSuggestionCallback);
 
         updateSelectedSearchType();
 
@@ -335,7 +363,8 @@ public class SearchActivity extends BaseActivity implements
                 setEmptyText(null);
                 break;
         }
-        mSearch.getSuggestionsAdapter().changeCursor(getSuggestionsCursor(mQuery));
+        mSearch.getSuggestionsAdapter().changeCursor(null);
+        getSupportLoaderManager().restartLoader(1, null, mSuggestionCallback);
     }
 
     @Override
@@ -346,8 +375,9 @@ public class SearchActivity extends BaseActivity implements
             case 2: lm.restartLoader(0, null, mCodeCallback); break;
             default: lm.restartLoader(0, null, mRepoCallback); break;
         }
+        mQuery = query;
+        new SaveSearchSuggestionTask().schedule();
         setContentShown(false);
-        saveSuggestion(mSearchType.getSelectedItemPosition(), query);
         mSearch.clearFocus();
         return true;
     }
@@ -356,10 +386,13 @@ public class SearchActivity extends BaseActivity implements
     public boolean onQueryTextChange(String newText) {
         CursorAdapter cursorAdapter = mSearch.getSuggestionsAdapter();
         if (cursorAdapter != null) {
-            if (newText.startsWith(mQuery) && cursorAdapter.getCursor().getCount() == 0) {
+            Cursor cursor = cursorAdapter.getCursor();
+            if (newText.startsWith(mQuery) && cursor != null && cursor.getCount() == 0) {
                 // nothing found on previous query
             } else {
-                cursorAdapter.changeCursor(getSuggestionsCursor(newText));
+                mQuery = newText;
+                cursorAdapter.changeCursor(null);
+                getSupportLoaderManager().restartLoader(1, null, mSuggestionCallback);
             }
         }
         mQuery = newText;
@@ -422,23 +455,34 @@ public class SearchActivity extends BaseActivity implements
         }
     }
 
-    private void saveSuggestion(int type, String suggestion) {
-        if (suggestion == null || "".equals(suggestion)) {
-            return;
+
+    private class SaveSearchSuggestionTask extends BackgroundTask<Void> {
+
+        public SaveSearchSuggestionTask() {
+            super(SearchActivity.this);
         }
-        ContentValues cv = new ContentValues();
-        cv.put(SuggestionsProvider.Columns.TYPE, type);
-        cv.put(SuggestionsProvider.Columns.SUGGESTION, suggestion);
-        cv.put(SuggestionsProvider.Columns.DATE, System.currentTimeMillis());
-        getContentResolver().insert(SuggestionsProvider.Columns.CONTENT_URI, cv);
+
+        @Override
+        protected Void run() throws IOException {
+            saveSuggestion(mSearchType.getSelectedItemPosition(), mQuery);
+            return null;
+        }
+
+        @Override
+        protected void onSuccess(Void result) {
+
+        }
+
+        private void saveSuggestion(int type, String suggestion) {
+            if (StringUtils.isBlank(suggestion)) {
+                return;
+            }
+            ContentValues cv = new ContentValues();
+            cv.put(SuggestionsProvider.Columns.TYPE, type);
+            cv.put(SuggestionsProvider.Columns.SUGGESTION, suggestion);
+            cv.put(SuggestionsProvider.Columns.DATE, System.currentTimeMillis());
+            getContentResolver().insert(SuggestionsProvider.Columns.CONTENT_URI, cv);
+        }
     }
 
-    private Cursor getSuggestionsCursor(String text) {
-        return getContentResolver().query(
-                SuggestionsProvider.Columns.CONTENT_URI,
-                new String[]{SuggestionsProvider.Columns._ID, SuggestionsProvider.Columns.SUGGESTION},
-                SuggestionsProvider.Columns.TYPE + " = ? and " + SuggestionsProvider.Columns.SUGGESTION + " like ?",
-                new String[]{String.valueOf(mSearchType.getSelectedItemPosition()), text + "%"},
-                SuggestionsProvider.Columns.DATE + " desc");
-    }
 }
