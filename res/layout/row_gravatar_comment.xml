@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="?attr/listPreferredItemHeight"
@@ -11,7 +12,8 @@
         android:id="@+id/iv_gravatar"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_marginRight="16dp" />
+        android:layout_marginRight="16dp"
+        tools:src="@drawable/default_avatar" />
 
     <ImageView
         android:id="@+id/iv_edit"
@@ -20,7 +22,8 @@
         android:layout_marginRight="-8dp"
         android:layout_alignParentRight="true"
         android:src="?attr/contentEditIcon"
-        style="@style/SelectableBorderlessItem" />
+        style="@style/SelectableBorderlessItem"
+        tools:src="@drawable/content_edit" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_extra"
@@ -29,7 +32,8 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="?android:attr/textColorPrimary"
         android:layout_toRightOf="@id/iv_gravatar"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentTop="true"
+        tools:text="octopus" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_timestamp"
@@ -40,7 +44,8 @@
         android:layout_toRightOf="@id/tv_extra"
         android:layout_toLeftOf="@id/iv_edit"
         android:layout_alignBaseline="@id/tv_extra"
-        android:layout_alignWithParentIfMissing="true" />
+        android:layout_alignWithParentIfMissing="true"
+        tools:text="5 days ago" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_file"
@@ -64,6 +69,7 @@
         android:layout_below="@id/tv_file"
         android:layout_toLeftOf="@id/iv_edit"
         android:layout_toRightOf="@id/iv_gravatar"
-        android:layout_alignWithParentIfMissing="true" />
+        android:layout_alignWithParentIfMissing="true"
+        tools:text="Comment text" />
 
 </RelativeLayout>
