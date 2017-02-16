@@ -55,10 +55,23 @@
     <attr name="commitStatusOkIcon" format="reference" />
     <attr name="commitStatusUnknownIcon" format="reference" />
     <attr name="commitStatusFailIcon" format="reference" />
+    <attr name="issueEventClosedIcon" format="reference" />
+    <attr name="issueEventReopenedIcon" format="reference" />
+    <attr name="issueEventMergedIcon" format="reference" />
+    <attr name="issueEventReferencedIcon" format="reference" />
+    <attr name="issueEventAssignedIcon" format="reference" />
+    <attr name="issueEventUnassignedIcon" format="reference" />
+    <attr name="issueEventLabeledIcon" format="reference" />
+    <attr name="issueEventUnlabeledIcon" format="reference" />
+    <attr name="issueEventLockedIcon" format="reference" />
+    <attr name="issueEventUnlockedIcon" format="reference" />
+    <attr name="issueEventMilestonedIcon" format="reference" />
+    <attr name="issueEventDemilestonedIcon" format="reference" />
+    <attr name="issueEventRenamedIcon" format="reference" />
 
     <declare-styleable name="LabelBadgeView">
-        <attr name="badgeSize" format="dimension"/>
-        <attr name="badgeSpacing" format="dimension"/>
+        <attr name="badgeSize" format="dimension" />
+        <attr name="badgeSpacing" format="dimension" />
     </declare-styleable>
 
     <declare-styleable name="StyleableTextView">
@@ -70,7 +83,7 @@
             <enum name="condensed" value="4" />
             <enum name="boldCondensed" value="5" />
         </attr>
-        <attr name="allCaps" format="boolean"/>
+        <attr name="allCaps" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="IssueStateTrackingFloatingActionButton">
