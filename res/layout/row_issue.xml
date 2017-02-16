@@ -97,6 +97,7 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/iv_gravatar"
         android:layout_below="@id/tv_desc"
+        android:layout_toLeftOf="@id/info"
         android:textAppearance="?android:attr/textAppearanceSmall"
         tools:text="#999 on LongUsername/LongRepositoryName"/>
 
