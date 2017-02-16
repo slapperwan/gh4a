@@ -1,7 +1,5 @@
 package com.gh4a.adapter;
 
-import org.eclipse.egit.github.core.Label;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -16,10 +14,12 @@ import android.widget.TextView;
 
 import com.gh4a.ColorPickerDialog;
 import com.gh4a.ColorPickerDialog.OnColorChangedListener;
+import com.gh4a.R;
 import com.gh4a.utils.TypefaceCache;
 import com.gh4a.utils.UiUtils;
-import com.gh4a.R;
 import com.gh4a.widget.StyleableTextView;
+
+import org.eclipse.egit.github.core.Label;
 
 public class IssueLabelAdapter extends
         RootAdapter<IssueLabelAdapter.EditableLabel, IssueLabelAdapter.ViewHolder> {
@@ -41,6 +41,11 @@ public class IssueLabelAdapter extends
             setColor(label.getColor());
             setName(label.getName());
             setUrl(label.getUrl());
+        }
+
+        public void restoreOriginalProperties() {
+            editedColor = getColor();
+            editedName = getName();
         }
     }
 
