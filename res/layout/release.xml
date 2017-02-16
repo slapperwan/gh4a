@@ -51,7 +51,8 @@
                     android:textColor="?attr/colorPrimaryDark"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:layout_toRightOf="@id/iv_gravatar"
-                    android:layout_below="@id/tv_releasetype" />
+                    android:layout_below="@id/tv_releasetype"
+                    android:background="?attr/selectableItemBackground" />
 
             </RelativeLayout>
 
