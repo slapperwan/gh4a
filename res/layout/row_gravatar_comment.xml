@@ -8,12 +8,26 @@
     android:clipToPadding="false"
     android:padding="@dimen/content_padding">
 
-    <com.gh4a.widget.FixedSizeImageView
-        android:id="@+id/iv_gravatar"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginRight="16dp"
-        tools:src="@drawable/default_avatar" />
+    <FrameLayout
+        android:id="@+id/fl_avatar_container"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginRight="8dp">
+
+        <com.gh4a.widget.FixedSizeImageView
+            android:id="@+id/iv_gravatar"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            tools:src="@drawable/default_avatar" />
+
+        <com.gh4a.widget.FixedSizeImageView
+            android:id="@+id/iv_issue_event"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="end|bottom"
+            android:visibility="gone"
+            tools:src="@drawable/issue_event_closed" />
+    </FrameLayout>
 
     <ImageView
         android:id="@+id/iv_edit"
@@ -31,7 +45,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="?android:attr/textColorPrimary"
-        android:layout_toRightOf="@id/iv_gravatar"
+        android:layout_toRightOf="@id/fl_avatar_container"
         android:layout_alignParentTop="true"
         tools:text="octopus" />
 
@@ -53,7 +67,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_below="@id/tv_extra"
-        android:layout_toRightOf="@id/iv_gravatar"
+        android:layout_toRightOf="@id/fl_avatar_container"
         android:layout_toLeftOf="@id/iv_edit"
         android:layout_alignWithParentIfMissing="true"
         android:visibility="gone" />
@@ -68,7 +82,7 @@
         android:layout_marginTop="2dp"
         android:layout_below="@id/tv_file"
         android:layout_toLeftOf="@id/iv_edit"
-        android:layout_toRightOf="@id/iv_gravatar"
+        android:layout_toRightOf="@id/fl_avatar_container"
         android:layout_alignWithParentIfMissing="true"
         tools:text="Comment text" />
 
