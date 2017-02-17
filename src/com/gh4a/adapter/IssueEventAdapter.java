@@ -15,14 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.CommitFile;
-import org.eclipse.egit.github.core.IssueEvent;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.Rename;
-import org.eclipse.egit.github.core.User;
-
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -42,8 +34,8 @@ import com.gh4a.activities.PullRequestDiffViewerActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.utils.ApiHelpers;
-import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.AvatarHandler;
+import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IntentSpan;
@@ -52,6 +44,15 @@ import com.gh4a.widget.StyleableTextView;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
+import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.CommitFile;
+import org.eclipse.egit.github.core.IssueEvent;
+import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.Rename;
+import org.eclipse.egit.github.core.User;
+
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,6 +64,23 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
 
     private static final Pattern COMMIT_URL_REPO_NAME_AND_OWNER_PATTERN =
             Pattern.compile(".*github.com\\/repos\\/([^\\/]+)\\/([^\\/]+)\\/commits");
+
+    private static final HashMap<String, Integer> EVENT_ICONS = new HashMap<>();
+    static {
+        EVENT_ICONS.put(IssueEvent.TYPE_CLOSED, R.attr.issueEventClosedIcon);
+        EVENT_ICONS.put(IssueEvent.TYPE_REOPENED, R.attr.issueEventReopenedIcon);
+        EVENT_ICONS.put(IssueEvent.TYPE_MERGED, R.attr.issueEventMergedIcon);
+        EVENT_ICONS.put(IssueEvent.TYPE_REFERENCED, R.attr.issueEventReferencedIcon);
+        EVENT_ICONS.put(IssueEvent.TYPE_ASSIGNED, R.attr.issueEventAssignedIcon);
+        EVENT_ICONS.put(IssueEvent.TYPE_UNASSIGNED, R.attr.issueEventUnassignedIcon);
+        EVENT_ICONS.put(IssueEvent.TYPE_LABELED, R.attr.issueEventLabeledIcon);
+        EVENT_ICONS.put(IssueEvent.TYPE_UNLABELED, R.attr.issueEventUnlabeledIcon);
+        EVENT_ICONS.put(IssueEvent.TYPE_LOCKED, R.attr.issueEventLockedIcon);
+        EVENT_ICONS.put(IssueEvent.TYPE_UNLOCKED, R.attr.issueEventUnlockedIcon);
+        EVENT_ICONS.put(IssueEvent.TYPE_MILESTONED, R.attr.issueEventMilestonedIcon);
+        EVENT_ICONS.put(IssueEvent.TYPE_DEMILESTONED, R.attr.issueEventDemilestonedIcon);
+        EVENT_ICONS.put(IssueEvent.TYPE_RENAMED, R.attr.issueEventRenamedIcon);
+    }
 
     private final HttpImageGetter mImageGetter;
     private final OnEditComment mEditCallback;
@@ -146,10 +164,20 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         if (event.comment != null) {
             String body = HtmlUtils.format(event.comment.getBodyHtml()).toString();
             mImageGetter.bind(holder.tvDesc, body, event.comment.getId());
+
+            holder.ivIssueEvent.setVisibility(View.GONE);
         } else {
             holder.tvDesc.setTag(null);
             holder.tvDesc.setText(formatEvent(event.event, event.getUser(),
                     holder.tvExtra.getTypefaceValue()));
+
+            Integer eventIconAttr = EVENT_ICONS.get(event.event.getEvent());
+            if (eventIconAttr != null) {
+                holder.ivIssueEvent.setImageResource(UiUtils.resolveDrawable(mContext, eventIconAttr));
+                holder.ivIssueEvent.setVisibility(View.VISIBLE);
+            } else {
+                holder.ivIssueEvent.setVisibility(View.GONE);
+            }
         }
 
         String ourLogin = Gh4Application.get().getAuthLogin();
@@ -303,6 +331,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         private ViewHolder(View view) {
             super(view);
             ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
+            ivIssueEvent = (ImageView) view.findViewById(R.id.iv_issue_event);
             tvDesc = (TextView) view.findViewById(R.id.tv_desc);
             tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
             tvExtra = (StyleableTextView) view.findViewById(R.id.tv_extra);
@@ -312,6 +341,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         }
 
         private final ImageView ivGravatar;
+        private final ImageView ivIssueEvent;
         private final TextView tvDesc;
         private final StyleableTextView tvExtra;
         private final StyleableTextView tvFile;
