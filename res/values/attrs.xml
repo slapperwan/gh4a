@@ -48,6 +48,7 @@
     <attr name="labelsIcon" format="reference" />
     <attr name="branchIcon" format="reference" />
     <attr name="tagIcon" format="reference" />
+    <attr name="pullRequestIcon" format="reference" />
     <attr name="pullRequestMergeOkIcon" format="reference" />
     <attr name="pullRequestMergeUnstableIcon" format="reference" />
     <attr name="pullRequestMergeDirtyIcon" format="reference" />

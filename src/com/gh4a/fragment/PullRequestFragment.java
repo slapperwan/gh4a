@@ -62,6 +62,7 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IssueLabelSpan;
+import com.gh4a.widget.StyleableTextView;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
@@ -278,6 +279,17 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
             body = HtmlUtils.format(body).toString();
             mImageGetter.bind(descriptionView, body, mPullRequest.getId());
         }
+
+        View branchGroup = mListHeaderView.findViewById(R.id.pr_container);
+        branchGroup.setVisibility(View.VISIBLE);
+
+        StyleableTextView fromBranch = (StyleableTextView) branchGroup.findViewById(R.id.tv_pr_from);
+        StringUtils.applyBoldTagsAndSetText(fromBranch, getString(R.string.pull_request_from,
+                mPullRequest.getHead().getLabel()));
+
+        StyleableTextView toBranch = (StyleableTextView) branchGroup.findViewById(R.id.tv_pr_to);
+        StringUtils.applyBoldTagsAndSetText(toBranch, getString(R.string.pull_request_to,
+                mPullRequest.getBase().getLabel()));
 
         View milestoneGroup = mListHeaderView.findViewById(R.id.milestone_container);
         if (mPullRequest.getMilestone() != null) {

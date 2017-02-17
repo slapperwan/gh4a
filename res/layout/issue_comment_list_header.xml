@@ -50,6 +50,37 @@
         android:textColor="?android:attr/textColorPrimary" />
 
     <RelativeLayout
+        android:id="@+id/pr_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/overview_item_spacing"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/iv_pr"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginRight="10dp"
+            android:src="?attr/pullRequestIcon" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_pr_from"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/iv_pr"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_pr_to"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_pr_from"
+            android:layout_toRightOf="@id/iv_pr"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
         android:id="@+id/milestone_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

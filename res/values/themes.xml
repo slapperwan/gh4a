@@ -40,6 +40,7 @@
         <item name="commitStatusOkIcon">@drawable/commit_status_ok_dark</item>
         <item name="commitStatusUnknownIcon">@drawable/commit_status_unknown_dark</item>
         <item name="commitStatusFailIcon">@drawable/commit_status_fail_dark</item>
+        <item name="pullRequestIcon">@drawable/pull_request_dark</item>
         <item name="pullRequestMergeOkIcon">@drawable/pull_request_merge_ok_dark</item>
         <item name="pullRequestMergeDirtyIcon">@drawable/pull_request_merge_dirty_dark</item>
         <item name="pullRequestMergeUnstableIcon">@drawable/pull_request_merge_unstable_dark</item>
@@ -139,6 +140,7 @@
         <item name="commitStatusOkIcon">@drawable/commit_status_ok</item>
         <item name="commitStatusUnknownIcon">@drawable/commit_status_unknown</item>
         <item name="commitStatusFailIcon">@drawable/commit_status_fail</item>
+        <item name="pullRequestIcon">@drawable/pull_request</item>
         <item name="pullRequestMergeOkIcon">@drawable/pull_request_merge_ok</item>
         <item name="pullRequestMergeDirtyIcon">@drawable/pull_request_merge_dirty</item>
         <item name="pullRequestMergeUnstableIcon">@drawable/pull_request_merge_unstable</item>
