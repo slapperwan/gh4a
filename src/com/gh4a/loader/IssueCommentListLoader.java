@@ -1,20 +1,20 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import android.content.Context;
+
+import com.gh4a.Gh4Application;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IssueEvent;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.IssueService;
 
-import android.content.Context;
-
-import com.gh4a.Gh4Application;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class IssueCommentListLoader extends BaseLoader<List<IssueEventHolder>> {
     private final String mRepoOwner;
@@ -51,13 +51,14 @@ public class IssueCommentListLoader extends BaseLoader<List<IssueEventHolder>> {
                 new RepositoryId(mRepoOwner, mRepoName), mIssueNumber);
         List<IssueEvent> events = issueService.getIssueEvents(mRepoOwner, mRepoName, mIssueNumber);
         List<IssueEventHolder> result = new ArrayList<>();
+        boolean isPullRequest = this instanceof PullRequestCommentListLoader;
 
         for (Comment comment : comments) {
-            result.add(new IssueEventHolder(comment));
+            result.add(new IssueEventHolder(comment, isPullRequest));
         }
         for (IssueEvent event : events) {
             if (INTERESTING_EVENTS.contains(event.getEvent())) {
-                result.add(new IssueEventHolder(event));
+                result.add(new IssueEventHolder(event, isPullRequest));
             }
         }
 
