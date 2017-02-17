@@ -1,30 +1,24 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import android.content.Context;
+
+import com.gh4a.Gh4Application;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
-import android.content.Context;
-
-import com.gh4a.Gh4Application;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 public class PullRequestCommentListLoader extends IssueCommentListLoader {
-    private final String mRepoOwner;
-    private final String mRepoName;
-    private final int mIssueNumber;
 
     public PullRequestCommentListLoader(Context context, String repoOwner,
             String repoName, int issueNumber) {
-        super(context, repoOwner, repoName, issueNumber);
-        mRepoOwner = repoOwner;
-        mRepoName = repoName;
-        mIssueNumber = issueNumber;
+        super(context, repoOwner, repoName, issueNumber, true);
     }
 
     @Override
@@ -34,11 +28,11 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
 
         PullRequestService pullRequestService = (PullRequestService)
                 Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
-        RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
-        List<CommitComment> commitComments = pullRequestService.getComments(repoId, mIssueNumber);
+        RepositoryId repoId = new RepositoryId(repoOwner, repoName);
+        List<CommitComment> commitComments = pullRequestService.getComments(repoId, issueNumber);
         HashMap<String, CommitFile> filesByName = new HashMap<>();
 
-        for (CommitFile file : pullRequestService.getFiles(repoId, mIssueNumber)) {
+        for (CommitFile file : pullRequestService.getFiles(repoId, issueNumber)) {
             filesByName.put(file.getFilename(), file);
         }
 

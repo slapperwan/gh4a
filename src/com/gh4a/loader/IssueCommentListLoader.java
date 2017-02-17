@@ -17,9 +17,11 @@ import java.util.Comparator;
 import java.util.List;
 
 public class IssueCommentListLoader extends BaseLoader<List<IssueEventHolder>> {
-    private final String mRepoOwner;
-    private final String mRepoName;
-    private final int mIssueNumber;
+    private final boolean mIsPullRequest;
+
+    protected final String repoOwner;
+    protected final String repoName;
+    protected final int issueNumber;
 
     private static final List<String> INTERESTING_EVENTS = Arrays.asList(
         IssueEvent.TYPE_CLOSED, IssueEvent.TYPE_REOPENED, IssueEvent.TYPE_MERGED,
@@ -36,11 +38,18 @@ public class IssueCommentListLoader extends BaseLoader<List<IssueEventHolder>> {
         }
     };
 
-    public IssueCommentListLoader(Context context, String repoOwner, String repoName, int issueNumber) {
+    public IssueCommentListLoader(Context context, String repoOwner, String repoName,
+            int issueNumber) {
+        this(context, repoOwner, repoName, issueNumber, false);
+    }
+
+    protected IssueCommentListLoader(Context context, String repoOwner, String repoName,
+            int issueNumber, boolean isPullRequest) {
         super(context);
-        mRepoOwner = repoOwner;
-        mRepoName = repoName;
-        mIssueNumber = issueNumber;
+        this.repoOwner = repoOwner;
+        this.repoName = repoName;
+        this.issueNumber = issueNumber;
+        mIsPullRequest = isPullRequest;
     }
 
     @Override
@@ -48,17 +57,16 @@ public class IssueCommentListLoader extends BaseLoader<List<IssueEventHolder>> {
         IssueService issueService = (IssueService)
                 Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
         List<Comment> comments = issueService.getComments(
-                new RepositoryId(mRepoOwner, mRepoName), mIssueNumber);
-        List<IssueEvent> events = issueService.getIssueEvents(mRepoOwner, mRepoName, mIssueNumber);
+                new RepositoryId(repoOwner, repoName), issueNumber);
+        List<IssueEvent> events = issueService.getIssueEvents(repoOwner, repoName, issueNumber);
         List<IssueEventHolder> result = new ArrayList<>();
-        boolean isPullRequest = this instanceof PullRequestCommentListLoader;
 
         for (Comment comment : comments) {
-            result.add(new IssueEventHolder(comment, isPullRequest));
+            result.add(new IssueEventHolder(comment, mIsPullRequest));
         }
         for (IssueEvent event : events) {
             if (INTERESTING_EVENTS.contains(event.getEvent())) {
-                result.add(new IssueEventHolder(event, isPullRequest));
+                result.add(new IssueEventHolder(event, mIsPullRequest));
             }
         }
 

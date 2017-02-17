@@ -193,7 +193,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
     }
 
     private CharSequence formatEvent(final IssueEvent event, final User user, int typefaceValue,
-                                     boolean isPullRequestEvent) {
+            boolean isPullRequestEvent) {
         String textBase = null;
         int textResId = 0;
 
