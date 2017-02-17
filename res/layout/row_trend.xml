@@ -2,6 +2,7 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
@@ -13,7 +14,8 @@
         android:id="@+id/tv_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.ItemTitle" />
+        android:textAppearance="@style/TextAppearance.ItemTitle"
+        tools:text="username/repository" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_desc"
@@ -21,7 +23,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
         android:maxLines="2"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        tools:text="Repository description" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -36,7 +39,8 @@
             android:layout_marginRight="16dp"
             android:drawableLeft="?attr/forkSmallIcon"
             android:drawablePadding="4dp"
-            android:textAppearance="@style/TextAppearance.VerySmall" />
+            android:textAppearance="@style/TextAppearance.VerySmall"
+            tools:text="2" />
 
         <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_stars"
@@ -44,7 +48,8 @@
             android:layout_height="wrap_content"
             android:drawableLeft="?attr/starSmallIcon"
             android:drawablePadding="4dp"
-            android:textAppearance="@style/TextAppearance.VerySmall" />
+            android:textAppearance="@style/TextAppearance.VerySmall"
+            tools:text="3468" />
 
     </LinearLayout>
 

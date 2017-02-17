@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -23,13 +24,15 @@
                     android:id="@+id/tv_created_at"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    tools:text="on 1/1/1970" />
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_desc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.ItemTitle" />
+                    android:textAppearance="@style/TextAppearance.ItemTitle"
+                    tools:text="Gist title" />
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_private"
@@ -40,7 +43,8 @@
                     android:drawablePadding="4dp"
                     android:text="@string/repo_type_private"
                     android:textAppearance="@style/TextAppearance.VerySmall.Bold"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    tools:visibility="visible" />
 
             </LinearLayout>
 

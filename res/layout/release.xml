@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -25,14 +26,16 @@
                     android:layout_height="40dp"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="16dp"
-                    android:background="?attr/selectableItemBackgroundBorderless" />
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    tools:src="@drawable/default_avatar" />
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_releaseinfo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/iv_gravatar"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    tools:text="Released by username yesterday" />
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_releasetype"
@@ -41,7 +44,8 @@
                     android:layout_below="@id/tv_releaseinfo"
                     android:layout_marginTop="@dimen/overview_header_spacing"
                     android:layout_toRightOf="@id/iv_gravatar"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    tools:text="Release type" />
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_releasetag"
@@ -52,7 +56,8 @@
                     android:layout_toRightOf="@id/iv_gravatar"
                     android:background="?attr/selectableItemBackground"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="?attr/colorAccent" />
+                    android:textColor="?attr/colorAccent"
+                    tools:text="On tag v3.23.2" />
 
             </RelativeLayout>
 
@@ -86,7 +91,9 @@
                     android:paddingBottom="@dimen/content_padding"
                     android:paddingLeft="@dimen/content_padding"
                     android:paddingRight="@dimen/content_padding"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    tools:text="Release notes text"
+                    tools:visibility="visible" />
 
             </LinearLayout>
 

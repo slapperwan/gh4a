@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
@@ -20,7 +21,8 @@
             android:id="@+id/tv_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.ItemTitle" />
+            android:textAppearance="@style/TextAppearance.ItemTitle"
+            tools:text="Milestone title" />
 
         <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_desc"
@@ -28,7 +30,8 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="2"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            tools:text="Description" />
 
     </LinearLayout>
 
@@ -44,14 +47,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="@style/TextAppearance.VerySmall"
-            android:textColor="?attr/colorCommitAddition" />
+            android:textColor="?attr/colorCommitAddition"
+            tools:text="3 open" />
 
         <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_closed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="@style/TextAppearance.VerySmall"
-            android:textColor="?attr/colorCommitDeletion" />
+            android:textColor="?attr/colorCommitDeletion"
+            tools:text="3 closed" />
 
         <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_due"
@@ -59,7 +64,8 @@
             android:layout_height="wrap_content"
             android:drawableLeft="?attr/dueSmallIcon"
             android:drawablePadding="4dp"
-            android:textAppearance="@style/TextAppearance.VerySmall" />
+            android:textAppearance="@style/TextAppearance.VerySmall"
+            tools:text="in 2 days" />
 
     </LinearLayout>
 

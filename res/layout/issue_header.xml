@@ -1,9 +1,11 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    tools:background="@color/issue_open_light">
 
     <com.gh4a.widget.VerticalTextView
         android:id="@+id/tv_state"
@@ -14,7 +16,8 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:textAppearance="@style/TextAppearance.VerySmall"
-        android:textColor="@color/primary_text_default_material_dark" />
+        android:textColor="@color/primary_text_default_material_dark"
+        tools:text="OPEN" />
 
     <!-- right padding is FAB size + FAB right margin -->
     <com.gh4a.widget.StyleableTextView
@@ -32,6 +35,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:textColor="@color/primary_text_default_material_dark"
         android:textIsSelectable="true"
-        app:font="condensed" />
+        app:font="condensed"
+        tools:text="Issue title" />
 
 </LinearLayout>

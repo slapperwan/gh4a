@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -31,7 +32,8 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:layout_marginRight="16dp"
-                        android:background="?attr/selectableItemBackgroundBorderless" />
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        tools:src="@drawable/default_avatar" />
 
                     <com.gh4a.widget.StyleableTextView
                         android:id="@+id/tv_name"
@@ -39,7 +41,8 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentTop="true"
                         android:layout_toRightOf="@id/iv_gravatar"
-                        android:textAppearance="@style/TextAppearance.HeaderTitle" />
+                        android:textAppearance="@style/TextAppearance.HeaderTitle"
+                        tools:text="Username" />
 
                     <com.gh4a.widget.StyleableTextView
                         android:id="@+id/tv_created_at"
@@ -48,7 +51,8 @@
                         android:layout_below="@id/tv_name"
                         android:layout_marginTop="2dp"
                         android:layout_toRightOf="@id/iv_gravatar"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        tools:text="yesterday" />
 
                     <com.gh4a.widget.StyleableTextView
                         android:id="@+id/tv_email"
@@ -59,7 +63,8 @@
                         android:layout_toRightOf="@id/iv_gravatar"
                         android:autoLink="email"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textColorLink="?android:attr/textColorLink" />
+                        android:textColorLink="?android:attr/textColorLink"
+                        tools:text='user@email.com' />
 
                     <com.gh4a.widget.StyleableTextView
                         android:id="@+id/tv_website"
@@ -70,7 +75,8 @@
                         android:layout_toRightOf="@id/iv_gravatar"
                         android:autoLink="web"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textColorLink="?android:attr/textColorLink" />
+                        android:textColorLink="?android:attr/textColorLink"
+                        tools:text="https://example.com" />
 
                     <com.gh4a.widget.StyleableTextView
                         android:id="@+id/tv_company"
@@ -79,7 +85,8 @@
                         android:layout_below="@id/tv_website"
                         android:layout_marginTop="2dp"
                         android:layout_toRightOf="@id/iv_gravatar"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        tools:text="Company name" />
 
                     <com.gh4a.widget.StyleableTextView
                         android:id="@+id/tv_location"
@@ -89,7 +96,8 @@
                         android:layout_marginTop="2dp"
                         android:layout_toRightOf="@id/iv_gravatar"
                         android:autoLink="map"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        tools:text="Location" />
                 </RelativeLayout>
 
                 <LinearLayout
@@ -135,7 +143,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-                            android:textAppearance="@style/TextAppearance.CountHeaderItem" />
+                            android:textAppearance="@style/TextAppearance.CountHeaderItem"
+                            tools:text="354" />
 
                         <com.gh4a.widget.StyleableTextView
                             android:id="@+id/tv_followers_label"
@@ -158,7 +167,8 @@
                             android:id="@+id/tv_following_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextAppearance.CountHeaderItem" />
+                            android:textAppearance="@style/TextAppearance.CountHeaderItem"
+                            tools:text="23" />
 
                         <com.gh4a.widget.StyleableTextView
                             android:id="@+id/tv_following_label"
@@ -181,7 +191,8 @@
                             android:id="@+id/tv_repos_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextAppearance.CountHeaderItem" />
+                            android:textAppearance="@style/TextAppearance.CountHeaderItem"
+                            tools:text="1" />
 
                         <com.gh4a.widget.StyleableTextView
                             android:id="@+id/tv_repos_label"
@@ -204,7 +215,8 @@
                             android:id="@+id/tv_gists_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextAppearance.CountHeaderItem" />
+                            android:textAppearance="@style/TextAppearance.CountHeaderItem"
+                            tools:text="0" />
 
                         <com.gh4a.widget.StyleableTextView
                             android:id="@+id/tv_gists_label"
@@ -257,7 +269,8 @@
                     android:paddingLeft="@dimen/content_padding"
                     android:paddingRight="@dimen/content_padding"
                     android:text="@string/view_more"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    tools:visibility="visible" />
 
             </LinearLayout>
 

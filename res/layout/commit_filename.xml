@@ -21,6 +21,7 @@
         android:drawablePadding="4dp"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:visibility="gone"
+        tools:text="10"
         tools:visibility="visible" />
 
     <com.gh4a.widget.StyleableTextView
@@ -30,13 +31,15 @@
         android:layout_alignParentLeft="true"
         android:layout_alignWithParentIfMissing="true"
         android:layout_toLeftOf="@id/comments"
-        android:typeface="monospace" />
+        android:typeface="monospace"
+        tools:text="some/file/in/directories.txt" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/stats"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/filename"
-        android:textAppearance="@style/TextAppearance.VerySmall" />
+        android:textAppearance="@style/TextAppearance.VerySmall"
+        tools:text="+3 -34" />
 
 </RelativeLayout>

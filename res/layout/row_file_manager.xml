@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
@@ -16,7 +17,8 @@
         android:id="@+id/iv_icon"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_marginRight="16dp" />
+        android:layout_marginRight="16dp"
+        tools:src="@drawable/file" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_text"
@@ -24,7 +26,8 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="?android:attr/textColorPrimary" />
+        android:textColor="?android:attr/textColorPrimary"
+        tools:text="filename.txt" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_size"
@@ -32,6 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:layout_marginLeft="4dp"
-        android:textAppearance="@style/TextAppearance.VerySmall" />
+        android:textAppearance="@style/TextAppearance.VerySmall"
+        tools:text="2.5 KB" />
 
 </LinearLayout>

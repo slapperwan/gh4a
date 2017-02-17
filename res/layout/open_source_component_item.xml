@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -17,14 +18,16 @@
                 android:id="@+id/title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.ItemTitle" />
+                android:textAppearance="@style/TextAppearance.ItemTitle"
+                tools:text="Library title" />
 
             <com.gh4a.widget.StyleableTextView
                 android:id="@+id/url"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:autoLink="web" />
+                android:autoLink="web"
+                tools:text="https://example.com" />
 
         </LinearLayout>
 

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
@@ -25,7 +26,8 @@
             android:drawablePadding="4dp"
             android:text="@string/repo_type_private"
             android:textAppearance="@style/TextAppearance.VerySmall.Bold"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:visibility="visible" />
 
         <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_files"
@@ -33,7 +35,8 @@
             android:layout_height="wrap_content"
             android:drawableLeft="?attr/filesSmallIcon"
             android:drawablePadding="4dp"
-            android:textAppearance="@style/TextAppearance.VerySmall" />
+            android:textAppearance="@style/TextAppearance.VerySmall"
+            tools:text="2" />
 
     </LinearLayout>
 
@@ -45,7 +48,9 @@
         android:layout_marginRight="16dp"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="?android:attr/textColorPrimary"
-        android:visibility="gone" />
+        android:visibility="gone"
+        tools:text="Creator"
+        tools:visibility="visible" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_timestamp"
@@ -55,7 +60,8 @@
         android:layout_alignWithParentIfMissing="true"
         android:layout_toLeftOf="@id/info"
         android:layout_toRightOf="@id/tv_creator"
-        android:textAppearance="@style/TextAppearance.VerySmall" />
+        android:textAppearance="@style/TextAppearance.VerySmall"
+        tools:text="yesterday" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_title"
@@ -64,7 +70,8 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@id/tv_timestamp"
         android:layout_toLeftOf="@id/info"
-        android:textAppearance="@style/TextAppearance.ItemTitle" />
+        android:textAppearance="@style/TextAppearance.ItemTitle"
+        tools:text="Gist title" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_sha"
@@ -73,6 +80,7 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@id/tv_title"
         android:layout_toLeftOf="@id/info"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        tools:text="da7b7aa36a89" />
 
 </RelativeLayout>

@@ -27,7 +27,8 @@
             android:layout_height="16dp"
             android:layout_gravity="end|bottom"
             android:visibility="gone"
-            tools:src="@drawable/issue_event_closed" />
+            tools:src="@drawable/issue_event_closed"
+            tools:visibility="visible" />
     </FrameLayout>
 
     <ImageView
@@ -48,7 +49,7 @@
         android:layout_toRightOf="@id/fl_avatar_container"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="?android:attr/textColorPrimary"
-        tools:text="octopus" />
+        tools:text="username" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_timestamp"
@@ -71,7 +72,9 @@
         android:layout_toLeftOf="@id/iv_edit"
         android:layout_toRightOf="@id/fl_avatar_container"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:visibility="gone" />
+        android:visibility="gone"
+        tools:text="Comment on filename.txt"
+        tools:visibility="visible" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_desc"

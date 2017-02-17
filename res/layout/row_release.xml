@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
@@ -13,19 +14,22 @@
         android:id="@+id/tv_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.ItemTitle" />
+        android:textAppearance="@style/TextAppearance.ItemTitle"
+        tools:text="Release title" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_type"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        tools:text="Release type" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_created_at"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.VerySmall" />
+        android:textAppearance="@style/TextAppearance.VerySmall"
+        tools:text="Created yesterday" />
 
 </LinearLayout>

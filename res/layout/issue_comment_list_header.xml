@@ -60,7 +60,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/overview_item_spacing"
-        android:visibility="gone">
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <ImageView
             android:id="@+id/iv_pr"
@@ -74,7 +75,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/iv_pr"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            tools:text="From branch" />
 
         <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_pr_to"
@@ -82,7 +84,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_pr_from"
             android:layout_toRightOf="@id/iv_pr"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            tools:text="Into branch" />
 
     </RelativeLayout>
 
@@ -91,7 +94,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/overview_item_spacing"
-        android:visibility="gone">
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <ImageView
             android:id="@+id/iv_milestone"
@@ -115,7 +119,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_milestone_label"
             android:layout_toRightOf="@id/iv_milestone"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            tools:text="v1.10.1" />
 
     </RelativeLayout>
 
@@ -124,7 +129,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/overview_item_spacing"
-        android:visibility="gone">
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <ImageView
             android:id="@+id/iv_assignee_icon"
@@ -157,7 +163,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/overview_item_spacing"
-        android:visibility="gone">
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <ImageView
             android:id="@+id/iv_labels"
@@ -180,7 +187,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_labels_label"
-            android:layout_toRightOf="@id/iv_labels" />
+            android:layout_toRightOf="@id/iv_labels"
+            tools:text="colored labels here" />
 
     </RelativeLayout>
 
@@ -189,20 +197,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/overview_item_spacing"
-        android:visibility="gone">
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <ImageView
             android:id="@+id/iv_merge_status_icon"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_marginRight="10dp" />
+            android:layout_marginRight="10dp"
+            tools:src="@drawable/pull_request_merge_ok" />
 
         <com.gh4a.widget.StyleableTextView
             android:id="@+id/merge_status_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/iv_merge_status_icon"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            tools:text="@string/pull_merge_status_clean" />
 
         <LinearLayout
             android:id="@+id/merge_commit_status_container"
@@ -232,6 +243,7 @@
         android:text="@string/view_pull_request"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="?android:attr/textColorLink"
-        android:visibility="gone" />
+        android:visibility="gone"
+        tools:visibility="visible" />
 
 </LinearLayout>

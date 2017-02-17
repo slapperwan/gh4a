@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="4dp">
@@ -9,7 +10,8 @@
         android:id="@+id/iv_status_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="8dp" />
+        android:layout_marginRight="8dp"
+        tools:src="@drawable/commit_status_ok" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_desc"
@@ -17,7 +19,8 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/iv_status_icon"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textColor="?android:attr/textColorSecondary" />
+        android:textColor="?android:attr/textColorSecondary"
+        tools:text="Commit status" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_context"
@@ -25,6 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_desc"
         android:layout_toRightOf="@id/iv_status_icon"
-        android:textAppearance="@style/TextAppearance.VerySmall" />
+        android:textAppearance="@style/TextAppearance.VerySmall"
+        tools:text="context" />
 
 </RelativeLayout>

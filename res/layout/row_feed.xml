@@ -2,6 +2,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
@@ -14,7 +15,8 @@
         android:layout_height="40dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="8dp"
-        android:background="?attr/selectableItemBackgroundBorderless" />
+        android:background="?attr/selectableItemBackgroundBorderless"
+        tools:src="@drawable/default_avatar" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_extra"
@@ -23,7 +25,8 @@
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@id/iv_gravatar"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="?android:attr/textColorPrimary" />
+        android:textColor="?android:attr/textColorPrimary"
+        tools:text="username" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_timestamp"
@@ -32,7 +35,8 @@
         android:layout_alignBaseline="@id/tv_extra"
         android:layout_marginLeft="16dp"
         android:layout_toRightOf="@id/tv_extra"
-        android:textAppearance="@style/TextAppearance.VerySmall" />
+        android:textAppearance="@style/TextAppearance.VerySmall"
+        tools:text="yesterday" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_title"
@@ -42,7 +46,8 @@
         android:layout_toRightOf="@id/iv_gravatar"
         android:textAppearance="@style/TextAppearance.ItemTitle"
         android:textSize="16sp"
-        app:font="boldCondensed" />
+        app:font="boldCondensed"
+        tools:text="Feed item title" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_desc"
@@ -52,6 +57,7 @@
         android:layout_toRightOf="@id/iv_gravatar"
         android:ellipsize="end"
         android:maxLines="2"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        tools:text="Feed item description" />
 
 </RelativeLayout>
