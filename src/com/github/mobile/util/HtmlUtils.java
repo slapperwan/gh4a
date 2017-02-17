@@ -16,29 +16,49 @@
 package com.github.mobile.util;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.text.Editable;
 import android.text.Html.ImageGetter;
-import android.text.Html.TagHandler;
 import android.text.Layout;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.AlignmentSpan;
 import android.text.style.BackgroundColorSpan;
+import android.text.style.BulletSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.ImageSpan;
 import android.text.style.LeadingMarginSpan;
-import android.text.style.QuoteSpan;
+import android.text.style.ParagraphStyle;
+import android.text.style.RelativeSizeSpan;
 import android.text.style.StrikethroughSpan;
+import android.text.style.StyleSpan;
+import android.text.style.SubscriptSpan;
+import android.text.style.SuperscriptSpan;
 import android.text.style.TypefaceSpan;
+import android.text.style.URLSpan;
+import android.text.style.UnderlineSpan;
 
+import org.ccil.cowan.tagsoup.HTMLSchema;
+import org.ccil.cowan.tagsoup.Parser;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-import java.util.LinkedList;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static android.graphics.Paint.Style.FILL;
-import static android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE;
-import static android.text.Spanned.SPAN_MARK_MARK;
 
 public class HtmlUtils {
 
@@ -73,23 +93,9 @@ public class HtmlUtils {
 
     private static final String TAG_ROOT = "githubroot";
 
-    private static final String TAG_HTML = "html";
-
     private static final String ROOT_START = '<' + TAG_ROOT + '>';
 
     private static final String ROOT_END = "</" + TAG_ROOT + '>';
-
-    private static final String TAG_DEL = "del";
-
-    private static final String TAG_UL = "ul";
-
-    private static final String TAG_OL = "ol";
-
-    private static final String TAG_LI = "li";
-
-    private static final String TAG_CODE = "code";
-
-    private static final String TAG_PRE = "pre";
 
     private static final String TOGGLE_START = "<span class=\"email-hidden-toggle\">";
 
@@ -130,125 +136,6 @@ public class HtmlUtils {
     private static final String CODE_START = "<code>";
 
     private static final String CODE_END = "</code>";
-
-    private static class ListSeparator {
-
-        private int count;
-
-        public ListSeparator(boolean ordered) {
-            if (ordered)
-                count = 1;
-            else
-                count = -1;
-        }
-
-        public void append(Editable output, int indentLevel) {
-            output.append('\n');
-            for (int i = 0; i < indentLevel * 2; i++)
-                output.append(' ');
-            if (count != -1) {
-                output.append(Integer.toString(count)).append('.');
-                count++;
-            } else
-                output.append('\u2022');
-            output.append(' ').append(' ');
-        }
-    }
-
-    private static class MyTagHandler implements TagHandler {
-        private LinkedList<ListSeparator> listElements = new LinkedList<>();
-
-        @Override
-        public void handleTag(final boolean opening, final String tag,
-                final Editable output, final XMLReader xmlReader) {
-            if (TAG_DEL.equalsIgnoreCase(tag)) {
-                if (opening)
-                    startSpan(new StrikethroughSpan(), output);
-                else
-                    endSpan(StrikethroughSpan.class, output);
-                return;
-            }
-
-            if (TAG_UL.equalsIgnoreCase(tag) || TAG_OL.equalsIgnoreCase(tag)) {
-                if (opening) {
-                    listElements.add(new ListSeparator(TAG_OL.equalsIgnoreCase(tag)));
-                } else if (!listElements.isEmpty()) {
-                    listElements.removeLast();
-                }
-
-                if (!opening && listElements.isEmpty())
-                    output.append('\n');
-                return;
-            }
-
-            if (TAG_LI.equalsIgnoreCase(tag) && opening && !listElements.isEmpty()) {
-                listElements.getLast().append(output, listElements.size());
-                return;
-            }
-
-            if (TAG_CODE.equalsIgnoreCase(tag)) {
-                if (opening) {
-                    startSpan(new TypefaceSpan("monospace"), output);
-                    startSpan(new BackgroundColorSpan(0x30aaaaaa), output);
-                } else {
-                    endSpan(TypefaceSpan.class, output);
-                    endSpan(BackgroundColorSpan.class, output);
-                }
-                return;
-            }
-
-            if (TAG_PRE.equalsIgnoreCase(tag)) {
-                output.append('\n');
-                if (opening)
-                    startSpan(new TypefaceSpan("monospace"), output);
-                else
-                    endSpan(TypefaceSpan.class, output);
-                return;
-            }
-
-            if ((TAG_ROOT.equalsIgnoreCase(tag) || TAG_HTML.equalsIgnoreCase(tag)) && !opening) {
-                // Remove leading newlines
-                while (output.length() > 0 && output.charAt(0) == '\n')
-                    output.delete(0, 1);
-
-                // Remove trailing newlines
-                int last = output.length() - 1;
-                while (last >= 0 && output.charAt(last) == '\n') {
-                    output.delete(last, last + 1);
-                    last = output.length() - 1;
-                }
-
-                QuoteSpan[] quoteSpans = output.getSpans(0, output.length(),
-                        QuoteSpan.class);
-                for (QuoteSpan span : quoteSpans) {
-                    int start = output.getSpanStart(span);
-                    int end = output.getSpanEnd(span);
-                    output.removeSpan(span);
-                    output.setSpan(new ReplySpan(), start, end,
-                            SPAN_EXCLUSIVE_EXCLUSIVE);
-                }
-            }
-        }
-    };
-
-    private static Object getLast(final Spanned text, final Class<?> kind) {
-        Object[] spans = text.getSpans(0, text.length(), kind);
-        return spans.length > 0 ? spans[spans.length - 1] : null;
-    }
-
-    private static void startSpan(Object span, Editable output) {
-        int length = output.length();
-        output.setSpan(span, length, length, SPAN_MARK_MARK);
-    }
-
-    private static void endSpan(Class<?> type, Editable output) {
-        int length = output.length();
-        Object span = getLast(output, type);
-        int start = output.getSpanStart(span);
-        output.removeSpan(span);
-        if (start != length)
-            output.setSpan(span, start, length, SPAN_EXCLUSIVE_EXCLUSIVE);
-    }
 
     /**
      * Rewrite relative URLs in HTML fetched e.g. from markdown files.
@@ -294,7 +181,7 @@ public class HtmlUtils {
         if (TextUtils.isEmpty(html))
             return "";
 
-        return android.text.Html.fromHtml(html, imageGetter, new MyTagHandler());
+        return Html.fromHtml(html, imageGetter);
     }
 
     /**
@@ -484,6 +371,692 @@ public class HtmlUtils {
             else
                 break;
             length = input.length();
+        }
+    }
+
+    /* a copy of the framework's HTML class, stripped down and extended for our use cases */
+    private static class Html {
+        private Html() { }
+
+        /**
+         * Lazy initialization holder for HTML parser.
+         */
+        private static class HtmlParser {
+            private static final HTMLSchema schema = new HTMLSchema();
+        }
+
+        public static Spanned fromHtml(String source, android.text.Html.ImageGetter imageGetter) {
+            Parser parser = new Parser();
+            try {
+                parser.setProperty(Parser.schemaProperty, HtmlParser.schema);
+            } catch (org.xml.sax.SAXNotRecognizedException e) {
+                // Should not happen.
+                throw new RuntimeException(e);
+            } catch (org.xml.sax.SAXNotSupportedException e) {
+                // Should not happen.
+                throw new RuntimeException(e);
+            }
+
+            HtmlToSpannedConverter converter =
+                    new HtmlToSpannedConverter(source, imageGetter, parser);
+            return converter.convert();
+        }
+    }
+
+    private static class HtmlToSpannedConverter implements ContentHandler {
+        private static final float[] HEADING_SIZES = {
+            1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1f,
+        };
+
+        private String mSource;
+        private XMLReader mReader;
+        private SpannableStringBuilder mSpannableStringBuilder;
+        private android.text.Html.ImageGetter mImageGetter;
+
+        private static Pattern sTextAlignPattern;
+        private static Pattern sForegroundColorPattern;
+        private static Pattern sBackgroundColorPattern;
+        private static Pattern sTextDecorationPattern;
+
+        private static Pattern getTextAlignPattern() {
+            if (sTextAlignPattern == null) {
+                sTextAlignPattern = Pattern.compile("(?:\\s+|\\A)text-align\\s*:\\s*(\\S*)\\b");
+            }
+            return sTextAlignPattern;
+        }
+
+        private static Pattern getForegroundColorPattern() {
+            if (sForegroundColorPattern == null) {
+                sForegroundColorPattern = Pattern.compile(
+                        "(?:\\s+|\\A)color\\s*:\\s*(\\S*)\\b");
+            }
+            return sForegroundColorPattern;
+        }
+
+        private static Pattern getBackgroundColorPattern() {
+            if (sBackgroundColorPattern == null) {
+                sBackgroundColorPattern = Pattern.compile(
+                        "(?:\\s+|\\A)background(?:-color)?\\s*:\\s*(\\S*)\\b");
+            }
+            return sBackgroundColorPattern;
+        }
+
+        private static Pattern getTextDecorationPattern() {
+            if (sTextDecorationPattern == null) {
+                sTextDecorationPattern = Pattern.compile(
+                        "(?:\\s+|\\A)text-decoration\\s*:\\s*(\\S*)\\b");
+            }
+            return sTextDecorationPattern;
+        }
+
+        public HtmlToSpannedConverter(String source,
+                android.text.Html.ImageGetter imageGetter, Parser parser) {
+            mSource = source;
+            mSpannableStringBuilder = new SpannableStringBuilder();
+            mImageGetter = imageGetter;
+            mReader = parser;
+        }
+
+        public Spanned convert() {
+            mReader.setContentHandler(this);
+            try {
+                mReader.parse(new InputSource(new StringReader(mSource)));
+            } catch (IOException e) {
+                // We are reading from a string. There should not be IO problems.
+                throw new RuntimeException(e);
+            } catch (SAXException e) {
+                // TagSoup doesn't throw parse exceptions.
+                throw new RuntimeException(e);
+            }
+
+            // Fix flags and range for paragraph-type markup.
+            Object[] obj = mSpannableStringBuilder.getSpans(0, mSpannableStringBuilder.length(), ParagraphStyle.class);
+            for (int i = 0; i < obj.length; i++) {
+                int start = mSpannableStringBuilder.getSpanStart(obj[i]);
+                int end = mSpannableStringBuilder.getSpanEnd(obj[i]);
+
+                // If the last line of the range is blank, back off by one.
+                if (end - 2 >= 0) {
+                    if (mSpannableStringBuilder.charAt(end - 1) == '\n' &&
+                            mSpannableStringBuilder.charAt(end - 2) == '\n') {
+                        end--;
+                    }
+                }
+
+                if (end == start) {
+                    mSpannableStringBuilder.removeSpan(obj[i]);
+                } else {
+                    mSpannableStringBuilder.setSpan(obj[i], start, end, Spannable.SPAN_PARAGRAPH);
+                }
+            }
+
+            // Remove leading newlines
+            while (mSpannableStringBuilder.length() > 0
+                    && mSpannableStringBuilder.charAt(0) == '\n') {
+                mSpannableStringBuilder.delete(0, 1);
+            }
+
+            // Remove trailing newlines
+            int last = mSpannableStringBuilder.length() - 1;
+            while (last >= 0 && mSpannableStringBuilder.charAt(last) == '\n') {
+                mSpannableStringBuilder.delete(last, last + 1);
+                last = mSpannableStringBuilder.length() - 1;
+            }
+
+            return mSpannableStringBuilder;
+        }
+
+        private void handleStartTag(String tag, Attributes attributes) {
+            if (tag.equalsIgnoreCase("br")) {
+                // We don't need to handle this. TagSoup will ensure that there's a </br> for each <br>
+                // so we can safely emit the linebreaks when we handle the close tag.
+            } else if (tag.equalsIgnoreCase("p")) {
+                startBlockElement(mSpannableStringBuilder, attributes);
+                startCssStyle(mSpannableStringBuilder, attributes);
+            } else if (tag.equalsIgnoreCase("ul")) {
+                startBlockElement(mSpannableStringBuilder, attributes);
+                start(mSpannableStringBuilder, new List());
+            } else if (tag.equalsIgnoreCase("ol")) {
+                startBlockElement(mSpannableStringBuilder, attributes);
+                start(mSpannableStringBuilder, new List(parseIntAttribute(attributes, "start", 1)));
+            } else if (tag.equalsIgnoreCase("li")) {
+                startLi(mSpannableStringBuilder, attributes);
+            } else if (tag.equalsIgnoreCase("div")) {
+                startBlockElement(mSpannableStringBuilder, attributes);
+            } else if (tag.equalsIgnoreCase("span")) {
+                startCssStyle(mSpannableStringBuilder, attributes);
+            } else if (tag.equalsIgnoreCase("strong")) {
+                start(mSpannableStringBuilder, new Bold());
+            } else if (tag.equalsIgnoreCase("b")) {
+                start(mSpannableStringBuilder, new Bold());
+            } else if (tag.equalsIgnoreCase("em")) {
+                start(mSpannableStringBuilder, new Italic());
+            } else if (tag.equalsIgnoreCase("cite")) {
+                start(mSpannableStringBuilder, new Italic());
+            } else if (tag.equalsIgnoreCase("dfn")) {
+                start(mSpannableStringBuilder, new Italic());
+            } else if (tag.equalsIgnoreCase("i")) {
+                start(mSpannableStringBuilder, new Italic());
+            } else if (tag.equalsIgnoreCase("big")) {
+                start(mSpannableStringBuilder, new Big());
+            } else if (tag.equalsIgnoreCase("small")) {
+                start(mSpannableStringBuilder, new Small());
+            } else if (tag.equalsIgnoreCase("font")) {
+                startFont(mSpannableStringBuilder, attributes);
+            } else if (tag.equalsIgnoreCase("blockquote")) {
+                startBlockquote(mSpannableStringBuilder, attributes);
+            } else if (tag.equalsIgnoreCase("tt") || tag.equalsIgnoreCase("pre")) {
+                start(mSpannableStringBuilder, new Monospace());
+            } else if (tag.equalsIgnoreCase("a")) {
+                startA(mSpannableStringBuilder, attributes);
+            } else if (tag.equalsIgnoreCase("u")) {
+                start(mSpannableStringBuilder, new Underline());
+            } else if (tag.equalsIgnoreCase("del")) {
+                start(mSpannableStringBuilder, new Strikethrough());
+            } else if (tag.equalsIgnoreCase("s")) {
+                start(mSpannableStringBuilder, new Strikethrough());
+            } else if (tag.equalsIgnoreCase("strike")) {
+                start(mSpannableStringBuilder, new Strikethrough());
+            } else if (tag.equalsIgnoreCase("sup")) {
+                start(mSpannableStringBuilder, new Super());
+            } else if (tag.equalsIgnoreCase("sub")) {
+                start(mSpannableStringBuilder, new Sub());
+            } else if (tag.equalsIgnoreCase("code")) {
+                start(mSpannableStringBuilder, new Code());
+            } else if (tag.length() == 2 &&
+                    Character.toLowerCase(tag.charAt(0)) == 'h' &&
+                    tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
+                startHeading(mSpannableStringBuilder, attributes, tag.charAt(1) - '1');
+            } else if (tag.equalsIgnoreCase("img")) {
+                startImg(mSpannableStringBuilder, attributes, mImageGetter);
+            }
+        }
+
+        private void handleEndTag(String tag) {
+            if (tag.equalsIgnoreCase("br")) {
+                handleBr(mSpannableStringBuilder);
+            } else if (tag.equalsIgnoreCase("p")) {
+                endCssStyle(mSpannableStringBuilder);
+                endBlockElement(mSpannableStringBuilder);
+            } else if (tag.equalsIgnoreCase("ul")) {
+                endBlockElement(mSpannableStringBuilder);
+                end(mSpannableStringBuilder, List.class, null);
+            } else if (tag.equalsIgnoreCase("ol")) {
+                endBlockElement(mSpannableStringBuilder);
+                end(mSpannableStringBuilder, List.class, null);
+            } else if (tag.equalsIgnoreCase("li")) {
+                endLi(mSpannableStringBuilder);
+            } else if (tag.equalsIgnoreCase("div")) {
+                endBlockElement(mSpannableStringBuilder);
+            } else if (tag.equalsIgnoreCase("span")) {
+                endCssStyle(mSpannableStringBuilder);
+            } else if (tag.equalsIgnoreCase("strong")) {
+                end(mSpannableStringBuilder, Bold.class, new StyleSpan(Typeface.BOLD));
+            } else if (tag.equalsIgnoreCase("b")) {
+                end(mSpannableStringBuilder, Bold.class, new StyleSpan(Typeface.BOLD));
+            } else if (tag.equalsIgnoreCase("em")) {
+                end(mSpannableStringBuilder, Italic.class, new StyleSpan(Typeface.ITALIC));
+            } else if (tag.equalsIgnoreCase("cite")) {
+                end(mSpannableStringBuilder, Italic.class, new StyleSpan(Typeface.ITALIC));
+            } else if (tag.equalsIgnoreCase("dfn")) {
+                end(mSpannableStringBuilder, Italic.class, new StyleSpan(Typeface.ITALIC));
+            } else if (tag.equalsIgnoreCase("i")) {
+                end(mSpannableStringBuilder, Italic.class, new StyleSpan(Typeface.ITALIC));
+            } else if (tag.equalsIgnoreCase("big")) {
+                end(mSpannableStringBuilder, Big.class, new RelativeSizeSpan(1.25f));
+            } else if (tag.equalsIgnoreCase("small")) {
+                end(mSpannableStringBuilder, Small.class, new RelativeSizeSpan(0.8f));
+            } else if (tag.equalsIgnoreCase("font")) {
+                endFont(mSpannableStringBuilder);
+            } else if (tag.equalsIgnoreCase("blockquote")) {
+                endBlockquote(mSpannableStringBuilder);
+            } else if (tag.equalsIgnoreCase("tt") || tag.equalsIgnoreCase("pre")) {
+                end(mSpannableStringBuilder, Monospace.class, new TypefaceSpan("monospace"));
+            } else if (tag.equalsIgnoreCase("a")) {
+                endA(mSpannableStringBuilder);
+            } else if (tag.equalsIgnoreCase("u")) {
+                end(mSpannableStringBuilder, Underline.class, new UnderlineSpan());
+            } else if (tag.equalsIgnoreCase("del")) {
+                end(mSpannableStringBuilder, Strikethrough.class, new StrikethroughSpan());
+            } else if (tag.equalsIgnoreCase("s")) {
+                end(mSpannableStringBuilder, Strikethrough.class, new StrikethroughSpan());
+            } else if (tag.equalsIgnoreCase("strike")) {
+                end(mSpannableStringBuilder, Strikethrough.class, new StrikethroughSpan());
+            } else if (tag.equalsIgnoreCase("sup")) {
+                end(mSpannableStringBuilder, Super.class, new SuperscriptSpan());
+            } else if (tag.equalsIgnoreCase("sub")) {
+                end(mSpannableStringBuilder, Sub.class, new SubscriptSpan());
+            } else if (tag.equalsIgnoreCase("code")) {
+                Object code = getLast(mSpannableStringBuilder, Code.class);
+                if (code != null) {
+                    setSpanFromMark(mSpannableStringBuilder, code,
+                            new TypefaceSpan("monospace"),
+                            new BackgroundColorSpan(0x30aaaaaa));
+                }
+            } else if (tag.length() == 2 &&
+                    Character.toLowerCase(tag.charAt(0)) == 'h' &&
+                    tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
+                endHeading(mSpannableStringBuilder);
+            }
+        }
+
+        private static void appendNewlines(Editable text, int minNewline) {
+            final int len = text.length();
+
+            if (len == 0) {
+                return;
+            }
+
+            int existingNewlines = 0;
+            for (int i = len - 1; i >= 0 && text.charAt(i) == '\n'; i--) {
+                existingNewlines++;
+            }
+
+            for (int j = existingNewlines; j < minNewline; j++) {
+                text.append("\n");
+            }
+        }
+
+        private static void startBlockElement(Editable text, Attributes attributes) {
+            appendNewlines(text, 2);
+            start(text, new Newline(2));
+
+            String style = attributes.getValue("", "style");
+            if (style != null) {
+                Matcher m = getTextAlignPattern().matcher(style);
+                if (m.find()) {
+                    String alignment = m.group(1);
+                    if (alignment.equalsIgnoreCase("start")) {
+                        start(text, new Alignment(Layout.Alignment.ALIGN_NORMAL));
+                    } else if (alignment.equalsIgnoreCase("center")) {
+                        start(text, new Alignment(Layout.Alignment.ALIGN_CENTER));
+                    } else if (alignment.equalsIgnoreCase("end")) {
+                        start(text, new Alignment(Layout.Alignment.ALIGN_OPPOSITE));
+                    }
+                }
+            }
+        }
+
+        private static void endBlockElement(Editable text) {
+            Newline n = getLast(text, Newline.class);
+            if (n != null) {
+                appendNewlines(text, n.mNumNewlines);
+                text.removeSpan(n);
+            }
+
+            Alignment a = getLast(text, Alignment.class);
+            if (a != null) {
+                setSpanFromMark(text, a, new AlignmentSpan.Standard(a.mAlignment));
+            }
+        }
+
+        private static void handleBr(Editable text) {
+            text.append('\n');
+        }
+
+        private void startLi(Editable text, Attributes attributes) {
+            startBlockElement(text, attributes);
+            start(text, new ListItem(getLast(text, List.class), attributes));
+            startCssStyle(text, attributes);
+        }
+
+        private static void endLi(Editable text) {
+            endCssStyle(text);
+            endBlockElement(text);
+            ListItem item = getLast(text, ListItem.class);
+            if (item != null) {
+                int len = text.length();
+                if (item.mOrdered) {
+                    int where = text.getSpanStart(item);
+                    text.removeSpan(item);
+                    text.insert(where, "" + item.mPosition + ". ");
+                } else {
+                    setSpanFromMark(text, item, new BulletSpan());
+                }
+            }
+        }
+
+        private void startBlockquote(Editable text, Attributes attributes) {
+            startBlockElement(text, attributes);
+            start(text, new Blockquote());
+        }
+
+        private static void endBlockquote(Editable text) {
+            endBlockElement(text);
+            end(text, Blockquote.class, new ReplySpan());
+        }
+
+        private void startHeading(Editable text, Attributes attributes, int level) {
+            startBlockElement(text, attributes);
+            start(text, new Heading(level));
+        }
+
+        private static void endHeading(Editable text) {
+            // RelativeSizeSpan and StyleSpan are CharacterStyles
+            // Their ranges should not include the newlines at the end
+            Heading h = getLast(text, Heading.class);
+            if (h != null) {
+                setSpanFromMark(text, h, new RelativeSizeSpan(HEADING_SIZES[h.mLevel]),
+                        new StyleSpan(Typeface.BOLD));
+            }
+
+            endBlockElement(text);
+        }
+
+        private static <T> T getLast(Spanned text, Class<T> kind) {
+        /*
+         * This knows that the last returned object from getSpans()
+         * will be the most recently added.
+         */
+            T[] objs = text.getSpans(0, text.length(), kind);
+
+            if (objs.length == 0) {
+                return null;
+            } else {
+                return objs[objs.length - 1];
+            }
+        }
+
+        private static void setSpanFromMark(Spannable text, Object mark, Object... spans) {
+            int where = text.getSpanStart(mark);
+            text.removeSpan(mark);
+            int len = text.length();
+            if (where != len) {
+                for (Object span : spans) {
+                    text.setSpan(span, where, len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+            }
+        }
+
+        private static void start(Editable text, Object mark) {
+            int len = text.length();
+            text.setSpan(mark, len, len, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        }
+
+        private static void end(Editable text, Class kind, Object repl) {
+            Object obj = getLast(text, kind);
+            if (obj != null) {
+                setSpanFromMark(text, obj, repl);
+            }
+        }
+
+        private void startCssStyle(Editable text, Attributes attributes) {
+            String style = attributes.getValue("", "style");
+            if (style != null) {
+                Matcher m = getForegroundColorPattern().matcher(style);
+                if (m.find()) {
+                    int c = Color.parseColor(m.group(1));
+                    if (c != -1) {
+                        start(text, new Foreground(c | 0xFF000000));
+                    }
+                }
+
+                m = getBackgroundColorPattern().matcher(style);
+                if (m.find()) {
+                    int c = Color.parseColor(m.group(1));
+                    if (c != -1) {
+                        start(text, new Background(c | 0xFF000000));
+                    }
+                }
+
+                m = getTextDecorationPattern().matcher(style);
+                if (m.find()) {
+                    String textDecoration = m.group(1);
+                    if (textDecoration.equalsIgnoreCase("line-through")) {
+                        start(text, new Strikethrough());
+                    }
+                }
+            }
+        }
+
+        private static void endCssStyle(Editable text) {
+            Strikethrough s = getLast(text, Strikethrough.class);
+            if (s != null) {
+                setSpanFromMark(text, s, new StrikethroughSpan());
+            }
+
+            Background b = getLast(text, Background.class);
+            if (b != null) {
+                setSpanFromMark(text, b, new BackgroundColorSpan(b.mBackgroundColor));
+            }
+
+            Foreground f = getLast(text, Foreground.class);
+            if (f != null) {
+                setSpanFromMark(text, f, new ForegroundColorSpan(f.mForegroundColor));
+            }
+        }
+
+        private static void startImg(Editable text, Attributes attributes,
+                android.text.Html.ImageGetter img) {
+            String src = attributes.getValue("", "src");
+            Drawable d = img.getDrawable(src);
+
+            int len = text.length();
+            text.append("\uFFFC");
+
+            text.setSpan(new ImageSpan(d, src), len, text.length(),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+
+        private void startFont(Editable text, Attributes attributes) {
+            String color = attributes.getValue("", "color");
+            String face = attributes.getValue("", "face");
+
+            if (!TextUtils.isEmpty(color)) {
+                int c = Color.parseColor(color);
+                if (c != -1) {
+                    start(text, new Foreground(c | 0xFF000000));
+                }
+            }
+
+            if (!TextUtils.isEmpty(face)) {
+                start(text, new Font(face));
+            }
+        }
+
+        private static void endFont(Editable text) {
+            Font font = getLast(text, Font.class);
+            if (font != null) {
+                setSpanFromMark(text, font, new TypefaceSpan(font.mFace));
+            }
+
+            Foreground foreground = getLast(text, Foreground.class);
+            if (foreground != null) {
+                setSpanFromMark(text, foreground,
+                        new ForegroundColorSpan(foreground.mForegroundColor));
+            }
+        }
+
+        private static void startA(Editable text, Attributes attributes) {
+            String href = attributes.getValue("", "href");
+            start(text, new Href(href));
+        }
+
+        private static void endA(Editable text) {
+            Href h = getLast(text, Href.class);
+            if (h != null) {
+                if (h.mHref != null) {
+                    setSpanFromMark(text, h, new URLSpan((h.mHref)));
+                }
+            }
+        }
+
+        public void setDocumentLocator(Locator locator) {
+        }
+
+        public void startDocument() throws SAXException {
+        }
+
+        public void endDocument() throws SAXException {
+        }
+
+        public void startPrefixMapping(String prefix, String uri) throws SAXException {
+        }
+
+        public void endPrefixMapping(String prefix) throws SAXException {
+        }
+
+        public void startElement(String uri, String localName, String qName, Attributes attributes)
+                throws SAXException {
+            handleStartTag(localName, attributes);
+        }
+
+        public void endElement(String uri, String localName, String qName) throws SAXException {
+            handleEndTag(localName);
+        }
+
+        public void characters(char ch[], int start, int length) throws SAXException {
+            StringBuilder sb = new StringBuilder();
+
+        /*
+         * Ignore whitespace that immediately follows other whitespace;
+         * newlines count as spaces.
+         */
+
+            for (int i = 0; i < length; i++) {
+                char c = ch[i + start];
+
+                if (c == ' ' || c == '\n') {
+                    char pred;
+                    int len = sb.length();
+
+                    if (len == 0) {
+                        len = mSpannableStringBuilder.length();
+
+                        if (len == 0) {
+                            pred = '\n';
+                        } else {
+                            pred = mSpannableStringBuilder.charAt(len - 1);
+                        }
+                    } else {
+                        pred = sb.charAt(len - 1);
+                    }
+
+                    if (pred != ' ' && pred != '\n') {
+                        sb.append(' ');
+                    }
+                } else {
+                    sb.append(c);
+                }
+            }
+
+            mSpannableStringBuilder.append(sb);
+        }
+
+        public void ignorableWhitespace(char ch[], int start, int length) throws SAXException {
+        }
+
+        public void processingInstruction(String target, String data) throws SAXException {
+        }
+
+        public void skippedEntity(String name) throws SAXException {
+        }
+
+        private static int parseIntAttribute(Attributes attributes, String name, int defaultValue) {
+            String value = attributes.getValue("", name);
+            if (value != null) {
+                try {
+                    return Integer.parseInt(value);
+                } catch (NumberFormatException e) {
+                }
+            }
+            return defaultValue;
+        }
+
+        private static class Bold { }
+        private static class Italic { }
+        private static class Underline { }
+        private static class Strikethrough { }
+        private static class Big { }
+        private static class Small { }
+        private static class Monospace { }
+        private static class Blockquote { }
+        private static class Super { }
+        private static class Sub { }
+        private static class Code { }
+
+        private static class List {
+            public final boolean mOrdered;
+            public int mPosition = 0;
+
+            public List() {
+                mOrdered = false;
+            }
+            public List(int position) {
+                mOrdered = true;
+                mPosition = position;
+            }
+        }
+
+        private static class ListItem {
+            public final boolean mOrdered;
+            public final int mPosition;
+
+            public ListItem(List list, Attributes attrs) {
+                mOrdered = list != null ? list.mOrdered : false;
+                int position = list != null ? list.mPosition : -1;
+                if (mOrdered) {
+                    position = parseIntAttribute(attrs, "value", position);
+                }
+                mPosition = position;
+                list.mPosition = position + 1;
+            }
+        }
+
+        private static class Font {
+            public String mFace;
+
+            public Font(String face) {
+                mFace = face;
+            }
+        }
+
+        private static class Href {
+            public String mHref;
+
+            public Href(String href) {
+                mHref = href;
+            }
+        }
+
+        private static class Foreground {
+            private int mForegroundColor;
+
+            public Foreground(int foregroundColor) {
+                mForegroundColor = foregroundColor;
+            }
+        }
+
+        private static class Background {
+            private int mBackgroundColor;
+
+            public Background(int backgroundColor) {
+                mBackgroundColor = backgroundColor;
+            }
+        }
+
+        private static class Heading {
+            private int mLevel;
+
+            public Heading(int level) {
+                mLevel = level;
+            }
+        }
+
+        private static class Newline {
+            private int mNumNewlines;
+
+            public Newline(int numNewlines) {
+                mNumNewlines = numNewlines;
+            }
+        }
+
+        private static class Alignment {
+            private Layout.Alignment mAlignment;
+
+            public Alignment(Layout.Alignment alignment) {
+                mAlignment = alignment;
+            }
         }
     }
 }
