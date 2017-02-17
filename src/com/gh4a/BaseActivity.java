@@ -621,7 +621,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
             mLeftDrawer.inflateMenu(drawerMenuResId);
             mLeftDrawer.setNavigationItemSelectedListener(this);
 
-            mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolBar, 0, 0);
+            mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolBar, 0, 0) {
+                @Override
+                public void onDrawerSlide(View drawerView, float slideOffset) {
+                    super.onDrawerSlide(drawerView, 0f);
+                }
+            };
             mDrawerLayout.addDrawerListener(this);
 
             mLeftDrawerTitle = getLeftDrawerTitle(mLeftDrawer);
