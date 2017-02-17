@@ -87,6 +87,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
     private View mListHeaderView;
     private PullRequest mPullRequest;
+    private Issue mIssue;
     private String mRepoOwner;
     private String mRepoName;
     private boolean mIsCollaborator;
@@ -127,6 +128,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
         Bundle args = new Bundle();
         args.putSerializable("pr", pr);
+        args.putSerializable("issue", issue);
         f.setArguments(args);
 
         return f;
@@ -136,6 +138,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPullRequest = (PullRequest) getArguments().getSerializable("pr");
+        mIssue = (Issue) getArguments().getSerializable("issue");
 
         Repository repo = mPullRequest.getBase().getRepo();
         mRepoOwner = repo.getOwner().getLogin();
@@ -218,6 +221,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         mCommentFragment = (CommentBoxFragment) fm.findFragmentById(R.id.comment_box);
 
         fillData();
+        fillLabels(mIssue.getLabels());
         updateCommentLockState();
 
         super.onActivityCreated(savedInstanceState);
