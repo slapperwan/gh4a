@@ -2,6 +2,7 @@
 <android.support.v4.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -29,7 +30,8 @@
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:layout_marginRight="16dp"
-                        android:background="?attr/selectableItemBackgroundBorderless" />
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        tools:src="@drawable/default_avatar" />
 
                     <com.gh4a.widget.StyleableTextView
                         android:id="@+id/tv_author"
@@ -38,7 +40,8 @@
                         android:layout_toRightOf="@id/iv_gravatar"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="?android:attr/textColorPrimary"
-                        android:textSize="16sp" />
+                        android:textSize="16sp"
+                        tools:text="Username" />
 
                     <com.gh4a.widget.StyleableTextView
                         android:id="@+id/tv_timestamp"
@@ -47,7 +50,8 @@
                         android:layout_below="@id/tv_author"
                         android:layout_marginTop="2dp"
                         android:layout_toRightOf="@id/iv_gravatar"
-                        android:textAppearance="@style/TextAppearance.VerySmall" />
+                        android:textAppearance="@style/TextAppearance.VerySmall"
+                        tools:text="yesterday" />
 
                 </RelativeLayout>
 
@@ -62,7 +66,8 @@
                         android:id="@+id/iv_commit_gravatar"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:layout_marginRight="8dp" />
+                        android:layout_marginRight="8dp"
+                        tools:src="@drawable/default_avatar" />
 
                     <com.gh4a.widget.StyleableTextView
                         android:id="@+id/tv_commit_extra"
@@ -70,7 +75,8 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textColor="?android:attr/textColorPrimary" />
+                        android:textColor="?android:attr/textColorPrimary"
+                        tools:text="Committed by username2 yesterday" />
 
                 </LinearLayout>
 
@@ -80,7 +86,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:textAppearance="@style/TextAppearance.ItemTitle"
-                    android:textIsSelectable="true" />
+                    android:textIsSelectable="true"
+                    tools:text="Commit title" />
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_message"
@@ -88,7 +95,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textIsSelectable="true" />
+                    android:textIsSelectable="true"
+                    tools:text="Commit message" />
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_desc"
@@ -96,7 +104,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    app:font="italic" />
+                    app:font="italic"
+                    tools:text="10 files added with 42 additions and 32 deletions." />
 
             </LinearLayout>
 

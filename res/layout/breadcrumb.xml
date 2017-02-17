@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="center_vertical"
     android:background="?attr/selectableItemBackgroundBorderless"
     android:orientation="horizontal"
-    android:padding="@dimen/breadcrumb_padding_side">
+    android:padding="@dimen/breadcrumb_padding_side"
+    tools:background="?colorBreadcrumbBackground">
 
     <com.gh4a.widget.StyleableTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-        android:textColor="@color/crumb_text" />
+        android:textColor="@color/crumb_text"
+        tools:text="directory" />
 
     <ImageView
         android:layout_width="@dimen/breadcrumb_arrow_size"
@@ -22,6 +25,7 @@
         android:layout_marginLeft="@dimen/breadcrumb_arrow_margin"
         android:scaleType="fitXY"
         android:src="@drawable/ic_right_arrow"
-        android:visibility="gone" />
+        android:visibility="gone"
+        tools:visibility="visible" />
 
 </LinearLayout>
