@@ -15,20 +15,10 @@
  */
 package com.gh4a.activities;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
-
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.service.IssueService;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
@@ -38,7 +28,9 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -70,6 +62,17 @@ import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
+
+import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.service.IssueService;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 public class IssueActivity extends BaseActivity implements
         View.OnClickListener, IssueEventAdapter.OnEditComment,
@@ -268,6 +271,10 @@ public class IssueActivity extends BaseActivity implements
         if (!StringUtils.isBlank(body)) {
             body = HtmlUtils.format(body).toString();
             mImageGetter.bind(descriptionView, body, mIssue.getNumber());
+        } else {
+            SpannableString noDescriptionString = new SpannableString(getString(R.string.issue_no_description));
+            noDescriptionString.setSpan(new StyleSpan(Typeface.ITALIC), 0, noDescriptionString.length(), 0);
+            descriptionView.setText(noDescriptionString);
         }
         descriptionView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
 
